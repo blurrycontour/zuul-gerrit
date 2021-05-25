@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22216b2e_b9127e37",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 29739
+      },
+      "writtenOn": "2021-05-25T16:01:28Z",
+      "side": 1,
+      "message": "Artifactory",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 11
+      },
+      "revId": "fbf63a5c756bcb6f1357ecaf43a9e41e4bff0209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20012477_ee379a6e",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 29739
+      },
+      "writtenOn": "2021-05-25T16:01:28Z",
+      "side": 1,
+      "message": "truth",
+      "range": {
+        "startLine": 60,
+        "startChar": 27,
+        "endLine": 60,
+        "endChar": 34
+      },
+      "revId": "fbf63a5c756bcb6f1357ecaf43a9e41e4bff0209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "503358c4_8209c29a",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 29739
+      },
+      "writtenOn": "2021-05-25T16:01:28Z",
+      "side": 1,
+      "message": "nit: could be omitted",
+      "range": {
+        "startLine": 115,
+        "startChar": 34,
+        "endLine": 115,
+        "endChar": 66
+      },
+      "revId": "fbf63a5c756bcb6f1357ecaf43a9e41e4bff0209",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
