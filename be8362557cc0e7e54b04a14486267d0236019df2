@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1beb5073_7d10b4e1",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-25T22:52:21Z",
+      "side": 1,
+      "message": "That\u0027s a good point, and I honestly don\u0027t know which approach is best.  Maybe sorting?",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b6603a3_8d8307a2",
         "filename": "releasenotes/notes/semaphore-resources-295dceaf7ddbab0d.yaml",
         "patchSetId": 2
@@ -42,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "47deca3f_5a6adc77",
+        "filename": "releasenotes/notes/semaphore-resources-295dceaf7ddbab0d.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-25T22:52:21Z",
+      "side": 1,
+      "message": "Yes.",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "864e4073_575b7dab",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 2
@@ -59,6 +93,23 @@
     },
     {
       "key": {
+        "uuid": "fbe6f71a_ccdf42cb",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 7866,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-25T22:52:21Z",
+      "side": 1,
+      "message": "++",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "abad269e_b3d5ccc2",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -73,6 +124,23 @@
       "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68666672_90670ba4",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1715,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-25T22:52:21Z",
+      "side": 1,
+      "message": "Good point.  I\u0027m also just taking a guess as to what would be the most desirable behavior here.  We should document it.",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
