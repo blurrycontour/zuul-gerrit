@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c0798203_bfddb8cc",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4516e1d_0dc23f68",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "082baf2d_625798b6",
         "filename": "tests/unit/test_web.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "52837d60_f3be08da",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "082baf2d_625798b6",
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "758b5861_cf3d4743",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "I\u0027ve removed the comment and the additional nodeset parameter",
+      "parentUuid": "b2fc1b8d_2e77b0a0",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f5f1ab7_7948fe07",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 1,
       "message": "Honestly, I\u0027d rather go the other way and use the explicit hierarchy.  If zuul.model is too verbose, then let\u0027s just:\n  from zuul import model\nBut for now, let\u0027s just try to keep this change small and not move the scheme into this; there are too many lines changed.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f9cfa4f_26c7a93e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "I\u0027ve reverted all the import changes in this file as they aren\u0027t necessary anymore",
+      "parentUuid": "3f5f1ab7_7948fe07",
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "38d6fc6d_1a4ddcb4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 835,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1364ef6a_db622a75",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10e5b99a_1ce022b0",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -98,6 +188,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 1,
       "message": "Undo.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "477aa1ef_6cdc32e0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1851,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10e5b99a_1ce022b0",
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "5fa7af10_3907f16e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1891,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ffd20e94_9289111b",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f98a1322_769fd106",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -132,6 +258,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 1,
       "message": "Undo.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10f90c78_0e973dc5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1901,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f98a1322_769fd106",
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "425af2ec_6f392590",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3171,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56a8455f_b848b19f",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c230a9a8_bcf216ab",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -169,6 +331,24 @@
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "23b732e9_96a12db6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3176,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "I didn\u0027t find a better place in the ExecutorServer, but I\u0027m open for suggestions. Technically it\u0027s possible to do that in the AnsibleJob, but to me that feels a little wrong. I think that the executor should be responsible for locking the nodes, not the job class.",
+      "parentUuid": "c230a9a8_bcf216ab",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     },
     {
       "key": {
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "2cd01a83_4077ca7c",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Currently we don\u0027t need those attributes on the executor to lock the nodes. But as those are mandatory parameters to instantiate a NodeRequest object, I think it should be noted that we don\u0027t have the necessary information here to provide them.",
+      "parentUuid": "d15881fc_29833b27",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d979b613_c028375e",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "26a45ebf_cd16885f",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2299,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "IIRC I removed this line so I can look up the node request ID from the build_set in the executor client and provide it to the job. If there is another way to access the NodeRequest in the executor client, this would also be fine.",
+      "parentUuid": "d979b613_c028375e",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "59861bc8_df120175",
         "filename": "zuul/nodepool.py",
         "patchSetId": 8
@@ -217,6 +433,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 1,
       "message": "Agreed; I don\u0027t see a way for this to happen.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "22c9181d_57db4899",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 1,
+      "message": "Ok, I\u0027ve removed the code",
+      "parentUuid": "59861bc8_df120175",
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false

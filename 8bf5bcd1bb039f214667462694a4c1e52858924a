@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "317d65ed_ff30fa7a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1440,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 0,
+      "message": "IIRC this wasn\u0027t necessary in the old version of this patch, but I can\u0027t remember why. With the new version it\u0027s still necessary, so it should be fine.",
+      "parentUuid": "5df66639_f58778ea",
+      "revId": "8bf5bcd1bb039f214667462694a4c1e52858924a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7137a5ef_e8640e87",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 0,
       "message": "Why remove this?",
+      "revId": "8bf5bcd1bb039f214667462694a4c1e52858924a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7c42b9a7_594e2b6e",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2951,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-26T14:02:34Z",
+      "side": 0,
+      "message": "This change is obsolete now, but was necessary in the old version of this change. But I can\u0027t remember why.",
+      "parentUuid": "7137a5ef_e8640e87",
       "revId": "8bf5bcd1bb039f214667462694a4c1e52858924a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
