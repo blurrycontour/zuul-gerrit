@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "11297ca8_1dc66d3f",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-26T20:32:41Z",
+      "side": 1,
+      "message": "I\u0027m going to go with sorting and not mention it in the docs since it shouldn\u0027t matter to users.",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b6603a3_8d8307a2",
         "filename": "releasenotes/notes/semaphore-resources-295dceaf7ddbab0d.yaml",
         "patchSetId": 2
@@ -104,6 +121,23 @@
       "writtenOn": "2021-05-25T22:52:21Z",
       "side": 1,
       "message": "++",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfdb4345_b8f8a205",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 7866,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-26T20:32:41Z",
+      "side": 1,
+      "message": "Actually, we can\u0027t test that right now because starting jobs is single-threaded.  We may be able to test it with multiple schedulers, but I\u0027m not sure how to write that test yet.  I\u0027ll leave a TODO.",
       "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
