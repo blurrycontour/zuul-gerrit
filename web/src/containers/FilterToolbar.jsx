@@ -173,12 +173,14 @@ function FilterToolbar(props) {
         </InputGroup>
       )
     } else if (category.type === 'select') {
+      /* The key property below ensures the FilterSelect is updated if the category is set dynamically.*/
       return (
         <InputGroup>
           <FilterSelect
             onFilterChange={onFilterChange}
             filters={filters}
             category={category}
+            key={JSON.stringify(category.options)}
           />
         </InputGroup>
       )
