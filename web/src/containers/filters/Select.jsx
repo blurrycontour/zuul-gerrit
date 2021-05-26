@@ -30,6 +30,7 @@ function FilterSelect(props) {
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState(filters[category.key])
   const [options, setOptions] = useState(category.options)
+  const [typeAheadInput, setTypeAheadInput] = useState('')
 
   function onToggle(isOpen) {
     setSelected(filters[category.key])
@@ -51,7 +52,19 @@ function FilterSelect(props) {
     onFilterChange(newFilters)
   }
 
+  function onTypeAheadInputChanged(txt) {
+    setTypeAheadInput(txt)
+  }
+
   function onClear() {
+    if (typeAheadInput.length > 0) {
+      setTypeAheadInput('')
+    } else {
+      onClearAll()
+    }
+  }
+
+  function onClearAll() {
     const { onFilterChange, filters, category } = props
     setSelected([])
     setIsOpen(false)
@@ -88,11 +101,16 @@ function FilterSelect(props) {
   return (
     <Select
       chipGroupProps={{ numChips: 1, expandedText: 'Hide' }}
-      variant={SelectVariant.typeaheadMulti}
+      variant={
+        // TODO Performance issue with too many options - Opened https://github.com/patternfly/patternfly-react/issues/7483
+        // For now, drop typeahead to avoid slowdowns.
+        options.length > 1000 ? SelectVariant.single : SelectVariant.typeaheadMulti
+      }
       typeAheadAriaLabel={category.title}
       onToggle={onToggle}
       onClear={onClear}
       onSelect={onSelect}
+      onTypeaheadInputChanged={onTypeAheadInputChanged}
       selections={filters[category.key]}
       isOpen={isOpen}
       isCreatable="true"

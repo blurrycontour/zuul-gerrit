@@ -174,6 +174,9 @@ function fetchAutoholds(apiPrefix) {
 function fetchAutohold(apiPrefix, requestId) {
   return Axios.get(apiUrl + apiPrefix + 'autohold/' + requestId)
 }
+function fetchPipelines(apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'pipelines')
+}
 
 // token-protected API
 function fetchUserAuthorizations(apiPrefix, token) {
@@ -319,6 +322,7 @@ export {
   fetchUserAuthorizations,
   fetchAutoholds,
   fetchAutohold,
+  fetchPipelines,
   autohold,
   autohold_delete,
   dequeue,
