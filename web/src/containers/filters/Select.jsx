@@ -30,6 +30,7 @@ function FilterSelect(props) {
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState(filters[category.key])
   const [options, setOptions] = useState(category.options)
+  const [typeAheadInput, setTypeAheadInput] = useState('')
 
   function onToggle(isOpen) {
     setSelected(filters[category.key])
@@ -51,7 +52,19 @@ function FilterSelect(props) {
     onFilterChange(newFilters)
   }
 
+  function onTypeAheadInputChanged(txt) {
+    setTypeAheadInput(txt)
+  }
+
   function onClear() {
+    if (typeAheadInput.length > 0) {
+      setTypeAheadInput('')
+    } else {
+      onClearAll()
+    }
+  }
+
+  function onClearAll() {
     const { onFilterChange, filters, category } = props
     setSelected([])
     setIsOpen(false)
@@ -93,6 +106,7 @@ function FilterSelect(props) {
       onToggle={onToggle}
       onClear={onClear}
       onSelect={onSelect}
+      onTypeaheadInputChanged={onTypeAheadInputChanged}
       selections={filters[category.key]}
       isOpen={isOpen}
       isCreatable="true"

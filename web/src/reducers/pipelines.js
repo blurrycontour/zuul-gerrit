@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2021 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -13,30 +13,30 @@
 // under the License.
 
 import {
-  JOBS_FETCH_FAIL,
-  JOBS_FETCH_REQUEST,
-  JOBS_FETCH_SUCCESS
-} from '../actions/jobs'
+  PIPELINES_FETCH_FAIL,
+  PIPELINES_FETCH_REQUEST,
+  PIPELINES_FETCH_SUCCESS
+} from '../actions/pipelines'
 
 export default (state = {
   isFetching: false,
-  jobs: {},
+  pipelines: {},
 }, action) => {
   switch (action.type) {
-    case JOBS_FETCH_REQUEST:
+    case PIPELINES_FETCH_REQUEST:
       return {
         isFetching: true,
-        jobs: state.jobs,
+        pipelines: state.pipelines,
       }
-    case JOBS_FETCH_SUCCESS:
+    case PIPELINES_FETCH_SUCCESS:
       return {
         isFetching: false,
-        jobs: { ...state.jobs, [action.tenant]: action.jobs },
+        pipelines: { ...state.pipelines, [action.tenant]: action.pipelines },
       }
-    case JOBS_FETCH_FAIL:
+    case PIPELINES_FETCH_FAIL:
       return {
         isFetching: false,
-        jobs: state.jobs,
+        pipelines: state.pipelines,
       }
     default:
       return state
