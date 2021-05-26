@@ -26,6 +26,8 @@ import {
 } from '../containers/FilterToolbar'
 import BuildsetTable from '../containers/build/BuildsetTable'
 
+import * as API from '../api'
+
 class BuildsetsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
@@ -85,6 +87,30 @@ class BuildsetsPage extends React.Component {
       fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
     }
+
+    // Fetch selections once, at load time.
+    // Fetch projects list
+    API.fetchProjects(props.tenant.apiPrefix).then((response) => {
+      const index = this.filterCategories.findIndex(x => x.key === 'project')
+      this.filterCategories[index] = {
+        key: 'project',
+        title: 'Project',
+        placeholder: 'Any project',
+        type: 'select',
+        options: response.data.map(x => x.name)
+      }
+    })
+    // Fetch pipelines list
+    API.fetchPipelines(props.tenant.apiPrefix).then((response) => {
+      const index = this.filterCategories.findIndex(x => x.key === 'pipeline')
+      this.filterCategories[index] = {
+        key: 'pipeline',
+        title: 'Pipeline',
+        placeholder: 'Any pipeline',
+        type: 'select',
+        options: response.data.map(x => x.name)
+      }
+    })
   }
 
   updateData = (filters) => {

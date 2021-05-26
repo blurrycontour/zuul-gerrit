@@ -27,6 +27,8 @@ import {
 } from '../containers/FilterToolbar'
 import BuildTable from '../containers/build/BuildTable'
 
+import * as API from '../api'
+
 class BuildsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
@@ -120,6 +122,41 @@ class BuildsPage extends React.Component {
       fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
     }
+
+    // Fetch selections once, at load time.
+    // Fetch projects list
+    API.fetchProjects(props.tenant.apiPrefix).then((response) => {
+      const index = this.filterCategories.findIndex(x => x.key === 'project')
+      this.filterCategories[index] = {
+        key: 'project',
+        title: 'Project',
+        placeholder: 'Any project',
+        type: 'select',
+        options: response.data.map(x => x.name)
+      }
+    })
+    // Fetch jobs list
+    API.fetchJobs(props.tenant.apiPrefix).then((response) => {
+      const index = this.filterCategories.findIndex(x => x.key === 'job_name')
+      this.filterCategories[index] = {
+        key: 'job_name',
+        title: 'Job',
+        placeholder: 'Any job',
+        type: 'select',
+        options: response.data.map(x => x.name)
+      }
+    })
+    // Fetch pipelines list
+    API.fetchPipelines(props.tenant.apiPrefix).then((response) => {
+      const index = this.filterCategories.findIndex(x => x.key === 'pipeline')
+      this.filterCategories[index] = {
+        key: 'pipeline',
+        title: 'Pipeline',
+        placeholder: 'Any pipeline',
+        type: 'select',
+        options: response.data.map(x => x.name)
+      }
+    })
   }
 
   updateData = (filters) => {
