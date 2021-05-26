@@ -26,16 +26,42 @@ import {
 } from '../containers/FilterToolbar'
 import BuildsetTable from '../containers/build/BuildsetTable'
 
+import { fetchProjectsIfNeeded } from '../actions/projects'
+import { fetchPipelinesIfNeeded } from '../actions/pipelines'
+import { updateSelectProjects, updateSelectPipelines } from '../Misc'
+
 class BuildsetsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
+    projects: PropTypes.object,
+    pipelines: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
+    dispatch: PropTypes.func,
   }
 
   constructor(props) {
     super()
     this.filterCategories = [
+      // set 'result' as the default filter as a little trick to 
+      // ensure that selects that are loaded dynamically have time
+      // to update under the hood.
+      {
+        key: 'result',
+        title: 'Result',
+        placeholder: 'Filter by Result...',
+        type: 'select',
+        // are there more? these were found by looking for "setReportedResult" occurences in the python code.
+        options: [
+          'SUCCESS',
+          'FAILURE',
+          'CONFIG_ERROR',
+          'DEQUEUED',
+          'ERROR',
+          'MERGER_FAILURE',
+          'NO_JOBS'
+        ]
+      },
       {
         key: 'project',
         title: 'Project',
@@ -61,18 +87,6 @@ class BuildsetsPage extends React.Component {
         type: 'search',
       },
       {
-        key: 'result',
-        title: 'Result',
-        placeholder: 'Filter by Result...',
-        type: 'select',
-        // are there more?
-        options: [
-          'SUCCESS',
-          'FAILURE',
-          'MERGER_FAILURE',
-        ]
-      },
-      {
         key: 'uuid',
         title: 'Buildset',
         placeholder: 'Filter by Buildset UUID...',
@@ -88,6 +102,10 @@ class BuildsetsPage extends React.Component {
   }
 
   updateData = (filters) => {
+    // Fetch data for selects
+    this.props.dispatch(fetchProjectsIfNeeded(this.props.tenant))
+    this.props.dispatch(fetchPipelinesIfNeeded(this.props.tenant))
+
     // When building the filter query for the API we can't rely on the location
     // search parameters. Although, we've updated them in the updateUrl() method
     // they always have the same value in here (the values when the page was
@@ -106,9 +124,19 @@ class BuildsetsPage extends React.Component {
     )
   }
 
+  updateAllSelects = (filterCategories) => {
+    return updateSelectProjects(this.props)(
+      updateSelectPipelines(this.props)(
+        filterCategories
+      )
+    )
+  }
+
   componentDidMount() {
     document.title = 'Zuul Buildsets'
-    if (this.props.tenant.name) {
+    if (this.props.tenant.name ||
+      this.props.projects.projects[this.props.tenant.name] ||
+      this.props.pipelines.pipelines[this.props.tenant.name]) {
       this.updateData(this.state.filters)
     }
   }
@@ -146,10 +174,12 @@ class BuildsetsPage extends React.Component {
   render() {
     const { history } = this.props
     const { buildsets, fetching, filters } = this.state
+
+    const filterCategories = this.updateAllSelects(this.filterCategories)
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
-          filterCategories={this.filterCategories}
+          filterCategories={filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
         />
@@ -164,4 +194,8 @@ class BuildsetsPage extends React.Component {
   }
 }
 
-export default connect((state) => ({ tenant: state.tenant }))(BuildsetsPage)
+export default connect((state) => ({
+  tenant: state.tenant,
+  projects: state.projects,
+  pipelines: state.pipelines,
+}))(BuildsetsPage)

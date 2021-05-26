@@ -27,17 +27,56 @@ import {
 } from '../containers/FilterToolbar'
 import BuildTable from '../containers/build/BuildTable'
 
+import { fetchProjectsIfNeeded } from '../actions/projects'
+import { fetchJobsIfNeeded } from '../actions/jobs'
+import { fetchPipelinesIfNeeded } from '../actions/pipelines'
+import { updateSelectProjects, updateSelectJobs, updateSelectPipelines } from '../Misc'
+
 class BuildsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
+    projects: PropTypes.object,
+    jobs: PropTypes.object,
+    pipelines: PropTypes.object,
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
+    dispatch: PropTypes.func,
   }
 
   constructor(props) {
     super()
     this.filterCategories = [
+      // set 'result' as the default filter as a little trick to 
+      // ensure that selects that are loaded dynamically have time
+      // to update under the hood.
+      {
+        key: 'result',
+        title: 'Result',
+        placeholder: 'Any result',
+        type: 'select',
+        // TODO there should be a single source of truth for this
+        options: [
+          'SUCCESS',
+          'FAILURE',
+          'RETRY_LIMIT',
+          'POST_FAILURE',
+          'SKIPPED',
+          'NODE_FAILURE',
+          'MERGER_FAILURE',
+          'CONFIG_ERROR',
+          'TIMED_OUT',
+          'CANCELED',
+          'ERROR',
+          'RETRY',
+          'DISK_FULL',
+          'NO_JOBS',
+          'DISCONNECT',
+          'ABORTED',
+          'LOST',
+          'EXCEPTION',
+          'NO_HANDLE'],
+      },
       {
         key: 'job_name',
         title: 'Job',
@@ -67,33 +106,6 @@ class BuildsPage extends React.Component {
         title: 'Change',
         placeholder: 'Filter by Change...',
         type: 'search',
-      },
-      {
-        key: 'result',
-        title: 'Result',
-        placeholder: 'Any result',
-        type: 'select',
-        // TODO there should be a single source of truth for this
-        options: [
-          'SUCCESS',
-          'FAILURE',
-          'RETRY_LIMIT',
-          'POST_FAILURE',
-          'SKIPPED',
-          'NODE_FAILURE',
-          'MERGER_FAILURE',
-          'CONFIG_ERROR',
-          'TIMED_OUT',
-          'CANCELED',
-          'ERROR',
-          'RETRY',
-          'DISK_FULL',
-          'NO_JOBS',
-          'DISCONNECT',
-          'ABORTED',
-          'LOST',
-          'EXCEPTION',
-          'NO_HANDLE'],
       },
       {
         key: 'uuid',
@@ -133,6 +145,11 @@ class BuildsPage extends React.Component {
   }
 
   updateData = (filters) => {
+    // Fetch data for selects
+    this.props.dispatch(fetchProjectsIfNeeded(this.props.tenant))
+    this.props.dispatch(fetchJobsIfNeeded(this.props.tenant))
+    this.props.dispatch(fetchPipelinesIfNeeded(this.props.tenant))
+
     // When building the filter query for the API we can't rely on the location
     // search parameters. Although, we've updated them in theu URL directly
     // they always have the same value in here (the values when the page was
@@ -152,9 +169,22 @@ class BuildsPage extends React.Component {
     })
   }
 
+  updateAllSelects = (filterCategories) => {
+    return updateSelectProjects(this.props)(
+      updateSelectJobs(this.props)(
+        updateSelectPipelines(this.props)(
+          filterCategories
+        )
+      )
+    )
+  }
+
   componentDidMount() {
     document.title = 'Zuul Builds'
-    if (this.props.tenant.name) {
+    if (this.props.tenant.name ||
+      this.props.projects.projects[this.props.tenant.name] ||
+      this.props.jobs.jobs[this.props.tenant.name] ||
+      this.props.pipelines.pipelines[this.props.tenant.name]) {
       this.updateData(this.state.filters)
     }
   }
@@ -185,7 +215,7 @@ class BuildsPage extends React.Component {
 
   handleClearFilters = () => {
     // Delete the values for each filter category
-    const filters = this.filterCategories.reduce((filterDict, category) => {
+    const filters = this.state.filterCategories.reduce((filterDict, category) => {
       filterDict[category.key] = []
       return filterDict
     }, {})
@@ -195,10 +225,12 @@ class BuildsPage extends React.Component {
   render() {
     const { history } = this.props
     const { builds, fetching, filters } = this.state
+
+    const filterCategories = this.updateAllSelects(this.filterCategories)
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
-          filterCategories={this.filterCategories}
+          filterCategories={filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
         />
@@ -216,4 +248,7 @@ class BuildsPage extends React.Component {
 export default connect((state) => ({
   tenant: state.tenant,
   timezone: state.timezone,
+  projects: state.projects,
+  jobs: state.jobs,
+  pipelines: state.pipelines,
 }))(BuildsPage)
