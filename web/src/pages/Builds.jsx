@@ -27,6 +27,8 @@ import {
 } from '../containers/FilterToolbar'
 import BuildTable from '../containers/build/BuildTable'
 
+import * as API from '../api'
+
 class BuildsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
@@ -87,10 +89,57 @@ class BuildsPage extends React.Component {
       builds: [],
       fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
+      projectsFetched: false,
+      pipelinesFetched: false,
+      jobsFetched: false,
     }
   }
 
   updateData = (filters) => {
+
+    // Fetch selections once, at load time.
+    // Fetch projects list
+    if (!this.state.projectsFetched) {
+      API.fetchProjects(this.props.tenant.apiPrefix).then((response) => {
+        const index = this.filterCategories.findIndex(x => x.key === 'project')
+        this.filterCategories[index] = {
+          key: 'project',
+          title: 'Project',
+          placeholder: 'Any project',
+          type: 'select',
+          options: response.data.map(x => x.name)
+        }
+      })
+      this.setState({ projectsFetched: true })
+    }
+    // Fetch jobs list
+    if (!this.state.jobsFetched) {
+      API.fetchJobs(this.props.tenant.apiPrefix).then((response) => {
+        const index = this.filterCategories.findIndex(x => x.key === 'job_name')
+        this.filterCategories[index] = {
+          key: 'job_name',
+          title: 'Job',
+          placeholder: 'Any job',
+          type: 'select',
+          options: response.data.map(x => x.name)
+        }
+      })
+      this.setState({ jobsFetched: true })
+    }
+    // Fetch pipelines list
+    if (!this.state.pipelinesFetched) {
+      API.fetchPipelines(this.props.tenant.apiPrefix).then((response) => {
+        const index = this.filterCategories.findIndex(x => x.key === 'pipeline')
+        this.filterCategories[index] = {
+          key: 'pipeline',
+          title: 'Pipeline',
+          placeholder: 'Any pipeline',
+          type: 'select',
+          options: response.data.map(x => x.name)
+        }
+      })
+      this.setState({ pipelinesFetched: true })
+    }
     // When building the filter query for the API we can't rely on the location
     // search parameters. Although, we've updated them in theu URL directly
     // they always have the same value in here (the values when the page was

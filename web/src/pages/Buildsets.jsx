@@ -26,6 +26,8 @@ import {
 } from '../containers/FilterToolbar'
 import BuildsetTable from '../containers/build/BuildsetTable'
 
+import * as API from '../api'
+
 class BuildsetsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
@@ -79,10 +81,42 @@ class BuildsetsPage extends React.Component {
       buildsets: [],
       fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
+      projectsFetched: false,
+      pipelinesFetched: false,
     }
   }
 
   updateData = (filters) => {
+
+    // Fetch selections once, at load time.
+    // Fetch projects list
+    if (!this.state.projectsFetched) {
+      API.fetchProjects(this.props.tenant.apiPrefix).then((response) => {
+        const index = this.filterCategories.findIndex(x => x.key === 'project')
+        this.filterCategories[index] = {
+          key: 'project',
+          title: 'Project',
+          placeholder: 'Any project',
+          type: 'select',
+          options: response.data.map(x => x.name)
+        }
+      })
+      this.setState({ projectsFetched: true })
+    }
+    // Fetch pipelines list
+    if (!this.state.pipelinesFetched) {
+      API.fetchPipelines(this.props.tenant.apiPrefix).then((response) => {
+        const index = this.filterCategories.findIndex(x => x.key === 'pipeline')
+        this.filterCategories[index] = {
+          key: 'pipeline',
+          title: 'Pipeline',
+          placeholder: 'Any pipeline',
+          type: 'select',
+          options: response.data.map(x => x.name)
+        }
+      })
+      this.setState({ pipelinesFetched: true })
+    }
     // When building the filter query for the API we can't rely on the location
     // search parameters. Although, we've updated them in the updateUrl() method
     // they always have the same value in here (the values when the page was
