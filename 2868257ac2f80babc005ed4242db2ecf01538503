@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28373742_50440742",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-26T00:04:23Z",
+      "side": 1,
+      "message": "There\u0027s already a zk.Node.resources dictionary, which the OpenStack driver fills in with a dictionary with keys \u0027cores\u0027, \u0027instances\u0027, \u0027ram\u0027.  I think we shound standardize all drivers to use that.\n\nI would suggest you either make this more vague (\"Add resource information to zk.Node in a standardized way in all drivers\") or update it to say \"Standardize all drivers to supply a resources dictionary to zk.Node with keys: cores, instances, ram (as the OpenStack driver currently does)\").\n\nThat will improve Zuul\u0027s resource reporting as a side effect since it already reads that.",
+      "revId": "2868257ac2f80babc005ed4242db2ecf01538503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17ad4733_3d5400fb",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-26T00:04:23Z",
+      "side": 1,
+      "message": "Well, that\u0027s about to stop being true for Azure at least, and should be easy to rectify for AWS.  That\u0027s why we standardizing on using the Node.resources dictionary.\n\nI might rephrase this to just say that since the AWS and Azure drivers currently (as of this writing) have incomplete quota support, the tenant limits will only be as good as the driver support for quota.",
+      "revId": "2868257ac2f80babc005ed4242db2ecf01538503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da3aeabd_9417ad17",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-26T00:04:23Z",
+      "side": 1,
+      "message": "Okay this sentence \"global limits as intended for tenant quotas\" seems to address my comment on line 96 of ps 2.",
+      "revId": "2868257ac2f80babc005ed4242db2ecf01538503",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
