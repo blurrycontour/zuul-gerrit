@@ -27,12 +27,19 @@ import {
 import { makeBuildQueryString } from '../containers/BuildQuery'
 import BuildsetTable from '../containers/build/BuildsetTable'
 
+import { fetchProjectsIfNeeded } from '../actions/projects'
+import { fetchPipelinesIfNeeded } from '../actions/pipelines'
+import { updateSelectProjects, updateSelectPipelines } from '../Misc'
+
 class BuildsetsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
+    projects: PropTypes.object,
+    pipelines: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
     preferences: PropTypes.object,
+    dispatch: PropTypes.func,
   }
 
   constructor(props) {
@@ -67,13 +74,16 @@ class BuildsetsPage extends React.Component {
         title: 'Result',
         placeholder: 'Filter by Result...',
         type: 'select',
-        // are there more?
+        // are there more? these were found by looking for "setReportedResult" occurences in the python code.
         options: [
           'SUCCESS',
           'FAILURE',
           'MERGE_CONFLICT',
           'MERGE_FAILURE',
+          'CONFIG_ERROR',
           'DEQUEUED',
+          'ERROR',
+          'NO_JOBS'
         ]
       },
       {
@@ -103,6 +113,10 @@ class BuildsetsPage extends React.Component {
   }
 
   updateData = (filters) => {
+    // Fetch data for selects
+    this.props.dispatch(fetchProjectsIfNeeded(this.props.tenant))
+    this.props.dispatch(fetchPipelinesIfNeeded(this.props.tenant))
+
     // When building the filter query for the API we can't rely on the location
     // search parameters. Although, we've updated them in the updateUrl() method
     // they always have the same value in here (the values when the page was
@@ -135,9 +149,19 @@ class BuildsetsPage extends React.Component {
     )
   }
 
+  updateAllSelects = (filterCategories) => {
+    return updateSelectProjects(this.props)(
+      updateSelectPipelines(this.props)(
+        filterCategories
+      )
+    )
+  }
+
   componentDidMount() {
     document.title = 'Zuul Buildsets'
-    if (this.props.tenant.name) {
+    if (this.props.tenant.name ||
+      this.props.projects.projects[this.props.tenant.name] ||
+      this.props.pipelines.pipelines[this.props.tenant.name]) {
       this.updateData(this.state.filters)
     }
   }
@@ -230,10 +254,12 @@ class BuildsetsPage extends React.Component {
     const { history } = this.props
     const { buildsets, fetching, filters, resultsPerPage, currentPage, itemCount } = this.state
 
+    const filterCategories = this.updateAllSelects(this.filterCategories)
+
     return (
       <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <FilterToolbar
-          filterCategories={this.filterCategories}
+          filterCategories={filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
           filterInputValidation={this.filterInputValidation}
@@ -272,4 +298,6 @@ class BuildsetsPage extends React.Component {
 export default connect((state) => ({
   tenant: state.tenant,
   preferences: state.preferences,
+  projects: state.projects,
+  pipelines: state.pipelines,
 }))(BuildsetsPage)

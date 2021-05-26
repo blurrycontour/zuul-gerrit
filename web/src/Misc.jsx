@@ -146,4 +146,65 @@ function setDarkMode(darkMode) {
   }
 }
 
-export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper, resolveDarkMode, setDarkMode }
+function updateFilterCategories(filterCategories, category, options, placeholderText) {
+  const index = filterCategories.findIndex(x => x.key === category)
+  const pht = placeholderText ? placeholderText : ('Any ' + category)
+  let newFilterCategories = [...filterCategories]
+  newFilterCategories[index] = {
+    ...filterCategories[index],
+    placeholder: pht,
+    type: 'select',
+    options: options,
+  }
+  return newFilterCategories
+}
+
+const updateSelectProjects = (props) => (filterCategories) => {
+  const { tenant, projects } = props
+
+  let projectsMap
+  if (!projects.projects[tenant.name]) {
+    projectsMap = ['Loading...']
+  } else {
+    projectsMap = projects.projects[tenant.name].map(x => x.name)
+  }
+  return updateFilterCategories(filterCategories, 'project', projectsMap)
+}
+
+const updateSelectJobs = (props) => (filterCategories) => {
+  const { tenant, jobs } = props
+
+  let jobsMap
+  if (!jobs.jobs[tenant.name]) {
+    jobsMap = ['Loading...']
+  } else {
+    jobsMap = jobs.jobs[tenant.name].map(x => x.name)
+  }
+  return updateFilterCategories(filterCategories, 'job_name', jobsMap, 'Any job')
+}
+
+const updateSelectPipelines = (props) => (filterCategories) => {
+  const { tenant, pipelines } = props
+  let pipelinesMap
+  if (!pipelines.pipelines[tenant.name]) {
+    pipelinesMap = ['Loading...']
+  } else {
+    pipelinesMap = pipelines.pipelines[tenant.name].map(x => x.name)
+  }
+  return updateFilterCategories(filterCategories, 'pipeline', pipelinesMap)
+}
+
+export {
+  IconProperty,
+  removeHash,
+  ExternalLink,
+  buildExternalLink,
+  buildExternalTableLink,
+  ConditionalWrapper,
+  updateFilterCategories,
+  updateSelectProjects,
+  updateSelectJobs,
+  updateSelectPipelines,
+  resolveDarkMode,
+  setDarkMode,
+}
