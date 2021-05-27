@@ -101,13 +101,13 @@ function BuildsetTable({
           title: changeOrRefLink && changeOrRefLink,
         },
         {
-            title: (
-              <BuildResult
-                result={buildset.result}
-                link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-              >
-              </BuildResult>
-            ),
+          title: (
+            <BuildResult
+              result={buildset.result}
+              link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+            >
+            </BuildResult>
+          ),
         },
       ],
     }
@@ -145,7 +145,7 @@ function BuildsetTable({
     // the fetching row.
     columns[0].dataLabel = ''
   } else {
-    rows = buildsets.map((buildset) => createBuildsetRow(buildset))
+    rows = buildsets.buildsets.map((buildset) => createBuildsetRow(buildset))
     // This list of actions will be applied to each row in the table. For
     // row-specific actions we must evaluate the individual row data provided to
     // the onClick handler.
@@ -196,7 +196,7 @@ function BuildsetTable({
 }
 
 BuildsetTable.propTypes = {
-  buildsets: PropTypes.array.isRequired,
+  buildsets: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   tenant: PropTypes.object.isRequired,
