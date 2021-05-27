@@ -16,7 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import 'moment-duration-format'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { PageSection, PageSectionVariants, Pagination } from '@patternfly/react-core'
 
 import { fetchBuilds } from '../api'
 import {
@@ -117,13 +117,21 @@ class BuildsPage extends React.Component {
       },
     ]
 
+    const _filters = getFiltersFromUrl(props.location, this.filterCategories)
+
     this.state = {
-      builds: [],
+      builds: {
+        builds: [],
+        offset: null,
+        total: null,
+      },
       fetching: false,
-      filters: getFiltersFromUrl(props.location, this.filterCategories),
+      filters: _filters,
       projectsFetched: false,
       pipelinesFetched: false,
       jobsFetched: false,
+      resultsPerPage: _filters.limit[0],
+      currentPage: 1,
     }
   }
 
@@ -187,6 +195,7 @@ class BuildsPage extends React.Component {
       this.setState({
         builds: response.data,
         fetching: false,
+        currentPage: Math.floor(response.data.offset / this.state.resultsPerPage) + 1,
       })
     })
   }
@@ -231,15 +240,39 @@ class BuildsPage extends React.Component {
     this.handleFilterChange(filters)
   }
 
+  handlePerPageSelect = (event, perPage) => {
+    const { filters } = this.state
+    this.setState({ resultsPerPage: perPage })
+    const newFilters = { ...filters, limit: [perPage,] }
+    this.handleFilterChange(newFilters)
+  }
+
+  handleSetPage = (event, pageNumber) => {
+    const { filters, resultsPerPage } = this.state
+    this.setState({ currentPage: pageNumber })
+    var offset = resultsPerPage * (pageNumber - 1)
+    const newFilters = { ...filters, skip: [offset,] }
+    this.handleFilterChange(newFilters)
+  }
+
+
   render() {
     const { history } = this.props
-    const { builds, fetching, filters } = this.state
+    const { builds, fetching, filters, resultsPerPage, currentPage } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
           filterCategories={this.filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
+        />
+        <Pagination
+          itemCount={builds.total}
+          perPage={resultsPerPage}
+          page={currentPage}
+          widgetId="pagination-menu"
+          onPerPageSelect={this.handlePerPageSelect}
+          onSetPage={this.handleSetPage}
         />
         <BuildTable
           builds={builds}
