@@ -82,17 +82,7 @@ class ZuulRESTClient(object):
             'tenant/%s/autohold' % tenant)
         req = requests.get(url, verify=self.verify)
         self._check_status(req)
-        resp = req.json()
-        # reformat the answer to match RPC format
-        ret = {}
-        for d in resp:
-            key = ','.join([d['tenant'],
-                            d['project'],
-                            d['job'],
-                            d['ref_filter']])
-            ret[key] = (d['count'], d['reason'], d['node_hold_expiration'])
-
-        return ret
+        return req.json()
 
     def enqueue(self, tenant, pipeline, project, trigger, change):
         if not self.auth_token:
@@ -494,7 +484,7 @@ class Client(zuul.cmd.ZuulApp):
         table = prettytable.PrettyTable(
             field_names=[
                 'ID', 'Tenant', 'Project', 'Job', 'Ref Filter',
-                'Max Count', 'Reason'
+                'Current Count', 'Max Count', 'Reason'
             ])
 
         for request in autohold_requests:
@@ -504,6 +494,7 @@ class Client(zuul.cmd.ZuulApp):
                 request['project'],
                 request['job'],
                 request['ref_filter'],
+                request['current_count'],
                 request['max_count'],
                 request['reason'],
             ])
