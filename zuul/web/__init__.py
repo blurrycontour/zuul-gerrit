@@ -999,7 +999,11 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return [self.buildToDict(b, b.buildset) for b in builds]
+        return {
+            'total': builds['total'],
+            'offset': builds['offset'],
+            'builds': [self.buildToDict(b, b.buildset) for b in builds]
+        }
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1080,7 +1084,11 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return [self.buildsetToDict(b) for b in buildsets]
+        return {
+            'total': buildsets['total'],
+            'offset': buildsets['offset'],
+            'buildsets': [self.buildsetToDict(b) for b in buildsets]
+        }
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
