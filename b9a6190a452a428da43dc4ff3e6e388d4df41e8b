@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9e587b77_3da1ee6f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T20:58:59Z",
+      "side": 0,
+      "message": "It might be good to keep this commend and initializer, and remove the \"\u003d False\" initializer below.",
+      "revId": "b9a6190a452a428da43dc4ff3e6e388d4df41e8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
