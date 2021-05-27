@@ -125,9 +125,18 @@ paths:
             application/json:
               schema:
                 description: The list of builds
-                items:
-                  $ref: '#/components/schemas/build'
-                type: array
+                properties:
+                  total:
+                    type: integer
+                    description: the total amount of builds matching the search query
+                  offset:
+                    type: integer
+                    description: how many results were omitted for pagination
+                  builds:
+                    items:
+                      $ref: '#/components/schemas/build'
+                    type: array
+                type: object
           description: Returns the list of builds
         '404':
           description: Tenant not found
@@ -205,9 +214,18 @@ paths:
             application/json:
               schema:
                 description: The list of buildsets
-                items:
-                  $ref: '#/components/schemas/buildset'
-                type: array
+                properties:
+                  total:
+                    type: integer
+                    description: the total amount of buildsets matching the search query
+                  offset:
+                    type: integer
+                    description: how many results were omitted for pagination
+                  buildsets:
+                    items:
+                      $ref: '#/components/schemas/buildset'
+                    type: array
+                type: object
           description: Returns the list of builds
         '404':
           description: Tenant not found
