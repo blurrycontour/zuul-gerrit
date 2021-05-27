@@ -107,14 +107,31 @@ class DatabaseSession(object):
         q = self.listFilter(q, provides_table.c.name, provides)
         q = self.listFilter(q, build_table.c.held, held)
 
+        try:
+            total = q.count()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return {
+                'total': 0,
+                'offset': offset,
+                'builds': []
+            }
+
         q = q.order_by(build_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return {
+                'total': total,
+                'offset': offset,
+                'builds': q.all()
+            }
         except sqlalchemy.orm.exc.NoResultFound:
-            return []
+            return {
+                'total': 0,
+                'offset': offset,
+                'builds': []
+            }
 
     def createBuildSet(self, *args, **kw):
         bs = self.connection.buildSetModel(*args, **kw)
@@ -145,14 +162,31 @@ class DatabaseSession(object):
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
         q = self.listFilter(q, buildset_table.c.result, result)
 
+        try:
+            total = q.count()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return {
+                'total': 0,
+                'offset': offset,
+                'buildsets': []
+            }
+
         q = q.order_by(buildset_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return {
+                'total': total,
+                'offset': offset,
+                'buildsets': q.all()
+            }
         except sqlalchemy.orm.exc.NoResultFound:
-            return []
+            return {
+                'total': 0,
+                'offset': offset,
+                'buildsets': []
+            }
 
     def getBuildset(self, tenant, uuid):
         """Get one buildset with its builds"""
