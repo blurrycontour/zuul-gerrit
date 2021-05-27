@@ -86,6 +86,9 @@
         - event: pull_request
           action: status
           status: ".*:success"
+        - event: check_run
+          action: rerequested
+          check: .*/gate:.*
         - event: pull_request
           action: labeled
           label:
