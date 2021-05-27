@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "93dd738a_f3babcf0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "I love that this is getting a real use now.  We added the uuid to the layout originally just to help in debugging memory leaks, and hopefully this change will continue to reduce the chances of that.  :)",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b372e27_30faf9e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "I\u0027m not following this.  Where does the executor client need this?  I see a path from the manager to the model.  Plus, anything with the job graph should have access to the item and therefore pipeline, so should have access to the layout cache.  Maybe we can simplify this?",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e76036c0_f6bb9902",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2414,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "This seems counter-intuitive to me.  Why are we specifying a universally unique id for a new object.  what are we reusing here?",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc33c839_31efe8ce",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "I\u0027m curious why you decided to put this on the manager instead of the pipeline itself?  Most of the \"runtime\" data are in the pipeline (the items themselves, for instance; and of course the layouts are right now since they\u0027re on the items).  It seems like it would have worked just as well either way.",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2044c8a5_0ca5f587",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 695,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "This is a good comment, but on a first pass, because of the way it\u0027s written and since it appears at the top of the method, it looks like it\u0027s saying that this method does the opposite of what it does.  I think if you said \"First collect all the config....\"  and then added a comment below saying \"Then find the current errors which aren\u0027t also in the parent\" or something like that...",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4aa3cfb6_6deb0c33",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2415,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "This comment could use more information about why it must be independent of the layout due to the buildset global repo state.  If we\u0027re at this point, we should have a layout that was build from the item\u0027s merge job.  (And obviously this is the thing I was suggesting we might be able to avoid in the comment on the commit message.)",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a8b3740_c9a512fc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "All of these places where we pass in the layout and the layout ahead seem like places where errors could easily sneak in.  Can we keep something like the old code here and obtain the layout ahead here?\n\nA getLayoutAhead() method seems like it would be really nice (whether that\u0027s on QueueItem or Pipeline, or PipelineManager).",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2254ee5b_36d5bfef",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4563,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-27T21:36:59Z",
+      "side": 1,
+      "message": "As mentioned elsewhere, the idea of having duplicate uuids seems counterintuitive.",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
