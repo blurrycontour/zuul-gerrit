@@ -16,6 +16,24 @@
       "revId": "b9a6190a452a428da43dc4ff3e6e388d4df41e8b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e53824ef_fc2df496",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-28T07:08:06Z",
+      "side": 0,
+      "message": "My intention was to move these two lines further down and replace the False initializer with that. I think it makes sense to initialize this variable directly before it\u0027s used and do not put a whole code block in between that doesn\u0027t use it. But it looks like I got this the wrong way around. Will fix it.",
+      "parentUuid": "9e587b77_3da1ee6f",
+      "revId": "b9a6190a452a428da43dc4ff3e6e388d4df41e8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

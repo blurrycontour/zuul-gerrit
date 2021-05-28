@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bb6afe7f_be50c9bb",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 4984,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-28T07:08:06Z",
+      "side": 1,
+      "message": "This solves a race condition which could lead to a test being settled to early because this whole if block evaluates to True, but there are still result events in ZooKeeper.\n\nThere could be a short timeframe in which the ZK event queues are empty, but the builds are just about to report their result. But when those results show up in ZK, the areZooKeeperEventQueuesEmpty() check was already successful. If the haveAllBuildsReported(9 check is now also successful (because the builds reported fast enough), the test will settle although there are still result events left in the queue. Putting the areZooKeeperEventQueuesEmpty() check to the end ensures that we catch all result events which might happen during the waitUntilSettled().",
+      "parentUuid": "aa049ea8_d5766e8f",
+      "revId": "6afd7872fa61a1c2a2264eea5f32103e5deca16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ba5e60a2_ae1704d5",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2021-05-27T20:58:59Z",
       "side": 1,
       "message": "Maybe add the new queue_name parameter too?  Or maybe not:\n\nIf the name of the queue changes during a reconfiguration, then this result event could get lost.  I think the additional time savings of iterating over all changes in a pipeline vs just the queue in order to find the buildset isn\u0027t worth the complexity of dealing with that situation.  Maybe we should keep this simple and omit the queue_name for now.  Once everything is in ZK, if we still don\u0027t like that, we can add dictionary to speed things up.",
+      "revId": "6afd7872fa61a1c2a2264eea5f32103e5deca16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63aa90fa_8aef7a81",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3807,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-28T07:08:06Z",
+      "side": 1,
+      "message": "Can do that. I think in another patch I used the \"iterate over all queues\" approach, but directly providing the queue name felt a lot easier to me. Will change that.",
+      "parentUuid": "ba5e60a2_ae1704d5",
       "revId": "6afd7872fa61a1c2a2264eea5f32103e5deca16d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
