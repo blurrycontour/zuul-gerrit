@@ -10,6 +10,7 @@ GitPython>=2.1.8
 python-daemon>=2.0.4
 extras
 statsd>=3.0
+prometheus-client
 voluptuous>=0.10.2
 gear>=0.13.0,<1.0.0,!=0.15.0
 apscheduler>=3.0
