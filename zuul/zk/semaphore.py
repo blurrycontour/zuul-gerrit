@@ -60,11 +60,23 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             self.log.exception("Unable to send semaphore stats:")
 
     def acquire(self, item, job, request_resources):
-        if not job.semaphore:
+        if not job.semaphores:
             return True
 
         log = get_annotated_logger(self.log, item.event)
-        if job.semaphore.resources_first and request_resources:
+        all_acquired = True
+        for semaphore in job.semaphores:
+            if not self._acquire_one(log, item, job, request_resources,
+                                     semaphore):
+                all_acquired = False
+                break
+        if not all_acquired:
+            self.release(item, job)
+            return False
+        return True
+
+    def _acquire_one(self, log, item, job, request_resources, semaphore):
+        if semaphore.resources_first and request_resources:
             # We're currently in the resource request phase and want to get the
             # resources before locking. So we don't need to do anything here.
             return True
@@ -75,7 +87,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             # the resources phase.
             pass
 
-        semaphore_key = quote_plus(job.semaphore.name)
+        semaphore_key = quote_plus(semaphore.name)
         semaphore_path = f"{self.tenant_root}/{semaphore_key}"
         semaphore_handle = f"{item.uuid}-{job.name}"
 
@@ -86,7 +98,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             return True
 
         # semaphore is there, check max
-        while len(semaphore_holders) < self._max_count(job.semaphore.name):
+        while len(semaphore_holders) < self._max_count(semaphore.name):
             semaphore_holders.append(semaphore_handle)
 
             try:
@@ -96,12 +108,12 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             except BadVersionError:
                 log.debug(
                     "Retrying semaphore %s acquire due to concurrent update",
-                    job.semaphore.name)
+                    semaphore.name)
                 semaphore_holders, zstat = self.getHolders(semaphore_path)
                 continue
 
             log.info("Semaphore %s acquired: job %s, item %s",
-                     job.semaphore.name, job.name, item)
+                     semaphore.name, job.name, item)
 
             self._emitStats(semaphore_path, len(semaphore_holders))
             return True
@@ -145,11 +157,16 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             break
 
     def release(self, item, job):
-        if not job.semaphore:
+        if not job.semaphores:
             return
 
         log = get_annotated_logger(self.log, item.event)
-        semaphore_key = quote_plus(job.semaphore.name)
+
+        for semaphore in job.semaphores:
+            self._release_one(log, item, job, semaphore)
+
+    def _release_one(self, log, item, job, semaphore):
+        semaphore_key = quote_plus(semaphore.name)
         semaphore_path = f"{self.tenant_root}/{semaphore_key}"
         semaphore_handle = f"{item.uuid}-{job.name}"
 

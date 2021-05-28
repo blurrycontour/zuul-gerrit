@@ -1286,7 +1286,7 @@ class Job(ConfigObject):
             cleanup_run=(),
             run=(),
             ansible_version=None,
-            semaphore=None,
+            semaphores=(),
             attempts=3,
             final=False,
             abstract=False,
@@ -1352,12 +1352,7 @@ class Job(ConfigObject):
         d['required_projects'] = []
         for project in self.required_projects.values():
             d['required_projects'].append(project.toDict())
-        if self.semaphore:
-            # For now just leave the semaphore name here until we really need
-            # more information in zuul-web about this
-            d['semaphore'] = self.semaphore.name
-        else:
-            d['semaphore'] = None
+        d['semaphores'] = [s.toDict() for s in self.semaphores]
         d['variables'] = self.variables
         d['extra_variables'] = self.extra_variables
         d['host_variables'] = self.host_variables
@@ -1679,7 +1674,8 @@ class Job(ConfigObject):
                 if k not in set(['pre_run', 'run', 'post_run', 'cleanup_run',
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
-                                 'required_projects', 'allowed_projects']):
+                                 'required_projects', 'allowed_projects',
+                                 'semaphores']):
                     setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
@@ -1779,6 +1775,14 @@ class Job(ConfigObject):
                     other.allowed_projects))
         elif other._get('allowed_projects') is not None:
             self.allowed_projects = other.allowed_projects
+        if other._get('semaphores') is not None:
+            # Sort the list of semaphores to avoid issues with
+            # contention (where two jobs try to start at the same time
+            # and fail due to acquiring the same semaphores but in
+            # reverse order.
+            self.semaphores = tuple(
+                sorted(other.semaphores + self.semaphores,
+                       key=lambda x: x.name))
 
         for k in self.context_attributes:
             if (other._get(k) is not None and
@@ -2878,8 +2882,8 @@ class QueueItem(object):
                     toreq.append(job)
                     job.queued = True
                 else:
-                    job.waiting_status = 'semaphore: {}'.format(
-                        job.semaphore.name)
+                    sem_names = ','.join([s.name for s in job.semaphores])
+                    job.waiting_status = 'semaphores: {}'.format(sem_names)
         return toreq
 
     def setResult(self, build):

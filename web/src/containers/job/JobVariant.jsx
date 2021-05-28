@@ -84,7 +84,7 @@ class JobVariant extends React.Component {
 
     const jobInfos = [
       'description', 'context', 'builds', 'status',
-      'parent', 'attempts', 'timeout', 'semaphore',
+      'parent', 'attempts', 'timeout', 'semaphores',
       'nodeset', 'variables', 'override_checkout',
     ]
     jobInfos.forEach(key => {
