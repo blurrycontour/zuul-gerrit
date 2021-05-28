@@ -231,7 +231,7 @@ class GitlabAPIClient():
 
     def __init__(self, baseurl, api_token):
         self.session = requests.Session()
-        self.baseurl = '%s/api/v4/' % baseurl
+        self.baseurl = '%s/api/v4' % baseurl
         self.api_token = api_token
         self.headers = {'Authorization': 'Bearer %s' % (
             self.api_token)}
