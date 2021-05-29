@@ -50,7 +50,11 @@ class BaseFingerRequestHandler(socketserver.BaseRequestHandler):
                 raise Exception("Timeout while waiting for input")
             for fd, event in poll.poll(timeout):
                 if event & select.POLLIN:
-                    buffer += self.request.recv(self.MAX_REQUEST_LEN)
+                    x = self.request.recv(self.MAX_REQUEST_LEN)
+                    if not x:
+                        # This will cause the caller to quietly shut down
+                        raise BrokenPipeError
+                    buffer += x
                 else:
                     raise Exception("Received error event")
             if len(buffer) >= self.MAX_REQUEST_LEN:
