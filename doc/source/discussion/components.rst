@@ -1038,15 +1038,17 @@ sections of ``zuul.conf`` are used by the web server:
 
    .. attr:: zone
 
-      The zone in which zuul-web is deployed. This is only needed if there are
-      executors with different zones in the environment and not all executors
-      are directly addressable from zuul-web. This can be the case within a
-      k8s based zuul deployment spread over multiple sites. The zone defines
-      the zone where the executors are directly adressable. Live log streaming
-      will go directly to the executors of the same zone and be routed to
-      a finger gateway of the target zone of the zones are different. The
-      finger gateway of the other zone is a central entrypoint for all live
-      log streams of that zone.
+      The zone in which zuul-web is deployed. This is only needed if
+      there are executors with different zones in the environment and
+      not all executors are directly addressable from zuul-web. The
+      parameter specifies the zone where the executors are directly
+      adressable. Live log streaming will go directly to the executors
+      of the same zone and be routed to a finger gateway of the target
+      zone if the zones are different.
+
+      In a mixed system (with zoned and unzoned executors) there may
+      also be zoned and unzoned zuul-web services. Omit the zone
+      parameter for any unzoned zuul-web servers.
 
       If this is used the finger gateways should be configured accordingly.
 
@@ -1304,12 +1306,26 @@ sections of ``zuul.conf`` are used by the finger gateway:
       user during startup.  It is recommended to set this option to an
       unprivileged user.
 
+   .. attr:: hostname
+      :default: hostname of the server
+
+      When running finger gateways in a multi-zone configuration, the
+      gateway needs to know its hostname under which it is reachable
+      by zuul-web. Otherwise live console log streaming doesn't
+      work. In most cases This is automatically detected
+      correctly. But when running in environments where it cannot
+      determine its hostname correctly this can be overridden here.
+
    .. attr:: zone
 
       The zone where the finger gateway is located. This is only needed for
       live log streaming if the zuul deployment is spread over multiple
       zones without the ability to directly connect to all executors from
       zuul-web. See :attr:`executor.zone` for further information.
+
+      In a mixed system (with zoned and unzoned executors) there may
+      also be zoned and unzoned finger gateway services. Omit the zone
+      parameter for any unzoned finger gateway servers.
 
 Operation
 ~~~~~~~~~
