@@ -106,7 +106,7 @@ class TestComponentRegistry(ZuulTestCase):
             'fingergw': {
                 'listen_address': self.host,
                 'port': '0',
-                'hostname': 'localhost',
+                'hostname': 'janine',
             }
         })
         gateway = FingerGateway(
@@ -118,6 +118,7 @@ class TestComponentRegistry(ZuulTestCase):
 
         try:
             self.assertComponentState("fingergw", BaseComponent.RUNNING)
+            self.assertComponentAttr("fingergw", "hostname", "janine")
         finally:
             gateway.stop()
 
