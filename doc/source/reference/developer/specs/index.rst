@@ -23,3 +23,4 @@ documentation instead.
    zuul-runner
    enhanced-regional-executors
    tenant-resource-quota
+   community-matrix
