@@ -32,8 +32,6 @@ from tests.base import iterate_timeout, ZuulWebFixture
 
 from ws4py.client import WebSocketBaseClient
 
-from zuul.lib.gear_utils import getGearmanFunctions
-
 
 class WSClient(WebSocketBaseClient):
     def __init__(self, port, build_uuid):
@@ -187,9 +185,13 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
 
         if zone:
             for _ in iterate_timeout(20, 'fingergw is registered'):
-                functions = getGearmanFunctions(gateway.gearworker.gearman)
-                jobname = 'fingergw:info:%s' % zone
-                if jobname in functions:
+                found = False
+                for gw in self.scheds.first.sched.component_registry.all('fingergw'):
+                    print(zone, gw.content)
+                    if gw.zone == zone:
+                        found = True
+                        break
+                if found:
                     break
 
         gateway_port = gateway.server.socket.getsockname()[1]
@@ -725,13 +727,13 @@ class TestStreamingZones(TestStreamingBase):
         gateway_us_west.history.clear()
 
         # This finger client runs against an unzoned finger gateway while there
-        # is a target finger client. As it is unzoned it should not route via
-        # The finger gateway in eu-central.
+        # is a gateway in the worker zone. It should still route vie the gateway
+        # in the worker zone since that may be the only way it's accessible.
         finger_client_unzoned2 = self._run_finger_client(
             build, gateway_unzoned_address, name='unzoned2')
         wait_for_stream('unzoned2')
         self.assertEqual(1, len(gateway_unzoned.history))
-        self.assertEqual(0, len(gateway_eu_central.history))
+        self.assertEqual(1, len(gateway_eu_central.history))
         self.assertEqual(0, len(gateway_us_west.history))
         gateway_unzoned.history.clear()
         gateway_eu_central.history.clear()
