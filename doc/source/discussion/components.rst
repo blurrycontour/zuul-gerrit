@@ -1264,6 +1264,18 @@ Finger gateway servers need to be able to connect to the Gearman
 server (usually the scheduler host), as well as the console streaming
 port on the executors (usually 7900).
 
+Finger gateways are optional.  They may be run for either or both of
+the following purposes:
+
+* Allowing end-users to connect to the finger port to stream logs.
+
+* Providing an accessible log streaming port for remote zoned
+  executors which are otherwise inacessible.
+
+  In this case, log streaming requests from finger gateways or
+  zuul-web will route to the executors via finger gateways in the same
+  zone.
+
 Configuration
 ~~~~~~~~~~~~~
 
@@ -1326,6 +1338,42 @@ sections of ``zuul.conf`` are used by the finger gateway:
       In a mixed system (with zoned and unzoned executors) there may
       also be zoned and unzoned finger gateway services. Omit the zone
       parameter for any unzoned finger gateway servers.
+
+  If the Zuul installation spans an untrusted network (for example, if
+  there are remote executor zones), it may be necessary to use TLS
+  between the components that handle log streaming (zuul-executor,
+  zuul-fingergw, and zuul-web).  If so, set the following options.
+
+  Note that this section is also read by zuul-web in order to load a
+  client certificate to use when connecting to a finger gateway which
+  requires TLS, and it is also read by zuul-executor to load a server
+  certificate for its console streaming port.
+
+  If any of these are present, all three certificate options must be
+  provided.
+
+   .. attr:: tls_cert
+
+      The path to the PEM encoded certificate file.
+
+   .. attr:: tls_key
+
+      The path to the PEM encoded key file.
+
+   .. attr:: tls_ca
+
+      The path to the PEM encoded CA certificate file.
+
+   .. attr:: tls_client_only
+      :default: false
+
+      In order to provide a finger gateway which can reach remote
+      finger gateways and executors which use TLS, but does not itself
+      serve end-users via TLS (i.e., it runs within a protected
+      network and users access it directly via the finger port), set
+      this to ``true`` and the finger gateway will not listen on TLS,
+      but will still use the supplied certificate to make remote TLS
+      connections.
 
 Operation
 ~~~~~~~~~
