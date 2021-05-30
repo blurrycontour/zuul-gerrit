@@ -119,7 +119,7 @@ class TestSchedulerZone(ZuulTestCase):
         # be two executors online (one unzoned and one zoned)
         # TODO(corvus): remove deprecated top-level stats in 5.0
         self.assertReportedStat(
-            'zuul.executors.online', value='1', kind='g')
+            'zuul.executors.online', value='2', kind='g')
         self.assertReportedStat(
             'zuul.executors.unzoned.online', value='1', kind='g')
         self.assertReportedStat(
@@ -156,7 +156,7 @@ class TestSchedulerZone(ZuulTestCase):
 
         # Validate that both (zoned and unzoned) executors are accepting work
         self.assertReportedStat(
-            'zuul.executors.accepting', value='1', kind='g')
+            'zuul.executors.accepting', value='2', kind='g')
         self.assertReportedStat(
             'zuul.executors.unzoned.accepting', value='1', kind='g')
         self.assertReportedStat(
