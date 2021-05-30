@@ -33,6 +33,23 @@
       "revId": "28b9d685d4067b737292bade7c5984194779f189",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e01b6ff_36ffe9fa",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-30T00:52:16Z",
+      "side": 1,
+      "message": "Oh, but related to my other question, that would make it difficult to have a fingergw with client ssl but no server ssl.  Maybe we should add a boolean for that?",
+      "revId": "28b9d685d4067b737292bade7c5984194779f189",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
