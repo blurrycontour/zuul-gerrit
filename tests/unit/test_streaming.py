@@ -156,8 +156,8 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = False
                 context.load_cert_chain(
-                    os.path.join(FIXTURE_DIR, 'fingergw/client.pem'),
-                    os.path.join(FIXTURE_DIR, 'fingergw/client.key'))
+                    os.path.join(FIXTURE_DIR, 'fingergw/fingergw.pem'),
+                    os.path.join(FIXTURE_DIR, 'fingergw/fingergw.key'))
                 context.load_verify_locations(
                     os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
                 s = context.wrap_socket(s)
@@ -188,18 +188,12 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
 
         if self.fingergw_use_ssl:
             self.log.info('SSL enabled for fingergw')
-            config.set('fingergw', 'server_ssl_ca',
+            config.set('fingergw', 'tls_ca',
                        os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
-            config.set('fingergw', 'server_ssl_cert',
-                       os.path.join(FIXTURE_DIR, 'fingergw/server.pem'))
-            config.set('fingergw', 'server_ssl_key',
-                       os.path.join(FIXTURE_DIR, 'fingergw/server.key'))
-            config.set('fingergw', 'client_ssl_ca',
-                       os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
-            config.set('fingergw', 'client_ssl_cert',
-                       os.path.join(FIXTURE_DIR, 'fingergw/client.pem'))
-            config.set('fingergw', 'client_ssl_key',
-                       os.path.join(FIXTURE_DIR, 'fingergw/client.key'))
+            config.set('fingergw', 'tls_cert',
+                       os.path.join(FIXTURE_DIR, 'fingergw/fingergw.pem'))
+            config.set('fingergw', 'tls_key',
+                       os.path.join(FIXTURE_DIR, 'fingergw/fingergw.key'))
 
         gateway = FingerGateway(
             config,
