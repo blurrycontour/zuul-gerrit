@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "43c68602_3ae0071b",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 808,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-30T00:21:05Z",
+      "side": 1,
+      "message": "We don\u0027t have gearman working with py39 yet, so I\u0027m going to rename this variable so we can specify we want to use ssl for the fingergw without invoking gearman ssl.",
+      "revId": "28b9d685d4067b737292bade7c5984194779f189",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d3f10c2f_97a07216",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-30T00:21:05Z",
+      "side": 1,
+      "message": "Why do we need separate client/server certs?  It seems like one cert would be appropriate for both.",
+      "revId": "28b9d685d4067b737292bade7c5984194779f189",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
