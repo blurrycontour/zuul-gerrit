@@ -22,6 +22,23 @@
       "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d15a3195_31ed0d38",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-31T20:12:16Z",
+      "side": 1,
+      "message": "I\u0027m of two minds about this.  In the long run, we probably shouldn\u0027t have these on the status page, and instead, operators should have nice dashboards.  Or, perhaps in an expandable section as Matthieu suggests.\n\nIn the short term, as we work toward 5.0, it might be helpful for us to have them front-and-center as we observe new behaviors.  And I think if that\u0027s the case, we don\u0027t want to hide them with an expandable section.  But they also shouldn\u0027t be more prominent than the description.  :)\n\nSo how about:\n\n1) We move them below the description and wrap them with \u003csmall\u003e.  Maybe even greying them out a bit would be good too?\n2) When we get close to 5.0, we drop them or put them in an expandable section?",
+      "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
