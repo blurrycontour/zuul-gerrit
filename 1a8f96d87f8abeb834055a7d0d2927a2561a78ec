@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4af4beba_e82b09f5",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-31T09:08:11Z",
+      "side": 1,
+      "message": "While this is very handy, typing can become very slow as the list of jobs is large enough.",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 160,
+        "endChar": 5
+      },
+      "revId": "1a8f96d87f8abeb834055a7d0d2927a2561a78ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
