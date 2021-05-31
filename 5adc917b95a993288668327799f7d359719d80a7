@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "0928624a_07f094ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "The executor client needs the project metadata for constructing the gearman params (see changes in executor/common.py). If we require a layout in order to access the project metadata, it means we MUST (re-)create a layout on all schedulers.\n\nOut working assumption is that we can limit the use of the layout to job freezing. In that case we only need to re-create an item\u0027s layout on another scheduler if a following item needs it as a fallback.\n\nBesides the scale-out scheduler use-case, storing the project metadata independent of the layout is also required for the optimization in I9b9657a18664e515ecc11a47f8624b5f248084c4.",
+      "parentUuid": "7b372e27_30faf9e8",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e76036c0_f6bb9902",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2021-05-27T21:36:59Z",
       "side": 1,
       "message": "This seems counter-intuitive to me.  Why are we specifying a universally unique id for a new object.  what are we reusing here?",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb722a80_73fa8286",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2414,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "This is for the case when we created a layout for this item on one scheduler but it is later required on a different one. Initially the item\u0027s layout UUID will be None, so a new layout UUID must be created. If the layout UUID is already set, we need to re-create the layout and since it\u0027s the \"same\" layout (though a different object) we also use the same UUID. The item\u0027s layout UUID should only change if its position in the queue changed or it was reset during a re-enqueue.",
+      "parentUuid": "e76036c0_f6bb9902",
       "revId": "5adc917b95a993288668327799f7d359719d80a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "3404d99e_3cfe2cbd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "It feels to me like the layout cache is less of a runtime data thing and more of an implementation detail with most of the \"mechanics\" in the manager. I don\u0027t have a strong opinion on where to put the cache, so I\u0027m fine with moving it to the pipeline if you prefer that.",
+      "parentUuid": "cc33c839_31efe8ce",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2044c8a5_0ca5f587",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 1
@@ -81,6 +135,24 @@
       "writtenOn": "2021-05-27T21:36:59Z",
       "side": 1,
       "message": "This is a good comment, but on a first pass, because of the way it\u0027s written and since it appears at the top of the method, it looks like it\u0027s saying that this method does the opposite of what it does.  I think if you said \"First collect all the config....\"  and then added a comment below saying \"Then find the current errors which aren\u0027t also in the parent\" or something like that...",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5d8e470b_8ef55894",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 695,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "Ack, done with the next PS.",
+      "parentUuid": "2044c8a5_0ca5f587",
       "revId": "5adc917b95a993288668327799f7d359719d80a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "dc61583d_16c09f22",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2415,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "Yea, I think this should be rephrased as the reference to the global repo state is a bit misleading.\n\nThe thing is that we might NOT have a layout in certain situations:\n\n1. a layout can be reset during re-enqueue w/o re-freezing the job graph. Since we want to avoid re-creating the layout just for the project metadata (that\u0027s the optimization in I9b9657a18664e515ecc11a47f8624b5f248084c4) we store it on the job graph instead.\n\n2. if we freeze the job graph on one scheduler but job execution (which needs the project metadata) is requested on a different scheduler we can avoid re-recreating the layout.",
+      "parentUuid": "4aa3cfb6_6deb0c33",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a8b3740_c9a512fc",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -121,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "3ae8bc93_e1e0faae",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3284,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "Makes sense. I think we can simply use the manager\u0027s getFallbackLayout() method.",
+      "parentUuid": "6a8b3740_c9a512fc",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2254ee5b_36d5bfef",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -132,6 +240,24 @@
       "writtenOn": "2021-05-27T21:36:59Z",
       "side": 1,
       "message": "As mentioned elsewhere, the idea of having duplicate uuids seems counterintuitive.",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfe93719_533f9786",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4563,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-31T07:58:49Z",
+      "side": 1,
+      "message": "See my reply to the other comment. Maybe it makes sense to have a comment here explaining why we allow setting the layout UUID.",
+      "parentUuid": "2254ee5b_36d5bfef",
       "revId": "5adc917b95a993288668327799f7d359719d80a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
