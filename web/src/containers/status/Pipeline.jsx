@@ -125,6 +125,13 @@ class Pipeline extends React.Component {
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
             </small>) : ''}
+          <small className="pf-u-color-200">
+            Event queues:&nbsp;
+            {pipeline.trigger_events} trigger events,&nbsp;
+            {pipeline.management_events} management events,&nbsp;
+            {pipeline.result_events} results.
+          </small>
+
         </div>
         {pipeline.change_queues.filter(item => item.heads.length > 0)
           .filter(item => (!filter || (
