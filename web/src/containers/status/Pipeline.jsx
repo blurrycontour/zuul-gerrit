@@ -121,6 +121,12 @@ class Pipeline extends React.Component {
           <h3>
             {pipeline.name} <Badge>{count}</Badge>
           </h3>
+          <p>
+            Event queues:&nbsp;
+            {pipeline.trigger_events} trigger events,&nbsp;
+            {pipeline.management_events} management events,&nbsp;
+            {pipeline.result_events} results.
+          </p>
           {pipeline.description ? (
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
