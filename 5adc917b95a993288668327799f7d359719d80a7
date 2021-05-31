@@ -54,6 +54,23 @@
     },
     {
       "key": {
+        "uuid": "bad6df27_d12a7d92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-31T14:12:33Z",
+      "side": 1,
+      "message": "That makes sense, but let\u0027s change the commit message so that it says that.  The executor client *does* have access to the layout, so it\u0027s confusing as written.  Saying \"we want to restrict layout access to job freezing so that fewer actions (like creating a build request after a job is frozen) require access to it\" would help reviewers and others in the future looking at the git history.  :)",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e76036c0_f6bb9902",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -83,6 +100,23 @@
       "side": 1,
       "message": "This is for the case when we created a layout for this item on one scheduler but it is later required on a different one. Initially the item\u0027s layout UUID will be None, so a new layout UUID must be created. If the layout UUID is already set, we need to re-create the layout and since it\u0027s the \"same\" layout (though a different object) we also use the same UUID. The item\u0027s layout UUID should only change if its position in the queue changed or it was reset during a re-enqueue.",
       "parentUuid": "e76036c0_f6bb9902",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1b5a3584_18593249",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2414,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-31T14:12:33Z",
+      "side": 1,
+      "message": "This change seems to be reaching pretty far forward, in that it\u0027s making changes in aid of future changes, but doesn\u0027t fully describe why.  This is a significant change in meaning for what a layout UUID is, so it\u0027s important to understand fully and document.\n\nWhy would another scheduler need to create that layout then?\n\nHow would it create the same layout given that the inputs may have changed?",
       "revId": "5adc917b95a993288668327799f7d359719d80a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -188,6 +222,23 @@
       "side": 1,
       "message": "Yea, I think this should be rephrased as the reference to the global repo state is a bit misleading.\n\nThe thing is that we might NOT have a layout in certain situations:\n\n1. a layout can be reset during re-enqueue w/o re-freezing the job graph. Since we want to avoid re-creating the layout just for the project metadata (that\u0027s the optimization in I9b9657a18664e515ecc11a47f8624b5f248084c4) we store it on the job graph instead.\n\n2. if we freeze the job graph on one scheduler but job execution (which needs the project metadata) is requested on a different scheduler we can avoid re-recreating the layout.",
       "parentUuid": "4aa3cfb6_6deb0c33",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2da8ce48_56966d59",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2415,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-31T14:12:33Z",
+      "side": 1,
+      "message": "That makes sense; another way to put it is that the project metadata are needed in order to run the jobs in the job graph, and are therefore arguably part of the frozen job graph.\n\nI think your updated comment helps, thanks.",
       "revId": "5adc917b95a993288668327799f7d359719d80a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
