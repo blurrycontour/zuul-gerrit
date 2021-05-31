@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0c4e89f4_74a505d2",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-31T16:13:56Z",
+      "side": 1,
+      "message": "open-source is used in Ansible\u0027s definition, let\u0027s keep consistency",
+      "range": {
+        "startLine": 416,
+        "startChar": 17,
+        "endLine": 416,
+        "endChar": 28
+      },
+      "revId": "519fa2d2c86e1bf0f3ff5cc5c107f2f0607ef52f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
