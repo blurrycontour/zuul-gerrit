@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13ae24ac_ab9d3ce2",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-31T15:53:27Z",
+      "side": 1,
+      "message": "I\u0027d suggest hiding this in an ExpandableSection: https://www.patternfly.org/v4/components/expandable-section#basic",
+      "range": {
+        "startLine": 124,
+        "startChar": 0,
+        "endLine": 129,
+        "endChar": 14
+      },
+      "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
