@@ -15,6 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { Badge } from 'patternfly-react'
+import { Tooltip } from '@patternfly/react-core';
 
 import ChangeQueue from './ChangeQueue'
 
@@ -125,6 +126,17 @@ class Pipeline extends React.Component {
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
             </small>) : ''}
+          <Tooltip position="top"
+            content={<div>Unprocessed pipeline specific events</div>}>
+            <small>
+              <em>
+                Events:&nbsp;
+                {pipeline.trigger_events} trigger events,&nbsp;
+                {pipeline.management_events} management events,&nbsp;
+                {pipeline.result_events} results.
+              </em>
+            </small>
+          </Tooltip>
         </div>
         {pipeline.change_queues.filter(item => item.heads.length > 0)
           .filter(item => (!filter || (
