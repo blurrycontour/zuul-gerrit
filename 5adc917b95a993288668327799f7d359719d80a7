@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "de35a63e_9f75fe28",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-01T12:57:52Z",
+      "side": 1,
+      "message": "Updated the commit message to make the intention more clear.",
+      "parentUuid": "bad6df27_d12a7d92",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e76036c0_f6bb9902",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -117,6 +135,24 @@
       "writtenOn": "2021-05-31T14:12:33Z",
       "side": 1,
       "message": "This change seems to be reaching pretty far forward, in that it\u0027s making changes in aid of future changes, but doesn\u0027t fully describe why.  This is a significant change in meaning for what a layout UUID is, so it\u0027s important to understand fully and document.\n\nWhy would another scheduler need to create that layout then?\n\nHow would it create the same layout given that the inputs may have changed?",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f48966e_664a063a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2414,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-01T12:57:52Z",
+      "side": 1,
+      "message": "I agree that this might be something that we should rather do in a later change when the context of why this is necessary is more obvious. I think I\u0027ll remove it as it is unrelated to the rest of this change.\n\nRe. why another scheduler would need to create the layout: it might be required as a fallback layout for following items. If item A\u0027s layout is created for job freezing on scheduler ONE and later a following item B\u0027s job graph is frozen on scheduler TWO we need to re-create the layout of item A on scheduler TWO as B needs it as fallback layout and it\u0027s not in the layout cache.\n\nRe. how we would create the \"same\" layout: I don\u0027t expect the inputs to change (the inputs being the chain of items ahead; position in the queue) and the tenant layout) without the layout UUID changing:\n\n1. In case the tenant layout changed we would re-enqueue the pipeline and with that reset the layout UUID to None (done in manager/__init__.py#61). If we need the layout again as a fallback for following items we will create a new layout (inputs changed) with a new UUID.\n\n2. In case of a gate reset (position in the queue changed) the pipeline manager will call resetAllBuilds() and with that also reset the layout UUID (see model.py#2359).\n\nDo you have any other inputs in mind that could lead to a different layout?",
+      "parentUuid": "1b5a3584_18593249",
       "revId": "5adc917b95a993288668327799f7d359719d80a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
