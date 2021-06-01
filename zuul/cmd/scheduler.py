@@ -71,6 +71,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             self.log.exception("Reconfiguration failed:")
 
     def exit_handler(self, signum, frame):
+        self.sched.stop()
         self.sched.join()
         self.stop_gear_server()
         sys.exit(0)
