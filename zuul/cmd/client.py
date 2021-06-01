@@ -718,8 +718,15 @@ class Client(zuul.cmd.ZuulApp):
         from zuul import scheduler
         from zuul import configloader
         self.configure_connections(source_only=True)
-        sched = scheduler.Scheduler(self.config, self.connections,
-                                    self, testonly=True)
+
+        class SchedulerConfig(scheduler.Scheduler):
+            # A custom scheduler constructor adapted for config check
+            # to avoid loading runtime clients.
+            def __init__(self, config, connections):
+                self.config = config
+                self.connections = connections
+
+        sched = SchedulerConfig(self.config, self.connections)
         loader = configloader.ConfigLoader(
             sched.connections, sched, None, None)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
