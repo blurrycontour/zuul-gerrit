@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "73f68220_bd042514",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-01T17:14:37Z",
+      "side": 1,
+      "message": "Looking at the child change has helped me understand this better. I think we should consider checking for a None item.layout_uuid above so that we don\u0027t somehow accidentally start caching a layout for None (and then sharing that between changes).\n\nThen I think what you wanted the condition here to be is if not item.layout_uuid so that we log the recalculation only when there isn\u0027t already something cached. However, I think that since we\u0027ve fallen through to here that is already the case and we can just drop this condition entirely.",
+      "parentUuid": "ed12537a_51dfd8e1",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "89bfcfc1_135d9ae3",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 5
