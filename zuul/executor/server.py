@@ -2749,7 +2749,7 @@ class ExecutorServer(BaseMergeServer):
         # If the execution driver ever becomes configurable again,
         # this is where it would happen.
         execution_wrapper_name = 'bubblewrap'
-        self.accepting_work = False
+        self.accepting_work = True
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
         self.update_queue = DeduplicateQueue()
