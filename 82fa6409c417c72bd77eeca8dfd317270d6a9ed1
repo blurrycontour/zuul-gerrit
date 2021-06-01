@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fd0251bb_598798e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-01T16:21:34Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4a435f04_2188c303",
+      "revId": "82fa6409c417c72bd77eeca8dfd317270d6a9ed1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d3c1aedb_32526624",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2021-06-01T13:27:26Z",
       "side": 1,
       "message": "This is where we should add the comment from the commit message; but also, if you\u0027re going to remove the other thing, you should remove this comment.\n\nHonestly, since I\u0027m asking for another patchset, I\u0027d say put it back in.  I think we\u0027ve worked through it now, we might as well call it done.  :)",
+      "revId": "82fa6409c417c72bd77eeca8dfd317270d6a9ed1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0fbe5413_9cee09a3",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 4569,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-01T16:21:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3c1aedb_32526624",
       "revId": "82fa6409c417c72bd77eeca8dfd317270d6a9ed1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
