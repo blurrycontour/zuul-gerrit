@@ -159,6 +159,23 @@
     },
     {
       "key": {
+        "uuid": "1a52174c_9c195e00",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2414,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-01T13:27:37Z",
+      "side": 1,
+      "message": "I think that covers it.  I\u0027m happy now with the understanding that a layout UUID represents a unique combination of (tenant layout + position in queue), and that any potential future schedulers can re-create them.  I think that\u0027s what we need to document to help people with brain patterns like mine to understand it.  :)\n\nThat also helps me understand that the code path where we create a layout with an existing uuid can\u0027t happen in this patch.  I\u0027m happy to make the change now, or we can do it later (I think we have found what we need to document either way).",
+      "revId": "5adc917b95a993288668327799f7d359719d80a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc33c839_31efe8ce",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 1
