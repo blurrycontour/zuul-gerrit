@@ -20,6 +20,7 @@ import voluptuous as v
 import time
 import uuid
 import requests
+import fnmatch
 
 import dateutil.parser
 
@@ -282,14 +283,36 @@ class GitlabAPIClient():
     # https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
     def get_project_branches(self, project_name, exclude_unprotected,
                              zuul_event_id=None):
-        if exclude_unprotected:
-            path = "/projects/{}/protected_branches"
-        else:
-            path = "/projects/{}/repository/branches"
+        path = "/projects/{}/repository/branches"
         url = self.baseurl + path.format(quote_plus(project_name))
         resp = self.get(url, zuul_event_id=zuul_event_id)
         self._manage_error(*resp, zuul_event_id=zuul_event_id)
-        return [branch['name'] for branch in resp[0]]
+
+        branches = [branch['name'] for branch in resp[0]]
+        if exclude_unprotected:
+            branches = self._filter_unprotected_branches(project_name,
+                                                         branches,
+                                                         zuul_event_id)
+        return branches
+
+    def _filter_unprotected_branches(self, project_name, branches,
+                                     zuul_event_id=None):
+        path = "/projects/{}/protected_branches"
+        url = self.baseurl + path.format(quote_plus(project_name))
+        resp = self.get(url, zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+
+        patterns = [branch['name'] for branch in resp]
+        protected_branches = filter(
+            lambda branch: any(
+                map(
+                    lambda pattern: fnmatch.fnmatchcase(branch, pattern),
+                    patterns
+                )
+            ),
+            branches
+        )
+        return protected_branches
 
     # https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch
     def get_project_branch(self, project_name, branch_name,
