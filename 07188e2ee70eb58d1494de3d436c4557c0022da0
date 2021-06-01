@@ -22,6 +22,23 @@
       "revId": "07188e2ee70eb58d1494de3d436c4557c0022da0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b218829_44a03bd1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-01T22:19:42Z",
+      "side": 1,
+      "message": "Yes, it\u0027s an ususual phrasing on the comment.  I believe the comment was only intended to explain the second part of the boolean clause: \"or has_job_graph\".  In other words:\n\nIf the item is active, we should totally prepare it.\nIf the item is not active, but does have a job graph, that means it was probably active at some point in the past, so we should prepare it because we don\u0027t want old data from before the re-enqueue sticking around.",
+      "revId": "07188e2ee70eb58d1494de3d436c4557c0022da0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
