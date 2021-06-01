@@ -282,14 +282,26 @@ class GitlabAPIClient():
     # https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
     def get_project_branches(self, project_name, exclude_unprotected,
                              zuul_event_id=None):
+        path = "/projects/{}/repository/branches?per_page=100&page={}"
+        page = 1
+        branches = []
+
+        # Handle pagination
+        while True:
+            url = self.baseurl + path.format(quote_plus(project_name), page)
+            resp = self.get(url, zuul_event_id=zuul_event_id)
+            if resp[0]:
+                self._manage_error(*resp, zuul_event_id=zuul_event_id)
+                branches.extend(resp[0])
+                page += 1
+            else:
+                break
+
         if exclude_unprotected:
-            path = "/projects/{}/protected_branches"
+            return [branch['name'] for branch
+                    in branches if branch['protected']]
         else:
-            path = "/projects/{}/repository/branches"
-        url = self.baseurl + path.format(quote_plus(project_name))
-        resp = self.get(url, zuul_event_id=zuul_event_id)
-        self._manage_error(*resp, zuul_event_id=zuul_event_id)
-        return [branch['name'] for branch in resp[0]]
+            return [branch['name'] for branch in branches]
 
     # https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch
     def get_project_branch(self, project_name, branch_name,
