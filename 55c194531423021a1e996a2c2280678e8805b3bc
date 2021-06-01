@@ -37,6 +37,40 @@
     },
     {
       "key": {
+        "uuid": "02002dbc_264724ed",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-01T18:27:14Z",
+      "side": 1,
+      "message": "See below for my thoughts on protecting from a null key.\n\nRegarding the conditional log line, I think what this means is: there exists a theoretical layout for this item, but we don\u0027t have it.  We need to recreate it.  I think this can only happen in a multi-scheduler situation.  Because in a single scheduler situation, the only way for an item to have a layout uuid assigned to it is to get it from a layout.  Meanwhile, if item.layout_uuid is None, then that means no one has ever made a layout for this item, so it needs to be created (\"calculated\") for the first time.",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8869bee4_ef9b38cb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-01T18:27:14Z",
+      "side": 1,
+      "message": "If the goal is to be defensive about caching a layout with a null key, it seems like this would be the best place to do it:\n        if layout.uuid is None: raise Exception\nBecause otherwise, item.layout_uuid is expected to be either a string or None within this method, so I don\u0027t know that it makes sense to test that anywhere else.",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89bfcfc1_135d9ae3",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 5
