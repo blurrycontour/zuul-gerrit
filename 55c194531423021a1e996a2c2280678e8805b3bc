@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ed12537a_51dfd8e1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-01T17:06:31Z",
+      "side": 1,
+      "message": "Is the layout_uuid ever expected to be false? if so would this be better as:\n\n  if not item.layout_uuid:\n      return None\n\n  self.log.debug(\"...\")\n  layout \u003d self._getLayout(item)\n  ...",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89bfcfc1_135d9ae3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1081,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-01T17:06:31Z",
+      "side": 1,
+      "message": "My above question is related to this condition as well. It seems to be the opposite of what we attempt above.",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
