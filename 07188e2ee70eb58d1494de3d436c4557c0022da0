@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "91641711_8aa23af4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-01T22:12:58Z",
+      "side": 1,
+      "message": "I know this isn\u0027t strictly related to this specific change but we seem to check \u0027item.active\u0027 below and not \u0027not item.active\u0027. That then determines if we call prepareItem() which will call getLayout and generate a layout if necessary.\n\nIs this condition correct?",
+      "range": {
+        "startLine": 309,
+        "startChar": 18,
+        "endLine": 309,
+        "endChar": 49
+      },
+      "revId": "07188e2ee70eb58d1494de3d436c4557c0022da0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
