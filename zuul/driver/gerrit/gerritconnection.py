@@ -152,6 +152,7 @@ class GerritEventConnector(threading.Thread):
                 self.event_queue.election.run(self._run)
             except Exception:
                 self.log.exception("Exception moving Gerrit event:")
+                time.sleep(1)
 
     def _run(self):
         while not self._stopped:
@@ -516,6 +517,7 @@ class GerritPoller(threading.Thread):
             except Exception:
                 self.log.exception("Exception on Gerrit poll with %s:",
                                    self.connection.connection_name)
+                time.sleep(1)
             self._connection_lost_event.clear()
 
     def stop(self):
