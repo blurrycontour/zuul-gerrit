@@ -718,6 +718,16 @@ class Client(zuul.cmd.ZuulApp):
         from zuul import scheduler
         from zuul import configloader
         self.configure_connections(source_only=True)
+
+        class SchedulerConfig(scheduler.Scheduler):
+            # A custom scheduler constructor adapted for config check
+            # to avoid loading runtime clients.
+            def __init__(self, config, connections):
+                self.config = config
+                self.connections = connections
+                # TODO figure out disabling zookeeper cache:
+                self.unparsed_config_cache = None
+
         sched = scheduler.Scheduler(self.config, self.connections,
                                     self, testonly=True)
         loader = configloader.ConfigLoader(
