@@ -75,6 +75,24 @@
       "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "52a217f8_f0bb11b8",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-01T08:29:52Z",
+      "side": 1,
+      "message": "Since the confusion for the user seems to come from the term \"queue\" I\u0027m going to remove it. I\u0027ll also add a tooltip with a short explanation.",
+      "parentUuid": "9e68ee59_e7a3e155",
+      "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
