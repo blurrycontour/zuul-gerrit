@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "c6a61404_6c8a2214",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-01T21:53:37Z",
+      "side": 1,
+      "message": "I was confused about the reason for logging here only when we have a cache miss when we expect a hit rather than a miss due to not being seen before. Sounds like this is useful for understanding why layouts are calculated at different times in the logs.",
+      "parentUuid": "02002dbc_264724ed",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8869bee4_ef9b38cb",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 5
@@ -65,6 +83,24 @@
       "writtenOn": "2021-06-01T18:27:14Z",
       "side": 1,
       "message": "If the goal is to be defensive about caching a layout with a null key, it seems like this would be the best place to do it:\n        if layout.uuid is None: raise Exception\nBecause otherwise, item.layout_uuid is expected to be either a string or None within this method, so I don\u0027t know that it makes sense to test that anywhere else.",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54c1366e_b731160c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-01T21:53:37Z",
+      "side": 1,
+      "message": "I agree this would be the place to address the None key concern. That said after some discussion on IRC, corvus pointed out this is the only place we write to the cache. We also always have a uuid on a layout. Below we update item.layout_uuid from the layout so it should always be valid and not None. This should be fine as is.",
+      "parentUuid": "8869bee4_ef9b38cb",
       "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
