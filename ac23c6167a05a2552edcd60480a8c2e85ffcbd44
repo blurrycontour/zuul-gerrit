@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebb76f3f_9b6c11c1",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-06-01T08:26:19Z",
+      "side": 1,
+      "message": "I don\u0027t know if it\u0027s just me and my screen setup, but I don\u0027t see a lot of difference between this text and the pipelines\u0027 descriptions, in terms of color and size. How about using italics to make a clear distinction?",
+      "range": {
+        "startLine": 128,
+        "startChar": 28,
+        "endLine": 128,
+        "endChar": 42
+      },
+      "revId": "ac23c6167a05a2552edcd60480a8c2e85ffcbd44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
