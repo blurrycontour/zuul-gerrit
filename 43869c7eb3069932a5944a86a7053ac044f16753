@@ -57,6 +57,24 @@
       "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9e68ee59_e7a3e155",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-06-01T08:07:14Z",
+      "side": 1,
+      "message": "Then how about a popover to explain what a queue refers to in that context, since the term is already used within pipelines? The dual use might be a bit confusing to non-operators.\n\nOr we can wait until we see enough users asking what these mean before putting in the extra effort. :)",
+      "parentUuid": "f01b0e03_8f0f0b71",
+      "revId": "43869c7eb3069932a5944a86a7053ac044f16753",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
