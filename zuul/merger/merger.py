@@ -441,9 +441,10 @@ class Repo(object):
         return repo.refs
 
     def setRef(self, path, hexsha, repo=None, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        log.debug("Create reference %s at %s in %s",
-                  path, hexsha, self.local_path)
+        ref_log = get_annotated_logger(
+            logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
+        ref_log.debug("Create reference %s at %s in %s",
+                      path, hexsha, self.local_path)
         if repo is None:
             repo = self.createRepoObject(zuul_event_id)
         self._setRef(path, hexsha, repo)
@@ -458,8 +459,9 @@ class Repo(object):
 
     def setRefs(self, refs, keep_remotes=False, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
-        log = get_annotated_logger(self.log, zuul_event_id)
-        self._setRefs(repo, refs, keep_remotes=keep_remotes, log=log)
+        ref_log = get_annotated_logger(
+            logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
+        self._setRefs(repo, refs, keep_remotes=keep_remotes, log=ref_log)
 
     @staticmethod
     def setRefsAsync(local_path, refs, keep_remotes=False):
@@ -503,10 +505,11 @@ class Repo(object):
         origin_ref.commit = rev
 
     def deleteRef(self, path, repo=None, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
+        ref_log = get_annotated_logger(
+            logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
         if repo is None:
             repo = self.createRepoObject(zuul_event_id)
-        log.debug("Delete reference %s", path)
+        ref_log.debug("Delete reference %s", path)
         Repo._deleteRef(path, repo)
 
     @staticmethod
@@ -976,8 +979,10 @@ class Merger(object):
                 Repo.setRefsAsync, repo.local_path, project,
                 keep_remotes=self.execution_context)
             messages = job.result()
+            ref_log = get_annotated_logger(
+                logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
             for message in messages:
-                log.debug(message)
+                ref_log.debug(message)
 
     def _mergeChange(self, item, ref, zuul_event_id):
         log = get_annotated_logger(self.log, zuul_event_id)
