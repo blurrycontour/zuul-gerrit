@@ -20,6 +20,7 @@ import voluptuous as v
 import time
 import uuid
 import requests
+import fnmatch
 
 import dateutil.parser
 
@@ -282,14 +283,17 @@ class GitlabAPIClient():
     # https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
     def get_project_branches(self, project_name, exclude_unprotected,
                              zuul_event_id=None):
-        if exclude_unprotected:
-            path = "/projects/{}/protected_branches"
-        else:
-            path = "/projects/{}/repository/branches"
+        path = "/projects/{}/repository/branches"
         url = self.baseurl + path.format(quote_plus(project_name))
         resp = self.get(url, zuul_event_id=zuul_event_id)
         self._manage_error(*resp, zuul_event_id=zuul_event_id)
-        return [branch['name'] for branch in resp[0]]
+
+        branches = []
+        if exclude_unprotected:
+            branches = [branch['name'] for branch in resp[0] if branch['protected']]
+        else:
+            branches = [branch['name'] for branch in resp[0]]
+        return branches
 
     # https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch
     def get_project_branch(self, project_name, branch_name,
