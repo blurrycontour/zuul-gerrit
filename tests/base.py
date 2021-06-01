@@ -1955,13 +1955,12 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             }, 200, "", "GET"
 
         match = re.match('.+/projects/(.+)/'
-                         '(repository/branches|protected_branches)$', url)
+                         'repository/branches\?.*$', url)
         if match:
-            protected = url.endswith('protected_branches')
             project = urllib.parse.unquote(match.group(1)).split('/')
             branches = [{'name': branch.name, 'protected': branch.protected}
                         for branch in self.fake_repos[tuple(project)]
-                        if ((not protected) or branch.protected)]
+                        if branch.protected]
             return branches, 200, "", "GET"
 
         match = re.match(
