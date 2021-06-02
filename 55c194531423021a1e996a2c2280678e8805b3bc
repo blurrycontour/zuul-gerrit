@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "dc3a1409_1abf2e54",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-02T13:37:13Z",
+      "side": 1,
+      "message": "Yes, this log line will become useful when we have multiple schedulers running.",
+      "parentUuid": "c6a61404_6c8a2214",
+      "revId": "55c194531423021a1e996a2c2280678e8805b3bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8869bee4_ef9b38cb",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 5
