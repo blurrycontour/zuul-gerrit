@@ -253,8 +253,15 @@ class ChangePanel extends React.Component {
   renderJob (job) {
     const { tenant } = this.props
     let job_name = job.name
+    let ordinal_rules = new Intl.PluralRules('en', {type: 'ordinal'})
+    const suffixes = {
+      one: 'st',
+      two: 'nd',
+      few: 'rd',
+      other: 'th'
+    }
     if (job.tries > 1) {
-      job_name = job_name + ' (' + job.tries + '. attempt)'
+        job_name = job_name + ' (' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
     }
     let name = ''
     if (job.result !== null) {
