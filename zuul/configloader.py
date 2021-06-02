@@ -2420,7 +2420,7 @@ class ConfigLoader(object):
             self._loadDynamicProjectData(config, project, files, False, item,
                                          loading_errors, pcontext)
 
-        layout = model.Layout(tenant)
+        layout = model.Layout(tenant, item.layout_uuid)
         layout.loading_errors = loading_errors
         log.debug("Created layout id %s", layout.uuid)
         if not include_config_projects:
