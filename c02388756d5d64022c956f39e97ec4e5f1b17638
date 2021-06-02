@@ -16,6 +16,24 @@
       "revId": "c02388756d5d64022c956f39e97ec4e5f1b17638",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6087348_3b7595ca",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-06-02T20:24:36Z",
+      "side": 1,
+      "message": "Next PS does both.",
+      "parentUuid": "33ec4b2f_b96c95f6",
+      "revId": "c02388756d5d64022c956f39e97ec4e5f1b17638",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
