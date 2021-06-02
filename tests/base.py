@@ -4602,6 +4602,15 @@ class ZuulTestCase(BaseTestCase):
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
 
+    def getCurrentLtime(self):
+        """Get the logical timestamp as seen by the Zookeeper cluster."""
+        result = self.zk_client.client.command(b"srvr")
+        for line in result.splitlines():
+            match = re.match(r"zxid:\s+0x(?P<zxid>[a-f0-9])", line, re.I)
+            if match:
+                return int(match.group("zxid"), 16)
+        raise RuntimeError("Could not find zxid in Zookeeper srvr output")
+
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
 
