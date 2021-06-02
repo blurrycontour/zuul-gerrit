@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "78a33798_e81bbbed",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-06-02T12:22:30Z",
+      "side": 1,
+      "message": "Matrix provides a simple lightweight HTTP API relatively easy to use for bots: https://matrix.org/docs/spec/client_server/latest",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
