@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33ec4b2f_b96c95f6",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-02T06:56:06Z",
+      "side": 1,
+      "message": "I think this hack either should have an explaining comment or use a sub class of Scheduler for that purpose.",
+      "revId": "c02388756d5d64022c956f39e97ec4e5f1b17638",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
