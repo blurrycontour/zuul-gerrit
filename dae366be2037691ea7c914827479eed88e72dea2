@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "95a2c373_559d4bad",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-02T22:43:45Z",
+      "side": 1,
+      "message": "Moved switched... pick one? ;)",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "78a33798_e81bbbed",
         "filename": "doc/source/reference/developer/specs/community-matrix.rst",
         "patchSetId": 1
@@ -16,6 +33,74 @@
       "revId": "dae366be2037691ea7c914827479eed88e72dea2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50460254_3eb9eaba",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-02T22:43:45Z",
+      "side": 1,
+      "message": "Note that this is possible to accomplish with DCC in IRC as well if clients have interoperable implementations (e.g. OTR), though is not straightforward to configure and get working. But for any of these sorts of solutions the key distribution problem is the most challenging part, I haven\u0027t looked at Matrix\u0027s E2E encryption to see how they ease that.",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff08d5d3_85d19c93",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-02T22:43:45Z",
+      "side": 1,
+      "message": "neither?",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9318b53c_bca280c2",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-02T22:43:45Z",
+      "side": 1,
+      "message": "With what little I know about it so far, I would still consider the OpenDev SSO spec a prerequisite for hosting any user accounts on the hypothetical homeserver.",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c5a863e5_b5edbdff",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-02T22:43:45Z",
+      "side": 1,
+      "message": "I suppose we could cover this in the OpenDev spec, but I\u0027m curious what the high availability options are for homeservering... like if one homeserver is down can a replica of the channel continue on a different homeserver?",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
