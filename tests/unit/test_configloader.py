@@ -546,10 +546,9 @@ class TestUnparsedConfigCache(ZuulTestCase):
 
     def test_cache_use(self):
         sched = self.scheds.first.sched
-        # Stop cleanup thread so it's not removing projects from the cache
-        # during the test.
-        sched.cleanup_stop.set()
-        sched.cleanup_thread.join()
+        # Stop cleanup jobs so it's not removing projects from
+        # the cache during the test.
+        sched.apsched.shutdown()
         tenant = sched.abide.tenants['tenant-one']
         _, project = tenant.getProject('org/project2')
 
@@ -576,6 +575,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
         cat_jobs = [job for job in self.gearman_server.jobs_history
                     if job.name == b"merger:cat"]
         self.assertEqual(len(cat_jobs), 1)
+        sched.apsched.start()
 
 
 class TestAuthorizationRuleParser(ZuulTestCase):
