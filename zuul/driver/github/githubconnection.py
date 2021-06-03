@@ -1325,9 +1325,10 @@ class GithubConnection(CachedBranchConnection):
                 with lock:
                     log.debug('Finished updating change %s', change)
         except Exception:
+            log.exception(f'Error getting change {change}')
             if key in self._change_cache:
                 del self._change_cache[key]
-            raise
+            return None
         return change
 
     def getChangesDependingOn(self, change, projects, tenant):
@@ -1632,7 +1633,11 @@ class GithubConnection(CachedBranchConnection):
         log = get_annotated_logger(self.log, event)
 
         if allow_refresh:
-            self._updateCanMergeInfo(change, event)
+            try:
+                self._updateCanMergeInfo(change, event)
+            except Exception:
+                self.log.exception(f"Change {change} failed to update")
+                return False
 
         # If the PR is a draft it cannot be merged.
         if change.draft:
