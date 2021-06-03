@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5d98098a_bed7766b",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-03T20:44:04Z",
+      "side": 1,
+      "message": "Aw shoot.  I\u0027ll fix it in a followup so we don\u0027t lose all the votes.",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "78a33798_e81bbbed",
         "filename": "doc/source/reference/developer/specs/community-matrix.rst",
         "patchSetId": 1
@@ -70,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "f2cc8b66_ed102bff",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-03T20:44:04Z",
+      "side": 1,
+      "message": "I think I meant either -- I was trying to point out that one possible alternative is for some/most of us to do what I\u0027m doing right now, which is just IRC through matrix, but that goes from a single point of failure to a double point of failure system.\n\nIf I switch to \"neither\", that suggests that neither system is capable of an outage, and I bet they both are.",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9318b53c_bca280c2",
         "filename": "doc/source/reference/developer/specs/community-matrix.rst",
         "patchSetId": 1
@@ -87,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "d89df874_b8e0a670",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-03T20:44:04Z",
+      "side": 1,
+      "message": "That would be my strong recommendation.",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c5a863e5_b5edbdff",
         "filename": "doc/source/reference/developer/specs/community-matrix.rst",
         "patchSetId": 1
@@ -98,6 +149,23 @@
       "writtenOn": "2021-06-02T22:43:45Z",
       "side": 1,
       "message": "I suppose we could cover this in the OpenDev spec, but I\u0027m curious what the high availability options are for homeservering... like if one homeserver is down can a replica of the channel continue on a different homeserver?",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "708f1f14_64464aac",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-03T20:44:04Z",
+      "side": 1,
+      "message": "Good question, and I don\u0027t have the answer at hand.",
       "revId": "dae366be2037691ea7c914827479eed88e72dea2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
