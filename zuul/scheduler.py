@@ -26,6 +26,8 @@ import time
 import traceback
 import urllib
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from kazoo.exceptions import NotEmptyError
 
 from zuul import configloader, exceptions
@@ -68,6 +70,7 @@ from zuul.model import (
     UnparsedAbideConfig,
 )
 from zuul.zk import ZooKeeperClient
+from zuul.zk.cleanup import SemaphoreCleanupLock, BuildRequestCleanupLock
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, SchedulerComponent
 )
@@ -110,7 +113,9 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
-    _cleanup_interval = 60 * 60
+    _semaphore_cleanup_interval = IntervalTrigger(minutes=60)
+    _config_cache_cleanup_interval = IntervalTrigger(minutes=60)
+    _build_request_cleanup_interval = IntervalTrigger(seconds=60)
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
 
@@ -141,10 +146,8 @@ class Scheduler(threading.Thread):
         self.repl = None
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
-        self.stats_stop = threading.Event()
-        self.cleanup_thread = threading.Thread(target=self.runCleanup)
-        self.cleanup_thread.daemon = True
-        self.cleanup_stop = threading.Event()
+        self.stop_event = threading.Event()
+        self.apsched = BackgroundScheduler()
         # TODO(jeblair): fix this
         # Despite triggers being part of the pipeline, there is one trigger set
         # per scheduler. The pipeline handles the trigger filters but since
@@ -186,6 +189,11 @@ class Scheduler(threading.Thread):
         self.pipeline_result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client
         )
+
+        self.semaphore_cleanup_lock = SemaphoreCleanupLock(self.zk_client)
+        self.build_request_cleanup_lock = BuildRequestCleanupLock(
+            self.zk_client)
+
         self.abide = Abide()
         self.unparsed_abide = UnparsedAbideConfig()
 
@@ -243,18 +251,22 @@ class Scheduler(threading.Thread):
         self.rpc.start()
         self.rpc_slow.start()
         self.stats_thread.start()
-        self.cleanup_thread.start()
+        self.apsched.start()
+        # Start an anonymous thread to perform initial cleanup, then
+        # schedule later cleanup tasks.
+        t = threading.Thread(target=self.startCleanup, name='cleanup start')
+        t.daemon = True
+        t.start()
         self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
         self._stopped = True
         self.component_info.state = self.component_info.STOPPED
-        self.stats_stop.set()
-        self.cleanup_stop.set()
+        self.stop_event.set()
         self.stopConnections()
         self.wake_event.set()
         self.stats_thread.join()
-        self.cleanup_thread.join()
+        self.apsched.shutdown()
         self.rpc.stop()
         self.rpc.join()
         self.rpc_slow.stop()
@@ -278,7 +290,7 @@ class Scheduler(threading.Thread):
         self.connections.stop()
 
     def runStats(self):
-        while not self.stats_stop.wait(self._stats_interval):
+        while not self.stop_event.wait(self._stats_interval):
             try:
                 self._runStats()
             except Exception:
@@ -412,38 +424,68 @@ class Scheduler(threading.Thread):
                 self.statsd.gauge(f"{base}.management_events",
                                   len(management_event_queues[pipeline.name]))
 
-    def runCleanup(self):
+    def startCleanup(self):
         # Run the first cleanup immediately after the first
         # reconfiguration.
-        interval = 0
-        while not self.cleanup_stop.wait(interval):
-            try:
-                if not self.last_reconfigured:
-                    time.sleep(1)
-                    continue
-                self._runCleanup()
-            except Exception:
-                self.log.exception("Error in periodic cleanup:")
-            interval = self._cleanup_interval
+        while not self.stop_event.wait(0):
+            if not self.last_reconfigured:
+                time.sleep(0.1)
+                continue
 
-    def _runCleanup(self):
+            try:
+                self._runSemaphoreCleanup()
+            except Exception:
+                self.log.exception("Error in semaphore cleanup:")
+            try:
+                self._runBuildRequestCleanup()
+            except Exception:
+                self.log.exception("Error in build request cleanup:")
+
+            self.apsched.add_job(self._runSemaphoreCleanup,
+                                 trigger=self._semaphore_cleanup_interval)
+            self.apsched.add_job(self._runBuildRequestCleanup,
+                                 trigger=self._build_request_cleanup_interval)
+            self.apsched.add_job(self._runConfigCacheCleanup,
+                                 trigger=self._config_cache_cleanup_interval)
+            return
+
+    def _runSemaphoreCleanup(self):
         # Get the layout lock to make sure the abide doesn't change
         # under us.
         with self.layout_lock:
-            self.log.debug("Starting semaphore cleanup")
-            for tenant in self.abide.tenants.values():
+            if self.semaphore_cleanup_lock.acquire(blocking=False):
                 try:
-                    tenant.semaphore_handler.cleanupLeaks()
-                except Exception:
-                    self.log.exception("Error in semaphore cleanup:")
+                    self.log.debug("Starting semaphore cleanup")
+                    for tenant in self.abide.tenants.values():
+                        try:
+                            tenant.semaphore_handler.cleanupLeaks()
+                        except Exception:
+                            self.log.exception("Error in semaphore cleanup:")
+                finally:
+                    self.semaphore_cleanup_lock.release()
 
-            cached_projects = set(
-                self.unparsed_config_cache.listCachedProjects())
-            active_projects = set(
-                self.abide.unparsed_project_branch_cache.keys())
-            unused_projects = cached_projects - active_projects
-            for project_cname in unused_projects:
-                self.unparsed_config_cache.clearCache(project_cname)
+    def _runConfigCacheCleanup(self):
+        with self.layout_lock:
+            try:
+                self.log.debug("Starting config cache cleanup")
+                cached_projects = set(
+                    self.unparsed_config_cache.listCachedProjects())
+                active_projects = set(
+                    self.abide.unparsed_project_branch_cache.keys())
+                unused_projects = cached_projects - active_projects
+                for project_cname in unused_projects:
+                    self.unparsed_config_cache.clearCache(project_cname)
+            except Exception:
+                self.log.exception("Error in config cache cleanup:")
+
+    def _runBuildRequestCleanup(self):
+        # If someone else is running the cleanup, skip it.
+        if self.build_request_cleanup_lock.acquire(blocking=False):
+            try:
+                self.log.debug("Starting build request cleanup")
+                self.executor.cleanupLostBuildRequests()
+            finally:
+                self.build_request_cleanup_lock.release()
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()

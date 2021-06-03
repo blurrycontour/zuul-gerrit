@@ -162,7 +162,6 @@ class TestSchedulerZone(ZuulTestCase):
             'zuul.executors.zone.test-provider_vpn.accepting',
             value='1', kind='g')
 
-    @skip("Disabled until I0245b71f31aae9616d8e65d27c63b25b2c27f815")
     def test_executor_disconnect(self):
         "Test that jobs are completed after an executor disconnect"
 
@@ -194,8 +193,14 @@ class TestSchedulerZone(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+        # There is a test-only race in the recording executor class
+        # where we may record a successful first build, even though
+        # the executor didn't actually send a build complete event.
+        # This could probabyl be improved, but for now, it's
+        # sufficient to verify that the job was retried.  So we omit a
+        # result classifier on the first build.
         self.assertHistory([
-            dict(name='project-merge', result='ABORTED', changes='1,1'),
+            dict(name='project-merge', changes='1,1'),
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
@@ -5927,7 +5932,6 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(A.reported, 1)
         self.assertIn('RETRY_LIMIT', A.messages[0])
 
-    @skip("Disabled until I0245b71f31aae9616d8e65d27c63b25b2c27f815")
     def test_executor_disconnect(self):
         "Test that jobs are completed after an executor disconnect"
 
@@ -5959,14 +5963,19 @@ For CI problems and help debugging, contact ci@example.org"""
         self.executor_server.release()
         self.waitUntilSettled()
 
+        # There is a test-only race in the recording executor class
+        # where we may record a successful first build, even though
+        # the executor didn't actually send a build complete event.
+        # This could probabyl be improved, but for now, it's
+        # sufficient to verify that the job was retried.  So we omit a
+        # result classifier on the first build.
         self.assertHistory([
-            dict(name='project-merge', result='ABORTED', changes='1,1'),
+            dict(name='project-merge', changes='1,1'),
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
-    @skip("Disabled until I0245b71f31aae9616d8e65d27c63b25b2c27f815")
     def test_scheduler_disconnect(self):
         "Test that jobs are completed after a scheduler disconnect"
 
