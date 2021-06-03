@@ -4778,6 +4778,7 @@ class ZuulTestCase(BaseTestCase):
         whitelist = ['watchdog',
                      'socketserver_Thread',
                      'GerritWebServer',
+                     'cleanup start',
                      ]
         # Ignore threads that start with
         # * Thread- : Kazoo TreeCache
