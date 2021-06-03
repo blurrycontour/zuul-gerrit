@@ -82,69 +82,74 @@ class GraphQLClient:
     def fetch_canmerge(self, github, change, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         owner, repo = change.project.name.split('/')
-
         data = self._fetch_canmerge(github, owner, repo, change.number,
                                     change.patchset)
         result = {}
 
-        repository = nested_get(data, 'data', 'repository')
-        # Find corresponding rule to our branch
-        rules = nested_get(repository, 'branchProtectionRules', 'nodes',
-                           default=[])
+        try:
+            repository = nested_get(data, 'data', 'repository')
+            # Find corresponding rule to our branch
+            rules = nested_get(repository, 'branchProtectionRules', 'nodes',
+                               default=[])
 
-        # Filter branch protection rules for the one matching the change.
-        matching_rules = [
-            rule for rule in rules
-            for ref in nested_get(rule, 'matchingRefs', 'nodes', default=[])
-            if ref.get('name') == change.branch
-        ]
-        if len(matching_rules) > 1:
-            log.warn('More than one branch protection rules match change %s',
-                     change)
+            # Filter branch protection rules for the one matching the change.
+            matching_rules = [
+                rule for rule in rules
+                for ref in nested_get(
+                        rule, 'matchingRefs', 'nodes', default=[])
+                if ref.get('name') == change.branch
+            ]
+            if len(matching_rules) > 1:
+                log.warn('More than one branch protection rules '
+                         'match change %s', change)
+                return result
+            elif len(matching_rules) == 1:
+                matching_rule = matching_rules[0]
+            else:
+                matching_rule = None
+
+            # If there is a matching rule, get required status checks
+            if matching_rule:
+                result['requiredStatusCheckContexts'] = matching_rule.get(
+                    'requiredStatusCheckContexts', [])
+                result['requiresApprovingReviews'] = matching_rule.get(
+                    'requiresApprovingReviews')
+                result['requiresCodeOwnerReviews'] = matching_rule.get(
+                    'requiresCodeOwnerReviews')
+                result['protected'] = True
+            else:
+                result['requiredStatusCheckContexts'] = []
+                result['protected'] = False
+
+            # Check for draft
+            pull_request = nested_get(repository, 'pullRequest')
+            result['isDraft'] = nested_get(pull_request, 'isDraft',
+                                           default=False)
+
+            # Get review decision. This is supported since GHE 2.21. Default to
+            # None to signal if the field is not present.
+            result['reviewDecision'] = nested_get(
+                pull_request, 'reviewDecision', default=None)
+
+            # Add status checks
+            result['status'] = {}
+            commit = nested_get(data, 'data', 'repository', 'object')
+            # Status can be explicit None so make sure we work with a dict
+            # afterwards
+            status = commit.get('status') or {}
+            for context in status.get('contexts', []):
+                result['status'][context['context']] = context
+
+            # Add check runs
+            result['checks'] = {}
+            for suite in nested_get(
+                    commit, 'checkSuites', 'nodes', default=[]):
+                for run in nested_get(suite, 'checkRuns', 'nodes', default=[]):
+                    result['checks'][run['name']] = {
+                        **run,
+                        "app": suite.get("app")
+                    }
+
             return result
-        elif len(matching_rules) == 1:
-            matching_rule = matching_rules[0]
-        else:
-            matching_rule = None
-
-        # If there is a matching rule, get required status checks
-        if matching_rule:
-            result['requiredStatusCheckContexts'] = matching_rule.get(
-                'requiredStatusCheckContexts', [])
-            result['requiresApprovingReviews'] = matching_rule.get(
-                'requiresApprovingReviews')
-            result['requiresCodeOwnerReviews'] = matching_rule.get(
-                'requiresCodeOwnerReviews')
-            result['protected'] = True
-        else:
-            result['requiredStatusCheckContexts'] = []
-            result['protected'] = False
-
-        # Check for draft
-        pull_request = nested_get(repository, 'pullRequest')
-        result['isDraft'] = nested_get(pull_request, 'isDraft', default=False)
-
-        # Get review decision. This is supported since GHE 2.21. Default to
-        # None to signal if the field is not present.
-        result['reviewDecision'] = nested_get(
-            pull_request, 'reviewDecision', default=None)
-
-        # Add status checks
-        result['status'] = {}
-        commit = nested_get(data, 'data', 'repository', 'object')
-        # Status can be explicit None so make sure we work with a dict
-        # afterwards
-        status = commit.get('status') or {}
-        for context in status.get('contexts', []):
-            result['status'][context['context']] = context
-
-        # Add check runs
-        result['checks'] = {}
-        for suite in nested_get(commit, 'checkSuites', 'nodes', default=[]):
-            for run in nested_get(suite, 'checkRuns', 'nodes', default=[]):
-                result['checks'][run['name']] = {
-                    **run,
-                    "app": suite.get("app")
-                }
-
-        return result
+        except AttributeError:
+            raise MergeFailure(f'Failed to parse graphql response: {data}')
