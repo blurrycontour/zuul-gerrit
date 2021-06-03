@@ -104,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "a3e5f1cb_7138a122",
+        "filename": "doc/source/reference/developer/specs/community-matrix.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-03T20:52:49Z",
+      "side": 1,
+      "message": "Oh, yep you\u0027re right. I originally misread the sentence. Thanks.",
+      "revId": "dae366be2037691ea7c914827479eed88e72dea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9318b53c_bca280c2",
         "filename": "doc/source/reference/developer/specs/community-matrix.rst",
         "patchSetId": 1
