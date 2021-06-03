@@ -11,10 +11,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import json
 import logging
 
 from pkg_resources import resource_string
 
+from zuul.exceptions import MergeFailure
 from zuul.lib.logutil import get_annotated_logger
 
 
@@ -69,7 +71,16 @@ class GraphQLClient:
             query = self.queries['canmerge']
         query = self._prepare_query(query, variables)
         response = github.session.post(self.url, json=query)
-        return response.json()
+        if response.status_code != 200:
+            raise MergeFailure(
+                f'GitHub graphql query failed: {response.status_code}')
+        j = response.json()
+        # graphql queries always return 200, but if something is
+        # wrong it will be in an "errors" key.
+        if 'errors' in j:
+            raise MergeFailure(
+                'GitHub graphql query failed: %s' % json.dumps(j))
+        return j
 
     def fetch_canmerge(self, github, change, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
