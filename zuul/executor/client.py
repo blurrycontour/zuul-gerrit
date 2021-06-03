@@ -213,3 +213,41 @@ class ExecutorClient(object):
             self.executor_api.remove(build_request)
 
         del self.builds[build.uuid]
+
+    def cleanupLostBuildRequests(self):
+        for build_request in self.executor_api.lostBuildRequests():
+            try:
+                self.cleanupLostBuildRequest(build_request)
+            except Exception:
+                self.log.exception("Exception cleaning up lost build request:")
+
+    def cleanupLostBuildRequest(self, build_request):
+        result = {"result": "ABORTED"}
+        params = build_request.params
+        tenant_name = params["zuul"]["tenant"]
+        pipeline_name = params["zuul"]["pipeline"]
+
+        # TODO (felix): Once the builds are stored in ZooKeeper, we can store
+        # the end_time directly on the build. But for now we have to use the
+        # result dict for that.
+        result["end_time"] = time.time()
+
+        build_request.state = BuildRequest.COMPLETED
+        try:
+            self.executor_api.update(build_request)
+        except BuildRequestNotFound as e:
+            self.log.warning("Could not complete build: %s", str(e))
+            return
+        except BadVersionError:
+            # There could be a race condition:
+            # The build is found by lost_builds in state RUNNING
+            # but gets completed/unlocked before the is_locked()
+            # check. Since we use the znode version, the update
+            # will fail in this case and we can simply ignore the
+            # exception.
+            return
+
+        # No need to unlock the build, as it is by definition unlocked
+
+        event = BuildCompletedEvent(build_request.uuid, result)
+        self.result_events[tenant_name][pipeline_name].put(event)

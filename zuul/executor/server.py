@@ -3208,35 +3208,6 @@ class ExecutorServer(BaseMergeServer):
         log.debug("Next executed job: %s", build_request)
         self.executeJob(build_request)
 
-    def runCleanupWorker(self):
-        while self._running:
-            try:
-                self.cleanup_election.run(self._runCleanupWorker)
-            except Exception:
-                self.log.exception("Exception in cleanup worker")
-
-    def _runCleanupWorker(self):
-        while self._running:
-            for build_request in self.executor_api.lostBuildRequests():
-                try:
-                    result = {"result": "CANCELED"}
-                    self.completeBuild(build_request, result)
-                except BadVersionError:
-                    # There could be a race condition:
-                    # The build is found by lost_builds in state RUNNING
-                    # but gets completed/unlocked before the is_locked()
-                    # check. Since we use the znode version, the update
-                    # will fail in this case and we can simply ignore the
-                    # exception.
-                    pass
-                if not self._running:
-                    return
-            # TODO (felix): It should be enough to execute the cleanup every
-            # 60 minutes. Find a proper way to do that. Maybe we could combine
-            # this with other cleanups in the scheduler and use APScheduler for
-            # proper scheduling.
-            time.sleep(5)
-
     def run_governor(self):
         while not self.governor_stop_event.wait(10):
             try:
