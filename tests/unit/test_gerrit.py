@@ -544,7 +544,7 @@ class TestChecksApi(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
-        print(A.checks_history)
+        self.log.info(A.checks_history)
         self.assertEqual(A.checks_history[3]['zuul:check']['state'],
                          'NOT_STARTED')
         self.assertEqual(A.checks_history[4]['zuul:check']['state'],

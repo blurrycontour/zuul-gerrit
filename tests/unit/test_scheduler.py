@@ -6966,7 +6966,7 @@ class TestDependencyGraph(ZuulTestCase):
         self.assertHistory([])
         self.assertEqual(len(A.messages), 1)
         self.assertTrue('Job project-merge not defined' in A.messages[0])
-        print(A.messages)
+        self.log.info(A.messages)
 
     @simple_layout('layouts/soft-dependencies.yaml')
     def test_soft_dependencies(self):

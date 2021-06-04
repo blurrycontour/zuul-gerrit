@@ -940,7 +940,14 @@ class TestExecutorExtraPackages(AnsibleZuulTestCase):
         for version in ansible_manager._supported_versions:
             command = [ansible_manager.getAnsibleCommand(version, 'pip'),
                        'uninstall', '-y', self.test_package]
-            subprocess.run(command)
+            # We want to error if the uninstall fails as the test below
+            # relies on the package not being installed to be properly
+            # exercised.
+            s = subprocess.run(command,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+            self.log.info(s.stdout)
+            self.assertEqual(s.returncode, 0)
 
     @mock.patch('zuul.lib.ansible.ManagedAnsible.extra_packages',
                 new_callable=mock.PropertyMock)
