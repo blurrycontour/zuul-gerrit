@@ -1,7 +1,7 @@
 Zuul
 ====
 
-Zuul is a project gating system.
+Zuul is an awesome project gating system.
 
 The latest documentation for Zuul v3 is published at:
 https://zuul-ci.org/docs/zuul/
