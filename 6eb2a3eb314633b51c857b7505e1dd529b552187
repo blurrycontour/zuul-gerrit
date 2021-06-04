@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5abc6c4_90f1184d",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-04T22:27:27Z",
+      "side": 1,
+      "message": "Do you know why we seem to install the handler only when we aren\u0027t a daemon? Seems like this would be useful daemon or not.",
+      "revId": "6eb2a3eb314633b51c857b7505e1dd529b552187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
