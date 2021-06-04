@@ -80,10 +80,18 @@ To create a `GitHub application
 * Set Where can this GitHub App be installed to "Any account"
 * Create the App
 * Generate a Private key in the app settings page
+* If you need access to projects the app is not installed for (e.g. to
+  Depends-On: pull requests for projects you are not installed on),
+  you may create an api_token as well (see this `article
+  <https://help.github.com/articles/creating-an-access-token-for-command-line-use/>`_).
+  This api_token is not strictly required as Zuul will fallback to
+  anonymous access; however, anonymous access is severely limited by
+  API rate limits.
 
-Then in the zuul.conf, set webhook_token, app_id and app_key.
-After restarting zuul-scheduler, verify in the 'Advanced' tab that the
-Ping payload works (green tick and 200 response)
+Then in the zuul.conf, set `webhook_token`, `app_id`, `app_key` and
+optionally `api_token`.  After restarting zuul-scheduler, verify in
+the 'Advanced' tab that the Ping payload works (green tick and 200
+response)
 
 Users can now install the application using its public page, e.g.:
 https://github.com/apps/my-org-zuul
@@ -105,9 +113,9 @@ Connection Configuration
 There are two forms of operation. Either the Zuul installation can be
 configured as a `Github App`_ or it can be configured as a Webhook.
 
-If the `Github App`_ approach is taken, the config settings ``app_id`` and
-``app_key`` are required. If the Webhook approach is taken, the ``api_token``
-setting is required.
+If the `Github App`_ approach is taken, the config settings
+``app_id``, ``app_key`` and optionally ``api_token`` are required. If
+the Webhook approach is taken, the ``api_token`` setting is required.
 
 The supported options in ``zuul.conf`` connections are:
 
