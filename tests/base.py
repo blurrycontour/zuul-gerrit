@@ -2102,7 +2102,7 @@ class FakeGitlabMergeRequest(object):
         self.notes.append(
             {
                 "body": body,
-                "created_at": datetime.datetime.now(),
+                "created_at": datetime.datetime.now(datetime.timezone.utc),
             }
         )
 
@@ -2156,7 +2156,7 @@ class FakeGitlabMergeRequest(object):
         repo.heads['master'].checkout()
 
     def _updateTimeStamp(self):
-        self.updated_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
     def getMergeRequestEvent(self, action, include_labels=False):
         name = 'gl_merge_request'
