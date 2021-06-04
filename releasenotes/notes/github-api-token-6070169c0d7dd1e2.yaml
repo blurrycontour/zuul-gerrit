@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    If using the GitHub driver in app mode, you should also
+    generate and add an ``api_token``.  This is required to
+    perform GraphQL queries on GitHub for projects the app is
+    not installed in.
