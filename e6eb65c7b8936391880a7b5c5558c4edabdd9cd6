@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "411f0855_1f20860c",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-04T22:08:44Z",
+      "side": 1,
+      "message": "See comment on parent change about whether or not MergeFailure is the most accurate exception here.",
+      "revId": "e6eb65c7b8936391880a7b5c5558c4edabdd9cd6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
