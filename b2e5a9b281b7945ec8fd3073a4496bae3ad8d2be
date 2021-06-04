@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f20081a_eb6294f3",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-04T22:34:42Z",
+      "side": 1,
+      "message": "This is a change in behavior with the old code. The old code would\u0027ve fallen through if the return code was 401, but now we will raise. You might want to rewrite this as:\n\n  log \u003d get_annotated_logger()\n  log.error(\u0027...\u0027)\n  if resp[1] not in (401, 409):\n      raise\n  elif approve \u003d\u003d \u0027approve\u0027 and resp[1] \u003d\u003d 409:\n      return\n\nThen the old behavior should be preserved for 401s.",
+      "revId": "b2e5a9b281b7945ec8fd3073a4496bae3ad8d2be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
