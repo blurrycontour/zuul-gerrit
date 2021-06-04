@@ -787,6 +787,9 @@ class FakeGithubClient(object):
     def repository(self, owner, proj):
         return self._data.repos.get((owner, proj), None)
 
+    def login(self, token):
+        pass
+
     def repo_from_project(self, project):
         # This is a convenience method for the tests.
         owner, proj = project.split('/')

@@ -44,7 +44,7 @@ from zuul.driver.github.graphql import GraphQLClient
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
-from zuul.exceptions import MergeFailure
+from zuul.exceptions import MergeFailure, ConfigurationError
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 from zuul.model import DequeueEvent
 from zuul.zk.event_queues import ConnectionEventQueue
@@ -985,8 +985,8 @@ class GithubClientManager:
                                                  inst_id=inst_id,
                                                  reprime=False)
 
-            self.log.error("No installation ID available for project %s",
-                           project_name)
+            self.log.info("No installation ID available for project %s",
+                          project_name)
             return ''
 
         now = datetime.datetime.now(utc)
@@ -1110,6 +1110,7 @@ class GithubClientManager:
                         project_name=None,
                         zuul_event_id=None):
         github = self._createGithubClient(zuul_event_id)
+        token = ''
 
         # if you're authenticating for a project and you're an integration then
         # you need to use the installation specific token.
@@ -1118,10 +1119,8 @@ class GithubClientManager:
             # case it's expired.
             token = self.get_installation_key(project_name)
 
-            # Only set the auth header if we have a token. If not, just don't
-            # set any auth header so we will be treated as anonymous. That's
-            # also what the github.login() method would do if the token is not
-            # set.
+            # Only set the auth header if we have a token. If not,
+            # falls back to the api_token specified below
             if token:
                 # To set the AppInstallationAuthToken on the github session, we
                 # also need the expiry date, but in the correct ISO format.
@@ -1142,16 +1141,18 @@ class GithubClientManager:
                 github.session.auth = AppInstallationTokenAuth(
                     token, format_expiry
                 )
+                github._zuul_project = project_name
+                github._zuul_user_id = self.installation_map.get(project_name)
 
-            github._zuul_project = project_name
-            github._zuul_user_id = self.installation_map.get(project_name)
-
-        # if we're using api_token authentication then use the provided token,
-        # else anonymous is the best we have.
-        else:
+        if not token:
+            # Fall back to using the API token
             api_token = self.connection_config.get('api_token')
             if api_token:
                 github.login(token=api_token)
+            else:
+                raise ConfigurationError('GitHub app should be installed for '
+                                         f'{project_name} or api_token set to '
+                                         'allow graphql queries.')
 
         return github
 
