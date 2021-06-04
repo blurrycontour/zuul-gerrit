@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7dab2d55_4335a4c6",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-04T22:00:31Z",
+      "side": 1,
+      "message": "Should this check if status_code is not \u003e\u003d200 and not \u003c 300 ? That way we handle other success responses.\n\nI\u0027m also not sure MergeFailure() is the right exception here as MergeFailure is used when merges actually fail, but this is just checking whether or not something is allowed to merge if I understand correctly.",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "168e08b3_d428a62d",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-04T22:00:31Z",
+      "side": 1,
+      "message": "This comment seems at odds with the check above?\n\nI\u0027m also not sure MergeFailure() is the right exception here as MergeFailure is used when merges actually fail, but this is just checking whether or not something is allowed to merge if I understand correctly.",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
