@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0fa23544_d0a42231",
+        "filename": "Dockerfile",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-04T22:20:04Z",
+      "side": 1,
+      "message": "Previously we were mkdir -p\u0027ing this path. Dockerfile reference says \"If \u003cdest\u003e doesn’t exist, it is created along with all missing directories in its path.\" so we should be good with this COPY.",
+      "range": {
+        "startLine": 34,
+        "startChar": 38,
+        "endLine": 34,
+        "endChar": 62
+      },
+      "revId": "a4dcc8bc4b7d2a9c8474ec7c27c9c7e20a361228",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
