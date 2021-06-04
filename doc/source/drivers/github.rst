@@ -12,9 +12,48 @@ installations of GitHub enterprise.
 Configure GitHub
 ----------------
 
-There are two options currently available. GitHub's project owner can either
-manually setup web-hook or install a GitHub Application. In the first case,
-the project's owner needs to know the zuul endpoint and the webhook secrets.
+Zuul needs to receive notification of events from GitHub, and it needs
+to interact with GitHub in response to those events.  There are two
+options aviable for configuring these connections.  A GitHub project's
+owner can either manually setup a web-hook or install a GitHub
+Application.  In the first case, the project's owner needs to know
+the Zuul endpoint and the webhook secrets and configure them manually.
+In the second, the project (or organization) owner need only install
+pre-existing GitHub Application into the project or organization.
+
+In general, the Application method is recommended.  Both options are
+described in the following sections.
+
+Regardless of which option is chosen, there are several types of
+authentication between Zuul and GitHub used for various purposes. Some
+are required and some are optional depending on the intended use and
+configuration.
+
+In all cases Zuul needs to authenticate messages received from GitHub
+as being valid. To do this a `webhook_token` is configured.
+
+Zuul also needs to authenticate to GitHub to make certain requests. At
+a high level, this is the sort of authentication that is required for
+various Zuul Github functionality:
+
+  * Reporting: Authentication with write access is required
+  * Enqueuing (including Depends-On): Authentication with read access is required
+  * `required-projects` listing in jobs: No authentication necessary (for public repos)
+
+There are two different ways Zuul can Authenticate its requests to
+GitHub. The first is the `api_token`. This `api_token` is used by the
+web-hook option for all authentication. When using the GitHub
+Application system Zuul uses an `app_id` and `app_key` which is
+used to generate an application token behind the scenes. But this only
+works against projects that have installed your application. As a
+fallback for interaction with projects that haven't installed your
+application you can also configure an `api_token` when using the
+application system. This is particularly useful for supporting
+Depends-On functionality against GitHub projects.
+
+Finally, authenticated requests receive much larger GitHub API rate limits.
+It is worthwhile to configure both an `app_id`/`app_key` and `api_token`
+when operating in application mode to avoid rate limits as much as possible.
 
 
 Web-Hook
@@ -80,10 +119,14 @@ To create a `GitHub application
 * Set Where can this GitHub App be installed to "Any account"
 * Create the App
 * Generate a Private key in the app settings page
+* Optionally configure an api_token. Please see this `article
+  <https://help.github.com/articles/creating-an-access-token-for-command-line-use/>`_
+  for more information.
 
-Then in the zuul.conf, set webhook_token, app_id and app_key.
-After restarting zuul-scheduler, verify in the 'Advanced' tab that the
-Ping payload works (green tick and 200 response)
+Then in the zuul.conf, set `webhook_token`, `app_id`, `app_key` and
+optionally `api_token`.  After restarting zuul-scheduler, verify in
+the 'Advanced' tab that the Ping payload works (green tick and 200
+response)
 
 Users can now install the application using its public page, e.g.:
 https://github.com/apps/my-org-zuul
@@ -105,9 +148,9 @@ Connection Configuration
 There are two forms of operation. Either the Zuul installation can be
 configured as a `Github App`_ or it can be configured as a Webhook.
 
-If the `Github App`_ approach is taken, the config settings ``app_id`` and
-``app_key`` are required. If the Webhook approach is taken, the ``api_token``
-setting is required.
+If the `Github App`_ approach is taken, the config settings
+``app_id``, ``app_key`` and optionally ``api_token`` are required. If
+the Webhook approach is taken, the ``api_token`` setting is required.
 
 The supported options in ``zuul.conf`` connections are:
 
