@@ -14,12 +14,16 @@
 
 import time
 import jwt
+import configparser
 import os
+import socket
 import subprocess
 import tempfile
 import textwrap
 
 from zuul.lib import yamlutil
+from zuul.lib.fingergw import FingerGateway
+import zuul.lib.log_streamer
 
 from tests.base import iterate_timeout
 from tests.base import AnsibleZuulTestCase
@@ -415,6 +419,143 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+# TODO a lot of this comes verbatim from test_streaming.py's
+# test_finger_gateway
+class TestZuulClientConsoleStream(BaseTestWeb, AnsibleZuulTestCase):
+    tenant_config_file = 'config/streamer/main.yaml'
+
+    def prelude(self):
+        self.executor_server.hold_jobs_in_build = True
+        # Start the finger streamer daemon
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            self.host, 0, self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+
+        # Need to set the streaming port before submitting the job
+        finger_port = streamer.server.socket.getsockname()[1]
+        self.executor_server.log_streaming_port = finger_port
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        # wait for the job to start
+        for _ in iterate_timeout(30, "builds"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+        return build
+
+    # TODO duplicate from tests/unit/test_streaming.py
+    def runFingerGateway(self):
+        self.log.info('Starting fingergw')
+        config = configparser.ConfigParser()
+        config.read_dict(self.config)
+        config.read_dict({
+            'fingergw': {
+                'listen_address': self.host,
+                'port': '0',
+                'hostname': 'localhost',
+            }
+        })
+
+        gateway = FingerGateway(
+            config,
+            command_socket=None,
+            pid_file=None
+        )
+        gateway.history = []
+        gateway.start()
+        self.addCleanup(gateway.stop)
+        gateway_port = gateway.server.socket.getsockname()[1]
+        return gateway, (self.host, gateway_port)
+
+    def _test_console_stream(self, args, build):
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        for x in iterate_timeout(30, "build dir"):
+            if os.path.exists(build_dir):
+                break
+        for x in iterate_timeout(30, "jobdir"):
+            if build.jobdir is not None:
+                break
+
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        for x in iterate_timeout(30, "ansible log"):
+            if os.path.exists(ansible_log):
+                break
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Start the finger gateway daemon
+        _, gateway_address = self.runFingerGateway()
+
+        # Wait until the gateway is started
+        for x in iterate_timeout(30, "finger client to start"):
+            try:
+                # NOTE(Shrews): This causes the gateway to begin to handle
+                # a request for which it never receives data, and thus
+                # causes the getCommand() method to timeout (seen in the
+                # test results, but is harmless).
+                with socket.create_connection(gateway_address) as s:
+                    break
+            except ConnectionRefusedError:
+                pass
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'console-stream',
+             '--tenant', 'tenant-one', ] + args,
+            stdout=subprocess.PIPE)
+
+        # Allow job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        file_contents = logfile.readlines()
+        logfile.close()
+
+        # Wait for the CLI to complete
+        output, err = (None, None)
+        for i in range(10):
+            self.log.debug('Attempt #%i to communicate with CLI' % i)
+            try:
+                output, err = p.communicate(timeout=i)
+            except subprocess.TimeoutExpired:
+                pass
+            if output:
+                break
+
+        self.assertTrue(output is not None, 'CLI process timed out')
+        self.assertTrue(output.endswith(b'### CONNECTION CLOSED ###\n'),
+                        'Connection did not close')
+
+        self.log.debug('\n\nzuul-client stdout: %s\n\n' % str(output))
+        self.log.debug('\n\nzuul-client stderr: %s\n\n' % err)
+        self.log.debug('\n\nLog File: %s\n\n' % file_contents)
+
+        self.assertEqual(0, p.returncode, (output, err))
+        for line in file_contents:
+            l = line.strip()
+            if l != '':
+                self.assertTrue(l.encode('utf-8') in output,
+                                'missing line: "%s"' % line)
+
+    def test_console_stream_by_change(self):
+        build = self.prelude()
+        args = ['--job', 'python27', '--change', '1,1']
+        self._test_console_stream(args, build)
+
+    def test_console_stream_by_uuid(self):
+        build = self.prelude()
+        args = ['--uuid', build.uuid]
+        self._test_console_stream(args, build)
 
 
 class TestZuulClientQueryData(BaseTestWeb):
