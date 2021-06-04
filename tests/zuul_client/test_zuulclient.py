@@ -411,6 +411,56 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.reported, 2)
 
 
+class TestZuulClientConsoleStream(BaseTestWeb, AnsibleZuulTestCase):
+    def test_console_stream(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        # wait for the job to start
+        for x in iterate_timeout(30, "builds"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        for x in iterate_timeout(30, "build dir"):
+            if os.path.exists(build_dir):
+                break
+        for x in iterate_timeout(30, "jobdir"):
+            if build.jobdir is not None:
+                break
+            build = self.builds[0]
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        for x in iterate_timeout(30, "ansible log"):
+            if os.path.exists(ansible_log):
+                break
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             '-v',
+             'console-stream',
+             '--tenant', 'tenant-one',
+             '--uuid', build.uuid],
+            stdout=subprocess.PIPE)
+
+        file_contents = logfile.read()
+        logfile.close()
+
+        output, err = p.communicate(timeout=30)
+
+        self.log.debug('\n\nStreamed: %s\n\n' % output)
+        self.log.debug('\n\nError: %s\n\n' % err)
+        self.log.debug('\n\nLog File: %s\n\n' % file_contents)
+
+        self.assertEqual(0, p.returncode, (output, err))
+        self.assertTrue(file_contents in output)
+
+
 class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
     """Test that zuul-client can fetch builds"""
     config_file = 'zuul-sql-driver-mysql.conf'
