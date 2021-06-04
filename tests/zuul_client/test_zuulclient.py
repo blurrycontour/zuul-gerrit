@@ -19,6 +19,8 @@ import subprocess
 import tempfile
 import textwrap
 
+from zuul.lib.fingergw import FingerGateway
+import zuul.lib.log_streamer
 import zuul.web
 import zuul.rpcclient
 
@@ -409,6 +411,95 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+class TestZuulClientConsoleStream(BaseTestWeb, AnsibleZuulTestCase):
+    tenant_config_file = 'config/streamer/main.yaml'
+
+    def test_console_stream(self):
+        # Start the finger streamer daemon
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            self.executor_server.hostname, 0,
+            self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+
+        # Need to set the streaming port before submitting the job
+        finger_port = streamer.server.socket.getsockname()[1]
+        self.executor_server.log_streaming_port = finger_port
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        # wait for the job to start
+        for x in iterate_timeout(30, "builds"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        for x in iterate_timeout(30, "build dir"):
+            if os.path.exists(build_dir):
+                break
+        for x in iterate_timeout(30, "jobdir"):
+            if build.jobdir is not None:
+                break
+            build = self.builds[0]
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        for x in iterate_timeout(30, "ansible log"):
+            if os.path.exists(ansible_log):
+                break
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Start the finger gateway daemon
+        gateway = FingerGateway(
+            self.config,
+            ('127.0.0.1', self.gearman_server.port, None, None, None),
+            (self.host, 0),
+            user=None,
+            command_socket=None,
+            pid_file=None
+        )
+        gateway.start()
+        self.addCleanup(gateway.stop)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'console-stream',
+             '--tenant', 'tenant-one',
+             '--job', 'python27', '--change', '1,1'],
+            stdout=subprocess.PIPE)
+
+        # Allow job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
+
+        file_contents = logfile.readlines()
+        logfile.close()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Wait for the CLI to complete
+        output, err = (None, None)
+        for i in range(10):
+            self.log.debug('Attempt #%i to communicate with CLI' % i)
+            try:
+                output, err = p.communicate(timeout=i)
+            except subprocess.TimeoutExpired:
+                pass
+
+        self.assertTrue(output is not None, 'CLI process timed out')
+        self.assertTrue('CONNECTION CLOSED' in str(output))
+
+        self.log.debug('\n\nzuul-client stdout: %s\n\n' % str(output))
+        self.log.debug('\n\nzuul-client stderr: %s\n\n' % err)
+        self.log.debug('\n\nLog File: %s\n\n' % file_contents)
+
+        self.assertEqual(0, p.returncode, (output, err))
+        for line in file_contents:
+            self.assertTrue(line in str(output))
 
 
 class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
