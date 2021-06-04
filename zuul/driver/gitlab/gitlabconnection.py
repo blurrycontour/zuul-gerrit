@@ -347,12 +347,12 @@ class GitlabAPIClient():
             # endpoint the second call return 401.
             # 409 is returned when current HEAD of the merge request doesn't
             # match the 'sha' parameter.
-            if resp[1] not in (401, 409):
-                raise
-            elif approve == 'approve' and resp[1] == 409:
-                log = get_annotated_logger(self.log, zuul_event_id)
-                log.error('Fail to approve the merge request: %s' % resp[0])
+            log = get_annotated_logger(self.log, zuul_event_id)
+            log.error('Fail to approve the merge request: %s' % resp[0])
+            if approve == 'approve' and resp[1] == 409:
                 return
+            else:
+                raise
         return resp[0]
 
     # https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
