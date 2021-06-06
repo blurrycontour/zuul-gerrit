@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f54698e5_28abc888",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-06-06T22:38:16Z",
+      "side": 1,
+      "message": "I feel like anything !200 from graphql is going to cause a problem, so it might be useful to call it out explicitly.\n\nNote that github.session.post does log things like (from attached story):\n\n POST https://api.github.com/graphql result: 401, size: 177, duration: 47, zuul_query: canmerge, owner: ansible, repo: ansible, pull: 74892, head_sha: 8d4bed1690e5baa023045384695ae86a101aec21\n\nhowever it\u0027s fairly easy to mistake \"result:\" -- I certainly missed it although it\u0027s obvious once pointed out.  We should definitely stop loudly in that case.",
+      "parentUuid": "7dab2d55_4335a4c6",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "168e08b3_d428a62d",
         "filename": "zuul/driver/github/graphql/__init__.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2021-06-04T22:00:31Z",
       "side": 1,
       "message": "This comment seems at odds with the check above?\n\nI\u0027m also not sure MergeFailure() is the right exception here as MergeFailure is used when merges actually fail, but this is just checking whether or not something is allowed to merge if I understand correctly.",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a8857a5c_c60552ac",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-06-06T22:38:16Z",
+      "side": 1,
+      "message": "I guess I\u0027m making a difference between the HTTP request and the graphql query in it.  An invalid syntax for example will return 200 but with errors in the response.\n\nThis is really from early debugging when I thought we were making the query correctly but getting back invalid data; as it turned out that was not the case.  If people feel strongly we could drop this bit; as I don\u0027t really expect we\u0027d have invalid queries make it into the production code.\n\nMergeFailure was an educated guess based on grepping what other drivers seemed to be raising.  I\u0027ll certainly take advice on another exception.  ConfigurationError didn\u0027t seem quite right either.",
+      "parentUuid": "168e08b3_d428a62d",
       "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
