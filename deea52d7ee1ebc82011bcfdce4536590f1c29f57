@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff6282ff_3333718b",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-06T12:06:18Z",
+      "side": 1,
+      "message": "I wonder if we should use a note:: for this instead, and reserve warning for more security-sensitive concerns.",
+      "revId": "deea52d7ee1ebc82011bcfdce4536590f1c29f57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a76ada89_962bf1b8",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-06-06T12:06:18Z",
+      "side": 1,
+      "message": "The location of this block is not really in close proximity to the relevant options. Perhaps it should be separately included in the branches, files and irrelevant-files attributes instead?",
+      "revId": "deea52d7ee1ebc82011bcfdce4536590f1c29f57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
