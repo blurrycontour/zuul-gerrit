@@ -78,6 +78,13 @@ Here is an example of two job definitions:
            - name: test-node
              label: fedora
 
+.. warning::
+
+   Regular expression matching in Zuul *starts at the beginning of
+   the string*, i.e., as if there was an implicit ``^`` at the beginning
+   of the regular expression. To match at an arbitrary position, prepend
+   ``.*`` to the regular expression.
+
 .. attr:: job
 
    The following attributes are available on a job; all are optional
