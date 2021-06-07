@@ -16,6 +16,23 @@
       "revId": "60b5e174db040366d49f7f82ed8e37e4671048cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93324881_5b253fb2",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T21:00:56Z",
+      "side": 1,
+      "message": "That sounds workable; it could use a multiplexing protocol, or the persistent connection could be used just to tell the executor to establish another connection to start a stream.\n\nThat\u0027s probably easier for the NAT case, but it\u0027s probably a coin toss for the k8s case (either way, you add a new nodeport service; just on the remote cluster in the first case, and the main cluster in the second).\n\nGiven the marginal benefit plus additional complexity, I\u0027m inclined to say let\u0027s stick with this and if the NAT issue is bothersome enough for someone to want to implement the callback idea in the future, great.",
+      "revId": "60b5e174db040366d49f7f82ed8e37e4671048cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
