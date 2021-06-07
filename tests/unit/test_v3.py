@@ -5471,6 +5471,41 @@ class TestSecretLeaks(AnsibleZuulTestCase):
         self._test_secret_file_fail()
 
 
+class TestParseErrors(AnsibleZuulTestCase):
+    tenant_config_file = 'config/parse-errors/main.yaml'
+
+    def searchForContent(self, path, content):
+        matches = []
+        for (dirpath, dirnames, filenames) in os.walk(path):
+            for filename in filenames:
+                filepath = os.path.join(dirpath, filename)
+                with open(filepath, 'rb') as f:
+                    if content in f.read():
+                        matches.append(filepath[len(path):])
+        return matches
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_parse_error_leak(self):
+        # Test that parse errors don't leak inventory information
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+        ])
+        matches = self.searchForContent(self.history[0].jobdir.root,
+                                        b'xyzzy')
+        self.assertEqual(set([
+            '/trusted/project_0/review.example.com/common-config/zuul.yaml']),
+            set(matches))
+
+
 class TestNodesets(ZuulTestCase):
     tenant_config_file = 'config/nodesets/main.yaml'
 
