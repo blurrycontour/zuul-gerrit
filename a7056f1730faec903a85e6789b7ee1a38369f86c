@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "4995abe2_c9793d7d",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-07T21:10:23Z",
+      "side": 1,
+      "message": "I was thinking that a 201, 202, 203, 204, 205, or 206 may be possible and represent a valid return. Failing when \u003c200 or \u003e299 makes sense to me.",
+      "parentUuid": "f54698e5_28abc888",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "168e08b3_d428a62d",
         "filename": "zuul/driver/github/graphql/__init__.py",
         "patchSetId": 3
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "I guess I\u0027m making a difference between the HTTP request and the graphql query in it.  An invalid syntax for example will return 200 but with errors in the response.\n\nThis is really from early debugging when I thought we were making the query correctly but getting back invalid data; as it turned out that was not the case.  If people feel strongly we could drop this bit; as I don\u0027t really expect we\u0027d have invalid queries make it into the production code.\n\nMergeFailure was an educated guess based on grepping what other drivers seemed to be raising.  I\u0027ll certainly take advice on another exception.  ConfigurationError didn\u0027t seem quite right either.",
       "parentUuid": "168e08b3_d428a62d",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1ec39f8e_2491568b",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-07T21:10:23Z",
+      "side": 1,
+      "message": "Re MergeFailure maybe ChangeQueryFailure or similar? I just made that up so may need to add it 😊",
+      "parentUuid": "a8857a5c_c60552ac",
       "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
