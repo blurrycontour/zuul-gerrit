@@ -352,6 +352,23 @@
     },
     {
       "key": {
+        "uuid": "e88620bb_80604a39",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3176,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T23:36:58Z",
+      "side": 1,
+      "message": "The job class is part of the executor.  It\u0027s the part that handles the stuff that\u0027s specific to the job.  I think the locking should happen there so that the executor\u0027s main thread can get back to its work.  Think of it as a fork and exec model (with threads).  The executor does the minimum necessary to start a new thread to handle the build request, and then hands it off to the child thread.  You can see this method is all there is -- there is almost no work done in this method.\n\nFor that reason, I do think we should move this to the job class.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d15881fc_29833b27",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -387,6 +404,23 @@
     },
     {
       "key": {
+        "uuid": "15e660be_06d1106a",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T23:36:58Z",
+      "side": 1,
+      "message": "Mostly this was a note to remind us to evaluate whether those parameters should still be required for the NodeRequest given all the changes.  They may not be necessary on the scheduler either.  We should still look into this.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d979b613_c028375e",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -419,6 +453,23 @@
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0799c20_7f427be8",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2299,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T23:36:58Z",
+      "side": 1,
+      "message": "Okay; there\u0027s a lot of stuff in the model and pipeline managers that expects a certain lifecycle for entries in this dictionary.  So it may make sense to make this change as you suggest, but we\u0027ll need to be careful to check all the usages of it.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
