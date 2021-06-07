@@ -63,7 +63,6 @@ from zuul.model import (
     PromoteEvent,
     ReconfigureEvent,
     SmartReconfigureEvent,
-    Tenant,
     TenantReconfigureEvent,
     UnparsedAbideConfig,
 )
@@ -779,26 +778,47 @@ class Scheduler(threading.Thread):
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
-            abide = loader.loadConfig(
-                self.unparsed_abide, self.ansible_manager,
-                event.validate_tenants)
-            if event.validate_tenants is None:
-                for tenant in abide.tenants.values():
-                    self._reconfigureTenant(tenant)
-                for old_tenant in self.abide.tenants.values():
-                    if not abide.tenants.get(old_tenant.name):
-                        # We deleted a tenant
-                        self._reconfigureDeleteTenant(old_tenant)
-                self.abide = abide
-            else:
+
+            tenants_to_load = list(self.unparsed_abide.tenants)
+            if event.validate_tenants is not None:
+                validate_tenants = set(event.validate_tenants)
+                if not validate_tenants.issubset(tenants_to_load):
+                    invalid = validate_tenants.difference(tenants_to_load)
+                    raise RuntimeError(f"Invalid tenant(s) found: {invalid}")
+                # In case we have an empty list, we validate all tenants.
+                tenants_to_load = event.validate_tenants or tenants_to_load
+
+            abide = Abide()
+            loader.loadAdminRules(abide, self.unparsed_abide)
+            for tenant_name in tenants_to_load:
+                tenant = loader.loadTenant(abide, tenant_name,
+                                           self.ansible_manager,
+                                           self.unparsed_abide,
+                                           cache_ltime=None)
+                if event.validate_tenants:
+                    # We are only validating the tenant config; skip reconfig
+                    continue
+
+                if tenant is not None:
+                    old_tenant = self.abide.tenants.get(tenant_name)
+                    self._reconfigureTenant(tenant, old_tenant)
+
+            for old_tenant in self.abide.tenants.values():
+                if old_tenant.name not in abide.tenants:
+                    # We deleted a tenant
+                    self._reconfigureDeleteTenant(old_tenant)
+
+            if event.validate_tenants is not None:
                 loading_errors = []
                 for tenant in abide.tenants.values():
                     for error in tenant.layout.loading_errors:
-                        loading_errors.append(error.__repr__())
+                        loading_errors.append(repr(error))
                 if loading_errors:
                     summary = '\n\n\n'.join(loading_errors)
                     raise configloader.ConfigurationSyntaxError(
-                        'Configuration errors: {}'.format(summary))
+                        f"Configuration errors: {summary}")
+
+            self.abide = abide
         finally:
             self.layout_lock.release()
 
@@ -841,20 +861,16 @@ class Scheduler(threading.Thread):
 
                 reconfigured_tenants.append(tenant_name)
                 old_tenant = self.abide.tenants.get(tenant_name)
-                if old_tenant is None:
-                    # If there is no old tenant, use a fake tenant with the
-                    # correct name
-                    old_tenant = Tenant(tenant_name)
-                abide = loader.reloadTenant(
-                    self.abide, old_tenant, self.ansible_manager,
-                    self.unparsed_abide)
+                tenant = loader.loadTenant(self.abide, tenant_name,
+                                           self.ansible_manager,
+                                           self.unparsed_abide,
+                                           cache_ltime=event.zuul_event_ltime)
 
-                tenant = abide.tenants.get(tenant_name)
+                tenant = self.abide.tenants.get(tenant_name)
                 if tenant is not None:
-                    self._reconfigureTenant(tenant)
+                    self._reconfigureTenant(tenant, old_tenant)
                 else:
                     self._reconfigureDeleteTenant(old_tenant)
-                self.abide = abide
         duration = round(time.monotonic() - start, 3)
         self.log.info("Smart reconfiguration of tenants %s complete "
                       "(duration: %s seconds)", reconfigured_tenants, duration)
@@ -879,15 +895,14 @@ class Scheduler(threading.Thread):
                     self.unparsed_config_cache.clearCache(project_name,
                                                           branch_name)
 
-            old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
-            abide = loader.reloadTenant(self.abide, old_tenant,
-                                        self.ansible_manager,
-                                        cache_ltime=event.zuul_event_ltime)
-            tenant = abide.tenants[event.tenant_name]
-            self._reconfigureTenant(tenant)
-            self.abide = abide
+            old_tenant = self.abide.tenants.get(event.tenant_name)
+            loader.loadTenant(self.abide, event.tenant_name,
+                              self.ansible_manager, self.unparsed_abide,
+                              cache_ltime=event.zuul_event_ltime)
+            tenant = self.abide.tenants[event.tenant_name]
+            self._reconfigureTenant(tenant, old_tenant)
         finally:
             self.layout_lock.release()
         duration = round(time.monotonic() - start, 3)
@@ -1038,11 +1053,9 @@ class Scheduler(threading.Thread):
             if not new_pipeline:
                 self._reconfigureDeletePipeline(old_pipeline)
 
-    def _reconfigureTenant(self, tenant):
+    def _reconfigureTenant(self, tenant, old_tenant=None):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
-        old_tenant = self.abide.tenants.get(tenant.name)
-
         if old_tenant:
             self._reenqueueTenant(old_tenant, tenant)
 
