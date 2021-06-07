@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92dc92c0_c87b21a3",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-07T20:39:04Z",
+      "side": 1,
+      "message": "It might be worth writing down how this global config should be handled in a distributed system. Currently OpenDev runs 4 nodepool launchers and 3 builders. Each of the launchers runs a different config. Would we be required to pick a primary launcher and define the limits there? Or would we need to set the same limits across the board? Maybe nodepool would take the most conservative config?\n\nI think we have options here. I think it would be good to think about what we want to have though.",
+      "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38753612_e48a94d1",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-07T20:39:04Z",
+      "side": 1,
+      "message": "We might want to prioritize requests which were previously passed over due to tenant limits to avoid starving tenants when near our global resource limits.",
+      "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b086d4de_22d42ae3",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-07T20:39:04Z",
+      "side": 1,
+      "message": "Could we do a simple max-servers limit for kubernetes and other drivers?",
+      "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
