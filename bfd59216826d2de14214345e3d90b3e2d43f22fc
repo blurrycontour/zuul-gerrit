@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9dad9420_c4f996bb",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-06-07T12:14:39Z",
+      "side": 1,
+      "message": "Perhaps move the zuul-client process creation after it settled?, here",
+      "revId": "bfd59216826d2de14214345e3d90b3e2d43f22fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
