@@ -50,6 +50,24 @@
       "revId": "c1c30c43d7099eea6fec7b5683e97b347661eb1f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b4272d20_d61bcab0",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-06-07T12:48:35Z",
+      "side": 1,
+      "message": "So are you suggesting we add something like \n\n allow_unmamaged_projects\u003dTrue/False\n\nIn the driver config?  If that is true and we don\u0027t have and api key we raise the failure, if False, then not being installed is also an error and we have to fail if there\u0027s no installation is?",
+      "parentUuid": "3e3c6716_7496a1df",
+      "revId": "c1c30c43d7099eea6fec7b5683e97b347661eb1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
