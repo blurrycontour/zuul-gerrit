@@ -1514,25 +1514,28 @@ class PipelineManager(metaclass=ABCMeta):
         log.debug("Reporting change %s", item.change)
         ret = True  # Means error as returned by trigger.report
 
-        # In the case of failure, we may not hove completed an initial
+        # In the case of failure, we may not have completed an initial
         # merge which would get the layout for this item, so in order
         # to determine whether this item's project is in this
         # pipeline, use the dynamic layout if available, otherwise,
         # fall back to the current static layout as a best
-        # approximation.
-        layout = None
-        if item.layout_uuid:
-            layout = self.getLayout(item)
-        if not layout:
-            layout = self.pipeline.tenant.layout
+        # approximation.  However, if we ran jobs, then we obviously
+        # were in the pipeline config.
+        project_in_pipeline = bool(item.getJobs())
 
-        project_in_pipeline = True
-        ppc = None
-        try:
-            ppc = layout.getProjectPipelineConfig(item)
-        except Exception:
-            log.exception("Invalid config for change %s", item.change)
-        if not ppc:
+        if not project_in_pipeline:
+            layout = None
+            if item.layout_uuid:
+                layout = self.getLayout(item)
+            if not layout:
+                layout = self.pipeline.tenant.layout
+
+            try:
+                project_in_pipeline = bool(
+                    layout.getProjectPipelineConfig(item))
+            except Exception:
+                log.exception("Invalid config for change %s", item.change)
+        if not project_in_pipeline:
             log.debug("Project %s not in pipeline %s for change %s",
                       item.change.project, self.pipeline, item.change)
             project_in_pipeline = False

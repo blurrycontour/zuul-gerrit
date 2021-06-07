@@ -3019,6 +3019,44 @@ class TestInRepoJoin(ZuulTestCase):
             dict(name='project-test1', result='ABORTED', changes='1,1 2,1'),
         ], ordered=False)
 
+    def test_dynamic_failure_with_reconfig(self):
+        # Test that a reconfig in the middle of adding a change to a
+        # pipeline works.
+        self.executor_server.hold_jobs_in_build = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+
+            - project:
+                name: org/project
+                gate:
+                  jobs:
+                    - project-test1
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.executor_server.failJob('project-test1', A)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        # Execute a reconfig here which will clear the cached layout
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        self.orderedRelease()
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 2,
+                         "A should report start and failure")
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertHistory([
+            dict(name='project-test1', result='FAILURE', changes='1,1'),
+        ], ordered=False)
+
     def test_dynamic_dependent_pipeline_absent(self):
         # Test that a series of dependent changes don't report merge
         # failures to a pipeline they aren't in.
