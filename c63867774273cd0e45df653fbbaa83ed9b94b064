@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "a681aa96_c2a386dd",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T20:53:14Z",
+      "side": 1,
+      "message": "Good point; I was assuming it would be like min-ready, which is sort of \"caveat operator\".  The values would be used independently by each launcher.  I don\u0027t think this has the same race condition properties of min-ready that lead us to pick a \"primary\" launcher.  Instead, they should be kept the same on all of the launchers.  Technically they could be different though.  If they are different, I don\u0027t think it would cause a problem, just be confusing why some launchers could apparently exceed the capacity while others never get to launch anything.\n\nI think in the long run we might want to move to a single global state in ZK, but we need to work out the lifecycle for that.  I think the idea that they should be the same everywhere is workable enough (and matches the current design) that it doesn\u0027t need to be a pre-requisite for this.",
+      "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "38753612_e48a94d1",
         "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
         "patchSetId": 6
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "f9a5e57e_601799b1",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T20:53:14Z",
+      "side": 1,
+      "message": "It will effectively be a high priority since it\u0027s the head of the queue at this point; the next launcher to look at the queue (which could be this one), will see it first (or at least, after all the other similar requests it skipped).",
+      "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b086d4de_22d42ae3",
         "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
         "patchSetId": 6
@@ -50,6 +84,23 @@
       "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5f48028c_c5e39a30",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-07T20:53:14Z",
+      "side": 1,
+      "message": "We could -- I feel like there are equally legitimate use cases for counting a k8s pod as a \"server\" and not doing so.  Either way, we pick a side.",
+      "revId": "c63867774273cd0e45df653fbbaa83ed9b94b064",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
