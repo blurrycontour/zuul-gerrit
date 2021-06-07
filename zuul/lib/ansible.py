@@ -231,7 +231,7 @@ class AnsibleManager:
         return result
 
     def _validate_packages(self, version):
-        result = True
+        result = False
         try:
             extra_packages = self._getAnsible(version).extra_packages
             python_package_check = \
@@ -240,11 +240,22 @@ class AnsibleManager:
 
             command = [self.getAnsibleCommand(version, 'python'),
                        '-c', python_package_check]
-            subprocess.run(command, check=True)
+            ret = subprocess.run(command,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT)
+            # We check manually so that we can log the stdout and stderr
+            # properly which aren't going to be available if we have
+            # subprocess.run() check and raise.
+            if ret.returncode != 0:
+                self.log.error(
+                    'Ansible version %s installation is missing packages' %
+                    version)
+                self.log.debug("Ansible package check output: %s", ret.stdout)
+            else:
+                result = True
         except Exception:
-            result = False
             self.log.exception(
-                'Ansible version %s installation is missing packages' %
+                'Exception checking Ansible version %s packages' %
                 version)
         return result
 
