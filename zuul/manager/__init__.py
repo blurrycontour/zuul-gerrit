@@ -1038,6 +1038,9 @@ class PipelineManager(metaclass=ABCMeta):
             msg = "This change depends on a change "\
                   "with an invalid configuration.\n"
             item.setConfigError(msg)
+            # Find our layout since the reporter will need it to
+            # determine if the project is in the pipeline.
+            self.getLayout(item)
             return False
 
         # The next section starts between 0 and 2 remote merger
@@ -1076,9 +1079,10 @@ class PipelineManager(metaclass=ABCMeta):
 
         # If the change can not be merged or has config errors, don't
         # run jobs.
-        if build_set.unable_to_merge:
-            return False
-        if build_set.config_errors:
+        if build_set.unable_to_merge or build_set.config_errors:
+            # Find our layout since the reporter will need it to
+            # determine if the project is in the pipeline.
+            self.getLayout(item)
             return False
 
         # With the merges done, we have the info needed to get a

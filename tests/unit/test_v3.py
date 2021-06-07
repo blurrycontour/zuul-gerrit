@@ -3057,6 +3057,62 @@ class TestInRepoJoin(ZuulTestCase):
             dict(name='project-test1', result='FAILURE', changes='1,1'),
         ], ordered=False)
 
+    def test_dynamic_dependent_pipeline_merge_failure(self):
+        # Test that a merge failure behind a change adding a project
+        # to a dependent pipeline is correctly reported.
+        self.executor_server.hold_jobs_in_build = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+
+            - project:
+                name: org/project
+                gate:
+                  jobs:
+                    - project-test1
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test2
+                run: playbooks/project-test1.yaml
+
+            - project:
+                name: org/project
+                gate:
+                  jobs:
+                    - project-test2
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.orderedRelease()
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 2,
+                         "A should report start and success")
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.reported, 1,
+                         "B should report merge failure")
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
     def test_dynamic_dependent_pipeline_absent(self):
         # Test that a series of dependent changes don't report merge
         # failures to a pipeline they aren't in.
