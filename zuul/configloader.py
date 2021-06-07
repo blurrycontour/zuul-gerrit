@@ -2266,20 +2266,16 @@ class ConfigLoader(object):
         unparsed_abide.extend(data)
         return unparsed_abide
 
-    def loadConfig(self, unparsed_abide, ansible_manager, tenants=None):
-        abide = model.Abide()
+    def loadAdminRules(self, abide, unparsed_abide):
         for conf_admin_rule in unparsed_abide.admin_rules:
             admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
             abide.admin_rules[admin_rule.name] = admin_rule
 
-        if tenants:
-            tenants_to_load = {t: unparsed_abide.tenants[t] for t in tenants}
-        else:
-            tenants_to_load = unparsed_abide.tenants
-
+    def loadTPCs(self, abide, unparsed_abide, tenants):
         # Pre-load TenantProjectConfigs so we can get and cache all of a
         # project's config files (incl. tenant specific extra config) at once.
-        for tenant_name, conf_tenant in tenants_to_load.items():
+        for tenant_name in tenants:
+            conf_tenant = unparsed_abide[tenant_name]
             config_tpcs, untrusted_tpcs = (
                 self.tenant_parser.loadTenantProjects(conf_tenant)
             )
@@ -2288,67 +2284,37 @@ class ConfigLoader(object):
             for tpc in untrusted_tpcs:
                 abide.addUntrustedTPC(tenant_name, tpc)
 
-        for conf_tenant in tenants_to_load.values():
-            # When performing a full reload, do not use cached data.
-            tenant = self.tenant_parser.fromYaml(
-                abide, conf_tenant, ansible_manager)
-            abide.tenants[tenant.name] = tenant
-            if len(tenant.layout.loading_errors):
-                self.log.warning(
-                    "%s errors detected during %s tenant "
-                    "configuration loading" % (
-                        len(tenant.layout.loading_errors), tenant.name))
-                # Log accumulated errors
-                for err in tenant.layout.loading_errors.errors[:10]:
-                    self.log.warning(err.error)
-        return abide
+    def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
+                   cache_ltime=None):
+        if tenant_name not in unparsed_abide.tenants:
+            del abide.tenants[tenant_name]
+            return None
 
-    def reloadTenant(self, abide, tenant, ansible_manager,
-                     unparsed_abide=None, cache_ltime=None):
-        new_abide = model.Abide()
-        new_abide.tenants = abide.tenants.copy()
-        new_abide.admin_rules = abide.admin_rules.copy()
-        new_abide.unparsed_project_branch_cache = \
-            abide.unparsed_project_branch_cache
-        new_abide.config_tpcs = abide.config_tpcs
-        new_abide.untrusted_tpcs = abide.untrusted_tpcs
-
-        if unparsed_abide:
-            # We got a new unparsed abide so re-load the tenant completely.
-            # First check if the tenant is still existing and if not remove
-            # from the abide.
-            if tenant.name not in unparsed_abide.tenants:
-                del new_abide.tenants[tenant.name]
-                return new_abide
-
-            unparsed_config = unparsed_abide.tenants[tenant.name]
-        else:
-            unparsed_config = tenant.unparsed_config
+        unparsed_config = unparsed_abide.tenants[tenant_name]
 
         # Pre-load TenantProjectConfig so we can get and cache all of a
         # project's config files (incl. tenant specific extra config) at once.
         config_tpcs, untrusted_tpcs = (
             self.tenant_parser.loadTenantProjects(unparsed_config)
         )
-        new_abide.clearTPCs(tenant.name)
+        abide.clearTPCs(tenant_name)
         for tpc in config_tpcs:
-            new_abide.addConfigTPC(tenant.name, tpc)
+            abide.addConfigTPC(tenant_name, tpc)
         for tpc in untrusted_tpcs:
-            new_abide.addUntrustedTPC(tenant.name, tpc)
+            abide.addUntrustedTPC(tenant_name, tpc)
 
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            new_abide, unparsed_config, ansible_manager, cache_ltime)
-        new_abide.tenants[tenant.name] = new_tenant
+            abide, unparsed_config, ansible_manager, cache_ltime)
+        abide.tenants[tenant_name] = new_tenant
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
-                "%s errors detected during %s tenant "
-                "configuration re-loading" % (
-                    len(new_tenant.layout.loading_errors), tenant.name))
+                "%s errors detected during %s tenant configuration loading",
+                len(new_tenant.layout.loading_errors), tenant_name)
             # Log accumulated errors
             for err in new_tenant.layout.loading_errors.errors[:10]:
                 self.log.warning(err.error)
-        return new_abide
+        return new_tenant
 
     def _loadDynamicProjectData(self, config, project,
                                 files, trusted, item, loading_errors,
