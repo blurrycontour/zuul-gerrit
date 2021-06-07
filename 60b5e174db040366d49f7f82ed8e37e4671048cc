@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af1efd67_d528ded9",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-07T20:52:51Z",
+      "side": 1,
+      "message": "Currently we don\u0027t have many issues with executors behind NAT because they connect to the rest of the cluster rather than having connections made to them. The proposal presented here should work just fine, but I wonder if we would be better off with having the zoned executors connect out to the finger gateways creating a connection that is happy behind NAT. Then when the fingergw looks up a stream location it can simply request it from the connection that already exists for that executor?\n\nWhere this gets complicated is we\u0027ll need to be able to run multiple streams over that single connection so tcp alone is probably insufficient?\n\nMostly thinking out loud here to point out the existing NAT bypass methodology to see if that might be preferred if workable.",
+      "revId": "60b5e174db040366d49f7f82ed8e37e4671048cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
