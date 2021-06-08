@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1ab530f_e7e78d12",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-08T06:46:10Z",
+      "side": 1,
+      "message": "I disagree here. Currently we let all exceptions on api calls bubble up and catch them in _updateChange and reraise them in order to prevent operating on wrong data on changes. This change changes that and transforms an api error (which could be anything from access denied, bug in the graphql query or a 500) silently (for the user) into \u0027change cannot merge\u0027. This makes zuul operating on wrong data instead of just not operating on the change due to the error (which I\u0027d consider a safer fallback).",
+      "revId": "8c0b5a032a581cf1936b3a2957da1e490bb73ea0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6876054e_2a942051",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-08T06:46:10Z",
+      "side": 1,
+      "message": "This is a substantial change to the api of this method which requires checking the returned change for none everywhere this method is called (which I don\u0027t see in this change). A quick search reveals at least six places where we need to look if we need to change something there.\n\nI think we can discuss if we want to change this but then this should be its own change.",
+      "revId": "8c0b5a032a581cf1936b3a2957da1e490bb73ea0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
