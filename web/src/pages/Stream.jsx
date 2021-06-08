@@ -19,17 +19,13 @@ import Sockette from 'sockette'
 import {Checkbox, Form, FormGroup, FormControl} from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
-import 'xterm/dist/xterm.css'
+import 'xterm/css/xterm.css'
 import { Terminal } from 'xterm'
-import * as fit from 'xterm/lib/addons/fit/fit'
-import * as weblinks from 'xterm/lib/addons/webLinks/webLinks'
-import * as search from 'xterm/lib/addons/search/search'
+import { FitAddon} from 'xterm-addon-fit'
+import { WebLinksAddon } from 'xterm-addon-web-links'
+import { SearchAddon } from 'xterm-addon-search'
 
 import { getStreamUrl } from '../api'
-
-Terminal.applyAddon(fit)
-Terminal.applyAddon(weblinks)
-Terminal.applyAddon(search)
 
 class StreamPage extends React.Component {
   static propTypes = {
@@ -63,21 +59,7 @@ class StreamPage extends React.Component {
   }
 
   onResize = () => {
-    // Note: We call proposeGeometry to get the number of cols and rows that
-    // fit into the parent element. However the number of rows is not detected
-    // correctly so we derive this directly from the window height.
-    const geometry = this.term.proposeGeometry()
-    if (geometry) {
-      const cellHeight = this.term._core._renderCoordinator.dimensions.actualCellHeight
-      const height = window.innerHeight - this.term.element.offsetTop - 10
-
-      const rows = Math.max(Math.floor(height / cellHeight), 10)
-      const cols = Math.max(geometry.cols, 10)
-
-      if (this.term.rows !== rows || this.term.cols !== cols) {
-        this.term.resize(cols, rows)
-      }
-    }
+    this.fitAddon.fit()
   }
 
   componentDidMount() {
@@ -92,13 +74,18 @@ class StreamPage extends React.Component {
     document.title = 'Zuul Stream | ' + params.uuid.slice(0, 7)
 
     const term = new Terminal()
+    const fitAddon = new FitAddon()
+    const webLinksAddon = new WebLinksAddon()
+    const searchAddon = new SearchAddon()
 
-    term.webLinksInit()
+    term.loadAddon(fitAddon)
+    term.loadAddon(webLinksAddon)
+    term.loadAddon(searchAddon)
+
     term.setOption('fontSize', 12)
     term.setOption('scrollback', 1000000)
     term.setOption('disableStdin', true)
     term.setOption('convertEol', true)
-    term.setOption('theme', {selection: 'rgba(252, 252, 252)'})
 
     // Block all keys but page up/down. This needs to be done so ctrl+c can
     // be used to copy text from the terminal.
@@ -107,6 +94,7 @@ class StreamPage extends React.Component {
     })
 
     term.open(this.terminal)
+    fitAddon.fit()
     term.focus()
 
     this.ws = new Sockette(getStreamUrl(this.props.tenant.apiPrefix), {
@@ -135,6 +123,7 @@ class StreamPage extends React.Component {
     })
 
     this.term = term
+    this.fitAddon = fitAddon
 
     term.element.style.padding = '5px'
     this.onResize()
@@ -177,7 +166,7 @@ class StreamPage extends React.Component {
 
   render () {
     return (
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={PageSectionVariants.light} >
         <Form inline>
           <FormGroup controlId='stream'>
             <FormControl
@@ -202,7 +191,9 @@ class StreamPage extends React.Component {
             </Checkbox>
           </FormGroup>
         </Form>
-        <div ref={ref => this.terminal = ref}/>
+        <div id="terminal"
+             style={{ height: '80vh'}}
+             ref={ref => this.terminal = ref} />
       </PageSection>
     )
   }
