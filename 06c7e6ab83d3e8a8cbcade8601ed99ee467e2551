@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af4914a8_77d4931e",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 5959,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-08T00:04:33Z",
+      "side": 1,
+      "message": "If the scheduler is disconnected from ZK, then we would expect the request to be lost (since a request is an ephemeral node).  Therefore, the scheduler needs to resubmit the request.  I think that\u0027s true before and with this change, so I think this test is still correct.\n\nBut with this change, that should only happen if the executor has not yet accepted the nodes.  Once it has, then the scheduler should not resubmit.  We should make sure to add a test case to cover that (something like this one, but perform the disconnect/reconnect after the job starts running).\n\nWe may eventually want to make node requests non-ephemeral, as right now they need to be recreated if a scheduler crashes and an executor hasn\u0027t accepted them.",
+      "revId": "06c7e6ab83d3e8a8cbcade8601ed99ee467e2551",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d9f3a45c_4bb9c991",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-08T00:04:33Z",
+      "side": 1,
+      "message": "When I have questions like this, I use git blame to find out why code was added; here\u0027s the relevant commit: 0b00c4685b1883dcb6d9ac1814acc68c89eeae26\n\nIt implements the relative priority system.\n\nRemember when I said there would be a lot of things we have to change if you update the lifecycle of the items in the build set node_requests dictionary?  This is one of them.  My guess is that we\u0027re now trying to update relative priority of requests which have been fulfilled, but the scheduler doesn\u0027t know that, because they\u0027re still in this dict.\n\nIt\u0027s probably sufficient to just check if the node request is complete and skip this.",
+      "revId": "06c7e6ab83d3e8a8cbcade8601ed99ee467e2551",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
