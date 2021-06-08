@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "6ab6a0bb_f9fb182b",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-08T06:22:20Z",
+      "side": 1,
+      "message": "Why not just using response.raise_for_status() here? This is a quite standard way and is used for most other calls as well.",
+      "parentUuid": "4995abe2_c9793d7d",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "168e08b3_d428a62d",
         "filename": "zuul/driver/github/graphql/__init__.py",
         "patchSetId": 3
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "Re MergeFailure maybe ChangeQueryFailure or similar? I just made that up so may need to add it 😊",
       "parentUuid": "a8857a5c_c60552ac",
+      "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "763265e9_6a6270f4",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-08T06:22:20Z",
+      "side": 1,
+      "message": "Indeed, graphql returns always 200 (I guess except 40x or 500). The error reason is part of the body in graphql. So it indeed makes sense to check both.\n\nHowever MergeFailure feels wrong here and indicates a false issue regarding mergeability of a PR (where the error here indicates an issue with a generic api call towards github). Other places in the github driver just use Exception.",
+      "parentUuid": "1ec39f8e_2491568b",
       "revId": "a7056f1730faec903a85e6789b7ee1a38369f86c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
