@@ -873,30 +873,31 @@ class JobParser(object):
                 setattr(job, k, v)
 
         variables = conf.get('vars', None)
+        forbidden = {'zuul', 'nodepool', 'unsafe_vars'}
         if variables:
-            if 'zuul' in variables or 'nodepool' in variables:
-                raise Exception("Variables named 'zuul' or 'nodepool' "
-                                "are not allowed.")
+            if set(variables.keys()).intersection(forbidden):
+                raise Exception("Variables named 'zuul', 'nodepool', "
+                                "or 'unsafe_vars' are not allowed.")
             job.variables = variables
         extra_variables = conf.get('extra-vars', None)
         if extra_variables:
-            if 'zuul' in extra_variables or 'nodepool' in extra_variables:
-                raise Exception("Variables named 'zuul' or 'nodepool' "
-                                "are not allowed.")
+            if set(extra_variables.keys()).intersection(forbidden):
+                raise Exception("Variables named 'zuul', 'nodepool', "
+                                "or 'unsafe_vars' are not allowed.")
             job.extra_variables = extra_variables
         host_variables = conf.get('host-vars', None)
         if host_variables:
             for host, hvars in host_variables.items():
-                if 'zuul' in hvars or 'nodepool' in hvars:
-                    raise Exception("Variables named 'zuul' or 'nodepool' "
-                                    "are not allowed.")
+                if set(hvars.keys()).intersection(forbidden):
+                    raise Exception("Variables named 'zuul', 'nodepool', "
+                                    "or 'unsafe_vars'are not allowed.")
             job.host_variables = host_variables
         group_variables = conf.get('group-vars', None)
         if group_variables:
             for group, gvars in group_variables.items():
-                if 'zuul' in group_variables or 'nodepool' in gvars:
-                    raise Exception("Variables named 'zuul' or 'nodepool' "
-                                    "are not allowed.")
+                if set(gvars.keys()).intersection(forbidden):
+                    raise Exception("Variables named 'zuul', 'nodepool', "
+                                    "or 'unsafe_vars'are not allowed.")
             job.group_variables = group_variables
 
         allowed_projects = conf.get('allowed-projects', None)
@@ -1008,10 +1009,11 @@ class ProjectTemplateParser(object):
             project_template.setImpliedBranchMatchers(branches)
 
         variables = conf.get('vars', {})
+        forbidden = {'zuul', 'nodepool', 'unsafe_vars'}
         if variables:
-            if 'zuul' in variables or 'nodepool' in variables:
-                raise Exception("Variables named 'zuul' or 'nodepool' "
-                                "are not allowed.")
+            if set(variables.keys()).intersection(forbidden):
+                raise Exception("Variables named 'zuul', 'nodepool', "
+                                "or 'unsafe_vars' are not allowed.")
             project_template.variables = variables
 
         if freeze:
@@ -1131,10 +1133,11 @@ class ProjectParser(object):
         project_config.queue_name = conf.get('queue', None)
 
         variables = conf.get('vars', {})
+        forbidden = {'zuul', 'nodepool', 'unsafe_vars'}
         if variables:
-            if 'zuul' in variables or 'nodepool' in variables:
-                raise Exception("Variables named 'zuul' or 'nodepool' "
-                                "are not allowed.")
+            if set(variables.keys()).intersection(forbidden):
+                raise Exception("Variables named 'zuul', 'nodepool', "
+                                "or 'unsafe_vars' are not allowed.")
             project_config.variables = variables
 
         project_config.freeze()

@@ -1106,9 +1106,9 @@ class PlaybookContext(ConfigObject):
                 raise Exception(
                     'The secret "{name}" was not found.'.format(
                         name=secret_use.name))
-            if secret_use.alias == 'zuul' or secret_use.alias == 'nodepool':
-                raise Exception('Secrets named "zuul" or "nodepool" '
-                                'are not allowed.')
+            if secret_use.alias in ('zuul', 'nodepool', 'unsafe_vars'):
+                raise Exception("Secrets named 'zuul', 'nodepool', "
+                                "or 'unsafe_vars' are not allowed.")
             if not VARNAME_RE.match(secret_use.alias):
                 raise Exception("Variable names may only contain letters, "
                                 "numbers, and underscores")
@@ -1570,8 +1570,10 @@ class Job(ConfigObject):
         v = Job._deepUpdate(v, other_vars)
         # To avoid running afoul of checks that jobs don't set zuul
         # variables, remove them from parent data here.
-        if 'zuul' in v:
-            del v['zuul']
+        v.pop('zuul', None)
+        # For safety, also drop nodepool and unsafe_vars
+        v.pop('nodepool', None)
+        v.pop('unsafe_vars', None)
         self.parent_data = v
 
         secret_other_vars = other_build.secret_result_data

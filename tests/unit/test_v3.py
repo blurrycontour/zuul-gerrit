@@ -7283,10 +7283,17 @@ class TestUnsafeVars(AnsibleZuulTestCase):
         self.assertIn("BASE SECRETSUB: {{ subtext }}", job_output)
         # latefact wasn't present when frozen
         self.assertIn("BASE LATESUB: undefined", job_output)
+        # check the !unsafe tagged version
+        self.assertIn("BASE LATESUB UNSAFE: "
+                      "{{ latefact | default('undefined') }}", job_output)
 
         # Both of these are dynamically evaluated
         self.assertIn("TESTJOB SUB: text", job_output)
         self.assertIn("TESTJOB LATESUB: late", job_output)
+
+        # check the !unsafe tagged version
+        self.assertIn("TESTJOB LATESUB UNSAFE: "
+                      "{{ latefact | default('undefined') }}", job_output)
 
         # The project secret is not defined
         self.assertNotIn("TESTJOB SECRET:", job_output)
@@ -7300,10 +7307,17 @@ class TestUnsafeVars(AnsibleZuulTestCase):
         self.assertIn("BASE SECRETSUB: {{ subtext }}", job_output)
         # latefact wasn't present when frozen
         self.assertIn("BASE LATESUB: undefined", job_output)
+        # check the !unsafe tagged version
+        self.assertIn("BASE LATESUB UNSAFE: "
+                      "{{ latefact | default('undefined') }}", job_output)
 
         # These are frozen
         self.assertIn("TESTJOB SUB: text", job_output)
         self.assertIn("TESTJOB LATESUB: undefined", job_output)
+
+        # check the !unsafe tagged version
+        self.assertIn("TESTJOB LATESUB UNSAFE: "
+                      "{{ latefact | default('undefined') }}", job_output)
 
         # This is marked unsafe
         self.assertIn("TESTJOB SECRET: {{ subtext }}", job_output)

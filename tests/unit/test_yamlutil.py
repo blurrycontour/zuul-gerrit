@@ -63,11 +63,22 @@ class TestYamlDumper(BaseTestCase):
 
     def test_ansible_dumper(self):
         data = {'foo': 'bar'}
-        expected = "!unsafe 'foo': !unsafe 'bar'\n"
+        data = yamlutil.mark_strings_unsafe(data)
+        expected = "foo: !unsafe 'bar'\n"
         yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
         self.assertEqual(yaml_out, expected)
 
-        data = {'foo': {'bar': 'baz'}}
-        expected = "!unsafe 'foo':\n  !unsafe 'bar': !unsafe 'baz'\n"
+        data = {'foo': {'bar': 'baz'}, 'list': ['bar', 1, 3.0, True, None]}
+        data = yamlutil.mark_strings_unsafe(data)
+        expected = """\
+foo:
+  bar: !unsafe 'baz'
+list:
+- !unsafe 'bar'
+- 1
+- 3.0
+- true
+- null
+"""
         yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
         self.assertEqual(yaml_out, expected)

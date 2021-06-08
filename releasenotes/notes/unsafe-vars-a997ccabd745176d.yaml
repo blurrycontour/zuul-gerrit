@@ -41,4 +41,15 @@ security:
        - set_fact:
            unsafe_var_eval: "{{ hostvars['localhost'].secret.var }}"
 
-    This will force an explicit evaluation of the variable.
+    This will force an explicit evaluation of the variable.  This is
+    generally safe to do in a situation where a playbook is accessing
+    a single secret by name, with no other secrets in scope.  Do not
+    use this capability with more than one secret that is not under
+    the control of the project where the playbook is defined.
+
+    Similarly, versions of all the original job variables tagged with
+    ``!unsafe`` are available under the ``unsafe_vars`` variable
+    hierarchy.  For example, the job variable `myvar` would be
+    available under `unsafe_vars.myvar`.  It is not recommended to
+    evaluate ``unsafe_vars`` expressions except in the most controlled
+    of circumstances.  They are almost impossible to render safely.

@@ -752,6 +752,9 @@ def check_varnames(var):
         raise Exception("Defining variables named 'zuul' is not allowed")
     if 'nodepool' in var:
         raise Exception("Defining variables named 'nodepool' is not allowed")
+    if 'unsafe_vars' in var:
+        raise Exception("Defining variables named 'unsafe_vars' "
+                        "is not allowed")
     for varname in var.keys():
         if not VARNAME_RE.match(varname):
             raise Exception("Variable names may only contain letters, "
@@ -1892,6 +1895,7 @@ class AnsibleJob(object):
         secrets = self.mergeSecretVars(secrets, args)
         if secrets:
             check_varnames(secrets)
+            secrets = yaml.mark_strings_unsafe(secrets)
             jobdir_playbook.secrets_content = yaml.ansible_unsafe_dump(
                 secrets, default_flow_style=False)
             jobdir_playbook.secrets_keys = set(secrets.keys())
@@ -2325,6 +2329,16 @@ class AnsibleJob(object):
             with open(path, 'w') as f:
                 f.write(json.dumps(facts))
 
+            # While we're here, update both hostvars dicts with
+            # an !unsafe copy of the original input as well.
+            unsafe = yaml.mark_strings_unsafe(
+                self.original_hostvars[host['name']])
+            self.frozen_hostvars[host['name']]['unsafe_vars'] = unsafe
+
+            unsafe = yaml.mark_strings_unsafe(
+                self.original_hostvars[host['name']])
+            self.original_hostvars[host['name']]['unsafe_vars'] = unsafe
+
     def writeDebugInventory(self):
         # This file is unused by Zuul, but the base jobs copy it to logs
         # for debugging, so let's continue to put something there.
@@ -2334,12 +2348,13 @@ class AnsibleJob(object):
 
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
-                yaml.safe_dump(inventory, default_flow_style=False))
+                yaml.ansible_unsafe_dump(inventory, default_flow_style=False))
 
     def writeSetupInventory(self):
         jobdir_playbook = self.jobdir.setup_playbook
         setup_inventory = make_setup_inventory_dict(
             self.host_list, self.original_hostvars)
+        setup_inventory = yaml.mark_strings_unsafe(setup_inventory)
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
             # Write this inventory with !unsafe tags to avoid mischief
@@ -2356,7 +2371,7 @@ class AnsibleJob(object):
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
-                yaml.safe_dump(inventory, default_flow_style=False))
+                yaml.ansible_unsafe_dump(inventory, default_flow_style=False))
 
     def writeLoggingConfig(self):
         self.log.debug("Writing logging config for job %s %s",

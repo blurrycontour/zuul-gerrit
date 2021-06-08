@@ -114,19 +114,42 @@ def encrypted_load(stream, *args, **kwargs):
 
 # Add support for the Ansible !unsafe tag
 # Note that "unsafe" here is used differently than "safe" from PyYAML
+
+class AnsibleUnsafeStr:
+    yaml_tag = u'!unsafe'
+
+    def __init__(self, value):
+        self.value = value
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if isinstance(other, AnsibleUnsafeStr):
+            return self.value == other.value
+        return self.value == other
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return cls(node.value)
+
+    @classmethod
+    def to_yaml(cls, dumper, data):
+        return yaml.ScalarNode(tag=cls.yaml_tag, value=data.value)
+
+
 class AnsibleUnsafeDumper(yaml.SafeDumper):
-    def represent_str(self, data):
-        return self.represent_scalar('!unsafe', data)
+    pass
 
 
 class AnsibleUnsafeLoader(yaml.SafeLoader):
     pass
 
 
-AnsibleUnsafeDumper.add_representer(
-    str, AnsibleUnsafeDumper.represent_str)
-AnsibleUnsafeLoader.add_constructor(
-    '!unsafe', AnsibleUnsafeLoader.construct_yaml_str)
+AnsibleUnsafeDumper.add_representer(AnsibleUnsafeStr,
+                                    AnsibleUnsafeStr.to_yaml)
+AnsibleUnsafeLoader.add_constructor(AnsibleUnsafeStr.yaml_tag,
+                                    AnsibleUnsafeStr.from_yaml)
 
 
 def ansible_unsafe_dump(data, *args, **kwargs):
@@ -135,3 +158,35 @@ def ansible_unsafe_dump(data, *args, **kwargs):
 
 def ansible_unsafe_load(stream, *args, **kwargs):
     return yaml.load(stream, *args, Loader=AnsibleUnsafeLoader, **kwargs)
+
+
+def mark_strings_unsafe(d):
+    """Traverse a json-style data structure and replace every string value
+    with an AnsibleUnsafeStr
+
+    Returns the new structure.
+    """
+    if isinstance(d, tuple):
+        d = list(d)
+
+    if isinstance(d, dict):
+        newdict = {}
+        for key, value in d.items():
+            newdict[key] = mark_strings_unsafe(value)
+        return newdict
+    elif isinstance(d, list):
+        return [mark_strings_unsafe(v) for v in d]
+    elif isinstance(d, int):
+        return d
+    elif isinstance(d, float):
+        return d
+    elif isinstance(d, type(None)):
+        return d
+    elif isinstance(d, bool):
+        return d
+    elif isinstance(d, AnsibleUnsafeStr):
+        return d
+    elif isinstance(d, str):
+        return AnsibleUnsafeStr(d)
+    else:
+        raise Exception("Unhandled type: %s", type(d))

@@ -670,6 +670,15 @@ Here is an example of two job definitions:
       will not change.  Untrusted playbooks dynamically evaluate
       variables and are not limited by this restriction.
 
+      Un-frozen versions of all the original job variables are
+      available tagged with the ``!unsafe`` YAML tag under the
+      ``unsafe_vars`` variable hierarchy.  This tag prevents Ansible
+      from evaluating them as Jinja templates.  For example, the job
+      variable `myvar` would be available under `unsafe_vars.myvar`.
+      Advanced users may force Ansible to evaluate these values, but
+      it is not recommended to do so except in the most controlled of
+      circumstances.  They are almost impossible to render safely.
+
    .. attr:: extra-vars
 
       A dictionary of variables to supply to Ansible with higher
