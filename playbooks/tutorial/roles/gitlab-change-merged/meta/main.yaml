@@ -1,0 +1,4 @@
+dependencies:
+  - role: gitlab-check-pipeline
+  - role: gitlab-approve-change
+  - role: gitlab-gate-pipeline

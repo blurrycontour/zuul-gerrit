@@ -1,0 +1,146 @@
+- name: Init Test1
+  include_role:
+    name: gitlab-init-repository
+  vars:
+    project_name: test1
+
+- name: Copy data to test1
+  copy:
+    src: ../../doc/source/examples/test1/
+    dest: "{{ workspace }}/test1/"
+
+- name: Commit and upload test change in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      git checkout -b init-data
+      mv zuul.yaml .zuul.yaml
+      git add .zuul.yaml playbooks
+      git commit -m "Add test Zuul job"
+      git push origin init-data
+
+- pause:
+    seconds: 5
+
+- name: Create Merge Request
+  uri:
+    url: "http://localhost:8081/api/v4/projects/tutorial%2ftest1/merge_requests"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+    body:
+      source_branch: init-data
+      target_branch: master
+      title: Add test Zuul job
+      description: Add test Zuul job
+  register: gitlab_merge_request_test1
+  until: gitlab_merge_request_test1.status == 201
+  delay: 10
+  retries: 3
+
+- pause:
+    seconds: 5
+
+- include_role:
+    name: gitlab-check-pipeline
+  vars:
+    title: "test job test1"
+    project_name: tutorial%2ftest1
+    merge_request_iid: "{{ gitlab_merge_request_test1.json['iid'] }}"
+
+- name: Save test1 change info
+  set_fact:
+    json_query_finger: "[?contains(@.body, 'testjob finger://')].body | [0]"
+
+- name: "Fetch url finger://"
+  assert:
+    that:
+      - (result_json | to_json | from_json | json_query(json_query_finger) | regex_search('(finger://[^ ]*)') | length > 0)
+
+- name: Configure a Base Job zuul-config
+  copy:
+    src: ../../doc/source/examples/gitlab-zuul-config/playbooks/base/
+    dest: "{{ workspace }}/zuul-config/playbooks/base/"
+
+- name: Update the base job definition
+  copy:
+    src: ../../doc/source/examples/gitlab-zuul-config/zuul.d/jobs2.yaml
+    dest: "{{ workspace }}/zuul-config/zuul.d/jobs.yaml"
+
+- name: Commit and upload zuul-config
+  shell:
+    chdir: "{{ workspace }}/zuul-config/"
+    executable: /bin/bash
+    warn: false
+    cmd: |
+      git fetch --all
+      git checkout -b base-job origin/master
+      git add playbooks zuul.d/jobs.yaml
+      git commit -m "Update Zuul base job"
+      git push origin base-job
+
+- pause:
+    seconds: 5
+
+- name: Create Merge Request
+  uri:
+    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+    body:
+      source_branch: base-job
+      target_branch: master
+      title: Update Zuul base job
+      description: Update Zuul base job
+  register: gitlab_merge_request
+
+- pause:
+    seconds: 5
+
+- include_role:
+    name: gitlab-change-merged
+  vars:
+    title: "Update Zuul base job"
+    project_name: tutorial%2fzuul-config
+    merge_request_iid: "{{ gitlab_merge_request.json['iid'] }}"
+
+# Remove the label so Zuul will post again Verified+1 which is what
+# check-pipeline is looking for
+- include_role:
+    name: gitlab-remove-verified
+  vars:
+    project_name: tutorial%2ftest1
+    merge_request_iid: "{{ gitlab_merge_request_test1.json['iid'] }}"
+
+- include_role:
+    name: gitlab-recheck-change
+  vars:
+    project_name: tutorial%2ftest1
+    merge_request_iid: "{{ gitlab_merge_request_test1.json['iid'] }}"
+
+- include_role:
+    name: gitlab-check-pipeline
+  vars:
+    title: "test job test1"
+    project_name: tutorial%2ftest1
+    merge_request_iid: "{{ gitlab_merge_request_test1.json['iid'] }}"
+
+- name: Find the log URL with regex
+  set_fact:
+    log_url: "{{ result_json | to_json | from_json | json_query(json_query_log_url) | regex_search('(http://[^ ]*)') }}"
+  vars:
+    json_query_log_url: "[?contains(@.body, 'http://')].body | [0]"
+
+- name: Fetch log URL
+  get_url:
+    url: "{{ log_url }}job-output.txt"
+    dest: "{{ workspace }}/job-output.txt"
+
+- name: Verify log contents
+  command: "grep 'Hello world!' {{ workspace }}/job-output.txt"

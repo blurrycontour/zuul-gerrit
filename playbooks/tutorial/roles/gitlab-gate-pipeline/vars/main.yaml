@@ -1,0 +1,5 @@
+json_query_change_gate_started: "[?contains(@.body, 'Starting gate jobs')]"
+json_query_change_gate_ko: "[?contains(@.body, 'Patch Set 1: Verified-2')]"
+json_query_change_gate_ok: "[?contains(@.body, 'Patch Set 1: Verified+2')]"
+json_query_change_merged_ok: "[?contains(@.body, 'Change has been successfully merged')]"
+json_query_change_gate: "{{ json_query_change_gate_ok if pipeline_expected_result == 'ok' else json_query_change_gate_ko }}"

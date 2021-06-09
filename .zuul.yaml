@@ -171,6 +171,16 @@
     required-projects:
       - zuul/zuul
 
+- job:
+    name: zuul-quick-start-gitlab
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    pre-run: playbooks/tutorial/pre.yaml
+    run: playbooks/tutorial/run-gitlab.yaml
+    post-run: playbooks/tutorial/post-gitlab.yaml
+    required-projects:
+      - zuul/zuul
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -297,6 +307,10 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-quick-start-gitlab:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            voting: false
         - nodepool-zuul-functional:
             voting: false
         - zuul-tox-zuul-client
