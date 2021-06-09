@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "96d171d6_8ec8bf51",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5958,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-09T18:47:03Z",
+      "side": 1,
+      "message": "Is it possible that if we don\u0027t break quickly enough we\u0027ll hit retry limit and have that result below rather than SUCCESS?\n\nAlso does this case map to the onDisconnect() handling in the executor client? The DISCONNECT status results in a RETRY result by the time we record it for checking?",
+      "revId": "20e31afe84a19b6539d9800e09663172865bce91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
