@@ -1,0 +1,224 @@
+- name: Create workspace directory
+  file:
+    state: directory
+    path: "{{ workspace }}"
+
+- name: Run docker-compose up
+  shell:
+    cmd: docker-compose -f gitlab-docker-compose.yaml -p zuul-tutorial up -d
+    chdir: "{% if local %}../..{% else %}src/opendev.org/zuul/zuul{% endif %}/doc/source/examples"
+
+- name: Print list of images
+  command: docker image ls --all --digests --no-trunc
+
+- name: Wait for Gitlab to start
+  uri:
+    url: "http://localhost:8081/api/v4/version"
+    method: GET
+    status_code: 200
+    headers:
+      PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+  register: gitlab_version
+  until: gitlab_version.status == 200
+  delay: 10
+  retries: 50
+
+- name: Wait for Zuul user to be created
+  uri:
+    url: "http://localhost:8081/api/v4/users/zuul/status"
+    method: GET
+    status_code: 200
+    body_format: json
+  register: gitlab_zuul_user
+  until: gitlab_zuul_user.status == 200
+  delay: 10
+  retries: 30
+
+- name: Wait for Admin user to be created
+  uri:
+    url: "http://localhost:8081/api/v4/users/administrator/status"
+    method: GET
+    status_code: 200
+    body_format: json
+  register: gitlab_admin_user
+  until: gitlab_admin_user.status == 200
+  delay: 10
+  retries: 30
+
+- name: Load admin token from file
+  shell: "cat {% if local %}../..{% else %}src/opendev.org/zuul/zuul{% endif %}/doc/source/examples/gitlab_playbooks/gitlab_admin_token.txt"
+  register: gitlab_admin_token_file
+
+- name: Load admin token from file (set_fact)
+  set_fact:
+    gitlab_admin_token: "{{ (gitlab_admin_token_file.stdout | from_yaml)['gitlab_admin_token'] }}"
+
+- name: Check if example user exists in Gitlab
+  uri:
+    url: "http://localhost:8081/api/v4/users/user/status"
+    method: GET
+    status_code: 200, 404
+    body_format: json
+  register: gitlab_user_check
+
+- name: Create User Gitlab account
+  when: gitlab_user_check.status==404
+  uri:
+    url: "http://localhost:8081/api/v4/users"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_admin_token }}"
+    body:
+      reset_password: false
+      password: secretsecret
+      admin: false
+      name: User
+      username: user
+      email: user@localhost
+      skip_confirmation: true
+  register: zuul_example_user
+  failed_when: zuul_example_user.json['id'] is not defined
+
+- name: Create User impersonation token
+  uri:
+    url: "http://localhost:8081/api/v4/users/{{ zuul_example_user.json['id'] }}/impersonation_tokens"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_admin_token }}"
+    body:
+      name: false
+      scopes:
+        - api
+  register: gitlab_user_token
+
+- name: Add User to tutorial group
+  uri:
+    url: "http://localhost:8081/api/v4/groups/tutorial/members"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_admin_token }}"
+    body:
+      user_id: "{{ zuul_example_user.json['id'] }}"
+      access_level: 40
+
+- name: Wait for zuul
+  uri:
+    url: http://localhost:9000/api/tenant/example-tenant/status
+    method: GET
+    return_content: true
+    status_code: 200
+    body_format: json
+  register: result
+  retries: 30
+  delay: 10
+  until: result.status == 200 and result.json["zuul_version"] is defined
+  changed_when: false
+
+# Quick-Start tutorial begin
+- name: Init zuul-config
+  include_role:
+    name: gitlab-init-repository
+  vars:
+    project_name: zuul-config
+
+- pause:
+    seconds: 5
+
+- name: Make initial change in zuul-config
+  copy:
+    src: ../../doc/source/examples/gitlab-zuul-config/zuul.d/pipelines.yaml
+    dest: "{{ workspace }}/zuul-config/zuul.d/"
+
+- name: Make initial change in zuul-config
+  copy:
+    src: ../../doc/source/examples/gitlab-zuul-config/zuul.d/projects.yaml
+    dest: "{{ workspace }}/zuul-config/zuul.d/"
+
+- name: Copy basic base job definition
+  copy:
+    src: ../../doc/source/examples/gitlab-zuul-config/zuul.d/jobs.yaml
+    dest: "{{ workspace }}/zuul-config/zuul.d/jobs.yaml"
+
+- name: Commit and upload initial change in zuul-config
+  shell:
+    chdir: "{{ workspace }}/zuul-config/"
+    executable: /bin/bash
+    warn: false
+    cmd: |
+      git checkout -b initial-zuul-config
+      git add zuul.d
+      git commit -m "Add initial Zuul configuration"
+      git push origin initial-zuul-config
+
+- pause:
+    seconds: 5
+
+- name: Create Merge Request
+  uri:
+    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+    body:
+      source_branch: initial-zuul-config
+      target_branch: master
+      title: Add initial Zuul configuration
+      description: Add initial Zuul configuration
+  register: gitlab_merge_request
+
+- pause:
+    seconds: 5
+
+- name: Approve zuul-config Merge Request
+  uri:
+    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests/{{ gitlab_merge_request.json['iid'] }}/approve"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+
+- pause:
+    seconds: 5
+
+- name: Merge Merge Request
+  uri:
+    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests/{{ gitlab_merge_request.json['iid'] }}/merge"
+    method: PUT
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+    body:
+      should_remove_source_branch: true
+  register: merge_request_config
+  retries: 5
+  delay: 10
+  until: merge_request_config.status == 200
+
+- name: Fetch status page
+  uri:
+    url: http://localhost:9000/t/example-tenant/status
+    return_content: true
+  register: status_page
+
+- name: Verify status page was served
+  assert:
+    that: "'You need to enable JavaScript to run this app.' in status_page.content"
+
+- name: Fetch status data
+  uri:
+    url: http://localhost:9000/api/tenant/example-tenant/status
+    return_content: true
+  register: status_data
+
+- name: Verify status data were served
+  assert:
+    that: "status_data.json.last_reconfigured > 0"
