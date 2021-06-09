@@ -30,6 +30,10 @@
         ssh_agent: "{{ ssh_agent_new }}"
   when: ssh_public_key is not defined or ssh_public_key == ''
 
+- name: test PWD
+  shell:
+    cmd: pwd
+
 - name: Run docker-compose up
   when: not local
   shell:
@@ -41,6 +45,10 @@
   shell:
     cmd: docker-compose -p zuul-tutorial up -d
     chdir: ../../doc/source/examples
+
+- name: test PWD
+  shell:
+    cmd: pwd
 
 - name: Print list of images
   command: docker image ls --all --digests --no-trunc
@@ -106,6 +114,10 @@
     name: init-repository
   vars:
     projectname: zuul-config
+
+- name: test PWD
+  shell:
+    cmd: pwd
 
 - name: Make initial change in zuul-config
   copy:
