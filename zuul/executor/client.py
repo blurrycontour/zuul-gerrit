@@ -111,7 +111,7 @@ class ZuulGearmanClient(gear.Client):
         except gear.UnknownJobError:
             handle = packet.getArgument(0)
             for build in self.__zuul_gearman.builds.values():
-                if build.__gearman_job.handle == handle:
+                if build._gearman_job.handle == handle:
                     self.__zuul_gearman.onUnknownJob(job)
 
 
@@ -224,7 +224,7 @@ class ExecutorClient(object):
         gearman_job = gear.TextJob(
             function_name, json_dumps(params), unique=uuid)
 
-        build.__gearman_job = gearman_job
+        build._gearman_job = gearman_job
         build.__gearman_worker = None
 
         if pipeline.precedence == PRECEDENCE_NORMAL:
@@ -262,7 +262,7 @@ class ExecutorClient(object):
 
         build.canceled = True
         try:
-            job = build.__gearman_job  # noqa
+            job = build._gearman_job  # noqa
         except AttributeError:
             log.debug("Build has no associated gearman job")
             return False
@@ -318,7 +318,7 @@ class ExecutorClient(object):
     def cancelJobInQueue(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,
                                    build=build.uuid)
-        job = build.__gearman_job
+        job = build._gearman_job
 
         req = gear.CancelJobAdminRequest(job.handle)
         job.connection.sendAdminRequest(req, timeout=300)
@@ -341,7 +341,7 @@ class ExecutorClient(object):
         if not build.__gearman_worker:
             log.error("Build %s has no manager while canceling", build)
         stop_uuid = str(uuid4().hex)
-        data = dict(uuid=build.__gearman_job.unique,
+        data = dict(uuid=build._gearman_job.unique,
                     zuul_event_id=build.zuul_event_id)
         stop_job = gear.TextJob("executor:stop:%s" % build.__gearman_worker,
                                 json_dumps(data), unique=stop_uuid)
@@ -356,7 +356,7 @@ class ExecutorClient(object):
         if not build.__gearman_worker:
             log.error("Build %s has no manager while resuming", build)
         resume_uuid = str(uuid4().hex)
-        data = dict(uuid=build.__gearman_job.unique,
+        data = dict(uuid=build._gearman_job.unique,
                     zuul_event_id=build.zuul_event_id)
         stop_job = gear.TextJob("executor:resume:%s" % build.__gearman_worker,
                                 json_dumps(data), unique=resume_uuid)
@@ -373,7 +373,7 @@ class ExecutorClient(object):
             if build.result:
                 # The build has finished, it will be removed
                 continue
-            job = build.__gearman_job
+            job = build._gearman_job
             if not job.handle:
                 # The build hasn't been enqueued yet
                 continue
