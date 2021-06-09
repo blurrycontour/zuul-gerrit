@@ -5890,6 +5890,86 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(A.reported, 1)
         self.assertIn('RETRY_LIMIT', A.messages[0])
 
+    def test_executor_disconnect(self):
+        "Test that jobs are completed after an executor disconnect"
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Forcibly disconnect the executor from gearman
+        for connection in self.executor_server.executor_gearworker.\
+            gearman.active_connections:
+            connection.conn.shutdown(socket.SHUT_RDWR)
+
+        # Wake up the cleanup thread since it is on a 5 minute interval
+        self.scheds.first.sched.executor.cleanup_thread.wake_event.set()
+
+        # Find the build in the scheduler so we can check its status
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        builds = items[0].current_build_set.getBuilds()
+        build = builds[0]
+        # Wait for the build to be reported as lost
+        for x in iterate_timeout(30, 'lost build'):
+            if build.result == 'LOST':
+                break
+
+        # If we didn't timeout, then it worked; we're done
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # LOST builds aren't recorded in the test history; instead the
+        # original build will be reported as success since it
+        # continued after our fake disconnect.  However, the fact that
+        # it's the *only* build, and the other two jobs are not
+        # present is extra confirmation that the scheduler saw the
+        # build as lost.
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+        ])
+
+    def test_scheduler_disconnect(self):
+        "Test that jobs are completed after a scheduler disconnect"
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Forcibly disconnect the scheduler from gearman
+        for connection in self.scheds.first.sched.executor.gearman.\
+            active_connections:
+            connection.conn.shutdown(socket.SHUT_RDWR)
+
+        # Find the build in the scheduler so we can check its status
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        builds = items[0].current_build_set.getBuilds()
+        build = builds[0]
+        # Wait for the build to be reported as lost
+        for x in iterate_timeout(30, 'lost build'):
+            #print(build.result)
+            if build.result == 'RETRY':
+                break
+
+        # If we didn't timeout, then it worked; we're done
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # There's an extra merge build due to the retry
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
     def test_zookeeper_disconnect(self):
         "Test that jobs are executed after a zookeeper disconnect"
 
