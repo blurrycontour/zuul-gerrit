@@ -424,7 +424,7 @@ class GerritWatcher(threading.Thread):
         self.log.debug("Stopping watcher")
         self._stopped = True
         self._stop_event.set()
-        self.watcher_election.cancel(self._run)
+        self.watcher_election.cancel()
 
 
 class GerritPoller(threading.Thread):
