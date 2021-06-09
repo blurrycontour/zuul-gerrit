@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62fedc60_73496db9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-09T13:08:14Z",
+      "side": 1,
+      "message": "Should we use a leader election (https://kazoo.readthedocs.io/en/latest/api/recipe/election.html) here rather than a lock? Not sure if that makes a big difference but I think for other parts (like the connection events) we used the leader election.",
+      "revId": "612404ea130aadf0b3e1467d7b2cd8e8f1592cb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
