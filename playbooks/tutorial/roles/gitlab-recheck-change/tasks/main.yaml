@@ -1,0 +1,10 @@
+- name: Set recheck
+  uri:
+    url: "http://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/notes"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+    body:
+      body: recheck

@@ -1,0 +1,152 @@
+# Version 2 is the latest that is supported by docker-compose in
+# Ubuntu Xenial.
+version: '2'
+
+services:
+  gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    hostname: 'gitlab'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:8081'
+        # Add any other gitlab.rb configuration here, each on its own line
+      GITLAB_ROOT_PASSWORD: secretsecret
+    command: >
+      bash -c "cp /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/development/25_api_personal_access_token.rb
+      /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/production/25_api_personal_access_token.rb &&
+      /assets/wrapper"
+    ports:
+      - '8081:8081'
+    volumes:
+      - 'gitlab-config:/etc/gitlab'
+      - 'gitlab-logs:/var/log/gitlab'
+      - 'gitlab-data:/var/opt/gitlab'
+  gitlabconfig:
+    image: zuul/zuul-executor
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gitlab
+    depends_on:
+      - gitlab
+    volumes:
+      - "sshkey:/var/ssh:z"
+      - "nodessh:/var/node:z"
+      - "./gitlab_playbooks/:/var/playbooks/:z"
+      - "certs:/var/certs:z"
+      - "../../../tools/:/var/zuul-tools/:z"
+    # NOTE(pabelanger): Be sure to update this line each time we change the
+    # default version of ansible for Zuul.
+    command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
+  zk:
+    image: zookeeper
+    hostname: examples_zk_1.examples_default
+    volumes:
+      - "certs:/var/certs:z"
+      - "./zoo.cfg:/conf/zoo.cfg:z"
+    # introduced for 3.7.0: zookeeper shall wait for certificates to be available
+    # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
+    command: |
+      /bin/sh -c '\
+        while [ ! -f /var/certs/keystores/examples_zk_1.examples_default.pem ] ; do \
+          sleep 1; \
+        done; \
+      zkServer.sh start-foreground'
+  mysql:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: zuul
+      MYSQL_USER: zuul
+      MYSQL_PASSWORD: secret
+      # Work around slow db startup when writing TZINFO data.
+      MYSQL_INITDB_SKIP_TZINFO: 1
+  scheduler:
+    depends_on:
+      - gitlabconfig
+      - zk
+      - mysql
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gitlab
+      - ZUUL_MYSQL_PASSWORD=secret
+    command: "sh -c '/var/playbooks/wait-to-start.sh && zuul-scheduler -f'"
+    # FIXME: The scheduler has no ansible anymore so use the executor image.
+    #        This needs to be changes such that ansible is not required for startup.
+    image: zuul/zuul-scheduler
+    volumes:
+      - "./gitlab_etc_zuul/:/etc/zuul/:z"
+      - "./gitlab_playbooks/:/var/playbooks/:z"
+      - "sshkey:/var/ssh:z"
+      - "certs:/var/certs:z"
+  web:
+    command: "sh -c '/var/playbooks/wait-to-start-gearman.sh && zuul-web -f'"
+    depends_on:
+      - scheduler
+      - mysql
+    ports:
+      - "9000:9000"
+    image: zuul/zuul-web
+    environment:
+      ZUUL_MYSQL_PASSWORD: secret
+    volumes:
+      - "./gitlab_etc_zuul/:/etc/zuul/:z"
+      - "./gitlab_playbooks/:/var/playbooks/:z"
+      - "certs:/var/certs:z"
+  executor:
+    privileged: true
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gitlab,scheduler
+      - ZUUL_MYSQL_PASSWORD=secret
+    depends_on:
+      - scheduler
+    image: zuul/zuul-executor
+    volumes:
+      - "./gitlab_etc_zuul/:/etc/zuul/:z"
+      - "./gitlab_playbooks/:/var/playbooks/:z"
+      - "sshkey:/var/ssh:z"
+      - "logs:/srv/static/logs:z"
+      - "certs:/var/certs:z"
+  node:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gitlab"
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  launcher:
+    depends_on:
+      - zk
+    image: zuul/nodepool-launcher
+    volumes:
+      - "./etc_nodepool/:/etc/nodepool/:z"
+      - "certs:/var/certs:z"
+    ports:
+      - "8022:8022"
+  logs:
+    build:
+      dockerfile: logs-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy}"
+    ports:
+      - "8000:80"
+    volumes:
+      - "logs:/usr/local/apache2/htdocs:z"
+
+volumes:
+  sshkey:
+  nodessh:
+  logs:
+  certs:
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:

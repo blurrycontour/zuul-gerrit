@@ -1,0 +1,60 @@
+- name: Check if {{ project }} project exists
+  uri:
+    url: "http://gitlab:8081/api/v4/projects/tutorial%2f{{ project }}"
+    status_code: 200, 404
+  register: project_check
+
+- name: Create {{ project }}
+  when: project_check.status==404
+  block:
+    - name: Create temp dir for {{ project }} creation
+      shell: mktemp -d
+      register: project_tmp
+        
+    - name: Create Gitlab project project1
+      uri:
+        url: "http://gitlab:8081/api/v4/projects"
+        method: POST
+        status_code: 201
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+        body:
+          name: "{{ project }} Project"
+          path: "{{ project }}"
+          namespace_id: "{{ group_id }}"
+
+    - name: Create initial commit in {{ project }}
+      shell:
+        executable: /bin/sh
+        chdir: "{{ project_tmp.stdout }}"
+        cmd: |
+          git init .
+          git config user.name "Admin"
+          git config user.email "admin@example.com"
+          echo "Zuul Tutorial" > README.md
+          git add -A
+          git commit -m "Initial commit"
+          git remote add gitlab http://admin:ypCa3Dzb23o5nvsixwPA@gitlab:8081/tutorial/{{ project }}
+          git push -f --set-upstream gitlab +HEAD:master
+
+    - name: Create Gitlab project {{ project }} webhook
+      uri:
+        url: "http://gitlab:8081/api/v4/projects/tutorial%2f{{ project }}/hooks"
+        method: POST
+        status_code: 201
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+        body:
+          token: monsecret
+          url: http://web:9000/api/connection/gitlab/payload
+          push_events: true
+          merge_requests_events: true
+          note_events: true
+          tag_push_events: true
+          enable_ssl_verification: false
+      register: gitlab_webhook
+      until: gitlab_webhook.status == 201
+      retries: 5
+      delay: 10
