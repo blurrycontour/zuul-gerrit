@@ -1,0 +1,68 @@
+- pipeline:
+    name: check
+    description: |
+      Newly uploaded patchsets enter this pipeline to receive an
+      initial +/-1 Verified vote.
+    manager: independent
+    require:
+      gitlab:
+        open: true
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action: comment
+          comment: (?i)^\s*recheck\s*$
+        - event: gl_merge_request
+          action:
+            - opened
+            - changed
+    success:
+      gitlab:
+        comment: true
+        approval: true
+    failure:
+      gitlab:
+        comment: true
+        approval: false
+    start:
+      gitlab:
+        comment: true
+        approval: false
+
+- pipeline:
+    name: gate
+    description: |
+      Changes that have been approved are enqueued in order in this
+      pipeline, and if they pass tests, will be merged.
+    manager: dependent
+    supercedes: check
+    post-review: True
+    require:
+      gitlab:
+        approved: true
+        open: true
+        labels:
+          - gateit
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action:
+            - labeled
+          labels:
+            - gateit
+        - event: gl_merge_request
+          action: comment
+          comment: (?i)^\s*regate\s*$
+    start:
+      gitlab:
+        comment: true
+        approval: false
+    success:
+      gitlab:
+        comment: true
+        approval: true
+        merge: true
+    failure:
+      gitlab:
+        comment: true
+        approval: false
