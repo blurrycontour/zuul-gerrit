@@ -1,0 +1,11 @@
+- name: "Gate pipeline: Wait for Zuul to report gate job has started: {{ title }}"
+  uri:
+    url: "http://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/notes?sort=asc&order_by=updated_at"
+    method: GET
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+  register: result
+  until: result.status == 200 and (result.json | json_query(json_query_change_gate_started) | length == 1)
+  delay: 1
+  retries: 30

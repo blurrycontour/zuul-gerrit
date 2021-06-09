@@ -25,3 +25,4 @@ zuul/web/static/*
 node_modules
 yarn-error.log
 tools/ca/
+doc/source/examples/gitlab_playbooks/gitlab_admin_token.txt
