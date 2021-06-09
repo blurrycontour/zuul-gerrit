@@ -1,0 +1,14 @@
+- tenant:
+    name: example-tenant
+    source:
+      gitlab:
+        config-projects:
+          - tutorial/zuul-config
+        untrusted-projects:
+          - tutorial/test1
+          - tutorial/test2
+      opendev.org:
+        untrusted-projects:
+          - zuul/zuul-jobs:
+              include:
+                - job

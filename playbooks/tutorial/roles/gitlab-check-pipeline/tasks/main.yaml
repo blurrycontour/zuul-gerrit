@@ -1,0 +1,15 @@
+- name: "Check pipeline: Wait for Zuul to report check status: {{ title }}"
+  uri:
+    url: "http://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/notes?sort=asc&order_by=updated_at"
+    method: GET
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_user_token.json['token'] }}"
+  register: result
+  until: result.status == 200 and result.json is defined and result.json|list|length>0 and result.json[-1]['body'] == "approved this merge request"
+  delay: 1
+  retries: "{{ check_timeout }}"
+
+- name: "Check pipeline: set variable: {{ title }}"
+  set_fact:
+    result_json: "{{ result.json }}"

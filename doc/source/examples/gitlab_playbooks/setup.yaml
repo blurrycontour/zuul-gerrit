@@ -1,0 +1,160 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Generate ZooKeeper certs
+      shell: |
+        /var/zuul-tools/zk-ca.sh /var/certs examples_zk_1.examples_default
+        chmod -R a+rX /var/certs
+    - name: Generate Zuul SSH key for Nodepool
+      command: ssh-keygen -f /var/ssh/nodepool -N '' -t rsa -m PEM
+      args:
+        creates: /var/ssh/nodepool.pub
+    - name: Add Nodepool key to node authorized_keys file
+      command: cp /var/ssh/nodepool.pub /var/node/authorized_keys
+      args:
+        creates: /var/node/authorized_keys
+
+    - name: Wait for Gitlab to start
+      wait_for:
+        host: gitlab
+        port: 8081
+    - name: Wait for Gitlab to answer API request
+      uri:
+        url: http://gitlab:8081/api/v4/version
+        method: GET
+        status_code: 200
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+      register: gitlab_version
+      until: gitlab_version.status == 200
+      delay: 10
+      retries: 50
+
+    - name: Create Gitlab Admin user
+      uri:
+        url: "http://gitlab:8081/api/v4/users"
+        method: POST
+        status_code: 201
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+        body:
+          reset_password: false
+          password: secretsecret
+          admin: true
+          name: Administrator
+          username: administrator
+          email: administrator@example.com
+          skip_confirmation: true
+      register: gitlab_admin_user
+      failed_when: gitlab_admin_user.json['id'] is not defined
+
+    - name: Create Gitlab Admin impersonation token
+      uri:
+        url: "http://gitlab:8081/api/v4/users/{{ gitlab_admin_user.json['id'] }}/impersonation_tokens"
+        method: POST
+        status_code: 201
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+        body:
+          name: false
+          scopes:
+            - api
+      register: gitlab_admin_token
+
+    - name: Write admin token to file
+      copy:
+        dest: "/var/playbooks/gitlab_admin_token.txt"
+        content: "{ 'gitlab_admin_token': {{ gitlab_admin_token.json['token'] }} }"
+
+    - name: Allow Gitlab local outbound requests
+      uri:
+        url: "http://gitlab:8081/api/v4/application/settings"
+        method: PUT
+        status_code: 200
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+        body:
+          allow_local_requests_from_hooks_and_services: true
+          allow_local_requests_from_web_hooks_and_services: true
+          allow_local_requests_from_system_hooks: true
+          signup_enabled: false
+          user_show_add_ssh_key_message: false
+          auto_devops_enabled: false
+
+    - name: Create Gitlab Group
+      uri:
+        url: "http://gitlab:8081/api/v4/groups"
+        method: POST
+        status_code: 201
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+        body:
+          name: Tutorial
+          path: tutorial
+      register: gitlab_tutorial_group
+
+    - name: Create zuul-config project
+      include_role:
+        name: create_project
+      vars:
+        project: zuul-config
+        group_id: "{{ gitlab_tutorial_group.json['id'] }}"
+    - name: Create test1 project
+      include_role:
+        name: create_project
+      vars:
+        project: test1
+        group_id: "{{ gitlab_tutorial_group.json['id'] }}"
+    - name: Create test2 project
+      include_role:
+        name: create_project
+      vars:
+        project: test2
+        group_id: "{{ gitlab_tutorial_group.json['id'] }}"
+
+    # The Zuul user is created last because it is an atomic operation
+    # which signals that Gerrit is ready for use and it is safe for
+    # the Zuul scheduler to start.
+    - name: Check if zuul user exists
+      uri:
+        url: http://gitlab:8081/api/v4/users/user/status
+        status_code: 200, 404
+      register: zuul_user_check
+
+    - name: Get current user id
+      uri:
+        url: "http://gitlab:8081/api/v4/user"
+        method: GET
+        status_code: 200
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+      register: gitlab_current_user
+
+    - set_fact:
+        gitlab_current_user_id: "{{ gitlab_current_user.json['id'] }}"
+    - name: Rename User from Root to Zuul
+      uri:
+        url: "http://gitlab:8081/api/v4/users/{{ gitlab_current_user_id }}"
+        method: PUT
+        status_code: 200
+        body_format: json
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_admin_token.json['token'] }}"
+        body:
+          name: Zuul
+          username: zuul
+          email: zuul@example.com
+          skip_confirmation: true
+      register: gitlab_zuul_user
+
+    - name: POST Gitlab profile picture
+      shell: 'curl --request PUT \
+                   -H "PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA" \
+                   --form "avatar=@/var/playbooks/zuul.png" \
+                   "http://gitlab:8081/api/v4/users/{{ gitlab_current_user_id }}"'

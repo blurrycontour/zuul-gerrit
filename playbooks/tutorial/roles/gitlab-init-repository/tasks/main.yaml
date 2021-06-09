@@ -1,0 +1,12 @@
+- name: "Clone {{ project_name }}"
+  git:
+    repo: "http://user:{{ gitlab_user_token.json['token'] }}@localhost:8081/tutorial/{{ project_name }}"
+    dest: "{{ workspace }}/{{ project_name }}"
+
+- name: "Setup repository {{ project_name }}"
+  shell:
+    chdir: "{{ workspace }}/{{ project_name }}/"
+    executable: /bin/bash
+    cmd: |
+      git config user.email 'user@example.com'
+      git config user.name 'Example User'

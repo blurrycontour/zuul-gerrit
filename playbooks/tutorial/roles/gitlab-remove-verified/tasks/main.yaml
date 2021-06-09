@@ -1,0 +1,11 @@
+- name: Unapprove Merge Request
+  uri:
+    url: "http://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/unapprove"
+    method: POST
+    status_code: 201
+    body_format: json
+    headers:
+      PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA
+
+- pause:
+    seconds: 5
