@@ -369,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "85087109_2325ac51",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3176,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-09T08:17:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e88620bb_80604a39",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d15881fc_29833b27",
         "filename": "zuul/model.py",
         "patchSetId": 8
@@ -536,6 +554,24 @@
       "writtenOn": "2021-05-24T21:05:10Z",
       "side": 1,
       "message": "I\u0027d rather treat this as an error to make sure we catch bugs.  Better to handle the lock failure separately.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f62ab04a_54b0e8a7",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-09T08:17:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa50fee2_a9acd5f6",
       "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
