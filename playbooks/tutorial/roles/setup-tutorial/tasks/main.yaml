@@ -30,17 +30,22 @@
         ssh_agent: "{{ ssh_agent_new }}"
   when: ssh_public_key is not defined or ssh_public_key == ''
 
-- name: Run docker-compose up
-  when: not local
+- name: test PWD
   shell:
-    cmd: docker-compose -p zuul-tutorial up -d
-    chdir: src/opendev.org/zuul/zuul/doc/source/examples
+    cmd: pwd
+
+- name: Zuul repository path
+  set_fact:
+    zuul_examples_path: "{% if local %}../..{% else %}src/opendev.org/zuul/zuul{% endif %}/doc/source/examples"
 
 - name: Run docker-compose up
-  when: local
   shell:
-    cmd: docker-compose -p zuul-tutorial up -d
-    chdir: ../../doc/source/examples
+    cmd: docker-compose -f gitlab-docker-compose.yaml -p zuul-tutorial up -d
+    chdir: "{{ zuul_examples_path }}"
+
+- name: test PWD
+  shell:
+    cmd: pwd
 
 - name: Print list of images
   command: docker image ls --all --digests --no-trunc
@@ -107,6 +112,10 @@
   vars:
     projectname: zuul-config
 
+- name: test PWD
+  shell:
+    cmd: pwd
+
 - name: Make initial change in zuul-config
   copy:
     src: ../../doc/source/examples/zuul-config/zuul.d/pipelines.yaml
@@ -114,7 +123,7 @@
 
 - name: Make initial change in zuul-config
   copy:
-    src: ../../doc/source/examples/zuul-config/zuul.d/projects.yaml
+    src: "{{ zuul_examples_path }}/zuul-config/zuul.d/projects.yaml"
     dest: "{{ workspace }}/zuul-config/zuul.d/"
 
 - name: Copy basic base job definition
