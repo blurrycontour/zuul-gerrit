@@ -16,6 +16,23 @@
       "revId": "20e31afe84a19b6539d9800e09663172865bce91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "87918eb6_85682792",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5958,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-09T18:50:10Z",
+      "side": 1,
+      "message": "It\u0027s only going to retry once due to the disconnect; the scheduler will succeed in the next attempt.  It doesn\u0027t depend on the test timing.\n\nAnd yes, the disconnect result gets superceded by retry.  A little weird, but the code is going away very soon so...",
+      "revId": "20e31afe84a19b6539d9800e09663172865bce91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
