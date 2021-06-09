@@ -72,7 +72,11 @@ COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 
 # https://podman.io/getting-started/installation.html
 COPY tools/4D64390375060AA4.asc /etc/apt/trusted.gpg.d/kubic.asc
-RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
+RUN apt-get update \
+  && apt-get install -y ca-certificates \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+RUN echo 'deb [ allow-insecure=yes ] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
   && apt-get update \
   && apt-get install -y skopeo \
   && apt-get clean \
