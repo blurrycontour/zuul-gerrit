@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c88dca0_a596c39c",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-10T23:54:51Z",
+      "side": 1,
+      "message": "This (and the other methods) really should take a Build instance instead of AnsibleJob, but we don\u0027t have builds in ZK yet.\n\nI don\u0027t think AnsibleJob is used anywhere outside of the executor, and it would be nice to keep it that way; it\u0027s complicated enough without trying to serve other use cases.  Can you either switch this to take a bunch of individual arguments, or add a TODO to switch to using Build when it\u0027s available?",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "593eacb4_f99b9920",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-10T23:54:51Z",
+      "side": 1,
+      "message": "It might be better to call this method \"checkNodeRequest\" since it doesn\u0027t actually accept anything; it\u0027s mostly a bunch of sanity checks (or possibly a resubmit).  That may help avoid confusions since \"accepting\" is a pretty well defined concept in the nodepool protocol.",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
