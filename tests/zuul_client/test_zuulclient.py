@@ -24,7 +24,7 @@ import zuul.rpcclient
 from zuul.lib.yamlutil import yaml
 
 from tests.base import iterate_timeout
-from tests.base import ZuulDBTestCase
+from tests.base import ZuulDBTestCase, AnsibleZuulTestCase
 from tests.unit.test_web import BaseTestWeb
 
 
@@ -422,13 +422,24 @@ class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
 
     def _split_pretty_table(self, output):
         lines = output.decode().split('\n')
-        # ['ID', 'Job', 'Project', 'Branch', 'Pipeline', 'Change or Ref',
-        #  'Duration (s)', 'Start time', 'Result', 'Event ID']
         headers = [x.strip() for x in lines[1].split('|') if x != '']
         # Trim headers and last line of the table
         return [dict(zip(headers,
                          [x.strip() for x in l.split('|') if x != '']))
                 for l in lines[3:-2]]
+
+    def _split_line_output(self, output):
+        lines = output.decode().split('\n')
+        info = {}
+        for l in lines:
+            if l.startswith('==='):
+                continue
+            try:
+                key, value = l.split(':', 1)
+                info[key] = value.strip()
+            except ValueError:
+                continue
+        return info
 
     def setUp(self):
         super(TestZuulClientQueryData, self).setUp()
@@ -462,6 +473,10 @@ class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
         self.executor_server.release()
         self.waitUntilSettled()
 
+
+class TestZuulClientBuilds(TestZuulClientQueryData,
+                           AnsibleZuulTestCase):
+    """Test that zuul-client can fetch builds"""
     def test_get_builds(self):
         """Test querying builds"""
 
@@ -527,18 +542,23 @@ class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
         results = self._split_pretty_table(output)
         self.assertEqual(0, len(results), results)
 
-        # 2 jobs skipped in check for 2,1
-        p = subprocess.Popen(
-            ['zuul-client',
-             '--zuul-url', self.base_url,
-             'builds', '--tenant', 'tenant-one', '--result', 'SKIPPED', ],
-            stdout=subprocess.PIPE)
-        output, err = p.communicate()
-        self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
-        self.assertEqual(2, len(results), results)
-        self.assertTrue(all(x['Result'] == 'SKIPPED' for x in results),
-                        results)
+        for result in ['SUCCESS', 'FAILURE']:
+            p = subprocess.Popen(
+                ['zuul-client',
+                 '--zuul-url', self.base_url,
+                 'builds', '--tenant', 'tenant-one', '--result', result, ],
+                stdout=subprocess.PIPE)
+            job_count = self.countJobResults(self.history, result)
+            # noop job not included, must be added
+            if result == 'SUCCESS':
+                job_count += 1
+            output, err = p.communicate()
+            self.assertEqual(p.returncode, 0, output)
+            results = self._split_pretty_table(output)
+            self.assertEqual(job_count, len(results), results)
+            if len(results) > 0:
+                self.assertTrue(all(x['Result'] == result for x in results),
+                                results)
 
         # 6 jobs in gate
         p = subprocess.Popen(
@@ -552,3 +572,58 @@ class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
         self.assertEqual(6, len(results), results)
         self.assertTrue(all(x['Pipeline'] == 'gate' for x in results),
                         results)
+
+
+class TestZuulClientBuildInfo(TestZuulClientQueryData,
+                              AnsibleZuulTestCase):
+    """Test that zuul-client can fetch a build's details"""
+    def test_get_build_info(self):
+        """Test querying a specific build"""
+
+        test_build = self.history[-1]
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'build-info', '--tenant', 'tenant-one',
+             '--uuid', test_build.uuid],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, (output, err))
+        info = self._split_line_output(output)
+        self.assertEqual(test_build.uuid, info.get('UUID'), test_build)
+        self.assertEqual(test_build.result, info.get('Result'), test_build)
+        self.assertEqual(test_build.name, info.get('Job'), test_build)
+
+    def test_get_build_artifacts(self):
+        """Test querying a specific build's artifacts"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--job', 'project-test1',
+             '--limit', '1'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        uuid = results[0]['ID']
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'build-info', '--tenant', 'tenant-one',
+             '--uuid', uuid,
+             '--show-artifacts'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, (output, err))
+        artifacts = self._split_pretty_table(output)
+        self.assertTrue(
+            any(x['name'] == 'tarball' and
+                x['url'] == 'http://example.com/tarball'
+                for x in artifacts),
+            output)
+        self.assertTrue(
+            any(x['name'] == 'docs' and
+                x['url'] == 'http://example.com/docs'
+                for x in artifacts),
+            output)
