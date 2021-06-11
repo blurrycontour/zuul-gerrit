@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a30e71d_24aa0779",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-11T06:52:50Z",
+      "side": 1,
+      "message": "I just took a look at this and it looks like both parameters used in the _getPausedParentProvider() call on the NodeRequest.__init__() method above. So I don\u0027t think we can remove them easily.\n\nI was just asking myself if this paused provider calculation is something that should/must be done inside the model class itself or if that is something we could also do outside of this class when the NodeRequest is created. In this case we could get rid of those two parameters and only have to provide the provider.",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3c88dca0_a596c39c",
         "filename": "zuul/nodepool.py",
         "patchSetId": 15
