@@ -82,6 +82,12 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
     TENANT_ROOT,
 )
+from zuul.zk.exceptions import LockException
+from zuul.zk.locks import (
+    locked,
+    pipeline_lock,
+    tenant_read_lock,
+)
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -1334,45 +1340,83 @@ class Scheduler(threading.Thread):
                 # Process tenant management events separate from other events
                 # as they might reload the tenant.
                 for tenant in self.abide.tenants.values():
+                    tlock = tenant_read_lock(self.zk_client, tenant.name)
                     if not self._stopped:
-                        # This will also forward events for the pipelines
-                        # (e.g. enqueue or dequeue events) to the matching
-                        # pipeline event queues that are processed afterwards.
-                        self.process_tenant_management_queue(tenant)
-
-                for tenant in self.abide.tenants.values():
-                    if not self._stopped:
-                        # This will forward trigger events to matching
-                        # pipeline event queues that are processed below.
-                        self.process_tenant_trigger_queue(tenant)
-
-                    for pipeline in tenant.layout.pipelines.values():
-                        self.process_pipeline_management_queue(
-                            tenant, pipeline)
-
-                        # Give result events priority -- they let us stop
-                        # builds, whereas trigger events cause us to execute
-                        # builds.
-                        self.process_pipeline_result_queue(tenant, pipeline)
-
-                        self.process_pipeline_trigger_queue(tenant, pipeline)
                         try:
-                            while (pipeline.manager.processQueue() and
-                                   not self._stopped):
-                                pass
-                        except Exception:
-                            self.log.exception(
-                                "Exception in pipeline processing:")
-                            pipeline.state = pipeline.STATE_ERROR
-                            # Continue processing other pipelines+tenants
-                        else:
-                            pipeline.state = pipeline.STATE_NORMAL
+                            self.log.debug("Locking tenant %s", tenant.name)
+                            # We (re-)lock the tenant for every pipeline so the
+                            # scheduler has a chance to get the write lock if
+                            # needed.
+                            with locked(tlock, blocking=False):
+                                # This will also forward events for the
+                                # pipelines (e.g. enqueue or dequeue events) to
+                                # the matching pipeline event queues that are
+                                # processed afterwards.
+                                self.process_tenant_management_queue(tenant)
+                        except LockException:
+                            self.log.debug("Skipping locked tenant: %s",
+                                           tenant.name)
+
+                self.process_pipelines()
             except Exception:
                 self.log.exception("Exception in run handler:")
                 # There may still be more events to process
                 self.wake_event.set()
             finally:
                 self.run_handler_lock.release()
+
+    def process_pipelines(self):
+        for tenant in self.abide.tenants.values():
+            tlock = tenant_read_lock(self.zk_client, tenant.name)
+            for pipeline in tenant.layout.pipelines.values():
+                if self._stopped:
+                    return
+
+                plock = pipeline_lock(
+                    self.zk_client, tenant.name, pipeline.name
+                )
+                try:
+                    self.log.debug("Locking tenant %s", tenant.name)
+                    # We (re-)lock the tenant for every pipeline so the
+                    # scheduler has a chance to get the write lock if needed.
+                    with locked(tlock, blocking=False):
+                        # This will forward trigger events to matching
+                        # pipeline event queues that are processed below.
+                        self.process_tenant_trigger_queue(tenant)
+
+                        self.log.debug("Locking pipeline %s", pipeline.name)
+                        try:
+                            with locked(plock, blocking=False):
+                                self._process_pipeline(tenant, pipeline)
+                        except LockException:
+                            self.log.debug(
+                                "Skipping locked pipeline %s in tenant",
+                                pipeline.name, tenant.name)
+                except LockException:
+                    self.log.debug("Skipping locked tenant: %s", tenant.name)
+                    break
+
+    def _process_pipeline(self, tenant, pipeline):
+        self.process_pipeline_management_queue(tenant, pipeline)
+
+        # Give result events priority -- they let us stop builds, whereas
+        # trigger events cause us to execute builds.
+        self.process_pipeline_result_queue(tenant, pipeline)
+
+        self.process_pipeline_trigger_queue(tenant, pipeline)
+
+        try:
+            while not self._stopped and pipeline.manager.processQueue():
+                pass
+            while not self._stopped:
+                if not pipeline.manager.processQueue():
+                    break
+        except Exception:
+            self.log.exception("Exception in pipeline processing:")
+            pipeline.state = pipeline.STATE_ERROR
+            # Continue processing other pipelines+tenants
+        else:
+            pipeline.state = pipeline.STATE_NORMAL
 
     def maintainConnectionCache(self):
         # TODOv3(jeblair): update for tenants
