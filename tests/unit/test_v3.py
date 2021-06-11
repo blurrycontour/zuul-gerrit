@@ -816,6 +816,7 @@ class TestBranchMismatch(ZuulTestCase):
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchCreatedEvent(
                 'org/project2', 'devel'))
+        self.waitUntilSettled()
 
         # A job in a repo with a weird branch name should use the
         # parent job from the parent job's master (default) branch.
@@ -1464,6 +1465,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchCreatedEvent(
                 'org/project1', 'stable'))
+        self.waitUntilSettled()
 
         in_repo_conf = textwrap.dedent(
             """

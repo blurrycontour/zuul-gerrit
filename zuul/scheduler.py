@@ -1350,18 +1350,37 @@ class Scheduler(threading.Thread):
             self.run_handler_lock.acquire()
             try:
                 if not self._stopped:
-                    self.process_management_queue()
+                    self.process_reconfigure_queue()
 
-                # Give result events priority -- they let us stop builds,
-                # whereas trigger events cause us to execute builds.
+                # TODO(swestphahl): Remove legacy result event queue after
+                # NodesProvisionedEvents are dispatched via Zookeeper.
                 if not self._stopped:
                     self.process_result_queue()
 
-                if not self._stopped:
-                    self.process_trigger_queue()
+                # Process tenant management events separate from other events
+                # as they might reload the tenant.
+                for tenant in self.abide.tenants.values():
+                    if not self._stopped:
+                        # This will also forward events for the pipelines
+                        # (e.g. enqueue or dequeue events) to the matching
+                        # pipeline event queues that are processed afterwards.
+                        self.process_tenant_management_queue(tenant)
 
                 for tenant in self.abide.tenants.values():
+                    # This will forward trigger events to matching pipeline
+                    # event queues that are processed below.
+                    self.process_tenant_trigger_queue(tenant)
+
                     for pipeline in tenant.layout.pipelines.values():
+                        self.process_pipeline_management_queue(
+                            tenant, pipeline)
+
+                        # Give result events priority -- they let us stop
+                        # builds, whereas trigger events cause us to execute
+                        # builds.
+                        self.process_pipeline_result_queue(tenant, pipeline)
+
+                        self.process_pipeline_trigger_queue(tenant, pipeline)
                         try:
                             while (pipeline.manager.processQueue() and
                                    not self._stopped):
@@ -1474,28 +1493,18 @@ class Scheduler(threading.Thread):
                     pipeline.name
                 ].put(event.driver_name, event)
 
-    def process_trigger_queue(self):
-        for tenant in self.abide.tenants.values():
+    def process_pipeline_trigger_queue(self, tenant, pipeline):
+        for event in self.pipeline_trigger_events[tenant.name][pipeline.name]:
             if self._stopped:
                 return
-            self.process_tenant_trigger_queue(tenant)
-
-            for pipeline in tenant.layout.pipelines.values():
-                for event in self.pipeline_trigger_events[tenant.name][
+            log = get_annotated_logger(self.log, event.zuul_event_id)
+            log.debug("Processing trigger event %s", event)
+            try:
+                self._process_trigger_event(tenant, pipeline, event)
+            finally:
+                self.pipeline_trigger_events[tenant.name][
                     pipeline.name
-                ]:
-                    if self._stopped:
-                        return
-                    log = get_annotated_logger(
-                        self.log, event.zuul_event_id
-                    )
-                    log.debug("Processing trigger event %s", event)
-                    try:
-                        self._process_trigger_event(tenant, pipeline, event)
-                    finally:
-                        self.pipeline_trigger_events[tenant.name][
-                            pipeline.name
-                        ].ack(event)
+                ].ack(event)
 
     def _process_trigger_event(self, tenant, pipeline, event):
         log = get_annotated_logger(
@@ -1557,7 +1566,7 @@ class Scheduler(threading.Thread):
             )
         return event_forwarded
 
-    def process_management_queue(self):
+    def process_reconfigure_queue(self):
         while not self.reconfigure_event_queue.empty() and not self._stopped:
             self.log.debug("Fetching reconfiguration event")
             event = self.reconfigure_event_queue.get()
@@ -1573,27 +1582,20 @@ class Scheduler(threading.Thread):
                     event.ack_ref.set()
                 self.reconfigure_event_queue.task_done()
 
-        for tenant in self.abide.tenants.values():
+    def process_pipeline_management_queue(self, tenant, pipeline):
+        for event in self.pipeline_management_events[tenant.name][
+            pipeline.name
+        ]:
             if self._stopped:
                 return
-            self.process_tenant_management_queue(tenant)
-
-            for pipeline in tenant.layout.pipelines.values():
-                for event in self.pipeline_management_events[tenant.name][
+            log = get_annotated_logger(self.log, event.zuul_event_id)
+            log.debug("Processing management event %s", event)
+            try:
+                self._process_management_event(event)
+            finally:
+                self.pipeline_management_events[tenant.name][
                     pipeline.name
-                ]:
-                    if self._stopped:
-                        return
-                    log = get_annotated_logger(
-                        self.log, event.zuul_event_id
-                    )
-                    log.debug("Processing management event %s", event)
-                    try:
-                        self._process_management_event(event)
-                    finally:
-                        self.pipeline_management_events[tenant.name][
-                            pipeline.name
-                        ].ack(event)
+                ].ack(event)
 
     def _process_management_event(self, event):
         try:
@@ -1611,28 +1613,25 @@ class Scheduler(threading.Thread):
                 "".join(traceback.format_exception(*sys.exc_info()))
             )
 
-    def process_result_queue(self):
-        for tenant in self.abide.tenants.values():
-            for pipeline in tenant.layout.pipelines.values():
-                for event in self.pipeline_result_events[tenant.name][
+    def process_pipeline_result_queue(self, tenant, pipeline):
+        for event in self.pipeline_result_events[tenant.name][pipeline.name]:
+            if self._stopped:
+                return
+
+            log = get_annotated_logger(
+                self.log,
+                event=getattr(event, "zuul_event_id", None),
+                build=getattr(event, "build", None),
+            )
+            log.debug("Processing result event %s", event)
+            try:
+                self._process_result_event(event, pipeline)
+            finally:
+                self.pipeline_result_events[tenant.name][
                     pipeline.name
-                ]:
-                    if self._stopped:
-                        return
+                ].ack(event)
 
-                    log = get_annotated_logger(
-                        self.log,
-                        event=getattr(event, "zuul_event_id", None),
-                        build=getattr(event, "build", None),
-                    )
-                    log.debug("Processing result event %s", event)
-                    try:
-                        self._process_result_event(event, pipeline)
-                    finally:
-                        self.pipeline_result_events[tenant.name][
-                            pipeline.name
-                        ].ack(event)
-
+    def process_result_queue(self):
         # TODO (felix): The old result event queue is still used for the nodes
         # provisioned results and will be removed once we move those to ZK as
         # well.
