@@ -82,6 +82,12 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
     TENANT_ROOT,
 )
+from zuul.zk.locks import (
+    locked,
+    LockFailedError,
+    pipeline_lock,
+    tenant_read_lock,
+)
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -1256,37 +1262,63 @@ class Scheduler(threading.Thread):
                 if not self._stopped:
                     self.process_global_trigger_queue()
 
-                for tenant in self.abide.tenants.values():
-                    for pipeline in tenant.layout.pipelines.values():
-                        if not self._stopped:
-                            self.process_management_queue(tenant, pipeline)
-
-                        # Give result events priority -- they let us stop
-                        # builds, whereas trigger events cause us to execute
-                        # builds.
-                        if not self._stopped:
-                            self.process_result_queue(tenant, pipeline)
-
-                        if not self._stopped:
-                            self.process_trigger_queue(tenant, pipeline)
-
-                        try:
-                            while (pipeline.manager.processQueue() and
-                                   not self._stopped):
-                                pass
-                        except Exception:
-                            self.log.exception(
-                                "Exception in pipeline processing:")
-                            pipeline.state = pipeline.STATE_ERROR
-                            # Continue processing other pipelines+tenants
-                        else:
-                            pipeline.state = pipeline.STATE_NORMAL
+                self.process_pipelines()
             except Exception:
                 self.log.exception("Exception in run handler:")
                 # There may still be more events to process
                 self.wake_event.set()
             finally:
                 self.run_handler_lock.release()
+
+    def process_pipelines(self):
+        for tenant in self.abide.tenants.values():
+            tlock = tenant_read_lock(self.zk_client, tenant.name)
+            for pipeline in tenant.layout.pipelines.values():
+                if self._stopped:
+                    return
+
+                plock = pipeline_lock(
+                    self.zk_client, tenant.name, pipeline.name
+                )
+                try:
+                    self.log.debug("Locking tenant %s", tenant.name)
+                    # We (re-)lock the tenant for every pipeline so the
+                    # scheduler has a chance to get the write lock if needed.
+                    with locked(tlock, blocking=False):
+                        self.log.debug("Locking pipeline %s", pipeline.name)
+                        try:
+                            with locked(plock, blocking=False):
+                                self._process_pipeline(tenant, pipeline)
+                        except LockFailedError:
+                            self.log.debug(
+                                "Skipping locked pipeline %s in tenant",
+                                pipeline.name, tenant.name)
+                except LockFailedError:
+                    self.log.debug("Skipping locked tenant: %s", tenant.name)
+                    break
+
+    def _process_pipeline(self, tenant, pipeline):
+        if not self._stopped:
+            self.process_management_queue(tenant, pipeline)
+
+        if not self._stopped:
+            # Give result events priority -- they let us stop builds, whereas
+            # trigger events cause us to execute builds.
+            self.process_result_queue(tenant, pipeline)
+
+        if not self._stopped:
+            self.process_trigger_queue(tenant, pipeline)
+
+        try:
+            while not self._stopped:
+                if not pipeline.manager.processQueue():
+                    break
+        except Exception:
+            self.log.exception("Exception in pipeline processing:")
+            pipeline.state = pipeline.STATE_ERROR
+            # Continue processing other pipelines+tenants
+        else:
+            pipeline.state = pipeline.STATE_NORMAL
 
     def maintainConnectionCache(self):
         # TODOv3(jeblair): update for tenants
