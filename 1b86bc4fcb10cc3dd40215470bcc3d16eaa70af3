@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d770f6d0_10d141ce",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 5956,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-11T00:16:39Z",
+      "side": 1,
+      "message": "This (and the history list below) is what needed to change due to the new test.\n\nThe current behavior has us performing a RETRY if we report a gearman disconnect, but since this change moves retry handling to the executor, that\u0027s no longer possible.\n\nThis will be a behavior change is that jobs will have DISCONNECT reported as a result instead of being retried, but it\u0027s pretty rare that the scheduler disconnects from gearman, and this is all going away *very* soon once the build requests are moved to ZK.",
+      "revId": "1b86bc4fcb10cc3dd40215470bcc3d16eaa70af3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
