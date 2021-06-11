@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "75bd5332_788fea6b",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-11T06:47:45Z",
+      "side": 1,
+      "message": "I\u0027ve added a TODO. I found that a little more appropriate since we would otherwise have to substitute the build/ansible_job parameter with 5 other parameters and move the logic to get those parameters out into the caller method.",
+      "parentUuid": "3c88dca0_a596c39c",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "593eacb4_f99b9920",
         "filename": "zuul/nodepool.py",
         "patchSetId": 15
@@ -30,6 +48,24 @@
       "writtenOn": "2021-06-10T23:54:51Z",
       "side": 1,
       "message": "It might be better to call this method \"checkNodeRequest\" since it doesn\u0027t actually accept anything; it\u0027s mostly a bunch of sanity checks (or possibly a resubmit).  That may help avoid confusions since \"accepting\" is a pretty well defined concept in the nodepool protocol.",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d3014c2_f3f8438f",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-11T06:47:45Z",
+      "side": 1,
+      "message": "Sounds reasonable. Done",
+      "parentUuid": "593eacb4_f99b9920",
       "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
