@@ -1189,21 +1189,25 @@ class Scheduler(threading.Thread):
                     self.process_global_management_queue()
 
                 if not self._stopped:
-                    self.process_management_queue()
-
-                # Give result events priority -- they let us stop builds,
-                # whereas trigger events cause us to execute builds.
-                if not self._stopped:
-                    self.process_result_queue()
+                    self.process_global_result_queue()
 
                 if not self._stopped:
                     self.process_global_trigger_queue()
 
-                if not self._stopped:
-                    self.process_trigger_queue()
-
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
+                        if not self._stopped:
+                            self.process_management_queue(tenant, pipeline)
+
+                        # Give result events priority -- they let us stop
+                        # builds, whereas trigger events cause us to execute
+                        # builds.
+                        if not self._stopped:
+                            self.process_result_queue(tenant, pipeline)
+
+                        if not self._stopped:
+                            self.process_trigger_queue(tenant, pipeline)
+
                         try:
                             while (pipeline.manager.processQueue() and
                                    not self._stopped):
@@ -1318,24 +1322,20 @@ class Scheduler(threading.Thread):
                     pipeline.name
                 ].put(event.driver_name, event)
 
-    def process_trigger_queue(self):
-        for tenant in self.abide.tenants.values():
-            for pipeline in tenant.layout.pipelines.values():
-                for event in self.pipeline_trigger_events[tenant.name][
+    def process_trigger_queue(self, tenant, pipeline):
+        for event in self.pipeline_trigger_events[tenant.name][
+            pipeline.name
+        ]:
+            if self._stopped:
+                return
+            log = get_annotated_logger(self.log, event.zuul_event_id)
+            log.debug("Processing trigger event %s", event)
+            try:
+                self._process_trigger_event(tenant, pipeline, event)
+            finally:
+                self.pipeline_trigger_events[tenant.name][
                     pipeline.name
-                ]:
-                    if self._stopped:
-                        return
-                    log = get_annotated_logger(
-                        self.log, event.zuul_event_id
-                    )
-                    log.debug("Processing trigger event %s", event)
-                    try:
-                        self._process_trigger_event(tenant, pipeline, event)
-                    finally:
-                        self.pipeline_trigger_events[tenant.name][
-                            pipeline.name
-                        ].ack(event)
+                ].ack(event)
 
     def _process_trigger_event(self, tenant, pipeline, event):
         log = get_annotated_logger(
@@ -1400,24 +1400,20 @@ class Scheduler(threading.Thread):
             )
         return event_forwarded
 
-    def process_management_queue(self):
-        for tenant in self.abide.tenants.values():
-            for pipeline in tenant.layout.pipelines.values():
-                for event in self.pipeline_management_events[tenant.name][
+    def process_management_queue(self, tenant, pipeline):
+        for event in self.pipeline_management_events[tenant.name][
+            pipeline.name
+        ]:
+            if self._stopped:
+                return
+            log = get_annotated_logger(self.log, event.zuul_event_id)
+            log.debug("Processing management event %s", event)
+            try:
+                self._process_management_event(event)
+            finally:
+                self.pipeline_management_events[tenant.name][
                     pipeline.name
-                ]:
-                    if self._stopped:
-                        return
-                    log = get_annotated_logger(
-                        self.log, event.zuul_event_id
-                    )
-                    log.debug("Processing management event %s", event)
-                    try:
-                        self._process_management_event(event)
-                    finally:
-                        self.pipeline_management_events[tenant.name][
-                            pipeline.name
-                        ].ack(event)
+                ].ack(event)
 
     def _process_management_event(self, event):
         try:
@@ -1435,28 +1431,26 @@ class Scheduler(threading.Thread):
                 "".join(traceback.format_exception(*sys.exc_info()))
             )
 
-    def process_result_queue(self):
-        for tenant in self.abide.tenants.values():
-            for pipeline in tenant.layout.pipelines.values():
-                for event in self.pipeline_result_events[tenant.name][
+    def process_result_queue(self, tenant, pipeline):
+        for event in self.pipeline_result_events[tenant.name][
+            pipeline.name
+        ]:
+            if self._stopped:
+                return
+            log = get_annotated_logger(
+                self.log,
+                event=getattr(event, "zuul_event_id", None),
+                build=getattr(event, "build", None),
+            )
+            log.debug("Processing result event %s", event)
+            try:
+                self._process_result_event(event, pipeline)
+            finally:
+                self.pipeline_result_events[tenant.name][
                     pipeline.name
-                ]:
-                    if self._stopped:
-                        return
+                ].ack(event)
 
-                    log = get_annotated_logger(
-                        self.log,
-                        event=getattr(event, "zuul_event_id", None),
-                        build=getattr(event, "build", None),
-                    )
-                    log.debug("Processing result event %s", event)
-                    try:
-                        self._process_result_event(event, pipeline)
-                    finally:
-                        self.pipeline_result_events[tenant.name][
-                            pipeline.name
-                        ].ack(event)
-
+    def process_global_result_queue(self):
         # TODO (felix): The old result event queue is still used for the nodes
         # provisioned results and will be removed once we move those to ZK as
         # well.
