@@ -26,12 +26,14 @@ TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"
 def locked(lock, blocking=True, timeout=None):
     if not lock.acquire(blocking=blocking, timeout=timeout):
         raise LockException(f"Failed to acquire lock {lock}")
-    yield
     try:
-        lock.release()
-    except Exception:
-        log = logging.getLogger("zuul.zk.locks")
-        log.exception("Failed to release lock %s", lock)
+        yield
+    finally:
+        try:
+            lock.release()
+        except Exception:
+            log = logging.getLogger("zuul.zk.locks")
+            log.exception("Failed to release lock %s", lock)
 
 
 def tenant_read_lock(client, tenant_name):

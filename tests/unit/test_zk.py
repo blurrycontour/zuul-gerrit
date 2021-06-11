@@ -664,6 +664,14 @@ class TestLocks(ZooKeeperBaseTestCase):
                 pass
         self.assertFalse(lock.is_acquired)
 
+    def test_unlock_exception(self):
+        lock = self.zk_client.client.Lock("/lock")
+        with testtools.ExpectedException(RuntimeError):
+            with locked(lock):
+                self.assertTrue(lock.is_acquired)
+                raise RuntimeError
+        self.assertFalse(lock.is_acquired)
+
 
 class TestLayoutStore(ZooKeeperBaseTestCase):
 
