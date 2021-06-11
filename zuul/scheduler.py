@@ -82,7 +82,16 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
     TENANT_ROOT,
 )
+from zuul.zk.exceptions import LockException
 from zuul.zk.layout import LayoutState, LayoutStateStore
+from zuul.zk.locks import (
+    locked,
+    management_queue_lock,
+    pipeline_lock,
+    tenant_read_lock,
+    tenant_write_lock,
+    trigger_queue_lock,
+)
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -921,15 +930,16 @@ class Scheduler(threading.Thread):
                         continue
 
                 old_tenant = self.abide.tenants.get(tenant_name)
-                tenant = loader.loadTenant(self.abide, tenant_name,
-                                           self.ansible_manager,
-                                           self.unparsed_abide,
-                                           cache_ltime=cache_ltime)
-                reconfigured_tenants.append(tenant_name)
-                if tenant is not None:
-                    self._reconfigureTenant(tenant, old_tenant)
-                else:
-                    self._reconfigureDeleteTenant(old_tenant)
+                with locked(tenant_write_lock(self.zk_client, tenant_name)):
+                    tenant = loader.loadTenant(self.abide, tenant_name,
+                                               self.ansible_manager,
+                                               self.unparsed_abide,
+                                               cache_ltime=cache_ltime)
+                    reconfigured_tenants.append(tenant_name)
+                    if tenant is not None:
+                        self._reconfigureTenant(tenant, old_tenant)
+                    else:
+                        self._reconfigureDeleteTenant(old_tenant)
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Reconfiguration complete (smart: %s, "
@@ -1359,38 +1369,57 @@ class Scheduler(threading.Thread):
                         self.process_tenant_management_queue(tenant)
 
                 for tenant in self.abide.tenants.values():
-                    if not self._stopped:
-                        # This will forward trigger events to matching
-                        # pipeline event queues that are processed below.
-                        self.process_tenant_trigger_queue(tenant)
+                    try:
+                        with locked(
+                            tenant_read_lock(self.zk_client, tenant.name),
+                            blocking=False
+                        ):
+                            if not self._stopped:
+                                # This will forward trigger events to pipeline
+                                # event queues that are processed below.
+                                self.process_tenant_trigger_queue(tenant)
 
-                    for pipeline in tenant.layout.pipelines.values():
-                        self.process_pipeline_management_queue(
-                            tenant, pipeline)
-
-                        # Give result events priority -- they let us stop
-                        # builds, whereas trigger events cause us to execute
-                        # builds.
-                        self.process_pipeline_result_queue(tenant, pipeline)
-
-                        self.process_pipeline_trigger_queue(tenant, pipeline)
-                        try:
-                            while (pipeline.manager.processQueue() and
-                                   not self._stopped):
-                                pass
-                        except Exception:
-                            self.log.exception(
-                                "Exception in pipeline processing:")
-                            pipeline.state = pipeline.STATE_ERROR
-                            # Continue processing other pipelines+tenants
-                        else:
-                            pipeline.state = pipeline.STATE_NORMAL
+                            self.process_pipelines(tenant)
+                    except LockException:
+                        self.log.debug("Skipping locked tenant %s",
+                                       tenant.name)
             except Exception:
                 self.log.exception("Exception in run handler:")
                 # There may still be more events to process
                 self.wake_event.set()
             finally:
                 self.run_handler_lock.release()
+
+    def process_pipelines(self, tenant):
+        for pipeline in tenant.layout.pipelines.values():
+            if self._stopped:
+                return
+            try:
+                with locked(
+                    pipeline_lock(self.zk_client, tenant.name, pipeline.name),
+                    blocking=False
+                ):
+                    self._process_pipeline(tenant, pipeline)
+
+            except LockException:
+                self.log.debug("Skipping locked pipeline %s in tenant %s",
+                               pipeline.name, tenant.name)
+
+    def _process_pipeline(self, tenant, pipeline):
+        self.process_pipeline_management_queue(tenant, pipeline)
+        # Give result events priority -- they let us stop builds, whereas
+        # trigger events cause us to execute builds.
+        self.process_pipeline_result_queue(tenant, pipeline)
+        self.process_pipeline_trigger_queue(tenant, pipeline)
+        try:
+            while not self._stopped and pipeline.manager.processQueue():
+                pass
+        except Exception:
+            self.log.exception("Exception in pipeline processing:")
+            pipeline.state = pipeline.STATE_ERROR
+            # Continue processing other pipelines+tenants
+        else:
+            pipeline.state = pipeline.STATE_NORMAL
 
     def maintainConnectionCache(self):
         # TODOv3(jeblair): update for tenants
@@ -1410,16 +1439,23 @@ class Scheduler(threading.Thread):
         self.log.debug("Connection cache size: %s" % len(relevant))
 
     def process_tenant_trigger_queue(self, tenant):
-        for event in self.trigger_events[tenant.name]:
-            log = get_annotated_logger(self.log, event.zuul_event_id)
-            log.debug("Forwarding trigger event %s", event)
-            try:
-                self._forward_trigger_event(event, tenant)
-            except Exception:
-                log.exception("Unable to forward event %s "
-                              "to tenant %s", event, tenant.name)
-            finally:
-                self.trigger_events[tenant.name].ack(event)
+        try:
+            with locked(
+                trigger_queue_lock(self.zk_client, tenant.name), blocking=False
+            ):
+                for event in self.trigger_events[tenant.name]:
+                    log = get_annotated_logger(self.log, event.zuul_event_id)
+                    log.debug("Forwarding trigger event %s", event)
+                    try:
+                        self._forward_trigger_event(event, tenant)
+                    except Exception:
+                        log.exception("Unable to forward event %s "
+                                      "to tenant %s", event, tenant.name)
+                    finally:
+                        self.trigger_events[tenant.name].ack(event)
+        except LockException:
+            self.log.debug("Skipping locked trigger event"
+                           " queue in tenant %s", tenant.name)
 
     def _forward_trigger_event(self, event, tenant):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -1522,11 +1558,24 @@ class Scheduler(threading.Thread):
             pipeline.manager.addChange(change, event)
 
     def process_tenant_management_queue(self, tenant):
+        try:
+            with locked(
+                management_queue_lock(self.zk_client, tenant.name)
+            ):
+                self._process_tenant_management_queue(tenant)
+        except LockException:
+            self.log.debug("Skipping locked management event queue"
+                           " in tenant %s", tenant.name)
+
+    def _process_tenant_management_queue(self, tenant):
         for event in self.management_events[tenant.name]:
             event_forwarded = False
             try:
                 if isinstance(event, TenantReconfigureEvent):
-                    self._doTenantReconfigureEvent(event)
+                    with locked(
+                        tenant_write_lock(self.zk_client, tenant.name)
+                    ):
+                        self._doTenantReconfigureEvent(event)
                 elif isinstance(event, (PromoteEvent, ChangeManagementEvent)):
                     event_forwarded = self._forward_management_event(event)
                 else:
