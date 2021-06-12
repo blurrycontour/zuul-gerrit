@@ -7,3 +7,4 @@ User How-to Guides
    cross-project-gating
    pti
    badges
+   matrix
