@@ -28,6 +28,7 @@ from tests.base import FIXTURE_DIR
 
 class BaseClientTestCase(BaseTestCase):
     config_file = 'zuul.conf'
+    config_with_zk = True
 
     def setUp(self):
         super(BaseClientTestCase, self).setUp()
@@ -35,6 +36,10 @@ class BaseClientTestCase(BaseTestCase):
             rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
         self.config = configparser.ConfigParser()
         self.config.read(os.path.join(FIXTURE_DIR, self.config_file))
+        if self.config_with_zk:
+            self.config_add_zk()
+
+    def config_add_zk(self):
         self.setupZK()
         self.config.add_section('zookeeper')
         self.config.set('zookeeper', 'hosts', self.zk_chroot_fixture.zk_hosts)
@@ -48,8 +53,9 @@ class BaseClientTestCase(BaseTestCase):
 
 
 class TestTenantValidationClient(BaseClientTestCase):
-    def test_client_tenant_conf_check(self):
+    config_with_zk = False
 
+    def test_client_tenant_conf_check(self):
         self.config.set(
             'scheduler', 'tenant_config',
             os.path.join(FIXTURE_DIR, 'config/tenant-parser/simple.yaml'))
