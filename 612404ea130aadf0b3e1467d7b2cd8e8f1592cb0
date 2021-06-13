@@ -16,6 +16,23 @@
       "revId": "612404ea130aadf0b3e1467d7b2cd8e8f1592cb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ec2aaa7_917edb78",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T14:19:31Z",
+      "side": 1,
+      "message": "I think that makes sense for long running processes, since the election blocks until it wins.  If we want any scheduler to be able to run these at any time, then we need non-blocking locks.\n\nNow, if we have a lot of schedulers, we probably don\u0027t need them all trying to run the same cleanup tasks.  So maybe we should think about going back to the approach where we dedicate a cleanup thread and sleep between tasks.  Then that thread could run an election.\n\nI don\u0027t think it\u0027s too important now, and it\u0027s easy to change later.",
+      "revId": "612404ea130aadf0b3e1467d7b2cd8e8f1592cb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
