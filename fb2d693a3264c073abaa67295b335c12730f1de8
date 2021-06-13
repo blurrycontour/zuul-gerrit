@@ -50,6 +50,23 @@
       "revId": "fb2d693a3264c073abaa67295b335c12730f1de8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2cf0633b_19fb1874",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3238,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T14:28:05Z",
+      "side": 1,
+      "message": "I implemented this in a followup.",
+      "revId": "fb2d693a3264c073abaa67295b335c12730f1de8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
