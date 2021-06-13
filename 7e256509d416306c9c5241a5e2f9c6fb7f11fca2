@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "afe07439_7263351c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1514,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T15:52:54Z",
+      "side": 1,
+      "message": "Felix has a change to remove the merge event and I think it\u0027s ready to go; let\u0027s rebase this on that.",
+      "revId": "7e256509d416306c9c5241a5e2f9c6fb7f11fca2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
