@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "afa848f6_20a10a35",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T14:35:51Z",
+      "side": 1,
+      "message": "Yes, that\u0027s a good idea.  It could be moved to the manager in provisionNodes.",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c88dca0_a596c39c",
         "filename": "zuul/nodepool.py",
         "patchSetId": 15
