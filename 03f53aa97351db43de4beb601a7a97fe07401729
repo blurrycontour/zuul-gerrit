@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "675fd506_70a5616e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T20:52:44Z",
+      "side": 1,
+      "message": "Can you elaborate on this?  Is there a case where all of them need to be locked simultaneously, or that we need to lock each one of these before we process it?\n\nActually, a mini doc on what locks exist and when they need to be locked would be nice.  Could just be a docstring in zk/locks.py.\n\nIt seems these should be able to operate independently, and they should be able to continue to operate even if a tenant is write-locked (we can continue to dispatch events to the tenant, it just shouldn\u0027t process them).  But that\u0027s not how the event dispatching works now.  We actually do a lot of processing of events before we forward them to each tenant-pipeline queue, including deciding whether we should forward them based on the current pipeline config and also we allow them to trigger tenant reconfigurations.  Particularly because we go from a global queue to a tenant-pipeline queue, we have to know what pipelines are in a tenant in order to forward events to it.  That means we can\u0027t forward events while that tenant is being reconfigured.\n\nUnfortunately this means that when we reconfigure a tenant, we will stop all global processing, which means that almost immediately after starting a reconfiguration for one tenant, we will \"stop the world\" for all tenants.  Sure, we can still process results, but we\u0027re not likely to be starting many, if any, new jobs.\n\nTenant reconfiguration is an event in the global management queue.  If we only have one scheduler processing that at a time, then we could end up serializing reconfiguration events.  So if we take all of these together: the system will process one tenant reconfiguration event at a time, in sequence, and while reconfiguring each tenant, global event processing will stop, effectively stopping all activity.\n\nThat sounds remarkably like what we have today with a single scheduler.  Hopefully I\u0027m missing something; otherwise we may need to rethink some of the event management.",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f093fb1c_3947f979",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T20:52:44Z",
+      "side": 1,
+      "message": "When would we ever create a non-ephemeral lock?  That sounds like it could cause deadlock.",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60dd899d_282986ea",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-13T20:52:44Z",
+      "side": 1,
+      "message": "Why would we need to acquire multiple locks?",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
