@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1cab4a66_37ba7319",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-14T13:03:55Z",
+      "side": 1,
+      "message": "\u003e ... The trade-off here would be that we need to duplicate all trigger events for each tenant.\n\nOf course, we can decide which events need to be forwarded to which tenant based on the tenant configuration. This way we are only duplicating events for projects that are part of multiple tenants.",
+      "parentUuid": "f30cb795_19f83ee8",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f093fb1c_3947f979",
         "filename": "zuul/zk/locks.py",
         "patchSetId": 4
