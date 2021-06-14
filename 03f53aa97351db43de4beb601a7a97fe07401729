@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f30cb795_19f83ee8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-14T09:41:09Z",
+      "side": 1,
+      "message": "Yes, with the way the global management and trigger event queues are currently implemented we can\u0027t continue processing the global event queues during a reconfiguration. I was aware of the issue with the serialized tenant reconfigurations, but did not think of the problem with forwarding trigger events.\n\nWhen I brought up the issue of the the serialized reconfigs some time ago, IIRC we decided to follow the spec in this regard and stick with the global management/trigger event queues for now.\n\nMy proposal back then was to have tenant specific management/trigger event queues instead. The trade-off here would be that we need to duplicate all trigger events for each tenant.",
+      "parentUuid": "675fd506_70a5616e",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f093fb1c_3947f979",
         "filename": "zuul/zk/locks.py",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "8005af62_5092db5f",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-14T09:41:09Z",
+      "side": 1,
+      "message": "I just wanted to expose the same arguments that lock.acquire() accepts, but you are right in that we should probably not use this argument. Do you think it\u0027s better to remove it?",
+      "parentUuid": "f093fb1c_3947f979",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60dd899d_282986ea",
         "filename": "zuul/zk/locks.py",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2021-06-13T20:52:44Z",
       "side": 1,
       "message": "Why would we need to acquire multiple locks?",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce78e12d_25fa0cb9",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-14T09:41:09Z",
+      "side": 1,
+      "message": "In order to give the scheduler a chance to get a lock for reconfiguration I\u0027m planning to re-lock the tenant before locking a pipeline. So basically something like:\n\n    with locked(tenant_read_lock, pipeline_lock, blocking\u003dFalse):\n        ... process pipeline ...\n\nHowever, I\u0027m not using that in https://review.opendev.org/c/zuul/zuul/+/796013/1/zuul/scheduler.py in favor of better logging in case a tenant or pipeline is already locked.\n\nI\u0027m fine with removing the support for multiple locks.",
+      "parentUuid": "60dd899d_282986ea",
       "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
