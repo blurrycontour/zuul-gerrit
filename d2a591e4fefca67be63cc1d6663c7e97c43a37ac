@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "c312ae8d_8666a060",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-14T07:13:41Z",
+      "side": 1,
+      "message": "It seems to be a little more complicated: The pausedParent() call is also used in the priority property of the node request, which means we can\u0027t simply move this part to the pipeline manager. In addition to that the NodesProvisionedEvent handling (Scheduler._doNodesProvisionedEvent) is also relying on the build_set and job being set on the node request. The latter one could be solved by just storing the build_set_uuid and job_name on the node request and iterate over all queue items to find the matching build_set (which we also do for the result events that are stored in ZK by now).",
+      "parentUuid": "f1d3e015_251d9877",
+      "revId": "d2a591e4fefca67be63cc1d6663c7e97c43a37ac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3c88dca0_a596c39c",
         "filename": "zuul/nodepool.py",
         "patchSetId": 15
