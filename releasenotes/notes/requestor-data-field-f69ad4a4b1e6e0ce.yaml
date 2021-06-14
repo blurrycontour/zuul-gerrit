@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    Zuul now requires a minimal Nodepool version of 4.2.0 as we are utilizing
+    the `requestor_data` field to provide opaque zuul-specific information to
+    the NodeRequest. This field is first supported by the Nodepool version
+    mentioned above.
