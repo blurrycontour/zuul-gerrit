@@ -1,0 +1,15 @@
+- hosts: all
+  tasks:
+    - name: Configure python 3.10 PPA repository
+      ansible.builtin.apt_repository:
+        repo: deadsnakes/nightly
+      become: yes
+    - name: install python
+      apt:
+        update_cache: yes
+        name:
+          - python3.10-dev
+          - python3.10-venv
+          - python3-distutils
+        state: present
+      become: yes
