@@ -119,6 +119,15 @@
         ZUUL_SCHEDULER_COUNT: 2
 
 - job:
+    name: zuul-tox-py310
+    parent: zuul-tox
+    timeout: 4800  # 80 minutes
+    vars:
+      tox_envlist: py310
+      python_version: "3.10"
+      python_use_pyenv: true
+
+- job:
     name: zuul-build-dashboard
     parent: build-javascript-deployment
     description: |
@@ -289,6 +298,8 @@
         - zuul-tox-py36
         - zuul-tox-py38
         - zuul-tox-py38-multi-scheduler
+        - zuul-tox-py310:
+            voting: false
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
