@@ -791,11 +791,14 @@ class NodeSet(ConfigObject):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, requestor, build_set, job, nodeset, relative_priority,
+    def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
+                 job_name, nodeset, provider, priority, relative_priority,
                  event=None):
         self.requestor = requestor
-        self.build_set = build_set
-        self.job = job
+        self.build_set_uuid = build_set_uuid
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.job_name = job_name
         self.nodeset = nodeset
         self._state = STATE_REQUESTED
         self.requested_time = time.time()
@@ -803,8 +806,9 @@ class NodeRequest(object):
         self.created_time = None
         self.stat = None
         self.uid = uuid4().hex
+        self.priority = priority
         self.relative_priority = relative_priority
-        self.provider = self._getPausedParentProvider()
+        self.provider = provider
         self.id = None
         self._zk_data = {}  # Data that we read back from ZK
         if event is not None:
@@ -815,37 +819,6 @@ class NodeRequest(object):
         # overwritten).
         self.failed = False
         self.canceled = False
-
-    def _getPausedParent(self):
-        if self.build_set:
-            job_graph = self.build_set.item.job_graph
-            if job_graph:
-                for parent in job_graph.getParentJobsRecursively(
-                        self.job.name):
-                    build = self.build_set.getBuild(parent.name)
-                    if build.paused:
-                        return build
-        return None
-
-    def _getPausedParentProvider(self):
-        build = self._getPausedParent()
-        if build:
-            nodeset = self.build_set.getJobNodeSet(build.job.name)
-            if nodeset and nodeset.nodes:
-                return list(nodeset.nodes.values())[0].provider
-        return None
-
-    @property
-    def priority(self):
-        precedence_adjustment = 0
-        if self.build_set:
-            precedence = self.build_set.item.pipeline.precedence
-            if self._getPausedParent():
-                precedence_adjustment = -1
-        else:
-            precedence = PRECEDENCE_NORMAL
-        initial_precedence = PRIORITY_MAP[precedence]
-        return max(0, initial_precedence + precedence_adjustment)
 
     @property
     def fulfilled(self):
@@ -868,6 +841,14 @@ class NodeRequest(object):
     def toDict(self):
         # Start with any previously read data
         d = self._zk_data.copy()
+        # The requestor_data is opaque to nodepool and won't be touched when
+        # by nodepool when it fulfills the request.
+        d["requestor_data"] = {
+            "build_set_uuid": self.build_set_uuid,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+            "job_name": self.job_name,
+        }
         nodes = [n.label for n in self.nodeset.getNodes()]
         # These are immutable once set
         d.setdefault('node_types', nodes)
@@ -878,6 +859,7 @@ class NodeRequest(object):
         d['state'] = self.state
         d['state_time'] = self.state_time
         d['relative_priority'] = self.relative_priority
+        d['priority'] = self.priority
         d['event_id'] = self.event_id
         return d
 
@@ -895,17 +877,18 @@ class NodeRequest(object):
         any additional attributes. Thus, we can only deserialize a NodeRequest
         with a subset of attributes.
         """
+        # The requestor_data contains zuul-specific information which is opaque
+        # to nodepool and returned as-is when the NodeRequest is fulfilled.
+        requestor_data = data["requestor_data"]
         request = cls(
             requestor=data["requestor"],
-            # TODO (felix): Check if the build_set and job parameters are still
-            # required on the NodeRequest. In the current implementation they
-            # aren't available when the node request is deserialized on the
-            # executor because those values couldn't be serialized to ZK in the
-            # first place. So there might be a good chance that they aren't
-            # needed on the scheduler as well.
-            build_set=None,
-            job=None,
+            build_set_uuid=requestor_data["build_set_uuid"],
+            tenant_name=requestor_data["tenant_name"],
+            pipeline_name=requestor_data["pipeline_name"],
+            job_name=requestor_data["job_name"],
             nodeset=None,
+            provider=data["provider"],
+            priority=data["priority"],
             relative_priority=data.get("relative_priority", 0),
         )
 
