@@ -12,7 +12,7 @@ extras
 statsd>=3.0
 prometheus-client
 voluptuous>=0.10.2
-gear>=0.13.0,<0.16.0,!=0.15.0
+gear>=0.15.1,<0.16.0
 apscheduler>=3.0
 PrettyTable>=0.6,<0.8
 babel>=1.0
