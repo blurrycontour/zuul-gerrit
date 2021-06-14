@@ -109,6 +109,15 @@
       python_version: 3.8
 
 - job:
+    name: zuul-tox-py310
+    parent: zuul-tox
+    timeout: 4800  # 80 minutes
+    vars:
+      tox_envlist: py310
+      python_version: "3.10"
+      python_use_pyenv: true
+
+- job:
     name: zuul-build-dashboard
     parent: build-javascript-deployment
     description: |
@@ -274,33 +283,35 @@
       jobs:
         - zuul-build-image
         - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-        - zuul-tox-py36
-        - zuul-tox-py38
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
+        # - tox-linters:
+        #     vars:
+        #       tox_install_bindep: false
+        # - zuul-tox-py36
+        # - zuul-tox-py38
+        - zuul-tox-py310:
             voting: false
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
+    #     - zuul-build-dashboard-openstack-whitelabel
+    #     - zuul-build-dashboard-software-factory
+    #     - zuul-build-dashboard-opendev
+    #     - nodejs-run-lint:
+    #         vars:
+    #           zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+    #     - nodejs-run-test:
+    #         vars:
+    #           zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+    #         success-url: 'npm/reports/bundle.html'
+    #         files:
+    #           - web/.*
+    #     - zuul-stream-functional-2.8
+    #     - zuul-stream-functional-2.9
+    #     - zuul-tox-remote
+    #     - zuul-quick-start:
+    #         requires: nodepool-container-image
+    #         dependencies: zuul-build-image
+    #     - nodepool-zuul-functional:
+    #         voting: false
+    #     - zuul-tox-zuul-client
+    #     - zuul-build-python-release
     gate:
       jobs:
         - zuul-upload-image
