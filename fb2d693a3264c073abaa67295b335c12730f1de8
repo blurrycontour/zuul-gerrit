@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "a7171778_601a645c",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-14T05:52:52Z",
+      "side": 1,
+      "message": "Wait, on second look I think we should keep it like that: There is still the differentiation between requesting the cancel via the cancel subnode in ZK (ExecutorApi.requestCancel) in case the build is locked and to directly cancel the build via a BuildCompletedEvent in case it\u0027s not locked. The latter part requires access to the result event queue and I\u0027m not sure if we should add this to the ExecutorApi as it wouldn\u0027t be needed for anything else. In the current version we also need the local build object to access the tenant and pipeline name via the buildset and this is only available in the executor_client. But maybe we could make things a little more clear by splitting this up in two methods (like before with cancelRunningBuild and cancelJobInQueue), whereby acquiring the lock is the condition which method is executed.",
+      "parentUuid": "99edc83f_62db2d49",
+      "revId": "fb2d693a3264c073abaa67295b335c12730f1de8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6a0a5b86_bf93dfe0",
         "filename": "zuul/executor/server.py",
         "patchSetId": 15
