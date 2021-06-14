@@ -22,6 +22,7 @@ import threading
 import time
 import json
 from collections import OrderedDict, defaultdict
+from collections.abc import Mapping
 from itertools import chain
 from json.decoder import JSONDecodeError
 from typing import List, Optional
@@ -773,7 +774,7 @@ class GithubEventConnector:
         return EventTuple(time.time(), body, event_type, delivery)
 
 
-class GithubUser(collections.Mapping):
+class GithubUser(Mapping):
     log = logging.getLogger('zuul.GithubUser')
 
     def __init__(self, username, connection, project_name):
