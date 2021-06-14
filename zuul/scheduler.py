@@ -1018,17 +1018,22 @@ class Scheduler(threading.Thread):
                 for request_job, request in \
                     item.current_build_set.node_requests.items():
                     requests_to_cancel.append(
-                        (item.current_build_set, request))
+                        (
+                            item.current_build_set,
+                            request,
+                            item.getJob(request_job),
+                        )
+                    )
 
             for build in builds_to_cancel:
                 self.log.info(
                     "Canceling build %s during reconfiguration" % (build,))
                 self.cancelJob(build.build_set, build.job, build=build)
-            for build_set, request in requests_to_cancel:
+            for build_set, request, request_job in requests_to_cancel:
                 self.log.info(
                     "Canceling node request %s during reconfiguration",
                     request)
-                self.cancelJob(build_set, request.job)
+                self.cancelJob(build_set, request_job)
         for name, old_pipeline in old_tenant.layout.pipelines.items():
             new_pipeline = tenant.layout.pipelines.get(name)
             if not new_pipeline:
@@ -1100,18 +1105,23 @@ class Scheduler(threading.Thread):
                 for request_job, request in \
                     item.current_build_set.node_requests.items():
                     requests_to_cancel.append(
-                        (item.current_build_set, request))
+                        (
+                            item.current_build_set,
+                            request,
+                            item.getJob(request_job),
+                        )
+                    )
 
             for build in builds_to_cancel:
                 self.log.info(
                     "Canceling build %s during reconfiguration" % (build,))
                 self.cancelJob(build.build_set, build.job,
                                build=build, force=True)
-            for build_set, request in requests_to_cancel:
+            for build_set, request, request_job in requests_to_cancel:
                 self.log.info(
                     "Canceling node request %s during reconfiguration",
                     request)
-                self.cancelJob(build_set, request.job, force=True)
+                self.cancelJob(build_set, request_job, force=True)
 
     def _doPromoteEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
@@ -1725,7 +1735,10 @@ class Scheduler(threading.Thread):
     def _doNodesProvisionedEvent(self, event):
         request = event.request
         request_id = event.request_id
-        build_set = request.build_set
+        build_set_uuid = request.build_set_uuid
+        tenant_name = request.tenant_name
+        pipeline_name = request.pipeline_name
+
         log = get_annotated_logger(self.log, request.event_id)
 
         ready = self.nodepool.checkNodeRequest(request, request_id)
@@ -1737,22 +1750,49 @@ class Scheduler(threading.Thread):
         if request.state == model.STATE_FAILED:
             self.nodepool.deleteNodeRequest(request)
 
-        if build_set is not build_set.item.current_build_set:
-            log.warning("Build set %s is not current "
-                        "for node request %s", build_set, request)
+        # Look up the pipeline by its name
+        pipeline = None
+        tenant = self.abide.tenants.get(tenant_name)
+        for pl in tenant.layout.pipelines.values():
+            if pl.name == pipeline_name:
+                pipeline = pl
+                break
+
+        if not pipeline:
+            self.log.warning(
+                "Build set %s is not associated with a pipeline for node "
+                "request %s", build_set_uuid, request)
             if request.fulfilled:
                 self.nodepool.returnNodeSet(request.nodeset,
                                             zuul_event_id=request.event_id)
             return
-        if request.job.name not in [x.name for x in build_set.item.getJobs()]:
+
+        # Look up the build_set from the pipeline
+        build_set = None
+        for item in pipeline.getAllItems():
+            # If the provided buildset UUID doesn't match any current one,
+            # we assume that it's not current anymore.
+            if item.current_build_set.uuid == build_set_uuid:
+                build_set = item.current_build_set
+                break
+
+        if not build_set:
+            self.log.warning("Build set %s is not current", build_set_uuid)
+            if request.fulfilled:
+                self.nodepool.returnNodeSet(request.nodeset,
+                                            zuul_event_id=request.event_id)
+            return
+
+        if request.job_name not in [x.name for x in build_set.item.getJobs()]:
             log.warning("Item %s does not contain job %s "
                         "for node request %s",
-                        build_set.item, request.job.name, request)
-            build_set.removeJobNodeRequest(request.job.name)
+                        build_set.item, request.job_name, request)
+            build_set.removeJobNodeRequest(request.job_name)
             if request.fulfilled:
                 self.nodepool.returnNodeSet(request.nodeset,
                                             zuul_event_id=request.event_id)
             return
+
         pipeline = build_set.item.pipeline
         if not pipeline:
             log.warning("Build set %s is not associated with a pipeline "
@@ -1761,7 +1801,7 @@ class Scheduler(threading.Thread):
                 self.nodepool.returnNodeSet(request.nodeset,
                                             zuul_event_id=request.event_id)
             return
-        pipeline.manager.onNodesProvisioned(event)
+        pipeline.manager.onNodesProvisioned(event, build_set)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants

@@ -111,13 +111,15 @@ class Nodepool(object):
             self.statsd.incr(
                 key, value * duration, project=project, resource=resource)
 
-    def requestNodes(self, build_set, job, relative_priority, event=None):
+    def requestNodes(self, build_set_uuid, job, tenant_name, pipeline_name,
+                     provider, priority, relative_priority, event=None):
         log = get_annotated_logger(self.log, event)
         # Create a copy of the nodeset to represent the actual nodes
         # returned by nodepool.
         nodeset = job.nodeset.copy()
-        req = model.NodeRequest(self.hostname, build_set, job,
-                                nodeset, relative_priority, event=event)
+        req = model.NodeRequest(self.hostname, build_set_uuid, tenant_name,
+                                pipeline_name, job.name, nodeset, provider,
+                                priority, relative_priority, event=event)
         self.requests[req.uid] = req
 
         if nodeset.nodes:

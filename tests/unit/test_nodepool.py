@@ -70,7 +70,8 @@ class TestNodepool(BaseTestCase):
         nodeset.addNode(model.Node(['compute'], 'ubuntu-xenial'))
         job = model.Job('testjob')
         job.nodeset = nodeset
-        request = self.nodepool.requestNodes(None, job, 0)
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
@@ -107,7 +108,8 @@ class TestNodepool(BaseTestCase):
         job = model.Job('testjob')
         job.nodeset = nodeset
         self.fake_nodepool.pause()
-        request = self.nodepool.requestNodes(None, job, 0)
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.zk_client.client.stop()
         self.zk_client.client.start()
         self.fake_nodepool.unpause()
@@ -124,7 +126,8 @@ class TestNodepool(BaseTestCase):
         job = model.Job('testjob')
         job.nodeset = nodeset
         self.fake_nodepool.pause()
-        request = self.nodepool.requestNodes(None, job, 0)
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.nodepool.cancelRequest(request)
 
         self.waitForRequests()
@@ -138,7 +141,8 @@ class TestNodepool(BaseTestCase):
         nodeset.addNode(model.Node(['compute'], 'ubuntu-xenial'))
         job = model.Job('testjob')
         job.nodeset = nodeset
-        request = self.nodepool.requestNodes(None, job, 0)
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
@@ -161,7 +165,8 @@ class TestNodepool(BaseTestCase):
         nodeset.addNode(model.Node(['compute'], 'ubuntu-xenial'))
         job = model.Job('testjob')
         job.nodeset = nodeset
-        request = self.nodepool.requestNodes(None, job, 0)
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
@@ -187,8 +192,10 @@ class TestNodepool(BaseTestCase):
         job = model.Job('testjob')
         job.nodeset = nodeset
         self.fake_nodepool.pause()
-        request1 = self.nodepool.requestNodes(None, job, 1)
-        request2 = self.nodepool.requestNodes(None, job, 0)
+        request1 = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 1)
+        request2 = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.fake_nodepool.unpause()
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 2)

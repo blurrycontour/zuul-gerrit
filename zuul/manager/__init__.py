@@ -622,16 +622,49 @@ class PipelineManager(metaclass=ABCMeta):
         build_set = item.current_build_set
         log.debug("Requesting nodes for change %s", item.change)
         if self.sched.use_relative_priority:
-            priority = item.getNodePriority()
+            relative_priority = item.getNodePriority()
         else:
-            priority = 0
+            relative_priority = 0
         for job in jobs:
+            provider = self._getPausedParentProvider(build_set, job)
+            priority = self._calculateNodeRequestPriority(build_set, job)
+            tenant_name = build_set.item.pipeline.tenant.name
+            pipeline_name = build_set.item.pipeline.name
             req = self.sched.nodepool.requestNodes(
-                build_set, job, priority, event=item.event)
+                build_set.uuid, job, tenant_name, pipeline_name, provider,
+                priority, relative_priority, event=item.event)
             log.debug("Adding node request %s for job %s to item %s",
                       req, job, item)
             build_set.setJobNodeRequest(job.name, req)
         return True
+
+    def _getPausedParent(self, build_set, job):
+        job_graph = build_set.item.job_graph
+        if job_graph:
+            for parent in job_graph.getParentJobsRecursively(job.name):
+                build = build_set.getBuild(parent.name)
+                if build.paused:
+                    return build
+        return None
+
+    def _getPausedParentProvider(self, build_set, job):
+        build = self._getPausedParent(build_set, job)
+        if build:
+            nodeset = build_set.getJobNodeSet(build.job.name)
+            if nodeset and nodeset.nodes:
+                return list(nodeset.nodes.values())[0].provider
+        return None
+
+    def _calculateNodeRequestPriority(self, build_set, job):
+        precedence_adjustment = 0
+        precedence = build_set.item.pipeline.precedence
+        if build_set:
+            if self._getPausedParent(build_set, job):
+                precedence_adjustment = -1
+        else:
+            precedence = model.PRECEDENCE_NORMAL
+        initial_precedence = model.PRIORITY_MAP[precedence]
+        return max(0, initial_precedence + precedence_adjustment)
 
     def _executeJobs(self, item, jobs):
         log = get_annotated_logger(self.log, item.event)
@@ -1454,25 +1487,24 @@ class PipelineManager(metaclass=ABCMeta):
                     repo_state[connection] = event.repo_state[connection]
             event.build_set.repo_state_state = event.build_set.COMPLETE
 
-    def onNodesProvisioned(self, event):
+    def onNodesProvisioned(self, event, build_set):
         # TODOv3(jeblair): handle provisioning failure here
         request = event.request
         log = get_annotated_logger(self.log, request.event_id)
 
-        build_set = request.build_set
-        build_set.jobNodeRequestComplete(request.job.name,
-                                         request.nodeset)
+        build_set.jobNodeRequestComplete(request.job_name, request.nodeset)
         if request.failed or not request.fulfilled:
             log.info("Node request %s: failure for %s",
-                     request, request.job.name)
-            build_set.item.setNodeRequestFailure(request.job)
-            self._resumeBuilds(request.build_set)
+                     request, request.job_name)
+            job = build_set.item.getJob(request.job_name)
+            build_set.item.setNodeRequestFailure(job)
+            self._resumeBuilds(build_set)
             tenant = build_set.item.pipeline.tenant
-            tenant.semaphore_handler.release(build_set.item, request.job)
+            tenant.semaphore_handler.release(build_set.item, job)
 
         log.info("Completed node request %s for job %s of item %s "
                  "with nodes %s",
-                 request, request.job, build_set.item, request.nodeset)
+                 request, request.job_name, build_set.item, request.nodeset)
 
     def reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
