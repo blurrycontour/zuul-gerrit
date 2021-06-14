@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "07eee1b3_31c08889",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-14T13:09:19Z",
+      "side": 1,
+      "message": "Mapping is in collections.abc at least since py35 so I think we should directly use this instead of doing a fallback approach for python versions we don\u0027t support anyway (zuul is py36+).",
+      "revId": "a961e0c4bb65f52e91309e33660e1acc489eeba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
