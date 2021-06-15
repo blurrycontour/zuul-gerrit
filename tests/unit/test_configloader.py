@@ -113,6 +113,37 @@ class TestTenantSimple(TenantParserTestCase):
             {'registry': 'registry.example.org', 'image_name': 'foo'},
         ])
 
+    def test_yaml_intern_strings(self):
+        """
+        Tests that the yaml loaded strings are internalized in order to
+        deduplicate memory.
+        """
+
+        data = textwrap.dedent(
+            """
+            foo:
+              bar: value
+              baz:
+                - item1
+                - item2
+            """)
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        project = tenant.config_projects[0]
+        source_context = SourceContext(project, 'master', 'zuul.yaml', True)
+
+        out1 = safe_load_yaml(data, source_context)
+        out2 = safe_load_yaml(data, source_context)
+
+        # Test string value identity
+        self.assertEqual(id(out1['foo']['bar']), id(out2['foo']['bar']))
+
+        # Test string in list identity
+        self.assertEqual(id(out1['foo']['bar'][0]), id(out2['foo']['bar'][0]))
+
+        # Test key identity
+        self.assertEqual(id(list(out1.keys())[0]), id(list(out2.keys())[0]))
+
 
 class TestTenantOverride(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/override.yaml'

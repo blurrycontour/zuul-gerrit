@@ -20,6 +20,7 @@ import textwrap
 import io
 import re
 import subprocess
+from sys import intern
 
 import voluptuous as vs
 
@@ -362,6 +363,12 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
         self.name = str(context)
         self.zuul_context = context
         self.zuul_stream = stream
+
+    def construct_scalar(self, node):
+        scalar = super().construct_scalar(node)
+        if isinstance(scalar, str):
+            scalar = intern(scalar)
+        return scalar
 
     def construct_mapping(self, node, deep=False):
         keys = set()
