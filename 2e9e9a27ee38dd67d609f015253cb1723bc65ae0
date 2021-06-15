@@ -16,6 +16,24 @@
       "revId": "2e9e9a27ee38dd67d609f015253cb1723bc65ae0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "36477c73_0b047ad8",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-15T17:25:33Z",
+      "side": 1,
+      "message": "The strings in your example are automatically interned because they follow some rules. One of those rules is that they are compile time constants. Dynamic strings like produced by the yaml parser are not automatically interned. The test case also fails without the explicit intern.",
+      "parentUuid": "6b1bbf1f_6d36f7f9",
+      "revId": "2e9e9a27ee38dd67d609f015253cb1723bc65ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
