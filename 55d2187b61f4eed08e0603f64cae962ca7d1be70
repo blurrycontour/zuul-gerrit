@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "05194a01_3fc950c0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-15T07:35:36Z",
+      "side": 1,
+      "message": "One thing that just came to my mind: Where is the part where the scheduler is using the ExecutorApi with use_cache\u003dTrue? I think that is needed for the lost build request cleanup to work. Maybe it\u0027s there and I just couldn\u0027t find it, but I wanted to raise this question just to be sure.",
+      "revId": "55d2187b61f4eed08e0603f64cae962ca7d1be70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
