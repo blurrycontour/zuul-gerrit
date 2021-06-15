@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d861e72_4ebc02bc",
+        "filename": "tox.ini",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 23851
+      },
+      "writtenOn": "2021-06-15T13:14:06Z",
+      "side": 1,
+      "message": "this should be git+https://.........",
+      "range": {
+        "startLine": 47,
+        "startChar": 4,
+        "endLine": 47,
+        "endChar": 10
+      },
+      "revId": "94b64dc9523fcc61af10c70195fa8bc309c7dc0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
