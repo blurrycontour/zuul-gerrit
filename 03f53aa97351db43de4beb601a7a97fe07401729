@@ -55,6 +55,23 @@
     },
     {
       "key": {
+        "uuid": "bc40f641_dd9153be",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-15T00:42:57Z",
+      "side": 1,
+      "message": "Agreed, that is sounding like a promising approach.  I re-checked the spec, and it looks like we failed to anticipate this problem at the time.\n\nIf we\u0027re concerned about the amount of data in zk with tenant queues, we could forward the events by reference (ie, have a single master copy of the event in zk, and then the tenant queues (and even tenant-pipeline) could reference that, so their znodes could be completely empty and their names simply references to the master copy.  If we did that, we\u0027d need to reference count or garbage collect.  I can think of some, but they\u0027re non-trivial enough that we\u0027d want to make sure it\u0027s really worth it.\n\nIf, on the other hand, the number of znodes is more concerning than the amount of data, then forward-by-reference doesn\u0027t help.  I don\u0027t have any ideas there.",
+      "revId": "03f53aa97351db43de4beb601a7a97fe07401729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f093fb1c_3947f979",
         "filename": "zuul/zk/locks.py",
         "patchSetId": 4
