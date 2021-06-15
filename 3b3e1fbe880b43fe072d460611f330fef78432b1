@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "111d02be_0551e87e",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-15T05:23:41Z",
+      "side": 0,
+      "message": "If we don\u0027t need the self.get() here anymore, could you please check if this is then needed at all? IIRC it was just used in the cache implementation, so there might be a good chance it\u0027s not needed anymore.",
+      "revId": "3b3e1fbe880b43fe072d460611f330fef78432b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}

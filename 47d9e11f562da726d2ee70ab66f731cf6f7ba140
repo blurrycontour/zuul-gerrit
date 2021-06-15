@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "35bdf342_afa18b1a",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-15T05:23:41Z",
+      "side": 1,
+      "message": "Maybe I\u0027m missing something here, but where do we actually store the node request in our cache dictionary?",
+      "revId": "47d9e11f562da726d2ee70ab66f731cf6f7ba140",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
