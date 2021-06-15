@@ -1820,6 +1820,10 @@ class Scheduler(threading.Thread):
         # internal dict after it's added to the report queue.
         del self.executor.builds[build.uuid]
 
+        # Delete the gearman object to free up space
+        # TODO: Remove together with jobs via gearman
+        build._gearman_job = None
+
         if build.build_set is not build.build_set.item.current_build_set:
             log.debug("Build %s is not in the current build set", build)
             return
