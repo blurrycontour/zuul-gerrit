@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6b1bbf1f_6d36f7f9",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-06-15T16:07:12Z",
+      "side": 1,
+      "message": "If I understand correctly, strings like `value` are already interned, e.g.\n\n  \u003e\u003e\u003e a \u003d \"value\"\n  \u003e\u003e\u003e b \u003d \"value\"\n  \u003e\u003e\u003e a is b\n  True\n\nPerhaps it would be better to test longer string, like \"a value\"",
+      "revId": "2e9e9a27ee38dd67d609f015253cb1723bc65ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
