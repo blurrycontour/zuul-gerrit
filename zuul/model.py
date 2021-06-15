@@ -29,6 +29,9 @@ import urllib.parse
 import textwrap
 import types
 import itertools
+
+from cachetools.func import lru_cache
+
 from zuul.lib import yamlutil as yaml
 
 import jsonpath_rw
@@ -968,6 +971,16 @@ class FrozenSecret(ConfigObject):
         self.name = name
         self.encrypted_data = encrypted_data
 
+    @staticmethod
+    @lru_cache(maxsize=1024)
+    def construct_cached(connection_name, project_name, name, encrypted_data):
+        """
+        A caching constructor that enables re-use already existing
+        FrozenSecret objects.
+        """
+        return FrozenSecret(connection_name, project_name, name,
+                            encrypted_data)
+
     def toDict(self):
         # Name is omitted since this is used in a dictionary
         return dict(
@@ -1125,8 +1138,9 @@ class PlaybookContext(ConfigObject):
             # with *our* key.
             connection_name = self.source_context.project.connection_name
             project_name = self.source_context.project.name
-            secrets.append(FrozenSecret(connection_name, project_name,
-                                        secret_name, encrypted_secret_data))
+            secrets.append(FrozenSecret.construct_cached(
+                connection_name, project_name, secret_name,
+                encrypted_secret_data))
         self.frozen_secrets = tuple(secrets)
 
     def addSecrets(self, frozen_secrets):
@@ -1735,7 +1749,7 @@ class Job(ConfigObject):
                 # want to decrypt with the other project's key key.
                 connection_name = other.source_context.project.connection_name
                 project_name = other.source_context.project.name
-                frozen_secrets.append(FrozenSecret(
+                frozen_secrets.append(FrozenSecret.construct_cached(
                     connection_name, project_name,
                     secret_name, encrypted_secret_data))
 
