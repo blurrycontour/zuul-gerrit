@@ -1115,26 +1115,6 @@ class PlaybookContext(ConfigObject):
             # Decrypt a copy of the secret to verify it can be done
             secret.decrypt(self.source_context.project.private_secrets_key)
 
-    def freezeSecrets(self, layout):
-        secrets = []
-        for secret_use in self.secrets:
-            secret = layout.secrets.get(secret_use.name)
-            secret_name = secret_use.alias
-            encrypted_secret_data = secret.serialize()
-            # Use *our* project, not the secret's, because we want to decrypt
-            # with *our* key.
-            connection_name = self.source_context.project.connection_name
-            project_name = self.source_context.project.name
-            secrets.append(FrozenSecret(connection_name, project_name,
-                                        secret_name, encrypted_secret_data))
-        self.frozen_secrets = tuple(secrets)
-
-    def addSecrets(self, frozen_secrets):
-        current_names = set([s.name for s in self.frozen_secrets])
-        new_secrets = [s for s in frozen_secrets
-                       if s.name not in current_names]
-        self.frozen_secrets = self.frozen_secrets + tuple(new_secrets)
-
     def toDict(self, redact_secrets=True):
         # Render to a dict to use in passing json to the executor
         secrets = {}
@@ -1639,11 +1619,12 @@ class Job(ConfigObject):
 
         """
 
+        self.freezeSecrets(layout)
         ret = []
         for old_pb in pblist:
             pb = old_pb.copy()
             pb.roles = self.roles
-            pb.freezeSecrets(layout)
+            pb.frozen_secrets = self.frozen_secrets
             ret.append(pb)
         return tuple(ret)
 
@@ -1746,9 +1727,10 @@ class Job(ConfigObject):
             # pre-review.  The only way pass-to-parent can work with
             # pre-review pipeline is if all playbooks are in the
             # trusted context.
+            self.addSecrets(frozen_secrets)
             for pb in itertools.chain(
                     self.pre_run, self.run, self.post_run, self.cleanup_run):
-                pb.addSecrets(frozen_secrets)
+                pb.frozen_secrets = self.frozen_secrets
                 if not pb.source_context.trusted:
                     self.post_review = True
 
@@ -1794,6 +1776,26 @@ class Job(ConfigObject):
                 setattr(self, k, getattr(self, k).union(other._get(k)))
 
         self.inheritance_path = self.inheritance_path + (repr(other),)
+
+    def freezeSecrets(self, layout):
+        secrets = []
+        for secret_use in self.secrets:
+            secret = layout.secrets.get(secret_use.name)
+            secret_name = secret_use.alias
+            encrypted_secret_data = secret.serialize()
+            # Use *our* project, not the secret's, because we want to decrypt
+            # with *our* key.
+            connection_name = self.source_context.project.connection_name
+            project_name = self.source_context.project.name
+            secrets.append(FrozenSecret(connection_name, project_name,
+                                        secret_name, encrypted_secret_data))
+        self.frozen_secrets = tuple(secrets)
+
+    def addSecrets(self, frozen_secrets):
+        current_names = set([s.name for s in self.frozen_secrets])
+        new_secrets = [s for s in frozen_secrets
+                       if s.name not in current_names]
+        self.frozen_secrets = self.frozen_secrets + tuple(new_secrets)
 
     def changeMatchesBranch(self, change, override_branch=None):
         if override_branch is None:
