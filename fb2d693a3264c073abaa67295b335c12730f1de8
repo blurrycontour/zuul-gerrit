@@ -55,6 +55,23 @@
     },
     {
       "key": {
+        "uuid": "14888e81_8daa9d91",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-15T00:26:17Z",
+      "side": 1,
+      "message": "Makes sense.  I lean toward keeping this as one method for now; it\u0027s not too hard to follow.",
+      "revId": "fb2d693a3264c073abaa67295b335c12730f1de8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a0a5b86_bf93dfe0",
         "filename": "zuul/executor/server.py",
         "patchSetId": 15
