@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f843a50_8a881c0a",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-15T20:38:33Z",
+      "side": 1,
+      "message": "This is where we add the build request to the cache (see below).",
+      "revId": "47d9e11f562da726d2ee70ab66f731cf6f7ba140",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "35bdf342_afa18b1a",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 7
@@ -16,6 +33,23 @@
       "revId": "47d9e11f562da726d2ee70ab66f731cf6f7ba140",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4e58fa6d_6776e074",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-15T20:38:33Z",
+      "side": 1,
+      "message": "Creating a datawatch causes the callback to fire, so the sequence is:\n* BuildRequest is created in ZK as a child of a zone we\u0027re watching.\n* This callback (_watchBuildRequests) is called for the new znode in the children entry of the zone.\n* This line of code creates a new data watch for the BuildRequest znode.\n* _watchBuildState is immediately called because the datawatch was created.\n* Line 103 adds the BuildRequest to the cache.\n\nThe reason that a callback is executed when you set a datawatch is because it\u0027s called with the results of the data of the zookeeper \"get\" call that sets the watch.  That makes it a race-free way of obtaining initial data and being notified of later changes.\n\nThis is the concept I refer to as \"priming\" in the commit message.",
+      "revId": "47d9e11f562da726d2ee70ab66f731cf6f7ba140",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

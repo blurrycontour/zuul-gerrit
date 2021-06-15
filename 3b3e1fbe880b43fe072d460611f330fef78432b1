@@ -16,6 +16,23 @@
       "revId": "3b3e1fbe880b43fe072d460611f330fef78432b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "94136675_aca1c636",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-15T20:38:33Z",
+      "side": 0,
+      "message": "It\u0027s used here: https://review.opendev.org/c/zuul/zuul/+/788988/17/zuul/executor/client.py#147\n\nThat\u0027s getting a build request in order to cancel the build.  I think avoiding the cache is correct in that case.",
+      "revId": "3b3e1fbe880b43fe072d460611f330fef78432b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
