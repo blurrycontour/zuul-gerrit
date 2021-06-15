@@ -10,7 +10,7 @@ This guide will walk you through getting started with Matrix and how
 to use it to join communities like Zuul on IRC.
 
 Familiar with Matrix already and want to jump straight to the room?
-Follow this link: https://matrix.to/#/#_oftc_#zuul:matrix.org
+Follow this link: `https://matrix.to/#/#_oftc_#zuul:matrix.org <https://matrix.to/#/#_oftc_#zuul:matrix.org>`_
 
 Why Use Matrix?
 ---------------
