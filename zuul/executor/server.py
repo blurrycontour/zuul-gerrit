@@ -3171,27 +3171,31 @@ class ExecutorServer(BaseMergeServer):
         while self._running:
             self.build_loop_wake_event.wait()
             self.build_loop_wake_event.clear()
-            for build_request in self.executor_api.next():
-                # Check the sensors again as they might have changed in the
-                # meantime. E.g. the last build started within the next()
-                # generator could have fulfilled the StartingBuildSensor.
-                if not self.accepting_work:
-                    break
-                if not self._running:
-                    break
+            try:
+                for build_request in self.executor_api.next():
+                    # Check the sensors again as they might have changed in the
+                    # meantime. E.g. the last build started within the next()
+                    # generator could have fulfilled the StartingBuildSensor.
+                    if not self.accepting_work:
+                        break
+                    if not self._running:
+                        break
 
-                try:
-                    self._runBuildWorker(build_request)
-                except Exception:
-                    log = get_annotated_logger(
-                        self.log, event=None, build=build_request.uuid
-                    )
-                    log.exception("Exception while running job")
-                    result = {
-                        "result": "ERROR",
-                        "exception": traceback.format_exc(),
-                    }
-                    self.completeBuild(build_request, result)
+                    try:
+                        self._runBuildWorker(build_request)
+                    except Exception:
+                        log = get_annotated_logger(
+                            self.log, event=None, build=build_request.uuid
+                        )
+                        log.exception("Exception while running job")
+                        result = {
+                            "result": "ERROR",
+                            "exception": traceback.format_exc(),
+                        }
+                        self.completeBuild(build_request, result)
+            except Exception:
+                self.log.exception("Error in build loop:")
+                time.sleep(5)
 
     def _runBuildWorker(self, build_request: BuildRequest):
         log = get_annotated_logger(
