@@ -188,7 +188,8 @@ class ComponentRegistry(ZooKeeperBase):
 
     def all(self, kind=None):
         if kind is None:
-            return [kind.values() for kind in self._cached_components.keys()]
+            return [(kind, list(components.values()))
+                    for (kind, components) in self._cached_components.items()]
 
         # Filter the cached components for the given kind
         return self._cached_components.get(kind, {}).values()
@@ -235,8 +236,8 @@ class ComponentRegistry(ZooKeeperBase):
         hostname = segments[1]
 
         self.log.debug(
-            "Got cache update event %s for path %s", event.event_type, path
-        )
+            "Registry %s got cache update event %s for path %s",
+            self, event.event_type, path)
 
         if event.event_type in (TreeEvent.NODE_UPDATED, TreeEvent.NODE_ADDED):
             # Ignore events without data
