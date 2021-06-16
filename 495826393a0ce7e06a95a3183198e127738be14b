@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7615997f_544faa5c",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-16T03:30:42Z",
+      "side": 0,
+      "message": "We still need this for the scheduler use case.",
+      "revId": "495826393a0ce7e06a95a3183198e127738be14b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
