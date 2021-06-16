@@ -16,6 +16,23 @@
       "revId": "55d2187b61f4eed08e0603f64cae962ca7d1be70",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c327cb2e_e834e3e1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-16T03:31:01Z",
+      "side": 1,
+      "message": "The use_cache argument was removed in https://review.opendev.org/787833 (afaict, it never actually enabled the cache, but rather subscribed to all zones).  However, that change also removed the ability to subscribe to all zones (I think that was an error in a refactor).\n\nIn a related issue, the test_executor_disconnect test did not exist when you wrote the ExecutorApi originally (I recently wrote it as part of the gear disconnect fix).  It is intended to test this case.  It is currently failing, but that\u0027s only because it\u0027s still performing a gearman disconnect.  If I modify it to do a ZK disconnect, it passes.  So this code is actually working.\n\nHowever, in light of the first paragraph of this comment, the test isn\u0027t robust enough, because it\u0027s not testing zoned jobs.  If I add a second test for zoned jobs, it fails because the scheduler is not subscribed to the zone.  So that test will catch the error of omission in 787833.\n\nSo here\u0027s what we should do:\n* Re-add the ability to subscribe to all zones in 787833.\n* Fix the test_executor_disconnect test case, and add the unzoned version too in 788988.\n\nNothing needs to change here.",
+      "revId": "55d2187b61f4eed08e0603f64cae962ca7d1be70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
