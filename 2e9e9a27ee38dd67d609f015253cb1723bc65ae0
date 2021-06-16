@@ -52,6 +52,24 @@
       "revId": "2e9e9a27ee38dd67d609f015253cb1723bc65ae0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9bdc174_edab6ff8",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-16T12:13:56Z",
+      "side": 1,
+      "message": "I don\u0027t know but I guess it\u0027s because pyyaml is for general purpose use and such an optimization only has advantages if there are many equal strings that are read. If that\u0027s not the case intern() imposes a small runtime overhead per string for no benefit. So I think it\u0027s actually correct to not do that without knowing the use case.",
+      "parentUuid": "6a7800f9_5d8f26b8",
+      "revId": "2e9e9a27ee38dd67d609f015253cb1723bc65ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
