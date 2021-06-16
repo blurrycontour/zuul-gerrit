@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17dd5bef_e33b2829",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-16T17:27:09Z",
+      "side": 1,
+      "message": "This seems like maybe an inefficiency we could live with until we remove gearman completely (which should be very soon)?",
+      "revId": "ee598b4c15da26b1d8cb42e902a14b6631945711",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
