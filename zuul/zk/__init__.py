@@ -13,6 +13,7 @@ import logging
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
+from threading import Thread
 from typing import Optional, List, Callable
 
 from kazoo.client import KazooClient
@@ -56,12 +57,14 @@ class ZooKeeperClient(object):
         self.tls_cert = tls_cert
         self.tls_key = tls_key
         self.tls_ca = tls_ca
+        self.was_lost = False
 
         self.client: Optional[KazooClient] = None
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
         self.on_connection_lost_listeners: List[Callable[[], None]] = []
+        self.on_reconnect_listeners: List[Callable[[], None]] = []
 
     def _connectionListener(self, state):
         """
@@ -71,6 +74,7 @@ class ZooKeeperClient(object):
         """
         if state == KazooState.LOST:
             self.log.debug("ZooKeeper connection: LOST")
+            self.was_lost = True
             for listener in self.on_connection_lost_listeners:
                 try:
                     listener()
@@ -80,6 +84,14 @@ class ZooKeeperClient(object):
             self.log.debug("ZooKeeper connection: SUSPENDED")
         else:
             self.log.debug("ZooKeeper connection: CONNECTED")
+            # Create a throwaway thread since zk operations can't
+            # happen in this one.
+            if self.was_lost:
+                self.was_lost = False
+                for listener in self.on_reconnect_listeners:
+                    t = Thread(target=listener)
+                    t.daemon = True
+                    t.start()
 
     @property
     def connected(self):
@@ -195,9 +207,13 @@ class ZooKeeperBase(ZooKeeperSimpleBase):
         super().__init__(client)
         self.client.on_connect_listeners.append(self._onConnect)
         self.client.on_disconnect_listeners.append(self._onDisconnect)
+        self.client.on_reconnect_listeners.append(self._onReconnect)
 
     def _onConnect(self):
         pass
 
     def _onDisconnect(self):
+        pass
+
+    def _onReconnect(self):
         pass

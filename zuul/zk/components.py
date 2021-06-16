@@ -18,13 +18,13 @@ from collections import defaultdict
 from kazoo.exceptions import NoNodeError
 from kazoo.recipe.cache import TreeCache, TreeEvent
 
-from zuul.zk import ZooKeeperBase, ZooKeeperSimpleBase
+from zuul.zk import ZooKeeperBase
 
 
 COMPONENTS_ROOT = "/zuul/components"
 
 
-class BaseComponent(ZooKeeperSimpleBase):
+class BaseComponent(ZooKeeperBase):
     """
     Read/write component object.
 
@@ -104,6 +104,9 @@ class BaseComponent(ZooKeeperSimpleBase):
             # the component.
             include_data=True,
         )
+
+    def _onReconnect(self):
+        self.register()
 
     def updateFromDict(self, data):
         self.content.update(data)
