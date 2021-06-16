@@ -29,6 +29,9 @@ from zuul.zk.sharding import (
     BufferedShardWriter,
     NODE_BYTE_SIZE_LIMIT,
 )
+from zuul.zk.components import (
+    BaseComponent, ComponentRegistry, ExecutorComponent
+)
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -234,3 +237,374 @@ class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
         self.assertEqual(len(master_files), 0)
         self.assertEqual(len(stable_files), 0)
         self.assertEqual(len(other_files), 1)
+
+
+class TestExecutorApi(ZooKeeperBaseTestCase):
+    def _get_zk_tree(self, root):
+        items = []
+        for x in self.zk_client.client.get_children(root):
+            path = '/'.join([root, x])
+            items.append(path)
+            items.extend(self._get_zk_tree(path))
+        return items
+
+    def test_build_request(self):
+        # Test the lifecycle of a build request
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # and the event queue
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        client.submit("A", "tenant", "pipeline", {}, None, '1')
+        request_queue.get(timeout=30)
+
+        # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # Executor locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = BuildRequest.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, BuildRequest.RUNNING)
+
+        # Executor should see no pending requests
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Executor pauses build
+        a.state = BuildRequest.PAUSED
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, BuildRequest.PAUSED)
+
+        # Scheduler resumes build
+        self.assertTrue(event_queue.empty())
+        sched_a = client.get(a.path)
+        client.requestResume(sched_a)
+        (build_request, event) = event_queue.get(timeout=30)
+        self.assertEqual(build_request, a)
+        self.assertEqual(event, BuildRequestEvent.RESUMED)
+
+        # Executor resumes build
+        a.state = BuildRequest.RUNNING
+        server.update(a)
+        server.fulfillResume(a)
+        self.assertEqual(client.get(a.path).state, BuildRequest.RUNNING)
+
+        # Scheduler cancels build
+        self.assertTrue(event_queue.empty())
+        sched_a = client.get(a.path)
+        client.requestCancel(sched_a)
+        (build_request, event) = event_queue.get(timeout=30)
+        self.assertEqual(build_request, a)
+        self.assertEqual(event, BuildRequestEvent.CANCELED)
+
+        # Executor aborts build
+        a.state = BuildRequest.COMPLETED
+        server.update(a)
+        server.fulfillCancel(a)
+        server.unlock(a)
+        self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
+
+        # Scheduler removes build request on completion
+        client.remove(sched_a)
+
+        self.assertEqual(set(self._get_zk_tree(client.BUILD_REQUEST_ROOT)),
+                         set(['/zuul/build-requests/unzoned',
+                              '/zuul/build-requests/zones']))
+        self.assertEqual(self._get_zk_tree(
+            client.BUILD_REQUEST_ROOT + '/zones'), [])
+        self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
+
+    def test_build_request_remove(self):
+        # Test the scheduler forcibly removing a request (perhaps the
+        # tenant is being deleted, so there will be no result queue).
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        client.submit("A", "tenant", "pipeline", {}, None, '1')
+        request_queue.get(timeout=30)
+
+        # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # Executor locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = BuildRequest.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, BuildRequest.RUNNING)
+
+        # Executor should see no pending requests
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+        self.assertTrue(event_queue.empty())
+
+        # Scheduler rudely removes build request
+        sched_a = client.get(a.path)
+        client.remove(sched_a)
+
+        # Make sure it shows up as deleted
+        (build_request, event) = event_queue.get(timeout=30)
+        self.assertEqual(build_request, a)
+        self.assertEqual(event, BuildRequestEvent.DELETED)
+
+        # Executor should not write anything else since the request
+        # was deleted.
+
+    def test_build_request_hold(self):
+        # Test that we can hold a build request in "queue"
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = HoldableExecutorApi(self.zk_client)
+        client.hold_in_queue = True
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        a_path = client.submit("A", "tenant", "pipeline", {}, None, '1')
+        request_queue.get(timeout=30)
+
+        # Executor receives nothing
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Test releases hold
+        a = client.get(a_path)
+        self.assertEqual(a.uuid, 'A')
+        a.state = BuildRequest.REQUESTED
+        client.update(a)
+
+        # Executor receives request
+        request_queue.get(timeout=30)
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # The rest is redundant.
+
+    def test_nonexistent_lock(self):
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+
+        # Scheduler submits request
+        a_path = client.submit("A", "tenant", "pipeline", {}, None, '1')
+        sched_a = client.get(a_path)
+
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        exec_a = server.get(a_path)
+        client.remove(sched_a)
+
+        # Try to lock a request that was just removed
+        self.assertFalse(server.lock(exec_a))
+
+    def test_lost_build_requests(self):
+        # Test that lostBuildRequests() returns unlocked running build
+        # requests
+        executor_api = ExecutorApi(self.zk_client)
+
+        executor_api.submit("A", "tenant", "pipeline", {}, "zone", '1')
+        path_b = executor_api.submit("B", "tenant", "pipeline", {},
+                                     None, '1')
+        path_c = executor_api.submit("C", "tenant", "pipeline", {},
+                                     "zone", '1')
+        path_d = executor_api.submit("D", "tenant", "pipeline", {},
+                                     "zone", '1')
+        path_e = executor_api.submit("E", "tenant", "pipeline", {},
+                                     "zone", '1')
+
+        b = executor_api.get(path_b)
+        c = executor_api.get(path_c)
+        d = executor_api.get(path_d)
+        e = executor_api.get(path_e)
+
+        b.state = BuildRequest.RUNNING
+        executor_api.update(b)
+
+        c.state = BuildRequest.RUNNING
+        executor_api.lock(c)
+        executor_api.update(c)
+
+        d.state = BuildRequest.COMPLETED
+        executor_api.update(d)
+
+        e.state = BuildRequest.PAUSED
+        executor_api.update(e)
+
+        # Wait until the latest state transition is reflected in the Executor
+        # APIs cache. Using a DataWatch for this purpose could lead to race
+        # conditions depending on which DataWatch is executed first. The
+        # DataWatch might be triggered for the correct event, but the cache
+        # might still be outdated as the DataWatch that updates the cache
+        # itself wasn't triggered yet.
+        cache = executor_api._cached_build_requests
+        for _ in iterate_timeout(30, "cache to be up-to-date"):
+            if (cache[path_b].state == BuildRequest.RUNNING and
+                cache[path_e].state == BuildRequest.PAUSED):
+                break
+
+        # The lost_builds method should only return builds which are running or
+        # paused, but not locked by any executor, in this case build b and e.
+        lost_build_requests = list(executor_api.lostBuildRequests())
+
+        self.assertEqual(2, len(lost_build_requests))
+        self.assertEqual(b.path, lost_build_requests[0].path)
+
+    def test_existing_build_request(self):
+        # Test that an executor sees an existing build request when
+        # coming online
+
+        # Test the lifecycle of a build request
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # and the event queue
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+        client.submit("A", "tenant", "pipeline", {}, None, '1')
+
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        request_queue.get(timeout=30)
+
+        # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+
+class TestComponentRegistry(ZooKeeperBaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.second_zk_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+        )
+        self.addCleanup(self.second_zk_client.disconnect)
+        self.second_zk_client.connect()
+        self.component_registry = ComponentRegistry(self.second_zk_client)
+
+    def assertComponentAttr(self, component_name, attr_name,
+                            attr_value, timeout=10):
+        for _ in iterate_timeout(
+            timeout,
+            f"{component_name} in cache has {attr_name} set to {attr_value}",
+        ):
+            components = list(self.component_registry.all(component_name))
+            if (
+                len(components) > 0 and
+                getattr(components[0], attr_name) == attr_value
+            ):
+                break
+
+    def assertComponentState(self, component_name, state, timeout=10):
+        return self.assertComponentAttr(
+            component_name, "state", state, timeout
+        )
+
+    def assertComponentStopped(self, component_name, timeout=10):
+        for _ in iterate_timeout(
+            timeout, f"{component_name} in cache is stopped"
+        ):
+            components = list(self.component_registry.all(component_name))
+            if len(components) == 0:
+                break
+
+    def test_component_registry(self):
+        self.component_info = ExecutorComponent(self.zk_client, 'test')
+        self.component_info.register()
+        self.assertComponentState("executor", BaseComponent.STOPPED)
+
+        self.zk_client.client.stop()
+        self.assertComponentStopped("executor")
+
+        self.zk_client.client.start()
+        self.assertComponentState("executor", BaseComponent.STOPPED)
+
+        self.component_info.state = self.component_info.RUNNING
+        self.assertComponentState("executor", BaseComponent.RUNNING)
+
+        self.log.debug("DISCONNECT")
+        self.second_zk_client.client.stop()
+        self.second_zk_client.client.start()
+        self.log.debug("RECONNECT")
+        self.component_info.state = self.component_info.PAUSED
+        self.assertComponentState("executor", BaseComponent.PAUSED)
+
+        # Make sure the registry didn't create any read/write
+        # component objects that re-registered themselves.
+        components = list(self.component_registry.all('executor'))
+        self.assertEqual(len(components), 1)
+
+        self.component_info.state = self.component_info.RUNNING
+        self.assertComponentState("executor", BaseComponent.RUNNING)

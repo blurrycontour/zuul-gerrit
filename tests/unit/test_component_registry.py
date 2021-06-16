@@ -35,9 +35,8 @@ class TestComponentRegistry(ZuulTestCase):
         self.zk_client.connect()
         self.component_registry = ComponentRegistry(self.zk_client)
 
-    def assertComponentAttr(
-        self, component_name, attr_name, attr_value, timeout=5
-    ):
+    def assertComponentAttr(self, component_name, attr_name,
+                            attr_value, timeout=10):
         for _ in iterate_timeout(
             timeout,
             f"{component_name} in cache has {attr_name} set to {attr_value}",
@@ -49,12 +48,12 @@ class TestComponentRegistry(ZuulTestCase):
             ):
                 break
 
-    def assertComponentState(self, component_name, state, timeout=5):
+    def assertComponentState(self, component_name, state, timeout=10):
         return self.assertComponentAttr(
             component_name, "state", state, timeout
         )
 
-    def assertComponentStopped(self, component_name, timeout=5):
+    def assertComponentStopped(self, component_name, timeout=10):
         for _ in iterate_timeout(
             timeout, f"{component_name} in cache is stopped"
         ):
@@ -80,6 +79,12 @@ class TestComponentRegistry(ZuulTestCase):
         self.executor_server.register_work()
         self.assertComponentAttr("executor", "accepting_work", True)
 
+        self.executor_server.zk_client.client.stop()
+        self.assertComponentStopped("executor")
+
+        self.executor_server.zk_client.client.start()
+        self.assertComponentAttr("executor", "accepting_work", True)
+
     def test_merger_component(self):
         self._startMerger()
         self.assertComponentState("merger", BaseComponent.RUNNING)
@@ -95,7 +100,12 @@ class TestComponentRegistry(ZuulTestCase):
         # Set the merger to None so the test doesn't try to stop it again
         self.merge_server = None
 
-        self.assertComponentStopped("merger")
+        try:
+            self.assertComponentStopped("merger")
+        except Exception:
+            for kind, components in self.component_registry.all():
+                self.log.error("Component %s has %s online", kind, components)
+            raise
 
     def test_fingergw_component(self):
         gateway = FingerGateway(
