@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8417874f_83405077",
+        "filename": "tox.ini",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 23851
+      },
+      "writtenOn": "2021-06-16T07:31:30Z",
+      "side": 1,
+      "message": "you should remove -e",
+      "range": {
+        "startLine": 47,
+        "startChar": 2,
+        "endLine": 47,
+        "endChar": 4
+      },
+      "revId": "f6738b4ab447d20dcfcf2ccc37e5f87d1d39cd28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d7c46e7_398c242f",
+        "filename": "tox.ini",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 23851
+      },
+      "writtenOn": "2021-06-16T07:31:30Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 49,
+        "startChar": 2,
+        "endLine": 49,
+        "endChar": 4
+      },
+      "revId": "f6738b4ab447d20dcfcf2ccc37e5f87d1d39cd28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
