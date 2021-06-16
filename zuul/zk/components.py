@@ -16,15 +16,15 @@ import logging
 from collections import defaultdict
 
 from kazoo.exceptions import NoNodeError
-from kazoo.recipe.cache import TreeCache, TreeEvent
+from kazoo.protocol.states import EventType
 
-from zuul.zk import ZooKeeperBase, ZooKeeperSimpleBase
+from zuul.zk import ZooKeeperBase
 
 
 COMPONENTS_ROOT = "/zuul/components"
 
 
-class BaseComponent(ZooKeeperSimpleBase):
+class BaseComponent(ZooKeeperBase):
     """
     Read/write component object.
 
@@ -34,6 +34,12 @@ class BaseComponent(ZooKeeperSimpleBase):
 
     This enables this object to be used as local key/value store even if the
     ZooKeeper connection got lost.
+
+    :arg client ZooKeeperClient: The Zuul ZooKeeperClient object to use, or
+         None if this should be a read-only component.
+    :arg hostname str: The component's hostname (multiple components with
+         the same hostname may be registered; the registry will create unique
+         nodes for each).
     """
 
     # Component states
@@ -41,7 +47,7 @@ class BaseComponent(ZooKeeperSimpleBase):
     PAUSED = "paused"
     STOPPED = "stopped"
 
-    log = logging.getLogger("zuul.zk.components.BaseComponent")
+    log = logging.getLogger("zuul.Component")
     kind = "base"
 
     def __init__(self, client, hostname):
@@ -52,8 +58,6 @@ class BaseComponent(ZooKeeperSimpleBase):
             "state": self.STOPPED,
             "kind": self.kind,
         }
-        # NOTE (felix): If we want to have a "read-only" component, we could
-        # provide client=None to the constructor.
         super().__init__(client)
 
         self.path = None
@@ -93,7 +97,7 @@ class BaseComponent(ZooKeeperSimpleBase):
 
     def register(self):
         path = "/".join([COMPONENTS_ROOT, self.kind, self.hostname])
-        self.log.debug("Registering component in ZooKeeper %s", path)
+        self.log.info("Registering component in ZooKeeper %s", path)
         self.path, self._zstat = self.kazoo_client.create(
             path,
             json.dumps(self.content).encode("utf-8"),
@@ -104,6 +108,9 @@ class BaseComponent(ZooKeeperSimpleBase):
             # the component.
             include_data=True,
         )
+
+    def _onReconnect(self):
+        self.register()
 
     def updateFromDict(self, data):
         self.content.update(data)
@@ -149,8 +156,24 @@ class WebComponent(BaseComponent):
 
 
 class ComponentRegistry(ZooKeeperBase):
+    """A component registry is organized like:
 
-    log = logging.getLogger("zuul.zk.components.ZooKeeperComponentRegistry")
+        /zuul/components/{kind}/{sequence}
+
+    Where kind corresponds to one of the classes in this module, and
+    sequence is a ZK sequence node with a prefix of the hostname in
+    order to produce a unique id for multiple identical components
+    running on the same host.  An example path:
+
+        /zuul/components/scheduler/hostname0000000000
+
+    Components are ephemeral nodes, and so if the actual service
+    disconnects from ZK, the node will disappear.
+
+    Component objects returned by this class are read-only; updating
+    their attributes will not be reflected in ZooKeeper.
+    """
+    log = logging.getLogger("zuul.ComponentRegistry")
 
     COMPONENT_CLASSES = {
         "scheduler": SchedulerComponent,
@@ -173,110 +196,106 @@ class ComponentRegistry(ZooKeeperBase):
         if self.client.connected:
             self._onConnect()
 
+    def _getComponentRoot(self, kind):
+        return '/'.join([COMPONENTS_ROOT, kind])
+
+    def _getComponentPath(self, kind, hostname):
+        return '/'.join([COMPONENTS_ROOT, kind, hostname])
+
     def _onConnect(self):
-        self._component_tree = TreeCache(self.kazoo_client, COMPONENTS_ROOT)
-        self._component_tree.listen_fault(self._cacheFaultListener)
-        self._component_tree.listen(self._componentCacheListener)
-        self._component_tree.start()
+        for kind in self.COMPONENT_CLASSES.keys():
+            root = self._getComponentRoot(kind)
+            self.kazoo_client.ensure_path(root)
+            self.kazoo_client.ChildrenWatch(
+                root, self._makeComponentRootWatcher(kind),
+                send_event=True
+            )
 
-    def _onDisconnect(self):
-        if self._component_tree is not None:
-            self._component_tree.close()
-            # Explicitly unset the TreeCache, otherwise we might leak
-            # open connections/ports.
-            self._component_tree = None
+    def _makeComponentRootWatcher(self, kind):
+        def watch(children, event=None):
+            return self._onComponentRootUpdate(kind, children, event)
+        return watch
 
-    def all(self, kind=None):
-        if kind is None:
-            return [kind.values() for kind in self._cached_components.keys()]
+    def _onComponentRootUpdate(self, kind, children, event):
+        for hostname in children:
+            component = self._cached_components[kind].get(hostname)
+            if not component:
+                self.log.info("Noticed new %s component %s", kind, hostname)
+                root = self._getComponentPath(kind, hostname)
+                self.kazoo_client.DataWatch(
+                    root, self._makeComponentWatcher(kind, hostname),
+                    send_event=True
+                )
 
-        # Filter the cached components for the given kind
-        return self._cached_components.get(kind, {}).values()
+    def _makeComponentWatcher(self, kind, hostname):
+        def watch(data, stat, event=None):
+            return self._onComponentUpdate(kind, hostname, data, stat, event)
+        return watch
 
-    def _cacheFaultListener(self, e):
-        self.log.exception(e)
-
-    def _componentCacheListener(self, event):
-        path = None
-        if hasattr(event.event_data, "path"):
-            path = event.event_data.path
-
-        # Ignore events without path
-        if not path:
-            return
-
-        # Ignore root node
-        if path == COMPONENTS_ROOT:
-            return
-
-        # Ignore lock nodes
-        if "__lock__" in path:
-            return
-
-        # Ignore unrelated events
-        if event.event_type not in (
-            TreeEvent.NODE_ADDED,
-            TreeEvent.NODE_UPDATED,
-            TreeEvent.NODE_REMOVED,
-        ):
-            return
-
-        # Split the path into segments to find out the type of event (e.g.
-        # a subnode was created or the buildnode itself was touched).
-        segments = self._getSegments(path)
-
-        # The segments we are interested in should look something like this:
-        # <kind> / <hostname>
-        if len(segments) < 2:
-            # Ignore events that don't touch a component
-            return
-
-        kind = segments[0]
-        hostname = segments[1]
-
+    def _onComponentUpdate(self, kind, hostname, data, stat, event):
+        if event:
+            etype = event.type
+        else:
+            etype = None
         self.log.debug(
-            "Got cache update event %s for path %s", event.event_type, path
-        )
-
-        if event.event_type in (TreeEvent.NODE_UPDATED, TreeEvent.NODE_ADDED):
+            "Registry %s got event %s for %s %s",
+            self, etype, kind, hostname)
+        if etype in (None, EventType.CHANGED, EventType.CREATED):
             # Ignore events without data
-            if not event.event_data.data:
+            if not data:
                 return
 
             # Perform an in-place update of the cached component (if any)
             component = self._cached_components.get(kind, {}).get(hostname)
-            d = json.loads(event.event_data.data.decode("utf-8"))
+            d = json.loads(data.decode("utf-8"))
+
+            self.log.info(
+                "Component %s %s updated: %s",
+                kind, hostname, d)
 
             if component:
-                if (
-                    event.event_data.stat.version
-                    <= component._zstat.version
-                ):
+                if (stat.version <= component._zstat.version):
                     # Don't update to older data
                     return
                 component.updateFromDict(d)
-                component._zstat = event.event_data.stat
+                component._zstat = stat
             else:
                 # Create a new component from the data structure
                 # Get the correct kind of component
                 # TODO (felix): KeyError on unknown component type?
                 component_cls = self.COMPONENT_CLASSES[kind]
-                component = component_cls.fromDict(self.client, hostname, d)
-                component.path = path
-                component._zstat = event.event_data.stat
+                # Pass in null ZK client to make a read-only component
+                # instance.
+                component = component_cls.fromDict(None, hostname, d)
+                component.path = self._getComponentPath(kind, hostname)
+                component._zstat = stat
 
             self._cached_components[kind][hostname] = component
-
-        elif event.event_type == TreeEvent.NODE_REMOVED:
+        elif etype == EventType.DELETED:
+            self.log.info(
+                "Noticed %s component %s disappeared",
+                kind, hostname)
             try:
                 del self._cached_components[kind][hostname]
             except KeyError:
                 # If it's already gone, don't care
                 pass
+            # Return False to stop the datawatch
+            return False
 
-    def _getSegments(self, path):
-        if path.startswith(COMPONENTS_ROOT):
-            # Normalize the path (remove the root part)
-            path = path[len(COMPONENTS_ROOT) + 1:]
+    def all(self, kind=None):
+        """Returns a list of components.
 
-        return path.split("/")
+        If kind is None, then a list of tuples is returned, with each tuple
+        being (kind, [list of components]).
+
+        :arg kind str: The type of component to look up in the registry, or
+            None to return all kinds
+        """
+
+        if kind is None:
+            return [(kind, list(components.values()))
+                    for (kind, components) in self._cached_components.items()]
+
+        # Filter the cached components for the given kind
+        return self._cached_components.get(kind, {}).values()

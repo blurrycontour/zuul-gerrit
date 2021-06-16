@@ -16,7 +16,7 @@ import json
 
 import testtools
 
-from tests.base import BaseTestCase
+from tests.base import BaseTestCase, iterate_timeout
 
 from zuul import model
 from zuul.zk import ZooKeeperClient
@@ -28,6 +28,9 @@ from zuul.zk.sharding import (
     BufferedShardReader,
     BufferedShardWriter,
     NODE_BYTE_SIZE_LIMIT,
+)
+from zuul.zk.components import (
+    BaseComponent, ComponentRegistry, ExecutorComponent
 )
 
 
@@ -234,3 +237,72 @@ class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
         self.assertEqual(len(master_files), 0)
         self.assertEqual(len(stable_files), 0)
         self.assertEqual(len(other_files), 1)
+
+
+class TestComponentRegistry(ZooKeeperBaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.second_zk_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+        )
+        self.addCleanup(self.second_zk_client.disconnect)
+        self.second_zk_client.connect()
+        self.component_registry = ComponentRegistry(self.second_zk_client)
+
+    def assertComponentAttr(self, component_name, attr_name,
+                            attr_value, timeout=10):
+        for _ in iterate_timeout(
+            timeout,
+            f"{component_name} in cache has {attr_name} set to {attr_value}",
+        ):
+            components = list(self.component_registry.all(component_name))
+            if (
+                len(components) > 0 and
+                getattr(components[0], attr_name) == attr_value
+            ):
+                break
+
+    def assertComponentState(self, component_name, state, timeout=10):
+        return self.assertComponentAttr(
+            component_name, "state", state, timeout
+        )
+
+    def assertComponentStopped(self, component_name, timeout=10):
+        for _ in iterate_timeout(
+            timeout, f"{component_name} in cache is stopped"
+        ):
+            components = list(self.component_registry.all(component_name))
+            if len(components) == 0:
+                break
+
+    def test_component_registry(self):
+        self.component_info = ExecutorComponent(self.zk_client, 'test')
+        self.component_info.register()
+        self.assertComponentState("executor", BaseComponent.STOPPED)
+
+        self.zk_client.client.stop()
+        self.assertComponentStopped("executor")
+
+        self.zk_client.client.start()
+        self.assertComponentState("executor", BaseComponent.STOPPED)
+
+        self.component_info.state = self.component_info.RUNNING
+        self.assertComponentState("executor", BaseComponent.RUNNING)
+
+        self.log.debug("DISCONNECT")
+        self.second_zk_client.client.stop()
+        self.second_zk_client.client.start()
+        self.log.debug("RECONNECT")
+        self.component_info.state = self.component_info.PAUSED
+        self.assertComponentState("executor", BaseComponent.PAUSED)
+
+        # Make sure the registry didn't create any read/write
+        # component objects that re-registered themselves.
+        components = list(self.component_registry.all('executor'))
+        self.assertEqual(len(components), 1)
+
+        self.component_info.state = self.component_info.RUNNING
+        self.assertComponentState("executor", BaseComponent.RUNNING)
