@@ -80,6 +80,12 @@ class TestComponentRegistry(ZuulTestCase):
         self.executor_server.register_work()
         self.assertComponentAttr("executor", "accepting_work", True)
 
+        self.executor_server.zk_client.client.stop()
+        self.assertComponentStopped("executor")
+
+        self.executor_server.zk_client.client.start()
+        self.assertComponentAttr("executor", "accepting_work", True)
+
     def test_merger_component(self):
         self._startMerger()
         self.assertComponentState("merger", BaseComponent.RUNNING)

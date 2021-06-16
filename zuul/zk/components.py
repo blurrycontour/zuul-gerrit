@@ -24,7 +24,7 @@ from zuul.zk import ZooKeeperBase, ZooKeeperSimpleBase
 COMPONENTS_ROOT = "/zuul/components"
 
 
-class BaseComponent(ZooKeeperSimpleBase):
+class BaseComponent(ZooKeeperBase):
     """
     Read/write component object.
 
@@ -104,6 +104,9 @@ class BaseComponent(ZooKeeperSimpleBase):
             # the component.
             include_data=True,
         )
+
+    def _onReconnect(self):
+        self.register()
 
     def updateFromDict(self, data):
         self.content.update(data)
