@@ -17,7 +17,6 @@ import json
 from unittest import mock
 import os.path
 import jwt
-from io import StringIO
 import time
 
 from zuul.driver import auth
@@ -32,10 +31,10 @@ with open(os.path.join(FIXTURE_DIR,
 algo = jwt.algorithms.RSAAlgorithm(jwt.algorithms.RSAAlgorithm.SHA256)
 with open(os.path.join(FIXTURE_DIR,
                        'auth/oidc-key'), 'r') as k:
-    OIDC_PRIVATE_KEY = algo.prepare_key(k.read())
+    OIDC_PRIVATE_KEY = algo.prepare_key(k.read().encode('utf-8'))
 with open(os.path.join(FIXTURE_DIR,
                        'auth/oidc-key.pub'), 'r') as k:
-    pub_key = algo.prepare_key(k.read())
+    pub_key = algo.prepare_key(k.read().encode('utf-8'))
     pub_jwk = algo.to_jwk(pub_key)
     key = {
         "kid": "OwO",
@@ -53,31 +52,23 @@ with open(os.path.join(FIXTURE_DIR,
     }
 
 
+def mock_get(url, params=None, **kwargs):
+    if url == ("https://my.oidc.provider/auth/realms/realm-one/"
+               ".well-known/openid-configuration"):
+        return FakeResponse(FAKE_WELL_KNOWN_CONFIG)
+    elif url == ("https://my.oidc.provider/auth/realms/realm-one/"
+                 "protocol/openid-connect/certs"):
+        return FakeResponse(FAKE_CERTS)
+    else:
+        raise Exception("Unknown URL %s" % url)
+
+
 class FakeResponse:
     def __init__(self, json_dict):
         self._json = json_dict
 
     def json(self):
         return self._json
-
-
-def mock_get(url, params=None, **kwargs):
-    if url == ("https://my.oidc.provider/auth/realms/realm-one/"
-               ".well-known/openid-configuration"):
-        return FakeResponse(FAKE_WELL_KNOWN_CONFIG)
-    else:
-        raise Exception("Unknown URL %s" % url)
-
-
-def mock_urlopen(url, *args, **kwargs):
-    if url == ("https://my.oidc.provider/auth/realms/realm-one/"
-               "protocol/openid-connect/certs"):
-        io = StringIO()
-        json.dump(FAKE_CERTS, io)
-        io.seek(0)
-        return io
-    else:
-        raise Exception("Unknown URL %s" % url)
 
 
 class TestOpenIDConnectAuthenticator(BaseTestCase):
@@ -101,9 +92,6 @@ class TestOpenIDConnectAuthenticator(BaseTestCase):
             algorithm='RS256',
             headers={'kid': 'OwO'})
         with mock.patch('requests.get', side_effect=mock_get):
-            # patching call in PyJWKClient's fetch_data
-            with mock.patch('urllib.request.urlopen',
-                            side_effect=mock_urlopen):
-                decoded = OIDCAuth.decodeToken(token)
-                for claim in payload.keys():
-                    self.assertEqual(payload[claim], decoded[claim])
+            decoded = OIDCAuth.decodeToken(token)
+            for claim in payload.keys():
+                self.assertEqual(payload[claim], decoded[claim])

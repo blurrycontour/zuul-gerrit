@@ -146,9 +146,9 @@ class TestWebTokenClient(BaseClientTestCase):
                            key=self.config.get(
                                'auth zuul_operator',
                                'secret'),
-                           algorithms=[self.config.get(
+                           algorithms=self.config.get(
                                'auth zuul_operator',
-                               'driver')],
+                               'driver'),
                            audience=self.config.get(
                                'auth zuul_operator',
                                'client_id'),)

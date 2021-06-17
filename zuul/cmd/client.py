@@ -572,7 +572,7 @@ class Client(zuul.cmd.ZuulApp):
         try:
             auth_token = jwt.encode(token,
                                     key=key,
-                                    algorithm=driver)
+                                    algorithm=driver).decode('utf-8')
             print("Bearer %s" % auth_token)
             err_code = 0
         except Exception as e:

@@ -23,7 +23,7 @@ alembic
 cryptography>=1.6
 cachecontrol
 cachetools
-pyjwt>=2.0.0,<3.0
+pyjwt<2.0.0
 iso8601
 psutil
 fb-re2>=1.0.6

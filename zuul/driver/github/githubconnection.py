@@ -964,7 +964,7 @@ class GithubClientManager:
         data = {'iat': now, 'exp': expiry, 'iss': self.app_id}
         app_token = jwt.encode(data,
                                self.app_key,
-                               algorithm='RS256')
+                               algorithm='RS256').decode('utf-8')
 
         headers = {'Accept': PREVIEW_JSON_ACCEPT,
                    'Authorization': 'Bearer %s' % app_token}

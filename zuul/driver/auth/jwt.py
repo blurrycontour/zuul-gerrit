@@ -16,6 +16,7 @@
 import logging
 import math
 import time
+import json
 import jwt
 import requests
 from urllib.parse import urljoin
@@ -70,19 +71,19 @@ class JWTAuthenticator(AuthenticatorInterface):
         """Verify the raw token and return the decoded dictionary of claims"""
         try:
             decoded = self._decode(rawToken)
-        except jwt.exceptions.InvalidSignatureError:
+        except jwt.InvalidSignatureError:
             raise exceptions.AuthTokenInvalidSignatureException(
                 realm=self.realm)
-        except jwt.exceptions.DecodeError:
+        except jwt.DecodeError:
             raise exceptions.AuthTokenUndecodedException(
                 realm=self.realm)
-        except jwt.exceptions.ExpiredSignatureError:
+        except jwt.ExpiredSignatureError:
             raise exceptions.TokenExpiredError(
                 realm=self.realm)
-        except jwt.exceptions.InvalidIssuerError:
+        except jwt.InvalidIssuerError:
             raise exceptions.IssuerUnknownError(
                 realm=self.realm)
-        except jwt.exceptions.InvalidAudienceError:
+        except jwt.InvalidAudienceError:
             raise exceptions.IncorrectAudienceError(
                 realm=self.realm)
         except Exception as e:
@@ -153,7 +154,7 @@ class HS256Authenticator(JWTAuthenticator):
     def _decode(self, rawToken):
         return jwt.decode(rawToken, self.secret, issuer=self.issuer_id,
                           audience=self.audience,
-                          algorithms=[self.algorithm])
+                          algorithms=self.algorithm)
 
 
 class RS256Authenticator(JWTAuthenticator):
@@ -171,7 +172,7 @@ class RS256Authenticator(JWTAuthenticator):
     def _decode(self, rawToken):
         return jwt.decode(rawToken, self.public_key, issuer=self.issuer_id,
                           audience=self.audience,
-                          algorithms=[self.algorithm])
+                          algorithms=self.algorithm)
 
 
 class OpenIDConnectAuthenticator(JWTAuthenticator):
@@ -202,9 +203,9 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
             raise exceptions.JWKSException(
                 realm=self.realm,
                 msg=msg)
-        jwks_client = jwt.PyJWKClient(keys_url)
+        # TODO keys can probably be cached
         try:
-            signing_key = jwks_client.get_signing_key(kid=key_id)
+            certs = requests.get(keys_url).json()
         except Exception as e:
             msg = 'Could not fetch Identity Provider keys at %s: %s'
             logger.error(msg % (keys_url, e))
@@ -212,9 +213,20 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
                 realm=self.realm,
                 msg='There was an error while fetching '
                     'keys for Identity Provider, check logs for details')
-        algorithm = signing_key._jwk_data.get("alg", None) or self.algorithm
-        key = signing_key.key
-        return key, algorithm
+        for key_dict in certs['keys']:
+            if key_dict.get('kid') == key_id:
+                # TODO: theoretically two other types of keys are
+                # supported by the JWKS standard. We should raise an error
+                # in the unlikely case 'kty' is not RSA.
+                # (see https://tools.ietf.org/html/rfc7518#section-6.1)
+                key = jwt.algorithms.RSAAlgorithm.from_jwk(
+                    json.dumps(key_dict))
+                algorithm = key_dict.get('alg', None) or self.algorithm
+                return key, algorithm
+        raise exceptions.JWKSException(
+            self.realm,
+            'Cannot verify token: public key %s '
+            'not listed by Identity Provider' % key_id)
 
     def get_well_known_config(self):
         issuer = self.issuer_id
@@ -246,7 +258,7 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
         key, algorithm = self.get_key(key_id)
         return jwt.decode(rawToken, key, issuer=self.issuer_id,
                           audience=self.audience,
-                          algorithms=[algorithm])
+                          algorithms=algorithm)
 
 
 AUTHENTICATORS = {

@@ -74,7 +74,7 @@ class AuthenticatorRegistry(object):
         cpb.capabilities_registry.register_capabilities('auth', capabilities)
 
     def authenticate(self, rawToken):
-        unverified = jwt.decode(rawToken, options={'verify_signature': False})
+        unverified = jwt.decode(rawToken, verify=False)
         for auth_name in self.authenticators:
             authenticator = self.authenticators[auth_name]
             if authenticator.issuer_id == unverified.get('iss', ''):
