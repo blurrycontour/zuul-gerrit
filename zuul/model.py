@@ -3757,6 +3757,7 @@ class ChangeManagementEvent(ManagementEvent):
         self.ref = ref
         self.oldrev = oldrev or '0000000000000000000000000000000000000000'
         self.newrev = newrev or '0000000000000000000000000000000000000000'
+        self.timestamp = time.time()
 
     def toDict(self):
         d = super().toDict()
@@ -3768,6 +3769,7 @@ class ChangeManagementEvent(ManagementEvent):
         d["ref"] = self.ref
         d["oldrev"] = self.oldrev
         d["newrev"] = self.newrev
+        d["timestamp"] = self.timestamp
         return d
 
     @classmethod
@@ -3781,6 +3783,7 @@ class ChangeManagementEvent(ManagementEvent):
             data.get("ref"),
             data.get("oldrev"),
             data.get("newrev"),
+            data.get("timestamp"),
         )
         event.updateFromDict(data)
         return event
