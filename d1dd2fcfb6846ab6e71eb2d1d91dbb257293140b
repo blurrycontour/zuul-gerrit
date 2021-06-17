@@ -39,6 +39,23 @@
       "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6eedd737_74cd704e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 3208,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-17T20:22:12Z",
+      "side": 1,
+      "message": "PS20 and 21 implement this suggestion.",
+      "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
