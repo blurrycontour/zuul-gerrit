@@ -22,6 +22,23 @@
       "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cb97005f_563d7c4a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 3208,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-17T17:21:55Z",
+      "side": 1,
+      "message": "I ran this in the REPL on OpenDev to get some approximate stats:\n\n   sched \u003d self.server.scheduler\n   builds \u003d sched.executor.builds.values()\n   count \u003d len(builds)\n   total \u003d sum([len(repr(build.parameters)) for build in builds])\n   print(\"Count: \", count)\n   print(\"Total: \", total)\n   print(\"Mean: \", int(total/count))\n\nCount:  463\nTotal:  102602073\nMean:  221602\n\n(This uses Python\u0027s repr as an approximation of what json serialization would expand out to.)\n\nIt\u0027s not nothing, but it\u0027s also not huge.  OpenDev running at capacity would consume 200MB in ZK, and therefore also 200MB on each scheduler and executor.\n\nTobias, if you could run that in your environment, that would be helpful; you may have a different pattern of data which account for the multi GB you\u0027re seeing.\n\nOne thing I note is that a significant portion (maybe 75%?) of the data are the repo state, and that\u0027s probably gotten larger with the global buildset state.\n\nOnce we move builds and buildset objects into ZooKeeper, we may be able to reference the global repo state directly from the buildset object, which would de-duplicate data that is currently copied to each BuildRequest.\n\nI think that\u0027s the best long-term solution to the problem.\n\nNow, given that we are taking the approach that we\u0027re moving the functionality that is currently in gearman into zk, I think we should be prepared to accept some inefficiency here, temporarily, until we have more objects in ZK so that we can make the optimization above.  Therefore, I\u0027d like to avoid over-optimizing this case now.\n\nHaving said that we *do* write the full build request back when we change the state, and if we can do as you suggest without too much trouble, it will save some ZK network traffic and storage.  So I\u0027ll see if I can make that change as a temporary measure.\n\n(I can think of some more efficient patterns if we were to keep the data in the build request long-term, but they are more complex to implement than this \"just forget the parameters\" idea).",
+      "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
