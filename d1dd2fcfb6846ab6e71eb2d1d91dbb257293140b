@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc3b7a1b_92a96317",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 3208,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-17T05:45:29Z",
+      "side": 1,
+      "message": "During memory profiling we\u0027ve seen that we have multi GB of data in gearman currently during peak load which is quite a lot. I think we need to assume that the BuildRequest objects in zk sum up to the same amount of data.\n\nIn order to keep this data low I think we need to strip the params field from the build request object in zk as soon as we\u0027ve accepted the build.",
+      "range": {
+        "startLine": 3205,
+        "startChar": 0,
+        "endLine": 3208,
+        "endChar": 0
+      },
+      "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
