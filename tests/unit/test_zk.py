@@ -341,7 +341,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        client.submit("A", "tenant", "pipeline", {}, None, '1')
+        client.submit("A", "tenant", "pipeline", {'job': 'test'}, None, '1')
         request_queue.get(timeout=30)
 
         # Executor receives request
@@ -349,6 +349,11 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 1)
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
+        params = client.getBuildParams(a)
+        self.assertEqual(params, {'job': 'test'})
+        client.clearBuildParams(a)
+        params = client.getBuildParams(a)
+        self.assertIsNone(params)
 
         # Executor locks request
         self.assertTrue(server.lock(a, blocking=False))

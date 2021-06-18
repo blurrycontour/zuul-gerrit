@@ -16,6 +16,7 @@ import io
 from contextlib import suppress
 
 from kazoo.exceptions import NoNodeError
+from kazoo.client import TransactionRequest
 
 # The default size limit for a node in Zookeeper is ~1MiB. However, as this
 # also includes the size of the key we can not use all of it for data.
@@ -27,6 +28,7 @@ class RawShardIO(io.RawIOBase):
     def __init__(self, client, path):
         self.client = client
         self.shard_base = path
+        self.is_transaction = isinstance(client, TransactionRequest)
 
     def readable(self):
         return True
@@ -37,6 +39,8 @@ class RawShardIO(io.RawIOBase):
     def truncate(self, size=None):
         if size != 0:
             raise ValueError("Can only truncate to 0")
+        if self.is_transaction:
+            raise Exception("Truncate within transactions unimplemented")
         with suppress(NoNodeError):
             self.client.delete(self.shard_base, recursive=True)
 
@@ -62,11 +66,13 @@ class RawShardIO(io.RawIOBase):
         byte_count = len(shard_data)
         # Only write one key at a time and defer writing the rest to the caller
         shard_bytes = bytes(shard_data[0:NODE_BYTE_SIZE_LIMIT])
+        kw = dict(sequence=True)
+        if not self.is_transaction:
+            kw['makepath'] = True
         self.client.create(
             "{}/".format(self.shard_base),
             shard_bytes,
-            sequence=True,
-            makepath=True,
+            **kw
         )
         return min(byte_count, NODE_BYTE_SIZE_LIMIT)
 
