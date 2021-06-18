@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "edaa07a6_69b2fd67",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-18T06:37:29Z",
+      "side": 1,
+      "message": "Could we move this test to tests/unit/test_component_registry.py? This would avoid that we have to duplicate all the assertion helper methods.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5f5559db_096fa6bd",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-18T06:37:29Z",
+      "side": 1,
+      "message": "Is there a reason why we don\u0027t provide the client here? That would mean that we can\u0027t use a component from the registry to write/update data, or? But we could still set the client after we retrieved the component from the registry which would still re-enable this behaviour.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89e525e4_e6887c00",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-18T06:37:29Z",
+      "side": 1,
+      "message": "That would mean that the return value of the method is different depending on whether we provide a kind or not, right? In case we provide a kind, we get a list of components. If no kind is provided, we would get a list of tuples (kind, \u003clist_of_components\u003e).",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
