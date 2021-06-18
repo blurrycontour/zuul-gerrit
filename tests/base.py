@@ -33,6 +33,7 @@ import re
 from collections import defaultdict, namedtuple
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
+from functools import lru_cache
 
 import requests
 import select
@@ -3199,6 +3200,13 @@ class TestingExecutorApi(HoldableExecutorApi):
         all_builds.sort()
         return all_builds
 
+    @lru_cache
+    def _getJobForBuildRequest(self, build_request):
+        d = self.getBuildParams(build_request)
+        if d:
+            return d.get('job', '')
+        return ''
+
     def release(self, what=None):
         """
         Releases a build request which was previously put on hold for testing.
@@ -3218,8 +3226,8 @@ class TestingExecutorApi(HoldableExecutorApi):
             # Either release all build requests in HOLD state or the ones
             # matching the given job name pattern.
             if what is None or (
-                    build_request.params and
-                    re.match(what, build_request.params["job"])):
+                    re.match(what,
+                             self._getJobForBuildRequest(build_request))):
                 self.log.debug("Releasing build %s", build_request)
                 build_request.state = BuildRequest.REQUESTED
                 self.update(build_request)
