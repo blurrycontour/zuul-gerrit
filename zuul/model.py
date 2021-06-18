@@ -2059,12 +2059,11 @@ class BuildRequest:
 
     ALL_STATES = (REQUESTED, HOLD, RUNNING, PAUSED, COMPLETED)
 
-    def __init__(self, uuid, state, precedence, params, zone,
+    def __init__(self, uuid, state, precedence, zone,
                  tenant_name, pipeline_name, event_id):
         self.uuid = uuid
         self.state = state
         self.precedence = precedence
-        self.params = params
         self.zone = zone
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
@@ -2080,7 +2079,6 @@ class BuildRequest:
             "uuid": self.uuid,
             "state": self.state,
             "precedence": self.precedence,
-            "params": self.params,
             "zone": self.zone,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
@@ -2093,7 +2091,6 @@ class BuildRequest:
             data["uuid"],
             data["state"],
             data["precedence"],
-            data["params"],
             data["zone"],
             data["tenant_name"],
             data["pipeline_name"],
