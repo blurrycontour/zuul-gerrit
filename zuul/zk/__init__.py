@@ -186,6 +186,14 @@ class ZooKeeperClient(object):
             tls_ca=tls_ca,
         )
 
+    def commitTransaction(self, tr):
+        results = tr.commit()
+        for res in results:
+            self.log.debug("Transaction response %s", repr(res))
+        for res in results:
+            if isinstance(res, Exception):
+                raise res
+
 
 class ZooKeeperSimpleBase(metaclass=ABCMeta):
     """Base class for stateless Zookeeper interaction."""

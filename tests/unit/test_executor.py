@@ -442,7 +442,6 @@ class TestAnsibleJob(ZuulTestCase):
             "test",
             state=None,
             precedence=200,
-            params=params,
             zone=None,
             tenant_name=None,
             pipeline_name=None,
