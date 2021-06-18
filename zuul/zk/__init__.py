@@ -61,6 +61,14 @@ class ZooKeeperClient(object):
         self.was_lost = False
 
         self.client = None
+
+        # Verify that we can read the cert files (Kazoo doesn't
+        # provide useful error messages).
+        for fn in (tls_cert, tls_key, tls_ca):
+            if fn:
+                with open(fn):
+                    pass
+
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
