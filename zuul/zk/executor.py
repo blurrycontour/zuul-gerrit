@@ -26,6 +26,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.model import BuildRequest
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.exceptions import BuildRequestNotFound
+from zuul.zk import sharding
 
 
 class BuildRequestEvent(Enum):
@@ -216,13 +217,13 @@ class ExecutorApi(ZooKeeperSimpleBase):
                event_id, precedence=200):
         log = get_annotated_logger(self.log, event=None, build=uuid)
 
-        path = "/".join([self._getZoneRoot(zone), uuid])
+        zone_root = self._getZoneRoot(zone)
+        path = "/".join([zone_root, uuid])
 
         build_request = BuildRequest(
             uuid,
             self.initial_state,
             precedence,
-            params,
             zone,
             tenant_name,
             pipeline_name,
@@ -231,13 +232,20 @@ class ExecutorApi(ZooKeeperSimpleBase):
 
         log.debug("Submitting build request to ZooKeeper %s", build_request)
 
-        real_path = self.kazoo_client.create(
+        self.kazoo_client.ensure_path(zone_root)
+        tr = self.kazoo_client.transaction()
+
+        tr.create(
             path,
             self._dictToBytes(build_request.toDict()),
-            makepath=True,
         )
-
-        return real_path
+        params_path = self._getParamsPath(path)
+        tr.create(params_path)
+        params_path = '/'.join([params_path, 'seq'])
+        with sharding.BufferedShardWriter(tr, params_path) as stream:
+            stream.write(self._dictToBytes(params))
+        self.client.commitTransaction(tr)
+        return path
 
     # We use child nodes here so that we don't need to lock the build
     # request node.
@@ -419,3 +427,26 @@ class ExecutorApi(ZooKeeperSimpleBase):
     def _dictToBytes(data):
         # The custom json_dumps() will also serialize MappingProxyType objects
         return json_dumps(data).encode("utf-8")
+
+    def _getParamsPath(self, root):
+        return '/'.join([root, 'params'])
+
+    def clearBuildParams(self, build_request):
+        """Erase the build parameters from ZK to save space"""
+        self.kazoo_client.delete(self._getParamsPath(build_request.path),
+                                 recursive=True)
+
+    def getBuildParams(self, build_request):
+        """Return the parameters for a build request, if they exist.
+
+        Once a build request is accepted by an executor, the params
+        may be erased from ZK; this will return None in that case.
+
+        """
+        with sharding.BufferedShardReader(
+            self.kazoo_client,
+                self._getParamsPath(build_request.path)) as stream:
+            data = stream.read()
+            if not data:
+                return None
+            return self._bytesToDict(data)
