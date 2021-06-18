@@ -14,6 +14,7 @@
 
 import io
 from contextlib import suppress
+import zlib
 
 from kazoo.exceptions import NoNodeError
 from kazoo.client import TransactionRequest
@@ -53,7 +54,7 @@ class RawShardIO(io.RawIOBase):
 
     def _getData(self, path):
         data, _ = self.client.get(path)
-        return data
+        return zlib.decompress(data)
 
     def readall(self):
         read_buffer = io.BytesIO()
@@ -66,6 +67,8 @@ class RawShardIO(io.RawIOBase):
         byte_count = len(shard_data)
         # Only write one key at a time and defer writing the rest to the caller
         shard_bytes = bytes(shard_data[0:NODE_BYTE_SIZE_LIMIT])
+        shard_bytes = zlib.compress(shard_bytes)
+        assert(len(shard_bytes) < NODE_BYTE_SIZE_LIMIT)
         kw = dict(sequence=True)
         if not self.is_transaction:
             kw['makepath'] = True
