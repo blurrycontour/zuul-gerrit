@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "648e5c6a_92704194",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-06-18T16:21:50Z",
+      "side": 1,
+      "message": "will the exception be logged? Can we ensure they\u0027re the right format? Does the service go into failed state if this check fails?",
+      "range": {
+        "startLine": 62,
+        "startChar": 16,
+        "endLine": 62,
+        "endChar": 30
+      },
+      "revId": "653d6e229a4ac762e4f0163a2faf11281aeb3de9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
