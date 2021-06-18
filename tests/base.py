@@ -3199,6 +3199,19 @@ class TestingExecutorApi(HoldableExecutorApi):
         all_builds.sort()
         return all_builds
 
+    def _getJobForBuildRequest(self, build_request):
+        if not hasattr(self, '_test_build_request_job_map'):
+            self._test_build_request_job_map = {}
+        if build_request.uuid in self._test_build_request_job_map:
+            return self._test_build_request_job_map[build_request.uuid]
+        d = self.getBuildParams(build_request)
+        if d:
+            data = d.get('job', '')
+        else:
+            data = ''
+        self._test_build_request_job_map[build_request.uuid] = data
+        return data
+
     def release(self, what=None):
         """
         Releases a build request which was previously put on hold for testing.
@@ -3218,8 +3231,8 @@ class TestingExecutorApi(HoldableExecutorApi):
             # Either release all build requests in HOLD state or the ones
             # matching the given job name pattern.
             if what is None or (
-                    build_request.params and
-                    re.match(what, build_request.params["job"])):
+                    re.match(what,
+                             self._getJobForBuildRequest(build_request))):
                 self.log.debug("Releasing build %s", build_request)
                 build_request.state = BuildRequest.REQUESTED
                 self.update(build_request)

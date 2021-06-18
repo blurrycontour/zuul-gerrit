@@ -3205,8 +3205,8 @@ class ExecutorServer(BaseMergeServer):
             return
 
         build_request.state = BuildRequest.RUNNING
-        params = build_request.params
-        build_request.params = None
+        params = self.executor_api.getBuildParams(build_request)
+        self.executor_api.clearBuildParams(build_request)
         # Directly update the build in ZooKeeper, so we don't
         # loop over and try to lock it again and again.
         self.executor_api.update(build_request)
