@@ -56,6 +56,24 @@
       "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0ff57030_6f96c2b8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 3208,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-18T13:36:54Z",
+      "side": 1,
+      "message": "I\u0027ve run this today at ~80% load:\n\nsched \u003d self.server.scheduler\nbuilds \u003d sched.executor.builds.values()\ncount \u003d len(builds)\ntotal \u003d sum([len(repr(build.parameters)) for build in builds])\nprint(\"Count: \", count)\nprint(\"Total: \", total)\nprint(\"Mean: \", int(total/count))\u003e\u003e\u003e \u003e\u003e\u003e \u003e\u003e\u003e\n\n\u003e\u003e\u003e Count:  1546\n\u003e\u003e\u003e Total:  1.409.059.761\n\u003e\u003e\u003e Mean:  911.422\n\n\nThat makes ~1.4GB. The mean of 911kb also suggests that we likely exceed the znode size limit and we will need sharding and/or compression for the parameters.",
+      "parentUuid": "cb97005f_563d7c4a",
+      "revId": "d1dd2fcfb6846ab6e71eb2d1d91dbb257293140b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
