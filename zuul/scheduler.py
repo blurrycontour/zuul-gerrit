@@ -1023,6 +1023,7 @@ class Scheduler(threading.Thread):
                     item.current_build_set.node_requests.items():
                     requests_to_cancel.append(
                         (item.current_build_set, request))
+                item.pipeline = None
 
             for build in builds_to_cancel:
                 self.log.info(
