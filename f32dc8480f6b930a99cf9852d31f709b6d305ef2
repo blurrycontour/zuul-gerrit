@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebc28c00_345af463",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-18T20:21:15Z",
+      "side": 1,
+      "message": "Should we return a tuple of logical bytes written and actual bytes written? It may help logging/debugging if we want to confirm size savings.",
+      "revId": "f32dc8480f6b930a99cf9852d31f709b6d305ef2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
