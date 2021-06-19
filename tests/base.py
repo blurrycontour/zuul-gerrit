@@ -344,10 +344,10 @@ class TestConnectionRegistry(ConnectionRegistry):
             rpcclient, git_url_with_auth))
         self.registerDriver(SMTPDriver())
         self.registerDriver(TimerDriver())
-        if fake_sql:
-            self.registerDriver(SQLDriverMock())
-        else:
-            self.registerDriver(SQLDriver())
+        # if fake_sql:
+        #     self.registerDriver(SQLDriverMock())
+        # else:
+        self.registerDriver(SQLDriver())
         self.registerDriver(BubblewrapDriver())
         self.registerDriver(NullwrapDriver())
         self.registerDriver(MQTTDriver())
@@ -4226,7 +4226,7 @@ class ZuulTestCase(BaseTestCase):
     git_url_with_auth: bool = False
     log_console_port: int = 19885
     source_only: bool = False
-    fake_sql: bool = True
+    fake_sql: bool = False
     validate_tenants = None
 
     def __getattr__(self, name):
@@ -4466,11 +4466,35 @@ class ZuulTestCase(BaseTestCase):
 
         sections = [
             'zuul', 'scheduler', 'executor', 'merger', 'web', 'zookeeper',
-            'keystore'
+            'keystore', 'database',
         ]
         for section in sections:
             if not config.has_section(section):
                 config.add_section(section)
+
+        def _setup_fixture(config, section_name):
+            if (config.get(section_name, 'dburi') ==
+                    '$MYSQL_FIXTURE_DBURI$'):
+                f = MySQLSchemaFixture()
+                self.useFixture(f)
+                config.set(section_name, 'dburi', f.dburi)
+            elif (config.get(section_name, 'dburi') ==
+                  '$POSTGRESQL_FIXTURE_DBURI$'):
+                f = PostgresqlSchemaFixture()
+                self.useFixture(f)
+                config.set(section_name, 'dburi', f.dburi)
+
+        for section_name in config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+
+            if config.get(section_name, 'driver') == 'sql':
+                _setup_fixture(config, section_name)
+
+        if 'database' in config.sections():
+            _setup_fixture(config, 'database')
 
         if not self.setupSimpleLayout(config):
             tenant_config = None
@@ -5546,35 +5570,8 @@ class SSLZuulTestCase(ZuulTestCase):
 
 
 class ZuulDBTestCase(ZuulTestCase):
-    fake_sql = False
-
-    def setup_config(self, config_file: str):
-        def _setup_fixture(config, section_name):
-            if (config.get(section_name, 'dburi') ==
-                    '$MYSQL_FIXTURE_DBURI$'):
-                f = MySQLSchemaFixture()
-                self.useFixture(f)
-                config.set(section_name, 'dburi', f.dburi)
-            elif (config.get(section_name, 'dburi') ==
-                  '$POSTGRESQL_FIXTURE_DBURI$'):
-                f = PostgresqlSchemaFixture()
-                self.useFixture(f)
-                config.set(section_name, 'dburi', f.dburi)
-
-        config = super(ZuulDBTestCase, self).setup_config(config_file)
-        for section_name in config.sections():
-            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
-                                 section_name, re.I)
-            if not con_match:
-                continue
-
-            if config.get(section_name, 'driver') == 'sql':
-                _setup_fixture(config, section_name)
-
-        if 'database' in config.sections():
-            _setup_fixture(config, 'database')
-
-        return config
+    # TODO: Remove this and fake_sql arguments
+    pass
 
 
 class ZuulGithubAppTestCase(ZuulTestCase):
