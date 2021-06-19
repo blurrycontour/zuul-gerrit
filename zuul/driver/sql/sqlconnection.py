@@ -180,6 +180,8 @@ class DatabaseSession(object):
 class SQLConnection(BaseConnection):
     driver_name = 'sql'
     log = logging.getLogger("zuul.SQLConnection")
+    # This is used by tests only
+    force_migrations = False
 
     def __init__(self, driver, connection_name, connection_config):
 
@@ -195,6 +197,7 @@ class SQLConnection(BaseConnection):
 
         try:
             self.dburi = self.connection_config.get('dburi')
+            self.metadata = sa.MetaData()
             self._setup_models()
 
             # Recycle connections if they've been idle for more than 1 second.
@@ -239,7 +242,12 @@ class SQLConnection(BaseConnection):
             # Alembic lets us add arbitrary data in the tag argument. We can
             # leverage that to tell the upgrade scripts about the table prefix.
             tag = {'table_prefix': self.table_prefix}
-            alembic.command.upgrade(config, 'head', tag=tag)
+
+            if current_rev is None and not self.force_migrations:
+                self.metadata.create_all(self.engine)
+                alembic.command.stamp(config, "head", tag=tag)
+            else:
+                alembic.command.upgrade(config, 'head', tag=tag)
 
     def onLoad(self):
         while True:
@@ -253,26 +261,33 @@ class SQLConnection(BaseConnection):
             time.sleep(10)
 
     def _setup_models(self):
-        Base = declarative_base(metadata=sa.MetaData())
+        Base = declarative_base(metadata=self.metadata)
 
         class BuildSetModel(Base):
             __tablename__ = self.table_prefix + BUILDSET_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            uuid = sa.Column(sa.String(36))
             zuul_ref = sa.Column(sa.String(255))
             pipeline = sa.Column(sa.String(255))
             project = sa.Column(sa.String(255))
-            branch = sa.Column(sa.String(255))
             change = sa.Column(sa.Integer, nullable=True)
             patchset = sa.Column(sa.String(255), nullable=True)
             ref = sa.Column(sa.String(255))
-            oldrev = sa.Column(sa.String(255))
-            newrev = sa.Column(sa.String(255))
-            ref_url = sa.Column(sa.String(255))
-            result = sa.Column(sa.String(255))
             message = sa.Column(sa.TEXT())
             tenant = sa.Column(sa.String(255))
+            result = sa.Column(sa.String(255))
+            ref_url = sa.Column(sa.String(255))
+            oldrev = sa.Column(sa.String(255))
+            newrev = sa.Column(sa.String(255))
+            branch = sa.Column(sa.String(255))
+            uuid = sa.Column(sa.String(36))
             event_id = sa.Column(sa.String(255), nullable=True)
+
+            sa.Index(self.table_prefix + 'project_pipeline_idx',
+                     project, pipeline)
+            sa.Index(self.table_prefix + 'project_change_idx',
+                     project, change)
+            sa.Index(self.table_prefix + 'change_idx', change)
+            sa.Index(self.table_prefix + 'uuid_idx', uuid)
 
             def createBuild(self, *args, **kw):
                 session = orm.session.Session.object_session(self)
@@ -286,12 +301,11 @@ class SQLConnection(BaseConnection):
         class BuildModel(Base):
             __tablename__ = self.table_prefix + BUILD_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            buildset_id = sa.Column(sa.String, sa.ForeignKey(
+            buildset_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + BUILDSET_TABLE + ".id"))
             uuid = sa.Column(sa.String(36))
             job_name = sa.Column(sa.String(255))
             result = sa.Column(sa.String(255))
-            held = sa.Column(sa.Boolean)
             start_time = sa.Column(sa.DateTime)
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
@@ -299,7 +313,13 @@ class SQLConnection(BaseConnection):
             node_name = sa.Column(sa.String(255))
             error_detail = sa.Column(sa.TEXT())
             final = sa.Column(sa.Boolean)
+            held = sa.Column(sa.Boolean)
             buildset = orm.relationship(BuildSetModel, backref="builds")
+
+            sa.Index(self.table_prefix + 'job_name_buildset_id_idx',
+                     job_name, buildset_id)
+            sa.Index(self.table_prefix + 'uuid_buildset_id_idx',
+                     uuid, buildset_id)
 
             def createArtifact(self, *args, **kw):
                 session = orm.session.Session.object_session(self)
