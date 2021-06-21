@@ -845,14 +845,14 @@ class PipelineManager(metaclass=ABCMeta):
         return self.getLayout(parent_item)
 
     def getLayout(self, item):
+        log = get_annotated_logger(self.log, event)
         layout = self._layout_cache.get(item.layout_uuid)
         if layout:
-            self.log.debug("Using cached layout %s for item %s",
-                           layout.uuid, item)
+            log.debug("Using cached layout %s for item %s", layout.uuid, item)
             return layout
 
         if item.layout_uuid:
-            self.log.debug("Re-calculating layout for item %s", item)
+            log.debug("Re-calculating layout for item %s", item)
 
         layout = self._getLayout(item)
         if layout:
@@ -861,6 +861,7 @@ class PipelineManager(metaclass=ABCMeta):
         return layout
 
     def _getLayout(self, item):
+        log = get_annotated_logger(self.log, event)
         if item.item_ahead:
             if (
                 (item.item_ahead.live and not item.item_ahead.job_graph) or
@@ -892,7 +893,7 @@ class PipelineManager(metaclass=ABCMeta):
         if build_set.unable_to_merge:
             return self.getFallbackLayout(item)
 
-        self.log.debug("Preparing dynamic layout for: %s" % item.change)
+        log.debug("Preparing dynamic layout for: %s" % item.change)
         return self._loadDynamicLayout(item)
 
     def _branchesForRepoState(self, projects, tenant, items=None):
