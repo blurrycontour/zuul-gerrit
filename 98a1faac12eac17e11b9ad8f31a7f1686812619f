@@ -34,6 +34,23 @@
       "revId": "98a1faac12eac17e11b9ad8f31a7f1686812619f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "03a0f8fa_f050e5e6",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-21T20:40:04Z",
+      "side": 1,
+      "message": "Done in https://review.opendev.org/793666 PS4 (where we switch to using the component registry).",
+      "revId": "98a1faac12eac17e11b9ad8f31a7f1686812619f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
