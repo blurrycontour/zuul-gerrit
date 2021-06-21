@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "8201f3be_acfbe419",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-21T18:02:53Z",
+      "side": 1,
+      "message": "No, that\u0027s a full ZuulTestCase; this test runs without a Zuul so that we can test the API without actually starting up components.\n\nIt would make sense to move the assertions to a shared location, but we don\u0027t have an established pattern for that, so we\u0027re pretty lenient on duplicating helper methods in tests when they need to be in different classes.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fbe73f5b_2cb97102",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-21T18:02:53Z",
+      "side": 1,
+      "message": "This is the comment that prompted this change.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f5559db_096fa6bd",
         "filename": "zuul/zk/components.py",
         "patchSetId": 4
@@ -36,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "60ca1b3c_0841f22d",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-21T18:02:53Z",
+      "side": 1,
+      "message": "Correct.  The whole point of this change is to implement your suggestion of passing in \"None\" as the client in order to create a read-only component.  Users of the registry should be read-only; there\u0027s no case where the scheduler should write out data for one of the executors.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89e525e4_e6887c00",
         "filename": "zuul/zk/components.py",
         "patchSetId": 4
@@ -50,6 +101,23 @@
       "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de08fa65_c95afa16",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-21T18:02:53Z",
+      "side": 1,
+      "message": "Yes, that\u0027s correct.  That is simila to the case with the current code, which produces a list of dict value iterators if kind is None (compared to a single dict value iterator if kind is specified).\n\nActually, the current code produces a traceback, because it\u0027s untested and it has a bug.  But that appears to have been the intention.\n\nSo the new version is similar in spirit to what was intended orginially, except by *also* including the kind information, the caller has access to the grouped components.  Think about how this would be used in the web api or on the status page -- you\u0027re going to want a list of every type of component, and every component under it.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
