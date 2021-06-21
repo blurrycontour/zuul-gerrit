@@ -1284,6 +1284,10 @@ class Scheduler(threading.Thread):
             finally:
                 self.run_handler_lock.release()
 
+            # To reduce memory footprint reset the last traceback which stores
+            # the traceback with all frames until the next exception occurs.
+            sys.last_traceback = None
+
     def maintainConnectionCache(self):
         # TODOv3(jeblair): update for tenants
         relevant = set()
