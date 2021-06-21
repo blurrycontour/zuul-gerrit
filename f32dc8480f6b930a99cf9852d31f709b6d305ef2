@@ -16,6 +16,23 @@
       "revId": "f32dc8480f6b930a99cf9852d31f709b6d305ef2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38aab996_a527c03c",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-21T17:31:09Z",
+      "side": 1,
+      "message": "I think this is part of the stream writer api, it always returns the number of input bytes written.\n\nFinding a way to report that might be useful, but we\u0027d have to do it out of band.  We also know that in some cases (like storing \"{}\") we\u0027re going to be worse, but the cases where we\u0027re storing giant blobs of job parameters or unparsed yaml should put us ahead overall.  We\u0027ll be able to tell by looking at the ZK data stored graphs in grafana.",
+      "revId": "f32dc8480f6b930a99cf9852d31f709b6d305ef2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
