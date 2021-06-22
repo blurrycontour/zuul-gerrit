@@ -49,6 +49,16 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
    :stat:`zuul.tenant.<tenant>.event_enqueue_processing_time` and any
    driver-specific pre-processing of the event.
 
+.. stat:: zuul.tenant.<tenant>.management_events
+   :type: gauge
+
+   The size of the tenant's management event queue.
+
+.. stat:: zuul.tenant.<tenant>.trigger_events
+   :type: gauge
+
+   The size of the tenant's trigger event queue.
+
 .. stat:: zuul.tenant.<tenant>.pipeline
 
    Holds metrics specific to jobs. This hierarchy includes:
@@ -463,11 +473,6 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
    .. stat:: eventqueues
 
       Holds metrics about the event queue lengths in the Zuul scheduler.
-
-      .. stat:: trigger
-         :type: gauge
-
-         The size of the current trigger event queue.
 
       .. stat:: result
          :type: gauge

@@ -753,7 +753,7 @@ class GithubEventConnector:
                         continue
                     self.connection.logEvent(event)
                     if isinstance(event, DequeueEvent):
-                        self.connection.sched.addManagementEvent(event)
+                        self.connection.sched.addChangeManagementEvent(event)
                     else:
                         self.connection.sched.addTriggerEvent(
                             self.connection.driver_name, event
