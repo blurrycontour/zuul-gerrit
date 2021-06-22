@@ -395,6 +395,10 @@ class TestScheduler(ZuulTestCase):
         self.assertReportedStat('zuul.event.gerrit.gerrit.comment-added',
                                 value='1', kind='c')
         self.assertReportedStat(
+            'zuul.tenant.tenant-one.trigger_events', value='0', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.management_events', value='0', kind='g')
+        self.assertReportedStat(
             'zuul.tenant.tenant-one.pipeline.gate.current_changes',
             value='1', kind='g')
         self.assertReportedStat(
@@ -3418,27 +3422,30 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants['tenant-one']
         (trusted, project) = tenant.getProject('org/project')
 
+        management_queue = self.scheds.first.sched.management_events[
+            'tenant-one']
+
         with self.scheds.first.sched.run_handler_lock:
-            mgmt_queue_size = len(self.scheds.first.sched.management_events)
+            mgmt_queue_size = len(management_queue)
             self.assertEqual(mgmt_queue_size, 0)
 
             self.scheds.first.sched.reconfigureTenant(tenant, project, None)
-            mgmt_queue_size = len(self.scheds.first.sched.management_events)
+            mgmt_queue_size = len(management_queue)
             self.assertEqual(mgmt_queue_size, 1)
 
             self.scheds.first.sched.reconfigureTenant(tenant, project, None)
-            mgmt_queue_size = len(self.scheds.first.sched.management_events)
+            mgmt_queue_size = len(management_queue)
             self.assertEqual(mgmt_queue_size, 2)
 
             # The second event should be combined with the first so we should
             # only see the merged entry when consuming from the queue.
-            mgmt_events = list(self.scheds.first.sched.management_events)
+            mgmt_events = list(management_queue)
             self.assertEqual(len(mgmt_events), 1)
             self.assertEqual(len(mgmt_events[0].merged_events), 1)
 
         self.waitUntilSettled()
 
-        mgmt_queue_size = len(self.scheds.first.sched.management_events)
+        mgmt_queue_size = len(management_queue)
         self.assertEqual(mgmt_queue_size, 0)
 
     def test_live_reconfiguration(self):

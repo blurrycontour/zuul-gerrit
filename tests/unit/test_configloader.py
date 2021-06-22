@@ -568,7 +568,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
         event = model.TenantReconfigureEvent(
             tenant.name, project.canonical_name, branch_name=None)
         event.zuul_event_ltime = ltime
-        sched.management_events.put(event, needs_result=False)
+        sched.management_events[tenant.name].put(event, needs_result=False)
         self.waitUntilSettled()
 
         # As the cache should be valid, we only expect a cat job for
