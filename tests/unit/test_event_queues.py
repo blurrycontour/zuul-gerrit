@@ -128,10 +128,10 @@ class TestTriggerEventQueue(EventQueueBaseTestCase):
         self.driver = DummyDriver()
         self.connections.registerDriver(self.driver)
 
-    def test_global_trigger_events(self):
-        # Test enqueue/dequeue of the global trigger event queue.
-        queue = event_queues.GlobalTriggerEventQueue(
-            self.zk_client, self.connections
+    def test_tenant_trigger_events(self):
+        # Test enqueue/dequeue of the tenant trigger event queue.
+        queue = event_queues.TenantTriggerEventQueue(
+            self.zk_client, self.connections, "tenant"
         )
 
         self.assertEqual(len(queue), 0)
@@ -199,8 +199,9 @@ class TestTriggerEventQueue(EventQueueBaseTestCase):
 class TestManagementEventQueue(EventQueueBaseTestCase):
 
     def test_management_events(self):
-        # Test enqueue/dequeue of the global management event queue.
-        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        # Test enqueue/dequeue of the tenant management event queue.
+        queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
 
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
@@ -229,7 +230,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
 
     def test_management_event_error(self):
         # Test that management event errors are reported.
-        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
         event = model.ReconfigureEvent(None)
         result_future = queue.put(event)
 
@@ -246,7 +248,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
     def test_event_merge(self):
         # Test that similar management events (eg, reconfiguration of
         # two projects) can be merged.
-        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
         event = model.TenantReconfigureEvent("tenant", "project", "master")
         queue.put(event, needs_result=False)
         event = model.TenantReconfigureEvent("tenant", "other", "branch")
@@ -267,21 +270,22 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         self.assertFalse(queue.hasEvents())
 
     def test_event_ltime(self):
-        global_queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        tenant_queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
         registry = event_queues.PipelineManagementEventQueue.createRegistry(
             self.zk_client
         )
 
         event = model.ReconfigureEvent(None)
-        global_queue.put(event, needs_result=False)
-        self.assertTrue(global_queue.hasEvents())
+        tenant_queue.put(event, needs_result=False)
+        self.assertTrue(tenant_queue.hasEvents())
 
         pipeline_queue = registry["tenant"]["pipeline"]
         self.assertIsInstance(
             pipeline_queue, event_queues.ManagementEventQueue
         )
         processed_events = 0
-        for event in global_queue:
+        for event in tenant_queue:
             processed_events += 1
             event_ltime = event.zuul_event_ltime
             self.assertGreater(event_ltime, -1)
@@ -301,33 +305,34 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
 
     def test_pipeline_management_events(self):
         # Test that when a management event is forwarded from the
-        # global to the a pipeline-specific queue, it is not
+        # tenant to the a pipeline-specific queue, it is not
         # prematurely acked and the future returns correctly.
-        global_queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        tenant_queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
         registry = event_queues.PipelineManagementEventQueue.createRegistry(
             self.zk_client
         )
 
         event = model.PromoteEvent('tenant', 'check', ['1234,1'])
-        result_future = global_queue.put(event, needs_result=False)
+        result_future = tenant_queue.put(event, needs_result=False)
         self.assertIsNone(result_future)
 
-        result_future = global_queue.put(event)
+        result_future = tenant_queue.put(event)
         self.assertIsNotNone(result_future)
 
-        self.assertEqual(len(global_queue), 2)
-        self.assertTrue(global_queue.hasEvents())
+        self.assertEqual(len(tenant_queue), 2)
+        self.assertTrue(tenant_queue.hasEvents())
 
         pipeline_queue = registry["tenant"]["pipeline"]
         self.assertIsInstance(
             pipeline_queue, event_queues.ManagementEventQueue
         )
         acked = 0
-        for event in global_queue:
+        for event in tenant_queue:
             self.assertIsInstance(event, model.PromoteEvent)
             # Forward event to pipeline management event queue
             pipeline_queue.put(event)
-            global_queue.ackWithoutResult(event)
+            tenant_queue.ackWithoutResult(event)
             acked += 1
 
         self.assertEqual(acked, 2)
@@ -335,8 +340,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         # future should not be completed yet.
         self.assertFalse(result_future.wait(0.1))
 
-        self.assertEqual(len(global_queue), 0)
-        self.assertFalse(global_queue.hasEvents())
+        self.assertEqual(len(tenant_queue), 0)
+        self.assertFalse(tenant_queue.hasEvents())
 
         self.assertEqual(len(pipeline_queue), 2)
         self.assertTrue(pipeline_queue.hasEvents())
@@ -355,7 +360,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
     def test_management_events_client(self):
         # Test management events from a second client
 
-        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
 
@@ -368,8 +374,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         self.addCleanup(external_client.disconnect)
         external_client.connect()
 
-        external_queue = event_queues.GlobalManagementEventQueue(
-            external_client)
+        external_queue = event_queues.TenantManagementEventQueue(
+            external_client, "tenant")
 
         event = model.ReconfigureEvent(None)
         result_future = external_queue.put(event)
@@ -394,7 +400,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         # Test management events from a second client which
         # disconnects before the event is complete.
 
-        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        queue = event_queues.TenantManagementEventQueue(
+            self.zk_client, "tenant")
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
 
@@ -408,8 +415,8 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         self.addCleanup(external_client.disconnect)
         external_client.connect()
 
-        external_queue = event_queues.GlobalManagementEventQueue(
-            external_client)
+        external_queue = event_queues.TenantManagementEventQueue(
+            external_client, "tenant")
 
         # Submit the event
         event = model.ReconfigureEvent(None)
@@ -492,28 +499,31 @@ class TestEventWatchers(EventQueueBaseTestCase):
             if event.is_set():
                 break
 
-    def test_global_event_watcher(self):
+    def test_tenant_event_watcher(self):
         event = threading.Event()
-        event_queues.GlobalEventWatcher(self.zk_client, event.set)
+        event_queues.EventWatcher(self.zk_client, event.set)
 
-        management_queue = event_queues.GlobalManagementEventQueue(
-            self.zk_client
+        management_queue = (
+            event_queues.TenantManagementEventQueue.createRegistry(
+                self.zk_client)
         )
-        trigger_queue = event_queues.GlobalTriggerEventQueue(
+        trigger_queue = event_queues.TenantTriggerEventQueue.createRegistry(
             self.zk_client, self.connections
         )
         self.assertFalse(event.is_set())
 
-        management_queue.put(model.ReconfigureEvent(None), needs_result=False)
+        management_queue["tenant"].put(model.ReconfigureEvent(None),
+                                       needs_result=False)
         self._wait_for_event(event)
         event.clear()
 
-        trigger_queue.put(self.driver.driver_name, DummyTriggerEvent())
+        trigger_queue["tenant"].put(self.driver.driver_name,
+                                    DummyTriggerEvent())
         self._wait_for_event(event)
 
     def test_pipeline_event_watcher(self):
         event = threading.Event()
-        event_queues.PipelineEventWatcher(self.zk_client, event.set)
+        event_queues.EventWatcher(self.zk_client, event.set)
 
         management_queues = (
             event_queues.PipelineManagementEventQueue.createRegistry(

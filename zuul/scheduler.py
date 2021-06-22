@@ -73,10 +73,9 @@ from zuul.zk.components import (
 )
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.event_queues import (
-    GlobalEventWatcher,
-    GlobalManagementEventQueue,
-    GlobalTriggerEventQueue,
-    PipelineEventWatcher,
+    EventWatcher,
+    TenantManagementEventQueue,
+    TenantTriggerEventQueue,
     PipelineManagementEventQueue,
     PipelineResultEventQueue,
     PipelineTriggerEventQueue,
@@ -161,20 +160,21 @@ class Scheduler(threading.Thread):
         self.component_registry = ComponentRegistry(self.zk_client)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
+        # TODO (swestphahl): Remove after we've refactored reconfigurations
+        # to be performed on the tenant level.
+        self.reconfigure_event_queue = NamedQueue("ReconfigureEventQueue")
         self.result_event_queue = NamedQueue("ResultEventQueue")
-        self.global_watcher = GlobalEventWatcher(
+        self.event_watcher = EventWatcher(
             self.zk_client, self.wake_event.set
         )
-        self.pipeline_watcher = PipelineEventWatcher(
-            self.zk_client, self.wake_event.set
-        )
-        self.management_events = GlobalManagementEventQueue(self.zk_client)
+        self.management_events = TenantManagementEventQueue.createRegistry(
+            self.zk_client)
         self.pipeline_management_events = (
             PipelineManagementEventQueue.createRegistry(
                 self.zk_client
             )
         )
-        self.trigger_events = GlobalTriggerEventQueue(
+        self.trigger_events = TenantTriggerEventQueue.createRegistry(
             self.zk_client, self.connections
         )
         self.pipeline_trigger_events = (
@@ -383,12 +383,10 @@ class Scheduler(threading.Thread):
                 merge_running += running
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
-        self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
-                          len(self.trigger_events))
         self.statsd.gauge('zuul.scheduler.eventqueues.result',
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
-                          len(self.management_events))
+                          self.reconfigure_event_queue.qsize())
         base = 'zuul.scheduler.eventqueues.connection'
         for connection in self.connections.connections.values():
             queue = connection.getEventQueue()
@@ -397,6 +395,10 @@ class Scheduler(threading.Thread):
                                   len(queue))
 
         for tenant in self.abide.tenants.values():
+            self.statsd.gauge(f"zuul.tenant.{tenant.name}.management_events",
+                              len(self.management_events[tenant.name]))
+            self.statsd.gauge(f"zuul.tenant.{tenant.name}.trigger_events",
+                              len(self.trigger_events[tenant.name]))
             trigger_event_queues = self.pipeline_trigger_events[tenant.name]
             result_event_queues = self.pipeline_result_events[tenant.name]
             management_event_queues = (
@@ -446,11 +448,27 @@ class Scheduler(threading.Thread):
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
-        self.trigger_events.put(driver_name, event)
-        self.wake_event.set()
+        for tenant in self.abide.tenants.values():
+            trusted, project = tenant.getProject(event.canonical_project_name)
 
-    def addManagementEvent(self, event):
-        self.management_events.put(event, needs_result=False)
+            if project is None:
+                continue
+            self.trigger_events[tenant.name].put(driver_name, event)
+
+    def addChangeManagementEvent(self, event):
+        tenant_name = event.tenant_name
+        pipeline_name = event.pipeline_name
+
+        tenant = self.abide.tenants.get(tenant_name)
+        if tenant is None:
+            raise ValueError(f'Unknown tenant {event.tenant_name}')
+        pipeline = tenant.layout.pipelines.get(pipeline_name)
+        if pipeline is None:
+            raise ValueError(f'Unknown pipeline {event.pipeline_name}')
+
+        self.pipeline_management_events[tenant_name][pipeline_name].put(
+            event, needs_result=False
+        )
 
     def addResultEvent(self, event):
         self.result_event_queue.put(event)
@@ -525,7 +543,7 @@ class Scheduler(threading.Thread):
         event = TenantReconfigureEvent(
             tenant.name, project.canonical_name, branch
         )
-        self.management_events.put(event, needs_result=False)
+        self.management_events[tenant.name].put(event, needs_result=False)
 
     def fullReconfigureCommandHandler(self):
         self._zuul_app.fullReconfigure()
@@ -559,10 +577,12 @@ class Scheduler(threading.Thread):
         else:
             event = ReconfigureEvent()
 
-        result = self.management_events.put(event)
+        event.ack_ref = threading.Event()
+        result = self.reconfigure_event_queue.put(event)
+        self.wake_event.set()
 
         self.log.debug("Waiting for reconfiguration")
-        result.wait()
+        event.ack_ref.wait()
         self.log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
@@ -661,7 +681,7 @@ class Scheduler(threading.Thread):
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
-        result = self.management_events.put(event)
+        result = self.management_events[tenant_name].put(event)
         self.log.debug("Waiting for promotion")
         result.wait()
         self.log.debug("Promotion complete")
@@ -680,7 +700,7 @@ class Scheduler(threading.Thread):
         event = DequeueEvent(tenant_name, pipeline_name,
                              project.canonical_hostname, project.name,
                              change, ref)
-        result = self.management_events.put(event)
+        result = self.management_events[tenant_name].put(event)
         self.log.debug("Waiting for dequeue")
         result.wait()
         self.log.debug("Dequeue complete")
@@ -700,7 +720,7 @@ class Scheduler(threading.Thread):
         event = EnqueueEvent(tenant_name, pipeline_name,
                              project.canonical_hostname, project.name,
                              change, ref, oldrev, newrev)
-        result = self.management_events.put(event)
+        result = self.management_events[tenant_name].put(event)
         self.log.debug("Waiting for enqueue")
         result.wait()
         self.log.debug("Enqueue complete")
@@ -1248,18 +1268,12 @@ class Scheduler(threading.Thread):
             self.run_handler_lock.acquire()
             try:
                 if not self._stopped:
-                    self.process_global_management_queue()
-
-                if not self._stopped:
                     self.process_management_queue()
 
                 # Give result events priority -- they let us stop builds,
                 # whereas trigger events cause us to execute builds.
                 if not self._stopped:
                     self.process_result_queue()
-
-                if not self._stopped:
-                    self.process_global_trigger_queue()
 
                 if not self._stopped:
                     self.process_trigger_queue()
@@ -1301,19 +1315,17 @@ class Scheduler(threading.Thread):
                 "End maintain connection cache for: %s" % connection)
         self.log.debug("Connection cache size: %s" % len(relevant))
 
-    def process_global_trigger_queue(self):
-        for event in self.trigger_events:
+    def process_tenant_trigger_queue(self, tenant):
+        for event in self.trigger_events[tenant.name]:
             log = get_annotated_logger(self.log, event.zuul_event_id)
             log.debug("Forwarding trigger event %s", event)
             try:
-                for tenant in self.abide.tenants.values():
-                    try:
-                        self._forward_trigger_event(event, tenant)
-                    except Exception:
-                        log.exception("Unable to forward event %s "
-                                      "to tenant %s", event, tenant.name)
+                self._forward_trigger_event(event, tenant)
+            except Exception:
+                log.exception("Unable to forward event %s "
+                              "to tenant %s", event, tenant.name)
             finally:
-                self.trigger_events.ack(event)
+                self.trigger_events[tenant.name].ack(event)
 
     def _forward_trigger_event(self, event, tenant):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -1382,6 +1394,10 @@ class Scheduler(threading.Thread):
 
     def process_trigger_queue(self):
         for tenant in self.abide.tenants.values():
+            if self._stopped:
+                return
+            self.process_tenant_trigger_queue(tenant)
+
             for pipeline in tenant.layout.pipelines.values():
                 for event in self.pipeline_trigger_events[tenant.name][
                     pipeline.name
@@ -1421,15 +1437,11 @@ class Scheduler(threading.Thread):
         if pipeline.manager.eventMatches(event, change):
             pipeline.manager.addChange(change, event)
 
-    def process_global_management_queue(self):
-        for event in self.management_events:
+    def process_tenant_management_queue(self, tenant):
+        for event in self.management_events[tenant.name]:
             event_forwarded = False
             try:
-                if isinstance(event, ReconfigureEvent):
-                    self._doReconfigureEvent(event)
-                elif isinstance(event, SmartReconfigureEvent):
-                    self._doSmartReconfigureEvent(event)
-                elif isinstance(event, TenantReconfigureEvent):
+                if isinstance(event, TenantReconfigureEvent):
                     self._doTenantReconfigureEvent(event)
                 elif isinstance(event, (PromoteEvent, ChangeManagementEvent)):
                     event_forwarded = self._forward_management_event(event)
@@ -1437,9 +1449,10 @@ class Scheduler(threading.Thread):
                     self.log.error("Unable to handle event %s", event)
             finally:
                 if event_forwarded:
-                    self.management_events.ackWithoutResult(event)
+                    self.management_events[tenant.name].ackWithoutResult(
+                        event)
                 else:
-                    self.management_events.ack(event)
+                    self.management_events[tenant.name].ack(event)
 
     def _forward_management_event(self, event):
         event_forwarded = False
@@ -1463,7 +1476,26 @@ class Scheduler(threading.Thread):
         return event_forwarded
 
     def process_management_queue(self):
+        while not self.reconfigure_event_queue.empty() and not self._stopped:
+            self.log.debug("Fetching reconfiguration event")
+            event = self.reconfigure_event_queue.get()
+            try:
+                if isinstance(event, ReconfigureEvent):
+                    self._doReconfigureEvent(event)
+                elif isinstance(event, SmartReconfigureEvent):
+                    self._doSmartReconfigureEvent(event)
+                else:
+                    self.log.error("Unable to handle event %s", event)
+            finally:
+                if event.ack_ref:
+                    event.ack_ref.set()
+                self.reconfigure_event_queue.task_done()
+
         for tenant in self.abide.tenants.values():
+            if self._stopped:
+                return
+            self.process_tenant_management_queue(tenant)
+
             for pipeline in tenant.layout.pipelines.values():
                 for event in self.pipeline_management_events[tenant.name][
                     pipeline.name
@@ -1904,12 +1936,15 @@ class Scheduler(threading.Thread):
         websocket_url = get_default(self.config, 'web', 'websocket_url', None)
 
         data['trigger_event_queue'] = {}
-        data['trigger_event_queue']['length'] = len(self.trigger_events)
+        data['trigger_event_queue']['length'] = len(
+            self.trigger_events[tenant_name])
         data['result_event_queue'] = {}
         data['result_event_queue']['length'] = \
             self.result_event_queue.qsize()
         data['management_event_queue'] = {}
-        data['management_event_queue']['length'] = len(self.management_events)
+        data['management_event_queue']['length'] = len(
+            self.management_events[tenant_name]
+        )
         data['connection_event_queues'] = {}
         for connection in self.connections.connections.values():
             queue = connection.getEventQueue()
