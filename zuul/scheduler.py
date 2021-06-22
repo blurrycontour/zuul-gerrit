@@ -470,10 +470,6 @@ class Scheduler(threading.Thread):
             event, needs_result=False
         )
 
-    def addResultEvent(self, event):
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
     def _reportBuildStats(self, build):
         # Note, as soon as the result is set, other threads may act
         # upon this, even though the event hasn't been fully
