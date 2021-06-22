@@ -4170,9 +4170,11 @@ class SchedulerTestApp:
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
 
-        # TODO (felix): Can be removed when the nodes provisioned events are
-        # switched to ZooKeeper.
+        # TODO (felix, swestphahl): Can be removed when the nodes
+        # provisioned events are switched to ZooKeeper and after we no
+        # longer use global management events.
         self.event_queues = [
+            self.sched.reconfigure_event_queue,
             self.sched.result_event_queue,
         ]
 
@@ -5080,11 +5082,11 @@ class ZuulTestCase(BaseTestCase):
             for connection_name in sched.connections.connections:
                 if self.connection_event_queues[connection_name].hasEvents():
                     return False
-            if sched.management_events.hasEvents():
-                return False
-            if sched.trigger_events.hasEvents():
-                return False
             for tenant in sched.abide.tenants.values():
+                if sched.management_events[tenant.name].hasEvents():
+                    return False
+                if sched.trigger_events[tenant.name].hasEvents():
+                    return False
                 for pipeline_name in tenant.layout.pipelines:
                     if sched.pipeline_management_events[tenant.name][
                         pipeline_name
