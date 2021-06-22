@@ -51,7 +51,6 @@ MANAGEMENT_EVENT_TYPE_MAP = {
 }
 
 TENANT_ROOT = "/zuul/events/tenant"
-SCHEDULER_GLOBAL_ROOT = "/zuul/events/scheduler-global"
 CONNECTION_ROOT = "/zuul/events/connection"
 
 # This is the path to the serialized from of the event in ZK (along
@@ -71,26 +70,9 @@ class EventPrefix(enum.Enum):
     TRIGGER = "300"
 
 
-class GlobalEventWatcher(ZooKeeperSimpleBase):
+class EventWatcher(ZooKeeperSimpleBase):
 
-    log = logging.getLogger("zuul.zk.event_queues.EventQueueWatcher")
-
-    def __init__(self, client, callback):
-        super().__init__(client)
-        self.callback = callback
-        self.kazoo_client.ensure_path(SCHEDULER_GLOBAL_ROOT)
-        self.kazoo_client.ChildrenWatch(
-            SCHEDULER_GLOBAL_ROOT, self._eventWatch
-        )
-
-    def _eventWatch(self, event_list):
-        if event_list:
-            self.callback()
-
-
-class PipelineEventWatcher(ZooKeeperSimpleBase):
-
-    log = logging.getLogger("zuul.zk.event_queues.EventQueueWatcher")
+    log = logging.getLogger("zuul.zk.event_queues.EventWatcher")
 
     def __init__(self, client, callback):
         super().__init__(client)
@@ -107,23 +89,27 @@ class PipelineEventWatcher(ZooKeeperSimpleBase):
             if tenant_path in self.watched_tenants:
                 continue
 
+            events_path = f"{tenant_path}/events"
+            self.kazoo_client.ensure_path(events_path)
             self.kazoo_client.ChildrenWatch(
-                tenant_path,
-                lambda p: self._pipelineWatch(tenant_name, p),
-            )
+                events_path, self._eventWatch, send_event=True)
+
+            pipelines_path = f"{tenant_path}/pipelines"
+            self.kazoo_client.ensure_path(pipelines_path)
+            self.kazoo_client.ChildrenWatch(
+                pipelines_path, lambda p: self._pipelineWatch(tenant_name, p))
+
             self.watched_tenants.add(tenant_path)
 
     def _pipelineWatch(self, tenant_name, pipelines):
         for pipeline_name in pipelines:
-            pipeline_path = "/".join((TENANT_ROOT, tenant_name, pipeline_name))
+            pipeline_path = "/".join((TENANT_ROOT, tenant_name, "pipelines",
+                                      pipeline_name))
             if pipeline_path in self.watched_pipelines:
                 continue
 
             self.kazoo_client.ChildrenWatch(
-                pipeline_path,
-                self._eventWatch,
-                send_event=True,
-            )
+                pipeline_path, self._eventWatch, send_event=True)
             self.watched_pipelines.add(pipeline_path)
 
     def _eventWatch(self, event_list, event=None):
@@ -394,7 +380,8 @@ class PipelineManagementEventQueue(ManagementEventQueue):
     )
 
     def __init__(self, client, tenant_name, pipeline_name):
-        event_root = "/".join((TENANT_ROOT, tenant_name, pipeline_name))
+        event_root = "/".join((TENANT_ROOT, tenant_name, "pipelines",
+                               pipeline_name))
         super().__init__(client, event_root, EventPrefix.MANAGEMENT)
 
     @classmethod
@@ -416,11 +403,12 @@ class PipelineManagementEventQueue(ManagementEventQueue):
         return DefaultKeyDict(lambda p: cls(client, tenant_name, p))
 
 
-class GlobalManagementEventQueue(ManagementEventQueue):
-    log = logging.getLogger("zuul.zk.event_queues.GlobalManagementEventQueue")
+class TenantManagementEventQueue(ManagementEventQueue):
+    log = logging.getLogger("zuul.zk.event_queues.TenantManagementEventQueue")
 
-    def __init__(self, client):
-        super().__init__(client, SCHEDULER_GLOBAL_ROOT, EventPrefix.MANAGEMENT)
+    def __init__(self, client, tenant_name):
+        event_root = "/".join((TENANT_ROOT, tenant_name, "events"))
+        super().__init__(client, event_root, EventPrefix.MANAGEMENT)
 
     def ackWithoutResult(self, event):
         """
@@ -431,6 +419,19 @@ class GlobalManagementEventQueue(ManagementEventQueue):
             for merged_event in event.merged_events:
                 super(ManagementEventQueue, self).ack(merged_event)
 
+    @classmethod
+    def createRegistry(cls, client):
+        """Create a tenant queue registry
+
+        Returns a dictionary of: tenant_name -> EventQueue
+
+        Queues are dynamically created with the originally supplied ZK
+        client as they are accessed via the registry (so new tenants
+        show up automatically).
+
+        """
+        return DefaultKeyDict(lambda t: cls(client, t))
+
 
 class PipelineResultEventQueue(SchedulerEventQueue):
     """Result events via ZooKeeper"""
@@ -438,7 +439,8 @@ class PipelineResultEventQueue(SchedulerEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.PipelineResultEventQueue")
 
     def __init__(self, client, tenant_name, pipeline_name):
-        event_root = "/".join((TENANT_ROOT, tenant_name, pipeline_name))
+        event_root = "/".join((TENANT_ROOT, tenant_name, "pipelines",
+                               pipeline_name))
         super().__init__(client, event_root, EventPrefix.RESULT)
 
     @classmethod
@@ -513,18 +515,34 @@ class TriggerEventQueue(SchedulerEventQueue):
             yield event
 
 
-class GlobalTriggerEventQueue(TriggerEventQueue):
-    log = logging.getLogger("zuul.zk.event_queues.GlobalTriggerEventQueue")
+class TenantTriggerEventQueue(TriggerEventQueue):
+    log = logging.getLogger("zuul.zk.event_queues.TenantTriggerEventQueue")
 
-    def __init__(self, client, connections):
-        super().__init__(client, SCHEDULER_GLOBAL_ROOT, connections)
+    def __init__(self, client, connections, tenant_name):
+        event_root = "/".join((TENANT_ROOT, tenant_name, "events"))
+        super().__init__(client, event_root, connections)
+
+    @classmethod
+    def createRegistry(cls, client, connections):
+        """Create a tenant queue registry
+
+        Returns a dictionary of: tenant_name -> EventQueue
+
+        Queues are dynamically created with the originally supplied ZK
+        client as they are accessed via the registry (so new tenants
+        show up automatically).
+
+        """
+        return DefaultKeyDict(lambda t: cls(client, connections, t))
 
 
 class PipelineTriggerEventQueue(TriggerEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.PipelineTriggerEventQueue")
 
     def __init__(self, client, tenant_name, pipeline_name, connections):
-        event_root = "/".join((TENANT_ROOT, tenant_name, pipeline_name))
+        event_root = "/".join((TENANT_ROOT, tenant_name, "pipelines",
+                               pipeline_name))
+        self.log.debug(f"SWE> pipeline trigger event root: {event_root}")
         super().__init__(client, event_root, connections)
 
     @classmethod

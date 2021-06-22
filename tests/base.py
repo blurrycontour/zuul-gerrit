@@ -4986,11 +4986,11 @@ class ZuulTestCase(BaseTestCase):
             for connection_name in sched.connections.connections:
                 if self.connection_event_queues[connection_name].hasEvents():
                     return False
-            if sched.management_events.hasEvents():
-                return False
-            if sched.trigger_events.hasEvents():
-                return False
             for tenant in sched.abide.tenants.values():
+                if sched.management_events[tenant.name].hasEvents():
+                    return False
+                if sched.trigger_events[tenant.name].hasEvents():
+                    return False
                 for pipeline_name in tenant.layout.pipelines:
                     if sched.pipeline_management_events[tenant.name][
                         pipeline_name
