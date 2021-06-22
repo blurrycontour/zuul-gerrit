@@ -34,6 +34,23 @@
       "revId": "b59631c48de446a83d1f5320206b7d67eeeb2290",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "077be6a4_e03d6505",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-22T21:32:45Z",
+      "side": 1,
+      "message": "This is a common trap with lambdas: Python doesn\u0027t fix the value of tenant_name in the closure here, it fixes the name and scope, so we end up with an unexpected value of tenant_name in the lambda based on the state of loop iteration at the time.\n\nIf I had to distill this into what to look for to avoid, I\u0027d say: don\u0027t use lambdas to make a closure in a loop.  I think the current/old code suffered from this too, but unlikely to hit a race condition.  I\u0027ve gone through the rest of this file and double checked the other lambdas look okay.\n\nThere are ways to do this with lamdbas (default arguments, or lambdas within lambdas), but I think they are harder to understand than just adding a factory function to return a closure.  That\u0027s what I did in the executor api, so that\u0027s what I\u0027ll do here in the next ptachset to resolve the race conditions.  It\u0027s going to look like:\n\n    def _makePipelineWatcher(self, tenant_name):\n        def watch(children, event\u003dNone):\n            return self._pipelineWatch(tenant_name, children)\n        return watch\n\nBut could be simplified as:\n\n    def _makePipelineWatcher(self, tenant_name):\n        return lambda children: self._pipelineWatch(tenant_name, children)\n\nThat seems equally readable/maintainable to me -- the main thing is getting the closure its own scope by calling into a method.",
+      "revId": "b59631c48de446a83d1f5320206b7d67eeeb2290",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
