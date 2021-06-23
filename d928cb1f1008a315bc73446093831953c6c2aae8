@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a398f4ab_a4af23de",
+        "filename": "zuul/model.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 870,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-23T20:10:55Z",
+      "side": 1,
+      "message": "This change relies on the nodeset being part of the node request, but that\u0027s not part of the zuul/nodepool protocol.  The quick-start tests are failing because Nodepool does not know anything about the nodeset attribute, so it strips it from zk when it writes.  The unit tests don\u0027t catch this because their simplified simulated nodepool does rewrite the complete object.\n\nWe really shouldn\u0027t change anything about the NodeRequest object.  But we shouldn\u0027t need to: the nodeset is part of the build parameters, so on the executor side, we can get the nodeset structure from that and fill in the nodes from the node request.",
+      "revId": "d928cb1f1008a315bc73446093831953c6c2aae8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
