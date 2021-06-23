@@ -51,6 +51,24 @@
       "revId": "b59631c48de446a83d1f5320206b7d67eeeb2290",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b317ea04_556da5ed",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-23T06:08:12Z",
+      "side": 1,
+      "message": "Thanks, for fixing this! I knew that late binding behavior would hit me at some point :D\n\nI think `functools.partial()` could also work here:\n\n     self.kazoo_client.ChildrenWatch(\n         pipelines_path,\n         functools.partial(self._pipelineWatch, tenant_name, p)\n     )",
+      "parentUuid": "077be6a4_e03d6505",
+      "revId": "b59631c48de446a83d1f5320206b7d67eeeb2290",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
