@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "23a95c30_620dfa30",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-23T16:14:13Z",
+      "side": 1,
+      "message": "Since we refer people to the sqlalchemy documentation for how to format a dburi:\n  https://zuul-ci.org/docs/zuul/reference/database.html\nShouldn\u0027t it be the responsibility of the user to encode that correctly in the Zuul config file?\n\nIf we were to do that ourselves, then someone who did follow those instructions would have it quadruple-escaped.\n\nAs an alternative, perhaps we could better detect this error and provide a more helpful message?",
+      "revId": "1e89973736bc8c8cece558023d768b16e3beb4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
