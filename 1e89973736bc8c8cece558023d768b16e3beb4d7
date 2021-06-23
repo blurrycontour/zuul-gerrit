@@ -16,6 +16,23 @@
       "revId": "1e89973736bc8c8cece558023d768b16e3beb4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17541d12_d166511d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-23T16:22:28Z",
+      "side": 1,
+      "message": "Oh, I misunderstood this; this is a disagreement between alembic and sqlalchemy.\n\nThis bug is relevant: https://github.com/sqlalchemy/alembic/issues/700\n\nAnd this must be the documentation you\u0027re referring to: https://alembic.sqlalchemy.org/en/latest/api/config.html#alembic.config.Config.set_main_option",
+      "revId": "1e89973736bc8c8cece558023d768b16e3beb4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
