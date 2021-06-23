@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "7ed642fa_936c3835",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-23T12:18:32Z",
+      "side": 1,
+      "message": "I see. This makes sense.",
+      "parentUuid": "8201f3be_acfbe419",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fbe73f5b_2cb97102",
         "filename": "zuul/zk/components.py",
         "patchSetId": 4
@@ -87,6 +105,24 @@
     },
     {
       "key": {
+        "uuid": "15b675ac_ccf922ed",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-23T12:18:32Z",
+      "side": 1,
+      "message": "Ok. I think I left this comment, but didn\u0027t expect somebody to make use of it 😄\nIf we go this way it might make sense to add a comment (here and/or in the docstring of the ComponentRegistry class) that the registry by design only contains read-only components. I think that was also the case in the initial implementation but I didn\u0027t like the boilerplate of having additional classes and type checks for that and wanted to keep the new version simple.",
+      "parentUuid": "60ca1b3c_0841f22d",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "43c57a76_29f4be75",
         "filename": "zuul/zk/components.py",
         "patchSetId": 4
@@ -132,6 +168,24 @@
       "writtenOn": "2021-06-21T18:02:53Z",
       "side": 1,
       "message": "Yes, that\u0027s correct.  That is simila to the case with the current code, which produces a list of dict value iterators if kind is None (compared to a single dict value iterator if kind is specified).\n\nActually, the current code produces a traceback, because it\u0027s untested and it has a bug.  But that appears to have been the intention.\n\nSo the new version is similar in spirit to what was intended orginially, except by *also* including the kind information, the caller has access to the grouped components.  Think about how this would be used in the web api or on the status page -- you\u0027re going to want a list of every type of component, and every component under it.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9894dcaa_c5e9961e",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-23T12:18:32Z",
+      "side": 1,
+      "message": "Ok, that sounds reasonable. Maybe we could add a comment here describing the different return types (or at least say that they are intentional). Although one can see the return value from the code I often like to have comments describing what\u0027s the intention behind (but maybe that\u0027s only me).\n\nTaking a look at the old version now, it looks like this is something I never followed up on.\nThanks for spotting the bug. That might indeed have been a path that wasn\u0027t used anywhere and thus I didn\u0027t spot the issue. Currently the only thing that comes to my mind requesting a list of all components (for all kinds) is the system overview page.",
+      "parentUuid": "de08fa65_c95afa16",
       "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
