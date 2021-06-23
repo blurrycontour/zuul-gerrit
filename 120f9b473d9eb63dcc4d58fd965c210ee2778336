@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "43c57a76_29f4be75",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-23T10:19:18Z",
+      "side": 1,
+      "message": "This should be (missing comma to create a tuple):\n\n    elif etype in (EventType.DELETED,):\n\nOtherwise this is comparing `\"string\" in \"string\"`.",
+      "revId": "120f9b473d9eb63dcc4d58fd965c210ee2778336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "89e525e4_e6887c00",
         "filename": "zuul/zk/components.py",
         "patchSetId": 4
