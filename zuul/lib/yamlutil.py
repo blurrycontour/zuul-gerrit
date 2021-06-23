@@ -59,7 +59,8 @@ class EncryptedPKCS1_OAEP:
         ciphertext = data.ciphertext
         if isinstance(ciphertext, list):
             ciphertext = [yaml.ScalarNode(tag='tag:yaml.org,2002:str',
-                                          value=base64.b64encode(x))
+                                          value=base64.b64encode(x).
+                                          decode('utf-8'))
                           for x in ciphertext]
             return yaml.SequenceNode(tag=cls.yaml_tag,
                                      value=ciphertext)
