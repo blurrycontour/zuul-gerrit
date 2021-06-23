@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc445723_651515a2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-23T10:09:13Z",
+      "side": 1,
+      "message": "New gauges should be documented.",
+      "revId": "fd93c2eea064a7ec846c95bdf4fb1189d47f1710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89948dc1_90db7624",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1947,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-23T10:09:13Z",
+      "side": 1,
+      "message": "I think this should be:\n\n    data[\u0027management_event_queue\u0027][\u0027length\u0027] \u003d len(\n        self.management_events[tenant_name]\n    ) + self.reconfigure_event_queue.qsize()",
+      "revId": "fd93c2eea064a7ec846c95bdf4fb1189d47f1710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
