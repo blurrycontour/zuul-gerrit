@@ -234,7 +234,8 @@ class SQLConnection(BaseConnection):
             config.set_main_option("script_location",
                                    "zuul:driver/sql/alembic")
             config.set_main_option("sqlalchemy.url",
-                                   self.connection_config.get('dburi'))
+                                   self.connection_config.get('dburi').
+                                   replace('%', '%%'))
 
             # Alembic lets us add arbitrary data in the tag argument. We can
             # leverage that to tell the upgrade scripts about the table prefix.
