@@ -94,16 +94,16 @@ class BaseComponent(ZooKeeperSimpleBase):
     def register(self):
         path = "/".join([COMPONENTS_ROOT, self.kind, self.hostname])
         self.log.debug("Registering component in ZooKeeper %s", path)
-        self.path, self._zstat = self.kazoo_client.create(
+        self.path = self.kazoo_client.create(
             path,
             json.dumps(self.content).encode("utf-8"),
             makepath=True,
             ephemeral=True,
             sequence=True,
-            # Also return the zstat, which is necessary to successfully update
-            # the component.
-            include_data=True,
         )
+        # Also fetch the zstat, which is necessary to successfully update the
+        # component.
+        _, self._zstat = self.kazoo_client.get(self.path)
 
     def updateFromDict(self, data):
         self.content.update(data)
