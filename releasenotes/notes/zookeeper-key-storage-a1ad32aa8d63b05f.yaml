@@ -11,4 +11,5 @@ upgrade:
   - |
     As project secrets keys and SSH keys are stored encrypted in Zookeeper the
     new :attr:`keystore.password` option in ``zuul.conf`` is
-    required. Please add it to your configuration.
+    required. Please add it to your configuration for both the scheduler and
+    executor.

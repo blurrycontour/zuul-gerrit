@@ -312,7 +312,6 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
       Encryption password for private data stored in Zookeeper.
 
-
 .. attr:: scheduler
 
    .. attr:: command_socket
@@ -866,6 +865,13 @@ The following sections of ``zuul.conf`` are used by the executor:
       executors that are running on slow network where you don't want them to
       perform merge operations for any events. The executor will still perform
       the merge operations required for the build they are executing.
+
+.. attr:: keystore
+
+   .. attr:: password
+      :required:
+
+      Encryption password for private data stored in Zookeeper.
 
 .. attr:: merger
 
