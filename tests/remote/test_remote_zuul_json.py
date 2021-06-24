@@ -91,10 +91,8 @@ class FunctionalZuulJSONMixIn:
             text = self._get_json_as_text(build)
             json_result = json.loads(text)
             tasks = json_result[0]['plays'][0]['tasks']
-            # NOTE(pabelanger): In 2.8 gather_facts are now logged as an
-            # expected action.
             expected_actions = [
-                'gather_facts', 'debug', 'debug', 'debug', 'copy', 'find',
+                'debug', 'debug', 'debug', 'copy', 'find',
                 'stat', 'debug'
             ]
             for i, expected in enumerate(expected_actions):
@@ -111,12 +109,10 @@ class FunctionalZuulJSONMixIn:
             self.assertIn('json-role', text)
 
             json_result = json.loads(text)
-            # NOTE(pabelanger): In 2.8 gather_facts are now logged as the
-            # first task.
-            role_name = json_result[0]['plays'][0]['tasks'][1]['role']['name']
+            role_name = json_result[0]['plays'][0]['tasks'][0]['role']['name']
             self.assertEqual('json-role', role_name)
 
-            role_path = json_result[0]['plays'][0]['tasks'][1]['role']['path']
+            role_path = json_result[0]['plays'][0]['tasks'][10['role']['path']
             self.assertEqual('json-role', os.path.basename(role_path))
 
     def test_json_time_log(self):
