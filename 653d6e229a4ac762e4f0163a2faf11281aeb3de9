@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "9fef62df_6bcb67b0",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-24T17:37:44Z",
+      "side": 1,
+      "message": "Should either be a string or None.",
+      "revId": "653d6e229a4ac762e4f0163a2faf11281aeb3de9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "648e5c6a_92704194",
         "filename": "zuul/zk/__init__.py",
         "patchSetId": 1
