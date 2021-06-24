@@ -341,4 +341,13 @@
               download_artifact_job: zuul-build-dashboard
     release:
       jobs:
+        - zuul-release-python
         - zuul-publish-tox-docs
+        - upload-docker-image:
+            secrets:
+              name: docker_credentials
+              secret: zuul-dockerhub
+              pass-to-parent: true
+            vars:
+              <<: *zuul_image_vars
+              upload_docker_image_promote: false
