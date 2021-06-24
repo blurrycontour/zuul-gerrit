@@ -21,7 +21,7 @@ import textwrap
 
 import zuul.web
 import zuul.rpcclient
-from zuul.lib.yamlutil import yaml
+from zuul.lib import yamlutil
 
 from tests.base import iterate_timeout
 from tests.base import ZuulDBTestCase, AnsibleZuulTestCase
@@ -53,7 +53,8 @@ class TestZuulClientEncrypt(BaseTestWeb):
         build = self.getJobFromHistory(job)
         for pb in getattr(build.jobdir, pbtype):
             if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
+                secrets.append(
+                    yamlutil.ansible_unsafe_load(pb.secrets_content))
             else:
                 secrets.append({})
         return secrets
