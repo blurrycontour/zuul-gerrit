@@ -57,6 +57,7 @@ class ZooKeeperClient(object):
         self.tls_key = tls_key
         self.tls_ca = tls_ca
 
+        # Make sure we have permissions to read each of these files.
         for fn in (tls_cert, tls_key, tls_ca):
             if fn:
                 with open(fn):
