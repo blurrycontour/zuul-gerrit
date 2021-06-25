@@ -57,13 +57,6 @@ class TestInventoryBase(ZuulTestCase):
         build = self.getBuildByName(name)
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
         inventory = yaml.safe_load(open(inv_path, 'r'))
-
-        zv_path = os.path.join(build.jobdir.root, 'ansible', 'zuul_vars.yaml')
-        zv = yaml.safe_load(open(zv_path, 'r'))
-
-        # TODO(corvus): zuul vars aren't really stored here anymore;
-        # rework these tests to examine them separately.
-        inventory['all']['vars'] = {'zuul': zv['zuul']}
         return inventory
 
     def _get_setup_inventory(self, name):

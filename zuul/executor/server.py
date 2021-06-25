@@ -948,6 +948,8 @@ class AnsibleJob(object):
         self.original_hostvars = {}
         # The same, but frozen
         self.frozen_hostvars = {}
+        # The zuul.* vars
+        self.zuul_vars = {}
 
     def run(self):
         self.running = True
@@ -2286,6 +2288,7 @@ class AnsibleJob(object):
         with open(self.jobdir.zuul_vars, 'w') as zuul_vars_yaml:
             zuul_vars_yaml.write(
                 yaml.safe_dump({'zuul': zuul_vars}, default_flow_style=False))
+        self.zuul_vars = zuul_vars
 
         # Squash all and extra vars into localhost (it's not
         # explicitly listed).
@@ -2335,6 +2338,7 @@ class AnsibleJob(object):
         inventory = make_inventory_dict(
             self.host_list, args['groups'], self.original_hostvars)
 
+        inventory['all']['vars']['zuul'] = self.zuul_vars
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
                 yaml.ansible_unsafe_dump(inventory, default_flow_style=False))
