@@ -218,6 +218,7 @@ class GithubReporter(BaseReporter):
         # check the state the reporter is going to report.
         completed = (
             item.current_build_set.result is not None or status == "cancelled"
+            or status == "skipped" or status == "neutral"
         )
 
         log.debug(
@@ -330,6 +331,8 @@ def getSchema():
         'unlabel': scalar_or_list(str),
         'review': v.Any('approve', 'request-changes', 'comment'),
         'review-body': str,
-        'check': v.Any("in_progress", "success", "failure", "cancelled"),
+        'check': v.Any(
+            "in_progress", "success", "failure", "cancelled",
+            "skipped", "neutral"),
     })
     return github_reporter
