@@ -385,10 +385,12 @@ itself. Status name, description, and context is taken from the pipeline.
       Report status via the Github `checks API
       <https://docs.github.com/v3/checks/>`__.  Set to one of
 
-      * ``in_progress``
-      * ``success``
+      * ``cancelled``
       * ``failure``
-      *  ``cancelled``
+      * ``in_progress``
+      * ``neutral``
+      * ``skipped``
+      * ``success``
 
       This is usually mutually exclusive with a value set in
       :attr:`pipeline.<reporter>.<github source>.status`, since this

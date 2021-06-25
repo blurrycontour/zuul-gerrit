@@ -1896,31 +1896,34 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         self.assertEqual(1, len(check_runs))
         check_run = check_runs[0]
 
-        self.assertEqual("tenant-one/checks-api-reporting", check_run["name"])
+        self.assertEqual(
+            "tenant-one/checks-api-reporting-skipped", check_run["name"])
         self.assertEqual("in_progress", check_run["status"])
         self.assertThat(
             check_run["output"]["summary"],
-            MatchesRegex(r'.*Starting checks-api-reporting jobs.*', re.DOTALL)
+            MatchesRegex(
+                r'.*Starting checks-api-reporting-skipped jobs.*', re.DOTALL)
         )
 
         # Use the client to dequeue the pending change
         client.dequeue(
             tenant="tenant-one",
-            pipeline="checks-api-reporting",
+            pipeline="checks-api-reporting-skipped",
             project="org/project3",
             change="{},{}".format(A.number, A.head_sha),
             ref=None,
         )
         self.waitUntilSettled()
 
-        # We should now have a cancelled check run for the head sha
+        # We should now have a skipped check run for the head sha
         check_runs = self.fake_github.getCommitChecks(project, A.head_sha)
         self.assertEqual(1, len(check_runs))
         check_run = check_runs[0]
 
-        self.assertEqual("tenant-one/checks-api-reporting", check_run["name"])
+        self.assertEqual(
+            "tenant-one/checks-api-reporting-skipped", check_run["name"])
         self.assertEqual("completed", check_run["status"])
-        self.assertEqual("cancelled", check_run["conclusion"])
+        self.assertEqual("skipped", check_run["conclusion"])
         self.assertThat(
             check_run["output"]["summary"],
             MatchesRegex(r'.*Build canceled.*', re.DOTALL)
