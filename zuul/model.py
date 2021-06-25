@@ -3754,6 +3754,7 @@ class ChangeManagementEvent(ManagementEvent):
                  project_name, change=None, ref=None, oldrev=None,
                  newrev=None):
         super().__init__()
+        self.type = None
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.project_hostname = project_hostname
@@ -3766,9 +3767,11 @@ class ChangeManagementEvent(ManagementEvent):
         self.ref = ref
         self.oldrev = oldrev or '0000000000000000000000000000000000000000'
         self.newrev = newrev or '0000000000000000000000000000000000000000'
+        self.timestamp = time.time()
 
     def toDict(self):
         d = super().toDict()
+        d["type"] = self.type
         d["tenant_name"] = self.tenant_name
         d["pipeline_name"] = self.pipeline_name
         d["project_hostname"] = self.project_hostname
@@ -3777,7 +3780,13 @@ class ChangeManagementEvent(ManagementEvent):
         d["ref"] = self.ref
         d["oldrev"] = self.oldrev
         d["newrev"] = self.newrev
+        d["timestamp"] = self.timestamp
         return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.type = d.get("type")
+        self.timestamp = d.get("timestamp")
 
     @classmethod
     def fromDict(cls, data):
@@ -3797,10 +3806,12 @@ class ChangeManagementEvent(ManagementEvent):
 
 class DequeueEvent(ChangeManagementEvent):
     """Dequeue a change from a pipeline"""
+    type = "dequeue"
 
 
 class EnqueueEvent(ChangeManagementEvent):
     """Enqueue a change into a pipeline"""
+    type = "enqueue"
 
 
 class ResultEvent(AbstractEvent):
