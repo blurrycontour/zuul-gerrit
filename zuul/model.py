@@ -1252,6 +1252,10 @@ class Job(ConfigObject):
 
     BASE_JOB_MARKER = object()
 
+    # Pre-allocated empty nodeset so we don't have to allocate a new one
+    # with every job variant.
+    empty_nodeset = NodeSet()
+
     def __init__(self, name):
         super(Job, self).__init__()
         # These attributes may override even the final form of a job
@@ -1292,7 +1296,7 @@ class Job(ConfigObject):
             extra_variables={},
             host_variables={},
             group_variables={},
-            nodeset=NodeSet(),
+            nodeset=Job.empty_nodeset,
             workspace=None,
             pre_run=(),
             post_run=(),
