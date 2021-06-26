@@ -60,7 +60,7 @@ class DatabaseSession(object):
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, uuid=None, job_name=None,
-                  voting=None, node_name=None, result=None, provides=None,
+                  voting=None, nodeset=None, result=None, provides=None,
                   final=None, held=None, limit=50, offset=0):
 
         build_table = self.connection.zuul_build_table
@@ -101,7 +101,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.uuid, uuid)
         q = self.listFilter(q, build_table.c.job_name, job_name)
         q = self.listFilter(q, build_table.c.voting, voting)
-        q = self.listFilter(q, build_table.c.node_name, node_name)
+        q = self.listFilter(q, build_table.c.nodeset, nodeset)
         q = self.listFilter(q, build_table.c.result, result)
         q = self.listFilter(q, build_table.c.final, final)
         q = self.listFilter(q, provides_table.c.name, provides)
@@ -333,10 +333,10 @@ class SQLConnection(BaseConnection):
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
             log_url = sa.Column(sa.String(255))
-            node_name = sa.Column(sa.String(255))
             error_detail = sa.Column(sa.TEXT())
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
+            nodeset = sa.Column(sa.String(255))
             buildset = orm.relationship(BuildSetModel, backref="builds")
 
             sa.Index(self.table_prefix + 'job_name_buildset_id_idx',

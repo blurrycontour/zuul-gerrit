@@ -44,21 +44,30 @@
     failure:
       resultsdb_failures: null
 
+- nodeset:
+    name: test-nodeset
+    nodes:
+      - name: test_node
+        label: test_label
+
 - job:
     name: base
     parent: null
-    nodeset:
-      nodes:
-        - name: test_node
-          label: test_label
+    nodeset: test-nodeset
 
 - job:
     name: project-merge
     run: playbooks/project-merge.yaml
+    nodeset:
+      nodes: []
 
 - job:
     name: project-test1
     run: playbooks/project-test1.yaml
+    nodeset:
+      nodes:
+        - name: test_node
+          label: test_label
 
 - job:
     name: project-test2

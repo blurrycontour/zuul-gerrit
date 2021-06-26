@@ -54,7 +54,7 @@ class ElasticsearchConnection(BaseConnection):
         "end_time": {"type": "date", "format": "epoch_second"},
         "voting": {"type": "boolean"},
         "log_url": {"type": "keyword"},
-        "node_name": {"type": "keyword"}
+        "nodeset": {"type": "keyword"}
     }
 
     def __init__(self, driver, connection_name, connection_config):

@@ -2042,8 +2042,6 @@ class Build(object):
         self.held = False
         self.parameters = {}
         self.worker = Worker()
-        self.node_labels = []
-        self.node_name = None
         self.nodeset = None
         self.zuul_event_id = zuul_event_id
 
@@ -3203,8 +3201,6 @@ class QueueItem(object):
                 'retry': build.retry if build else None,
                 'tries': self.current_build_set.getTries(job.name),
                 'queued': job.queued,
-                'node_labels': build.node_labels if build else [],
-                'node_name': build.node_name if build else None,
                 'worker': worker,
                 'waiting_status': waiting_status,
             })
