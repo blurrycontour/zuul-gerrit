@@ -1748,8 +1748,6 @@ class Scheduler(threading.Thread):
         )
         event_result = event.result
 
-        build.node_labels = event_result.get("node_labels", [])
-        build.node_name = event_result.get("node_name")
         result = event_result.get("result")
         build.error_detail = event_result.get("error_detail")
 
