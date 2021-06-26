@@ -935,7 +935,7 @@ class ZuulWebAPI(object):
             'duration': duration,
             'voting': build.voting,
             'log_url': build.log_url,
-            'node_name': build.node_name,
+            'nodeset': build.nodeset,
             'error_detail': build.error_detail,
             'final': build.final,
             'artifacts': [],
@@ -980,7 +980,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
-               uuid=None, job_name=None, voting=None, node_name=None,
+               uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, limit=50, skip=0):
         connection = self._get_connection()
 
@@ -994,7 +994,7 @@ class ZuulWebAPI(object):
         builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
-            uuid=uuid, job_name=job_name, voting=voting, node_name=node_name,
+            uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
             result=result, final=final, held=held, limit=limit, offset=skip)
 
         resp = cherrypy.response

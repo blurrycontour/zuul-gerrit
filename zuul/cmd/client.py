@@ -700,11 +700,8 @@ class Client(zuul.cmd.ZuulApp):
             'number': {
                 'title': 'Number'
             },
-            'node_labels': {
-                'title': 'Node Labels'
-            },
-            'node_name': {
-                'title': 'Node Name'
+            'nodeset': {
+                'title': 'Nodeset'
             },
             'worker.name': {
                 'title': 'Worker'
