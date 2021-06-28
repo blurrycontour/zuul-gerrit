@@ -13,12 +13,15 @@
 # under the License.
 
 import re
+import subprocess
 
 from zuul.driver.sql import SQLDriver
-from tests.base import BaseTestCase, MySQLSchemaFixture
+from tests.base import (
+    BaseTestCase, MySQLSchemaFixture, PostgresqlSchemaFixture
+)
 
 
-class TestDatabase(BaseTestCase):
+class TestMysqlDatabase(BaseTestCase):
     def setUp(self):
         super().setUp()
 
@@ -71,3 +74,49 @@ class TestDatabase(BaseTestCase):
             create = self.connection.engine.execute(
                 f"show create table {table}").one()[1]
             self.compareMysql(create, sqlalchemy_tables[table])
+
+
+class TestPostgresqlDatabase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        f = PostgresqlSchemaFixture()
+        self.useFixture(f)
+        self.db = f
+
+        config = dict(dburi=f.dburi)
+        driver = SQLDriver()
+        self.connection = driver.getConnection('database', config)
+        self.connection.onLoad()
+        self.addCleanup(self._cleanup)
+
+    def _cleanup(self):
+        self.connection.onStop()
+
+    def test_migration(self):
+        # Test that SQLAlchemy create_all produces the same output as
+        # a full migration run.
+        sqlalchemy_out = subprocess.check_output(
+            f"pg_dump -h {self.db.host} -U {self.db.name} -s {self.db.name}",
+            shell=True,
+            env={'PGPASSWORD': self.db.passwd}
+        )
+
+        tables = [x[0] for x in self.connection.engine.execute(
+            "select tablename from pg_catalog.pg_tables "
+            "where schemaname='public'"
+        ).all()]
+
+        self.assertTrue(len(tables) > 0)
+        for table in tables:
+            self.connection.engine.execute(f"drop table {table} cascade")
+
+        self.connection.force_migrations = True
+        self.connection.onLoad()
+
+        alembic_out = subprocess.check_output(
+            f"pg_dump -h {self.db.host} -U {self.db.name} -s {self.db.name}",
+            shell=True,
+            env={'PGPASSWORD': self.db.passwd}
+        )
+        self.assertEqual(alembic_out, sqlalchemy_out)
