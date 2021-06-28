@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a73b4a4_0e0eab9e",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4493,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-28T15:50:14Z",
+      "side": 1,
+      "message": "Nit this could be:\n\n  if config.get(section_name, \u0027driver\u0027) in [\u0027sql\u0027, \u0027database\u0027]:\n      _setup_fixture(config, section_name)\n\nThen we can drop the special block below.",
+      "revId": "737d0e61af70e22580ea226ef01d0f17924758ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7928232_7ca5d7f3",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5573,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-28T15:50:14Z",
+      "side": 1,
+      "message": "We should probably go ahead and delete fake_sql in this change. Whether or not we want to remove this class and update all of the test classes to change their parent is another question. That is probably fine in a followup.",
+      "revId": "737d0e61af70e22580ea226ef01d0f17924758ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
