@@ -31,7 +31,6 @@ import zuul.configloader
 from tests.base import (
     AnsibleZuulTestCase,
     ZuulTestCase,
-    ZuulDBTestCase,
     FIXTURE_DIR,
     simple_layout,
     iterate_timeout,
@@ -6549,7 +6548,7 @@ class TestProvidesRequiresBuildset(ZuulTestCase):
             }])
 
 
-class TestProvidesRequiresMysql(ZuulDBTestCase):
+class TestProvidesRequiresMysql(ZuulTestCase):
     config_file = "zuul-sql-driver-mysql.conf"
 
     @simple_layout('layouts/provides-requires.yaml')
