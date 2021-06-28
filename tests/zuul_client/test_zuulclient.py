@@ -24,7 +24,7 @@ import zuul.rpcclient
 from zuul.lib.yamlutil import yaml
 
 from tests.base import iterate_timeout
-from tests.base import ZuulDBTestCase, AnsibleZuulTestCase
+from tests.base import AnsibleZuulTestCase
 from tests.unit.test_web import BaseTestWeb
 
 
@@ -415,7 +415,7 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.reported, 2)
 
 
-class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
+class TestZuulClientQueryData(BaseTestWeb):
     """Test that zuul-client can fetch builds"""
     config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
