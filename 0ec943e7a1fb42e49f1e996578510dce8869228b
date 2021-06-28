@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "b559cec1_638b298c",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-28T17:54:05Z",
+      "side": 1,
+      "message": "Seems like it would raise an attributeerror exception; that seems okay for someone trying to modify a read-only component?  I guess we could use a dedicated exception for that?  But as long as it fails, I\u0027m happy.  :)",
+      "revId": "0ec943e7a1fb42e49f1e996578510dce8869228b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2e5b3dc_7fd32cd2",
         "filename": "zuul/zk/components.py",
         "patchSetId": 7
@@ -33,6 +50,23 @@
       "revId": "0ec943e7a1fb42e49f1e996578510dce8869228b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d80b0f7_f19a013a",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-28T17:54:05Z",
+      "side": 1,
+      "message": "It\u0027s actual False; kazoo code is:\n  if result is False:",
+      "revId": "0ec943e7a1fb42e49f1e996578510dce8869228b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
