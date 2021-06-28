@@ -23,7 +23,7 @@ import sqlalchemy as sa
 import zuul
 from zuul.lib.yamlutil import yaml
 from tests.base import ZuulTestCase, FIXTURE_DIR, \
-    PostgresqlSchemaFixture, MySQLSchemaFixture, ZuulDBTestCase, \
+    PostgresqlSchemaFixture, MySQLSchemaFixture, \
     BaseTestCase, AnsibleZuulTestCase
 
 
@@ -67,7 +67,7 @@ class TestConnections(ZuulTestCase):
                          'civoter')
 
 
-class TestSQLConnectionMysql(ZuulDBTestCase):
+class TestSQLConnectionMysql(ZuulTestCase):
     config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
     expected_table_prefix = ''
