@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a94bbc98_4238e938",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-28T17:47:00Z",
+      "side": 1,
+      "message": "The class below calls super() on __init__() and passes in the client but we don\u0027t guard against client being falsey here. Below the kazoo_client() property method assumes self.client is not None. Do we need to guard here?\n\nI think we only expect a None client when using a read only component. Not sure how that plays in here.",
+      "revId": "0ec943e7a1fb42e49f1e996578510dce8869228b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2e5b3dc_7fd32cd2",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-28T17:47:00Z",
+      "side": 1,
+      "message": "Is False the specific type to stop the watch? I think we\u0027ll return None if we don\u0027t hit this elif. If any falsey return stops watching we may stop here?",
+      "revId": "0ec943e7a1fb42e49f1e996578510dce8869228b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
