@@ -27,7 +27,7 @@ import requests
 import zuul.web
 import zuul.rpcclient
 
-from tests.base import ZuulTestCase, ZuulDBTestCase, AnsibleZuulTestCase
+from tests.base import ZuulTestCase, AnsibleZuulTestCase
 from tests.base import ZuulWebFixture, FIXTURE_DIR, iterate_timeout
 from tests.base import simple_layout
 
@@ -1134,7 +1134,7 @@ class TestWebSecrets(BaseTestWeb):
         self.assertEqual('REDACTED', resp['ssh_keys'][0])
 
 
-class TestInfo(ZuulDBTestCase, BaseTestWeb):
+class TestInfo(ZuulTestCase, BaseTestWeb):
 
     config_file = 'zuul-sql-driver-mysql.conf'
 
@@ -1262,7 +1262,7 @@ class TestGraphiteUrl(TestInfo):
     }
 
 
-class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
+class TestBuildInfo(ZuulTestCase, BaseTestWeb):
     config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
@@ -1376,7 +1376,7 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
                       builds[0]['error_detail'])
 
 
-class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):
+class TestArtifacts(ZuulTestCase, BaseTestWeb, AnsibleZuulTestCase):
     config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
@@ -2373,7 +2373,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
         self.assertEqual("some reason", ah_request['reason'])
 
 
-class TestHeldAttributeInBuildInfo(ZuulDBTestCase, BaseTestWeb):
+class TestHeldAttributeInBuildInfo(ZuulTestCase, BaseTestWeb):
     config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
