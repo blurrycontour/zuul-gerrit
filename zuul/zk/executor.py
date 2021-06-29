@@ -322,16 +322,15 @@ class ExecutorApi(ZooKeeperSimpleBase):
         if event is None:
             return
 
-        for action in actions:
-            build_event = None
-            if action == "cancel":
-                build_event = BuildRequestEvent.CANCELED
-            elif action == "resume":
-                build_event = BuildRequestEvent.RESUMED
+        build_event = None
+        if "cancel" in actions:
+            build_event = BuildRequestEvent.CANCELED
+        elif "resume" in actions:
+            build_event = BuildRequestEvent.RESUMED
 
-            if build_event and self.build_event_callback:
-                build_request = self._cached_build_requests.get(event.path)
-                self.build_event_callback(build_request, build_event)
+        if build_event and self.build_event_callback:
+            build_request = self._cached_build_requests.get(event.path)
+            self.build_event_callback(build_request, build_event)
 
     def lock(self, build_request, blocking=True, timeout=None):
         # Keep the lock nodes in a different path to keep the build request
