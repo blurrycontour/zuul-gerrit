@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c9e4267_81f41644",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 1088,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T17:41:53Z",
+      "side": 1,
+      "message": "It looks like this may not be functionally tested (tbh, it\u0027s a bit hard; I\u0027m not sure we can).",
+      "revId": "451100126aee290d3c4ff52ec80f8b5315940e77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fbfdf334_f4aa4715",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 1418,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T17:41:53Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "451100126aee290d3c4ff52ec80f8b5315940e77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
