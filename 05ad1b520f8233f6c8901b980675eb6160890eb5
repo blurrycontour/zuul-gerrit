@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "566d47af_f3769a21",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-29T19:28:57Z",
+      "side": 1,
+      "message": "We likely need to move that before the call to self.prepareNodes or self.prepareVars since that runs already ansible since the security update and could have a potential influence on the nodes.",
+      "revId": "05ad1b520f8233f6c8901b980675eb6160890eb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "revId": "09308332a35f032de4c7d7d042c4480ce9316206",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d55d192_67649b6f",
+        "filename": "zuul/model.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-29T19:28:57Z",
+      "side": 1,
+      "message": "That sounds good to me. There are a lot of apis out there that allow to pass opaque data which is returned by the api again. So this is not an uncommon pattern.",
+      "parentUuid": "7ca2ded8_6c06c629",
+      "revId": "09308332a35f032de4c7d7d042c4480ce9316206",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
