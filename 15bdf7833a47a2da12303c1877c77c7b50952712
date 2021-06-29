@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d38f6cd7_1eb37ecf",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T21:22:15Z",
+      "side": 1,
+      "message": "This seems like common setup code. Might be nice to move into the setUp() method for this test class.",
+      "range": {
+        "startLine": 421,
+        "startChar": 0,
+        "endLine": 435,
+        "endChar": 57
+      },
+      "revId": "15bdf7833a47a2da12303c1877c77c7b50952712",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c677224c_864d5289",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T21:22:15Z",
+      "side": 1,
+      "message": "We initialize to False so this line is redundant.",
+      "revId": "15bdf7833a47a2da12303c1877c77c7b50952712",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
