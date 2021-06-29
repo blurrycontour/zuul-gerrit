@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7b04918_6bcfebf9",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-29T06:02:05Z",
+      "side": 1,
+      "message": "This method name doesn\u0027t feel right anymore, but I didn\u0027t want to change it to something like getNodeRequestAndSetNodeset(). Maybe somebody else has a better idea.",
+      "revId": "7951192fad701fa6ae77c36fdac66b22b7a5c211",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
