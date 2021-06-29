@@ -33,6 +33,23 @@
       "revId": "451100126aee290d3c4ff52ec80f8b5315940e77",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ecfd21c8_38a17ccf",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 3118,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-06-29T18:10:11Z",
+      "side": 1,
+      "message": "nit: technically this could end up in [None, None] if the executor is unzoned and has enabled allow_unzoned. But I don\u0027t think this could be a problem.",
+      "revId": "451100126aee290d3c4ff52ec80f8b5315940e77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
