@@ -3843,6 +3843,61 @@ class TestScheduler(ZuulTestCase):
             else:
                 time.sleep(0)
 
+    def test_live_reconfiguration_shared_queue_removed(self):
+        # Test that items ahead/behind pointers are set correctly after
+        # a re-enqueue.
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        # Remove the shared queue.
+        self.commitConfigUpdate(
+            'common-config',
+            'layouts/live-reconfiguration-shared-queue-removed.yaml')
+
+        # Use _doReconfigureEvent() instead of reconfigure() here so that the
+        # pipeline manager does not run which would fix the wrong item state
+        # after the re-enqueue.
+        event = zuul.model.ReconfigureEvent()
+        event.zuul_event_ltime = self.zk_client.getCurrentLtime()
+        self.scheds.execute(lambda app: app.sched._doReconfigureEvent(event))
+
+        tenant = self.scheds.first.sched.abide.tenants['tenant-one']
+        pipeline = tenant.layout.pipelines["gate"]
+
+        for queue in pipeline.queues:
+            self.log.debug(f"SWE-TEST> queue: {queue}")
+            for item in queue.queue:
+                self.log.debug(f"SWE-TEST> item: {item}")
+                self.log.debug(f"SWE-TEST> ahead: {item.item_ahead}")
+                self.log.debug(f"SWE-TEST> behind: {item.items_behind}")
+                if item.item_ahead is not None:
+                    self.assertIn(item.item_ahead, queue.queue)
+                for item_behind in item.items_behind:
+                    self.assertIn(item_behind, queue.queue)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(C.data['status'], 'MERGED')
+
     def test_double_live_reconfiguration_shared_queue(self):
         # This was a real-world regression.  A change is added to
         # gate; a reconfigure happens, a second change which depends
