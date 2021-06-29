@@ -16,6 +16,23 @@
       "revId": "05ad1b520f8233f6c8901b980675eb6160890eb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23e1cd4b_9826de99",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T20:44:38Z",
+      "side": 1,
+      "message": "Agreed; Moved in PS 22.",
+      "revId": "05ad1b520f8233f6c8901b980675eb6160890eb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
