@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1961e434_21ffda6c",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-29T14:16:27Z",
+      "side": 1,
+      "message": "Assert that we are not referencing any items outside our own change queue.",
+      "revId": "d11b20fdb2c85d3724e87ee1a9ff5af33bd07d82",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
