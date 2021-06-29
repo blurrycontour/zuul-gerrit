@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "cc0d87aa_f8873001",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 852,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-29T07:43:07Z",
+      "side": 1,
+      "message": "I think for nodeless jobs the node request id will be None, so we have to handle that differently from the \"node request went away\" case. However, it looks like the second case is handled in lockNodes().",
+      "revId": "7951192fad701fa6ae77c36fdac66b22b7a5c211",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6655bdfe_11fbbb43",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 3389,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-06-29T07:43:07Z",
+      "side": 1,
+      "message": "Should we log the exception or is there a particular reason that\u0027s not done here?",
+      "revId": "7951192fad701fa6ae77c36fdac66b22b7a5c211",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e7b04918_6bcfebf9",
         "filename": "zuul/zk/nodepool.py",
         "patchSetId": 18
