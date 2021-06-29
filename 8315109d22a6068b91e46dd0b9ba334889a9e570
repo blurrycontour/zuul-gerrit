@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "ae64889c_062aeb4d",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T21:37:18Z",
+      "side": 1,
+      "message": "This is updated in the next change, and that restriction is removed.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "34ed8667_8708edf1",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 35
@@ -67,6 +84,23 @@
       "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2551f72b_fda0e80d",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T21:37:18Z",
+      "side": 1,
+      "message": "Yes, same for datawatch, and we rely on that more in a later change.\n\nIn the case of a datawatch, it avoids race conditions.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "8db41f21_0f62ff25",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T21:37:18Z",
+      "side": 1,
+      "message": "The kazoo recursive delete method appears robust against that: https://github.com/python-zk/kazoo/blob/master/kazoo/client.py#L1451",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b16276eb_082fd9aa",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 35
@@ -101,6 +152,23 @@
       "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d21731ab_f562a9e4",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T21:37:18Z",
+      "side": 1,
+      "message": "The list of \"actions\" is really the list of children, so for that to be a problem, we would have had to set both the canceled and resumed flag at the same time.  That\u0027s possible.\n\nIt\u0027s not going to have an adverse effect on the executor (the cancel call will actually resume the build, and then the resume event will be a noop).  But it will cause the executor to update the status of the build request.  I don\u0027t really like that race condition, so I think we should implement your suggestion and try to avoid it.  I don\u0027t think it\u0027s a critical flaw though, so I\u0027ll tack it onto the end of the stack.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +189,23 @@
     },
     {
       "key": {
+        "uuid": "7583a338_5589e545",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T21:37:18Z",
+      "side": 1,
+      "message": "Operators should never need to know a zookeeper path, so I\u0027d like to avoid suggesting they do by putting ZK node paths in logs.  Developers yes, but it\u0027s a predictable path.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a34b3ca_e0bb9974",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 35
@@ -135,6 +220,23 @@
       "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "74682dcb_066e1112",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T21:37:18Z",
+      "side": 1,
+      "message": "I think this is a misleading message.  In fact, I do not know what would cause this error to hit; probably something pretty egregious that we can\u0027t actually handle.  I think we should remove the exception handler.\n\nRegardless, it is okay and expected for a build to exist without a lock existing, but no error is produced in that case (the kazoo Lock() will create the lock node for the uuid; it will even create the lock root).",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
