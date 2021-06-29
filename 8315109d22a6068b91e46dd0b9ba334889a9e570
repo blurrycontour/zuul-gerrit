@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37047a81_57c8c094",
+        "filename": "zuul/model.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 2059,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "The docs for this decorator indicate that if performance of the BuildRequest comparisons matters we should implement all of the comparison methods ourselves. However, I don\u0027t expect this is the case in this code as the total number of build requests is counted in the thousands for most zuul users and comparing thousands of entities shouldn\u0027t be too slow either way.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a25539ae_1f3ccaf9",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "Small nit you might consider catching a json decoding error and printing the serialized string if it fails to decode. If this is a debugging aid then it may be used in cases of broken serialization.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76625ec8_cdf47eb3",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "Do we need a docs update indicating that \"default-zone\" is an invalid zone name (eg users shouldn\u0027t use this name?) and/or validate this when reading configs?",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "34ed8667_8708edf1",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "If anyone else is wondering ChildrenWatch() calls the supplied function on all children when it is first registered. According to the kazoo docs anyway.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aaf2cba2_bced115f",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "Is there any chance a recursive delete can raise this without fully deleting all of the nodes under it? For example if two deletions race each other and one cleans up a sub tree before the other?",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b16276eb_082fd9aa",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "Is there any concern that calling the callback on a cancel event then a resume event in that order will be a problem for us? If so we should probably not iterate through this list but instead check for cancel in action then handle it else check for resume in action and handle that exclusively.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2333c667_6782044c",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "We should consider logging the entire lock path rather than just the uuid to aid operators in debugging no node found errors here.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a34b3ca_e0bb9974",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "Is it possible for the build request to exist but the lock to not exist? In that case you could hit this path and log an error when that doesn\u0027t necessarily indicate an error (instead it would just indicate that the lock has never been held).",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cdbc143_b78dab25",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-29T20:52:21Z",
+      "side": 1,
+      "message": "See above comment.",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
