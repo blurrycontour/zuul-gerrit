@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ca2ded8_6c06c629",
+        "filename": "zuul/model.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-29T15:44:10Z",
+      "side": 1,
+      "message": "Ultimately, any scheduler needs to be able to de-serialize the node request, so we\u0027re either going to need to stop storing the extra information on the node request (since nodepool will delete it), or change nodepool so that it copies over the extra data.\n\nI would prefer the first option, since this is really Nodepool\u0027s API.\n\nTo do that, we need to be able to associate a node request with the buildset+job it was requested for.  We have a dictionary of node requests in the buildset object, so one way of doing that would be to iterate over all the queue items in all the pipelines in all the tenants and look for the node request in that dictionary.  That would work, but eventually any scheduler is going to need to be able to respond to any fulfilled node request, so there could be a lot of iteration involved.  The first step of getting the event to the right pipeline event queue is the main issue -- once it\u0027s in the right pipeline event queue, iterating over the pipeline isn\u0027t a big deal.\n\nTo make that process more efficient, we could put an index in zookeeper to map the node requests to buildsets+jobs, however that seems a bit excessive.  It sounds like we have a good use case for adding an extra piece of information to the node request in ZK.\n\nWe might consider using the \"requestor\" field for that, however, nodepool does use that for statistics purposes, so we should probably leave that alone.\n\nHow about we add a \"requestor_data\" field, so that requestors can encode information about the request?  From nodepool\u0027s perspective, it would be opaque data.  We could put the tenant, pipeline, buildset, and job in there.\n\nI don\u0027t think this has to happen as part of this change, but we should get started on that soon.",
+      "revId": "09308332a35f032de4c7d7d042c4480ce9316206",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
