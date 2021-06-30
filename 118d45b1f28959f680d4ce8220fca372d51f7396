@@ -33,6 +33,23 @@
       "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8231b72b_7c2d1914",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3204,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:47:00Z",
+      "side": 1,
+      "message": "Added in https://review.opendev.org/798954",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
