@@ -16,6 +16,40 @@
       "revId": "701611c22c48746211bd857515ee29eefe84ae1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d9cf558_d5917e8f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T17:26:42Z",
+      "side": 1,
+      "message": "Based on chatting in IRC, it sounds like you\u0027re using network_cli only because it doesn\u0027t run the setup playbook.  We don\u0027t actually know whether this is a problem for normal network_cli usage, so I don\u0027t think we should merge this change.\n\nFor your use case, I would recommend adding a new type of \"resource\" like \"namespace\" or \"project\".  Then we won\u0027t add them to the zuul inventory at all.",
+      "revId": "701611c22c48746211bd857515ee29eefe84ae1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "565fa9a9_e67ebde0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1514,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T17:26:42Z",
+      "side": 1,
+      "message": "You should set freeze\u003dTrue here, because as it\u0027s written, you\u0027re passing remove_keys\u003dTrue.  (ed: not applicable any more).",
+      "revId": "701611c22c48746211bd857515ee29eefe84ae1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
