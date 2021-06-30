@@ -67,6 +67,24 @@
       "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "48439a33_e8045fce",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T20:23:14Z",
+      "side": 1,
+      "message": "I think in my head the type of situation that might cause the issue I foresee is not being able to talk to zookeeper or having a flaky connection. In that case its better to just wait. That said I agree that waiting longer than necessary to clean up semaphores would be a problem.\n\nIs there any concern that we will schedule the cleanups to happen in an hour then still be running through this loop an hour later (and then have contention with ourselves? We hold the proper locks so that shouldn\u0027t be a functional problem.\n\nIf we are ok with the possibility of overlap in exceptional cases then this is probably fine as is.",
+      "parentUuid": "43f74af5_5f0e54f2",
+      "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
