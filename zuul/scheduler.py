@@ -561,9 +561,7 @@ class Scheduler(threading.Thread):
     def onFilesChangesCompleted(self, build_set, files):
         tenant_name = build_set.item.pipeline.tenant.name
         pipeline_name = build_set.item.pipeline.name
-        event = FilesChangesCompletedEvent(
-            build_set.uuid, build_set.item.queue.name, files
-        )
+        event = FilesChangesCompletedEvent(build_set.uuid, files)
         self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def onNodesProvisioned(self, req):
@@ -1895,7 +1893,7 @@ class Scheduler(threading.Thread):
 
         pipeline.manager.onBuildCompleted(build)
 
-    def _doMergeCompletedEvent(self, event, pipeline):
+    def _getBuildSetFromPipeline(self, event, pipeline):
         if not pipeline:
             self.log.warning(
                 "Build set %s is not associated with a pipeline",
@@ -1903,45 +1901,24 @@ class Scheduler(threading.Thread):
             )
             return
 
-        build_set = None
         for item in pipeline.getAllItems():
             # If the provided buildset UUID doesn't match any current one,
             # we assume that it's not current anymore.
             if item.current_build_set.uuid == event.build_set_uuid:
-                build_set = item.current_build_set
-                break
+                return item.current_build_set
 
+        self.log.warning("Build set %s is not current", event.build_set_uuid)
+
+    def _doMergeCompletedEvent(self, event, pipeline):
+        build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
-            self.log.warning("Build set %s is not current", build_set)
             return
-
         pipeline.manager.onMergeCompleted(event, build_set)
 
     def _doFilesChangesCompletedEvent(self, event, pipeline):
-        if not pipeline:
-            self.log.warning(
-                "Build set %s is not associated with a pipeline",
-                event.build_set_uuid
-            )
-            return
-
-        build_set = None
-        queues = [
-            q for q in pipeline.queues if q.name == event.queue_name
-        ]
-
-        for queue in queues:
-            # Look up the build set from the queue
-            for item in queue.queue:
-                # If the provided buildset UUID doesn't match the current one,
-                # we assume that it's not current anymore.
-                if item.current_build_set.uuid == event.build_set_uuid:
-                    build_set = item.current_build_set
-                    break
+        build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
-            self.log.warning("Build set %s is not current", build_set)
             return
-
         pipeline.manager.onFilesChangesCompleted(event, build_set)
 
     def _doNodesProvisionedEvent(self, event):
