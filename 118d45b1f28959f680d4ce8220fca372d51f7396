@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "929b427f_9db235f3",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3204,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-30T07:23:52Z",
+      "side": 1,
+      "message": "I assume that this is about caching the build_request.params as they will be removed from ZK after the build was accepted. But I could be totally wrong with this. Maybe we could add a comment/docstring to this method, telling what it is about.",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
