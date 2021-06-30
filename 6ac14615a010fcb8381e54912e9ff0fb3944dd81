@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "fa4bc108_9f8a0a3c",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 5931,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T15:44:51Z",
+      "side": 1,
+      "message": "Maybe we should call the zoned one test_zoned_executor_disconnect to make that distinction clearer.",
+      "parentUuid": "5c521058_3cf12450",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2680bbe6_32f09397",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 29
