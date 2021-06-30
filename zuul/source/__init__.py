@@ -129,12 +129,4 @@ class BaseSource(object, metaclass=abc.ABCMeta):
 
     def testReconfigureTenant(self, event, project, tenant,
                               abide, reconfigure_tenant):
-        # If the driver knows the branch but we don't have a config, we
-        # also need to reconfigure. This happens if a GitHub branch
-        # was just configured as protected without a push in between.
-        if (event.branch in self.getProjectBranches(
-                project, tenant)
-                and not abide.hasUnparsedBranchCache(
-                    project.canonical_name, event.branch)):
-            reconfigure_tenant = True
         return reconfigure_tenant

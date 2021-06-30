@@ -5621,6 +5621,7 @@ class UnparsedBranchCache(object):
         self.extra_dirs_searched = set()
         self.files = {}
         self.ltime = -1
+        self.revision = None
         self.useful_conf = {}
 
     def hasUsefulConf(self, tpc):
@@ -5742,6 +5743,22 @@ class Abide(object):
             cache.get(tpc)
             return cache.hasUsefulConf(tpc)
         return False
+
+    def setProjectBranchRevision(self, canonical_project_name,
+                                 branch, revision):
+        project_branch_cache = self.unparsed_project_branch_cache.setdefault(
+            canonical_project_name, {})
+        cache = project_branch_cache.get(branch)
+        if cache is not None:
+            cache.revision = revision
+
+    def getProjectBranchRevision(self, canonical_project_name, branch):
+        cache = self.unparsed_project_branch_cache.get(
+            canonical_project_name, {})\
+            .get(branch, None)
+        if cache is not None:
+            return cache.revision
+        return None
 
     def getUnparsedBranchCache(self, canonical_project_name, branch):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(

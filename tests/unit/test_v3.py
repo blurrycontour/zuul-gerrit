@@ -1501,10 +1501,14 @@ class TestInRepoConfig(ZuulTestCase):
 
         # Change job on branch master, was "project-test1", should be
         # "project-test2"
+        tenantReconfiguredBefore = self.scheds.first.sched\
+            .tenant_last_reconfigured.get('tenant-one', 0)
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='project-test2', result='SUCCESS', changes='1,1')])
@@ -1512,6 +1516,11 @@ class TestInRepoConfig(ZuulTestCase):
             'tenant-one', EMPTY_LAYOUT_STATE)
         self.assertLess(old, new)
         old = new
+
+        tenantReconfiguredAfter = self.scheds.first.sched\
+            .tenant_last_reconfigured.get('tenant-one', 0)
+        self.assertLess(tenantReconfiguredBefore, tenantReconfiguredAfter)
+        tenantReconfiguredBefore = tenantReconfiguredAfter
 
         # create a merge commit change on 'stable' branch: merge branch
         # 'master' into 'stable'. stable should use job project-test2
