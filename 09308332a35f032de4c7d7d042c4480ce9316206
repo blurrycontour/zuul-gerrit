@@ -34,6 +34,24 @@
       "revId": "09308332a35f032de4c7d7d042c4480ce9316206",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09b5875c_cd5ec032",
+        "filename": "zuul/model.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-30T08:40:01Z",
+      "side": 1,
+      "message": "I\u0027d also go for the opaque data in a dedicated field in the NodeRequest. That sounds like an appropriate solution. \"requestor_data\" sounds good.",
+      "parentUuid": "1d55d192_67649b6f",
+      "revId": "09308332a35f032de4c7d7d042c4480ce9316206",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
