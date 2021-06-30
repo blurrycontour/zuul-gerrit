@@ -3350,7 +3350,6 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.running_builds.append(build)
         self.job_builds[build_request.uuid] = build
         params['zuul']['_test'] = dict(test_root=self._test_root)
-        self.executor_api.update(build_request)
         super(RecordingExecutorServer, self).executeJob(build_request, params)
 
     def stopJob(self, build_request: BuildRequest):
