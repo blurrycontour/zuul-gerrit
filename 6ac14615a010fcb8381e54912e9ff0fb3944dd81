@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "a8192f65_ad8d5deb",
+        "filename": "tests/base.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3340,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T00:38:46Z",
+      "side": 1,
+      "message": "Agree we should remove this.",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2bcde74a_11a0e03e",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 29
@@ -50,6 +67,23 @@
       "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c521058_3cf12450",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 5931,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T00:38:46Z",
+      "side": 1,
+      "message": "One of them runs in an executor zone, the other unzoned; given the differences there, it seemed important to test.  Pretty sure I had this failing at one point during development.",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -93,6 +127,23 @@
     },
     {
       "key": {
+        "uuid": "b8c46019_444aab57",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3460,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T00:38:46Z",
+      "side": 1,
+      "message": "We run manageLoad before starting each build, so the sensors will update (they\u0027ll check cpu and the number of starting builds).  The accepting_work flag above will flip and we\u0027ll break the loop.",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d70ea47b_cb712f27",
         "filename": "zuul/executor/server.py",
         "patchSetId": 29
@@ -107,6 +158,23 @@
       "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c6f64b56_98bd3c0f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3518,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T00:38:46Z",
+      "side": 1,
+      "message": "Unfortunately this comment is wrong (we require a relatively tight loop, and this can\u0027t run on the executor). It and the code are removed in the next change.",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
