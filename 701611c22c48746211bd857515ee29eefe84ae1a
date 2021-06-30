@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf37636d_a5ae42a8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T13:51:09Z",
+      "side": 1,
+      "message": "Instead of doing this, can we set gather_facts to false in the freeze playbook (since presumably we have gathered them (if possible) already during setup)?\n\nBecause if we don\u0027t run the freeze playbook, then we won\u0027t have any job variables available for a host.",
+      "revId": "701611c22c48746211bd857515ee29eefe84ae1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
