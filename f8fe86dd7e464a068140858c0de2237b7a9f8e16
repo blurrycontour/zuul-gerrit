@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "bfb084b5_26816183",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1189,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T23:29:43Z",
+      "side": 1,
+      "message": "I believe this is correcting a subtle almost-bug.  This should be a list.  repo.contains returns a list in all cases, so the empty list is the better default value.\n\nThe False default was probably never accessed because any of the cases where the value is accessed also have a newrew, so contains would be called.\n\nIIRC, this is mostly to serve the \"figure out what branches this tag is in\" case, and tags have newrevs.",
+      "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "61436973_cc52226d",
         "filename": "zuul/model.py",
         "patchSetId": 12
@@ -56,6 +73,23 @@
       "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c813e245_27221e4f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1933,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T23:29:43Z",
+      "side": 1,
+      "message": "That\u0027s a really good question.  I thought this was fixed after patchest 4, but I see that the fix was only applied to merge completed events, not fileschangescompleted events.  I\u0027m sorry I didn\u0027t see that.\n\nI can think of no reason for this to be different, and I think the points I made in PS4 suggest that we should drop this as well as the extra \"queue name\" parameter to the event.",
+      "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
