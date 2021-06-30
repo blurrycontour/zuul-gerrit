@@ -85,6 +85,23 @@
       "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "66261bda_7a8bca8b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:30:01Z",
+      "side": 1,
+      "message": "We won\u0027t schedule the jobs until we get through at least the semaphore and build request cleanup, so I don\u0027t think it\u0027s possible to overlap.\n\nI could see moving everything below line 433 out of the loop, as once we\u0027ve reconfigured, the cleanups should work and then the job scheduled.  But if something goes wrong during the semaphore cleanup, we should probably retry it sooner than 1 hour, so I\u0027d at least like to keep that inside the loop.  The build request cleanup is on a short enough schedule that I\u0027m ambivalent about that one.",
+      "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
