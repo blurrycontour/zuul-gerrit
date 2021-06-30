@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "62b94623_b8dde3a3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2021-06-30T18:05:29Z",
+      "side": 1,
+      "message": "The use case, is we want them in the inventory file but not to run commands from zuul-executor until we have configured the node.  The use case I am thinking of, we need to SSH into a private IP from another node in the nodeset, to properly configure the public interface so that zuul-executor can start to use it.\n\nRight now, we have no way of opting out of this scan when we split it out from the setup playbooks.\n\nSo, I agree a new resource is likely needed, but I\u0027d like to also support the use-case above.\n\nA lot of this is network specific hardware where we cannot easily do provision things via cloud-init or glean.  And usually need to run raw commands to start.",
+      "parentUuid": "0d9cf558_d5917e8f",
+      "revId": "701611c22c48746211bd857515ee29eefe84ae1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "565fa9a9_e67ebde0",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
