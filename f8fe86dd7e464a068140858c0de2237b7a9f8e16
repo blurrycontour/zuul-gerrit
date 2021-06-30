@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "fb05f403_de97feee",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1189,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T23:17:46Z",
+      "side": 1,
+      "message": "Should this be initialized to False? Seems like we are operating on a boolean value in the next bit of code.",
+      "range": {
+        "startLine": 1189,
+        "startChar": 27,
+        "endLine": 1189,
+        "endChar": 29
+      },
+      "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "61436973_cc52226d",
         "filename": "zuul/model.py",
         "patchSetId": 12
@@ -13,6 +36,23 @@
       "writtenOn": "2021-06-30T07:29:06Z",
       "side": 1,
       "message": "nit: Just discovered that I forgot to update the docstring.",
+      "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e21e9a77_e071b2a0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1933,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T23:17:46Z",
+      "side": 1,
+      "message": "Why does this method and _doMergeCompletedEvent() iterate over the pipeline contents in two different ways? Would it be better for _doMergeCompletedEvent() to also prefilter by queue first?",
       "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
