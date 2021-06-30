@@ -240,6 +240,24 @@
     },
     {
       "key": {
+        "uuid": "606f40bd_825104a1",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-30T06:22:18Z",
+      "side": 1,
+      "message": "I think, I copied that logic over from the nodepool implementation https://opendev.org/zuul/nodepool/src/branch/master/nodepool/zk.py#L1898. But that was before we put the lock in a distinct ZK path, so it might not be necessary anymore.",
+      "parentUuid": "74682dcb_066e1112",
+      "revId": "8315109d22a6068b91e46dd0b9ba334889a9e570",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2cdbc143_b78dab25",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 35
