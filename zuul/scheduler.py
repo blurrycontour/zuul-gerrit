@@ -1712,7 +1712,7 @@ class Scheduler(threading.Thread):
                 change, tenant, project, event)
         elif event.branch_deleted:
             reconfigure_tenant = self._testReconfigureRemove(
-                project, event)
+                tenant, project, event)
 
         reconfigure_tenant = project.source.testReconfigureTenant(
             event, project, tenant, self.abide, reconfigure_tenant)
@@ -1728,13 +1728,24 @@ class Scheduler(threading.Thread):
             reconfigure_tenant = True
 
         if event.branch_created:
-            reconfigure_tenant = True
+            if hasattr(change, 'files'):
+                if change.updatesConfig(tenant):
+                    reconfigure_tenant = True
+                else:
+                    # create cache to avoid triggering a reconfigure in
+                    # the block bellow
+                    self.abide.getUnparsedBranchCache(
+                        project.canonical_name,
+                        event.branch)
+            else:
+                reconfigure_tenant = True
 
         return reconfigure_tenant
 
-    def _testReconfigureRemove(self, project, event):
-        return self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                                 event.branch)
+    def _testReconfigureRemove(self, tenant, project, event):
+        return self.abide.hasUsefulBranchCache(tenant,
+                                               project.canonical_name,
+                                               event.branch)
 
     def process_pipeline_trigger_queue(self, tenant, pipeline):
         for event in self.pipeline_trigger_events[tenant.name][pipeline.name]:
