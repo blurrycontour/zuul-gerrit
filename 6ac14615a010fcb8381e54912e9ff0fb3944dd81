@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "785da3c8_ce1fb33b",
+        "filename": "tests/base.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3065,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T00:19:53Z",
+      "side": 1,
+      "message": "Nit we could use self.uuid instead as we\u0027ve assigned that the value of self.build_request.uuid.",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09335710_28b59da6",
+        "filename": "tests/base.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3340,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T00:19:53Z",
+      "side": 1,
+      "message": "Is this necessary? I\u0027m not sure what we expect to have been updated here.",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2bcde74a_11a0e03e",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 5931,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T00:19:53Z",
+      "side": 1,
+      "message": "Is this test functionally different than the one on line 166?",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2680bbe6_32f09397",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 6371,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T00:19:53Z",
+      "side": 1,
+      "message": "Above we don\u0027t seem to use self.builds[x].uuid and self.builds[x].unique consistently. For example at line 4471 it is uuid but 6134 is unique. And here we change from unique to uuid.\n\nWould be nice if we were consistent.",
+      "range": {
+        "startLine": 6371,
+        "startChar": 48,
+        "endLine": 6371,
+        "endChar": 61
+      },
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e2736aa_49c4866e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3460,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T00:19:53Z",
+      "side": 1,
+      "message": "Thinking out loud here do we need some sort of mechanism to avoid a single executor grabbing many jobs all at once (say after a full cluster restart and reenqueue)? The loop here looks very small and I think it may be possible to grab lots of work then run into problems later as ansible memory use grows.\n\nThat said I think we had previously just relied on gearman\u0027s own IO slowness to create a sort of natural round robin and zookeeper seems likely to produce similar behavior (though I\u0027m not sure that is the case).",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d70ea47b_cb712f27",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 3518,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T00:19:53Z",
+      "side": 1,
+      "message": "Does it make sense to use a much larger sleep if we are ok with 60 minutes? Maybe 5 minutes instead of 5 seconds?",
+      "revId": "6ac14615a010fcb8381e54912e9ff0fb3944dd81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
