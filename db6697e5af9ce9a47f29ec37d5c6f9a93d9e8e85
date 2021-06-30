@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ede82eaf_bf507489",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:14:19Z",
+      "side": 1,
+      "message": "Good idea.",
+      "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f69ce0a1_786a8181",
         "filename": "zuul/scheduler.py",
         "patchSetId": 17
@@ -33,6 +50,23 @@
       "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43f74af5_5f0e54f2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:14:19Z",
+      "side": 1,
+      "message": "I don\u0027t think I follow the suggestion.  My understanding of this method is that it\u0027s imperative to run the semaphore cleanup immediately after starting the scheduler.  We can\u0027t wait an hour for it to start, because if the scheduler crashed, semaphores will be held and those jobs won\u0027t run until the cleanup happens.\n\nSo we must have a tight loop to wait until the initial reconfiguration is complete and then immediately run the semaphore cleanup.  Once that\u0027s done, we can be certain that we\u0027re not in that state and can schedule the hourly job (which should probably never actually clean anything up).",
+      "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
