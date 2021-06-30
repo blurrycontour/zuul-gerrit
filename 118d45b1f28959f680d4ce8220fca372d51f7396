@@ -152,6 +152,24 @@
       "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d8425e12_2630cd81",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T21:17:20Z",
+      "side": 1,
+      "message": "If there is testing of sharding generally elsewhere then we are probably fine. As far as something deep in kazoo or zookeeper goes I\u0027ve poked around a bit and I suspect that since you cannot have a / in a node name (it is a separator) zookeeper is stripping off the / when adding the sequence automatically.\n\nWe might want to do this ourselves explicitly if is_transaction is true. Just to avoid any potential behaviors changes under us in the future.",
+      "parentUuid": "f4de65fe_0147d03b",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
