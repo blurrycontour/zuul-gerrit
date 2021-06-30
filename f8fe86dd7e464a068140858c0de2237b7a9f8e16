@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61436973_cc52226d",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 4067,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-30T07:29:06Z",
+      "side": 1,
+      "message": "nit: Just discovered that I forgot to update the docstring.",
+      "revId": "f8fe86dd7e464a068140858c0de2237b7a9f8e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
