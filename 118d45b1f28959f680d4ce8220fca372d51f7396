@@ -50,6 +50,57 @@
       "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5d792fc3_7c2bfdfb",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T20:47:09Z",
+      "side": 1,
+      "message": "We should keep an eye on whether or not this gets too chatty. Perhaps combining them into one log line or even just relying on the raise below to bring up issues.",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2108c9ba_af58a018",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T20:47:09Z",
+      "side": 1,
+      "message": "What happens if this raises an exception and we don\u0027t commit the transaction? Is that equivalent to never having written the parameters at all? Or should we put the commitTransaction() in a finally block to ensure that happens?\n\nI suspect it is fine as we\u0027ll mark the build request as completed in error, then cleanups will remove whatever is left in the tree.",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93c899a2_01ba67ab",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T20:47:09Z",
+      "side": 1,
+      "message": "I\u0027m confused about this format string. This should produce paths like foo/seq/00000000000 but then without makepath the foo/seq path won\u0027t exist so this should raise NoNodeError according to the kazoo docs. What causes the trailing / here to be removed as per the commit message?\n\nRelated it doesn\u0027t look like we have an explicit test case for an extra large params list that will get sharded. Might be a good idea to have one of those.",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
