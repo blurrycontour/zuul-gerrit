@@ -817,9 +817,13 @@ def is_group_var_set(name, host, args):
     return False
 
 
-def make_inventory_dict(nodes, groups, hostvars, remove_keys=None):
+def make_inventory_dict(
+        nodes, groups, hostvars, remove_keys=None, freeze=False):
     hosts = {}
     for node in nodes:
+        if freeze and (hostvars[node['name']]['ansible_connection'] in
+                       BLACKLISTED_ANSIBLE_CONNECTION_TYPES):
+            continue
         node_hostvars = hostvars[node['name']].copy()
         if remove_keys:
             for k in remove_keys:
@@ -1506,7 +1510,8 @@ class AnsibleJob(object):
         # any jinja templates for use in the trusted execution
         # context.
         self.writeInventory(self.jobdir.freeze_playbook,
-                            self.original_hostvars)
+                            self.original_hostvars,
+                            True)
         freeze_status, freeze_code = self.runAnsibleFreeze(
             self.jobdir.freeze_playbook, self.ansible_version)
         if freeze_status != self.RESULT_NORMAL or setup_code != 0:
@@ -2352,11 +2357,11 @@ class AnsibleJob(object):
                 yaml.ansible_unsafe_dump(setup_inventory,
                                          default_flow_style=False))
 
-    def writeInventory(self, jobdir_playbook, hostvars):
+    def writeInventory(self, jobdir_playbook, hostvars, freeze=False):
         args = self.arguments
         inventory = make_inventory_dict(
             self.host_list, args['groups'], hostvars,
-            remove_keys=jobdir_playbook.secrets_keys)
+            remove_keys=jobdir_playbook.secrets_keys, freeze=freeze)
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
