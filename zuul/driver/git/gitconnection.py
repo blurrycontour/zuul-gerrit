@@ -22,7 +22,7 @@ import urllib
 from zuul.connection import BaseConnection
 from zuul.driver.git.gitmodel import GitTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
-from zuul.model import Ref, Branch
+from zuul.model import Ref, Branch, Tag
 
 
 class GitConnection(BaseConnection):
@@ -104,6 +104,7 @@ class GitConnection(BaseConnection):
     def getChange(self, event, refresh=False):
         if event.ref and event.ref.startswith('refs/heads/'):
             branch = event.ref[len('refs/heads/'):]
+            event.branch = branch
             change = self._change_cache.get(branch, {}).get(event.newrev)
             if change:
                 return change
@@ -117,6 +118,13 @@ class GitConnection(BaseConnection):
                 event.project_name, change.branch, change.ref,
                 event.oldrev, event.newrev)
             self._change_cache.setdefault(branch, {})[event.newrev] = change
+        elif event.ref and event.ref.startswith('refs/tags/'):
+            # catch-all ref (ie, not a branch or head)
+            project = self.getProject(event.project_name)
+            change = Tag(project)
+            for attr in ('ref', 'oldrev', 'newrev'):
+                setattr(change, attr, getattr(event, attr))
+            change.url = ""
         elif event.ref:
             # catch-all ref (ie, not a branch or head)
             project = self.getProject(event.project_name)
