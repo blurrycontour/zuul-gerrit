@@ -50,6 +50,24 @@
       "revId": "451100126aee290d3c4ff52ec80f8b5315940e77",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c3f2c08_82a7f3c6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 3118,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-06-30T07:03:54Z",
+      "side": 1,
+      "message": "We could change the zone_filter to be a set rather than a list. This should avoid this issue, although I don\u0027t think that this is much of a problem.",
+      "parentUuid": "ecfd21c8_38a17ccf",
+      "revId": "451100126aee290d3c4ff52ec80f8b5315940e77",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
