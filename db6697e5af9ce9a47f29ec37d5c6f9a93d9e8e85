@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44c79b27_9aacf60c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T20:03:59Z",
+      "side": 1,
+      "message": "You might consider adding a small amount of jitter to these intervals to reduce contention.\n\nhttps://apscheduler.readthedocs.io/en/stable/modules/triggers/interval.html#module-apscheduler.triggers.interval",
+      "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f69ce0a1_786a8181",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-06-30T20:03:59Z",
+      "side": 1,
+      "message": "I\u0027m not sure this loop makes as much sense here anymore now that apsched is scheduling this stuff. Maybe make it an if statement then put the add_job()s below in a finally case for the exceptions? Just thinking if we fail on the first pass we don\u0027t need to try again in a tight loop we can wait an interval and try then?",
+      "revId": "db6697e5af9ce9a47f29ec37d5c6f9a93d9e8e85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
