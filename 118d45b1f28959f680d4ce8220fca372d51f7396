@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "80d7f460_3ee25474",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:52:43Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s our first foray into transactions, so I wanted to make sure we had a handle on what the responses look like.",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2108c9ba_af58a018",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 7
@@ -87,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "c8032142_9bf5c6a7",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:52:43Z",
+      "side": 1,
+      "message": "I believe nothing will be written; I think transactions are group of opcodes sent together, and we just won\u0027t send anything at all.",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "93c899a2_01ba67ab",
         "filename": "zuul/zk/sharding.py",
         "patchSetId": 7
@@ -101,6 +135,23 @@
       "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4de65fe_0147d03b",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-06-30T20:52:43Z",
+      "side": 1,
+      "message": "No idea, it\u0027s something deep in kazoo or zookeeper.  :(\n\nWe do always at least have a single shard, and there\u0027s testing of the sharding generally elsewhere.  We could add an explicit test for a large param block, but I\u0027m not sure if it would add any significant coverage?",
+      "revId": "118d45b1f28959f680d4ce8220fca372d51f7396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
