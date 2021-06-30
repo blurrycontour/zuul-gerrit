@@ -1722,22 +1722,27 @@ class Scheduler(threading.Thread):
     def _testReconfigureFiles(self, change, tenant, project, event):
         reconfigure_tenant = False
 
-        if (event.branch_updated and
-                hasattr(change, 'files') and
-                change.updatesConfig(tenant)):
-            reconfigure_tenant = True
-
-        if event.branch_created:
-            if hasattr(change, 'files'):
-                if change.updatesConfig(tenant):
+        if hasattr(change, 'files'):
+            if change.updatesConfig(tenant):
+                if event.newrev != self.abide.getProjectBranchRevision(
+                        project.canonical_name, event.branch):
                     reconfigure_tenant = True
-                else:
-                    # create cache to avoid triggering a reconfigure in
-                    # the block bellow
-                    self.abide.getUnparsedBranchCache(
-                        project.canonical_name,
-                        event.branch)
             else:
+                # only save newrev if we don't reconfigure.
+                # all tenant/project/branch are cached during
+                # reconfiguration
+                self.abide.setProjectBranchRevision(
+                    project.canonical_name,
+                    event.branch, event.newrev)
+
+                # create cache to avoid triggering a reconfigure in
+                # specific tenant reconfigure test
+                self.abide.getUnparsedBranchCache(
+                    project.canonical_name,
+                    event.branch)
+        else:
+            if event.newrev != self.abide.getProjectBranchRevision(
+                    project.canonical_name, event.branch):
                 reconfigure_tenant = True
 
         return reconfigure_tenant

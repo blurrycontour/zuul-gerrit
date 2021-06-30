@@ -1843,8 +1843,8 @@ class TenantParser(object):
                            (job, job.files.keys()))
 
             self._updateUnparsedBranchCache(abide, tenant, job.source_context,
-                                            job.files, loading_errors,
-                                            job.ltime)
+                                            job.files, job.revision,
+                                            loading_errors, job.ltime)
 
             # Save all config files in Zookeeper (not just for the current tpc)
             files_cache = self.unparsed_config_cache.getFilesCache(
@@ -1866,7 +1866,7 @@ class TenantParser(object):
                                         job.ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
-                                   loading_errors, ltime):
+                                   revision, loading_errors, ltime):
         loaded = False
         tpc = tenant.project_configs[source_context.project.canonical_name]
         # Make sure we are clearing the local cache before updating it.
@@ -1901,6 +1901,11 @@ class TenantParser(object):
                     files[fn], source_context, loading_errors)
                 branch_cache.put(source_context.path, incdata)
         branch_cache.setValidFor(tpc, ltime)
+        abide.setProjectBranchRevision(
+            source_context.project.canonical_name,
+            source_context.branch,
+            revision,
+        )
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()

@@ -207,7 +207,11 @@ class GerritEventConnector(threading.Thread):
         # But we do not yet get files changed data for pure refupdate events.
         # TODO(jlk): handle refupdated events instead of just changes
         if event.type == 'change-merged':
-            event.branch_updated = True
+            # when http only, querying a merged change doesn't give the sha of
+            # branch, so do not set branch_updated, only rely on ref-updated.
+            # could be "solved" by using gerrit events-log plugin
+            if self.connection.enable_stream_events:
+                event.branch_updated = True
             event.newrev = data.get('newRev')
         event.trigger_name = 'gerrit'
         change = data.get('change')
@@ -286,16 +290,29 @@ class GerritEventConnector(threading.Thread):
                 event.branch_created = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
+            elif event.newrev == '0' * 40:
                 event.branch_deleted = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
+            else:
+                if not self._searchChangeMerged(event):
+                    event.branch_updated = True
 
         self._getChange(event)
         self.connection.logEvent(event)
         self.connection.sched.addTriggerEvent(
             self.connection.driver_name, event
         )
+
+    def _searchChangeMerged(self, ref_updated_event):
+        found = False
+        for event in self.event_queue:
+            self.log.debug("SEARCH MERGED item {}".format(event))
+            if (event.get('payload', {}).get('type') == "change-merged" and
+                    event.get('payload', {}).get('refUpdate',{}).get('newRev') == ref_updated_event.newrev):
+                found = True
+                break
+        return found
 
     def _getChange(self, event):
         # Grab the change if we are managing the project or if it exists in the
