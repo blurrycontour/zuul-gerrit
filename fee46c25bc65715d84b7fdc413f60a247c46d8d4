@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9468404_fd1ff571",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T17:37:50Z",
+      "side": 1,
+      "message": "This function should probably be renamed in a followup. Out of curiosity why don\u0027t we set params[\u0027max_attempts\u0027] and params[\u0027nodeset\u0027] in this method?",
+      "range": {
+        "startLine": 62,
+        "startChar": 38,
+        "endLine": 62,
+        "endChar": 62
+      },
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2c2bd05_d7b58d45",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T17:37:50Z",
+      "side": 1,
+      "message": "params[\u0027nodes\u0027] is a subset of the data in nodeset. Do we need to keep sending both to the executor if we send the entire nodeset dict?",
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4fcfa673_81eb33bf",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T17:37:50Z",
+      "side": 1,
+      "message": "Should we lock the nodes before setting up ssh details? If we can\u0027t lock these nodes then the ssh setup wasn\u0027t necessary.",
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0dfd40a6_41d67774",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 3676,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T17:37:50Z",
+      "side": 1,
+      "message": "Nit: it seems this attribute is called \u0027expired\u0027 not \u0027expiration\u0027.",
+      "range": {
+        "startLine": 3676,
+        "startChar": 13,
+        "endLine": 3676,
+        "endChar": 23
+      },
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c872d1f_2483a22a",
+        "filename": "zuul/model.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T17:37:50Z",
+      "side": 1,
+      "message": "Note the nodeset value appears to be set by getNodeRequest() after constructing this class.",
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
