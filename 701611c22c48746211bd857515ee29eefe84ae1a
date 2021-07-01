@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3f1f02c3_052e8bea",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T17:57:40Z",
+      "side": 1,
+      "message": "To support your specific use case could the workflow be something like:\n\n* Zuul manages new resource, doesn\u0027t put it in the inventory but does put it in zuul vars.\n* Write a zuul role to provision that new resource so that it is able to talk to ansible\n* Manually add these resources to the inventory in your playbooks as necessary to talk to them.",
+      "parentUuid": "62b94623_b8dde3a3",
+      "revId": "701611c22c48746211bd857515ee29eefe84ae1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "565fa9a9_e67ebde0",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
