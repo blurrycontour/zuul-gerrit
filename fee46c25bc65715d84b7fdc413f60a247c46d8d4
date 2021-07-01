@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "6b8443b7_d737063c",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-01T20:29:32Z",
+      "side": 1,
+      "message": "I can\u0027t think of a reason not to.",
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e2c2bd05_d7b58d45",
         "filename": "zuul/executor/client.py",
         "patchSetId": 25
@@ -42,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "4a7bf775_77494ff2",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-01T20:29:32Z",
+      "side": 1,
+      "message": "We can probably shift to nodeset.  We should make sure Tristan reviews the change where we drop nodes since it\u0027s used by the runner client (which isn\u0027t merged yet).",
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4fcfa673_81eb33bf",
         "filename": "zuul/executor/server.py",
         "patchSetId": 25
@@ -56,6 +90,23 @@
       "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0edc2884_ce650558",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-01T20:29:32Z",
+      "side": 1,
+      "message": "I could go either way.",
+      "revId": "fee46c25bc65715d84b7fdc413f60a247c46d8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
