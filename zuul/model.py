@@ -4068,15 +4068,13 @@ class FilesChangesCompletedEvent(ResultEvent):
     :arg list files: List of files changed.
     """
 
-    def __init__(self, build_set_uuid, queue_name, files):
+    def __init__(self, build_set_uuid, files):
         self.build_set_uuid = build_set_uuid
-        self.queue_name = queue_name
         self.files = files or []
 
     def toDict(self):
         return {
             "build_set_uuid": self.build_set_uuid,
-            "queue_name": self.queue_name,
             "files": list(self.files),
         }
 
@@ -4084,7 +4082,6 @@ class FilesChangesCompletedEvent(ResultEvent):
     def fromDict(cls, data):
         return cls(
             data.get("build_set_uuid"),
-            data.get("queue_name"),
             list(data.get("files", [])),
         )
 
