@@ -144,6 +144,24 @@
       "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee3d60cc_895aa4da",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-01T14:26:41Z",
+      "side": 1,
+      "message": "Thank you for confirming it is to simplify watches. I think that is a reasonable enough reason for the \"cohosting\" of the queues on the zookeeper side. It just jumped uot to me as potentially odd so wanted to call it out. Sounds like there is a good reason for it though.",
+      "parentUuid": "f23354e7_8dcd2953",
+      "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
