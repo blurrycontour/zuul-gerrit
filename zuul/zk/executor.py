@@ -391,15 +391,8 @@ class ExecutorApi(ZooKeeperSimpleBase):
 
     def isLocked(self, build_request):
         path = "/".join([self.LOCK_ROOT, build_request.uuid])
-        try:
-            lock = Lock(self.kazoo_client, path)
-            is_locked = len(lock.contenders()) > 0
-        except NoNodeError:
-            is_locked = False
-            self.log.error(
-                "BuildReqeust not found to check lock: %s", build_request.uuid
-            )
-
+        lock = Lock(self.kazoo_client, path)
+        is_locked = len(lock.contenders()) > 0
         return is_locked
 
     def lostBuildRequests(self):
