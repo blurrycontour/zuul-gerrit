@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cf6f9ed7_7f20b7b2",
+        "filename": "doc/source/reference/monitoring.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-01T05:35:52Z",
+      "side": 1,
+      "message": "I\u0027d say no. The length of the reconfig event queue is only added in the REST API for backward compatibility. E.g. some of our users use that value in order to see if there is a reconfiguration ongoing.",
+      "parentUuid": "af50255c_a1c56fd9",
+      "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f83bd194_2ff293ed",
         "filename": "doc/source/reference/monitoring.rst",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2021-07-01T00:05:23Z",
       "side": 1,
       "message": "This gauge continues to be reported but it is only the length of the reconfiguration events. We should probably update these docs.",
+      "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e5e06ff_77888ed0",
+        "filename": "doc/source/reference/monitoring.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-01T05:35:52Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "f83bd194_2ff293ed",
       "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
@@ -87,6 +123,24 @@
       "writtenOn": "2021-07-01T00:05:23Z",
       "side": 1,
       "message": "I know it was this way before but its a bit weird to have both trigger and management events in the same zookeeper path which is analogous to having them all in one queue there then we split them out here into two different queues.\n\nI guess we use a prefix on the znodes rather than separating them into different paths. Is there a specific reason we do that? This sort of thing might be worth calling out in the code?",
+      "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f23354e7_8dcd2953",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-01T05:35:52Z",
+      "side": 1,
+      "message": "Yes, the different event types are separated by using different prefixes. I guess the main reason was that it\u0027s described like this in the spec, but it also simplifies the watches. Otherwise we\u0027d need three instead of one data watch for every pipeline/tenant event queue.",
+      "parentUuid": "7cbcd360_b069f035",
       "revId": "4aa8462d0818cffd77d34c85d614c02b00e90278",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
