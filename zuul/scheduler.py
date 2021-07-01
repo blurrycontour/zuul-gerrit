@@ -620,10 +620,9 @@ class Scheduler(threading.Thread):
         self.repl.stop()
         self.repl = None
 
-    def prime(self, config, validate_tenants=None):
+    def prime(self, config):
         self.log.debug("Priming scheduler config")
-        event = ReconfigureEvent(validate_tenants=validate_tenants)
-        self._doReconfigureEvent(event)
+        self._doReconfigureEvent(ReconfigureEvent())
         self.log.debug("Config priming complete")
         self.last_reconfigured = int(time.time())
 
@@ -831,6 +830,44 @@ class Scheduler(threading.Thread):
                 "is missing from the configuration.")
         return tenant_config, script
 
+    def validateTenants(self, config, tenants_to_validate):
+        self.config = config
+        with self.layout_lock:
+            self.log.info("Config validation beginning")
+            start = time.monotonic()
+
+            loader = configloader.ConfigLoader(
+                self.connections, self, self.merger, self.keystore)
+            tenant_config, script = self._checkTenantSourceConf(self.config)
+            unparsed_abide = loader.readConfig(tenant_config,
+                                               from_script=script)
+
+            available_tenants = list(unparsed_abide.tenants)
+            tenants_to_load = tenants_to_validate or available_tenants
+            if not set(tenants_to_load).issubset(available_tenants):
+                invalid = tenants_to_load.difference(available_tenants)
+                raise RuntimeError(f"Invalid tenant(s) found: {invalid}")
+
+            abide = Abide()
+            loader.loadAdminRules(abide, unparsed_abide)
+            loader.loadTPCs(abide, unparsed_abide)
+            for tenant_name in tenants_to_load:
+                loader.loadTenant(abide, tenant_name, self.ansible_manager,
+                                  unparsed_abide, cache_ltime=None)
+
+            loading_errors = []
+            for tenant in abide.tenants.values():
+                for error in tenant.layout.loading_errors:
+                    loading_errors.append(repr(error))
+            if loading_errors:
+                summary = '\n\n\n'.join(loading_errors)
+                raise configloader.ConfigurationSyntaxError(
+                    f"Configuration errors: {summary}")
+
+        duration = round(time.monotonic() - start, 3)
+        self.log.info("Config validation complete (duration: %s seconds)",
+                      duration)
+
     def _doReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
         # a request
@@ -857,26 +894,14 @@ class Scheduler(threading.Thread):
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
 
-            tenants_to_load = list(self.unparsed_abide.tenants)
-            if event.validate_tenants is not None:
-                validate_tenants = set(event.validate_tenants)
-                if not validate_tenants.issubset(tenants_to_load):
-                    invalid = validate_tenants.difference(tenants_to_load)
-                    raise RuntimeError(f"Invalid tenant(s) found: {invalid}")
-                # In case we have an empty list, we validate all tenants.
-                tenants_to_load = event.validate_tenants or tenants_to_load
-
             abide = Abide()
             loader.loadAdminRules(abide, self.unparsed_abide)
             loader.loadTPCs(abide, self.unparsed_abide)
-            for tenant_name in tenants_to_load:
+            for tenant_name in self.unparsed_abide.tenants:
                 tenant = loader.loadTenant(abide, tenant_name,
                                            self.ansible_manager,
                                            self.unparsed_abide,
                                            cache_ltime=None)
-                if event.validate_tenants:
-                    # We are only validating the tenant config; skip reconfig
-                    continue
 
                 if tenant is not None:
                     old_tenant = self.abide.tenants.get(tenant_name)
@@ -886,16 +911,6 @@ class Scheduler(threading.Thread):
                 if old_tenant.name not in abide.tenants:
                     # We deleted a tenant
                     self._reconfigureDeleteTenant(old_tenant)
-
-            if event.validate_tenants is not None:
-                loading_errors = []
-                for tenant in abide.tenants.values():
-                    for error in tenant.layout.loading_errors:
-                        loading_errors.append(repr(error))
-                if loading_errors:
-                    summary = '\n\n\n'.join(loading_errors)
-                    raise configloader.ConfigurationSyntaxError(
-                        f"Configuration errors: {summary}")
 
             self.abide = abide
         finally:

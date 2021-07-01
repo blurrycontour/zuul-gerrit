@@ -4183,7 +4183,10 @@ class SchedulerTestApp:
 
     def start(self, validate_tenants: list):
         self.sched.start()
-        self.sched.prime(self.config, validate_tenants=validate_tenants)
+        if validate_tenants is None:
+            self.sched.prime(self.config)
+        else:
+            self.sched.validateTenants(self.config, validate_tenants)
 
     def fullReconfigure(self):
         try:
