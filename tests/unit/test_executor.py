@@ -21,10 +21,6 @@ import os
 import time
 from unittest import mock
 
-import zuul.executor.server
-import zuul.model
-import gear
-
 from tests.base import (
     BaseTestCase,
     ZuulTestCase,
@@ -36,7 +32,9 @@ from tests.base import (
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
+from zuul.executor.server import AnsibleJob, squash_variables
 from zuul.lib.ansible import AnsibleManager
+from zuul.model import BuildRequest
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -437,10 +435,22 @@ class TestAnsibleJob(ZuulTestCase):
     def setUp(self):
         super(TestAnsibleJob, self).setUp()
         ansible_version = AnsibleManager().default_version
-        args = '{"ansible_version": "%s"}' % ansible_version
-        job = gear.TextJob('executor:execute', args, unique='test')
-        self.test_job = zuul.executor.server.AnsibleJob(self.executor_server,
-                                                        job)
+        params = {
+            "ansible_version": ansible_version,
+            "zuul_event_id": 0,
+        }
+        build_request = BuildRequest(
+            "test",
+            state=None,
+            precedence=200,
+            params=params,
+            zone=None,
+            tenant_name=None,
+            pipeline_name=None,
+            event_id='1',
+        )
+
+        self.test_job = AnsibleJob(self.executor_server, build_request, params)
 
     def test_getHostList_host_keys(self):
         # Test without connection_port set
@@ -1001,7 +1011,7 @@ class TestVarSquash(BaseTestCase):
         extravars = {
             'extra': 'extravar_extra',
         }
-        out = zuul.executor.server.squash_variables(
+        out = squash_variables(
             nodes, groups, jobvars, groupvars, extravars)
 
         expected = {
