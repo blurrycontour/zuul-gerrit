@@ -33,6 +33,24 @@
       "revId": "bfea232a58c75fa3d8e37da4952babc2700132fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7970205_70ded46e",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-02T21:01:26Z",
+      "side": 1,
+      "message": "I had missed that the exists call was necessary to set a watch on a non existent path. Though now I remember you saying that this behavior is why you think they had the code there in the first place.\n\nGiven that I think this code is correct as long as we don\u0027t want to defer to DELETE event callbacks to decide if the path should continue to be watched. Asserting this is a watcher for a path that exists until the path does not exist seems like a fine tool since that is what zuul needs.\n\nLast thought is we might want to vendor the entire parent class in this definition to avoid issues with private methods changing. Otherwise I think this is good.",
+      "parentUuid": "79a26240_85d0dff9",
+      "revId": "bfea232a58c75fa3d8e37da4952babc2700132fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
