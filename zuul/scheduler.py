@@ -296,6 +296,12 @@ class Scheduler(threading.Thread):
         if not self.statsd:
             return
 
+        executor_stats_default = {
+            "online": 0,
+            "accepting": 0,
+            "queued": 0,
+            "running": 0
+        }
         # Calculate the executor and merger stats
         executors_online = 0
         executors_accepting = 0
@@ -303,7 +309,7 @@ class Scheduler(threading.Thread):
         executors_unzoned_accepting = 0
         # zone -> accepting|online
         zoned_executor_stats = {}
-
+        zoned_executor_stats.setdefault(None, executor_stats_default.copy())
         mergers_online = 0
 
         for executor_component in self.component_registry.all("executor"):
@@ -314,8 +320,8 @@ class Scheduler(threading.Thread):
                     executors_unzoned_accepting += 1
             else:
                 zone_stats = zoned_executor_stats.setdefault(
-                    executor_component.zone, {"online": 0, "accepting": 0}
-                )
+                    executor_component.zone,
+                    executor_stats_default.copy())
                 if executor_component.state == BaseComponent.RUNNING:
                     zone_stats["online"] += 1
                 if executor_component.accepting_work:
@@ -333,14 +339,36 @@ class Scheduler(threading.Thread):
             if merger_component.state == BaseComponent.RUNNING:
                 mergers_online += 1
 
+        # Get all builds so we can filter by state and zone
+        for build_request in self.executor.executor_api.inState():
+            zone = build_request.zone
+            zone_stats = zoned_executor_stats.setdefault(
+                executor_component.zone,
+                executor_stats_default.copy())
+            if build_request.state == build_request.REQUESTED:
+                zone_stats['queued'] += 1
+            if build_request.state in (
+                    build_request.RUNNING, build_request.PAUSED):
+                zone_stats['running'] += 1
+
         # Publish the executor stats
-        self.statsd.gauge(
-            'zuul.executors.unzoned.accepting', executors_unzoned_accepting
-        )
-        self.statsd.gauge(
-            'zuul.executors.unzoned.online', executors_unzoned_online
-        )
+        self.statsd.gauge('zuul.executors.unzoned.accepting',
+                          executors_unzoned_accepting)
+        self.statsd.gauge('zuul.executors.unzoned.online',
+                          executors_unzoned_online)
+        self.statsd.gauge('zuul.executors.unzoned.jobs_running',
+                          zoned_executor_stats[None]['running'])
+        self.statsd.gauge('zuul.executors.unzoned.jobs_queued',
+                          zoned_executor_stats[None]['queued'])
+        # TODO(corvus): Remove for 5.0:
+        self.statsd.gauge('zuul.executors.jobs_running',
+                          zoned_executor_stats[None]['running'])
+        self.statsd.gauge('zuul.executors.jobs_queued',
+                          zoned_executor_stats[None]['queued'])
+
         for zone, stats in zoned_executor_stats.items():
+            if zone is None:
+                continue
             self.statsd.gauge(
                 f'zuul.executors.zone.{normalize_statsd_name(zone)}.accepting',
                 stats["accepting"],
@@ -349,6 +377,14 @@ class Scheduler(threading.Thread):
                 f'zuul.executors.zone.{normalize_statsd_name(zone)}.online',
                 stats["online"],
             )
+            self.statsd.gauge(
+                'zuul.executors.zone.'
+                f'{normalize_statsd_name(zone)}.jobs_running',
+                zoned_executor_stats[zone]['running'])
+            self.statsd.gauge(
+                'zuul.executors.zone.'
+                f'{normalize_statsd_name(zone)}.jobs_queued',
+                zoned_executor_stats[zone]['queued'])
 
         # TODO(corvus): Remove for 5.0:
         self.statsd.gauge('zuul.executors.accepting', executors_accepting)
@@ -362,30 +398,6 @@ class Scheduler(threading.Thread):
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
-            if name.startswith('executor:execute'):
-                execute_queue = queued - running
-                tokens = name.split(':', 2)
-                if len(tokens) == 2:
-                    # unzoned case
-                    self.statsd.gauge('zuul.executors.unzoned.jobs_running',
-                                      running)
-                    self.statsd.gauge('zuul.executors.unzoned.jobs_queued',
-                                      execute_queue)
-                    # TODO(corvus): Remove for 5.0:
-                    self.statsd.gauge('zuul.executors.jobs_running',
-                                      running)
-                    self.statsd.gauge('zuul.executors.jobs_queued',
-                                      execute_queue)
-                else:
-                    # zoned case
-                    zone = tokens[2]
-                    self.statsd.gauge('zuul.executors.zone.%s.jobs_running' %
-                                      normalize_statsd_name(zone),
-                                      running)
-                    self.statsd.gauge('zuul.executors.zone.%s.jobs_queued' %
-                                      normalize_statsd_name(zone),
-                                      execute_queue)
-
             if name == 'merger:merge':
                 mergers_online = registered
             if name.startswith('merger:'):
