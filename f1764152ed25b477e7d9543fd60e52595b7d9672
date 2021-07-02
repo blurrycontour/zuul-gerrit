@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b0b9a48_e0456418",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-02T15:46:56Z",
+      "side": 1,
+      "message": "Nit we use stats above as one of the loop vars and here we use the parent object and reindex into it. Consistency is probably a good thing (and should probably use the loop var).",
+      "range": {
+        "startLine": 383,
+        "startChar": 16,
+        "endLine": 383,
+        "endChar": 36
+      },
+      "revId": "f1764152ed25b477e7d9543fd60e52595b7d9672",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3e281a23_18c6661a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-02T15:46:56Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "f1764152ed25b477e7d9543fd60e52595b7d9672",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
