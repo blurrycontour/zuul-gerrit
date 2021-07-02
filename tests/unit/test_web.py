@@ -1026,6 +1026,17 @@ class TestWeb(BaseTestWeb):
                 'name': ['controller'],
                 'state': 'unknown'
             }],
+            'nodeset': {
+                'groups': [],
+                'name': '',
+                'nodes': [
+                    {'aliases': [],
+                     'comment': None,
+                     'hold_job': None,
+                     'id': None,
+                     'label': 'label1',
+                     'name': 'controller',
+                     'state': 'unknown'}]},
             'override_branch': None,
             'override_checkout': None,
             'repo_state': {},

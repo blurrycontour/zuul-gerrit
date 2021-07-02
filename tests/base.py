@@ -3112,9 +3112,9 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                 result = (self.RESULT_NORMAL, 0)
         return result
 
-    def getHostList(self, args):
-        self.log.debug("hostlist")
-        hosts = super(RecordingAnsibleJob, self).getHostList(args)
+    def getHostList(self, args, nodes):
+        self.log.debug("hostlist %s", nodes)
+        hosts = super(RecordingAnsibleJob, self).getHostList(args, nodes)
         for host in hosts:
             if not host['host_vars'].get('ansible_connection'):
                 host['host_vars']['ansible_connection'] = 'local'

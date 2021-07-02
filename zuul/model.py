@@ -658,7 +658,7 @@ class Node(ConfigObject):
         self._state = data['state']
         keys = []
         for k, v in data.items():
-            if k == 'state':
+            if k in ['state', 'name', 'aliases']:
                 continue
             keys.append(k)
             setattr(self, k, v)
@@ -666,7 +666,8 @@ class Node(ConfigObject):
 
     @classmethod
     def fromDict(cls, data):
-        node = cls(data["name"], data["label"])
+        aliases = data.get('aliases', [])
+        node = cls([data["name"]] + aliases, data["label"])
         node.updateFromDict(data)
         return node
 
