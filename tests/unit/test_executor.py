@@ -438,6 +438,12 @@ class TestAnsibleJob(ZuulTestCase):
         params = {
             "ansible_version": ansible_version,
             "zuul_event_id": 0,
+            "nodeset": {
+                "name": "dummy-node",
+                "node_request_id": 0,
+                "nodes": [],
+                "groups": [],
+            },
         }
         build_request = BuildRequest(
             "test",

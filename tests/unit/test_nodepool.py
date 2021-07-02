@@ -76,7 +76,11 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes
-        self.nodepool.acceptNodes(request, request.id)
+        accepted = self.nodepool.checkNodeRequest(request, request.id)
+        self.assertTrue(accepted)
+        # acceptNodes will be called on the executor, but only if the
+        # noderequest was accepted before.
+        self.nodepool.acceptNodes(request)
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
@@ -140,7 +144,9 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes, passing a different ID
-        self.nodepool.acceptNodes(request, "invalid")
+        accepted = self.nodepool.checkNodeRequest(request, "invalid")
+        self.assertFalse(accepted)
+        # Don't call acceptNodes here as the node request wasn't accepted.
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
@@ -163,7 +169,9 @@ class TestNodepool(BaseTestCase):
         self.zk_nodepool.deleteNodeRequest(request)
 
         # Accept the nodes
-        self.nodepool.acceptNodes(request, request.id)
+        accepted = self.nodepool.checkNodeRequest(request, request.id)
+        self.assertFalse(accepted)
+        # Don't call acceptNodes here as the node request wasn't accepted.
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():

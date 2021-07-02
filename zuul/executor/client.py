@@ -73,7 +73,6 @@ class ExecutorClient(object):
             zuul_event_id=item.event.zuul_event_id,
         )
         build.parameters = params
-        build.nodeset = nodeset
 
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
@@ -99,6 +98,14 @@ class ExecutorClient(object):
         # is up to date.
         attempts = build.build_set.getTries(job.name)
         params["zuul"]['attempts'] = attempts
+        params['max_attempts'] = job.attempts
+
+        # Store the NodeRequest ID in the job arguments, so we can look it up
+        # on the executor side to lock the nodes.
+        params["nodeset"] = nodeset.toDict()
+        node_request = build.build_set.getJobNodeRequest(job.name)
+        if node_request:
+            params["noderequest_id"] = node_request.id
 
         # Because all nodes belong to the same provider, region and
         # availability zone we can get executor_zone from only the first
