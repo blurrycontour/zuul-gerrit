@@ -16,6 +16,23 @@
       "revId": "6fecd3334bb2d2b4e79546384d79607bd0048a75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a5cf30d_cc59e633",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-02T22:20:47Z",
+      "side": 1,
+      "message": "Yes exactly.  But I think I missed the case where we see an entry from another chroot; let me adjust this.\nExample:\n\n/our/chroot/path\n   session1\n/other/chroot/path\n   session2\n\nWe don\u0027t want to return {path: [session1, session2]}",
+      "revId": "6fecd3334bb2d2b4e79546384d79607bd0048a75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
