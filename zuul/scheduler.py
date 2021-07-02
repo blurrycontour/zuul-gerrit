@@ -326,7 +326,8 @@ class Scheduler(threading.Thread):
 
             # TODO(corvus): Remove for 5.0:
             executors_online += 1
-            executors_accepting += 1
+            if executor_component.accepting_work:
+                executors_accepting += 1
 
         for merger_component in self.component_registry.all("merger"):
             if merger_component.state == BaseComponent.RUNNING:
