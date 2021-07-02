@@ -320,6 +320,27 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             items.extend(self._get_zk_tree(path))
         return items
 
+    def _get_watches(self):
+        chroot = self.zk_chroot_fixture.zookeeper_chroot
+        data = self.zk_client.client.command(b'wchp')
+        ret = {}
+        sessions = None
+        for line in data.split('\n'):
+            if line.startswith('\t'):
+                if sessions is not None:
+                    sessions.append(line.strip())
+            else:
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith(chroot):
+                    line = line[len(chroot):]
+                    sessions = []
+                    ret[line] = sessions
+                else:
+                    sessions = None
+        return ret
+
     def test_build_request(self):
         # Test the lifecycle of a build request
         request_queue = queue.Queue()
@@ -398,6 +419,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         server.fulfillCancel(a)
         server.unlock(a)
         self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
+        self.assertNotEqual(self._get_watches(), {})
 
         # Scheduler removes build request on completion
         client.remove(sched_a)
@@ -408,6 +430,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(self._get_zk_tree(
             client.BUILD_REQUEST_ROOT + '/zones'), [])
         self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
+        self.assertEqual(self._get_watches(), {})
 
     def test_build_request_remove(self):
         # Test the scheduler forcibly removing a request (perhaps the

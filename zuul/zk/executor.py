@@ -27,6 +27,7 @@ from zuul.model import BuildRequest
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.exceptions import BuildRequestNotFound
 from zuul.zk import sharding
+from zuul.zk.watchers import ExistingDataWatch
 
 
 class BuildRequestEvent(Enum):
@@ -175,8 +176,9 @@ class ExecutorApi(ZooKeeperSimpleBase):
         )
 
         for req_path in new_build_requests:
-            self.kazoo_client.DataWatch(req_path,
-                                        self._makeBuildStateWatcher(req_path))
+            ExistingDataWatch(self.kazoo_client,
+                              req_path,
+                              self._makeBuildStateWatcher(req_path))
 
         # Notify the user about new build requests if a callback is provided,
         # but only if there are new requests (we don't want to fire on the
@@ -313,6 +315,10 @@ class ExecutorApi(ZooKeeperSimpleBase):
         return build_request
 
     def remove(self, build_request):
+        log = get_annotated_logger(
+            self.log, event=None, build=build_request.uuid
+        )
+        log.debug("Removing build request %s", build_request)
         try:
             # As the build node might contain children (result, data, ...) we
             # must delete it recursively.
@@ -324,6 +330,10 @@ class ExecutorApi(ZooKeeperSimpleBase):
             # Delete the lock parent node as well.
             path = "/".join([self.LOCK_ROOT, build_request.uuid])
             self.kazoo_client.delete(path, recursive=True)
+        except NoNodeError:
+            pass
+        try:
+            self.kazoo_client.get(build_request.path)
         except NoNodeError:
             pass
 
