@@ -17,12 +17,12 @@ import os
 from zuul.lib import strings
 
 
-def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
-                             dependent_changes=[], merger_items=[],
-                             redact_secrets_and_keys=True):
+def construct_build_params(uuid, sched, nodeset, job, item, pipeline,
+                           dependent_changes=[], merger_items=[],
+                           redact_secrets_and_keys=True):
     """Returns a list of all the parameters needed to build a job.
 
-    These parameters may be passed to zuul-executors (via gearman) to perform
+    These parameters may be passed to zuul-executors (via ZK) to perform
     the job itself.
 
     Alternatively they contain enough information to load into another build
@@ -124,6 +124,8 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
         params['cleanup_playbooks'] = [make_playbook(x)
                                        for x in job.cleanup_run]
 
+    # TODO(corvus): Remove nodes and groups since they're included in
+    # nodeset
     nodes = []
     for node in nodeset.getNodes():
         n = node.toDict()
@@ -131,6 +133,7 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
         nodes.append(n)
     params['nodes'] = nodes
     params['groups'] = [group.toDict() for group in nodeset.getGroups()]
+    params["nodeset"] = nodeset.toDict()
     params['ssh_keys'] = []
     if pipeline.post_review:
         if redact_secrets_and_keys:

@@ -34,7 +34,7 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.executor.server import AnsibleJob, squash_variables
 from zuul.lib.ansible import AnsibleManager
-from zuul.model import BuildRequest
+from zuul.model import BuildRequest, NodeSet, Group
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -978,6 +978,7 @@ class TestExecutorExtraPackages(AnsibleZuulTestCase):
 class TestVarSquash(BaseTestCase):
     def test_squash_variables(self):
         # Test that we correctly squash job variables
+        nodeset = NodeSet()
         nodes = [
             {'name': 'node1', 'host_vars': {
                 'host': 'node1_host',
@@ -988,10 +989,8 @@ class TestVarSquash(BaseTestCase):
                 'extra': 'node2_extra',
             }},
         ]
-        groups = [
-            {'name': 'group1', 'nodes': ['node1']},
-            {'name': 'group2', 'nodes': ['node2']},
-        ]
+        nodeset.addGroup(Group('group1', ['node1']))
+        nodeset.addGroup(Group('group2', ['node2']))
         groupvars = {
             'group1': {
                 'host': 'group1_host',
@@ -1017,7 +1016,7 @@ class TestVarSquash(BaseTestCase):
             'extra': 'extravar_extra',
         }
         out = squash_variables(
-            nodes, groups, jobvars, groupvars, extravars)
+            nodes, nodeset, jobvars, groupvars, extravars)
 
         expected = {
             'node1': {

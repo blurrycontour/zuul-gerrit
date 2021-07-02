@@ -753,8 +753,7 @@ class DeduplicateQueue(object):
             self.condition.release()
 
 
-def squash_variables(nodes, groups, jobvars, groupvars,
-                     extravars):
+def squash_variables(nodes, nodeset, jobvars, groupvars, extravars):
     """Combine the Zuul job variable parameters into a hostvars dictionary.
 
     This is used by the executor when freezing job variables.  It
@@ -763,10 +762,9 @@ def squash_variables(nodes, groups, jobvars, groupvars,
     therefore group vars and extra vars can be combined in such a way
     to present a single hierarchy of variables visible to each host).
 
-    :param list nodes: A list of node dictionaries (as supplied by
-         the executor client)
-    :param dict groups: A list of group dictionaries (as supplied by
-         the executor client)
+    :param list nodes: A list of node dictionaries (as returned by
+         getHostList)
+    :param Nodeset nodeset: A nodeset (used for group membership).
     :param dict jobvars: A dictionary corresponding to Zuul's job.vars.
     :param dict groupvars: A dictionary keyed by group name with a value of
          a dictionary of variables for that group.
@@ -781,18 +779,18 @@ def squash_variables(nodes, groups, jobvars, groupvars,
 
     # Zuul runs ansible with the default hash behavior of 'replace';
     # this means we don't need to deep-merge dictionaries.
+    groups = sorted(nodeset.getGroups(), key=lambda g: g.name)
     for node in nodes:
         hostname = node['name']
         ret[hostname] = {}
         # group 'all'
         ret[hostname].update(jobvars)
         # group vars
-        groups = sorted(groups, key=lambda g: g['name'])
         if 'all' in groupvars:
             ret[hostname].update(groupvars.get('all', {}))
         for group in groups:
-            if hostname in group['nodes']:
-                ret[hostname].update(groupvars.get(group['name'], {}))
+            if hostname in group.nodes:
+                ret[hostname].update(groupvars.get(group.name, {}))
         # host vars
         ret[hostname].update(node['host_vars'])
         # extra vars
@@ -818,16 +816,16 @@ def make_setup_inventory_dict(nodes, hostvars):
     return inventory
 
 
-def is_group_var_set(name, host, args):
-    for group in args['groups']:
-        if host in group['nodes']:
-            group_vars = args['group_vars'].get(group['name'], {})
+def is_group_var_set(name, host, nodeset, args):
+    for group in nodeset.getGroups():
+        if host in group.nodes:
+            group_vars = args['group_vars'].get(group.name, {})
             if name in group_vars:
                 return True
     return False
 
 
-def make_inventory_dict(nodes, groups, hostvars, remove_keys=None):
+def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
     hosts = {}
     for node in nodes:
         node_hostvars = hostvars[node['name']].copy()
@@ -851,16 +849,16 @@ def make_inventory_dict(nodes, groups, hostvars, remove_keys=None):
         }
     }
 
-    for group in groups:
+    for group in nodeset.getGroups():
         if 'children' not in inventory['all']:
             inventory['all']['children'] = dict()
 
         group_hosts = {}
-        for node_name in group['nodes']:
+        for node_name in group.nodes:
             group_hosts[node_name] = None
 
         inventory['all']['children'].update({
-            group['name']: {
+            group.name: {
                 'hosts': group_hosts,
             }})
 
@@ -1757,9 +1755,9 @@ class AnsibleJob(object):
                 "Could not decode json from {logfile}".format(
                     logfile=json_output))
 
-    def getHostList(self, args):
+    def getHostList(self, args, nodes):
         hosts = []
-        for node in args['nodes']:
+        for node in nodes:
             # NOTE(mordred): This assumes that the nodepool launcher
             # and the zuul executor both have similar network
             # characteristics, as the launcher will do a test for ipv6
@@ -1768,9 +1766,9 @@ class AnsibleJob(object):
             # set to True in the clouds.yaml for a cloud if this
             # results in the wrong thing being in interface_ip
             # TODO(jeblair): Move this notice to the docs.
-            for name in node['name']:
-                ip = node.get('interface_ip')
-                port = node.get('connection_port', node.get('ssh_port', 22))
+            for name in node.name:
+                ip = node.interface_ip
+                port = node.connection_port
                 host_vars = args['host_vars'].get(name, {}).copy()
                 check_varnames(host_vars)
                 host_vars.update(dict(
@@ -1778,18 +1776,18 @@ class AnsibleJob(object):
                     ansible_user=self.executor_server.default_username,
                     ansible_port=port,
                     nodepool=dict(
-                        label=node.get('label'),
-                        az=node.get('az'),
-                        cloud=node.get('cloud'),
-                        provider=node.get('provider'),
-                        region=node.get('region'),
-                        host_id=node.get('host_id'),
-                        external_id=node.get('external_id'),
-                        interface_ip=node.get('interface_ip'),
-                        public_ipv4=node.get('public_ipv4'),
-                        private_ipv4=node.get('private_ipv4'),
-                        public_ipv6=node.get('public_ipv6'),
-                        private_ipv6=node.get('private_ipv6'))))
+                        label=node.label,
+                        az=node.az,
+                        cloud=node.cloud,
+                        provider=node.provider,
+                        region=node.region,
+                        host_id=node.host_id,
+                        external_id=getattr(node, 'external_id', None),
+                        interface_ip=node.interface_ip,
+                        public_ipv4=node.public_ipv4,
+                        private_ipv4=node.private_ipv4,
+                        public_ipv6=node.public_ipv6,
+                        private_ipv6=node.private_ipv6)))
 
                 # Ansible >=2.8 introduced "auto" as an
                 # ansible_python_interpreter argument that looks up
@@ -1802,15 +1800,15 @@ class AnsibleJob(object):
                 # user control.
                 api = 'ansible_python_interpreter'
                 if (api not in args['vars'] and
-                    not is_group_var_set(api, name, args)):
-                    python = node.get('python_path', 'auto')
+                    not is_group_var_set(api, name, self.nodeset, args)):
+                    python = getattr(node, 'python_path', 'auto')
                     host_vars.setdefault(api, python)
 
-                username = node.get('username')
+                username = node.username
                 if username:
                     host_vars['ansible_user'] = username
 
-                connection_type = node.get('connection_type')
+                connection_type = node.connection_type
                 if connection_type:
                     host_vars['ansible_connection'] = connection_type
                     if connection_type == "winrm":
@@ -1833,19 +1831,19 @@ class AnsibleJob(object):
                                 self.winrm_read_timeout
                     elif connection_type == "kubectl":
                         host_vars['ansible_kubectl_context'] = \
-                            node.get('kubectl_context')
+                            getattr(node, 'kubectl_context', None)
 
-                shell_type = node.get('shell_type')
+                shell_type = getattr(node, 'shell_type', None)
                 if shell_type:
                     host_vars['ansible_shell_type'] = shell_type
 
                 host_keys = []
-                for key in node.get('host_keys', []):
+                for key in getattr(node, 'host_keys', []):
                     if port != 22:
                         host_keys.append("[%s]:%s %s" % (ip, port, key))
                     else:
                         host_keys.append("%s %s" % (ip, key))
-                if not node.get('host_keys'):
+                if not getattr(node, 'host_keys', None):
                     host_vars['ansible_ssh_common_args'] = \
                         '-o StrictHostKeyChecking=false'
 
@@ -2293,32 +2291,33 @@ class AnsibleJob(object):
     def prepareNodes(self, args):
         # Returns the zuul.resources ansible variable for later user
 
-        # Used to remove resource nodes from the inventory
-        resources_nodes = []
+        # The (non-resource) nodes we want to keep in the inventory
+        inventory_nodes = []
         # The zuul.resources ansible variable
         zuul_resources = {}
-        for node in args['nodes']:
-            if node.get('connection_type') in (
+        for node in self.nodeset.getNodes():
+            if node.connection_type in (
                     'namespace', 'project', 'kubectl'):
                 # TODO: decrypt resource data using scheduler key
-                data = node['connection_port']
+                data = connection_port
                 # Setup kube/config file
                 self.prepareKubeConfig(self.jobdir, data)
                 # Convert connection_port in kubectl connection parameters
-                node['connection_port'] = None
-                node['kubectl_namespace'] = data['namespace']
-                node['kubectl_context'] = data['context_name']
+                node.connection_port = None
+                node.kubectl_namespace = data['namespace']
+                node.kubectl_context = data['context_name']
                 # Add node information to zuul.resources
-                zuul_resources[node['name'][0]] = {
+                zuul_resources[node.name[0]] = {
                     'namespace': data['namespace'],
                     'context': data['context_name'],
                 }
-                if node['connection_type'] in ('project', 'namespace'):
+                if node.connection_type in ('project', 'namespace'):
                     # Project are special nodes that are not the inventory
-                    resources_nodes.append(node)
+                    pass
                 else:
+                    inventory_nodes.append(node)
                     # Add the real pod name to the resources_var
-                    zuul_resources[node['name'][0]]['pod'] = data['pod']
+                    zuul_resources[node.name[0]]['pod'] = data['pod']
 
                     fwd = KubeFwd(zuul_event_id=self.zuul_event_id,
                                   build=self.build_request.uuid,
@@ -2329,18 +2328,17 @@ class AnsibleJob(object):
                     try:
                         fwd.start()
                         self.port_forwards.append(fwd)
-                        zuul_resources[node['name'][0]]['stream_port'] = \
+                        zuul_resources[node.name[0]]['stream_port'] = \
                             fwd.port
                     except Exception:
                         self.log.exception("Unable to start port forward:")
                         self.log.error("Kubectl and socat are required for "
                                        "streaming logs")
+            else:
+                # A normal node to include in inventory
+                inventory_nodes.append(node)
 
-        # Remove resource node from nodes list
-        for node in resources_nodes:
-            args['nodes'].remove(node)
-
-        self.host_list = self.getHostList(args)
+        self.host_list = self.getHostList(args, inventory_nodes)
 
         with open(self.jobdir.known_hosts, 'w') as known_hosts:
             for node in self.host_list:
@@ -2354,8 +2352,8 @@ class AnsibleJob(object):
 
         # Check the group and extra var names for safety; they'll get
         # merged later
-        for group in args['groups']:
-            group_vars = args['group_vars'].get(group['name'], {})
+        for group in self.nodeset.getGroups():
+            group_vars = args['group_vars'].get(group.name, {})
             check_varnames(group_vars)
 
         check_varnames(args['extra_vars'])
@@ -2387,7 +2385,7 @@ class AnsibleJob(object):
         }
         host_list = self.host_list + [localhost]
         self.original_hostvars = squash_variables(
-            host_list, args['groups'], all_vars,
+            host_list, self.nodeset, all_vars,
             args['group_vars'], args['extra_vars'])
 
     def loadFrozenHostvars(self):
@@ -2425,7 +2423,7 @@ class AnsibleJob(object):
         # for debugging, so let's continue to put something there.
         args = self.arguments
         inventory = make_inventory_dict(
-            self.host_list, args['groups'], self.original_hostvars)
+            self.host_list, self.nodeset, self.original_hostvars)
 
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
@@ -2447,7 +2445,7 @@ class AnsibleJob(object):
     def writeInventory(self, jobdir_playbook, hostvars):
         args = self.arguments
         inventory = make_inventory_dict(
-            self.host_list, args['groups'], hostvars,
+            self.host_list, self.nodeset, hostvars,
             remove_keys=jobdir_playbook.secrets_keys)
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:

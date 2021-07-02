@@ -509,7 +509,7 @@ class RPCListener(RPCListenerBase):
         nodeset = job.nodeset
         job.setBase(tenant.layout)
         uuid = '0' * 32
-        params = zuul.executor.common.construct_gearman_params(
+        params = zuul.executor.common.construct_build_params(
             uuid, self.sched, nodeset,
             job, item, pipeline)
         gear_job.sendWorkComplete(json.dumps(params, cls=ZuulJSONEncoder))

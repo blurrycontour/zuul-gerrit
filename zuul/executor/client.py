@@ -59,7 +59,7 @@ class ExecutorClient(object):
             "with dependent changes %s",
             job, uuid, nodeset, item.change, dependent_changes)
 
-        params = zuul.executor.common.construct_gearman_params(
+        params = zuul.executor.common.construct_build_params(
             uuid, self.sched, nodeset,
             job, item, pipeline, dependent_changes, merger_items,
             redact_secrets_and_keys=False)
@@ -102,7 +102,6 @@ class ExecutorClient(object):
 
         # Store the NodeRequest ID in the job arguments, so we can look it up
         # on the executor side to lock the nodes.
-        params["nodeset"] = nodeset.toDict()
         node_request = build.build_set.getJobNodeRequest(job.name)
         if node_request:
             params["noderequest_id"] = node_request.id
