@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8e58d6d6_0814699b",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-02T21:39:29Z",
+      "side": 1,
+      "message": "Do we get this line first then append the \\t prefixed lines after it? That would explain why we reset sessions here at least.",
+      "revId": "6fecd3334bb2d2b4e79546384d79607bd0048a75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
