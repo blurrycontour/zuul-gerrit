@@ -3202,6 +3202,10 @@ class TestingExecutorApi(HoldableExecutorApi):
         return all_builds
 
     def _getJobForBuildRequest(self, build_request):
+        # The parameters for the build request are removed immediately
+        # after the job starts in order to reduce impact to ZK, so if
+        # we want to inspect them in the tests, we need to save them.
+        # This adds them to a private internal cache for that purpose.
         if not hasattr(self, '_test_build_request_job_map'):
             self._test_build_request_job_map = {}
         if build_request.uuid in self._test_build_request_job_map:
