@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4fd6a76d_bc6859f3",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-02T19:11:05Z",
+      "side": 1,
+      "message": "This block is not necessary if the user supplied callback returned False for some reason: https://github.com/python-zk/kazoo/blob/master/kazoo/recipe/watchers.py#L165-L168\n\nThis would also remove a watcher that was created on a non existing path. If you want the callback to be able to decide if it should return False and stop watching then you should defer this to the callback.\n\nHowever, if we want to ensure no watching happens on non existing nodes (seems like a reasonable thing specifically for zuul in this case) then we should probably guard against this more robustly:\n\n  if stat is None and not self._stopped:\n      #cleanup",
+      "revId": "bfea232a58c75fa3d8e37da4952babc2700132fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
