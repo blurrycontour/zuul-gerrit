@@ -124,15 +124,6 @@ def construct_build_params(uuid, sched, nodeset, job, item, pipeline,
         params['cleanup_playbooks'] = [make_playbook(x)
                                        for x in job.cleanup_run]
 
-    # TODO(corvus): Remove nodes and groups since they're included in
-    # nodeset
-    nodes = []
-    for node in nodeset.getNodes():
-        n = node.toDict()
-        n.update(dict(name=node.name, label=node.label))
-        nodes.append(n)
-    params['nodes'] = nodes
-    params['groups'] = [group.toDict() for group in nodeset.getGroups()]
     params["nodeset"] = nodeset.toDict()
     params['ssh_keys'] = []
     if pipeline.post_review:
