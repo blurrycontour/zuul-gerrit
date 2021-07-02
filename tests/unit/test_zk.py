@@ -398,6 +398,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         server.fulfillCancel(a)
         server.unlock(a)
         self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
+        print(self.zk_client.client.command(b'wchp'))
 
         # Scheduler removes build request on completion
         client.remove(sched_a)
@@ -408,6 +409,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(self._get_zk_tree(
             client.BUILD_REQUEST_ROOT + '/zones'), [])
         self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
+        print(self.zk_client.client.command(b'wchp'))
 
     def test_build_request_remove(self):
         # Test the scheduler forcibly removing a request (perhaps the

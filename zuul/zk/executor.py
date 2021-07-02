@@ -20,6 +20,7 @@ from enum import Enum
 from kazoo.exceptions import LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType
 from kazoo.recipe.lock import Lock
+from kazoo.recipe.watchers import DataWatch, _ignore_closed
 
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
@@ -27,6 +28,41 @@ from zuul.model import BuildRequest
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.exceptions import BuildRequestNotFound
 from zuul.zk import sharding
+
+
+class ZuulDataWatch(DataWatch):
+    # From
+    # https://github.com/python-zk/kazoo/blob/master/kazoo/recipe/watchers.py
+    @_ignore_closed
+    def _get_data(self, event=None):
+        # Ensure this runs one at a time, possible because the session
+        # watcher may trigger a run
+        with self._run_lock:
+            if self._stopped:
+                return
+
+            initial_version = self._version
+
+            try:
+                data, stat = self._retry(self._client.get,
+                                         self._path, self._watcher)
+            except NoNodeError:
+                self._stopped = True
+                self._func = None
+                self._client.remove_listener(self._session_watcher)
+                return
+
+            # No node data, clear out version
+            if stat is None:
+                self._version = None
+            else:
+                self._version = stat.mzxid
+
+            # Call our function if its the first time ever, or if the
+            # version has changed
+            if initial_version != self._version or not self._ever_called:
+                self._log_func_exception(data, stat, event)
+
 
 
 class BuildRequestEvent(Enum):
@@ -102,11 +138,13 @@ class ExecutorApi(ZooKeeperSimpleBase):
         self.registerZone(None)
 
     def _makeBuildStateWatcher(self, path):
+        self.log.debug("make watcher %s", path)
         def watch(data, stat, event=None):
             return self._watchBuildState(path, data, stat, event)
         return watch
 
     def _watchBuildState(self, path, data, stat, event=None):
+        self.log.debug("%s %s", path, event)
         if not event or event.type == EventType.CHANGED:
             # As we already get the data and the stat value, we can directly
             # use it without asking ZooKeeper for the data again.
@@ -149,6 +187,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
                 )
 
             # Return False to stop the datawatch as the build got deleted.
+            self.log.debug("return false")
             return False
 
     def _makeBuildRequestWatcher(self, path):
@@ -175,8 +214,9 @@ class ExecutorApi(ZooKeeperSimpleBase):
         )
 
         for req_path in new_build_requests:
-            self.kazoo_client.DataWatch(req_path,
-                                        self._makeBuildStateWatcher(req_path))
+            ZuulDataWatch(self.kazoo_client,
+                          req_path,
+                          self._makeBuildStateWatcher(req_path))
 
         # Notify the user about new build requests if a callback is provided,
         # but only if there are new requests (we don't want to fire on the
@@ -313,6 +353,10 @@ class ExecutorApi(ZooKeeperSimpleBase):
         return build_request
 
     def remove(self, build_request):
+        log = get_annotated_logger(
+            self.log, event=None, build=build_request.uuid
+        )
+        log.debug("Removing build request %s", build_request)
         try:
             # As the build node might contain children (result, data, ...) we
             # must delete it recursively.
@@ -325,6 +369,11 @@ class ExecutorApi(ZooKeeperSimpleBase):
             path = "/".join([self.LOCK_ROOT, build_request.uuid])
             self.kazoo_client.delete(path, recursive=True)
         except NoNodeError:
+            pass
+        try:
+            self.kazoo_client.get(build_request.path)
+        except NoNodeError:
+            print('no node')
             pass
 
     def _watchBuildEvents(self, actions, event=None):
