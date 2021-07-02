@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e22f64e9_519a1ee7",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-02T18:45:34Z",
+      "side": 1,
+      "message": "I think you may need to set default values for data and stat to None. If you don\u0027t then the exception that can be raised below means they won\u0027t be set. Then on lines 56 and 64 we may have problems with undefined names.",
+      "range": {
+        "startLine": 47,
+        "startChar": 16,
+        "endLine": 47,
+        "endChar": 26
+      },
+      "revId": "ab474dbac304a3143be24b234460d1925d9e6734",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
