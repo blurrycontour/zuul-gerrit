@@ -16,6 +16,23 @@
       "revId": "bfea232a58c75fa3d8e37da4952babc2700132fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79a26240_85d0dff9",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-02T20:47:38Z",
+      "side": 1,
+      "message": "I don\u0027t think we need to guard against that?  It\u0027s just a couple of duplicate lines (it\u0027s okay to remove the listener twice; it\u0027s just a set discard).\n\nTo be clear, the ZooKeeper watch is removed regardless of what we do here because we haven\u0027t called a method to add it (removing the \u0027retry\u0027 is what does this).  The remove_listener call just stops the watcher from being re-added after a disconnect.\n\nThis class never creates a watcher on a non-existent path, because the get call doesn\u0027t succeed so the watcher isn\u0027t set.  However, we are registered as a client-side connection listener, so on a disconnect, we\u0027ll be called and will attempt again.\n\nI think the current code is correct because in all cases it leaves us without a watch and without a connection listener.",
+      "revId": "bfea232a58c75fa3d8e37da4952babc2700132fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
