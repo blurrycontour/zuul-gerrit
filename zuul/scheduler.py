@@ -111,9 +111,9 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
-    _semaphore_cleanup_interval = IntervalTrigger(minutes=60)
-    _config_cache_cleanup_interval = IntervalTrigger(minutes=60)
-    _build_request_cleanup_interval = IntervalTrigger(seconds=60)
+    _semaphore_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
+    _config_cache_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
+    _build_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
 
