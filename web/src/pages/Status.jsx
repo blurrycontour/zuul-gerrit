@@ -171,10 +171,7 @@ class StatusPage extends React.Component {
         }</span> events,&nbsp;
         <span>{status.management_event_queue ?
           status.management_event_queue.length : '0'
-        }</span> management events,&nbsp;
-        <span>{status.result_event_queue ?
-          status.result_event_queue.length : '0'
-        }</span> results.
+        }</span> management events.
       </p>
     )
   }

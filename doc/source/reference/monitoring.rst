@@ -474,11 +474,6 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
       Holds metrics about the event queue lengths in the Zuul scheduler.
 
-      .. stat:: result
-         :type: gauge
-
-         The size of the current result event queue.
-
       .. stat:: management
          :type: gauge
 

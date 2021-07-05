@@ -308,9 +308,6 @@ paths:
                     items:
                       $ref: '#/components/schemas/pipelineStatus'
                     type: array
-                  result_event_queue:
-                    description: The number of completed events
-                    type: integer
                   trigger_event_queue:
                     description: The number of running events
                     type: integer

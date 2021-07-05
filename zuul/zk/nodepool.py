@@ -21,7 +21,7 @@ from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
-from zuul.model import HoldRequest, NodeRequest
+from zuul.model import HoldRequest, Node, NodeRequest, NodeSet
 from zuul.zk import ZooKeeperClient, ZooKeeperBase
 from zuul.zk.exceptions import LockException
 
@@ -400,14 +400,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         self.kazoo_client.DataWatch(path, callback)
 
-    def getNodeRequest(self, node_request_id, nodeset):
+    def getNodeRequest(self, node_request_id, nodeset=None):
         """
         Retrieve a NodeRequest from a given path in ZooKeeper.
 
-        The nodeset provided to this method will be set on the NodeRequest
-        before updating it. This will ensure that all nodes are updated as
-        well.
-
+        The serialized version of the NodeRequest doesn't contain a NodeSet, so
+        we have to add this to the request manually. The nodeset provided to
+        this method will be set on the NodeRequest before updating it. This
+        will ensure that all nodes are updated as well.
         """
 
         path = f"{self.REQUEST_ROOT}/{node_request_id}"
@@ -419,7 +419,25 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if not data:
             return None
 
-        obj = NodeRequest.fromDict(json.loads(data.decode("utf-8")))
+        json_data = json.loads(data.decode("utf-8"))
+
+        obj = NodeRequest.fromDict(json_data)
+        if nodeset is None:
+            # If no NodeSet is provided, we create one on-the-fly based on the
+            # list of labels (node_types) stored in the NodeRequest's znode
+            # data.
+            # This is necessary as the logic in the updateNodeRequest() method
+            # below will update each node "in-place" an thus, we have to ensure
+            # that the NodeRequest has a valid NodeSet with all nodes available
+            # in advance.
+            # This is only used to return the nodes to nodepool in case
+            # something went wrong and the original NodeRequest and/or NodeSet
+            # objects are not available anymore.
+            nodeset = NodeSet()
+            for i, node_type in enumerate(json_data["node_types"]):
+                node = Node(name=f"{node_type}-{i}", label=node_type)
+                nodeset.addNode(node)
+
         obj.nodeset = nodeset
         # Using updateNodeRequest() here will ensure that the nodes are also
         # updated. Doing the update in here directly rather than calling it
