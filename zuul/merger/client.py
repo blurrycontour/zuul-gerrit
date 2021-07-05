@@ -111,12 +111,14 @@ class MergeClient(object):
         return job
 
     def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, precedence=PRECEDENCE_HIGH,
+                        tosha=None, oldrev=None, newrev=None, precedence=PRECEDENCE_HIGH,
                         build_set=None, needs_result=False, event=None):
         data = dict(connection=connection_name,
                     project=project_name,
                     branch=branch,
-                    tosha=tosha)
+                    tosha=tosha,
+                    oldrev=oldrev,
+                    newrev=newrev)
         job = self.submitJob(
             MergeRequest.FILES_CHANGES,
             data,

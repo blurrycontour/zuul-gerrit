@@ -214,6 +214,8 @@ class PagureEventConnector(threading.Thread):
             event.change_number = data.get('id')
             event.updated_at = data.get('date_created')
             event.branch = data.get('branch')
+            event.oldrev = data.get('commit_start')
+            event.newrev = data.get('commit_stop')
             event.tags = data.get('tags', [])
             event.change_url = self.connection.getPullUrl(event.project_name,
                                                           event.change_number)
@@ -723,6 +725,8 @@ class PagureConnection(BaseConnection):
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('branch')
         change.patchset = change.pr.get('commit_stop')
+        change.newrev = change.pr.get('commit_stop')
+        change.oldrev = change.pr.get('commit_start')
         change.files = change.pr.get('files')
         change.title = change.pr.get('title')
         change.tags = change.pr.get('tags')

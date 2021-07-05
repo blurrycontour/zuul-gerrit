@@ -1401,6 +1401,8 @@ class GithubConnection(CachedBranchConnection):
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
         change.commit_id = change.pr.get('head').get('sha')
+        change.oldrev = change.pr.get('base').get('sha')
+        change.newrev = change.pr.get('head').get('sha')
         change.owner = change.pr.get('user').get('login')
         # Don't overwrite the files list. The change object is bound to a
         # specific revision and thus the changed files won't change. This is

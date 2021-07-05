@@ -665,19 +665,83 @@ class Repo(object):
                             'utf-8')
         return ret
 
-    def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
+    def getFilesChanges(self, refBase, refTo=None, oldrev=None,
+                        newrev=None, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
         files = set()
+        commitBase = None
+        commitTo = None
+        if refBase and refBase != (40 * '0'):
+            self.fetch(refBase, zuul_event_id=zuul_event_id)
+            commitBase = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+        if refTo and refTo != (40 * '0'):
+            self.fetch(refTo, zuul_event_id=zuul_event_id)
+            commitTo = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
 
-        if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+        # if commitBase and commitTo reference point to the same commit
+        # mostly in case of a ref-updated event
+        # we use oldrev and newrev information to decide what to do:
+        if commitBase and commitTo and (commitBase == commitTo):
+            # values exist and are different from null
+            # git diff between the 2 rev
+            if (newrev and newrev != (40 * '0') and
+                    oldrev and oldrev != (40 * '0')):
+                commitBase = repo.commit(oldrev)
+                commitTo = repo.commit(newrev)
+
+            # newrev exists and oldrev is null, all files from newrev
+            elif (newrev and newrev != (40 * '0') and
+                    oldrev == (40 * '0')):
+                commitBase = None
+                commitTo = repo.commit(newrev)
+
+            # [1] if newrev and oldrev are both null/0000, all files
+            # from commitTo reference [1]
+            else:
+                commitBase = None
+
+        # same use case as [1] above, but commitTo and CommitBase were
+        # not equal, (maybe because of the driver implementation)
+        # use case is similar, return all files from commitTo reference
+        elif (commitTo and oldrev == (40 * '0') and
+                newrev == (40 * '0')):
+            commitBase = None
+
+        # define function for ancestor type diff
+        def gitDiffAncestor(commitA, commitB):
+            ancestorDiffFiles = set()
+            for x in commitA.diff(commitB):
+                if x.a_blob is not None:
+                    ancestorDiffFiles.add(x.a_blob.path)
+                if x.b_blob is not None:
+                    ancestorDiffFiles.add(x.b_blob.path)
+            return ancestorDiffFiles
+
+        if (commitBase and commitTo and commitBase.hexsha != (40 * '0')
+                and commitTo.hexsha != (40 * '0') and
+                commitBase != commitTo):
+            if (repo.is_ancestor(commitBase, commitTo) or
+                    repo.is_ancestor(commitTo, commitBase)):
+                files = gitDiffAncestor(commitBase, commitTo)
+            else:
+                filesDiffList = []
+                for mergeBase in repo.merge_base(commitBase, commitTo,
+                                                 all=True):
+                    filesDiffList.append(gitDiffAncestor(mergeBase,
+                                                         commitTo))
+                files = set.intersection(*filesDiffList)
+        elif commitBase and commitBase.hexsha != (40 * '0'):
+            for item in commitBase.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
+        elif commitTo and commitTo.hexsha != (40 * '0'):
+            for item in commitTo.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
         else:
-            files.update(head.stats.files.keys())
+            raise
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
@@ -1210,7 +1274,8 @@ class Merger(object):
         return repo.getFiles(files, dirs, branch=branch)
 
     def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, zuul_event_id=None):
+                        tosha=None, oldrev=None, newrev=None,
+                        zuul_event_id=None):
         """Get a list of files changed in one or more commits
 
         Gets files changed between tosha and branch (or just the
@@ -1226,4 +1291,5 @@ class Merger(object):
                             zuul_event_id=zuul_event_id)
         # This performs a fetch, and therefore update/reset are not
         # required.
-        return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)
+        return repo.getFilesChanges(branch, tosha, oldrev, newrev,
+                                    zuul_event_id=zuul_event_id)

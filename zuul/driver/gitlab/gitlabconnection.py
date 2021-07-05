@@ -555,6 +555,8 @@ class GitlabConnection(CachedBranchConnection):
         change.branch = change.mr['target_branch']
         change.patchset = change.mr['sha']
         change.commit_id = change.mr['diff_refs'].get('head_sha')
+        change.oldrev = change.mr['diff_refs'].get('base_sha')
+        change.newrev = change.mr['diff_refs'].get('head_sha')
         change.owner = change.mr['author'].get('username')
         # Files changes are not part of the Merge Request data
         # See api/merge_requests.html#get-single-mr-changes

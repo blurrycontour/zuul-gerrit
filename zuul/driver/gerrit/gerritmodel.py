@@ -47,6 +47,8 @@ class GerritChange(Change):
             raise exceptions.ChangeNotFound(self.number, self.patchset)
         self.project = connection.source.getProject(data['project'])
         self.commit_id = str(data['currentPatchSet']['revision'])
+        self.oldrev = str(data['currentPatchSet']['parents'][0])
+        self.newrev = self.commit_id
         self.branch = data['branch']
         self.url = data['url']
         urlparse = urllib.parse.urlparse(connection.baseurl)
@@ -104,6 +106,8 @@ class GerritChange(Change):
             self.patchset = str(current_revision['_number'])
         self.project = connection.source.getProject(data['project'])
         self.commit_id = str(data['current_revision'])
+        self.oldrev = str(current_revision['commit']['parents'][0]['commit'])
+        self.newrev = self.commit_id
         self.id = data['change_id']
         self.branch = data['branch']
         self.url = '%s/%s' % (baseurl, self.number)
