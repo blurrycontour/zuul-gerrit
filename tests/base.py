@@ -4178,7 +4178,6 @@ class SchedulerTestApp:
         # longer use global management events.
         self.event_queues = [
             self.sched.reconfigure_event_queue,
-            self.sched.result_event_queue,
         ]
 
     def start(self, validate_tenants: list):
