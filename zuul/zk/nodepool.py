@@ -480,10 +480,13 @@ class ZooKeeperNodepool(ZooKeeperBase):
             path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
             data, stat = self.kazoo_client.get(path)
         data = json.loads(data.decode('utf8'))
-        request_nodes = list(node_request.nodeset.getNodes())
+        # Depending on whether this method is called on the scheduler or the
+        # executor side after the NR has be retrieved from ZK, the nodeset
+        # might not be set/available.
         for i, nodeid in enumerate(data.get('nodes', [])):
-            request_nodes[i].id = nodeid
-            self._updateNode(request_nodes[i])
+            node = node_request.nodeset.getNodeAtIndex(i)
+            node.id = nodeid
+            self._updateNode(node)
         node_request.updateFromDict(data)
 
     def storeNode(self, node):

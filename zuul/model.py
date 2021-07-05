@@ -766,6 +766,9 @@ class NodeSet(ConfigObject):
                 raise Exception("Duplicate node in %s" % (self,))
         self.nodes[tuple(node.name)] = node
 
+    def getNodeAtIndex(self, index):
+        return self.getNodes()[index]
+
     def getNodes(self):
         return list(self.nodes.values())
 
@@ -786,6 +789,33 @@ class NodeSet(ConfigObject):
 
     def __len__(self):
         return len(self.nodes)
+
+
+class AnonymousNodeSet(NodeSet):
+    """Mimics a NodeSet object with a list of dummy nodes.
+
+    As the Nodepool client is relying on all nodes being present on the NodeSet
+    before updating them with the information from ZooKeeper, this class will
+    ensure that there is always a node available that can be updated.
+
+    This can be used to return the nodes to nodepool when the original
+    NodeRequest and/or the original NodeSet objects are not available anymore.
+
+    This should only be used in clean up cases, e.g. to return the nodes to
+    nodepool but not to start a build or similar.
+    """
+
+    def getNodeAtIndex(self, index):
+        try:
+            return super().getNodeAtIndex(index)
+        except IndexError:
+            name = f"dummy_{index}"
+            node = Node(name=name, label=name)
+            self.nodes[name] = node
+            return node
+
+    def __repr__(self):
+        return f"<AnonymousNodeSet {self.name}>"
 
 
 class NodeRequest(object):
@@ -874,6 +904,7 @@ class NodeRequest(object):
         self._state = data['state']
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
+        self.event_id = data['event_id']
 
     @classmethod
     def fromDict(cls, data):
@@ -4105,20 +4136,26 @@ class NodesProvisionedEvent(ResultEvent):
     :arg NodeRequest request: The fulfilled node request.
     """
 
-    def __init__(self, request):
-        self.request = request
-        self.build_set_uuid = request.build_set_uuid
-        self.request_id = request.id
+    def __init__(self, request_id, job_name, build_set_uuid):
+        self.request_id = request_id
+        # We have to use the job_name to look up empty node requests from the
+        # buildset (as empty node requests don't have an id).
+        self.job_name = job_name
+        self.build_set_uuid = build_set_uuid
 
     def toDict(self):
         return {
-            "request": self.request,
+            "request_id": self.request_id,
+            "job_name": self.job_name,
+            "build_set_uuid": self.build_set_uuid,
         }
 
     @classmethod
     def fromDict(cls, data):
         return cls(
-            data.get("request"),
+            data.get("request_id"),
+            data.get("job_name"),
+            data.get("build_set_uuid"),
         )
 
 
