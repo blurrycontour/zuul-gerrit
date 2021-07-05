@@ -109,6 +109,11 @@ class ExecutorApi(ZooKeeperSimpleBase):
 
     def _watchBuildState(self, path, data, stat, event=None):
         if not event or event.type == EventType.CHANGED:
+            # Don't process change events w/o any data. This can happen when
+            # a "slow" change watch tried to retrieve the data of a znode that
+            # was deleted in the meantime.
+            if data is None:
+                return
             # As we already get the data and the stat value, we can directly
             # use it without asking ZooKeeper for the data again.
             content = self._bytesToDict(data)
