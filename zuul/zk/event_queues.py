@@ -46,7 +46,6 @@ MANAGEMENT_EVENT_TYPE_MAP = {
     "EnqueueEvent": model.EnqueueEvent,
     "PromoteEvent": model.PromoteEvent,
     "ReconfigureEvent": model.ReconfigureEvent,
-    "SmartReconfigureEvent": model.SmartReconfigureEvent,
     "TenantReconfigureEvent": model.TenantReconfigureEvent,
 }
 

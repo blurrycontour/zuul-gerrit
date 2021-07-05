@@ -3760,10 +3760,20 @@ class ReconfigureEvent(ManagementEvent):
     """Reconfigure the scheduler.  The layout will be (re-)loaded from
     the path specified in the configuration."""
 
+    def __init__(self, smart=False):
+        super(ReconfigureEvent, self).__init__()
+        self.smart = smart
 
-class SmartReconfigureEvent(ManagementEvent):
-    """Reconfigure the scheduler.  The layout will be (re-)loaded from
-    the path specified in the configuration."""
+    def toDict(self):
+        d = super().toDict()
+        d["smart"] = self.smart
+        return d
+
+    @classmethod
+    def fromDict(cls, data):
+        event = cls(data.get("smart", False))
+        event.updateFromDict(data)
+        return event
 
 
 class TenantReconfigureEvent(ManagementEvent):

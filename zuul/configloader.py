@@ -2266,6 +2266,7 @@ class ConfigLoader(object):
         return unparsed_abide
 
     def loadAdminRules(self, abide, unparsed_abide):
+        abide.admin_rules.clear()
         for conf_admin_rule in unparsed_abide.admin_rules:
             admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
             abide.admin_rules[admin_rule.name] = admin_rule

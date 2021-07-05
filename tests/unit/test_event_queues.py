@@ -206,7 +206,7 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
 
-        event = model.ReconfigureEvent(None)
+        event = model.ReconfigureEvent()
         result_future = queue.put(event, needs_result=False)
         self.assertIsNone(result_future)
 
@@ -232,7 +232,7 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         # Test that management event errors are reported.
         queue = event_queues.TenantManagementEventQueue(
             self.zk_client, "tenant")
-        event = model.ReconfigureEvent(None)
+        event = model.ReconfigureEvent()
         result_future = queue.put(event)
 
         acked = 0
@@ -276,7 +276,7 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
             self.zk_client
         )
 
-        event = model.ReconfigureEvent(None)
+        event = model.ReconfigureEvent()
         tenant_queue.put(event, needs_result=False)
         self.assertTrue(tenant_queue.hasEvents())
 
@@ -377,7 +377,7 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         external_queue = event_queues.TenantManagementEventQueue(
             external_client, "tenant")
 
-        event = model.ReconfigureEvent(None)
+        event = model.ReconfigureEvent()
         result_future = external_queue.put(event)
         self.assertIsNotNone(result_future)
 
@@ -419,7 +419,7 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
             external_client, "tenant")
 
         # Submit the event
-        event = model.ReconfigureEvent(None)
+        event = model.ReconfigureEvent()
         result_future = external_queue.put(event)
         self.assertIsNotNone(result_future)
 
@@ -512,7 +512,7 @@ class TestEventWatchers(EventQueueBaseTestCase):
         )
         self.assertFalse(event.is_set())
 
-        management_queue["tenant"].put(model.ReconfigureEvent(None),
+        management_queue["tenant"].put(model.ReconfigureEvent(),
                                        needs_result=False)
         self._wait_for_event(event)
         event.clear()
@@ -538,7 +538,7 @@ class TestEventWatchers(EventQueueBaseTestCase):
         )
         self.assertFalse(event.is_set())
 
-        management_queues["tenant"]["check"].put(model.ReconfigureEvent(None))
+        management_queues["tenant"]["check"].put(model.ReconfigureEvent())
         self._wait_for_event(event)
         event.clear()
 
