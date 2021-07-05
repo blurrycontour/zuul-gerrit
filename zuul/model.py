@@ -871,6 +871,7 @@ class NodeRequest(object):
         self._state = data['state']
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
+        self.event_id = data['event_id']
 
     @classmethod
     def fromDict(cls, data):
@@ -4096,20 +4097,26 @@ class NodesProvisionedEvent(ResultEvent):
     :arg NodeRequest request: The fulfilled node request.
     """
 
-    def __init__(self, request):
-        self.request = request
-        self.build_set_uuid = request.build_set_uuid
-        self.request_id = request.id
+    def __init__(self, request_id, job_name, build_set_uuid):
+        self.request_id = request_id
+        # We have to use the job_name to look up empty node requests from the
+        # buildset (as empty node requests don't have an id).
+        self.job_name = job_name
+        self.build_set_uuid = build_set_uuid
 
     def toDict(self):
         return {
-            "request": self.request,
+            "request_id": self.request_id,
+            "job_name": self.job_name,
+            "build_set_uuid": self.build_set_uuid,
         }
 
     @classmethod
     def fromDict(cls, data):
         return cls(
-            data.get("request"),
+            data.get("request_id"),
+            data.get("job_name"),
+            data.get("build_set_uuid"),
         )
 
 
