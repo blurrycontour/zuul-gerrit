@@ -134,6 +134,7 @@ class ZuulDriver(Driver, TriggerInterface):
         event.change_url = change.url
         event.patch_number = change.patchset
         event.ref = change.ref
+        event.timestamp = time.time()
         event.zuul_event_id = str(uuid4().hex)
         self.sched.addTriggerEvent(self.name, event)
 
