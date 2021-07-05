@@ -16,6 +16,23 @@
       "revId": "2209ae6d205393400553247a6f9b0867f3140e89",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "116aa43e_2202829b",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-05T21:58:02Z",
+      "side": 1,
+      "message": "Based on my understanding of the DataWatch (and now ExistingDataWatch) class, I believe there will not be a separate deleted event, because:\n\n1) If we were using DataWatch, the watcher would be set via the \"exists\" call, and so the next callback would only happen if a new znode were created at that path.\n2) But since we\u0027re using the new ExistingDataWatch (because the above doesn\u0027t make sense for us), there will be no watcher set at this point.  The return value in this case does not matter.",
+      "revId": "2209ae6d205393400553247a6f9b0867f3140e89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
