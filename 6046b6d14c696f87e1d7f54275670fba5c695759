@@ -16,6 +16,24 @@
       "revId": "6046b6d14c696f87e1d7f54275670fba5c695759",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9d58f441_1ac8edf0",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2021-07-05T14:02:49Z",
+      "side": 1,
+      "message": "I thought we wanted to get rid of the scheduler reference here eventually. Therefore passed in the tenants separately as I wanted to avoid a new reference to something that\u0027s ought to be removed.\nWouldn\u0027t it be also okay to have the tenant param be empty in case the executor creates the instance and then just skip the corresponding stats?\nOtherwise, I can of course remove the tenant param and use scheduler.abide.tenants instead (I think we had it this way before, and then changed it because of the above reason).",
+      "parentUuid": "b6b8d96c_f98f9533",
+      "revId": "6046b6d14c696f87e1d7f54275670fba5c695759",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
