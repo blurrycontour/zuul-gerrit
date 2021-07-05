@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86dbf36b_2216a980",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-05T11:58:50Z",
+      "side": 1,
+      "message": "Not sure if we should return False in this case to stop the data watch or if there will be a separate DELETED event.",
+      "revId": "2209ae6d205393400553247a6f9b0867f3140e89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
