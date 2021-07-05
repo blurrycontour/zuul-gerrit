@@ -593,7 +593,7 @@ class PagureConnection(BaseConnection):
                 change.branch = None
             elif event.ref and event.ref.startswith('refs/heads/'):
                 change = Branch(project)
-                change.branch = event.branch
+                change.branch = event.ref[len('refs/heads/'):]
             else:
                 change = Ref(project)
                 change.branch = None

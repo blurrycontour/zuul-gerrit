@@ -912,6 +912,14 @@ class Scheduler(threading.Thread):
         if project is None:
             raise ValueError(f'Unknown project {project_name}')
 
+        if ref and not ref.startswith('refs/'):
+            branch = ref
+            # tenant and project are valid
+            project_branches = tenant.getProjectBranches(project)
+            if branch in project_branches:
+                branch = branch
+                ref = 'refs/heads/' + branch
+
         event = EnqueueEvent(tenant_name, pipeline_name,
                              project.canonical_hostname, project.name,
                              change, ref, oldrev, newrev)
