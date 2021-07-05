@@ -81,9 +81,12 @@ class GerritChangeData(object):
     def parseSSH(self, data):
         self.needed_by = []
         self.depends_on = None
-        self.message = data['commitMessage']
+        number = data.get('number')
+        if not number:
+            raise Exception('Unknown number')
+        self.number = str(number)
         self.current_patchset = str(data['currentPatchSet']['number'])
-        self.number = str(data['number'])
+        self.message = data['commitMessage']
 
         if 'dependsOn' in data:
             parts = data['dependsOn'][0]['ref'].split('/')
