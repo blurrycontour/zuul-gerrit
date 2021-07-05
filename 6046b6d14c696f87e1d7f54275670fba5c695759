@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6b8d96c_f98f9533",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-05T13:08:36Z",
+      "side": 1,
+      "message": "I think passing in the tenants won\u0027t work as the executors will also create a Nodepool instance, but they don\u0027t have a layout.\n\nIn case the Nodepool API is created as part of the scheduler it will also receive the scheduler instance. You can use that to directly access the list of tenants via self.sched.abide.tenants.",
+      "revId": "6046b6d14c696f87e1d7f54275670fba5c695759",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
