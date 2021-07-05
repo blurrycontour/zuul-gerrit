@@ -5141,11 +5141,15 @@ class ZuulTestCase(BaseTestCase):
         return hexsha
 
     def create_commit(self, project, files=None, head='master',
-                      message='Creating a fake commit', **kwargs):
+                      message='Creating a fake commit', merge_branch=None,
+                      **kwargs):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = repo.heads[head]
         repo.head.reset(index=True, working_tree=True)
+
+        if merge_branch:
+            repo.git.merge(merge_branch, no_ff=True)
 
         files = files or {"README": "creating fake commit\n"}
         for name, content in files.items():
@@ -5153,7 +5157,15 @@ class ZuulTestCase(BaseTestCase):
             with open(file_name, 'a') as f:
                 f.write(content)
             repo.index.add([file_name])
-        commit = repo.index.commit(message, **kwargs)
+
+        if merge_branch:
+            if message:
+                repo.git.commit('--amend', '-m', message)
+            else:
+                repo.git.commit('--amend', '-C', 'HEAD')
+            commit = repo.commit('HEAD')
+        else:
+            commit = repo.index.commit(message, **kwargs)
         return commit.hexsha
 
     def orderedRelease(self, count=None):
