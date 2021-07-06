@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    The executor now honors the ``ZUUL_EXECUTOR_SIGTERM_METHOD``
+    environment variable to determine whether ``SIGTERM`` should be
+    equivalent to the ``stop`` command (the default) or the
+    ``graceful`` command.
