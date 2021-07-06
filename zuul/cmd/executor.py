@@ -44,7 +44,11 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.executor.stop()
+        graceful = os.environ.get('ZUUL_EXECUTOR_STOP_GRACEFUL', '0')
+        if graceful in ('True', '1'):
+            self.executor.graceful()
+        else:
+            self.executor.stop()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()
