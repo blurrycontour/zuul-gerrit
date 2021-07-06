@@ -34,6 +34,24 @@
       "revId": "6046b6d14c696f87e1d7f54275670fba5c695759",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5f873a8_79fc05a1",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-06T05:19:08Z",
+      "side": 1,
+      "message": "From my perspective - currently working on the config loading in a multi-scheduler setup - I\u0027d avoid having to update the list of tenants here whenever the abide changes.\n\nBut that\u0027s just my two cents ...",
+      "parentUuid": "9d58f441_1ac8edf0",
+      "revId": "6046b6d14c696f87e1d7f54275670fba5c695759",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
