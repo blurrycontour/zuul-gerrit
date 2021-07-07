@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d5d84b9b_098b76e0",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-07T21:45:41Z",
+      "side": 1,
+      "message": "I don\u0027t think we need priority.  That\u0027s only used when creating the node request, so we can just add it as an extra argument to submitNodeRequest.  That should make it clearer.",
+      "revId": "72c41a17f1dbd8dfcbafb223ec91a099b2a29289",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
