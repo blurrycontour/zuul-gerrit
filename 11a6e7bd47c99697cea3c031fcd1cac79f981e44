@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46c66e38_d0da33fd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-07T22:43:12Z",
+      "side": 1,
+      "message": "As an alternative to this, how about we change the getNodeRequest method in zk/nodepool.py to accept nodeset\u003dNone, and in that case, construct a new nodeset object from the the nodes attribute.\n\nThat seems like it will produce more explicit code, so we don\u0027t have to have an AnonymousNodeSet class which performs implicit operations.",
+      "revId": "11a6e7bd47c99697cea3c031fcd1cac79f981e44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
