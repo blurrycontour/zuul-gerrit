@@ -2780,17 +2780,17 @@ class TestScheduler(ZuulTestCase):
 
         tevent = threading.Event()
 
-        def data_watch(data, stat, event):
-            if not any([data, stat, event]):
-                return
+        def data_watch(event):
             # Set the threading event as soon as the cancel node is present
             tevent.set()
-            return False
 
         builds = list(self.executor_api.all())
-        # Use a DataWatch to avoid a race condition between creating and
-        # immediately deleting the cancel node in ZooKeeper.
-        self.zk_client.client.DataWatch(f"{builds[0].path}/cancel", data_watch)
+        # When using DataWatch it is possible for the cancel znode to be
+        # created, then deleted almost immediately before the watch handling
+        # happens. When this happens kazoo sees no stat info and treats the
+        # event as a noop because no new version is available. Use exists to
+        # avoid this problem.
+        self.zk_client.client.exists(f"{builds[0].path}/cancel", data_watch)
 
         # Abandon change to cancel build
         self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
