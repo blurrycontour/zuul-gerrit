@@ -25,6 +25,7 @@ import time
 from collections import namedtuple
 from unittest import mock, skip
 from kazoo.exceptions import NoNodeError
+from kazoo.protocol.states import EventType
 
 import git
 import testtools
@@ -2778,14 +2779,26 @@ class TestScheduler(ZuulTestCase):
             if all(b.worker.name != "Unknown" for b in builds):
                 break
 
+        events_seen = []
         tevent = threading.Event()
 
         def data_watch(data, stat, event):
-            if not any([data, stat, event]):
+            # We must be careful of a race here:
+            # The watch event can be received, then before we read the
+            # data back from zookeeper, the delete request could be handled
+            # causing the watch here to see no data or stat info.
+            if not events_seen and not event:
+                # This is the initial call
+                events_seen.append(event)
                 return
-            # Set the threading event as soon as the cancel node is present
-            tevent.set()
-            return False
+            elif event and event.type == EventType.CREATED:
+                events_seen.append(event)
+                # Set the threading event as soon as the cancel node is present
+                tevent.set()
+                return False
+            else:
+                # This should only happen if we reconnect to zk
+                raise Exception("Unexpected watch event received")
 
         builds = list(self.executor_api.all())
         # Use a DataWatch to avoid a race condition between creating and
