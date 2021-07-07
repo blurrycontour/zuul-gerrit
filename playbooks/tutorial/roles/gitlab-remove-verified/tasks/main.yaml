@@ -1,6 +1,7 @@
 - name: Unapprove Merge Request
   uri:
-    url: "http://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/unapprove"
+    url: "https://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/unapprove"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json

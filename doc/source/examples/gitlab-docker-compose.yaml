@@ -8,16 +8,23 @@ services:
     hostname: 'gitlab'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://localhost:8081'
+        external_url 'https://gitlab:8081'
+        letsencrypt['enable'] = false
+        nginx['ssl_certificate'] = "/var/certs/certs/gitlab.pem"
+        nginx['ssl_certificate_key'] = "/var/certs/keys/gitlabkey.pem"
         # Add any other gitlab.rb configuration here, each on its own line
       GITLAB_ROOT_PASSWORD: secretsecret
     command: >
       bash -c "cp /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/development/25_api_personal_access_token.rb
-      /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/production/25_api_personal_access_token.rb &&
+      /opt/gitlab/embedded/service/gitlab-rails/db/fixtures/production/25_api_personal_access_token.rb;
+      while [ ! -f /var/certs/keys/gitlabkey.pem ] ; do
+        sleep 1;
+      done;
       /assets/wrapper"
     ports:
       - '8081:8081'
     volumes:
+      - "certs:/var/certs:z"
       - 'gitlab-config:/etc/gitlab'
       - 'gitlab-logs:/var/log/gitlab'
       - 'gitlab-data:/var/opt/gitlab'
@@ -27,6 +34,7 @@ services:
       - http_proxy
       - https_proxy
       - no_proxy=${no_proxy},gitlab
+      - SSL_CERT_FILE=/var/certs/certs/cacert.pem
     depends_on:
       - gitlab
     volumes:
@@ -71,7 +79,9 @@ services:
       - https_proxy
       - no_proxy=${no_proxy},gitlab
       - ZUUL_MYSQL_PASSWORD=secret
-    command: "sh -c '/var/playbooks/wait-to-start.sh && zuul-scheduler -f'"
+      - SSL_CERT_FILE=/var/certs/certs/cacert.pem
+      - REQUESTS_CA_BUNDLE=/var/certs/certs/cacert.pem
+    command: "sh -c 'git config --global http.https://gitlab:8081/.sslcainfo /var/certs/certs/cacert.pem && /var/playbooks/wait-to-start.sh && zuul-scheduler -f'"
     # FIXME: The scheduler has no ansible anymore so use the executor image.
     #        This needs to be changes such that ansible is not required for startup.
     image: zuul/zuul-scheduler
@@ -95,12 +105,14 @@ services:
       - "./gitlab_playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
   executor:
+    command: "sh -c 'git config --global http.https://gitlab:8081/.sslcainfo /var/certs/certs/cacert.pem && zuul-executor -f'"
     privileged: true
     environment:
       - http_proxy
       - https_proxy
       - no_proxy=${no_proxy},gitlab,scheduler
       - ZUUL_MYSQL_PASSWORD=secret
+      - SSL_CERT_FILE=/var/certs/certs/cacert.pem
     depends_on:
       - scheduler
     image: zuul/zuul-executor

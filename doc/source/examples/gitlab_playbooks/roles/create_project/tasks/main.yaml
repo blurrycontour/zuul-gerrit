@@ -1,6 +1,6 @@
 - name: Check if {{ project }} project exists
   uri:
-    url: "http://gitlab:8081/api/v4/projects/tutorial%2f{{ project }}"
+    url: "https://gitlab:8081/api/v4/projects/tutorial%2f{{ project }}"
     status_code: 200, 404
   register: project_check
 
@@ -13,7 +13,7 @@
         
     - name: Create Gitlab project project1
       uri:
-        url: "http://gitlab:8081/api/v4/projects"
+        url: "https://gitlab:8081/api/v4/projects"
         method: POST
         status_code: 201
         body_format: json
@@ -35,12 +35,13 @@
           echo "Zuul Tutorial" > README.md
           git add -A
           git commit -m "Initial commit"
-          git remote add gitlab http://admin:ypCa3Dzb23o5nvsixwPA@gitlab:8081/tutorial/{{ project }}
+          git remote add gitlab https://admin:ypCa3Dzb23o5nvsixwPA@gitlab:8081/tutorial/{{ project }}
+          git config http.https://gitlab:8081/.sslcainfo /var/certs/certs/cacert.pem
           git push -f --set-upstream gitlab +HEAD:master
 
     - name: Create Gitlab project {{ project }} webhook
       uri:
-        url: "http://gitlab:8081/api/v4/projects/tutorial%2f{{ project }}/hooks"
+        url: "https://gitlab:8081/api/v4/projects/tutorial%2f{{ project }}/hooks"
         method: POST
         status_code: 201
         body_format: json

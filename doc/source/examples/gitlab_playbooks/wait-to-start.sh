@@ -17,7 +17,7 @@ wait_for_mysql() {
 wait_for_gitlab() {
     echo `date -Iseconds` "Wait for zuul user to be created"
     for i in $(seq 1 300); do
-        [ $(curl -s -o /dev/null -w "%{http_code}" http://gitlab:8081/api/v4/users/zuul/status) = "200" ] && return
+        [ $(curl -s -o /dev/null -w "%{http_code}" -k https://gitlab:8081/api/v4/users/zuul/status) = "200" ] && return
         sleep 1
     done
 
