@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "85fa0047_0c17a6e4",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2781,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-07T20:32:02Z",
+      "side": 1,
+      "message": "Can drop this.",
+      "revId": "5f968ca9f6db7441635cdaff7d80f12e72d5abc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81a5a072_070eeb51",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2787,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-07T20:32:02Z",
+      "side": 1,
+      "message": "Don\u0027t need return False.",
+      "revId": "5f968ca9f6db7441635cdaff7d80f12e72d5abc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c779c12_e70a2bc0",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2791,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-07T20:32:02Z",
+      "side": 1,
+      "message": "\u0027hanlding\u0027 typo",
+      "revId": "5f968ca9f6db7441635cdaff7d80f12e72d5abc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
