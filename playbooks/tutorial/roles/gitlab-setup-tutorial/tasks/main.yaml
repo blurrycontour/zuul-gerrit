@@ -13,7 +13,8 @@
 
 - name: Wait for Gitlab to start
   uri:
-    url: "http://localhost:8081/api/v4/version"
+    url: "https://localhost:8081/api/v4/version"
+    validate_certs: no
     method: GET
     status_code: 200
     headers:
@@ -25,7 +26,8 @@
 
 - name: Wait for Zuul user to be created
   uri:
-    url: "http://localhost:8081/api/v4/users/zuul/status"
+    url: "https://localhost:8081/api/v4/users/zuul/status"
+    validate_certs: no
     method: GET
     status_code: 200
     body_format: json
@@ -36,7 +38,8 @@
 
 - name: Wait for Admin user to be created
   uri:
-    url: "http://localhost:8081/api/v4/users/administrator/status"
+    url: "https://localhost:8081/api/v4/users/administrator/status"
+    validate_certs: no
     method: GET
     status_code: 200
     body_format: json
@@ -55,7 +58,8 @@
 
 - name: Check if example user exists in Gitlab
   uri:
-    url: "http://localhost:8081/api/v4/users/user/status"
+    url: "https://localhost:8081/api/v4/users/user/status"
+    validate_certs: no
     method: GET
     status_code: 200, 404
     body_format: json
@@ -64,7 +68,8 @@
 - name: Create User Gitlab account
   when: gitlab_user_check.status==404
   uri:
-    url: "http://localhost:8081/api/v4/users"
+    url: "https://localhost:8081/api/v4/users"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json
@@ -83,7 +88,8 @@
 
 - name: Create User impersonation token
   uri:
-    url: "http://localhost:8081/api/v4/users/{{ zuul_example_user.json['id'] }}/impersonation_tokens"
+    url: "https://localhost:8081/api/v4/users/{{ zuul_example_user.json['id'] }}/impersonation_tokens"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json
@@ -97,7 +103,8 @@
 
 - name: Add User to tutorial group
   uri:
-    url: "http://localhost:8081/api/v4/groups/tutorial/members"
+    url: "https://localhost:8081/api/v4/groups/tutorial/members"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json
@@ -161,7 +168,8 @@
 
 - name: Create Merge Request
   uri:
-    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests"
+    url: "https://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json
@@ -179,7 +187,8 @@
 
 - name: Approve zuul-config Merge Request
   uri:
-    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests/{{ gitlab_merge_request.json['iid'] }}/approve"
+    url: "https://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests/{{ gitlab_merge_request.json['iid'] }}/approve"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json
@@ -191,7 +200,8 @@
 
 - name: Merge Merge Request
   uri:
-    url: "http://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests/{{ gitlab_merge_request.json['iid'] }}/merge"
+    url: "https://localhost:8081/api/v4/projects/tutorial%2fzuul-config/merge_requests/{{ gitlab_merge_request.json['iid'] }}/merge"
+    validate_certs: no
     method: PUT
     body_format: json
     headers:

@@ -42,7 +42,7 @@ make_ca() {
     openssl req $CONFIG -new -nodes -subj "$SUBJECT/CN=caroot" \
             -keyout $CAROOT/demoCA/private/cakey.pem \
             -out $CAROOT/demoCA/reqs/careq.pem
-    openssl ca $CONFIG -create_serial -days 3560 -batch -selfsign -extensions v3_ca \
+    openssl ca $CONFIG -create_serial -days 3560 -batch -notext -selfsign -extensions v3_ca \
             -out $CAROOT/demoCA/cacert.pem \
             -keyfile $CAROOT/demoCA/private/cakey.pem \
             -infiles $CAROOT/demoCA/reqs/careq.pem

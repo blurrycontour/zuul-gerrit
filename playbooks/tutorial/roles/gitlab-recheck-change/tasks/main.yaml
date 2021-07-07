@@ -1,6 +1,7 @@
 - name: Set recheck
   uri:
-    url: "http://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/notes"
+    url: "https://localhost:8081/api/v4/projects/{{ project_name }}/merge_requests/{{ merge_request_iid }}/notes"
+    validate_certs: no
     method: POST
     status_code: 201
     body_format: json

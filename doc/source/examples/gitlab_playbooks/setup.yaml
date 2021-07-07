@@ -5,6 +5,10 @@
       shell: |
         /var/zuul-tools/zk-ca.sh /var/certs examples_zk_1.examples_default
         chmod -R a+rX /var/certs
+    - name: Generate Gitlab certs
+      shell: |
+        /var/zuul-tools/zk-ca.sh /var/certs gitlab
+        chmod -R a+rX /var/certs
     - name: Generate Zuul SSH key for Nodepool
       command: ssh-keygen -f /var/ssh/nodepool -N '' -t rsa -m PEM
       args:
@@ -20,7 +24,7 @@
         port: 8081
     - name: Wait for Gitlab to answer API request
       uri:
-        url: http://gitlab:8081/api/v4/version
+        url: https://gitlab:8081/api/v4/version
         method: GET
         status_code: 200
         body_format: json
@@ -33,7 +37,7 @@
 
     - name: Create Gitlab Admin user
       uri:
-        url: "http://gitlab:8081/api/v4/users"
+        url: "https://gitlab:8081/api/v4/users"
         method: POST
         status_code: 201
         body_format: json
@@ -52,7 +56,7 @@
 
     - name: Create Gitlab Admin impersonation token
       uri:
-        url: "http://gitlab:8081/api/v4/users/{{ gitlab_admin_user.json['id'] }}/impersonation_tokens"
+        url: "https://gitlab:8081/api/v4/users/{{ gitlab_admin_user.json['id'] }}/impersonation_tokens"
         method: POST
         status_code: 201
         body_format: json
@@ -71,7 +75,7 @@
 
     - name: Allow Gitlab local outbound requests
       uri:
-        url: "http://gitlab:8081/api/v4/application/settings"
+        url: "https://gitlab:8081/api/v4/application/settings"
         method: PUT
         status_code: 200
         body_format: json
@@ -87,7 +91,7 @@
 
     - name: Create Gitlab Group
       uri:
-        url: "http://gitlab:8081/api/v4/groups"
+        url: "https://gitlab:8081/api/v4/groups"
         method: POST
         status_code: 201
         body_format: json
@@ -122,13 +126,13 @@
     # the Zuul scheduler to start.
     - name: Check if zuul user exists
       uri:
-        url: http://gitlab:8081/api/v4/users/user/status
+        url: https://gitlab:8081/api/v4/users/user/status
         status_code: 200, 404
       register: zuul_user_check
 
     - name: Get current user id
       uri:
-        url: "http://gitlab:8081/api/v4/user"
+        url: "https://gitlab:8081/api/v4/user"
         method: GET
         status_code: 200
         body_format: json
@@ -140,7 +144,7 @@
         gitlab_current_user_id: "{{ gitlab_current_user.json['id'] }}"
     - name: Rename User from Root to Zuul
       uri:
-        url: "http://gitlab:8081/api/v4/users/{{ gitlab_current_user_id }}"
+        url: "https://gitlab:8081/api/v4/users/{{ gitlab_current_user_id }}"
         method: PUT
         status_code: 200
         body_format: json
@@ -157,4 +161,4 @@
       shell: 'curl --request PUT \
                    -H "PRIVATE-TOKEN: ypCa3Dzb23o5nvsixwPA" \
                    --form "avatar=@/var/playbooks/zuul.png" \
-                   "http://gitlab:8081/api/v4/users/{{ gitlab_current_user_id }}"'
+                   "https://gitlab:8081/api/v4/users/{{ gitlab_current_user_id }}"'
