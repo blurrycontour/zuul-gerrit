@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37135bc5_0c1167a6",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1364,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T21:01:47Z",
+      "side": 1,
+      "message": "Might also be worth noting that this also populates the pipeline_management_queue which is processed by process_pipeline_management_queue() below.",
+      "revId": "76f32cd67cb47d9c8a47798fa0214872994764a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6405822_59e4b3f7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1368,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T21:01:47Z",
+      "side": 1,
+      "message": "Might be worth a note here that process_tenant_trigger_queue populates the pipeline_trigger_queue which we process later. The order here is important.",
+      "revId": "76f32cd67cb47d9c8a47798fa0214872994764a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "baa35f4b_0e6a7d49",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1371,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T21:01:47Z",
+      "side": 1,
+      "message": "This check is probably not necessary as the function call below makes that check on each of its iterations.",
+      "revId": "76f32cd67cb47d9c8a47798fa0214872994764a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd1b1241_e593e803",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T21:01:47Z",
+      "side": 1,
+      "message": "This check is probably not necessary as the function call below makes that check on each of its iterations.",
+      "revId": "76f32cd67cb47d9c8a47798fa0214872994764a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c974d62_545086e1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1382,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T21:01:47Z",
+      "side": 1,
+      "message": "This check is probably not necessary as the function call below makes that check on each of its iterations.",
+      "revId": "76f32cd67cb47d9c8a47798fa0214872994764a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
