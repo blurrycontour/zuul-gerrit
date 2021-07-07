@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5b6bf6a_3be194e2",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T23:42:33Z",
+      "side": 1,
+      "message": "You might want to move this block up into the line 150 area to keep the code together.",
+      "range": {
+        "startLine": 160,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 23
+      },
+      "revId": "db0bf681d5c6553352f8d224e733a088c4fafe3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
