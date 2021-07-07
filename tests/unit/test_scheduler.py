@@ -2766,6 +2766,9 @@ class TestScheduler(ZuulTestCase):
 
     def test_cancel_starting_build(self):
         "Test that a canceled build that is not processed yet is removed"
+        import logging
+        klogger = logging.getLogger("kazoo.client")
+        klogger.setLevel(logging.DEBUG)
 
         self.executor_server.hold_jobs_in_start = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
