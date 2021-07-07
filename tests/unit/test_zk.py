@@ -419,7 +419,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         server.fulfillCancel(a)
         server.unlock(a)
         self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
-        self.assertNotEqual(self._get_watches(), {})
+        for _ in iterate_timeout(5, "Wait for watches to be registered"):
+            if self._get_watches():
+                break
 
         # Scheduler removes build request on completion
         client.remove(sched_a)
