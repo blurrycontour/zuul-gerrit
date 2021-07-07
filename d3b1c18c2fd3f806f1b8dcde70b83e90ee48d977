@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e29c921e_60cae061",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-07T17:07:44Z",
+      "side": 1,
+      "message": "If there were a tenant named \"management\" we would have a collision with the management lock above (it may not be a critical error, but it would at least be confusing).  How about we make this /zuul/locks/events/trigger/{safe_tenant} ?",
+      "revId": "d3b1c18c2fd3f806f1b8dcde70b83e90ee48d977",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
