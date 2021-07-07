@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0c7e0ffd_46ba301f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T23:57:59Z",
+      "side": 1,
+      "message": "The old not smart reconfiguration loaded AdminRules first then TPCs. I\u0027m not sure that order matters here, but thought I would call out the difference in case it does.",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "554eedd4_c11facd1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 911,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T23:57:59Z",
+      "side": 1,
+      "message": "The old code doesn\u0027t seem to do this but I think that is because it created an entirely new abide. Now that we reuse the abide we need to reset the cache.",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1253ec33_e9031410",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T23:57:59Z",
+      "side": 1,
+      "message": "I\u0027m not seeing anything that removes tenants that are no longer present from abide.tenants. Where is that happening for full reconfigurations?",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed341811_7aeb6a55",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 937,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-07T23:57:59Z",
+      "side": 1,
+      "message": "I guess this log info is only useful in the smart case because a non smart reconfigure does all tenants?",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
