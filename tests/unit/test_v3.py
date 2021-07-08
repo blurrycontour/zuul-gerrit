@@ -2542,6 +2542,8 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         github.repo_from_project(
             'org/requiringproject-github')._set_branch_protection(
             'master', True)
+        self.fake_github.emitEvent(self.fake_github.getPushEvent(
+            'org/requiringproject-github', ref='refs/heads/master'))
 
         # Create unprotected branch feat-x. This branch will be the target
         # of override-checkout
@@ -2549,9 +2551,11 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         repo._set_branch_protection('master', True)
         repo._create_branch('feat-x')
         self.create_branch('org/requiredproject-github', 'feat-x')
+        self.fake_github.emitEvent(self.fake_github.getPushEvent(
+            'org/requiredproject-github', ref='refs/heads/feat-x'))
 
-        # Reconfigure to ensure zuul knows about the branch protection
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        # Wait until Zuul has processed the push events and knows about
+        # the branch protection
         self.waitUntilSettled()
 
         A = self.fake_github.openFakePullRequest(
