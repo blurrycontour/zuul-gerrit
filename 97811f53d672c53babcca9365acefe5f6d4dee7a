@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0e70d5bf_6a40b385",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:12:48Z",
+      "side": 1,
+      "message": "I think the reason is that the Retry happens first and we record that in the database before things end. Basically because we are reporting as we go the retry happens earlier now. Is that the case?",
+      "parentUuid": "c4c77adc_f08d58de",
+      "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "14815569_2195b0f3",
         "filename": "tests/unit/test_database.py",
         "patchSetId": 6
