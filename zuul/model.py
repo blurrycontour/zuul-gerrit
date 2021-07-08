@@ -3296,7 +3296,7 @@ class QueueItem(object):
                     urlformat += '&websocket_url={websocket_url}'
                 build_url = urlformat.format(
                     build=build, websocket_url=websocket_url)
-                (unused, report_url) = self.formatProvisionalJobResult(job)
+                (unused, report_url) = self.formatJobResult(job)
                 if build.start_time:
                     if build.end_time:
                         elapsed = int((build.end_time -
