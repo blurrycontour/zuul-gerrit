@@ -39,6 +39,23 @@
       "revId": "5af2db426fb4c28fecc7289fb38f581ca4732d3e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c05d226_e5f4b0ae",
+        "filename": "releasenotes/notes/remove-build-page-8d6acda308d513f1.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:55:31Z",
+      "side": 1,
+      "message": "Monty, I don\u0027t think we have a way of getting config syntax warnings to users (though we do have run-time warnings).  I think it would be useful if we did have that though.\n\nClark, yes that\u0027s a good idea.",
+      "revId": "5af2db426fb4c28fecc7289fb38f581ca4732d3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
