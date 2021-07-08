@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "f1fbec75_14d09e15",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T18:11:24Z",
+      "side": 1,
+      "message": "See other comment, but we don\u0027t seem to lock around this which could lead to schedulers trampling over each other I think.",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d6ae8913_7741ae71",
         "filename": "zuul/zk/layout.py",
         "patchSetId": 19
@@ -16,6 +33,40 @@
       "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "21a6e1aa_9e05e0c3",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T18:11:24Z",
+      "side": 1,
+      "message": "Does this also need to check if ltime value match to have a proper ordering?",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79a92213_6c4209f8",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T18:11:24Z",
+      "side": 1,
+      "message": "What prevents multiple schedulers from writing different versions of the layouts to zookeeper if they use the same path? We\u0027ll lock around that?",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
