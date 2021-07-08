@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ea32726b_165374eb",
+        "filename": "releasenotes/notes/requestor-data-field-f69ad4a4b1e6e0ce.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T15:42:42Z",
+      "side": 1,
+      "message": "Considering that \"requestor_data\" doesn\u0027t show up anywhere in the Nodepool docs, this is probably too much detail, and could confuse users who may be looking for how to \"enable\" that or something.  I would just say \"Zuul now requires Nodepool version 4.2.0 at a minimum.\" or if you really want to include an explanation, add \"because of an internal API change\".",
+      "revId": "e85787a02cb4ddf4c7d9b34051e6513daadde95a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
