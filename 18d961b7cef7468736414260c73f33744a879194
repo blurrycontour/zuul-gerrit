@@ -33,6 +33,23 @@
       "revId": "18d961b7cef7468736414260c73f33744a879194",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68bfbaae_2881515b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T17:50:51Z",
+      "side": 1,
+      "message": "I can think of no circumstance.  I think the change is that this is no longer a @property, so we have a better understanding of the calling conditions.  Let\u0027s remove the condition entirely (attribute errors will bubble up if it happens).",
+      "revId": "18d961b7cef7468736414260c73f33744a879194",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
