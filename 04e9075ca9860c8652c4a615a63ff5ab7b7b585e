@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "6a86cc95_ae1ec63d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T00:11:23Z",
+      "side": 1,
+      "message": "I think they are distinct enough it should not matter.",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "554eedd4_c11facd1",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -50,6 +67,23 @@
       "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "326863fb_ae4e7e46",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T00:11:23Z",
+      "side": 1,
+      "message": "I agree that seems to be missing.  We should add the following test cases:\n\n* Add a tenant (1 -\u003e 2 tenants)\n* Delete a tenant (2 -\u003e 1 tenants)\n\nI can\u0027t find any existing tests that do that (but that doesn\u0027t mean they don\u0027t exist).",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
