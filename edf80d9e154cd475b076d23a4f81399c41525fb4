@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "298de5f1_167e1d4d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T18:25:40Z",
+      "side": 1,
+      "message": "I believe Simon has some locking changes in progress, should be coming up soon.  I believe the expectation is that this entire method will be within a tenant write lock.  I think it\u0027s safe to merge this now since we\u0027re unlikely to forget that (ie, it\u0027s not a small easy thing to forget, it\u0027s a big obvious change).",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6ae8913_7741ae71",
         "filename": "zuul/zk/layout.py",
         "patchSetId": 19
@@ -53,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "53ef4efc_31107a67",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T18:25:40Z",
+      "side": 1,
+      "message": "This seems safe, but I\u0027m interested in Simon\u0027s comments on the relative merits of uuid / ltime here.",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "79a92213_6c4209f8",
         "filename": "zuul/zk/layout.py",
         "patchSetId": 19
@@ -67,6 +101,23 @@
       "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6269ec19_80ae4b94",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T18:25:40Z",
+      "side": 1,
+      "message": "Yep: tenant write lock.",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
