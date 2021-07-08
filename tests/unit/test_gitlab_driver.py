@@ -726,7 +726,8 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         # now enable branch protection and trigger reload
         self.fake_gitlab.protectBranch('org', 'project2', 'master')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        pevent = self.fake_gitlab.getPushEvent(project='org/project2')
+        self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
@@ -869,6 +870,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         # Prepare repo with an initial commit and enable branch protection
         self.fake_gitlab.protectBranch('org', 'project2', 'master')
+        self.fake_gitlab.emitEvent(
+            self.fake_gitlab.getPushEvent(
+                project='org/project2', branch='refs/heads/master'))
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project2', 'master',
                                                   'A')
@@ -879,8 +883,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         self.create_branch('org/project2', 'feat-x')
         self.fake_gitlab.protectBranch('org', 'project2', 'feat-x',
                                        protected=False)
-
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.fake_gitlab.emitEvent(
+            self.fake_gitlab.getPushEvent(
+                project='org/project2', branch='refs/heads/feat-x'))
         self.waitUntilSettled()
 
         # record previous tenant reconfiguration time, which may not be set

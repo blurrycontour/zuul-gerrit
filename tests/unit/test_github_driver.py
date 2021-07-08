@@ -1339,7 +1339,10 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project('org/project2')
         repo._set_branch_protection('master', True)
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        pevent = self.fake_github.getPushEvent(project='org/project2',
+                                               ref='refs/heads/master')
+        self.fake_github.emitEvent(pevent)
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
@@ -1470,6 +1473,9 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project('org/project2')
         repo._set_branch_protection('master', True)
+        self.fake_github.emitEvent(
+            self.fake_github.getPushEvent(
+                project='org/project2', ref='refs/heads/master'))
 
         A = self.fake_github.openFakePullRequest('org/project2', 'master', 'A')
         A.setMerged("merging A")
@@ -1477,8 +1483,10 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         # add a spare branch so that the project is not empty after master gets
         # deleted.
         repo._create_branch('feat-x')
+        self.fake_github.emitEvent(
+            self.fake_github.getPushEvent(
+                project='org/project2', ref='refs/heads/feat-x'))
 
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
 
         # record previous tenant reconfiguration time, which may not be set
