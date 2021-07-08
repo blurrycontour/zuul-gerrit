@@ -20,6 +20,7 @@ import os
 import sys
 import textwrap
 import gc
+import re
 from time import sleep
 from unittest import skip, skipIf
 from zuul.lib import yamlutil
@@ -3227,17 +3228,6 @@ class FunctionalAnsibleMixIn(object):
             with open(secrets_path) as f:
                 self.assertEqual(f.read(), "test-username test-password")
 
-            msg = A.messages[0]
-            success = "{} https://success.example.com/zuul-logs/{}"
-            fail = "{} https://failure.example.com/zuul-logs/{}"
-            self.assertIn(success.format("python27", build_python27.uuid), msg)
-            self.assertIn(fail.format("faillocal", build_faillocal.uuid), msg)
-            self.assertIn(success.format("check-vars",
-                                         build_check_vars.uuid), msg)
-            self.assertIn(success.format("hello-world", build_hello.uuid), msg)
-            self.assertIn(fail.format("timeout", build_timeout.uuid), msg)
-            self.assertIn(fail.format("failpost", build_failpost.uuid), msg)
-
     def test_repo_ansible(self):
         A = self.fake_gerrit.addFakeChange('org/ansible', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -4234,9 +4224,9 @@ class TestRoles(RoleTestCase):
                                            files=file_dict)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertIn(
-            '- project-test project-test : ERROR Unable to find role',
-            A.messages[-1])
+        self.assertTrue(re.search(
+            '- project-test project-test .* ERROR Unable to find role',
+            A.messages[-1]))
 
 
 class TestImplicitRoles(RoleTestCase):
@@ -4316,10 +4306,9 @@ class TestDataReturn(AnsibleZuulTestCase):
             dict(name='data-return-relative', result='SUCCESS', changes='1,1'),
             dict(name='child', result='SUCCESS', changes='1,1'),
         ], ordered=False)
-        self.assertIn('- data-return http://example.com/test/log/url/',
+        self.assertIn('- data-return https://zuul.example.com/',
                       A.messages[-1])
-        self.assertIn('- data-return-relative '
-                      'http://example.com/test/log/url/docs/index.html',
+        self.assertIn('- data-return-relative https://zuul.example.com',
                       A.messages[-1])
 
     def test_data_return_child_jobs(self):
@@ -4352,12 +4341,12 @@ class TestDataReturn(AnsibleZuulTestCase):
             dict(name='data-return', result='SUCCESS', changes='1,1'),
         ])
         self.assertIn(
-            '- data-return-child-jobs http://example.com/test/log/url/',
+            '- data-return-child-jobs https://zuul.example.com/',
             A.messages[-1])
         self.assertIn(
-            '- data-return http://example.com/test/log/url/',
+            '- data-return https://zuul.example.com/',
             A.messages[-1])
-        self.assertIn('child : SKIPPED', A.messages[-1])
+        self.assertTrue(re.search('child .* SKIPPED', A.messages[-1]))
         self.assertIn('Build succeeded', A.messages[-1])
 
     def test_data_return_invalid_child_job(self):
@@ -4368,9 +4357,9 @@ class TestDataReturn(AnsibleZuulTestCase):
             dict(name='data-return-invalid-child-job', result='SUCCESS',
                  changes='1,1')])
         self.assertIn(
-            '- data-return-invalid-child-job http://example.com/test/log/url/',
+            '- data-return-invalid-child-job https://zuul.example.com',
             A.messages[-1])
-        self.assertIn('data-return : SKIPPED', A.messages[-1])
+        self.assertTrue(re.search('data-return .* SKIPPED', A.messages[-1]))
         self.assertIn('Build succeeded', A.messages[-1])
 
     def test_data_return_skip_all_child_jobs(self):
@@ -4382,10 +4371,10 @@ class TestDataReturn(AnsibleZuulTestCase):
                  changes='1,1'),
         ])
         self.assertIn(
-            '- data-return-skip-all http://example.com/test/log/url/',
+            '- data-return-skip-all https://zuul.example.com/',
             A.messages[-1])
-        self.assertIn('child : SKIPPED', A.messages[-1])
-        self.assertIn('data-return : SKIPPED', A.messages[-1])
+        self.assertTrue(re.search('child .* SKIPPED', A.messages[-1]))
+        self.assertTrue(re.search('data-return .* SKIPPED', A.messages[-1]))
         self.assertIn('Build succeeded', A.messages[-1])
 
     def test_data_return_skip_all_child_jobs_with_soft_dependencies(self):
@@ -4397,10 +4386,10 @@ class TestDataReturn(AnsibleZuulTestCase):
             dict(name='data-return-c', result='SUCCESS', changes='1,1'),
             dict(name='data-return-d', result='SUCCESS', changes='1,1'),
         ])
-        self.assertIn('- data-return-cd http://example.com/test/log/url/',
+        self.assertIn('- data-return-cd https://zuul.example.com/',
                       A.messages[-1])
-        self.assertIn('data-return-a : SKIPPED', A.messages[-1])
-        self.assertIn('data-return-b : SKIPPED', A.messages[-1])
+        self.assertTrue(re.search('data-return-a .* SKIPPED', A.messages[-1]))
+        self.assertTrue(re.search('data-return-b .* SKIPPED', A.messages[-1]))
         self.assertIn('Build succeeded', A.messages[-1])
 
     def test_several_zuul_return(self):
@@ -4412,9 +4401,9 @@ class TestDataReturn(AnsibleZuulTestCase):
                  changes='1,1'),
         ])
         self.assertIn(
-            '- several-zuul-return-child http://example.com/test/log/url/',
+            '- several-zuul-return-child https://zuul.example.com/',
             A.messages[-1])
-        self.assertIn('data-return : SKIPPED', A.messages[-1])
+        self.assertTrue(re.search('data-return .* SKIPPED', A.messages[-1]))
         self.assertIn('Build succeeded', A.messages[-1])
 
     def test_data_return_child_jobs_failure(self):
@@ -6282,7 +6271,7 @@ class TestJobPause(AnsibleZuulTestCase):
             dict(name='compile', result='SUCCESS', changes='1,1'),
         ])
 
-        self.assertIn('test : SKIPPED', A.messages[0])
+        self.assertTrue(re.search('test .* SKIPPED', A.messages[0]))
 
     def test_job_pause_pre_skipped_child(self):
         """
@@ -6330,7 +6319,7 @@ class TestJobPause(AnsibleZuulTestCase):
             dict(name='compile', result='SUCCESS', changes='1,1'),
         ])
 
-        self.assertIn('test : SKIPPED', A.messages[0])
+        self.assertTrue(re.search('test .* SKIPPED', A.messages[0]))
 
     def test_job_pause_skipped_child_retry(self):
         """
@@ -7104,7 +7093,7 @@ class TestProvidesRequiresMysql(ZuulTestCase):
             dict(name='hold', result='SUCCESS', changes='1,1'),
             dict(name='hold', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
-        self.assertIn('image-user : FAILURE', B.messages[0])
+        self.assertTrue(re.search('image-user .* FAILURE', B.messages[0]))
         self.assertEqual(
             B.messages[0].count(
                 'Job image-user requires artifact(s) images'),
@@ -7130,7 +7119,7 @@ class TestProvidesRequiresMysql(ZuulTestCase):
             dict(name='image-builder', result='FAILURE', changes='1,1'),
             dict(name='hold', result='SUCCESS', changes='1,1'),
         ], ordered=False)
-        self.assertIn('image-user : SKIPPED', A.messages[0])
+        self.assertTrue(re.search('image-user .* SKIPPED', A.messages[0]))
 
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
         B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
@@ -7144,7 +7133,7 @@ class TestProvidesRequiresMysql(ZuulTestCase):
             dict(name='image-builder', result='FAILURE', changes='1,1 2,1'),
             dict(name='hold', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
-        self.assertIn('image-user : FAILURE', B.messages[0])
+        self.assertTrue(re.search('image-user .* FAILURE', B.messages[0]))
         self.assertEqual(
             B.messages[0].count(
                 'Job image-user requires artifact(s) images'),
