@@ -1388,15 +1388,21 @@ class TestGithubCircularDependencies(ZuulTestCase):
             'master', True)
         github.repo_from_project('gh/project')._set_branch_protection(
             'stable/foo', True)
+        pevent = self.fake_github.getPushEvent(project='gh/project',
+                                               ref='refs/heads/stable/foo')
+        self.fake_github.emitEvent(pevent)
 
         self.create_branch('gh/project1', 'stable/bar')
         github.repo_from_project('gh/project1')._set_branch_protection(
             'master', True)
         github.repo_from_project('gh/project1')._set_branch_protection(
             'stable/bar', True)
+        pevent = self.fake_github.getPushEvent(project='gh/project',
+                                               ref='refs/heads/stable/bar')
+        self.fake_github.emitEvent(pevent)
 
-        # Reconfigure to pick up branch protection settings
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        # Wait until push events are processed to pick up branch
+        # protection settings
         self.waitUntilSettled()
 
         A = self.fake_github.openFakePullRequest(

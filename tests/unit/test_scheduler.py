@@ -4072,6 +4072,9 @@ class TestScheduler(ZuulTestCase):
         # timer-triggered job so that we have an opportunity to set
         # the hold flag before the first job.
         self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
         self.executor_server.hold_jobs_in_build = True
         self.commitConfigUpdate('common-config', 'layouts/timer-template.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
@@ -4122,6 +4125,9 @@ class TestScheduler(ZuulTestCase):
         # timer-triggered job so that we have an opportunity to set
         # the hold flag before the first job.
         self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
         self.executor_server.hold_jobs_in_build = True
         self.commitConfigUpdate('common-config', config_file)
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
