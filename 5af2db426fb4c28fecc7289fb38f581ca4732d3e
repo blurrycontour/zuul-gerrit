@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a01a658_d7f5798f",
+        "filename": "releasenotes/notes/remove-build-page-8d6acda308d513f1.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2021-07-08T22:51:28Z",
+      "side": 1,
+      "message": "Do we report any warnings anywhere?",
+      "range": {
+        "startLine": 20,
+        "startChar": 31,
+        "endLine": 20,
+        "endChar": 70
+      },
+      "revId": "5af2db426fb4c28fecc7289fb38f581ca4732d3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
