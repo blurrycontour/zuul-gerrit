@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "704478a3_02b2a5ad",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-08T09:50:28Z",
+      "side": 1,
+      "message": "The local layout state will be introduced with the next change, but I think it makes sense to already describe how this is supposed to work.",
+      "revId": "a932dddf0ed84e56d9abc599eb3bfdfb88493e0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
