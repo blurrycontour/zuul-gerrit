@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "fb9cb6f9_d30ac603",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:17:27Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "14815569_2195b0f3",
         "filename": "tests/unit/test_database.py",
         "patchSetId": 6
@@ -68,6 +85,23 @@
       "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3f93b140_7fd86366",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:17:27Z",
+      "side": 1,
+      "message": "It means that we return the same data we would get from querying sqlalchemy (because we\u0027re creating the object, sqlalchemy hasn\u0027t set up these relationships, but it would have if we did a query instead).",
+      "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
