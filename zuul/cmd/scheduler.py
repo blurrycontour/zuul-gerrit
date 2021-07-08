@@ -145,7 +145,11 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
-            self.sched.prime(self.config, self.args.validate_tenants)
+            if self.args.validate_tenants is not None:
+                self.sched.validateTenants(
+                    self.config, self.args.validate_tenants)
+            else:
+                self.sched.prime(self.config)
         except Exception:
             self.log.exception("Error starting Zuul:")
             # TODO(jeblair): If we had all threads marked as daemon,
