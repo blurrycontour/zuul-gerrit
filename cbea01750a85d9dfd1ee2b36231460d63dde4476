@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "abbc46c7_168a50b4",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3698,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T17:49:18Z",
+      "side": 1,
+      "message": "The acquire above seems to always request a blocking lock with no timeout. I\u0027m not sure the code below is necessary.",
+      "revId": "cbea01750a85d9dfd1ee2b36231460d63dde4476",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
