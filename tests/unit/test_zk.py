@@ -23,6 +23,7 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
+from zuul.zk.layout import LayoutStateStore, LayoutState
 from zuul.zk.locks import locked
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
@@ -662,3 +663,14 @@ class TestLocks(ZooKeeperBaseTestCase):
             with locked(lock, blocking=False):
                 pass
         self.assertFalse(lock.is_acquired)
+
+
+class TestLayoutStore(ZooKeeperBaseTestCase):
+
+    def test_layout_state(self):
+        store = LayoutStateStore(self.zk_client)
+        state = LayoutState("tenant", "hostname", 0)
+        store["tenant"] = state
+        self.assertEqual(state, store["tenant"])
+        self.assertNotEqual(state.ltime, -1)
+        self.assertNotEqual(store["tenant"].ltime, -1)
