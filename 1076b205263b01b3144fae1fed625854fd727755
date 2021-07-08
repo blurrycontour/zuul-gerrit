@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "6ff932f5_3053f3b0",
+        "filename": "zuul/driver/sql/alembic/versions/40c49b6fc2e3_build_nodeset.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:35:59Z",
+      "side": 1,
+      "message": "It\u0027s been recording \"null\" values for years.  We can ignore it.",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7aaa2d41_15d1e606",
         "filename": "zuul/driver/sql/alembic/versions/40c49b6fc2e3_build_nodeset.py",
         "patchSetId": 6
@@ -42,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "28e0dbb7_ce53fdee",
+        "filename": "zuul/driver/sql/alembic/versions/40c49b6fc2e3_build_nodeset.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:35:59Z",
+      "side": 1,
+      "message": "Yep.  There are some other fields like this I think.",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e25c66bd_cba72640",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -59,6 +93,23 @@
     },
     {
       "key": {
+        "uuid": "6b896072_47a36513",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 3343,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:35:59Z",
+      "side": 1,
+      "message": "Possibly, but since this is for the status page, we might want something different.  I think it\u0027s a separate question.",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d5454a6c_7e7fa6b7",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -73,6 +124,23 @@
       "revId": "1076b205263b01b3144fae1fed625854fd727755",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c10374ed_de3c63d1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1715,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T22:35:59Z",
+      "side": 1,
+      "message": "No it\u0027s set at the start of the build.",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
