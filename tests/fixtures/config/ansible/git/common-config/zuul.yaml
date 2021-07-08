@@ -80,13 +80,7 @@
           label: test_label
 
 - job:
-    name: base-urls
-    success-url: https://success.example.com/zuul-logs/{build.uuid}/
-    failure-url: https://failure.example.com/zuul-logs/{build.uuid}/
-
-- job:
     name: python27
-    parent: base-urls
     run: playbooks/python27.yaml
     pre-run: playbooks/pre.yaml
     post-run: playbooks/post.yaml
@@ -236,7 +230,6 @@
             - ubuntu-xenial
 
 - job:
-    parent: base-urls
     name: hello
     run: playbooks/hello-post.yaml
     post-run: playbooks/hello-post.yaml
