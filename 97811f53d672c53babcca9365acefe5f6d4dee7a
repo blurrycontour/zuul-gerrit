@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c4c77adc_f08d58de",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:11:33Z",
+      "side": 1,
+      "message": "Why do the build result orders change here?",
+      "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14815569_2195b0f3",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:11:33Z",
+      "side": 1,
+      "message": "Might want to also add a list of builds to the buildset and verify that works.",
+      "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "74307051_6c44160d",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:11:33Z",
+      "side": 1,
+      "message": "This is not really related to the change, but what does this append do? On the BuildModel we maintain a foreign key column to map builds to buildsets. This lets us map the other direction.\n\nI guess this allows us to look up self.builds for any builds we have created since the beginning of the process? Or does SQLAlchemy know to magically map that the database for us?",
+      "revId": "97811f53d672c53babcca9365acefe5f6d4dee7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
