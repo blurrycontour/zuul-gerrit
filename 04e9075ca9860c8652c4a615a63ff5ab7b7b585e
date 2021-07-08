@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "724b3bcc_261eeb4a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-07-08T06:56:56Z",
+      "side": 1,
+      "message": "The test_smart_reconfiguration test case adds and removes tenants. If we want that to be tested on full reconfigs I think this can be duplicated for full reconfigs.",
+      "parentUuid": "326863fb_ae4e7e46",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed341811_7aeb6a55",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
