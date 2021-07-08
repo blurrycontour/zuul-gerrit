@@ -34,6 +34,23 @@
       "revId": "424b170ad73bcb18502f74b0f970acf7dd4efa7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d6c05e0_5ff94f1a",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T17:05:51Z",
+      "side": 1,
+      "message": "It seems like our general approach is to include attributes whether they are null or not.  Take a look at jobs:\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L3334-L3348\n\nI think to be consistent, we should always return this.",
+      "revId": "424b170ad73bcb18502f74b0f970acf7dd4efa7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
