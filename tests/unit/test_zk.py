@@ -23,6 +23,7 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
+from zuul.zk.locks import locked
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
     RawShardIO,
@@ -641,3 +642,23 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 1)
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
+
+
+class TestLocks(ZooKeeperBaseTestCase):
+
+    def test_locking_ctx(self):
+        lock = self.zk_client.client.Lock("/lock")
+        with locked(lock):
+            self.assertTrue(lock.is_acquired)
+        self.assertFalse(lock.is_acquired)
+
+    def test_already_locked_ctx(self):
+        lock = self.zk_client.client.Lock("/lock")
+        other_lock = self.zk_client.client.Lock("/lock")
+        other_lock.acquire()
+        with testtools.ExpectedException(
+            LockException, "Failed to acquire lock .*"
+        ):
+            with locked(lock, blocking=False):
+                pass
+        self.assertFalse(lock.is_acquired)
