@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb42c10c_b157348b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T17:45:30Z",
+      "side": 1,
+      "message": "Nit these last two lines can drop the build_set prefix in the lookup as we already have item set above.",
+      "revId": "18d961b7cef7468736414260c73f33744a879194",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c302834_5cdfdd01",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T17:45:30Z",
+      "side": 1,
+      "message": "Under what circumstances would there be no buildset and we are requesting nodes? Would it be better to raise an error here instead of setting a default of PRECEDENCE_NORMAL?\n\nThis was in the old code so not a change of behavior. Noticed it while reviewing this change though so figured I would call it out.",
+      "revId": "18d961b7cef7468736414260c73f33744a879194",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
