@@ -5796,15 +5796,15 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(0, len(G.messages))
         self.assertIn('Build failed.', self.smtp_messages[0]['body'])
         self.assertIn(
-            'project-test1 finger://', self.smtp_messages[0]['body'])
+            'project-test1 https://', self.smtp_messages[0]['body'])
         self.assertEqual(0, len(H.messages))
         self.assertIn('Build failed.', self.smtp_messages[1]['body'])
         self.assertIn(
-            'project-test1 finger://', self.smtp_messages[1]['body'])
+            'project-test1 https://', self.smtp_messages[1]['body'])
         self.assertEqual(0, len(I.messages))
         self.assertIn('Build succeeded.', self.smtp_messages[2]['body'])
         self.assertIn(
-            'project-test1 finger://', self.smtp_messages[2]['body'])
+            'project-test1 https://', self.smtp_messages[2]['body'])
 
         # Now reload the configuration (simulate a HUP) to check the pipeline
         # comes out of disabled
@@ -6089,9 +6089,10 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(A.reported, 2)
-        self.assertIn('project-merge : NODE_FAILURE', A.messages[1])
-        self.assertIn('project-test1 : SKIPPED', A.messages[1])
-        self.assertIn('project-test2 : SKIPPED', A.messages[1])
+        self.assertTrue(re.search('project-merge .* NODE_FAILURE',
+                                  A.messages[1]))
+        self.assertTrue(re.search('project-test1 .* SKIPPED', A.messages[1]))
+        self.assertTrue(re.search('project-test2 .* SKIPPED', A.messages[1]))
 
     def test_nodepool_resources(self):
         "Test that resources are reported"
@@ -7308,46 +7309,6 @@ class TestSchedulerTemplatedProject(ZuulTestCase):
         self.assertEqual(len(stable_items), 0)
 
 
-class TestSchedulerSuccessURL(ZuulTestCase):
-    tenant_config_file = 'config/success-url/main.yaml'
-
-    def test_success_url(self):
-        "Ensure bad build params are ignored"
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.init_repo('org/docs')
-
-        A = self.fake_gerrit.addFakeChange('org/docs', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        # Both builds ran: docs-draft-test + docs-draft-test2
-        self.assertEqual(len(self.history), 2)
-
-        # Grab build id
-        for build in self.history:
-            if build.name == 'docs-draft-test':
-                uuid = build.uuid[:7]
-            elif build.name == 'docs-draft-test2':
-                uuid_test2 = build.uuid
-
-        # Two msgs: 'Starting...'  + results
-        self.assertEqual(len(self.smtp_messages), 2)
-        body = self.smtp_messages[1]['body'].splitlines()
-        self.assertEqual('Build succeeded.', body[0])
-
-        self.assertIn(
-            '- docs-draft-test http://docs-draft.example.org/1/1/1/check/'
-            'docs-draft-test/%s/publish-docs/' % uuid,
-            body[2])
-
-        # NOTE: This default URL is currently hard-coded in executor/server.py
-        self.assertIn(
-            '- docs-draft-test2 finger://{hostname}/{uuid}'.format(
-                hostname=self.executor_server.hostname,
-                uuid=uuid_test2),
-            body[3])
-
-
 class TestSchedulerMerges(ZuulTestCase):
     tenant_config_file = 'config/merges/main.yaml'
 
@@ -7754,8 +7715,8 @@ class TestSemaphore(ZuulTestCase):
             0)
 
         self.assertEquals(1, A.reported)
-        self.assertIn('semaphore-one-test3 semaphore-one-test3 : NODE_FAILURE',
-                      A.messages[0])
+        self.assertTrue(re.search('semaphore-one-test3 .* NODE_FAILURE',
+                                  A.messages[0]))
 
     def test_semaphore_resources_first(self):
         "Test semaphores with max=1 (mutex) and get resources first"
@@ -7836,8 +7797,9 @@ class TestSemaphore(ZuulTestCase):
         self.assertEqual(len(tenant.semaphore_handler.semaphoreHolders(
             "test-semaphore")), 0)
         self.assertEquals(1, A.reported)
-        self.assertIn('semaphore-one-test1-resources-first : NODE_FAILURE',
-                      A.messages[0])
+        self.assertTrue(
+            re.search('semaphore-one-test1-resources-first .* NODE_FAILURE',
+                      A.messages[0]))
 
     def test_semaphore_zk_error(self):
         "Test semaphore release with zk error"
@@ -8759,7 +8721,7 @@ class TestReportBuildPage(ZuulTestCase):
         self.assertHistory([
             dict(name='python27', result='SUCCESS', changes='1,1'),
         ])
-        self.assertIn('python27 finger://', A.messages[0])
+        self.assertIn('python27 https://', A.messages[0])
 
 
 class TestSchedulerSmartReconfiguration(ZuulTestCase):
