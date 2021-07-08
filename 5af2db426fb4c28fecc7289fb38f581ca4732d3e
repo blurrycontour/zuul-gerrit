@@ -22,6 +22,23 @@
       "revId": "5af2db426fb4c28fecc7289fb38f581ca4732d3e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6bc8836b_c2c00b74",
+        "filename": "releasenotes/notes/remove-build-page-8d6acda308d513f1.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:51:35Z",
+      "side": 1,
+      "message": "You might consider adding a paragraph in here about how users that used these features to report success-url as the artifact url should switch over to zuul_return and return proper artifacts instead.\n\nFrom memory a non zero number of users were using success-url as a hack around needing proper artifacts.",
+      "revId": "5af2db426fb4c28fecc7289fb38f581ca4732d3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
