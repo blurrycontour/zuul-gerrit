@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "a53a87ea_4e4439e0",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3690,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-08T18:02:36Z",
+      "side": 1,
+      "message": "This is a blocking acquisition with a 0 second timeout.  I haven\u0027t the foggiest idea where I got the idea that was the best way to specify a non-blocking acquisition here; must be some strange copy-pasta.  I\u0027m happy to change that and drop the exception handler below.",
+      "revId": "cbea01750a85d9dfd1ee2b36231460d63dde4476",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "abbc46c7_168a50b4",
         "filename": "tests/base.py",
         "patchSetId": 3
