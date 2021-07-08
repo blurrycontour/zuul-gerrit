@@ -366,7 +366,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self.log.exception(
                 "Exception in hold request cache update for event: %s", event)
 
-    def submitNodeRequest(self, node_request, watcher):
+    def submitNodeRequest(self, node_request, priority, watcher):
         """
         Submit a request for nodes to Nodepool.
 
@@ -385,7 +385,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         node_request.created_time = time.time()
         data = node_request.toDict()
 
-        path = '{}/{:0>3}-'.format(self.REQUEST_ROOT, node_request.priority)
+        path = '{}/{:0>3}-'.format(self.REQUEST_ROOT, priority)
         path = self.kazoo_client.create(path, json.dumps(data).encode('utf8'),
                                         makepath=True, sequence=True,
                                         ephemeral=True)
@@ -396,7 +396,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             if value:
                 self.updateNodeRequest(node_request, value)
             deleted = (value is None)  # data *are* none
-            return watcher(node_request, deleted)
+            return watcher(node_request, priority, deleted)
 
         self.kazoo_client.DataWatch(path, callback)
 
