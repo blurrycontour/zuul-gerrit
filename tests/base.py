@@ -4147,7 +4147,7 @@ class SchedulerTestApp:
     def __init__(self, log, config, changes, additional_event_queues,
                  upstream_root, rpcclient, poller_events,
                  git_url_with_auth, source_only, fake_sql,
-                 add_cleanup, validate_tenants):
+                 add_cleanup, validate_tenants, instance_id):
         self.log = log
         self.config = config
         self.changes = changes
@@ -4168,6 +4168,7 @@ class SchedulerTestApp:
         self.connections.configure(self.config, source_only=source_only)
 
         self.sched = TestScheduler(self.config, self.connections, self)
+        self.sched.log = logging.getLogger(f"zuul.Scheduler-{instance_id}")
         self.sched._stats_interval = 1
 
         if validate_tenants is None:
@@ -4225,10 +4226,11 @@ class SchedulerTestManager:
         scheduler_config = ConfigParser()
         scheduler_config.read_file(config_data)
 
+        instance_id = len(self.instances)
         # Ensure a unique command socket per scheduler instance
         command_socket = os.path.join(
             os.path.dirname(config.get("scheduler", "command_socket")),
-            f"scheduler-{len(self.instances)}.socket"
+            f"scheduler-{instance_id}.socket"
         )
         scheduler_config.set("scheduler", "command_socket", command_socket)
 
@@ -4237,7 +4239,7 @@ class SchedulerTestManager:
                                rpcclient, poller_events,
                                git_url_with_auth, source_only,
                                fake_sql, add_cleanup,
-                               validate_tenants)
+                               validate_tenants, instance_id)
         self.instances.append(app)
         return app
 
