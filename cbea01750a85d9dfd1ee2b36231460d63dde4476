@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "60eb5be1_a1b0988f",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3690,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T18:35:29Z",
+      "side": 1,
+      "message": "I think it would be a good idea to use lock.acquire(False) instead here as that will make it much more clear what the expected behavior is.",
+      "parentUuid": "a53a87ea_4e4439e0",
+      "revId": "cbea01750a85d9dfd1ee2b36231460d63dde4476",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "abbc46c7_168a50b4",
         "filename": "tests/base.py",
         "patchSetId": 3
