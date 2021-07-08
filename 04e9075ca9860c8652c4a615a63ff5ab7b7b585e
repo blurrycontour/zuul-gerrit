@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "a609dc97_e753791e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 911,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-08T06:57:52Z",
+      "side": 1,
+      "message": "Yes, correct.",
+      "parentUuid": "554eedd4_c11facd1",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1253ec33_e9031410",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -105,6 +123,24 @@
     },
     {
       "key": {
+        "uuid": "a403c21a_ba65fd5b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-08T06:57:52Z",
+      "side": 1,
+      "message": "Tenants that are no longer present are removed here: https://opendev.org/zuul/zuul/src/branch/master/zuul/configloader.py#L2294\n\nI\u0027ll try to see if there is already an existing test case or add one of this is not yet covered.",
+      "parentUuid": "326863fb_ae4e7e46",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed341811_7aeb6a55",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -116,6 +152,24 @@
       "writtenOn": "2021-07-07T23:57:59Z",
       "side": 1,
       "message": "I guess this log info is only useful in the smart case because a non smart reconfigure does all tenants?",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ce4bb95_b3750a60",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 937,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-08T06:57:52Z",
+      "side": 1,
+      "message": "It wouldn\u0027t hurt also logging the tenants in case of a full reconfiguration, but yes it\u0027s mostly useful for smart reconfigurations.",
+      "parentUuid": "ed341811_7aeb6a55",
       "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
