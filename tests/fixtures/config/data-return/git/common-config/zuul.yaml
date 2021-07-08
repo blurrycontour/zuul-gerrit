@@ -34,7 +34,6 @@
 
 - job:
     name: data-return-relative
-    success-url: docs/index.html
     run: playbooks/data-return-relative.yaml
 
 - job:

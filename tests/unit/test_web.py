@@ -180,10 +180,8 @@ class TestWeb(BaseTestWeb):
                 hostname=self.executor_server.hostname,
                 uuid=status_jobs[0]['uuid']),
             status_jobs[0]['finger_url'])
-        # TOOD(mordred) configure a success-url on the base job
         self.assertEqual(
-            'finger://{hostname}/{uuid}'.format(
-                hostname=self.executor_server.hostname,
+            'https://zuul.example.com/t/tenant-one/build/{uuid}'.format(
                 uuid=status_jobs[0]['uuid']),
             status_jobs[0]['report_url'])
         self.assertEqual('project-test1', status_jobs[1]['name'])
@@ -197,8 +195,7 @@ class TestWeb(BaseTestWeb):
                 uuid=status_jobs[1]['uuid']),
             status_jobs[1]['finger_url'])
         self.assertEqual(
-            'finger://{hostname}/{uuid}'.format(
-                hostname=self.executor_server.hostname,
+            'https://zuul.example.com/t/tenant-one/build/{uuid}'.format(
                 uuid=status_jobs[1]['uuid']),
             status_jobs[1]['report_url'])
 
@@ -213,8 +210,7 @@ class TestWeb(BaseTestWeb):
                 uuid=status_jobs[2]['uuid']),
             status_jobs[2]['finger_url'])
         self.assertEqual(
-            'finger://{hostname}/{uuid}'.format(
-                hostname=self.executor_server.hostname,
+            'https://zuul.example.com/t/tenant-one/build/{uuid}'.format(
                 uuid=status_jobs[2]['uuid']),
             status_jobs[2]['report_url'])
 

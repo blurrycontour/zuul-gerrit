@@ -633,10 +633,14 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertEquals(test_job['result'], 'SUCCESS')
         self.assertEquals(test_job['dependencies'], [])
         self.assertEquals(test_job['artifacts'], [artifact])
-        # Both log- and web-url should point to the same URL which is specified
-        # in the build result data under zuul.log_url.
         self.assertEquals(test_job['log_url'], 'some-log-url/')
-        self.assertEquals(test_job['web_url'], 'some-log-url')
+        build_id = test_job["uuid"]
+        self.assertEquals(
+            test_job["web_url"],
+            "https://tenant.example.com/t/tenant-one/build/{}".format(
+                build_id
+            ),
+        )
         self.assertIn('execute_time', test_job)
         self.assertIn('timestamp', mqtt_payload)
         self.assertIn('enqueue_time', mqtt_payload)
@@ -665,51 +669,6 @@ class TestMQTTConnection(ZuulTestCase):
 
         self.assertIn("topic component 'bad' is invalid", A.messages[0],
                       "A should report a syntax error")
-
-
-class TestMQTTConnectionBuildPage(ZuulTestCase):
-    config_file = "zuul-mqtt-driver.conf"
-    tenant_config_file = "config/mqtt-driver-report-build-page/main.yaml"
-
-    def test_mqtt_reporter(self):
-        "Test the MQTT reporter with 'report-build-page' enabled"
-
-        # Add a sucess result
-        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
-        self.executor_server.returnData(
-            "test", A, {"zuul": {"log_url": "some-log-url"}}
-        )
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        success_event = self.mqtt_messages.pop()
-
-        self.assertEquals(
-            success_event.get("topic"),
-            "tenant-one/zuul_buildset/check/org/project/master",
-        )
-
-        mqtt_payload = success_event["msg"]
-        self.assertEquals(mqtt_payload["project"], "org/project")
-        self.assertEquals(mqtt_payload["branch"], "master")
-        self.assertEquals(mqtt_payload["buildset"]["result"], "SUCCESS")
-
-        builds = mqtt_payload["buildset"]["builds"]
-        test_job = [b for b in builds if b["job_name"] == "test"][0]
-        self.assertEquals(test_job["job_name"], "test")
-        self.assertEquals(test_job["result"], "SUCCESS")
-
-        build_id = test_job["uuid"]
-        # When report-build-page is enabled, the log_url should still point to
-        # the URL that is specified in the build result data under
-        # zuul.log_url. The web_url will instead point to the builds page.
-        self.assertEquals(test_job["log_url"], "some-log-url/")
-        self.assertEquals(
-            test_job["web_url"],
-            "https://tenant.example.com/t/tenant-one/build/{}".format(
-                build_id
-            ),
-        )
 
 
 class TestElasticsearchConnection(AnsibleZuulTestCase):

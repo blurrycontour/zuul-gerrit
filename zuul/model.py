@@ -1250,8 +1250,6 @@ class Job(ConfigObject):
             hold_following_changes=False,
             failure_message=None,
             success_message=None,
-            failure_url=None,
-            success_url=None,
             branch_matcher=None,
             _branches=(),
             file_matcher=None,
@@ -3026,16 +3024,12 @@ class QueueItem(object):
         return url
 
     def formatJobResult(self, job, build=None):
-        if (self.pipeline.tenant.report_build_page and
-            self.pipeline.tenant.web_root):
-            if build is None:
-                build = self.current_build_set.getBuild(job.name)
-            pattern = urllib.parse.urljoin(self.pipeline.tenant.web_root,
-                                           'build/{build.uuid}')
-            url = self.formatUrlPattern(pattern, job, build)
-            return (build.result, url)
-        else:
-            return self.formatProvisionalJobResult(job, build)
+        if build is None:
+            build = self.current_build_set.getBuild(job.name)
+        pattern = urllib.parse.urljoin(self.pipeline.tenant.web_root,
+                                       'build/{build.uuid}')
+        url = self.formatUrlPattern(pattern, job, build)
+        return (build.result, url)
 
     def formatStatusUrl(self):
         # If we don't have a web root set, we can't format any url
@@ -3060,46 +3054,6 @@ class QueueItem(object):
             "status/change/{change.number},{change.patchset}",
         )
         return self.formatUrlPattern(pattern)
-
-    def formatProvisionalJobResult(self, job, build=None):
-        if build is None:
-            build = self.current_build_set.getBuild(job.name)
-        result = build.result
-        pattern = None
-        if result == 'SUCCESS':
-            if job.success_message:
-                result = job.success_message
-            if job.success_url:
-                pattern = job.success_url
-        else:
-            if job.failure_message:
-                result = job.failure_message
-            if job.failure_url:
-                pattern = job.failure_url
-        url = None  # The final URL
-        default_url = build.result_data.get('zuul', {}).get('log_url')
-        if pattern:
-            job_url = self.formatUrlPattern(pattern, job, build)
-        else:
-            job_url = None
-        try:
-            if job_url:
-                u = urllib.parse.urlparse(job_url)
-                if u.scheme:
-                    # The job success or failure url is absolute, so it's
-                    # our final url.
-                    url = job_url
-                else:
-                    # We have a relative job url.  Combine it with our
-                    # default url.
-                    if default_url:
-                        url = urllib.parse.urljoin(default_url, job_url)
-        except Exception:
-            self.log.exception("Error while parsing url for job %s:"
-                               % (job,))
-        if not url:
-            url = default_url or build.url or None
-        return (result, url)
 
     def formatJSON(self, websocket_url=None):
         ret = {}
@@ -5108,7 +5062,6 @@ class Tenant(object):
         self.max_job_timeout = 10800
         self.exclude_unprotected_branches = False
         self.default_base_job = None
-        self.report_build_page = False
         self.layout = None
         # The unparsed configuration from the main zuul config for
         # this tenant.
