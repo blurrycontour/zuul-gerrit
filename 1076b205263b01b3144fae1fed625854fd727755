@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1356c7a2_a4485d78",
+        "filename": "zuul/driver/sql/alembic/versions/40c49b6fc2e3_build_nodeset.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:31:15Z",
+      "side": 1,
+      "message": "Does this mean we are going to lose the node name info that has already been recorded? Do we need a transition period if so?",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7aaa2d41_15d1e606",
+        "filename": "zuul/driver/sql/alembic/versions/40c49b6fc2e3_build_nodeset.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:31:15Z",
+      "side": 1,
+      "message": "Will we truncate names that are longer than this? Probably not an issue for most (all?) users but want to understand what will happen if the field is too large.",
+      "range": {
+        "startLine": 34,
+        "startChar": 68,
+        "endLine": 34,
+        "endChar": 71
+      },
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e25c66bd_cba72640",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 3343,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:31:15Z",
+      "side": 1,
+      "message": "Should nodeset be reported here?",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5454a6c_7e7fa6b7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1715,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-08T22:31:15Z",
+      "side": 1,
+      "message": "Do we need to set nodeset here?",
+      "revId": "1076b205263b01b3144fae1fed625854fd727755",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
