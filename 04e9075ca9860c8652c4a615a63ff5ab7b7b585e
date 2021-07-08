@@ -141,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "50b74f5a_1a12f4d2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-08T07:16:28Z",
+      "side": 1,
+      "message": "I added an assert for the abide to test_smart_reconfiguration",
+      "parentUuid": "a403c21a_ba65fd5b",
+      "revId": "04e9075ca9860c8652c4a615a63ff5ab7b7b585e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed341811_7aeb6a55",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
