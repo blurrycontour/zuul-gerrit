@@ -1,7 +1,6 @@
 - tenant:
     name: tenant-one
     web-root: https://one.example.com/
-    report-build-page: true
     source:
       gerrit:
         config-projects:
@@ -11,7 +10,6 @@
 
 - tenant:
     name: tenant-two
-    report-build-page: true
     source:
       gerrit:
         config-projects:
