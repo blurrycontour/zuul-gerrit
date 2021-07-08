@@ -8836,6 +8836,7 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
 
         # The tenant-three has been removed so nothing should be reported
         self.assertEqual(0, C.reported)
+        self.assertNotIn('tenant-three', self.scheds.first.sched.abide.tenants)
 
         # Verify known tenants
         expected_tenants = {'tenant-one', 'tenant-two', 'tenant-four'}

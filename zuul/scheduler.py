@@ -62,7 +62,6 @@ from zuul.model import (
     NodesProvisionedEvent,
     PromoteEvent,
     ReconfigureEvent,
-    SmartReconfigureEvent,
     TenantReconfigureEvent,
     TimeDataBase,
     UnparsedAbideConfig,
@@ -628,11 +627,8 @@ class Scheduler(threading.Thread):
 
     def reconfigure(self, config, smart=False):
         self.log.debug("Submitting reconfiguration event")
-        if smart:
-            event = SmartReconfigureEvent()
-        else:
-            event = ReconfigureEvent()
 
+        event = ReconfigureEvent(smart=smart)
         event.ack_ref = threading.Event()
         self.reconfigure_event_queue.put(event)
         self.wake_event.set()
@@ -871,62 +867,10 @@ class Scheduler(threading.Thread):
     def _doReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
         # a request
-        self.layout_lock.acquire()
-        self.config = self._zuul_app.config
-        try:
-            self.log.info("Full reconfiguration beginning")
-            start = time.monotonic()
-
-            # Reload the ansible manager in case the default ansible version
-            # changed.
-            default_ansible_version = get_default(
-                self.config, 'scheduler', 'default_ansible_version', None)
-            self.ansible_manager = AnsibleManager(
-                default_version=default_ansible_version)
-
-            for connection in self.connections.connections.values():
-                self.log.debug("Clear cache for: %s" % connection)
-                connection.clearCache()
-
-            loader = configloader.ConfigLoader(
-                self.connections, self, self.merger, self.keystore)
-            tenant_config, script = self._checkTenantSourceConf(self.config)
-            self.unparsed_abide = loader.readConfig(
-                tenant_config, from_script=script)
-
-            abide = Abide()
-            loader.loadAdminRules(abide, self.unparsed_abide)
-            loader.loadTPCs(abide, self.unparsed_abide)
-            for tenant_name in self.unparsed_abide.tenants:
-                tenant = loader.loadTenant(abide, tenant_name,
-                                           self.ansible_manager,
-                                           self.unparsed_abide,
-                                           cache_ltime=None)
-
-                if tenant is not None:
-                    old_tenant = self.abide.tenants.get(tenant_name)
-                    self._reconfigureTenant(tenant, old_tenant)
-
-            for old_tenant in self.abide.tenants.values():
-                if old_tenant.name not in abide.tenants:
-                    # We deleted a tenant
-                    self._reconfigureDeleteTenant(old_tenant)
-
-            self.abide = abide
-        finally:
-            self.layout_lock.release()
-
-        duration = round(time.monotonic() - start, 3)
-        self.log.info("Full reconfiguration complete (duration: %s seconds)",
-                      duration)
-
-    def _doSmartReconfigureEvent(self, event):
-        # This is called in the scheduler loop after another thread submits
-        # a request
         reconfigured_tenants = []
         with self.layout_lock:
             self.config = self._zuul_app.config
-            self.log.info("Smart reconfiguration beginning")
+            self.log.info("Reconfiguration beginning (smart=%s)", event.smart)
             start = time.monotonic()
 
             # Reload the ansible manager in case the default ansible version
@@ -935,6 +879,11 @@ class Scheduler(threading.Thread):
                 self.config, 'scheduler', 'default_ansible_version', None)
             self.ansible_manager = AnsibleManager(
                 default_version=default_ansible_version)
+
+            if not event.smart:
+                for connection in self.connections.connections.values():
+                    self.log.debug("Clear cache for: %s" % connection)
+                    connection.clearCache()
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
@@ -943,8 +892,8 @@ class Scheduler(threading.Thread):
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
 
-            # We need to handle new and deleted tenants so we need to process
-            # all tenants from the currently known and the new ones.
+            # We need to handle new and deleted tenants, so we need to process
+            # all tenants currently known and the new ones.
             tenant_names = {t for t in self.abide.tenants}
             tenant_names.update(self.unparsed_abide.tenants.keys())
 
@@ -953,29 +902,39 @@ class Scheduler(threading.Thread):
                 self.unparsed_abide.tenants.keys())
             for tenant_name in deleted_tenants:
                 self.abide.clearTPCs(tenant_name)
+
             loader.loadTPCs(self.abide, self.unparsed_abide)
+            loader.loadAdminRules(self.abide, self.unparsed_abide)
+
+            cache_ltime = event.zuul_event_ltime
+            if not event.smart:
+                self.abide.unparsed_project_branch_cache.clear()
+                # Force a reload of the config via the mergers
+                cache_ltime = None
 
             for tenant_name in tenant_names:
-                old_tenant = old_unparsed_abide.tenants.get(tenant_name)
-                new_tenant = self.unparsed_abide.tenants.get(tenant_name)
-                if old_tenant == new_tenant:
-                    continue
+                if event.smart:
+                    old_tenant = old_unparsed_abide.tenants.get(tenant_name)
+                    new_tenant = self.unparsed_abide.tenants.get(tenant_name)
+                    if old_tenant == new_tenant:
+                        continue
 
-                reconfigured_tenants.append(tenant_name)
                 old_tenant = self.abide.tenants.get(tenant_name)
                 tenant = loader.loadTenant(self.abide, tenant_name,
                                            self.ansible_manager,
                                            self.unparsed_abide,
-                                           cache_ltime=event.zuul_event_ltime)
-
-                tenant = self.abide.tenants.get(tenant_name)
+                                           cache_ltime=cache_ltime)
+                reconfigured_tenants.append(tenant_name)
                 if tenant is not None:
                     self._reconfigureTenant(tenant, old_tenant)
                 else:
                     self._reconfigureDeleteTenant(old_tenant)
+
         duration = round(time.monotonic() - start, 3)
-        self.log.info("Smart reconfiguration of tenants %s complete "
-                      "(duration: %s seconds)", reconfigured_tenants, duration)
+        self.log.info("Reconfiguration complete (smart: %s, "
+                      "duration: %s seconds)", event.smart, duration)
+        if event.smart:
+            self.log.info("Reconfigured tenants: %s", reconfigured_tenants)
 
     def _doTenantReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
@@ -1589,8 +1548,6 @@ class Scheduler(threading.Thread):
             try:
                 if isinstance(event, ReconfigureEvent):
                     self._doReconfigureEvent(event)
-                elif isinstance(event, SmartReconfigureEvent):
-                    self._doSmartReconfigureEvent(event)
                 else:
                     self.log.error("Unable to handle event %s", event)
             finally:
