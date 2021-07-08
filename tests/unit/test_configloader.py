@@ -434,8 +434,13 @@ class TestTenantConfigBranches(ZuulTestCase):
         self.log.debug('Creating branches')
         self.create_branch('common-config', 'stable')
         self.create_branch('common-config', 'feat_x')
-
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'common-config', 'stable'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'common-config', 'feat_x'))
+        self.waitUntilSettled()
 
         # Job must be defined in master
         self._validate_job(common_job, 'master')

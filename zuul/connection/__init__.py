@@ -77,17 +77,6 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     def registerScheduler(self, sched) -> None:
         self.sched = sched
 
-    def clearCache(self):
-        """Clear the cache for this connection.
-
-        This is called immediately prior to performing a full
-        reconfiguration. The cache should be cleared so that a
-        full reconfiguration can be used to correct any errors in
-        cached data.
-
-        """
-        pass
-
     def maintainCache(self, relevant):
 
         """Make cache contain relevant changes.
@@ -235,17 +224,6 @@ class CachedBranchConnection(BaseConnection):
 
         cache[project.name] = branches
         return branches
-
-    def clearCache(self) -> None:
-        """Clear the connection cache for all projects.
-
-        This method is called by the scheduler in order to perform a full
-        reconfiguration.
-        """
-        self.log.debug("Clearing branch cache for all branches: %s",
-                       self.connection_name)
-        self._project_branch_cache_exclude_unprotected = {}
-        self._project_branch_cache_include_unprotected = {}
 
     def clearProjectCache(self, project: Project) -> None:
         """Clear the connection cache for this project.

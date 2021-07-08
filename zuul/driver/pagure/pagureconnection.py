@@ -534,9 +534,6 @@ class PagureConnection(BaseConnection):
         for key in remove:
             del self._change_cache[key]
 
-    def clearCache(self):
-        self.project_branch_cache = {}
-
     def getWebController(self, zuul_web):
         return PagureWebController(zuul_web, self)
 
