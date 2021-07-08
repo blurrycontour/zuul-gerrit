@@ -120,9 +120,8 @@ An MQTT report uses this schema:
 
          .. attr:: web_url
 
-            The url to the build result page if :attr:`tenant.report-build-page`
-            is enabled. The build log url otherwise (not present in start
-            report).
+            The url to the build result page.  Not present in start
+            report.
 
          .. attr:: result
 

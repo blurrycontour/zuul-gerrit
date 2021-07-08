@@ -29,12 +29,12 @@
 - name: Save test1 change info
   set_fact:
     changetest1: "{{ changeinfo }}"
-    json_query_finger: "messages[?contains(@.message, 'testjob finger://')].message | [0]"
+    json_query_finger: "messages[?contains(@.message, 'testjob http://')].message | [0]"
 
-- name: "Fetch url finger://"
+- name: "Check build URL"
   assert:
     that:
-      - (result_json | to_json | from_json | json_query(json_query_finger) | regex_search('(finger://[^ ]*)') | length > 0)
+      - (result_json | to_json | from_json | json_query(json_query_finger) | regex_search('(http://[^ ]*)') | length > 0)
 
 - name: Configure a Base Job zuul-config
   copy:
@@ -82,15 +82,26 @@
     projectname: test1
     check_number: 2
 
-- name: Find the log URL with regex
+- name: Find the build URL with regex
   set_fact:
-    log_url: "{{ result_json | to_json | from_json | json_query(json_query_log_url) | regex_search('(http://[^ ]*)') }}"
+    build_url: "{{ result_json | to_json | from_json | json_query(json_query_log_url) | regex_search('(http://[^ ]*)') }}"
   vars:
-    json_query_log_url: "messages[?contains(@.message, 'http://')].message | [0]"
+    json_query_log_url: "messages[?contains(@.message, 'http://')].message | [1]"
+
+- name: Extract build id from build url
+  set_fact:
+    build_uuid: "{{ build_url.split('/')[-1] }}"
+
+- name: Find log URL via Zuul API
+  uri:
+    url: "http://localhost:9000/api/tenant/example-tenant/build/{{ build_uuid }}"
+    method: GET
+    return_content: true
+  register: result
 
 - name: Fetch log URL
   get_url:
-    url: "{{ log_url }}job-output.txt"
+    url: "{{ result.json.log_url }}job-output.txt"
     dest: "{{ workspace }}/job-output.txt"
 
 - name: Verify log contents

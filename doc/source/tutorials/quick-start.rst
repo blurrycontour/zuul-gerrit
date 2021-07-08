@@ -385,10 +385,10 @@ uploaded, Zuul will run the new job and report back on the change.
 Visit http://localhost:8080/dashboard/self and open the change you
 just uploaded.  If the build is complete, Zuul should have left a
 Verified: +1 vote on the change, along with a comment at the bottom.
-Expand the comments and you should see that the job succeeded, but
-there are no logs and no way to see the output, only a `finger` URL
-(which is what Zuul reports when it doesn't know where build logs are
-stored).
+Expand the comments and you should see that the job succeeded, and a
+link to the build result in Zuul is provided.  You can follow that
+link to see some information about the build, but you won't find any
+logs since Zuul hasn't been told where to save them yet.
 
 .. image:: /images/check1-1002.png
    :align: center
@@ -523,9 +523,14 @@ the change:
 .. image:: /images/check2-1002.png
    :align: center
 
-Follow the link and you will be able to browse the console log for the
-job.  In the middle of the log, you should see the "Hello, world!"
-output from the job's playbook.
+Follow the link and you will be directed to the build result page.  If
+you click on the `Logs` tab, you'll be able to browse the console log
+for the job.  In the middle of the log, you should see the "Hello,
+world!"  output from the job's playbook.
+
+Also try the `Console` tab for a more structured view of the log.
+Click on the `OK` button in the middle of the page to see the output
+of just the task we're interested in.
 
 Further Steps
 -------------
