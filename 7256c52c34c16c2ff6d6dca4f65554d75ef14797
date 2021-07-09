@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8dae1549_2f48ef90",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-07-09T17:42:05Z",
+      "side": 1,
+      "message": "Per earlier discussion, it might be nice to go ahead and call self.executor.graceful() here as well, or at least have the error recommend a sigkill or to use the RPC client to send a stop or graceful to get the currently running process to actually terminate.",
+      "revId": "7256c52c34c16c2ff6d6dca4f65554d75ef14797",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
