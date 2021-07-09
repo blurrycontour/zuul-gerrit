@@ -16,6 +16,24 @@
       "revId": "11a6e7bd47c99697cea3c031fcd1cac79f981e44",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ef5a805_5a5f5a2a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-09T06:18:37Z",
+      "side": 1,
+      "message": "Which nodes attribute do you mean? The \"node_types\" are only created for the the serialization to ZK based on the request.nodeset attribute (https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L871) but never retrieved from it.\n\nBut maybe I can put this logic directly in the updateNodeRequest() method and iterate over data[\"node_types\"] in case node_request.nodeset is not set:  https://review.opendev.org/c/zuul/zuul/+/799833/1/zuul/zk/nodepool.py#b483",
+      "parentUuid": "46c66e38_d0da33fd",
+      "revId": "11a6e7bd47c99697cea3c031fcd1cac79f981e44",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
