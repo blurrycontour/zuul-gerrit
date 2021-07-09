@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b18f52e1_a38e6b52",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-09T14:55:17Z",
+      "side": 1,
+      "message": "Oh I just saw this.  I don\u0027t think we should import \"locked\" as a bare word.  Let\u0027s do:\n\nimport zuul.zk.locks as zuul_locks\n\nthen use with \"zuul_locks.locked\"\n\nAlso, out of curiosity, why not: \"with tenant_write_lock(blocking\u003dFalse)\" and avoid the \"locked\" method?",
+      "revId": "176da4891de0fee1f14a7e2242c65f1fb37aa1fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
