@@ -927,12 +927,6 @@ circumstances this will be the best way to stop Zuul.
 To stop the executor immediately, run ``zuul-executor stop``. Jobs that were
 running on the stopped executor will be rescheduled on other executors.
 
-The executor normally responds to a ``SIGTERM`` signal in the same way
-as the ``stop`` command, however you can change this behavior to match
-``graceful`` by setting the environment variable
-``ZUUL_EXECUTOR_SIGTERM_METHOD`` to ``graceful`` (the default is
-``stop``).
-
 To enable or disable running Ansible in verbose mode (with the
 ``-vvv`` argument to ansible-playbook) run ``zuul-executor verbose``
 and ``zuul-executor unverbose``.
