@@ -16,6 +16,23 @@
       "revId": "fce6a71034c205c9404a4a900b884b728bd396f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "db244407_b156481d",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-07-09T14:58:07Z",
+      "side": 1,
+      "message": "Oh, I see now, this is actually a substring match, so ZUUL_EXECUTOR_SIGTERM_METHOD\u003drace would also work. None of the letters in \"stop\" appear in \"graceful\" so any abbreviation would be fine for the user to set.",
+      "revId": "fce6a71034c205c9404a4a900b884b728bd396f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
