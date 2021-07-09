@@ -16,6 +16,23 @@
       "revId": "454fef6ab69930ad6b74916d524e1c16fdd2b024",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "500517e5_2c0497a9",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-07-09T16:52:49Z",
+      "side": 1,
+      "message": "And just to be clear, I think this means that also setting ZUUL_EXECUTOR_SIGTERM_METHOD to an empty string will result in the non-default behavior. Might be counter-intuitive, but perhaps this is an intentional choice.",
+      "revId": "454fef6ab69930ad6b74916d524e1c16fdd2b024",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
