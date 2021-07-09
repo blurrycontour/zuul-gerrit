@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5269af99_2d584edf",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-07-09T16:50:43Z",
+      "side": 1,
+      "message": "I suppose this makes the behavior now that not setting ZUUL_EXECUTOR_SIGTERM_METHOD at all or setting it to \"graceful\" (or alternative capitalizations thereof) will get the default graceful shutdown behavior, while setting it to any other value will abruptly stop the service at sigterm.",
+      "revId": "454fef6ab69930ad6b74916d524e1c16fdd2b024",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
