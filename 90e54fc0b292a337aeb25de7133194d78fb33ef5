@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3eecb417_0027e845",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-09T17:24:00Z",
+      "side": 1,
+      "message": "Yes to the first part, but to the second, the process can also be exited with the \u0027stop\u0027 or \u0027graceful\u0027 zuul-executor commands.",
+      "revId": "90e54fc0b292a337aeb25de7133194d78fb33ef5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f42d40ea_74ce9586",
         "filename": "zuul/cmd/executor.py",
         "patchSetId": 4
