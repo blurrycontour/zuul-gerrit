@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "deb3bc48_df06a13a",
+        "filename": "releasenotes/notes/graceful-09c7267360190f7a.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-07-09T16:36:37Z",
+      "side": 1,
+      "message": "This does not seems to be true anymore, perhaps we should drop `(the default)`",
+      "revId": "17abc5ff73466e03162a96e0b0763adbd185a4da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c1337f9_e7d07ea8",
+        "filename": "releasenotes/notes/graceful-09c7267360190f7a.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-07-09T16:36:37Z",
+      "side": 1,
+      "message": "It might be useful to indicate that setting the value to `stop` preserve the legacy behavior.",
+      "revId": "17abc5ff73466e03162a96e0b0763adbd185a4da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
