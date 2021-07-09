@@ -5,3 +5,9 @@ features:
     environment variable to determine whether ``SIGTERM`` should be
     equivalent to the ``stop`` command (the default) or the
     ``graceful`` command.
+upgrade:
+  - |
+    The default behavior when an executor receives SIGTERM has been
+    changed from immediately stopping jobs to gracefully waiting for
+    them to finish.  See the new ``ZUUL_EXECUTOR_SIGTERM_METHOD``
+    environment variable to specify the behavior.
