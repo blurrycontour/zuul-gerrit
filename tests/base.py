@@ -5690,11 +5690,6 @@ class SSLZuulTestCase(ZuulTestCase):
     use_ssl = True
 
 
-class ZuulDBTestCase(ZuulTestCase):
-    # TODO: Remove this and fake_sql arguments
-    pass
-
-
 class ZuulGithubAppTestCase(ZuulTestCase):
     def setup_config(self, config_file: str):
         config = super(ZuulGithubAppTestCase, self).setup_config(config_file)
