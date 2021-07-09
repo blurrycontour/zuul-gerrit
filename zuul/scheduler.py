@@ -881,11 +881,6 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=default_ansible_version)
 
-            if not event.smart:
-                for connection in self.connections.connections.values():
-                    self.log.debug("Clear cache for: %s" % connection)
-                    connection.clearCache()
-
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)

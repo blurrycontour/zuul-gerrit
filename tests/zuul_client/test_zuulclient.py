@@ -291,6 +291,9 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.executor_server.hold_jobs_in_build = True
         start_builds = len(self.builds)
         self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
         self.executor_server.hold_jobs_in_build = True
         self.commitConfigUpdate('common-config', 'layouts/timer.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
