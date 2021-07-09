@@ -16,6 +16,23 @@
       "revId": "90e54fc0b292a337aeb25de7133194d78fb33ef5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f42d40ea_74ce9586",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-09T17:01:19Z",
+      "side": 1,
+      "message": "Jeremy: we only register exit_handler for sigterm",
+      "revId": "90e54fc0b292a337aeb25de7133194d78fb33ef5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
