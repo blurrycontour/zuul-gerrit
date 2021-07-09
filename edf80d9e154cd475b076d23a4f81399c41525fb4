@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "9a93ce3e_1e7552c4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-09T05:22:12Z",
+      "side": 1,
+      "message": "Yes the whole reconfiguration will be protected by a tenant write lock which ensures that only one scheduler modifies the layout.",
+      "parentUuid": "298de5f1_167e1d4d",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6ae8913_7741ae71",
         "filename": "zuul/zk/layout.py",
         "patchSetId": 19
@@ -81,6 +99,24 @@
       "writtenOn": "2021-07-08T18:25:40Z",
       "side": 1,
       "message": "This seems safe, but I\u0027m interested in Simon\u0027s comments on the relative merits of uuid / ltime here.",
+      "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "93ca3f4d_02007a58",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-09T05:22:12Z",
+      "side": 1,
+      "message": "I think it wouldn\u0027t hurt to also check the ltime here. We expect the uuid to change when the layout changes, so in that case the ltime should also be different.\n\nMaybe it even makes sense to raise an Exception in case the uuid is the same, but the ltime is different and do the same for the __gt__ (ltime different, but uuid same).",
+      "parentUuid": "53ef4efc_31107a67",
       "revId": "edf80d9e154cd475b076d23a4f81399c41525fb4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
