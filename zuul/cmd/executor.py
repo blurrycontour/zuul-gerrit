@@ -44,7 +44,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        graceful = os.environ.get('ZUUL_EXECUTOR_SIGTERM_METHOD', 'stop')
+        graceful = os.environ.get('ZUUL_EXECUTOR_SIGTERM_METHOD', 'graceful')
         if graceful.lower() in ('graceful'):
             self.executor.graceful()
         else:
