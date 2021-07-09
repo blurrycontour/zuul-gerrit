@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b70af1f0_f3b644af",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 933,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-07-09T14:25:52Z",
+      "side": 1,
+      "message": "and here say `set it to ``0`` to disable`",
+      "revId": "d31c0930890d5b1f843922d58a609e3cac9be99e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37277e2a_16c145cf",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-07-09T14:25:52Z",
+      "side": 1,
+      "message": "Would using `graceful !\u003d \u00270\u0027` be more user friendly?",
+      "revId": "d31c0930890d5b1f843922d58a609e3cac9be99e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
