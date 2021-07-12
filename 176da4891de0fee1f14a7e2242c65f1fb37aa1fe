@@ -16,6 +16,24 @@
       "revId": "176da4891de0fee1f14a7e2242c65f1fb37aa1fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8394f4c6_0b002605",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-12T06:57:11Z",
+      "side": 1,
+      "message": "Similar to threading.Lock the locks will just return True/False indicating whether they\u0027ve been successfully acquired or not. The locked() ctx manager will throw an exception in case the lock can\u0027t be acquired. This way we don\u0027t have to check the return value every time.\n\nOr did you mean making e.g. tenant_write_lock a context manager that\u0027s performing the checks internally?",
+      "parentUuid": "b18f52e1_a38e6b52",
+      "revId": "176da4891de0fee1f14a7e2242c65f1fb37aa1fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
