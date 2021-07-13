@@ -1790,11 +1790,6 @@ class TenantParser(object):
             # in-repo configuration apply only to that branch.
             branches = tenant.getProjectBranches(project)
             for branch in branches:
-                branch_cache = abide.getUnparsedBranchCache(
-                    project.canonical_name, branch)
-                if branch_cache.isValidFor(tpc):
-                    # We already have this branch cached.
-                    continue
                 if not tpc.load_classes:
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
@@ -1811,10 +1806,15 @@ class TenantParser(object):
                             self.log.debug(
                                 "Using files from cache for project %s @%s",
                                 project.canonical_name, branch)
+                            branch_cache = abide.getUnparsedBranchCache(
+                                project.canonical_name, branch)
+                            if branch_cache.isValidFor(
+                                    tpc, files_cache.update_ltime):
+                                # Unparsed branch cache is already up-to-date
+                                continue
                             self._updateUnparsedBranchCache(
                                 abide, tenant, source_context, files_cache,
-                                loading_errors)
-                            branch_cache.setValidFor(tpc)
+                                loading_errors, files_cache.update_ltime)
                             continue
 
                 extra_config_files = abide.getExtraConfigFiles(project.name)
@@ -1834,7 +1834,6 @@ class TenantParser(object):
                 job.update_ltime = update_ltime
                 job.source_context = source_context
                 jobs.append(job)
-                branch_cache.setValidFor(tpc)
 
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
@@ -1849,7 +1848,8 @@ class TenantParser(object):
                            (job, job.files.keys()))
 
             self._updateUnparsedBranchCache(abide, tenant, job.source_context,
-                                            job.files, loading_errors)
+                                            job.files, loading_errors,
+                                            job.update_ltime)
 
             # Save all config files in Zookeeper (not just for the current tpc)
             files_cache = self.unparsed_config_cache.getFilesCache(
@@ -1865,9 +1865,15 @@ class TenantParser(object):
                                         job.update_ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
-                                   loading_errors):
+                                   loading_errors, update_ltime):
         loaded = False
         tpc = tenant.project_configs[source_context.project.canonical_name]
+        # Make sure we are clearing the local cache before updating it.
+        abide.clearUnparsedBranchCache(source_context.project.canonical_name,
+                                       source_context.branch)
+        branch_cache = abide.getUnparsedBranchCache(
+            source_context.project.canonical_name,
+            source_context.branch)
         for conf_root in (
                 ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
                 tpc.extra_config_files + tpc.extra_config_dirs):
@@ -1892,10 +1898,8 @@ class TenantParser(object):
                     (source_context,))
                 incdata = self.loadProjectYAML(
                     files[fn], source_context, loading_errors)
-                branch_cache = abide.getUnparsedBranchCache(
-                    source_context.project.canonical_name,
-                    source_context.branch)
                 branch_cache.put(source_context.path, incdata)
+        branch_cache.setValidFor(tpc, update_ltime)
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()

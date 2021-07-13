@@ -5425,19 +5425,23 @@ class UnparsedBranchCache(object):
         self.extra_files_searched = set()
         self.extra_dirs_searched = set()
         self.files = {}
+        self.update_ltime = -1
 
-    def isValidFor(self, tpc):
+    def isValidFor(self, tpc, cache_ltime):
         """Return True if this has valid cache results for the extra
         files/dirs in the tpc.
         """
         if self.load_skipped:
+            return False
+        if self.update_ltime < cache_ltime:
             return False
         if (set(tpc.extra_config_files) <= self.extra_files_searched and
             set(tpc.extra_config_dirs) <= self.extra_dirs_searched):
             return True
         return False
 
-    def setValidFor(self, tpc):
+    def setValidFor(self, tpc, update_ltime):
+        self.update_ltime = update_ltime
         self.load_skipped = False
         self.extra_files_searched |= set(tpc.extra_config_files)
         self.extra_dirs_searched |= set(tpc.extra_config_dirs)
