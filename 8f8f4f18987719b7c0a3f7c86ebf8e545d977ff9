@@ -73,6 +73,24 @@
       "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "93170ac6_0f8cc489",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-13T23:32:22Z",
+      "side": 1,
+      "message": "This helps a bunch, thanks. My only thought here is that we might be better off setting name to something that indicates the unused nature of the value. For example f\"unused-{node_type}-{i}\" or similar.",
+      "parentUuid": "fe6a9f42_d23a26b0",
+      "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
