@@ -603,7 +603,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
 
         # Get the current ltime from Zookeeper and run a full reconfiguration,
         # so that we know all items in the cache have a larger ltime.
-        ltime = self.getCurrentLtime()
+        ltime = self.zk_client.getCurrentLtime()
         self.scheds.first.fullReconfigure()
 
         # Clear the unparsed branch cache so all projects (except for

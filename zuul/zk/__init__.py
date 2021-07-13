@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import logging
+import re
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -17,6 +18,7 @@ from threading import Thread
 from typing import Optional, List, Callable
 
 from kazoo.client import KazooClient
+from kazoo.exceptions import NoNodeError
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 
@@ -193,6 +195,15 @@ class ZooKeeperClient(object):
         for res in results:
             if isinstance(res, Exception):
                 raise res
+
+    def getCurrentLtime(self):
+        """Get the logical timestamp as seen by the Zookeeper cluster."""
+        try:
+            zstat = self.client.set("/zuul/ltime", b"")
+        except NoNodeError:
+            self.client.create("/zuul/ltime", b"", makepath=True)
+            zstat = self.client.set("/zuul/ltime", b"")
+        return zstat.last_modified_transaction_id
 
 
 class ZooKeeperSimpleBase(metaclass=ABCMeta):
