@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7a80fd8_36e7ebd5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1832,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-13T23:09:44Z",
+      "side": 1,
+      "message": "Does this do something meaningful if we return a dummy nodeset?",
+      "range": {
+        "startLine": 1832,
+        "startChar": 44,
+        "endLine": 1832,
+        "endChar": 60
+      },
+      "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b87a78be_5d19789f",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-13T23:09:44Z",
+      "side": 1,
+      "message": "Is there any issue with these names potentially colliding with real node names on a fresh nodepool install?",
+      "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
