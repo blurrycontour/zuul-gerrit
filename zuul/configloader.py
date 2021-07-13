@@ -36,6 +36,7 @@ from zuul.lib.varnames import check_varnames
 from zuul.zk.semaphore import SemaphoreHandler
 
 
+# This line will violate the pep8 checks because the lien length is too long. We want this to fail.
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
 def to_list(x):
