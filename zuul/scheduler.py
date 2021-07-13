@@ -902,12 +902,6 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
 
-            cache_ltime = event.zuul_event_ltime
-            if not event.smart:
-                self.abide.unparsed_project_branch_cache.clear()
-                # Force a reload of the config via the mergers
-                cache_ltime = None
-
             for tenant_name in tenant_names:
                 if event.smart:
                     old_tenant = old_unparsed_abide.tenants.get(tenant_name)
@@ -919,7 +913,7 @@ class Scheduler(threading.Thread):
                 tenant = loader.loadTenant(self.abide, tenant_name,
                                            self.ansible_manager,
                                            self.unparsed_abide,
-                                           cache_ltime=cache_ltime)
+                                           cache_ltime=event.zuul_event_ltime)
                 reconfigured_tenants.append(tenant_name)
                 if tenant is not None:
                     self._reconfigureTenant(tenant, old_tenant)
@@ -946,8 +940,6 @@ class Scheduler(threading.Thread):
             for project_name, branch_name in event.project_branches:
                 self.log.debug("Clearing unparsed config: %s @%s",
                                project_name, branch_name)
-                self.abide.clearUnparsedBranchCache(project_name,
-                                                    branch_name)
                 with self.unparsed_config_cache.writeLock(project_name):
                     self.unparsed_config_cache.clearCache(project_name,
                                                           branch_name)
@@ -959,7 +951,7 @@ class Scheduler(threading.Thread):
                             [event.tenant_name])
             loader.loadTenant(self.abide, event.tenant_name,
                               self.ansible_manager, self.unparsed_abide,
-                              cache_ltime=event.zuul_event_ltime)
+                              cache_ltime=-1)
             tenant = self.abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant, old_tenant)
         finally:
