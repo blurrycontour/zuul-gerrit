@@ -8805,6 +8805,7 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
 
         self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
 
+        self.gearman_server.jobs_history.clear()
         self.scheds.execute(
             lambda app: app.smartReconfigure(command_socket=command_socket))
 
@@ -8822,6 +8823,12 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
                 break
             else:
                 time.sleep(0.1)
+
+        # We're only adding two new repos, so we should only need to
+        # issue 2 cat jobs.
+        cat_jobs = [job for job in self.gearman_server.jobs_history
+                    if job.name == b"merger:cat"]
+        self.assertEqual(len(cat_jobs), 2)
 
         # Ensure that tenant-one has not been reconfigured
         self.waitUntilSettled()
