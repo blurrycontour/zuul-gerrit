@@ -16,6 +16,23 @@
       "revId": "95ee8e81506f286218464567ca947c5ecfb7fedc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "296f9ed5_df10c44d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1898,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-13T17:55:43Z",
+      "side": 0,
+      "message": "I think it\u0027s okay to do this in one change.",
+      "revId": "95ee8e81506f286218464567ca947c5ecfb7fedc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
