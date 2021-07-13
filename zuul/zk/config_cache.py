@@ -42,11 +42,12 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
         self.root_path = root_path
         self.files_path = f"{root_path}/files"
 
-    def setValidFor(self, extra_config_files, extra_config_dirs):
+    def setValidFor(self, extra_config_files, extra_config_dirs, ltime):
         """Set the cache valid for the given extra config files/dirs."""
         data = {
             "extra_files_searched": list(extra_config_files),
             "extra_dirs_searched": list(extra_config_dirs),
+            "ltime": ltime,
         }
         payload = json.dumps(data).encode("utf8")
         try:
@@ -54,7 +55,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
         except NoNodeError:
             self.kazoo_client.create(self.root_path, payload, makepath=True)
 
-    def isValidFor(self, tpc, cache_ltime):
+    def isValidFor(self, tpc, min_ltime):
         """Check if the cache is valid.
 
         Check if the cache is valid for the given tenant project config
@@ -63,23 +64,33 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
 
         """
         try:
-            data, zstat = self.kazoo_client.get(self.root_path)
+            data, _ = self.kazoo_client.get(self.root_path)
         except NoNodeError:
-            return False
-
-        if zstat.last_modified_transaction_id < cache_ltime:
-            # Cache is outdated
             return False
 
         try:
             content = json.loads(data)
             extra_files_searched = set(content["extra_files_searched"])
             extra_dirs_searched = set(content["extra_dirs_searched"])
+            ltime = content["ltime"]
         except Exception:
+            return False
+
+        if ltime < min_ltime:
+            # Cache is outdated
             return False
 
         return (set(tpc.extra_config_files) <= extra_files_searched
                 and set(tpc.extra_config_dirs) <= extra_dirs_searched)
+
+    @property
+    def ltime(self):
+        try:
+            data, _ = self.kazoo_client.get(self.root_path)
+            content = json.loads(data)
+            return content["ltime"]
+        except Exception:
+            return -1
 
     def _key_path(self, key):
         return _safe_path(self.files_path, key)
