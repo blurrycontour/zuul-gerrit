@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e37dee40_2249343e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-07-13T06:40:24Z",
+      "side": 1,
+      "message": "Note it is currently broken to a new sphinx release; see https://review.opendev.org/c/zuul/zuul/+/800590",
+      "revId": "f7544287371941c8dbd795d554a55c14dfb9a16e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
