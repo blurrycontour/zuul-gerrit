@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5f3848a2_c03428fc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1832,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-13T23:27:32Z",
+      "side": 1,
+      "message": "Yes, the \"dummy\" nodeset is perhaps a misnomer -- at this point it\u0027s a real nodeset, it\u0027s just one that\u0027s been re-constituted from ZK.  It has all of the real node information in it and therefore can be returned.",
+      "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b87a78be_5d19789f",
         "filename": "zuul/zk/nodepool.py",
         "patchSetId": 5
@@ -39,6 +56,23 @@
       "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fe6a9f42_d23a26b0",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-13T23:27:32Z",
+      "side": 1,
+      "message": "Nope -- the name is unused, it\u0027s not even stored in ZK.  It\u0027s the name we give to Ansible (e.g. \"controller\").  We could supply the empty string here if we wanted.\n\nNote that in just a few lines, these nodes will be fully populated from ZK data and then can be acted on in the normal way.",
+      "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
