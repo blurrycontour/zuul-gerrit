@@ -3790,6 +3790,8 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
+        self.zuul_event_ltime = max(self.zuul_event_ltime,
+                                    other.zuul_event_ltime)
         self.merged_events.append(other)
 
     def toDict(self):
@@ -5425,19 +5427,23 @@ class UnparsedBranchCache(object):
         self.extra_files_searched = set()
         self.extra_dirs_searched = set()
         self.files = {}
+        self.ltime = -1
 
-    def isValidFor(self, tpc):
+    def isValidFor(self, tpc, min_ltime):
         """Return True if this has valid cache results for the extra
         files/dirs in the tpc.
         """
         if self.load_skipped:
+            return False
+        if self.ltime < min_ltime:
             return False
         if (set(tpc.extra_config_files) <= self.extra_files_searched and
             set(tpc.extra_config_dirs) <= self.extra_dirs_searched):
             return True
         return False
 
-    def setValidFor(self, tpc):
+    def setValidFor(self, tpc, ltime):
+        self.ltime = ltime
         self.load_skipped = False
         self.extra_files_searched |= set(tpc.extra_config_files)
         self.extra_dirs_searched |= set(tpc.extra_config_dirs)
