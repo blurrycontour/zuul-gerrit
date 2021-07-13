@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc27b1b9_b32c413f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-13T18:44:08Z",
+      "side": 1,
+      "message": "I\u0027m concerned about this: by default, \u0027srvr\u0027 is the only whitelisted ZK 4lw.  Most users are probably going to expand the whitelist, but it\u0027s conceivable they might restrict it.  So it\u0027s possible this might not work in some situations.  If we go with this, we should probably make it clear in the docs that it\u0027s required.\n\nWe could avoid the issue entirely by restricting ourselves to standard opcodes.  We could create and delete a znode to establish a zxid when we start a reconfiguration.  It\u0027s annoying to have to do an extra write operation, but it should not be expensive.",
+      "revId": "051d3462f991f14db57166480f9785112de68412",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
