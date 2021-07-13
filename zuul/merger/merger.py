@@ -440,6 +440,13 @@ class Repo(object):
         repo = self.createRepoObject(zuul_event_id)
         return repo.refs
 
+    def getPackedRefs(self, zuul_event_id=None):
+        repo = self.createRepoObject(zuul_event_id)
+        refs = repo.git.for_each_ref(
+            '--format=%(objectname) %(objecttype) %(refname)'
+        )
+        return refs.splitlines()
+
     def setRef(self, path, hexsha, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
@@ -936,6 +943,14 @@ class Merger(object):
                        repo_state, recent, branches):
         projects = repo_state.setdefault(connection_name, {})
         project = projects.setdefault(project_name, {})
+
+        packedRefs = repo.getPackedRefs()
+        tags = {}
+        for ref in packedRefs:
+            parts = ref.split(" ")
+            if len(parts) == 3 and parts[1] == "tag":
+                tags[parts[2]] = parts[0]
+
         for ref in repo.getRefs():
             if ref.path.startswith('refs/zuul/'):
                 continue
@@ -948,7 +963,10 @@ class Merger(object):
                 key = (connection_name, project_name, branch)
                 if key not in recent:
                     recent[key] = ref.object
-            project[ref.path] = ref.object.hexsha
+            if ref.path.startswith('refs/tags/'):
+                project[ref.path] = tags[ref.path]
+            else:
+                project[ref.path] = ref.object.hexsha
 
     def _alterRepoState(self, connection_name, project_name,
                         repo_state, path, hexsha):
