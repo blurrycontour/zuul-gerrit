@@ -1,5 +1,8 @@
 ansible
-sphinx>=1.6.1
+# NOTE(ianw) 2021-07-13: <4.1.0 until related issue in
+# sphixcontrib-httpdomain fixed
+#  https://github.com/sphinx-contrib/httpdomain/pull/51
+sphinx>=1.6.1,<4.1.0
 sphinxcontrib-blockdiag>=1.1.0
 sphinxcontrib-programoutput
 sphinx-autodoc-typehints
