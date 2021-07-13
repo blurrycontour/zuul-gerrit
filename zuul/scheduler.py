@@ -1641,7 +1641,7 @@ class Scheduler(threading.Thread):
             self._doBuildPausedEvent(event)
         elif isinstance(event, BuildCompletedEvent):
             self._doBuildCompletedEvent(event)
-        if isinstance(event, MergeCompletedEvent):
+        elif isinstance(event, MergeCompletedEvent):
             self._doMergeCompletedEvent(event, pipeline)
         elif isinstance(event, FilesChangesCompletedEvent):
             self._doFilesChangesCompletedEvent(event, pipeline)
