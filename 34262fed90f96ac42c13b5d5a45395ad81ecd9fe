@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9f966d1_d03dbd2c",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-07-13T14:16:06Z",
+      "side": 1,
+      "message": "maybe return directly an object instead of lines",
+      "revId": "34262fed90f96ac42c13b5d5a45395ad81ecd9fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "97bdbff5_cb9f1884",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 943,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-07-13T14:16:06Z",
+      "side": 1,
+      "message": "improve inline loop to split once",
+      "revId": "34262fed90f96ac42c13b5d5a45395ad81ecd9fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
