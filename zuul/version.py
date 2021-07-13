@@ -20,6 +20,7 @@ import json
 import pbr.version
 import pkg_resources
 
+# Version information
 version_info = pbr.version.VersionInfo('zuul')
 release_string = version_info.release_string()
 
