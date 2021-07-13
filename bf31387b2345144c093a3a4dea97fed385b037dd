@@ -16,6 +16,24 @@
       "revId": "bf31387b2345144c093a3a4dea97fed385b037dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d225e37_0dfe1b59",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-07-13T11:06:48Z",
+      "side": 1,
+      "message": "Thanks I will try. I thought it also works with \"Depends-On\".",
+      "parentUuid": "78c21672_3aa2b8a5",
+      "revId": "bf31387b2345144c093a3a4dea97fed385b037dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
