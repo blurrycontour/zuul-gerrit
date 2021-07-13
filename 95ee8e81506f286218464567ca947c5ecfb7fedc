@@ -33,6 +33,23 @@
       "revId": "95ee8e81506f286218464567ca947c5ecfb7fedc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "037220d2_fb1c80e8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1898,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-13T21:21:09Z",
+      "side": 0,
+      "message": "So let\u0027s update this to also remove the usage of it.",
+      "revId": "95ee8e81506f286218464567ca947c5ecfb7fedc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
