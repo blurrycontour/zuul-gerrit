@@ -16,6 +16,24 @@
       "revId": "f7544287371941c8dbd795d554a55c14dfb9a16e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ffb8ceb1_228c9bb4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-07-13T06:48:09Z",
+      "side": 1,
+      "message": "Thanks for the info, I have been looking into the issue for a while and wondering what is wrong with my change.",
+      "parentUuid": "e37dee40_2249343e",
+      "revId": "f7544287371941c8dbd795d554a55c14dfb9a16e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
