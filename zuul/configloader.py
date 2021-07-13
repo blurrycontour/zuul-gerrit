@@ -1819,6 +1819,7 @@ class TenantParser(object):
 
                 extra_config_files = abide.getExtraConfigFiles(project.name)
                 extra_config_dirs = abide.getExtraConfigDirs(project.name)
+                update_ltime = self.scheduler.zk_client.getCurrentLtime()
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
@@ -1830,6 +1831,7 @@ class TenantParser(object):
                     project.name, branch))
                 job.extra_config_files = extra_config_files
                 job.extra_config_dirs = extra_config_dirs
+                job.update_ltime = update_ltime
                 job.source_context = source_context
                 jobs.append(job)
                 branch_cache.setValidFor(tpc)
@@ -1859,7 +1861,8 @@ class TenantParser(object):
                     if content is not None:
                         files_cache[fn] = content
                 files_cache.setValidFor(job.extra_config_files,
-                                        job.extra_config_dirs)
+                                        job.extra_config_dirs,
+                                        job.update_ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
                                    loading_errors):

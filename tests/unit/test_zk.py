@@ -55,6 +55,18 @@ class ZooKeeperBaseTestCase(BaseTestCase):
         self.zk_client.connect()
 
 
+class TestZookeeperClient(ZooKeeperBaseTestCase):
+
+    def test_ltime(self):
+        ltime = self.zk_client.getCurrentLtime()
+        self.assertGreaterEqual(ltime, 0)
+        self.assertIsInstance(ltime, int)
+
+        # Perform an operation that will increase the ltime
+        self.zk_client.client.create("/test", b"")
+        self.assertGreater(self.zk_client.getCurrentLtime(), ltime)
+
+
 class TestNodepool(ZooKeeperBaseTestCase):
 
     def setUp(self):
@@ -191,12 +203,14 @@ class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
         master_files = self.config_cache.getFilesCache("project", "master")
         self.assertFalse(master_files.isValidFor(tpc, cache_ltime=-1))
 
-        master_files.setValidFor(tpc.extra_config_files, tpc.extra_config_dirs)
+        master_files.setValidFor(tpc.extra_config_files, tpc.extra_config_dirs,
+                                 update_ltime=1)
         self.assertTrue(master_files.isValidFor(tpc, cache_ltime=-1))
 
         tpc.extra_config_files = set()
         tpc.extra_config_dirs = set()
         self.assertTrue(master_files.isValidFor(tpc, cache_ltime=-1))
+        self.assertFalse(master_files.isValidFor(tpc, cache_ltime=2))
 
         tpc.extra_config_files = {"bar.yaml"}
         tpc.extra_config_dirs = {"bar.d/"}
@@ -207,11 +221,19 @@ class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
         tpc.extra_config_dirs = {"foo.d/", "bar.d/", "other.d/"}
         # Invalid for additional dirs
         self.assertFalse(master_files.isValidFor(tpc, cache_ltime=-1))
+        self.assertFalse(master_files.isValidFor(tpc, cache_ltime=2))
 
         tpc.extra_config_files = {"foo.yaml", "bar.yaml", "other.yaml"}
         tpc.extra_config_dirs = {"foo.d/", "bar.d/"}
         # Invalid for additional files
         self.assertFalse(master_files.isValidFor(tpc, cache_ltime=-1))
+        self.assertFalse(master_files.isValidFor(tpc, cache_ltime=2))
+
+    def test_update_ltime(self):
+        cache = self.config_cache.getFilesCache("project", "master")
+        self.assertEqual(cache.update_ltime, -1)
+        cache.setValidFor(set(), set(), update_ltime=1)
+        self.assertEqual(cache.update_ltime, 1)
 
     def test_branch_cleanup(self):
         master_files = self.config_cache.getFilesCache("project", "master")

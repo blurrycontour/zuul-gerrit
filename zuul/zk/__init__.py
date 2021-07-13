@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import logging
+import re
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -193,6 +194,15 @@ class ZooKeeperClient(object):
         for res in results:
             if isinstance(res, Exception):
                 raise res
+
+    def getCurrentLtime(self):
+        """Get the logical timestamp as seen by the Zookeeper cluster."""
+        result = self.client.command(b"srvr")
+        for line in result.splitlines():
+            match = re.match(r"zxid:\s+0x(?P<zxid>[a-f0-9]+)", line, re.I)
+            if match:
+                return int(match.group("zxid"), 16)
+        raise RuntimeError("Could not find zxid in Zookeeper srvr output")
 
 
 class ZooKeeperSimpleBase(metaclass=ABCMeta):
