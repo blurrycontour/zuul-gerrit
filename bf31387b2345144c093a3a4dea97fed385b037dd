@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "78c21672_3aa2b8a5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-07-13T10:27:13Z",
+      "side": 1,
+      "message": "Just for reference, what you would want to do is base your Zuul change ontop of this.\n\nSo you can use the download link like\n\ngit fetch \"https://review.opendev.org/zuul/zuul\" refs/changes/90/800590/2 \u0026\u0026 git checkout FETCH_HEAD\n\nand then \"git cherry-pick\" your change, and submit that.  That will stack the changes together 😊",
+      "revId": "bf31387b2345144c093a3a4dea97fed385b037dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
