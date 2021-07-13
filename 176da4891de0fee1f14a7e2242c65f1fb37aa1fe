@@ -51,6 +51,23 @@
       "revId": "176da4891de0fee1f14a7e2242c65f1fb37aa1fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "294e1ce3_529d4cfd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-13T21:07:16Z",
+      "side": 1,
+      "message": "Also, since I was just looking at this in the other change, we alredy have this in the scheduler:\n\n  with self.unparsed_config_cache.writeLock(project_name):\n\nThat reads very well, and I think it makes sense to continue that pattern.",
+      "revId": "176da4891de0fee1f14a7e2242c65f1fb37aa1fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
