@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc81f94f_380a0e38",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-14T23:17:05Z",
+      "side": 1,
+      "message": "Wouldn\u0027t the cache be outdated if its ltime is less than the update_ltime in the zookeeper content? It seems like this is backwards?",
+      "revId": "2b2d6a539c943491ab86015696f2f20b9da8d8cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f0fa04fd_fe6d3ce2",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-14T23:17:05Z",
+      "side": 1,
+      "message": "Calling this property update_ltime is a bit weird as it might imply that we are updating a record rather than getting a value.",
+      "range": {
+        "startLine": 87,
+        "startChar": 8,
+        "endLine": 87,
+        "endChar": 14
+      },
+      "revId": "2b2d6a539c943491ab86015696f2f20b9da8d8cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
