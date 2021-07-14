@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4198e5fc_f7e4a904",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 951,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-14T21:44:35Z",
+      "side": 1,
+      "message": "Maybe consider putting the tenant_write_lock() grab here rather than around calls to this function. Then anyone calling this function will have the lock and it is clear the lock is necessary to do the processing below.",
+      "revId": "acbfdfac8576c6cdad778339c482b8e33b23e658",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5c688b1_b70d2631",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1572,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-14T21:44:35Z",
+      "side": 1,
+      "message": "This is the lock grab that I\u0027m talking about considering for movement above.",
+      "revId": "acbfdfac8576c6cdad778339c482b8e33b23e658",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
