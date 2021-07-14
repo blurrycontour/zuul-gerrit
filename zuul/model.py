@@ -3790,6 +3790,8 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
+        self.zuul_event_ltime = max(self.zuul_event_ltime,
+                                    other.zuul_event_ltime)
         self.merged_events.append(other)
 
     def toDict(self):
