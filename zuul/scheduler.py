@@ -24,6 +24,7 @@ import threading
 import time
 import traceback
 import urllib
+import uuid
 from collections import defaultdict
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -855,12 +856,20 @@ class Scheduler(threading.Thread):
                 invalid = tenants_to_load.difference(available_tenants)
                 raise RuntimeError(f"Invalid tenant(s) found: {invalid}")
 
-            abide = Abide()
-            loader.loadAdminRules(abide, unparsed_abide)
-            loader.loadTPCs(abide, unparsed_abide)
-            for tenant_name in tenants_to_load:
-                loader.loadTenant(abide, tenant_name, self.ansible_manager,
-                                  unparsed_abide, min_ltimes=None)
+            # Use a temporary config cache for the validation
+            validate_root = f"/zuul/validate/{uuid.uuid4().hex}"
+            self.unparsed_config_cache = UnparsedConfigCache(self.zk_client,
+                                                             validate_root)
+
+            try:
+                abide = Abide()
+                loader.loadAdminRules(abide, unparsed_abide)
+                loader.loadTPCs(abide, unparsed_abide)
+                for tenant_name in tenants_to_load:
+                    loader.loadTenant(abide, tenant_name, self.ansible_manager,
+                                      unparsed_abide, min_ltimes=None)
+            finally:
+                self.zk_client.client.delete(validate_root, recursive=True)
 
             loading_errors = []
             for tenant in abide.tenants.values():

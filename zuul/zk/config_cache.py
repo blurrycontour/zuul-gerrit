@@ -23,6 +23,8 @@ from kazoo.exceptions import NoNodeError
 
 from zuul.zk import sharding, ZooKeeperSimpleBase
 
+CONFIG_ROOT = "/zuul/config"
+
 
 def _safe_path(root_path, *keys):
     return "/".join((root_path, *(quote_plus(k) for k in keys)))
@@ -134,13 +136,12 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
 class UnparsedConfigCache(ZooKeeperSimpleBase):
     """Zookeeper cache for unparsed config files."""
 
-    CONFIG_ROOT = "/zuul/config"
     log = logging.getLogger("zuul.zk.config_cache.UnparsedConfigCache")
 
-    def __init__(self, client):
+    def __init__(self, client, config_root=CONFIG_ROOT):
         super().__init__(client)
-        self.cache_path = f"{self.CONFIG_ROOT}/cache"
-        self.lock_path = f"{self.CONFIG_ROOT}/lock"
+        self.cache_path = f"{config_root}/cache"
+        self.lock_path = f"{config_root}/lock"
 
     def readLock(self, project_cname):
         return self.kazoo_client.ReadLock(
