@@ -90,11 +90,11 @@ Introduce Tenant Quotas in Nodepool
    .. code-block:: yaml
 
       tenant-resource-limits:
-        tenant1:
+        - tenant-name: tenant1
           max-servers: 10
           max-cores: 200
           max-ram: 800
-        tenant2:
+        - tenant-name: tenant2
           max-servers: 100
           max-cores: 1500
           max-ram: 6000
