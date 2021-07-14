@@ -16,9 +16,11 @@
 import argparse
 import babel.dates
 import datetime
+import json
 import jwt
 import logging
 import prettytable
+import os
 import re
 import sys
 import time
@@ -29,6 +31,8 @@ import urllib.parse
 import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
+from zuul.zk import ZooKeeperClient
+from zuul.lib.keystorage import KeyStorage
 
 
 # todo This should probably live somewhere else
@@ -178,6 +182,7 @@ class Client(zuul.cmd.ZuulApp):
                                            description='valid commands',
                                            help='additional help')
 
+        # Autohold
         cmd_autohold = subparsers.add_parser(
             'autohold', help='hold nodes for failed job')
         cmd_autohold.add_argument('--tenant', help='tenant name',
@@ -221,6 +226,7 @@ class Client(zuul.cmd.ZuulApp):
                                        required=True)
         cmd_autohold_list.set_defaults(func=self.autohold_list)
 
+        # Enqueue/Dequeue
         cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
         cmd_enqueue.add_argument('--tenant', help='tenant name',
                                  required=True)
@@ -277,6 +283,7 @@ class Client(zuul.cmd.ZuulApp):
                                  default=None)
         cmd_dequeue.set_defaults(func=self.dequeue)
 
+        # Promote
         cmd_promote = subparsers.add_parser('promote',
                                             help='promote one or more changes')
         cmd_promote.add_argument('--tenant', help='tenant name',
@@ -287,6 +294,7 @@ class Client(zuul.cmd.ZuulApp):
                                  required=True, nargs='+')
         cmd_promote.set_defaults(func=self.promote)
 
+        # Show
         cmd_show = subparsers.add_parser('show',
                                          help='show current statuses')
         cmd_show.set_defaults(func=self.show_running_jobs)
@@ -306,11 +314,13 @@ class Client(zuul.cmd.ZuulApp):
         # TODO: add filters such as queue, project, changeid etc
         show_running_jobs.set_defaults(func=self.show_running_jobs)
 
+        # Conf check
         cmd_conf_check = subparsers.add_parser(
             'tenant-conf-check',
             help='validate the tenant configuration')
         cmd_conf_check.set_defaults(func=self.validate)
 
+        # Auth token
         cmd_create_auth_token = subparsers.add_parser(
             'create-auth-token',
             help='create an Authentication Token for the web API',
@@ -348,6 +358,43 @@ class Client(zuul.cmd.ZuulApp):
             default=600,
             required=False)
         cmd_create_auth_token.set_defaults(func=self.create_auth_token)
+
+        # Key storage
+        cmd_import_keys = subparsers.add_parser(
+            'import-keys',
+            help='import project keys to ZooKeeper',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Import previously exported project secret keys to ZooKeeper
+
+            Given a file with previously exported project keys, this
+            command will import them into ZooKeeper.  Existing keys
+            will not be overwritten; to overwrite keys, add the
+            --force flag.'''))
+        cmd_import_keys.set_defaults(command='import-keys')
+        cmd_import_keys.add_argument('path', type=str,
+                                     help='key export file path')
+        cmd_import_keys.add_argument('--force', action='store_true',
+                                     help='overwrite existing keys')
+        cmd_import_keys.set_defaults(func=self.import_keys)
+
+        cmd_export_keys = subparsers.add_parser(
+            'export-keys',
+            help='export project keys from ZooKeeper',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Export project secret keys from ZooKeeper
+
+            This command exports project secret keys from ZooKeeper
+            and writes them to a file which is suitable for backing
+            up and later use with the import-keys command.
+
+            The key contents are still protected by the keystore
+            password and can not be used or decrypted without it.'''))
+        cmd_export_keys.set_defaults(command='export-keys')
+        cmd_export_keys.add_argument('path', type=str,
+                                     help='key export file path')
+        cmd_export_keys.set_defaults(func=self.export_keys)
 
         return parser
 
@@ -740,6 +787,35 @@ class Client(zuul.cmd.ZuulApp):
             err_code = 1
         finally:
             sys.exit(err_code)
+
+    def export_keys(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        try:
+            password = self.config["keystore"]["password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")
+        keystore = KeyStorage(zk_client, password=password)
+        export = keystore.exportKeys()
+        with open(os.open(self.args.path,
+                          os.O_CREAT | os.O_WRONLY, 0o600), 'w') as f:
+            json.dump(export, f)
+
+    def import_keys(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        try:
+            password = self.config["keystore"]["password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")
+        keystore = KeyStorage(zk_client, password=password)
+        with open(self.args.path, 'r') as f:
+            import_data = json.load(f)
+        keystore.importKeys(import_data, self.args.force)
 
 
 def main():

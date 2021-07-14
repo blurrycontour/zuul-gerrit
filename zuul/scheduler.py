@@ -38,7 +38,7 @@ from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
-from zuul.lib.keystorage import FileKeyStorage, ZooKeeperKeyStorage
+from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.queue import NamedQueue
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
@@ -246,10 +246,9 @@ class Scheduler(threading.Thread):
 
     def start(self):
         super(Scheduler, self).start()
-        self.keystore = ZooKeeperKeyStorage(
+        self.keystore = KeyStorage(
             self.zk_client,
-            password=self._get_key_store_password(),
-            backup=FileKeyStorage(self._get_key_dir()))
+            password=self._get_key_store_password())
 
         self._command_running = True
         self.log.debug("Starting command processor")
@@ -863,19 +862,6 @@ class Scheduler(threading.Thread):
             return self.config["keystore"]["password"]
         except KeyError:
             raise RuntimeError("No key store password configured!")
-
-    def _get_key_dir(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        key_dir = os.path.join(state_dir, 'keys')
-        if not os.path.exists(key_dir):
-            os.mkdir(key_dir, 0o700)
-        st = os.stat(key_dir)
-        mode = st.st_mode & 0o777
-        if mode != 0o700:
-            raise Exception("Project key directory %s must be mode 0700; "
-                            "current mode is %o" % (key_dir, mode))
-        return key_dir
 
     def updateTenantLayout(self, tenant_name):
         self.log.debug("Updating layout of tenant %s", tenant_name)

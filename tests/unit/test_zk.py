@@ -427,7 +427,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Scheduler removes build request on completion
         client.remove(sched_a)
 
-        self.assertEqual(set(self.getZKTree('/zuul/executor')),
+        self.assertEqual(set(self.getZKPaths('/zuul/executor')),
                          set(['/zuul/executor/unzoned',
                               '/zuul/executor/unzoned/locks',
                               '/zuul/executor/unzoned/params',
@@ -685,12 +685,12 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
 class TestMergerApi(ZooKeeperBaseTestCase):
     def _assertEmptyRoots(self, client):
-        self.assertEqual(self.getZKTree(client.REQUEST_ROOT), [])
-        self.assertEqual(self.getZKTree(client.PARAM_ROOT), [])
-        self.assertEqual(self.getZKTree(client.RESULT_ROOT), [])
-        self.assertEqual(self.getZKTree(client.RESULT_DATA_ROOT), [])
-        self.assertEqual(self.getZKTree(client.WAITER_ROOT), [])
-        self.assertEqual(self.getZKTree(client.LOCK_ROOT), [])
+        self.assertEqual(self.getZKPaths(client.REQUEST_ROOT), [])
+        self.assertEqual(self.getZKPaths(client.PARAM_ROOT), [])
+        self.assertEqual(self.getZKPaths(client.RESULT_ROOT), [])
+        self.assertEqual(self.getZKPaths(client.RESULT_DATA_ROOT), [])
+        self.assertEqual(self.getZKPaths(client.WAITER_ROOT), [])
+        self.assertEqual(self.getZKPaths(client.LOCK_ROOT), [])
         self.assertEqual(self.getZKWatches(), {})
 
     def test_merge_request(self):
@@ -837,12 +837,12 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         result_data = {'result': 'ok'}
         server.reportResult(a, result_data)
 
-        self.assertEqual(set(self.getZKTree(client.RESULT_ROOT)),
+        self.assertEqual(set(self.getZKPaths(client.RESULT_ROOT)),
                          set(['/zuul/merger/results/A']))
-        self.assertEqual(set(self.getZKTree(client.RESULT_DATA_ROOT)),
+        self.assertEqual(set(self.getZKPaths(client.RESULT_DATA_ROOT)),
                          set(['/zuul/merger/result-data/A',
                               '/zuul/merger/result-data/A/0000000000']))
-        self.assertEqual(self.getZKTree(client.WAITER_ROOT),
+        self.assertEqual(self.getZKPaths(client.WAITER_ROOT),
                          ['/zuul/merger/waiters/A'])
 
         # Merger removes and unlocks merge request on completion
@@ -936,12 +936,12 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         server.remove(a)
         server.unlock(a)
 
-        self.assertEqual(set(self.getZKTree(client.RESULT_ROOT)),
+        self.assertEqual(set(self.getZKPaths(client.RESULT_ROOT)),
                          set(['/zuul/merger/results/A']))
-        self.assertEqual(set(self.getZKTree(client.RESULT_DATA_ROOT)),
+        self.assertEqual(set(self.getZKPaths(client.RESULT_DATA_ROOT)),
                          set(['/zuul/merger/result-data/A',
                               '/zuul/merger/result-data/A/0000000000']))
-        self.assertEqual(self.getZKTree(client.WAITER_ROOT),
+        self.assertEqual(self.getZKPaths(client.WAITER_ROOT),
                          ['/zuul/merger/waiters/A'])
 
         # Scheduler "disconnects"
