@@ -16,6 +16,24 @@
       "revId": "051d3462f991f14db57166480f9785112de68412",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa05226e_80e01cf1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-14T08:10:56Z",
+      "side": 1,
+      "message": "Ok, I\u0027ve changed it to touching /zuul/ltime and then useing the mzxid of that operation.",
+      "parentUuid": "bc27b1b9_b32c413f",
+      "revId": "051d3462f991f14db57166480f9785112de68412",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
