@@ -269,6 +269,42 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         self.password_bytes = password.encode("utf-8")
         self.backup = backup
 
+    def _walk(self, root):
+        ret = []
+        children = self.kazoo_client.get_children(root)
+        if children:
+            for child in children:
+                path = '/'.join([root, child])
+                ret.extend(self._walk(path))
+        else:
+            data, _ = self.kazoo_client.get(root)
+            try:
+                json.loads(data)
+                ret.append((root, data))
+            except Exception:
+                self.log.error("Unable to load keys at %s", root)
+                # Keep processing exports
+        return ret
+
+    def export_keys(self):
+        paths = self._walk('/keystorage')
+        # Drop /keystorage from the start of the path
+        return [(path.split('/', 2)[2], data) for (path, data) in paths]
+
+    def import_keys(self, import_list):
+        for path, data in import_list:
+            try:
+                json.loads(data)
+            except Exception:
+                self.log.error("Unable to load keys at %s", path)
+                # Abort import on bad data
+                raise
+            path = '/'.join(['/keystorage', path])
+            try:
+                self.kazoo_client.create(path, value=data, makepath=True)
+            except kazoo.exceptions.NodeExistsError:
+                self.kazoo_client.set(path, value=data)
+
     @cachetools.cached(cache={})
     def getProjectSSHKeys(self, connection_name, project_name):
         key_project_name = strings.unique_project_name(project_name)

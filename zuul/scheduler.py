@@ -2014,3 +2014,42 @@ class Scheduler(threading.Thread):
             # Release the semaphore in any case
             tenant = buildset.item.pipeline.tenant
             tenant.semaphore_handler.release(item, job)
+
+
+def export_keys(config, path):
+    zk_client = ZooKeeperClient.fromConfig(config)
+    zk_client.connect()
+    try:
+        password = config["keystore"]["password"]
+    except KeyError:
+        raise RuntimeError("No key store password configured!")
+    keystore = ZooKeeperKeyStorage(zk_client, password=password)
+    for key_path, key_data in keystore.export_keys():
+        print(key_path)
+        key_root, fn = key_path.rsplit('/', 1)
+        root = os.path.join(path, key_root)
+        os.makedirs(root, exist_ok=True)
+        with open(os.path.join(root, fn), 'wb') as f:
+            f.write(key_data)
+
+
+def import_keys(config, path):
+    zk_client = ZooKeeperClient.fromConfig(config)
+    zk_client.connect()
+    try:
+        password = config["keystore"]["password"]
+    except KeyError:
+        raise RuntimeError("No key store password configured!")
+    keystore = ZooKeeperKeyStorage(zk_client, password=password)
+    import_list = []
+    for (dirpath, dirnames, filenames) in os.walk(path):
+        for fn in filenames:
+            key_root = dirpath[len(path):]
+            if key_root.startswith('/'):
+                key_root = key_root[1:]
+            key_root = os.path.join(key_root, fn)
+            print(key_root)
+            with open(os.path.join(dirpath, fn), 'rb') as f:
+                key_data = f.read()
+            import_list.append((key_root, key_data))
+    keystore.import_keys(import_list)

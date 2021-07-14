@@ -42,13 +42,26 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                  'listed, all tenants will be validated. '
                                  'Note: this requires the gearman server and '
                                  'will distribute work to mergers.')
-        parser.add_argument('command',
-                            choices=zuul.scheduler.COMMANDS,
-                            nargs='?')
+        subparser = parser.add_subparsers(help='sub-command help')
+        parser.set_defaults(command=None)
+        for command in zuul.scheduler.COMMANDS:
+            p = subparser.add_parser(command)
+            p.set_defaults(command=command)
+        import_parser = subparser.add_parser('import-keys',
+                                           help='import project keys to ZooKeeper')
+        import_parser.set_defaults(command='import-keys')
+        import_parser.add_argument('path', type=str,
+                                   help='filesystem root to read keys')
+        export_parser = subparser.add_parser('export-keys',
+                                           help='export project keys from ZooKeeper')
+        export_parser.set_defaults(command='export-keys')
+        export_parser.add_argument('path', type=str,
+                                   help='filesystem root to write keys')
         return parser
 
     def parseArguments(self, args=None):
         super(Scheduler, self).parseArguments()
+        print(self.args)
         if self.args.command:
             self.args.nodaemon = True
 
@@ -124,6 +137,11 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             os.kill(self.gear_server_pid, signal.SIGKILL)
 
     def run(self):
+        if self.args.command == 'export-keys':
+            return zuul.scheduler.export_keys(self.config, self.args.path)
+        if self.args.command == 'import-keys':
+            return zuul.scheduler.import_keys(self.config, self.args.path)
+
         if self.args.command in zuul.scheduler.COMMANDS:
             self.send_command(self.args.command)
             sys.exit(0)
