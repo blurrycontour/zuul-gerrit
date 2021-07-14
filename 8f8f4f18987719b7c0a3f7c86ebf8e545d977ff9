@@ -91,6 +91,24 @@
       "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "90f27fa8_66673154",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-14T05:10:18Z",
+      "side": 1,
+      "message": "Maybe dummy nodeset is the wrong name here, but I didn\u0027t came up with something better. I wanted to emphasize that the nodeset itself is not built from \"real\" data (meaning it\u0027s not built from the job\u0027s nodeset config), but I don\u0027t know if that has any impact. The nodes however, do contain the real Nodepool data after being updated from ZK. But if I\u0027m not mistaken there are also attributes like name and label which might be different from the \"real\" data (again, \"real\" meaning the data in the job configuration).",
+      "parentUuid": "93170ac6_0f8cc489",
+      "revId": "8f8f4f18987719b7c0a3f7c86ebf8e545d977ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
