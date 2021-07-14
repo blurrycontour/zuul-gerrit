@@ -41,7 +41,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 from zuul.lib import filecomments
-from zuul.lib.keystorage import ZooKeeperKeyStorage
+from zuul.lib.keystorage import KeyStorage
 from zuul.lib.varnames import check_varnames
 
 import zuul.lib.repl
@@ -3037,7 +3037,7 @@ class ExecutorServer(BaseMergeServer):
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
-        self.keystore = ZooKeeperKeyStorage(
+        self.keystore = KeyStorage(
             self.zk_client,
             password=self._get_key_store_password())
         self._running = False
