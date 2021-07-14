@@ -36,7 +36,7 @@ from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
-from zuul.lib.keystorage import FileKeyStorage, ZooKeeperKeyStorage
+from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.queue import NamedQueue
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
@@ -230,10 +230,9 @@ class Scheduler(threading.Thread):
 
     def start(self):
         super(Scheduler, self).start()
-        self.keystore = ZooKeeperKeyStorage(
+        self.keystore = KeyStorage(
             self.zk_client,
-            password=self._get_key_store_password(),
-            backup=FileKeyStorage(self._get_key_dir()))
+            password=self._get_key_store_password())
 
         self._command_running = True
         self.log.debug("Starting command processor")
@@ -789,19 +788,6 @@ class Scheduler(threading.Thread):
             return self.config["keystore"]["password"]
         except KeyError:
             raise RuntimeError("No key store password configured!")
-
-    def _get_key_dir(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        key_dir = os.path.join(state_dir, 'keys')
-        if not os.path.exists(key_dir):
-            os.mkdir(key_dir, 0o700)
-        st = os.stat(key_dir)
-        mode = st.st_mode & 0o777
-        if mode != 0o700:
-            raise Exception("Project key directory %s must be mode 0700; "
-                            "current mode is %o" % (key_dir, mode))
-        return key_dir
 
     def _checkTenantSourceConf(self, config):
         tenant_config = None
@@ -2014,3 +2000,42 @@ class Scheduler(threading.Thread):
             # Release the semaphore in any case
             tenant = buildset.item.pipeline.tenant
             tenant.semaphore_handler.release(item, job)
+
+
+def export_keys(config, path):
+    zk_client = ZooKeeperClient.fromConfig(config)
+    zk_client.connect()
+    try:
+        password = config["keystore"]["password"]
+    except KeyError:
+        raise RuntimeError("No key store password configured!")
+    keystore = KeyStorage(zk_client, password=password)
+    for key_path, key_data in keystore.exportKeys():
+        print(key_path)
+        key_root, fn = key_path.rsplit('/', 1)
+        root = os.path.join(path, key_root)
+        os.makedirs(root, exist_ok=True)
+        with open(os.path.join(root, fn), 'wb') as f:
+            f.write(key_data)
+
+
+def import_keys(config, path):
+    zk_client = ZooKeeperClient.fromConfig(config)
+    zk_client.connect()
+    try:
+        password = config["keystore"]["password"]
+    except KeyError:
+        raise RuntimeError("No key store password configured!")
+    keystore = KeyStorage(zk_client, password=password)
+    import_list = []
+    for (dirpath, dirnames, filenames) in os.walk(path):
+        for fn in filenames:
+            key_root = dirpath[len(path):]
+            if key_root.startswith('/'):
+                key_root = key_root[1:]
+            key_root = os.path.join(key_root, fn)
+            print(key_root)
+            with open(os.path.join(dirpath, fn), 'rb') as f:
+                key_data = f.read()
+            import_list.append((key_root, key_data))
+    keystore.importKeys(import_list)

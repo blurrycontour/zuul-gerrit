@@ -19,6 +19,8 @@ import os
 import re
 import shutil
 import socket
+import subprocess
+import sys
 import textwrap
 import threading
 import time
@@ -38,6 +40,7 @@ import zuul.rpcclient
 import zuul.model
 
 from tests.base import (
+    FIXTURE_DIR,
     SSLZuulTestCase,
     ZuulTestCase,
     repack_repo,
@@ -9002,3 +9005,46 @@ class TestEventProcessing(ZuulTestCase):
             dict(name='tagjob', result='SUCCESS'),
             dict(name='checkjob', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+
+class TestKeyExportImport(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_export_import(self):
+        # Test a round trip export/import of keys
+        export_root = os.path.join(self.test_root, 'export')
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        # Save a copy of the keys in ZK
+        old_data = self.getZKTree('/keystorage')
+
+        # Export keys
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul-scheduler'),
+             '-c', config_file,
+             'export-keys', export_root],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        # Delete keys from ZK
+        self.zk_client.client.delete('/keystorage', recursive=True)
+
+        # Make sure it's really gone
+        with testtools.ExpectedException(NoNodeError):
+            self.getZKTree('/keystorage')
+
+        # Import keys
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul-scheduler'),
+             '-c', config_file,
+             'import-keys', export_root],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        # Make sure the new data matches the original
+        new_data = self.getZKTree('/keystorage')
+        self.assertEqual(new_data, old_data)
