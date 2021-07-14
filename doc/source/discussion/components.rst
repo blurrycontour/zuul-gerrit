@@ -124,6 +124,15 @@ A minimal Zuul system may consist of a :ref:`scheduler` and
 should consider running multiple executors, each on a dedicated host,
 and running mergers on dedicated hosts as well.
 
+Zuul stores private keys for each project it knows about in ZooKeeper.
+It is recommended that you periodically back up the private keys in
+case the ZooKeeper data store is lost or damaged.  The :title:`Zuul
+Client` provides two sub-commands for use in this case:
+:title:`export-keys` and :title:`import-keys`.  Each takes an argument to
+a filesystem path and will write the keys to, or read the keys from
+that path.  The data in the exported files are still secured with the
+keystore passphrase, so be sure to retain it as well.
+
 Common
 ------
 
@@ -404,8 +413,8 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 Operation
 ~~~~~~~~~
 
-To start the scheduler, run ``zuul-scheduler``.  To stop it, kill the
-PID which was saved in the pidfile specified in the configuration.
+To start the scheduler, run ``zuul-scheduler``.  To stop it, run
+``zuul-scheduler stop``.
 
 Reconfiguration
 ~~~~~~~~~~~~~~~

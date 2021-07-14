@@ -21,8 +21,10 @@ import time
 import configparser
 import fixtures
 import jwt
+import testtools
+from kazoo.exceptions import NoNodeError
 
-from tests.base import BaseTestCase
+from tests.base import BaseTestCase, ZuulTestCase
 from tests.base import FIXTURE_DIR
 
 
@@ -166,3 +168,46 @@ class TestWebTokenClient(BaseClientTestCase):
         # allow one minute for the process to run
         self.assertTrue(580 <= int(token['exp']) - now < 660,
                         (token['exp'], now))
+
+
+class TestKeyExportImport(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_export_import(self):
+        # Test a round trip export/import of keys
+        export_root = os.path.join(self.test_root, 'export')
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        # Save a copy of the keys in ZK
+        old_data = self.getZKTree('/keystorage')
+
+        # Export keys
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'export-keys', export_root],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        # Delete keys from ZK
+        self.zk_client.client.delete('/keystorage', recursive=True)
+
+        # Make sure it's really gone
+        with testtools.ExpectedException(NoNodeError):
+            self.getZKTree('/keystorage')
+
+        # Import keys
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'import-keys', export_root],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        # Make sure the new data matches the original
+        new_data = self.getZKTree('/keystorage')
+        self.assertEqual(new_data, old_data)

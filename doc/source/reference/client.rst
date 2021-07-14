@@ -206,3 +206,21 @@ when querying a protected endpoint on Zuul's REST API.
 Example::
 
     bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbWFuYWdlc2Yuc2ZyZG90ZXN0aW5zdGFuY2Uub3JnIiwienV1bC50ZW5hbnRzIjp7ImxvY2FsIjoiKiJ9LCJleHAiOjE1Mzc0MTcxOTguMzc3NTQ0fQ.DLbKx1J84wV4Vm7sv3zw9Bw9-WuIka7WkPQxGDAHz7s
+
+export-keys
+^^^^^^^^^^^
+
+.. program-output:: zuul export-keys --help
+
+Example::
+
+  zuul export-keys /var/backup/zuul-keys.json
+
+import-keys
+^^^^^^^^^^^
+
+.. program-output:: zuul import-keys --help
+
+Example::
+
+  zuul import-keys /var/backup/zuul-keys.json
