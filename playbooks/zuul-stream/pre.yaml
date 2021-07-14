@@ -7,9 +7,6 @@
       bindep_profile: test
       bindep_dir: src/opendev.org/zuul/zuul
 
-    - role: bindep
-      bindep_dir: src/opendev.org/recordsansible/ara
-
   post_tasks:
 
     - name: Install software
