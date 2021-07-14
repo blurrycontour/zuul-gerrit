@@ -1802,7 +1802,8 @@ class TenantParser(object):
                         project.canonical_name, branch)
                     with self.unparsed_config_cache.readLock(
                             project.canonical_name):
-                        if files_cache.isValidFor(tpc, cache_ltime):
+                        pb_ltime = cache_ltime[project.canonical_name][branch]
+                        if files_cache.isValidFor(tpc, pb_ltime):
                             self.log.debug(
                                 "Using files from cache for project %s @%s",
                                 project.canonical_name, branch)

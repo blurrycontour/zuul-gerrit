@@ -640,11 +640,11 @@ class TestUnparsedConfigCache(ZuulTestCase):
         sched.management_events[tenant.name].put(event, needs_result=False)
         self.waitUntilSettled()
 
-        # As the cache should be valid, we only expect a cat job for
-        # org/project2.
+        # As the cache should be valid (cache ltime of org/project2 newer than
+        # event ltime, we don't expect any cat jobs.
         cat_jobs = [job for job in self.gearman_server.jobs_history
                     if job.name == b"merger:cat"]
-        self.assertEqual(len(cat_jobs), 1)
+        self.assertEqual(len(cat_jobs), 0)
 
         # Set canary value so we can detect if the configloader used
         # the cache in Zookeeper (it shouldn't).
@@ -666,11 +666,11 @@ class TestUnparsedConfigCache(ZuulTestCase):
         self.assertEqual(common_cache.update_ltime, upb_cache.update_ltime)
         self.assertNotIn("CANARY", upb_cache.extra_files_searched)
 
-        # As the cache should be valid, we only expect a cat job for
-        # org/project2.
+        # As the cache should be valid (cache ltime of org/project2 newer than
+        # event ltime, we don't expect any cat jobs.
         cat_jobs = [job for job in self.gearman_server.jobs_history
                     if job.name == b"merger:cat"]
-        self.assertEqual(len(cat_jobs), 1)
+        self.assertEqual(len(cat_jobs), 0)
         sched.apsched.start()
 
 

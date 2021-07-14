@@ -24,6 +24,7 @@ import threading
 import time
 import traceback
 import urllib
+from collections import defaultdict
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -911,10 +912,12 @@ class Scheduler(threading.Thread):
                         continue
 
                 old_tenant = self.abide.tenants.get(tenant_name)
+                cache_ltime = defaultdict(
+                    lambda: defaultdict(lambda: event.zuul_event_ltime))
                 tenant = loader.loadTenant(self.abide, tenant_name,
                                            self.ansible_manager,
                                            self.unparsed_abide,
-                                           cache_ltime=event.zuul_event_ltime)
+                                           cache_ltime=cache_ltime)
                 reconfigured_tenants.append(tenant_name)
                 if tenant is not None:
                     self._reconfigureTenant(tenant, old_tenant)
@@ -938,12 +941,15 @@ class Scheduler(threading.Thread):
             start = time.monotonic()
             # If a change landed to a project, clear out the cached
             # config of the changed branch before reconfiguring.
+            cache_ltime = defaultdict(lambda: defaultdict(lambda: -1))
             for project_name, branch_name in event.project_branches:
-                self.log.debug("Clearing unparsed config: %s @%s",
-                               project_name, branch_name)
-                with self.unparsed_config_cache.writeLock(project_name):
-                    self.unparsed_config_cache.clearCache(project_name,
-                                                          branch_name)
+                if branch_name is None:
+                    cache_ltime[project_name] = defaultdict(
+                        lambda:event.zuul_event_ltime)
+                else:
+                    cache_ltime[project_name][
+                        branch_name
+                    ] = event.zuul_event_ltime
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
@@ -952,7 +958,7 @@ class Scheduler(threading.Thread):
                             [event.tenant_name])
             loader.loadTenant(self.abide, event.tenant_name,
                               self.ansible_manager, self.unparsed_abide,
-                              cache_ltime=-1)
+                              cache_ltime=cache_ltime)
             tenant = self.abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant, old_tenant)
         finally:
