@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "dd821f48_aee44f33",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-14T23:30:45Z",
+      "side": 1,
+      "message": "Translating this code I get:\n\n  If the most recent timestamp of the zookeeper file cache cache is older than the logical timestamp of the event, then it is outdated.\n\nThat\u0027s based on update_ltime meaning \"the most recent timestamp of the zookeeper file cache\" (this class), and cache_ltime being \"the logical timestamp of the event\" (the input argument we\u0027re checking against).\n\nI think perhaps calling the argument cache_ltime is confusing; I think the idea is that we want a cache that is at least as new as the argument.  So maybe we should, at least in this method, and probably in some of the call sites as well, name the argument \"updated_since\" or \"required_ltime\" or \"newer_than_ltime\" or something along those lines?",
+      "revId": "2b2d6a539c943491ab86015696f2f20b9da8d8cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f0fa04fd_fe6d3ce2",
         "filename": "zuul/zk/config_cache.py",
         "patchSetId": 3
@@ -39,6 +56,23 @@
       "revId": "2b2d6a539c943491ab86015696f2f20b9da8d8cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9d8ab803_d6af693c",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-14T23:30:45Z",
+      "side": 1,
+      "message": "Would you prefer \"updated_ltime\"?",
+      "revId": "2b2d6a539c943491ab86015696f2f20b9da8d8cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
