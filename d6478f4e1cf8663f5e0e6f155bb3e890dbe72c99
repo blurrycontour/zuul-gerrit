@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e27346e3_2fbbb130",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5436,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-14T23:29:12Z",
+      "side": 1,
+      "message": "See comment on previous change. This conditional reads oddly because we want to know if the value in the cache is less than the value supplied. But we name the value on the right hand side cache_ltime implying the opposite.\n\nMaybe we can call this check_ltime instead of cache_ltime?",
+      "revId": "d6478f4e1cf8663f5e0e6f155bb3e890dbe72c99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
