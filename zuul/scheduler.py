@@ -163,7 +163,6 @@ class Scheduler(threading.Thread):
         # TODO (swestphahl): Remove after we've refactored reconfigurations
         # to be performed on the tenant level.
         self.reconfigure_event_queue = NamedQueue("ReconfigureEventQueue")
-        self.result_event_queue = NamedQueue("ResultEventQueue")
         self.event_watcher = EventWatcher(
             self.zk_client, self.wake_event.set
         )
@@ -405,8 +404,6 @@ class Scheduler(threading.Thread):
                 merge_running += running
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
-        self.statsd.gauge('zuul.scheduler.eventqueues.result',
-                          self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           self.reconfigure_event_queue.qsize())
         base = 'zuul.scheduler.eventqueues.connection'
@@ -588,9 +585,10 @@ class Scheduler(threading.Thread):
         self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def onNodesProvisioned(self, req):
-        event = NodesProvisionedEvent(req)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
+        tenant_name = req.tenant_name
+        pipeline_name = req.pipeline_name
+        event = NodesProvisionedEvent(req.id, req.job_name, req.build_set_uuid)
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def reconfigureTenant(self, tenant, project, event):
         self.log.debug("Submitting tenant reconfiguration event for "
@@ -1339,11 +1337,6 @@ class Scheduler(threading.Thread):
                 if not self._stopped:
                     self.process_reconfigure_queue()
 
-                # TODO(swestphahl): Remove legacy result event queue after
-                # NodesProvisionedEvents are dispatched via Zookeeper.
-                if not self._stopped:
-                    self.process_result_queue()
-
                 # Process tenant management events separate from other events
                 # as they might reload the tenant.
                 for tenant in self.abide.tenants.values():
@@ -1617,21 +1610,6 @@ class Scheduler(threading.Thread):
                     pipeline.name
                 ].ack(event)
 
-    def process_result_queue(self):
-        # TODO (felix): The old result event queue is still used for the nodes
-        # provisioned results and will be removed once we move those to ZK as
-        # well.
-        while not self.result_event_queue.empty() and not self._stopped:
-            self.log.debug("Fetching result event")
-            event = self.result_event_queue.get()
-            try:
-                if isinstance(event, NodesProvisionedEvent):
-                    self._doNodesProvisionedEvent(event)
-                else:
-                    self.log.error("Unable to handle event %s", event)
-            finally:
-                self.result_event_queue.task_done()
-
     def _process_result_event(self, event, pipeline):
         if isinstance(event, BuildStartedEvent):
             self._doBuildStartedEvent(event)
@@ -1645,6 +1623,8 @@ class Scheduler(threading.Thread):
             self._doMergeCompletedEvent(event, pipeline)
         elif isinstance(event, FilesChangesCompletedEvent):
             self._doFilesChangesCompletedEvent(event, pipeline)
+        elif isinstance(event, NodesProvisionedEvent):
+            self._doNodesProvisionedEvent(event, pipeline)
         else:
             self.log.error("Unable to handle event %s", event)
 
@@ -1834,39 +1814,40 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onFilesChangesCompleted(event, build_set)
 
-    def _doNodesProvisionedEvent(self, event):
-        request = event.request
+    def _doNodesProvisionedEvent(self, event, pipeline):
         request_id = event.request_id
-        tenant_name = request.tenant_name
-        pipeline_name = request.pipeline_name
 
-        log = get_annotated_logger(self.log, request.event_id)
+        # Look up the buildset to access the local node request object
+        build_set = self._getBuildSetFromPipeline(event, pipeline)
+        if not build_set:
+            # Directly look up the node request in ZK and provide a dummy
+            # nodeset, so we can return the nodes to nodepool.
+            request = self.zk_nodepool.getNodeRequest(request_id)
+            if request.fulfilled:
+                self.nodepool.returnNodeSet(request.nodeset,
+                                            zuul_event_id=request.event_id)
+            return
+
+        request = build_set.getJobNodeRequest(event.job_name)
+        if not request:
+            # Directly look up the node request in ZK and provide a dummy
+            # nodeset, so we can return the nodes to nodepool.
+            request = self.zk_nodepool.getNodeRequest(request_id)
+            if request.fulfilled:
+                self.nodepool.returnNodeSet(request.nodeset,
+                                            zuul_event_id=request.event_id)
+            return
 
         ready = self.nodepool.checkNodeRequest(request, request_id)
         if not ready:
             return
 
+        log = get_annotated_logger(self.log, request.event_id)
+
         # If the request failed, we must directly delete it as the nodes will
         # never be accepted.
         if request.state == STATE_FAILED:
             self.nodepool.deleteNodeRequest(request)
-
-        # Look up the pipeline by its name
-        # TODO (felix): The pipeline lookup can be removed once the
-        # NodesProvisionedEvents are in ZooKeeper.
-        pipeline = None
-        tenant = self.abide.tenants.get(tenant_name)
-        for pl in tenant.layout.pipelines.values():
-            if pl.name == pipeline_name:
-                pipeline = pl
-                break
-
-        build_set = self._getBuildSetFromPipeline(event, pipeline)
-        if not build_set:
-            if request.fulfilled:
-                self.nodepool.returnNodeSet(request.nodeset,
-                                            zuul_event_id=request.event_id)
-            return
 
         if request.job_name not in [x.name for x in build_set.item.getJobs()]:
             log.warning("Item %s does not contain job %s "
@@ -1878,7 +1859,7 @@ class Scheduler(threading.Thread):
                                             zuul_event_id=request.event_id)
             return
 
-        pipeline.manager.onNodesProvisioned(event, build_set)
+        pipeline.manager.onNodesProvisioned(request, build_set)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
@@ -1890,9 +1871,6 @@ class Scheduler(threading.Thread):
         data['trigger_event_queue'] = {}
         data['trigger_event_queue']['length'] = len(
             self.trigger_events[tenant_name])
-        data['result_event_queue'] = {}
-        data['result_event_queue']['length'] = \
-            self.result_event_queue.qsize()
         data['management_event_queue'] = {}
         data['management_event_queue']['length'] = len(
             self.management_events[tenant_name]

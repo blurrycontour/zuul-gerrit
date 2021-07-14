@@ -202,3 +202,67 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(request1.state, 'fulfilled')
         self.assertEqual(request2.state, 'fulfilled')
         self.assertTrue(request2.state_time < request1.state_time)
+
+    def test_get_node_request_with_nodeset(self):
+        # Test that we are able to deserialize a node request from ZK and
+        # update the node information while providing a valid NodeSet.
+        nodeset = model.NodeSet()
+        nodeset.addNode(model.Node(['controller', 'foo'], 'ubuntu-xenial'))
+        nodeset.addNode(model.Node(['compute'], 'ubuntu-xenial'))
+        job = model.Job('testjob')
+        job.nodeset = nodeset
+
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
+        self.waitForRequests()
+        self.assertEqual(len(self.provisioned_requests), 1)
+        self.assertEqual(request.state, 'fulfilled')
+
+        # Look up the node request from ZooKeeper while providing the original
+        # nodeset.
+        restored_request = self.zk_nodepool.getNodeRequest(request.id, nodeset)
+
+        # As we've provided the origial nodeset when retrieving the node
+        # request from ZooKeeper, they should be the same
+        self.assertEqual(restored_request.nodeset, nodeset)
+
+        # And the nodeset should contain the original data
+        restored_nodes = restored_request.nodeset.getNodes()
+        self.assertEqual(restored_nodes[0].name, ['controller', 'foo'])
+        self.assertEqual(restored_nodes[1].name, ['compute'])
+
+    def test_get_node_request_without_nodeset(self):
+        # Test that we are able to deserialize a node request from ZK and
+        # update the node information without providing a NodeSet object.
+
+        # This is used in case something went wrong when processing the
+        # NodesProvisionedEvents in the scheduler and the original NodeRequest
+        # and/or NodeSet objects are not available anymore.
+        nodeset = model.NodeSet()
+        nodeset.addNode(model.Node(['controller', 'foo'], 'ubuntu-xenial'))
+        nodeset.addNode(model.Node(['compute'], 'ubuntu-xenial'))
+        job = model.Job('testjob')
+        job.nodeset = nodeset
+
+        request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
+        self.waitForRequests()
+        self.assertEqual(len(self.provisioned_requests), 1)
+        self.assertEqual(request.state, 'fulfilled')
+
+        # Look up the node request from ZooKeeper while providing no nodeset
+        # will result in a fake nodeset being created for the node update.
+        restored_request = self.zk_nodepool.getNodeRequest(request.id)
+
+        # As we didn't provide a nodeset, the nodepool client will create a
+        # fake one to look up the node information from nodepool.
+        self.assertFalse(nodeset == restored_request.nodeset)
+
+        restored_nodes = restored_request.nodeset.getNodes()
+        self.assertEqual(len(restored_nodes), 2)
+        self.assertEqual(restored_nodes[0].label, 'ubuntu-xenial')
+        self.assertEqual(restored_nodes[1].label, 'ubuntu-xenial')
+        # As the nodes were faked, they don't have the same name like the
+        # original ones from the config
+        self.assertEqual(restored_nodes[0].name, "ubuntu-xenial-0")
+        self.assertEqual(restored_nodes[1].name, "ubuntu-xenial-1")
