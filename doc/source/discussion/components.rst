@@ -404,8 +404,18 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 Operation
 ~~~~~~~~~
 
-To start the scheduler, run ``zuul-scheduler``.  To stop it, kill the
-PID which was saved in the pidfile specified in the configuration.
+To start the scheduler, run ``zuul-scheduler``.  To stop it, run
+``zuul-scheduler stop``.
+
+Zuul stores private keys for each project it knows about in ZooKeeper.
+It is recommended that you periodically back up the private keys in
+case the ZooKeeper data store is lost or damaged.  The scheduler
+provides two sub-commands for use in this case: ``zuul-scheduler
+export-keys`` and ``zuul-scheduler import-keys``.  Each takes an
+argument to a filesystem path and will write the keys to, or read the
+keys from that path.  The data in the exported files is still secured
+with the keystore passphrase, so be sure to retain it as well.
+
 
 Reconfiguration
 ~~~~~~~~~~~~~~~

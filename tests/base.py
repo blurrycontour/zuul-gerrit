@@ -109,6 +109,7 @@ import zuul.executor.client
 import zuul.lib.ansible
 import zuul.lib.connections
 import zuul.lib.auth
+import zuul.lib.keystorage
 import zuul.merger.client
 import zuul.merger.merger
 import zuul.merger.server
@@ -4134,6 +4135,17 @@ class BaseTestCase(testtools.TestCase):
             ChrootedKazooFixture(self.id())
         )
 
+    def getZKTree(self, path, ret=None):
+        """Return the contents of a ZK tree as a dictionary"""
+        if ret is None:
+            ret = {}
+        for key in self.zk_client.client.get_children(path):
+            subpath = os.path.join(path, key)
+            ret[subpath] = self.zk_client.client.get(
+                os.path.join(path, key))[0]
+            self.getZKTree(subpath, ret)
+        return ret
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -4424,8 +4436,7 @@ class ZuulTestCase(BaseTestCase):
             'scheduler', 'command_socket',
             os.path.join(self.test_root, 'scheduler.socket'))
         if not self.config.has_option("keystore", "password"):
-            self.config.set("keystore", "password",
-                            uuid.uuid4().hex)
+            self.config.set("keystore", "password", 'keystorepassword')
         self.config.set('merger', 'git_dir', self.merger_src_root)
         self.config.set('executor', 'git_dir', self.executor_src_root)
         self.config.set('executor', 'private_key_file', self.private_key_file)
@@ -4494,6 +4505,9 @@ class ZuulTestCase(BaseTestCase):
         self.connection_event_queues = DefaultKeyDict(
             lambda cn: ConnectionEventQueue(self.zk_client, cn)
         )
+        # requires zk client
+        self.setupAllProjectKeys(self.config)
+
         self.poller_events = {}
         self._configureSmtp()
         self._configureMqtt()
@@ -4641,7 +4655,6 @@ class ZuulTestCase(BaseTestCase):
                                            os.path.join(git_path, reponame))
         # Make test_root persist after ansible run for .flag test
         config.set('executor', 'trusted_rw_paths', self.test_root)
-        self.setupAllProjectKeys(config)
 
         return config
 
@@ -4727,38 +4740,27 @@ class ZuulTestCase(BaseTestCase):
     def setupProjectKeys(self, source, project):
         # Make sure we set up an RSA key for the project so that we
         # don't spend time generating one:
-
         if isinstance(project, dict):
             project = list(project.keys())[0]
-        key_root = os.path.join(self.state_root, 'keys')
-        if not os.path.isdir(key_root):
-            os.mkdir(key_root, 0o700)
-            fn = os.path.join(key_root, '.version')
-            with open(fn, 'w') as f:
-                f.write('1')
-        # secrets key
-        private_key_file = os.path.join(
-            key_root, 'secrets', 'project', source, project, '0.pem')
-        private_key_dir = os.path.dirname(private_key_file)
-        self.log.debug("Installing test secrets keys for project %s at %s" % (
-            project, private_key_file))
-        if not os.path.isdir(private_key_dir):
-            os.makedirs(private_key_dir)
-        with open(os.path.join(FIXTURE_DIR, 'private.pem')) as i:
-            with open(private_key_file, 'w') as o:
-                o.write(i.read())
+
+        password = self.config.get("keystore", "password")
+        keystore = zuul.lib.keystorage.KeyStorage(
+            self.zk_client, password=password)
+        import_list = []
+
+        path = keystore.getProjectSecretsKeysPath(source, project)
+        # Strip /keystore, just like the export routine does
+        path = path.split('/', 2)[2]
+        with open(os.path.join(FIXTURE_DIR, 'secrets.json'), 'rb') as i:
+            import_list.append((path, i.read()))
 
         # ssh key
-        private_key_file = os.path.join(
-            key_root, 'ssh', 'project', source, project, '0.pem')
-        private_key_dir = os.path.dirname(private_key_file)
-        self.log.debug("Installing test ssh keys for project %s at %s" % (
-            project, private_key_file))
-        if not os.path.isdir(private_key_dir):
-            os.makedirs(private_key_dir)
-        with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
-            with open(private_key_file, 'w') as o:
-                o.write(i.read())
+        path = keystore.getSSHKeysPath(source, project)
+        path = path.split('/', 2)[2]
+        with open(os.path.join(FIXTURE_DIR, 'ssh.json'), 'rb') as i:
+            import_list.append((path, i.read()))
+
+        keystore.importKeys(import_list)
 
     def getCurrentLtime(self):
         """Get the logical timestamp as seen by the Zookeeper cluster."""
