@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a9ad7ca_b9d22361",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1797,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T17:30:41Z",
+      "side": 0,
+      "message": "I was wrong in my previous assesment -- even though the old change I referenced introduced the behavior where we pass in the event ltime for a smart reconfiguration event, it was still not spawning cat jobs because we also considered the unparsed branch cache valid for smart reconfigs, so we would hit this continue and avoid the code below.\n\nIn fact, this change does introduce the behavior of issuing more cat jobs on smart reconfigs.  I think we should squash my change into this before we approve.",
+      "revId": "c97b9206ef913ac9bc6dc55729a4445714ec3aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3aedfb38_d574c5af",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 936,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T17:30:41Z",
+      "side": 0,
+      "message": "It looks like the old code always sets the required ltime to the zuul event time, so it should always consider the zk cache invalid.",
+      "revId": "c97b9206ef913ac9bc6dc55729a4445714ec3aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
