@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "237856e9_325f9252",
+        "filename": "releasenotes/notes/tenant-information-in-node-request-1ce98b86f7388cd0.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T21:25:44Z",
+      "side": 1,
+      "message": "You could omit the first sentence since it\u0027s not yet actionable by users.  We try to keep release notes as brief and relevant as possible.",
+      "revId": "827fa2b08e3f3ba6c0564bc1cdd0a2d9df653d2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd368248_311392ce",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T21:25:44Z",
+      "side": 1,
+      "message": "Under what circumstances would a request\u0027s tenant be unknown?\n\nAnd perhaps we should just omit them here.  The value can be inferred by subtraction from the total requests, and by doing this, we will collide with anyone who sets a tenant name of \"unknown\" which is plausible.",
+      "revId": "827fa2b08e3f3ba6c0564bc1cdd0a2d9df653d2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
