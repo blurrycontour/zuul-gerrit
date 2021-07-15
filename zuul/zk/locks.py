@@ -26,36 +26,63 @@ TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"
 def locked(lock, blocking=True, timeout=None):
     if not lock.acquire(blocking=blocking, timeout=timeout):
         raise LockException(f"Failed to acquire lock {lock}")
-    yield
     try:
-        lock.release()
-    except Exception:
-        log = logging.getLogger("zuul.zk.locks")
-        log.exception("Failed to release lock %s", lock)
+        yield lock
+    finally:
+        try:
+            lock.release()
+        except Exception:
+            log = logging.getLogger("zuul.zk.locks")
+            log.exception("Failed to release lock %s", lock)
 
 
-def tenant_read_lock(client, tenant_name):
+@contextmanager
+def tenant_read_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
-    return client.client.ReadLock(f"{TENANT_LOCK_ROOT}/{safe_tenant}")
+    with locked(
+        client.client.ReadLock(f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
+        blocking=blocking
+    ) as lock:
+        yield lock
 
 
-def tenant_write_lock(client, tenant_name):
+@contextmanager
+def tenant_write_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
-    return client.client.WriteLock(f"{TENANT_LOCK_ROOT}/{safe_tenant}")
+    with locked(
+        client.client.WriteLock(f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
+        blocking=blocking
+    ) as lock:
+        yield lock
 
 
-def pipeline_lock(client, tenant_name, pipeline_name):
+@contextmanager
+def pipeline_lock(client, tenant_name, pipeline_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     safe_pipeline = quote_plus(pipeline_name)
-    return client.client.Lock(
-        f"/zuul/locks/pipeline/{safe_tenant}/{safe_pipeline}")
+    with locked(
+        client.client.Lock(
+            f"/zuul/locks/pipeline/{safe_tenant}/{safe_pipeline}"),
+        blocking=blocking
+    ) as lock:
+        yield lock
 
 
-def management_queue_lock(client, tenant_name):
+@contextmanager
+def management_queue_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
-    return client.client.Lock(f"/zuul/locks/events/management/{safe_tenant}")
+    with locked(
+        client.client.Lock(f"/zuul/locks/events/management/{safe_tenant}"),
+        blocking=blocking
+    ) as lock:
+        yield lock
 
 
-def trigger_queue_lock(client, tenant_name):
+@contextmanager
+def trigger_queue_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
-    return client.client.Lock(f"/zuul/locks/events/trigger/{safe_tenant}")
+    with locked(
+        client.client.Lock(f"/zuul/locks/events/trigger/{safe_tenant}"),
+        blocking=blocking
+    ) as lock:
+        yield lock

@@ -649,7 +649,8 @@ class TestLocks(ZooKeeperBaseTestCase):
 
     def test_locking_ctx(self):
         lock = self.zk_client.client.Lock("/lock")
-        with locked(lock):
+        with locked(lock) as ctx_lock:
+            self.assertIs(lock, ctx_lock)
             self.assertTrue(lock.is_acquired)
         self.assertFalse(lock.is_acquired)
 
@@ -662,6 +663,14 @@ class TestLocks(ZooKeeperBaseTestCase):
         ):
             with locked(lock, blocking=False):
                 pass
+        self.assertFalse(lock.is_acquired)
+
+    def test_unlock_exception(self):
+        lock = self.zk_client.client.Lock("/lock")
+        with testtools.ExpectedException(RuntimeError):
+            with locked(lock):
+                self.assertTrue(lock.is_acquired)
+                raise RuntimeError
         self.assertFalse(lock.is_acquired)
 
 
