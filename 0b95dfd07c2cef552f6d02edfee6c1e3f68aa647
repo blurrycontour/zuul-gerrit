@@ -16,6 +16,23 @@
       "revId": "0b95dfd07c2cef552f6d02edfee6c1e3f68aa647",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0a479ca_4bda5aa7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 973,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T14:18:04Z",
+      "side": 1,
+      "message": "I think it\u0027s fine -- I think the next time a reconfiguration happens, it will just find an empty cache and update it in the config loader.",
+      "revId": "0b95dfd07c2cef552f6d02edfee6c1e3f68aa647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
