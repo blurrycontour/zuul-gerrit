@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c79c9892_d11892db",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2324,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T16:10:14Z",
+      "side": 1,
+      "message": "Sort of a nit: the project names are canonical names, so example.com/org/project might be better sample text.",
+      "revId": "a4ec33d4296e46817536ef7fa912f160f6249a9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9d65677d_79364519",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2348,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T16:10:14Z",
+      "side": 1,
+      "message": "Does this mean that a smart reconfig will effectively clear out the entire cache?  Why would we not set min_ltime to -1 for everything in order to use cached config?  The goal of a smart reconfig is to add or remove projects/branches, and we\u0027ll still run cat jobs if the cache is missing any projects/branches.\n\nThis doesn\u0027t appear to be new behavior in this change; it\u0027s consistent with behavior introduced in I6b7afd34203b74d5a6524e5277055a813147ff9e.  The commit message does mention the behavior change, but I\u0027m not sure the importance registered with me at the time.\n\nExperimentation with tests.unit.test_scheduler.TestSchedulerSmartReconfiguration.test_smart_reconfiguration shows that we are running more cat jobs than before; 11 instead of the 8 that we run in commit bf4b16952567a6bccad9893991bfb2a1ec98b33d (the one before the change above).  The behavior is that it invalidates the ZK cache for every project-branch in a tenant which is updated.\n\nI believe this change is correct, but I would like to revisit whether we need to clear the zk cache for every project (which is more like the old full-reconfig but applied only to changed tenants), or whether we can use the zk cache in all cases (more like the old smart-reconfig).",
+      "revId": "a4ec33d4296e46817536ef7fa912f160f6249a9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
