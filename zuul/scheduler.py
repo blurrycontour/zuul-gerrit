@@ -927,9 +927,14 @@ class Scheduler(threading.Thread):
                         continue
 
                 old_tenant = self.abide.tenants.get(tenant_name)
-                # Consider caches valid if the cache ltime >= event ltime
-                min_ltimes = defaultdict(
-                    lambda: defaultdict(lambda: event.zuul_event_ltime))
+                if event.smart:
+                    # Consider caches always valid
+                    min_ltimes = defaultdict(
+                        lambda: defaultdict(lambda: -1))
+                else:
+                    # Consider caches valid if the cache ltime >= event ltime
+                    min_ltimes = defaultdict(
+                        lambda: defaultdict(lambda: event.zuul_event_ltime))
                 with tenant_write_lock(self.zk_client, tenant_name):
                     tenant = loader.loadTenant(self.abide, tenant_name,
                                                self.ansible_manager,
