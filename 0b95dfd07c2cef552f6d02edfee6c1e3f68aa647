@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e60aa19_b2af4ba3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 973,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-15T14:12:35Z",
+      "side": 1,
+      "message": "What happens if this raises an exception (zk disconnect)?  We\u0027ve already cleared our cache, what will happen next?",
+      "revId": "0b95dfd07c2cef552f6d02edfee6c1e3f68aa647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
