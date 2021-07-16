@@ -581,7 +581,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
         common_cache = cache.getFilesCache("review.example.com/common-config",
                                            "master")
         tpc = tenant.project_configs["review.example.com/common-config"]
-        self.assertTrue(common_cache.isValidFor(tpc, cache_ltime=-1))
+        self.assertTrue(common_cache.isValidFor(tpc, min_ltime=-1))
         self.assertEqual(len(common_cache), 1)
         self.assertIn("zuul.yaml", common_cache)
         self.assertTrue(len(common_cache["zuul.yaml"]) > 0)
@@ -590,7 +590,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
                                             "master")
         # Cache of org/project should be valid but empty (no in-repo config)
         tpc = tenant.project_configs["review.example.com/org/project"]
-        self.assertTrue(project_cache.isValidFor(tpc, cache_ltime=-1))
+        self.assertTrue(project_cache.isValidFor(tpc, min_ltime=-1))
         self.assertEqual(len(project_cache), 0)
 
     def test_cache_use(self):
@@ -603,7 +603,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
 
         # Get the current ltime from Zookeeper and run a full reconfiguration,
         # so that we know all items in the cache have a larger ltime.
-        ltime = self.getCurrentLtime()
+        ltime = self.zk_client.getCurrentLtime()
         self.scheds.first.fullReconfigure()
 
         # Clear the unparsed branch cache so all projects (except for
