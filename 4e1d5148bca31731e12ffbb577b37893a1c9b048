@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e969d04_b5ef0b8e",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 8829,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-16T09:20:48Z",
+      "side": 1,
+      "message": "This should be moved afterthe waitUntilSettled() call as we need to wait for the reconfiguration to finish.",
+      "revId": "4e1d5148bca31731e12ffbb577b37893a1c9b048",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
