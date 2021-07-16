@@ -61,7 +61,7 @@ class DatabaseSession(object):
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, uuid=None, job_name=None,
                   voting=None, nodeset=None, result=None, provides=None,
-                  final=None, held=None, limit=50, offset=0):
+                  final=None, held=None, complete=None, limit=50, offset=0):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -104,6 +104,10 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.nodeset, nodeset)
         q = self.listFilter(q, build_table.c.result, result)
         q = self.listFilter(q, build_table.c.final, final)
+        if complete is True:
+            q = q.filter(build_table.c.result != None)
+        elif complete is False:
+            q = q.filter(build_table.c.result == None)
         q = self.listFilter(q, provides_table.c.name, provides)
         q = self.listFilter(q, build_table.c.held, held)
 
@@ -148,7 +152,7 @@ class DatabaseSession(object):
 
     def getBuildsets(self, tenant=None, project=None, pipeline=None,
                      change=None, branch=None, patchset=None, ref=None,
-                     newrev=None, uuid=None, result=None,
+                     newrev=None, uuid=None, result=None, complete=None,
                      limit=50, offset=0):
 
         buildset_table = self.connection.zuul_buildset_table
@@ -168,6 +172,10 @@ class DatabaseSession(object):
         q = self.listFilter(q, buildset_table.c.newrev, newrev)
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
         q = self.listFilter(q, buildset_table.c.result, result)
+        if complete is True:
+            q = q.filter(buildset_table.c.result != None)
+        elif complete is False:
+            q = q.filter(buildset_table.c.result == None)
 
         q = q.order_by(buildset_table.c.id.desc()).\
             limit(limit).\
