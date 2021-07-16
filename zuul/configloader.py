@@ -1538,7 +1538,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager, cache_ltime=None):
+    def fromYaml(self, abide, conf, ansible_manager, min_ltimes=None):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1596,7 +1596,7 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors, cache_ltime)
+        self._cacheTenantYAML(abide, tenant, loading_errors, min_ltimes)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
@@ -1762,7 +1762,7 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors, cache_ltime):
+    def _cacheTenantYAML(self, abide, tenant, loading_errors, min_ltimes):
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
@@ -1773,11 +1773,6 @@ class TenantParser(object):
             # in-repo configuration apply only to that branch.
             branches = tenant.getProjectBranches(project)
             for branch in branches:
-                branch_cache = abide.getUnparsedBranchCache(
-                    project.canonical_name, branch)
-                if branch_cache.isValidFor(tpc):
-                    # We already have this branch cached.
-                    continue
                 if not tpc.load_classes:
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
@@ -1785,19 +1780,24 @@ class TenantParser(object):
 
                 source_context = model.SourceContext(
                     project, branch, '', False)
-                if cache_ltime is not None:
+                if min_ltimes is not None:
                     files_cache = self.unparsed_config_cache.getFilesCache(
                         project.canonical_name, branch)
                     with self.unparsed_config_cache.readLock(
                             project.canonical_name):
-                        if files_cache.isValidFor(tpc, cache_ltime):
+                        pb_ltime = min_ltimes[project.canonical_name][branch]
+                        if files_cache.isValidFor(tpc, pb_ltime):
                             self.log.debug(
                                 "Using files from cache for project %s @%s",
                                 project.canonical_name, branch)
+                            branch_cache = abide.getUnparsedBranchCache(
+                                project.canonical_name, branch)
+                            if branch_cache.isValidFor(tpc, files_cache.ltime):
+                                # Unparsed branch cache is already up-to-date
+                                continue
                             self._updateUnparsedBranchCache(
                                 abide, tenant, source_context, files_cache,
-                                loading_errors)
-                            branch_cache.setValidFor(tpc)
+                                loading_errors, files_cache.ltime)
                             continue
 
                 extra_config_files = abide.getExtraConfigFiles(project.name)
@@ -1817,7 +1817,6 @@ class TenantParser(object):
                 job.ltime = ltime
                 job.source_context = source_context
                 jobs.append(job)
-                branch_cache.setValidFor(tpc)
 
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
@@ -1832,7 +1831,8 @@ class TenantParser(object):
                            (job, job.files.keys()))
 
             self._updateUnparsedBranchCache(abide, tenant, job.source_context,
-                                            job.files, loading_errors)
+                                            job.files, loading_errors,
+                                            job.ltime)
 
             # Save all config files in Zookeeper (not just for the current tpc)
             files_cache = self.unparsed_config_cache.getFilesCache(
@@ -1848,9 +1848,15 @@ class TenantParser(object):
                                         job.ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
-                                   loading_errors):
+                                   loading_errors, ltime):
         loaded = False
         tpc = tenant.project_configs[source_context.project.canonical_name]
+        # Make sure we are clearing the local cache before updating it.
+        abide.clearUnparsedBranchCache(source_context.project.canonical_name,
+                                       source_context.branch)
+        branch_cache = abide.getUnparsedBranchCache(
+            source_context.project.canonical_name,
+            source_context.branch)
         for conf_root in (
                 ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
                 tpc.extra_config_files + tpc.extra_config_dirs):
@@ -1875,10 +1881,8 @@ class TenantParser(object):
                     (source_context,))
                 incdata = self.loadProjectYAML(
                     files[fn], source_context, loading_errors)
-                branch_cache = abide.getUnparsedBranchCache(
-                    source_context.project.canonical_name,
-                    source_context.branch)
                 branch_cache.put(source_context.path, incdata)
+        branch_cache.setValidFor(tpc, ltime)
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
@@ -2276,14 +2280,80 @@ class ConfigLoader(object):
                 abide.addUntrustedTPC(tenant_name, tpc)
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
-                   cache_ltime=None):
+                   min_ltimes=None):
+        """(Re-)load a single tenant.
+
+        Description of cache stages:
+
+        We have a local unparsed branch cache on each scheduler and the
+        global config cache in Zookeeper. Depending on the event that
+        triggers (re-)loading of a tenant we must make sure that those
+        caches are considered valid or invalid correctly.
+
+        If provided, the ``min_ltimes`` argument is expected to be a
+        nested dictionary with the project-branches. The value defines
+        the minimum logical time that is required for a cached config to
+        be considered valid::
+
+            {
+                "example.com/org/project": {
+                    "master": 12234,
+                    "stable": -1,
+                },
+                "example.com/common-config": {
+                    "master": -1,
+                },
+                ...
+            }
+
+        There are four scenarios to consider when loading a tenant.
+
+        1. Processing a tenant reconfig event:
+           - The min. ltime for the changed project(-branches) will be
+             set to the event's ``zuul_event_ltime`` (to establish a
+             happened-before relation in respect to the config change).
+             The min. ltime for all other project-branches will be -1.
+           - Config for needed project-branch(es) is updated via cat job
+             if the cache is not valid (cache ltime < min. ltime).
+           - Cache in Zookeeper and local unparsed branch cache is
+             updated. The ltime of the cache will be the timestamp
+             created shortly before requesting the config via the
+             mergers (only for outdated items).
+        2. Processing a FULL reconfiguration event:
+           - The min. ltime for all project-branches is given as the
+             ``zuul_event_ltime`` of the reconfiguration event.
+           - Config for needed project-branch(es) is updated via cat job
+             if the cache is not valid (cache ltime < min. ltime).
+             Otherwise the local unparsed branch cache or the global
+             config cache in Zookeeper is used.
+           - Cache in Zookeeper and local unparsed branch cache is
+             updated, with the ltime shortly before requesting the
+             config via the mergers (only for outdated items).
+        3. Processing a SMART reconfiguration event:
+           - The min. ltime for all project-branches is given as -1 in
+             order to use cached data wherever possible.
+           - Config for new project-branch(es) is updated via cat job if
+             the project is not yet cached. Otherwise the local unparsed
+             branch cache or the global config cache in Zookeper is
+             used.
+           - Cache in Zookeeper and local unparsed branch cache is
+             updated, with the ltime shortly before requesting the
+             config via the mergers (only for new items).
+        4. (Re-)loading a tenant due to a changed layout (happens after
+           an event according to one of the other scenarios was
+           processed on another scheduler):
+           - The min. ltime for all project-branches is given as -1 in
+             order to only use cached config.
+           - Local unparsed branch cache is updated if needed.
+
+        """
         if tenant_name not in unparsed_abide.tenants:
             del abide.tenants[tenant_name]
             return None
 
         unparsed_config = unparsed_abide.tenants[tenant_name]
         new_tenant = self.tenant_parser.fromYaml(
-            abide, unparsed_config, ansible_manager, cache_ltime)
+            abide, unparsed_config, ansible_manager, min_ltimes)
         abide.tenants[tenant_name] = new_tenant
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
