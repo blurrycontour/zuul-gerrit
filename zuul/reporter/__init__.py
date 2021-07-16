@@ -115,7 +115,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 del comments[fn]
                 item.warning("Comments left for invalid file %s" % (fn,))
 
-    def _getFormatter(self):
+    def _getFormatter(self, action):
         format_methods = {
             'enqueue': self._formatItemReportEnqueue,
             'start': self._formatItemReportStart,
@@ -126,12 +126,13 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             'disabled': self._formatItemReportDisabled,
             'dequeue': self._formatItemReportDequeue,
         }
-        return format_methods[self._action]
+        return format_methods[action]
 
-    def _formatItemReport(self, item, with_jobs=True):
+    def _formatItemReport(self, item, with_jobs=True, action=None):
         """Format a report from the given items. Usually to provide results to
         a reporter taking free-form text."""
-        ret = self._getFormatter()(item, with_jobs)
+        action = action or self._action
+        ret = self._getFormatter(action)(item, with_jobs)
 
         if item.current_build_set.warning_messages:
             warning = '\n  '.join(item.current_build_set.warning_messages)
