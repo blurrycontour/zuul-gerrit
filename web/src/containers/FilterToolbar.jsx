@@ -233,7 +233,7 @@ function writeFiltersToUrl(filters, location, history) {
 }
 
 function buildQueryString(filters) {
-  let queryString = ''
+  let queryString = '&complete=true'
   if (filters) {
     Object.keys(filters).map((key) => {
       filters[key].forEach((value) => {
