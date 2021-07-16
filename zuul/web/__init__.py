@@ -981,7 +981,8 @@ class ZuulWebAPI(object):
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
-               result=None, final=None, held=None, limit=50, skip=0):
+               result=None, final=None, held=None, complete=None,
+               limit=50, skip=0):
         connection = self._get_connection()
 
         if tenant not in [x['name'] for x in self._tenants()]:
@@ -991,11 +992,15 @@ class ZuulWebAPI(object):
         if final is not None:
             final = final.lower() == "true"
 
+        if complete is not None:
+            complete = complete.lower() == 'true'
+
         builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
-            result=result, final=final, held=held, limit=limit, offset=skip)
+            result=result, final=final, held=held, complete=complete,
+            limit=limit, offset=skip)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -1048,7 +1053,7 @@ class ZuulWebAPI(object):
 
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline,
-            branch=branch, limit=1)
+            branch=branch, complete=True, limit=1)
         if not buildsets:
             raise cherrypy.HTTPError(404, 'No buildset found')
 
@@ -1069,13 +1074,16 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def buildsets(self, tenant, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
-                  uuid=None, result=None, limit=50, skip=0):
+                  uuid=None, result=None, complete=None, limit=50, skip=0):
         connection = self._get_connection()
+
+        if complete:
+            complete = complete.lower() == 'true'
 
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
-            uuid=uuid, result=result,
+            uuid=uuid, result=result, complete=complete,
             limit=limit, offset=skip)
 
         resp = cherrypy.response

@@ -27,6 +27,12 @@ import {
 import { ConditionalWrapper } from '../../Misc'
 
 const RESULT_ICON_CONFIGS = {
+  // In progress
+  null: {
+    icon: QuestionIcon,
+    color: 'var(--pf-global--info-color--100)',
+    badgeColor: 'blue',
+  },
   SUCCESS: {
     icon: CheckIcon,
     color: 'var(--pf-global--success-color--100)',
@@ -96,7 +102,7 @@ function BuildResult(props) {
         condition={link}
         wrapper={children => <Link to={link} style={{ color: color }}>{children}</Link>}
       >
-        {result}
+        {result || "In Progress"}
       </ConditionalWrapper>
     </span>
   )
@@ -121,7 +127,7 @@ function BuildResultBadge(props) {
         verticalAlign: '0.15em',
       }}
     >
-      {result}
+      {result || "In Progress"}
     </Label>
   )
 }
