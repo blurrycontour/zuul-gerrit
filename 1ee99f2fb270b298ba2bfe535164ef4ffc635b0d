@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a7a79024_482cc107",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-16T15:17:41Z",
+      "side": 1,
+      "message": "This variable name is no longer very accurate.",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 21
+      },
+      "revId": "1ee99f2fb270b298ba2bfe535164ef4ffc635b0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc16e841_da82caf2",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-16T15:17:41Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 37,
+        "startChar": 67,
+        "endLine": 37,
+        "endChar": 73
+      },
+      "revId": "1ee99f2fb270b298ba2bfe535164ef4ffc635b0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "90e740a9_9ed3ebb8",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-16T15:17:41Z",
+      "side": 1,
+      "message": "Why isn\u0027t this able to use build_url set above?",
+      "revId": "1ee99f2fb270b298ba2bfe535164ef4ffc635b0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
