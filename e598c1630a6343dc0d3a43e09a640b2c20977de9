@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "968fbdda_28057378",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 996,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-16T22:07:09Z",
+      "side": 1,
+      "message": "Should you try except around this type cast? Then maybe default to None if it fails?",
+      "revId": "e598c1630a6343dc0d3a43e09a640b2c20977de9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2709118_3f24d32a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1081,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-16T22:07:09Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "e598c1630a6343dc0d3a43e09a640b2c20977de9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
