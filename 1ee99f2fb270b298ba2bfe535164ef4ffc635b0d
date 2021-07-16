@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "4668f84a_5de41ecf",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-16T15:23:44Z",
+      "side": 1,
+      "message": "True.  Oops.",
+      "revId": "1ee99f2fb270b298ba2bfe535164ef4ffc635b0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc16e841_da82caf2",
         "filename": "playbooks/tutorial/quick-start.yaml",
         "patchSetId": 7
@@ -62,6 +79,23 @@
       "revId": "1ee99f2fb270b298ba2bfe535164ef4ffc635b0d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d568165e_3c196aae",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-16T15:23:44Z",
+      "side": 1,
+      "message": "build_url is a link to the build page, which issues a generic blob of html/javascript; we can\u0027t do anything with that.  So we have to switch to using the api to mimic what the user is instructed to do.",
+      "revId": "1ee99f2fb270b298ba2bfe535164ef4ffc635b0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
