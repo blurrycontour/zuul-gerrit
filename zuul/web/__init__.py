@@ -1037,13 +1037,8 @@ class ZuulWebAPI(object):
         }
         if builds:
             ret['builds'] = []
-            ret['retry_builds'] = []
         for build in builds:
-            # Put all non-final (retry) builds under a different key
-            if not build.final:
-                ret['retry_builds'].append(self.buildToDict(build))
-            else:
-                ret['builds'].append(self.buildToDict(build))
+            ret['builds'].append(self.buildToDict(build))
         return ret
 
     @cherrypy.expose
