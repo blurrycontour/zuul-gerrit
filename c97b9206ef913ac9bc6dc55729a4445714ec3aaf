@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "535f87ef_b97961a5",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1797,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-16T05:49:12Z",
+      "side": 0,
+      "message": "I squashed https://review.opendev.org/c/zuul/zuul/+/800973/2 in PS10",
+      "parentUuid": "3a9ad7ca_b9d22361",
+      "revId": "c97b9206ef913ac9bc6dc55729a4445714ec3aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3aedfb38_d574c5af",
         "filename": "zuul/scheduler.py",
         "patchSetId": 9
