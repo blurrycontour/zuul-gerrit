@@ -5,7 +5,7 @@ Use Matrix for Chat
    are not currently available in Zuul.  They may change significantly
    before final implementation, or may never be fully completed.
 
-We just moved switched IRC networks from Freenode to OFTC.  This was
+We just switched IRC networks from Freenode to OFTC.  This was
 done quickly because remaining on Freenode was untenable due to recent
 changes, and the OpenDev community had an existing plan prepared to
 move to OFTC should such a situation arise.
