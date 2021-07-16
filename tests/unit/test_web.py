@@ -1288,6 +1288,7 @@ class TestBuildInfo(BaseTestWeb):
                                     "project=org/project&"
                                     "project=org/project1").json()
         self.assertEqual(len(builds_query), 6)
+        self.assertEqual(builds_query[0]['nodeset'], 'test-nodeset')
 
         resp = self.get_url("api/tenant/non-tenant/builds")
         self.assertEqual(404, resp.status_code)

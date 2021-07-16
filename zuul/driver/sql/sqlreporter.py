@@ -55,7 +55,7 @@ class SQLReporter(BaseReporter):
             end_time=end,
             voting=build.job.voting,
             log_url=log_url,
-            node_name=build.node_name,
+            nodeset=build.job.nodeset.name,
             error_detail=build.error_detail,
             final=final,
             held=build.held,
@@ -118,7 +118,7 @@ class SQLReporter(BaseReporter):
                 job_name=build.job.name,
                 start_time=start,
                 voting=build.job.voting,
-                node_name=build.node_name,
+                nodeset=build.job.nodeset.name,
             )
         return db_build
 
@@ -136,7 +136,6 @@ class SQLReporter(BaseReporter):
             db_build.result = build.result
             db_build.end_time = end
             db_build.log_url = build.log_url
-            db_build.node_name = build.node_name
             db_build.error_detail = build.error_detail
             db_build.final = final
             db_build.held = build.held
