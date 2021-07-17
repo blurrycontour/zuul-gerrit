@@ -101,8 +101,12 @@ class SQLReporter(BaseReporter):
         with self.connection.getSession() as db:
             db_buildset = db.getBuildset(
                 tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
-            db_buildset.result = buildset.result
-            db_buildset.message = message
+            if db_buildset:
+                db_buildset.result = buildset.result
+                db_buildset.message = message
+            elif buildset.builds:
+                self.log.error("Unable to find buildset "
+                               f"{buildset.uuid} in DB")
 
     def reportBuildStart(self, build):
         buildset = build.build_set

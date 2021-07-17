@@ -1066,7 +1066,6 @@ class PipelineManager(metaclass=ABCMeta):
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
         if not build_set.ref:
             build_set.setConfiguration()
-            self.sql.reportBuildsetStart(build_set)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
@@ -1151,6 +1150,8 @@ class PipelineManager(metaclass=ABCMeta):
                 item.setConfigError("Unable to freeze job graph: %s" %
                                     (str(e)))
                 return False
+            if item.job_graph and len(item.job_graph.jobs) > 0:
+                self.sql.reportBuildsetStart(build_set)
 
         # At this point we know all frozen jobs and their repos so update the
         # repo state with all missing repos.
