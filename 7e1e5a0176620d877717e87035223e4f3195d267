@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc9c172b_b0313bfe",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-17T16:07:41Z",
+      "side": 1,
+      "message": "I added this just in case we missed something.  I also added an exception here and ran the full test suite and it did not hit, so I think we\u0027re good.",
+      "revId": "7e1e5a0176620d877717e87035223e4f3195d267",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
