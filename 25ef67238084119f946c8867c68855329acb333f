@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b690a064_adfd639e",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1002,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-19T13:15:55Z",
+      "side": 1,
+      "message": "We might want to just echo what we say in RETRY_LIMIT: that the pre-run playbook failed for some reason and the job will be retried.",
+      "revId": "25ef67238084119f946c8867c68855329acb333f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
