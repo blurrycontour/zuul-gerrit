@@ -997,6 +997,9 @@ A job build may have the following status:
 **FAILURE**
   Job executed correctly, but exited with a failure.
 
+**RETRY**
+  The ``pre-run`` playbook failed and the job will be retried.
+
 **RETRY_LIMIT**
   The ``pre-run`` playbook failed more than the maximum number of
   retry ``attempts``.
