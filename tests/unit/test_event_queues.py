@@ -19,7 +19,7 @@ import testtools
 from zuul import model
 from zuul.driver import Driver, TriggerInterface
 from zuul.lib.connections import ConnectionRegistry
-from zuul.zk import ZooKeeperClient, event_queues
+from zuul.zk import ZooKeeperClient, event_queues, sharding
 
 from tests.base import BaseTestCase, iterate_timeout
 
@@ -127,6 +127,44 @@ class TestTriggerEventQueue(EventQueueBaseTestCase):
         super().setUp()
         self.driver = DummyDriver()
         self.connections.registerDriver(self.driver)
+
+    def test_sharded_tenant_trigger_events(self):
+        # Test enqueue/dequeue of the tenant trigger event queue.
+        queue = event_queues.TenantTriggerEventQueue(
+            self.zk_client, self.connections, "tenant"
+        )
+
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+        event = DummyTriggerEvent()
+        data = "x" * (sharding.NODE_BYTE_SIZE_LIMIT + 1)
+        event.data = data
+
+        queue.put(self.driver.driver_name, event)
+        queue.put(self.driver.driver_name, event)
+
+        self.assertEqual(len(queue), 2)
+        self.assertTrue(queue.hasEvents())
+
+        processed = 0
+        for event in queue:
+            self.assertIsInstance(event, DummyTriggerEvent)
+            processed += 1
+
+        self.assertEqual(processed, 2)
+        self.assertEqual(len(queue), 2)
+        self.assertTrue(queue.hasEvents())
+
+        acked = 0
+        for event in queue:
+            queue.ack(event)
+            self.assertEqual(event.data, data)
+            acked += 1
+
+        self.assertEqual(acked, 2)
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
 
     def test_tenant_trigger_events(self):
         # Test enqueue/dequeue of the tenant trigger event queue.
