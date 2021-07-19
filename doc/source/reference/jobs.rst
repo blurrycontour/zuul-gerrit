@@ -997,6 +997,10 @@ A job build may have the following status:
 **FAILURE**
   Job executed correctly, but exited with a failure.
 
+**RETRY**
+  Job failed because of an infrastructure failure. This can be anything
+  like connection issue, drive corruption, full disk, corrupted git cache, etc.
+
 **RETRY_LIMIT**
   The ``pre-run`` playbook failed more than the maximum number of
   retry ``attempts``.
