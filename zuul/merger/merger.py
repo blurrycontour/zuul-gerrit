@@ -445,7 +445,16 @@ class Repo(object):
         refs = repo.git.for_each_ref(
             '--format=%(objectname) %(objecttype) %(refname)'
         )
-        return refs.splitlines()
+        packed_refs = {}
+        for ref in refs.splitlines():
+            parts = ref.split(" ")
+            if len(parts) == 3:
+                packed_refs[parts[2]] = {
+                    "ref": parts[2],
+                    "commit": parts[0],
+                    "type": parts[1]
+                }
+        return packed_refs
 
     def setRef(self, path, hexsha, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
@@ -456,7 +465,7 @@ class Repo(object):
             repo = self.createRepoObject(zuul_event_id)
         self._setRef(path, hexsha, repo)
 
-    @staticmethod
+    @ staticmethod
     def _setRef(path, hexsha, repo):
         binsha = gitdb.util.to_bin_sha(hexsha)
         obj = git.objects.Object.new_from_sha(repo, binsha)
@@ -470,13 +479,13 @@ class Repo(object):
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
         self._setRefs(repo, refs, keep_remotes=keep_remotes, log=ref_log)
 
-    @staticmethod
+    @ staticmethod
     def setRefsAsync(local_path, refs, keep_remotes=False):
         repo = git.Repo(local_path)
         messages = Repo._setRefs(repo, refs, keep_remotes=keep_remotes)
         return messages
 
-    @staticmethod
+    @ staticmethod
     def _setRefs(repo, refs, keep_remotes=False, log=None):
         messages = []
         current_refs = {}
@@ -519,7 +528,7 @@ class Repo(object):
         ref_log.debug("Delete reference %s", path)
         Repo._deleteRef(path, repo)
 
-    @staticmethod
+    @ staticmethod
     def _deleteRef(path, repo):
         git.refs.SymbolicReference.delete(repo, path)
         return "Deleted reference %s" % path
@@ -773,12 +782,12 @@ class Merger(object):
         username: str,
         speed_limit: str,
         speed_time: str,
-        cache_root: Optional[str] = None,
-        logger: Optional[Logger] = None,
-        execution_context: bool = False,
-        git_timeout: int = 300,
-        scheme: str = None,
-        cache_scheme: str = None,
+        cache_root: Optional[str]=None,
+        logger: Optional[Logger]=None,
+        execution_context: bool=False,
+        git_timeout: int=300,
+        scheme: str=None,
+        cache_scheme: str=None,
     ):
         self.logger = logger
         if logger is None:
@@ -944,12 +953,7 @@ class Merger(object):
         projects = repo_state.setdefault(connection_name, {})
         project = projects.setdefault(project_name, {})
 
-        packedRefs = repo.getPackedRefs()
-        tags = {}
-        for ref in packedRefs:
-            parts = ref.split(" ")
-            if len(parts) == 3 and parts[1] == "tag":
-                tags[parts[2]] = parts[0]
+        packed_refs = repo.getPackedRefs()
 
         for ref in repo.getRefs():
             if ref.path.startswith('refs/zuul/'):
@@ -964,8 +968,8 @@ class Merger(object):
                 if key not in recent:
                     recent[key] = ref.object
 
-            if ref.path in tags:
-                project[ref.path] = tags[ref.path]
+            if ref.path in packed_refs:
+                project[ref.path] = packed_refs[ref.path].commit
             else:
                 project[ref.path] = ref.object.hexsha
 
