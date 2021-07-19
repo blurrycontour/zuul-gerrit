@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "52481236_3f245b99",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-19T21:40:30Z",
+      "side": 1,
+      "message": "Copy-pasta error: this shouldn\u0027t say \u0027tenant specific\u0027",
+      "revId": "ee633b561698b63bb569308e698dc050a84401d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
