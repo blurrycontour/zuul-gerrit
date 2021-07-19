@@ -194,6 +194,7 @@ class ZooKeeperClient(object):
         for res in results:
             if isinstance(res, Exception):
                 raise res
+        return results
 
     def getCurrentLtime(self):
         """Get the logical timestamp as seen by the Zookeeper cluster."""
