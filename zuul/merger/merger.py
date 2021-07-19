@@ -445,7 +445,16 @@ class Repo(object):
         refs = repo.git.for_each_ref(
             '--format=%(objectname) %(objecttype) %(refname)'
         )
-        return refs.splitlines()
+        packed_refs = {}
+        for ref in refs.splitlines():
+            parts = ref.split(" ")
+            if len(parts) == 3:
+                packed_refs[parts[2]] = {
+                    "ref": parts[2],
+                    "commit": parts[0],
+                    "type": parts[1]
+                }
+        return packed_refs
 
     def setRef(self, path, hexsha, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
@@ -944,12 +953,7 @@ class Merger(object):
         projects = repo_state.setdefault(connection_name, {})
         project = projects.setdefault(project_name, {})
 
-        packedRefs = repo.getPackedRefs()
-        tags = {}
-        for ref in packedRefs:
-            parts = ref.split(" ")
-            if len(parts) == 3 and parts[1] == "tag":
-                tags[parts[2]] = parts[0]
+        packed_refs = repo.getPackedRefs()
 
         for ref in repo.getRefs():
             if ref.path.startswith('refs/zuul/'):
@@ -964,8 +968,8 @@ class Merger(object):
                 if key not in recent:
                     recent[key] = ref.object
 
-            if ref.path in tags:
-                project[ref.path] = tags[ref.path]
+            if ref.path in packed_refs:
+                project[ref.path] = packed_refs[ref.path].commit
             else:
                 project[ref.path] = ref.object.hexsha
 
