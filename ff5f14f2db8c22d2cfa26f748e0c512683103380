@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4733cc96_3af08815",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-20T08:56:29Z",
+      "side": 1,
+      "message": "Do we want to have this backward compatible with the current version?\n\n    event \u003d model.ConnectionEvent.fromDict(data.get(\u0027event_data\u0027, data))\n\nWe might have unprocessed connection events in ZK with the old format that would otherwise lead to a KeyError.",
+      "revId": "ff5f14f2db8c22d2cfa26f748e0c512683103380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
