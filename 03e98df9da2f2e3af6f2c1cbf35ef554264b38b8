@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "245f83fc_8b6a0576",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1787,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T21:46:13Z",
+      "side": 1,
+      "message": "Should this be a property on the type that returns None if not set?",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef31fee6_8c84a3f9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1806,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T21:46:13Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e7cde4f3_961a1d70",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2319,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T21:46:13Z",
+      "side": 1,
+      "message": "Why not make this a\n\n  if node.connection_type not in (\u0027project\u0027, \u0027namespace\u0027):\n\ncondition then you can drop the pass?",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6377c65b_4e166c1d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2322,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T21:46:13Z",
+      "side": 1,
+      "message": "Is this not a string? Seems weird to index it with 0.",
+      "range": {
+        "startLine": 2322,
+        "startChar": 35,
+        "endLine": 2322,
+        "endChar": 44
+      },
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2eee210d_c0f3b0d5",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T21:46:13Z",
+      "side": 1,
+      "message": "I see here that the name is a list with the actual name and its aliases. This is why we index with 0 elsewhere.",
+      "range": {
+        "startLine": 670,
+        "startChar": 19,
+        "endLine": 670,
+        "endChar": 43
+      },
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
