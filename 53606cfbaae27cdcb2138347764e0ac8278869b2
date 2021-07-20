@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c76aa7f5_e38110ec",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T22:25:33Z",
+      "side": 1,
+      "message": "See comment in the other file. I think this test works because this data type is len()able in a way that makes sense. Might want to make it more complex to reflect reality a bit better and get slightly better coverage.",
+      "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e58ffa07_521a4d3d",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T22:25:33Z",
+      "side": 1,
+      "message": "Is this meant to be encoded_data?",
+      "range": {
+        "startLine": 246,
+        "startChar": 15,
+        "endLine": 246,
+        "endChar": 19
+      },
+      "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35533a26_43735a7a",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T22:25:33Z",
+      "side": 1,
+      "message": "This comment is no longer completely accurate.",
+      "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
