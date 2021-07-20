@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5c3a2bc9_3ccfef06",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T22:44:54Z",
+      "side": 1,
+      "message": "The type or content of the data doesn\u0027t affect the code paths, only the total length of the serialized data structure.  If you would prefer, I\u0027m happy to change this to a single-key dictionary because it\u0027s more reflective of other code, but it won\u0027t alter the effectivess of this test -- any json-serializable object is valid as event data.",
+      "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e58ffa07_521a4d3d",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 4
@@ -42,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "2ffc03a4_603a9408",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T22:44:54Z",
+      "side": 1,
+      "message": "Yes, our size limit is based on the amount of data we\u0027re going to store in zk, so this makes the decision about sharding based on what it\u0027s about to store.",
+      "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "35533a26_43735a7a",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 4
@@ -56,6 +90,23 @@
       "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c16062e_742d1135",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T22:44:54Z",
+      "side": 1,
+      "message": "But still mostly accurate -- in that if we expect data and it\u0027s not there, it\u0027s corrupt.  I\u0027ll rephrase.",
+      "revId": "53606cfbaae27cdcb2138347764e0ac8278869b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
