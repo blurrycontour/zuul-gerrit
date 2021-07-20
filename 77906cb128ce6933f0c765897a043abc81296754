@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "c46e8a73_176fff09",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T16:05:58Z",
+      "side": 1,
+      "message": "Yup I see that now. I conflated sequences and sharding. They use a similar underlying implementation but the specific details for each are important here. The behavior is completely different.",
+      "parentUuid": "979e093d_eec9328e",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e135d81c_011538c3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 2
@@ -70,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "030bd402_3b983383",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T16:05:58Z",
+      "side": 1,
+      "message": "See above.",
+      "parentUuid": "4ff01fc4_1c1921a8",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "057da2a7_f37fe847",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 2
@@ -98,6 +134,24 @@
       "writtenOn": "2021-07-20T15:53:55Z",
       "side": 1,
       "message": "Yeah, I think we can switch it around, but it\u0027ll be more verbose.",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "961b8738_d8801d93",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T16:05:58Z",
+      "side": 1,
+      "message": "In this case I think the verbosity is worthwhile to make this more robust to the various errors that may occur.",
+      "parentUuid": "4b3b339b_2da53d59",
       "revId": "77906cb128ce6933f0c765897a043abc81296754",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
