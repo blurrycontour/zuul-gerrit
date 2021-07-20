@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "979e093d_eec9328e",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T15:53:55Z",
+      "side": 1,
+      "message": "We don\u0027t shard on the event path, only on the data path.  sharding.BufferedShardWriter is what actually implements the sharding, on line 262.\n\nThe event_path is a sequence because the event queue is composed of sequential znodes (ie, the sequence number provides the queue ordering of the event).",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e135d81c_011538c3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 2
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "4ff01fc4_1c1921a8",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T15:53:55Z",
+      "side": 1,
+      "message": "Because this is sharded and that is not.",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "057da2a7_f37fe847",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 2
@@ -50,6 +84,23 @@
       "revId": "77906cb128ce6933f0c765897a043abc81296754",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b3b339b_2da53d59",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T15:53:55Z",
+      "side": 1,
+      "message": "Yeah, I think we can switch it around, but it\u0027ll be more verbose.",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
