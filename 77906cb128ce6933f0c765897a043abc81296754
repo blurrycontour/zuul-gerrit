@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f679e34d_b36783ad",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T15:46:50Z",
+      "side": 1,
+      "message": "Why bother with sharding on the event_path if we intend to always have a single sequence node?",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e135d81c_011538c3",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T15:46:50Z",
+      "side": 1,
+      "message": "Why does this use the more complicated create on the root then stream the data to the path instead of what appears to be the simpler alternative below of creating the data_path and setting sequence to True?",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "057da2a7_f37fe847",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-20T15:46:50Z",
+      "side": 1,
+      "message": "From an order of operations perspective I think it might be more correct to delete the side_channel_path first. Then if we have any errors the event will hang around allowing us to try removal again later?\n\nAlso if you get NoNodeError when deleting the side_channel_path I think you want to continue to try and delete the event itself. I believe this is why you have the current order, but I don\u0027t think the current order would handle other errors (like connection errors?) properly.",
+      "revId": "77906cb128ce6933f0c765897a043abc81296754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
