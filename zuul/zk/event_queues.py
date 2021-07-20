@@ -210,16 +210,11 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             self.log.warning("Event %s was already acknowledged", event)
 
     def _put(self, data):
-        # Get a unique data node
-        data_id = str(uuid.uuid4())
-        data_root = f'{EVENT_DATA_ROOT}/{data_id}'
-
         # Within a transaction, we need something after the / in order
         # to cause the sequence node to be created under the node
         # before the /.  So we use "seq" for that.  This will produce
         # paths like event_root/seq-0000.
         event_path = f"{self.event_root}/seq"
-        data_path = f'{data_root}/seq'
 
         # Event data can be large, so we want to shard it.  But events
         # also need to be atomic (we don't want an event listener to
@@ -247,24 +242,30 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         # is forwarded, rather than being read and re-written.
 
         side_channel_data = None
-        if 'event_data' in data:
-            side_channel_data = data['event_data']
-            side_channel_data = json.dumps(side_channel_data).encode("utf-8")
+        encoded_data = json.dumps(data).encode("utf-8")
+        if len(data) > sharding.NODE_BYTE_SIZE_LIMIT and 'event_data' in data:
+            # Get a unique data node
+            data_id = str(uuid.uuid4())
+            data_root = f'{EVENT_DATA_ROOT}/{data_id}'
+            data_path = f'{data_root}/seq'
+            side_channel_data = json.dumps(data['event_data']).encode("utf-8")
             data = data.copy()
-            data['event_data'] = data_root
+            del data['event_data']
+            data['event_data_path'] = data_root
+            encoded_data = json.dumps(data).encode("utf-8")
 
-        data = json.dumps(data).encode("utf-8")
+            tr = self.kazoo_client.transaction()
+            tr.create(data_root)
 
-        tr = self.kazoo_client.transaction()
-        tr.create(data_root)
-
-        if side_channel_data:
             with sharding.BufferedShardWriter(tr, data_path) as stream:
                 stream.write(side_channel_data)
 
-        tr.create(event_path, data, sequence=True)
-        resp = self.client.commitTransaction(tr)
-        return resp[-1]
+            tr.create(event_path, encoded_data, sequence=True)
+            resp = self.client.commitTransaction(tr)
+            return resp[-1]
+        else:
+            return self.kazoo_client.create(
+                event_path, encoded_data, sequence=True)
 
     def _iterEvents(self):
         try:
@@ -288,7 +289,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
 
             # Load the event data; if that fails, the event is
             # corrupt; delete and continue.
-            side_channel_path = event.get('event_data')
+            side_channel_path = event.get('event_data_path')
             if side_channel_path:
                 try:
                     with sharding.BufferedShardReader(
@@ -321,7 +322,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             data, zstat = self.kazoo_client.get(path)
             try:
                 event = json.loads(data)
-                side_channel_path = event.get('event_data')
+                side_channel_path = event.get('event_data_path')
             except json.JSONDecodeError:
                 pass
 
