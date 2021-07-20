@@ -16,6 +16,23 @@
       "revId": "ff5f14f2db8c22d2cfa26f748e0c512683103380",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6fc9c944_47ffdfff",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T13:25:59Z",
+      "side": 1,
+      "message": "Good idea.  We moved the other queues, but not this one.",
+      "revId": "ff5f14f2db8c22d2cfa26f748e0c512683103380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
