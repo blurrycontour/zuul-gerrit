@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ac5f7144_088f5191",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1787,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T21:56:03Z",
+      "side": 1,
+      "message": "Not a bad idea -- but do we want to do that in this change?",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ef31fee6_8c84a3f9",
         "filename": "zuul/executor/server.py",
         "patchSetId": 3
@@ -73,6 +90,23 @@
       "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e8c279f_376f5ef7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2322,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T21:56:03Z",
+      "side": 1,
+      "message": "I agree this is weird.  It is a huge time sink and source of errors.  It should be fixed.  Separately.",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
