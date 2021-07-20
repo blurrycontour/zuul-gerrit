@@ -2347,13 +2347,19 @@ class ConfigLoader(object):
 
         """
         if tenant_name not in unparsed_abide.tenants:
-            del abide.tenants[tenant_name]
+            # Copy tenants dictionary to not break concurrent iterations.
+            tenants = abide.tenants.copy()
+            del tenants[tenant_name]
+            abide.tenants = tenants
             return None
 
         unparsed_config = unparsed_abide.tenants[tenant_name]
         new_tenant = self.tenant_parser.fromYaml(
             abide, unparsed_config, ansible_manager, min_ltimes)
-        abide.tenants[tenant_name] = new_tenant
+        # Copy tenants dictionary to not break concurrent iterations.
+        tenants = abide.tenants.copy()
+        tenants[tenant_name] = new_tenant
+        abide.tenants = tenants
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
                 "%s errors detected during %s tenant configuration loading",
