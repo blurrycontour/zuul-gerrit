@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "69be40f8_ef5e06ca",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T14:23:42Z",
+      "side": 1,
+      "message": "Thanks, we\u0027ve needed these closing log lines in the merger for a while.  :)\n\nThis is sort of a nit, but it really helps when grepping: can we rephrase these lines like:\n\n  Completed refstate job %s: payload size: %s\n\nThat matches the opening log lines, and \"grep \u0027refstate job\u0027\" will return both and the user doesn\u0027t need to deal with escaping quotes.",
+      "revId": "c7858dbe617240bb6377a3773cbf4977db1cd562",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
