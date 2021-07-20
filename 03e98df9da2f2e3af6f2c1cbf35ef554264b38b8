@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "2c292f0f_e657354e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2319,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-20T21:59:36Z",
+      "side": 1,
+      "message": "Equivalency with the original code was foremost on my mind with this change.  But now that it\u0027s done, I agree it would be more idomatic to switch.",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6377c65b_4e166c1d",
         "filename": "zuul/executor/server.py",
         "patchSetId": 3
