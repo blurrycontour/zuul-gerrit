@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import socket
+import sys
 import threading
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -188,7 +189,10 @@ class BaseMergeServer(metaclass=ABCMeta):
         else:
             result = dict(updated=True, files=files)
 
-        job.sendWorkComplete(json.dumps(result))
+        payload = json.dumps(result)
+        self.log.debug("Completed cat job %s: payload size: %s",
+                       job.unique, sys.getsizeof(payload))
+        job.sendWorkComplete(payload)
 
     def merge(self, job):
         self.log.debug("Got merge job: %s" % job.unique)
@@ -212,7 +216,10 @@ class BaseMergeServer(metaclass=ABCMeta):
             (result['commit'], result['files'], result['repo_state'],
              recent, orig_commit) = ret
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        payload = json.dumps(result)
+        self.log.debug("Completed merge job %s: payload size: %s",
+                       job.unique, sys.getsizeof(payload))
+        job.sendWorkComplete(payload)
 
     def refstate(self, job):
         self.log.debug("Got refstate job: %s" % job.unique)
@@ -225,7 +232,10 @@ class BaseMergeServer(metaclass=ABCMeta):
                       repo_state=repo_state,
                       item_in_branches=item_in_branches)
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        payload = json.dumps(result)
+        self.log.debug("Completed refstate job %s: payload size: %s",
+                       job.unique, sys.getsizeof(payload))
+        job.sendWorkComplete(payload)
 
     def fileschanges(self, job):
         self.log.debug("Got fileschanges job: %s" % job.unique)
@@ -250,7 +260,10 @@ class BaseMergeServer(metaclass=ABCMeta):
             result = dict(updated=True, files=files)
 
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        payload = json.dumps(result)
+        self.log.debug("Completed fileschanges job %s: payload size: %s",
+                       job.unique, sys.getsizeof(payload))
+        job.sendWorkComplete(payload)
 
 
 class MergeServer(BaseMergeServer):
