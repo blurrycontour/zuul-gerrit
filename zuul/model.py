@@ -5436,8 +5436,8 @@ class UnparsedBranchCache(object):
 
 class Abide(object):
     def __init__(self):
-        self.admin_rules = OrderedDict()
-        self.tenants = OrderedDict()
+        self.admin_rules = {}
+        self.tenants = {}
         # tenant -> project -> list(tpcs)
         # The project TPCs are stored as a list as we don't check for
         # duplicate projects here.
