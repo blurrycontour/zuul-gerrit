@@ -3202,7 +3202,7 @@ class TestingMergerApi(HoldableMergerApi):
             self.update(merge_request)
 
     def queued(self):
-        return self.inState(
+        return self._test_getMergeJobsInState(
             MergeRequest.REQUESTED, MergeRequest.HOLD
         )
 
@@ -3212,16 +3212,25 @@ class TestingMergerApi(HoldableMergerApi):
 
 class RecordingMergeClient(zuul.merger.client.MergeClient):
 
+    _merger_api_class = HoldableMergerApi
+
     def __init__(self, config, sched):
         super().__init__(config, sched)
         self.history = {}
 
-    def submitJob(self, name, data, build_set,
-                  precedence=PRECEDENCE_NORMAL, event=None):
-        self.history.setdefault(name, [])
-        self.history[name].append((data, build_set))
+    def submitJob(
+        self,
+        job_type,
+        data,
+        build_set,
+        precedence=PRECEDENCE_NORMAL,
+        needs_result=False,
+        event=None,
+    ):
+        self.history.setdefault(job_type, [])
+        self.history[job_type].append((data, build_set))
         return super().submitJob(
-            name, data, build_set, precedence, event=event)
+            job_type, data, build_set, precedence, needs_result, event=event)
 
 
 class HoldableExecutorApi(ExecutorApi):
@@ -4579,6 +4588,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=True)
         self.executor_api = TestingExecutorApi(self.zk_client)
+        self.merger_api = TestingMergerApi(self.zk_client)
         self.executor_server = RecordingExecutorServer(
             self.config,
             executor_connections,
@@ -4958,7 +4968,6 @@ class ZuulTestCase(BaseTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.scheds.execute(lambda app: app.sched.executor.stop())
-        self.scheds.execute(lambda app: app.sched.merger.stop())
         if self.merge_server:
             self.merge_server.stop()
             self.merge_server.join()
@@ -5099,6 +5108,30 @@ class ZuulTestCase(BaseTestCase):
         for app in self.scheds:
             app.sched.executor.executor_api.hold_in_queue = hold_jobs_in_queue
 
+    @property
+    def hold_merge_jobs_in_queue(self):
+        return self.merger_api.hold_in_queue
+
+    @hold_merge_jobs_in_queue.setter
+    def hold_merge_jobs_in_queue(self, hold_in_queue):
+        """Helper method to set hold_in_queue on all involved Merger APIs"""
+
+        self.merger_api.hold_in_queue = hold_in_queue
+        for app in self.scheds:
+            app.sched.merger.merger_api.hold_in_queue = hold_in_queue
+
+    @property
+    def merge_job_history(self):
+        history = {}
+        for app in self.scheds:
+            history.update(app.sched.merger.merger_api.history)
+        return history
+
+    @merge_job_history.deleter
+    def merge_job_history(self):
+        for app in self.scheds:
+            app.sched.merger.merger_api.history.clear()
+
     def __haveAllBuildsReported(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
             executor_client = app.sched.executor
@@ -5180,24 +5213,11 @@ class ZuulTestCase(BaseTestCase):
         return True
 
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
-        for app in self.scheds.filter(matcher):
-            merge_client = app.sched.merger
-            for client_job in list(merge_client.jobs):
-                if not client_job.handle:
-                    self.log.debug("%s has no handle" % client_job)
-                    return False
-                server_job = self.gearman_server.jobs.get(client_job.handle)
-                if not server_job:
-                    self.log.debug("%s is not known to the gearman server" %
-                                   client_job)
-                    return False
-                if not hasattr(server_job, 'waiting'):
-                    self.log.debug("%s is being enqueued" % server_job)
-                    return False
-                if server_job.waiting:
-                    self.log.debug("%s is waiting" % server_job)
-                    continue
-                self.log.debug("%s is not waiting" % server_job)
+        # Look up the queued merge jobs directly from ZooKeeper
+        queued_merge_jobs = list(self.merger_api._test_getMergeJobsInState())
+        # Always ignore merge jobs which are on hold
+        for job in queued_merge_jobs:
+            if job.state != MergeRequest.HOLD:
                 return False
         return True
 
@@ -5305,11 +5325,6 @@ class ZuulTestCase(BaseTestCase):
         logger("All builds waiting: %s", all_builds_waiting)
         logger("All requests completed: %s", all_node_requests_completed)
         logger("All event queues empty: %s", all_event_queues_empty)
-        for app in self.scheds.filter(matcher):
-            logger(
-                "[Sched: %s] Merge client jobs: %s",
-                app.sched, app.sched.merger.jobs
-            )
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)
