@@ -66,7 +66,8 @@ class GitConnection(BaseConnection):
 
     def getChangeFilesUpdated(self, project_name, branch, tosha):
         job = self.sched.merger.getFilesChanges(
-            self.connection_name, project_name, branch, tosha)
+            self.connection_name, project_name, branch, tosha,
+            needs_result=True)
         self.log.debug("Waiting for fileschanges job %s" % job)
         job.wait()
         if not job.updated:

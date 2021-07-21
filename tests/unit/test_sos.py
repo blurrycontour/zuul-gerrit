@@ -58,10 +58,10 @@ class TestScaleOutScheduler(ZuulTestCase):
         for app in self.scheds.instances:
             if app is self.scheds.first:
                 self.assertIsNotNone(
-                    app.sched.merger.history.get("merger:cat"))
+                    app.sched.merger.history.get("cat"))
             else:
                 # Make sure the other schedulers did not issue any cat jobs
-                self.assertIsNone(app.sched.merger.history.get("merger:cat"))
+                self.assertIsNone(app.sched.merger.history.get("cat"))
 
         self.waitUntilSettled()
         self.assertEqual(self.scheds.first.sched.globals.max_hold_expiration,
