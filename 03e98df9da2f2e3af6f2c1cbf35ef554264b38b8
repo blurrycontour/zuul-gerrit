@@ -127,6 +127,24 @@
     },
     {
       "key": {
+        "uuid": "4e5366e2_4d7cde40",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2322,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-21T11:44:17Z",
+      "side": 1,
+      "message": "AFAIK the node.name could either be a string or a list of strings. I don\u0027t know where this comes from but I stumbled over that multiple times in my last changes. There are also some Nodes in the tests defined like this, e.g. https://opendev.org/zuul/zuul/src/branch/master/tests/nodepool/test_nodepool_integration.py#L59 and https://opendev.org/zuul/zuul/src/branch/master/tests/unit/test_nodepool.py#L69",
+      "parentUuid": "1e8c279f_376f5ef7",
+      "revId": "03e98df9da2f2e3af6f2c1cbf35ef554264b38b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2eee210d_c0f3b0d5",
         "filename": "zuul/model.py",
         "patchSetId": 3
