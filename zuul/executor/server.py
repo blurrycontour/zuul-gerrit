@@ -44,8 +44,6 @@ from zuul.lib import filecomments
 from zuul.lib.keystorage import ZooKeeperKeyStorage
 from zuul.lib.varnames import check_varnames
 
-import gear
-
 import zuul.lib.repl
 import zuul.merger.merger
 import zuul.ansible.logconfig
@@ -3016,19 +3014,6 @@ class AnsibleJob(object):
         return result, code
 
 
-class ExecutorMergeWorker(gear.TextWorker):
-    def __init__(self, executor_server, *args, **kw):
-        self.zuul_executor_server = executor_server
-        super(ExecutorMergeWorker, self).__init__(*args, **kw)
-
-    def handleNoop(self, packet):
-        # Wait until the update queue is empty before responding
-        while self.zuul_executor_server.update_queue.qsize():
-            time.sleep(1)
-
-        super(ExecutorMergeWorker, self).handleNoop(packet)
-
-
 class ExecutorServer(BaseMergeServer):
     log = logging.getLogger("zuul.ExecutorServer")
     _ansible_manager_class = AnsibleManager
@@ -3242,10 +3227,6 @@ class ExecutorServer(BaseMergeServer):
     def accepting_work(self, work):
         self.component_info.accepting_work = work
 
-    def noop(self, job):
-        """A noop gearman job so we can register for statistics."""
-        job.sendWorkComplete()
-
     def start(self):
         # Start merger worker only if we process merge jobs
         if self.process_merge_jobs:
@@ -3305,9 +3286,6 @@ class ExecutorServer(BaseMergeServer):
         # it has stopped.
         self.governor_stop_event.set()
         self.governor_thread.join()
-        # Stop accepting new jobs
-        if self.merger_gearworker is not None:
-            self.merger_gearworker.gearman.setFunctions([])
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:
@@ -3337,7 +3315,7 @@ class ExecutorServer(BaseMergeServer):
         self.command_socket.stop()
 
         # All job results should have been sent by now, shutdown the
-        # gearman workers.
+        # build and merger workers.
         self.build_loop_wake_event.set()
         self.build_worker.join()
 
