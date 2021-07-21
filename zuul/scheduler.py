@@ -1341,9 +1341,6 @@ class Scheduler(threading.Thread):
 
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")
-        if self.merger.areMergesOutstanding():
-            self.log.debug("Waiting on merger")
-            return False
         waiting = False
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
