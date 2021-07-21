@@ -409,3 +409,7 @@ class MergerApi(ZooKeeperSimpleBase):
             if not data:
                 return None
             return self._bytesToDict(data)
+
+    def deleteMergeResult(self, path):
+        with suppress(NoNodeError):
+            self.kazoo_client.delete(path, recursive=True)

@@ -27,3 +27,10 @@ class BuildRequestCleanupLock(kazoo.recipe.lock.Lock):
 
     def __init__(self, client):
         super().__init__(client.client, self._path)
+
+
+class MergeRequestCleanupLock(kazoo.recipe.lock.Lock):
+    _path = '/zuul/cleanup/merge_requests'
+
+    def __init__(self, client):
+        super().__init__(client.client, self._path)
