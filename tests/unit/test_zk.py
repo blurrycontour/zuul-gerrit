@@ -20,7 +20,7 @@ import testtools
 from zuul import model
 from zuul.model import BuildRequest, HoldRequest
 from zuul.zk import ZooKeeperClient
-from zuul.zk.config_cache import UnparsedConfigCache
+from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
 from zuul.zk.layout import LayoutStateStore, LayoutState
@@ -702,3 +702,52 @@ class TestLayoutStore(ZooKeeperBaseTestCase):
         self.assertEqual(state, store["tenant"])
         self.assertNotEqual(state.ltime, -1)
         self.assertNotEqual(store["tenant"].ltime, -1)
+
+
+class TestSystemConfigCache(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.config_cache = SystemConfigCache(self.zk_client)
+
+    def test_set_get(self):
+        uac = model.UnparsedAbideConfig()
+        uac.tenants = {"foo": "bar"}
+        uac.admin_rules = ["bar", "foo"]
+        attrs = {"dead": "beef"}
+        self.config_cache.set(uac, attrs)
+
+        uac_cached, cached_attrs = self.config_cache.get()
+        self.assertEqual(uac.uuid, uac_cached.uuid)
+        self.assertEqual(uac.tenants, uac_cached.tenants)
+        self.assertEqual(uac.admin_rules, uac_cached.admin_rules)
+        self.assertEqual(attrs, cached_attrs)
+
+    def test_cache_empty(self):
+        with testtools.ExpectedException(RuntimeError):
+            self.config_cache.get()
+
+    def test_ltime(self):
+        uac = model.UnparsedAbideConfig()
+
+        self.assertEqual(self.config_cache.ltime, -1)
+
+        self.config_cache.set(uac, {})
+        self.assertGreater(self.config_cache.ltime, -1)
+        self.assertEqual(uac.ltime, self.config_cache.ltime)
+
+        old_ltime = self.config_cache.ltime
+        self.config_cache.set(uac, {})
+        self.assertGreater(self.config_cache.ltime, old_ltime)
+        self.assertEqual(uac.ltime, self.config_cache.ltime)
+
+        cache_uac, _ = self.config_cache.get()
+        self.assertEqual(uac.ltime, cache_uac.ltime)
+
+    def test_valid(self):
+        uac = model.UnparsedAbideConfig()
+
+        self.assertFalse(self.config_cache.is_valid)
+
+        self.config_cache.set(uac, {})
+        self.assertTrue(self.config_cache.is_valid)

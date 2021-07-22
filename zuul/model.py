@@ -4492,6 +4492,8 @@ class UnparsedAbideConfig(object):
     """
 
     def __init__(self):
+        self.uuid = uuid4().hex
+        self.ltime = -1
         self.tenants = {}
         self.admin_rules = []
 
@@ -4519,6 +4521,22 @@ class UnparsedAbideConfig(object):
                 self.admin_rules.append(value)
             else:
                 raise ConfigItemUnknownError(item)
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "tenants": self.tenants,
+            "admin_rules": self.admin_rules,
+        }
+
+    @classmethod
+    def fromDict(cls, data, ltime):
+        unparsed_abide = cls()
+        unparsed_abide.uuid = data["uuid"]
+        unparsed_abide.ltime = ltime
+        unparsed_abide.tenants = data["tenants"]
+        unparsed_abide.admin_rules = data["admin_rules"]
+        return unparsed_abide
 
 
 class UnparsedConfig(object):

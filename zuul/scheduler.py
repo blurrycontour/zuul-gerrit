@@ -74,7 +74,7 @@ from zuul.zk.cleanup import SemaphoreCleanupLock, BuildRequestCleanupLock
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, SchedulerComponent
 )
-from zuul.zk.config_cache import UnparsedConfigCache
+from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.event_queues import (
     EventWatcher,
     TenantManagementEventQueue,
@@ -169,6 +169,7 @@ class Scheduler(threading.Thread):
         self.component_info = SchedulerComponent(self.zk_client, self.hostname)
         self.component_info.register()
         self.component_registry = ComponentRegistry(self.zk_client)
+        self.system_config_cache = SystemConfigCache(self.zk_client)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
         # TODO (swestphahl): Remove after we've refactored reconfigurations
@@ -262,6 +263,24 @@ class Scheduler(threading.Thread):
         self.web_status_url = get_default(self.config, 'web', 'status_url', '')
         self.websocket_url = get_default(
             self.config, 'web', 'websocket_url', None)
+
+    def _getSystemConfigAttributes(self):
+        return {
+            "use_relative_priority": self.use_relative_priority,
+            "default_hold": self.default_hold,
+            "max_hold": self.max_hold,
+            "web_root": self.web_root,
+            "web_status_url": self.web_status_url,
+            "websocket_url": self.websocket_url,
+        }
+
+    def _updateSystemConfigAttributes(self, data):
+        self.use_relative_priority = data["use_relative_priority"]
+        self.default_hold = data["default_hold"]
+        self.max_hold = data["max_hold"]
+        self.web_root = data["web_root"]
+        self.web_status_url = data["web_status_url"]
+        self.websocket_url = data["websocket_url"]
 
     def start(self):
         super(Scheduler, self).start()
@@ -916,6 +935,9 @@ class Scheduler(threading.Thread):
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
+            # Cache system config in Zookeeper
+            self.system_config_cache.set(self.unparsed_abide,
+                                         self._getSystemConfigAttributes())
 
             # We need to handle new and deleted tenants, so we need to process
             # all tenants currently known and the new ones.
