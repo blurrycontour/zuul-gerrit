@@ -143,10 +143,10 @@ class Nodepool(object):
         log.info("Canceling node request %s", request)
         if not request.canceled:
             try:
+                request.canceled = True
                 self.zk_nodepool.deleteNodeRequest(request)
             except Exception:
                 log.exception("Error deleting node request:")
-            request.canceled = True
 
     def reviseRequest(self, request, relative_priority=None):
         '''Attempt to update the node request, if it is not currently being
