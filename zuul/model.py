@@ -4387,6 +4387,84 @@ class ProjectMetadata(object):
         self.queue_name = None
 
 
+class SystemAttributes:
+    """Global system attributes from the Zuul config.
+
+    Those runtime related settings are expected to be consistent on
+    all schedulers and will be synchronized via Zookeeper.
+    """
+
+    def __init__(self):
+        self.use_relative_priority = False
+        self.max_hold_expiration = 0
+        self.default_hold_expiration = 0
+        self.default_ansible_version = None
+        self.web_root = None
+        self.web_status_url = ""
+        self.websocket_url = None
+
+    @classmethod
+    def fromConfig(cls, config):
+        sys_attrs = cls()
+        sys_attrs.updateFromConfig(config)
+        return sys_attrs
+
+    def updateFromConfig(self, config):
+        """Set runtime related system attributes from config."""
+        self.use_relative_priority = False
+        if config.has_option('scheduler', 'relative_priority'):
+            if config.getboolean('scheduler', 'relative_priority'):
+                self.use_relative_priority = True
+
+        max_hold = get_default(config, 'scheduler', 'max_hold_expiration', 0)
+        default_hold = get_default(
+            config, 'scheduler', 'default_hold_expiration', max_hold)
+
+        # If the max hold is not infinite, we need to make sure that
+        # our default value does not exceed it.
+        if (max_hold and default_hold != max_hold
+                and (default_hold == 0 or default_hold > max_hold)):
+            default_hold = max_hold
+        self.max_hold_expiration = max_hold
+        self.default_hold_expiration = default_hold
+
+        # Reload the ansible manager in case the default ansible version
+        # changed.
+        self.default_ansible_version = get_default(
+            config, 'scheduler', 'default_ansible_version', None)
+
+        web_root = get_default(config, 'web', 'root', None)
+        if web_root:
+            web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
+        self.web_root = web_root
+
+        self.web_status_url = get_default(config, 'web', 'status_url', '')
+        self.websocket_url = get_default(config, 'web', 'websocket_url', None)
+
+    def toDict(self):
+        return {
+            "use_relative_priority": self.use_relative_priority,
+            "max_hold_expiration": self.max_hold_expiration,
+            "default_hold_expiration": self.default_hold_expiration,
+            "default_ansible_version": self.default_ansible_version,
+            "web_root": self.web_root,
+            "web_status_url": self.web_status_url,
+            "websocket_url": self.websocket_url,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        sys_attrs = cls()
+        sys_attrs.use_relative_priority = data["use_relative_priority"]
+        sys_attrs.max_hold_expiration = data["max_hold_expiration"]
+        sys_attrs.default_hold_expiration = data["default_hold_expiration"]
+        sys_attrs.default_ansible_version = data["default_ansible_version"]
+        sys_attrs.web_root = data["web_root"]
+        sys_attrs.web_status_url = data["web_status_url"]
+        sys_attrs.websocket_url = data["websocket_url"]
+        return sys_attrs
+
+
 # TODO(ianw) : this would clearly be better if it recorded the
 # original file and made line-relative comments, however the contexts
 # the subclasses are raised in don't have that info currently, so this

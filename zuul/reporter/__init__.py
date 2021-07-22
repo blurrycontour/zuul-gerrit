@@ -148,8 +148,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         return ret
 
     def _formatItemReportEnqueue(self, item, with_jobs=True):
-        status_url = get_default(self.connection.sched.config,
-                                 'web', 'status_url', '')
+        status_url = self.connection.sched.globals.web_status_url
         if status_url:
             status_url = item.formatUrlPattern(status_url)
 
@@ -159,8 +158,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             status_url=status_url)
 
     def _formatItemReportStart(self, item, with_jobs=True):
-        status_url = get_default(self.connection.sched.config,
-                                 'web', 'status_url', '')
+        status_url = self.connection.sched.globals.web_status_url
         if status_url:
             status_url = item.formatUrlPattern(status_url)
 

@@ -1553,7 +1553,7 @@ class TenantParser(object):
                 conf['exclude-unprotected-branches']
         if conf.get('admin-rules') is not None:
             tenant.authorization_rules = conf['admin-rules']
-        tenant.web_root = conf.get('web-root', self.scheduler.web_root)
+        tenant.web_root = conf.get('web-root', self.scheduler.globals.web_root)
         if tenant.web_root and not tenant.web_root.endswith('/'):
             tenant.web_root += '/'
         tenant.allowed_triggers = conf.get('allowed-triggers')
