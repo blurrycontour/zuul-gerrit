@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eafd95f_5e0c04bf",
+        "filename": "web/src/containers/build/BuildTable.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-07-22T14:47:35Z",
+      "side": 1,
+      "message": "Perhaps this needs to be `builds.map` ?",
+      "revId": "38241ad29ac1b45ac6b724e1505cd751f53e9fd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
