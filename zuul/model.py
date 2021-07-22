@@ -4403,6 +4403,18 @@ class SystemAttributes:
         self.web_status_url = ""
         self.websocket_url = None
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return (
+            self.use_relative_priority == other.use_relative_priority
+            and self.max_hold_expiration == other.max_hold_expiration
+            and self.default_hold_expiration == other.default_hold_expiration
+            and self.default_ansible_version == other.default_ansible_version
+            and self.web_root == other.web_root
+            and self.web_status_url == other.web_status_url
+            and self.websocket_url == other.websocket_url)
+
     @classmethod
     def fromConfig(cls, config):
         sys_attrs = cls()
@@ -4572,6 +4584,8 @@ class UnparsedAbideConfig(object):
     """
 
     def __init__(self):
+        self.uuid = uuid4().hex
+        self.ltime = -1
         self.tenants = {}
         self.admin_rules = []
 
@@ -4599,6 +4613,22 @@ class UnparsedAbideConfig(object):
                 self.admin_rules.append(value)
             else:
                 raise ConfigItemUnknownError(item)
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "tenants": self.tenants,
+            "admin_rules": self.admin_rules,
+        }
+
+    @classmethod
+    def fromDict(cls, data, ltime):
+        unparsed_abide = cls()
+        unparsed_abide.uuid = data["uuid"]
+        unparsed_abide.ltime = ltime
+        unparsed_abide.tenants = data["tenants"]
+        unparsed_abide.admin_rules = data["admin_rules"]
+        return unparsed_abide
 
 
 class UnparsedConfig(object):

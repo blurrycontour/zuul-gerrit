@@ -78,7 +78,7 @@ from zuul.zk.cleanup import (
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, SchedulerComponent
 )
-from zuul.zk.config_cache import UnparsedConfigCache
+from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.event_queues import (
     EventWatcher,
     TenantManagementEventQueue,
@@ -173,6 +173,7 @@ class Scheduler(threading.Thread):
         self.component_info = SchedulerComponent(self.zk_client, self.hostname)
         self.component_info.register()
         self.component_registry = ComponentRegistry(self.zk_client)
+        self.system_config_cache = SystemConfigCache(self.zk_client)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
         # TODO (swestphahl): Remove after we've refactored reconfigurations
@@ -902,6 +903,8 @@ class Scheduler(threading.Thread):
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
+            # Cache system config in Zookeeper
+            self.system_config_cache.set(self.unparsed_abide, self.globals)
 
             # We need to handle new and deleted tenants, so we need to process
             # all tenants currently known and the new ones.
