@@ -23,7 +23,6 @@ import sys
 import threading
 import time
 import traceback
-import urllib
 import uuid
 from collections import defaultdict
 
@@ -67,6 +66,7 @@ from zuul.model import (
     TenantReconfigureEvent,
     TimeDataBase,
     UnparsedAbideConfig,
+    SystemAttributes,
     STATE_FAILED,
 )
 from zuul.zk import ZooKeeperClient
@@ -219,19 +219,10 @@ class Scheduler(threading.Thread):
         else:
             self.zuul_version = zuul_version.release_string
         self.last_reconfigured = None
-        self.use_relative_priority = False
-        if self.config.has_option('scheduler', 'relative_priority'):
-            if self.config.getboolean('scheduler', 'relative_priority'):
-                self.use_relative_priority = True
-        web_root = get_default(self.config, 'web', 'root', None)
-        if web_root:
-            web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
-        self.web_root = web_root
 
-        default_ansible_version = get_default(
-            self.config, 'scheduler', 'default_ansible_version', None)
+        self.globals = SystemAttributes.fromConfig(self.config)
         self.ansible_manager = AnsibleManager(
-            default_version=default_ansible_version)
+            default_version=self.globals.default_ansible_version)
 
         if not testonly:
             self.executor = self._executor_client_class(self.config, self)
@@ -665,25 +656,15 @@ class Scheduler(threading.Thread):
         request.reason = reason
         request.max_count = count
 
-        max_hold = get_default(
-            self.config, 'scheduler', 'max_hold_expiration', 0)
-        default_hold = get_default(
-            self.config, 'scheduler', 'default_hold_expiration', max_hold)
-
-        # If the max hold is not infinite, we need to make sure that
-        # our default value does not exceed it.
-        if max_hold and default_hold != max_hold and (default_hold == 0 or
-                                                      default_hold > max_hold):
-            default_hold = max_hold
-
         # Set node_hold_expiration to default if no value is supplied
         if node_hold_expiration is None:
-            node_hold_expiration = default_hold
+            node_hold_expiration = self.globals.default_hold_expiration
 
         # Reset node_hold_expiration to max if it exceeds the max
-        elif max_hold and (node_hold_expiration == 0 or
-                           node_hold_expiration > max_hold):
-            node_hold_expiration = max_hold
+        elif self.globals.max_hold_expiration and (
+                node_hold_expiration == 0 or
+                node_hold_expiration > self.globals.max_hold_expiration):
+            node_hold_expiration = self.globals.max_hold_expiration
 
         request.node_expiration = node_hold_expiration
 
@@ -890,16 +871,14 @@ class Scheduler(threading.Thread):
         # a request
         reconfigured_tenants = []
         with self.layout_lock:
-            self.config = self._zuul_app.config
             self.log.info("Reconfiguration beginning (smart=%s)", event.smart)
             start = time.monotonic()
 
-            # Reload the ansible manager in case the default ansible version
-            # changed.
-            default_ansible_version = get_default(
-                self.config, 'scheduler', 'default_ansible_version', None)
+            # Update runtime related system attributes from config
+            self.config = self._zuul_app.config
+            self.globals = SystemAttributes.fromConfig(self.config)
             self.ansible_manager = AnsibleManager(
-                default_version=default_ansible_version)
+                default_version=self.globals.default_ansible_version)
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
@@ -1940,9 +1919,7 @@ class Scheduler(threading.Thread):
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
         data = {}
-
         data['zuul_version'] = self.zuul_version
-        websocket_url = get_default(self.config, 'web', 'websocket_url', None)
 
         data['trigger_event_queue'] = {}
         data['trigger_event_queue']['length'] = len(
@@ -1981,7 +1958,7 @@ class Scheduler(threading.Thread):
         result_event_queues = self.pipeline_result_events[tenant_name]
         management_event_queues = self.pipeline_management_events[tenant_name]
         for pipeline in tenant.layout.pipelines.values():
-            status = pipeline.formatStatusJSON(websocket_url)
+            status = pipeline.formatStatusJSON(self.globals.websocket_url)
             status['trigger_events'] = len(
                 trigger_event_queues[pipeline.name])
             status['result_events'] = len(
