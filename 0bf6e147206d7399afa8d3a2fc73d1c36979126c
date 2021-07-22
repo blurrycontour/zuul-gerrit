@@ -144,6 +144,24 @@
     },
     {
       "key": {
+        "uuid": "e93d5db8_42744f01",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T22:16:14Z",
+      "side": 1,
+      "message": "Yes. In my mind there are two ways you hit this exception. The first is the one that is handled fine which is where we overwrite data with identical data because you are restoring what is already there. The other is if a project\u0027s secrets update for whatever reason and then you restore from backup you probably don\u0027t want it to implicitly overwrite what was there.\n\nInstead, you should be given the option to say \"no I really want the old stuff because the new stuff is bad\".",
+      "parentUuid": "5c5e0216_0a6aef5b",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3bfc0414_a68dd22f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -172,6 +190,24 @@
       "writtenOn": "2021-07-22T22:09:33Z",
       "side": 1,
       "message": "Yeah, I\u0027ve been toying around with that as well.  I think the only thing this has going for it is the ease with which keys could be added or removed.  But a sufficiently clever operator can perform JSON surgery if necessary.\n\nI\u0027m open to this idea.",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe027aa6_db757d63",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T22:16:14Z",
+      "side": 1,
+      "message": "Another thought that occured to me from this is it might be nice to keep checksums of the individual bits of data and having things split out into files like that might make that easier? Then you know what specific thing is corrupted if that happens rather than the entire dataset and needing to sift through it.",
+      "parentUuid": "ee0c0a53_b708b573",
       "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
