@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a13de6f_7ee921e6",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 863,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T20:55:01Z",
+      "side": 1,
+      "message": "Would it make sense to have UnparsedConfigCache.__init__ take a config_root argument to set these values? Then you don\u0027t have to override them out of band after init is called.",
+      "revId": "0d7b1578f0f37b1f40ab02ef0932e7e8b5489e36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
