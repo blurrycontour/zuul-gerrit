@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf600ad3_ad195c25",
+        "filename": "web/src/containers/filters/Select.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-07-22T16:02:11Z",
+      "side": 1,
+      "message": "Should this be set to false?",
+      "revId": "3795b2c67a2537d29a0d289ac1a3bdbe59999533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
