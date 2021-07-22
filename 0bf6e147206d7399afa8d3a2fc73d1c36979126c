@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "e98309a7_8815eceb",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-22T22:09:33Z",
+      "side": 1,
+      "message": "Oh, this is just a poorly named test method now.  \"backup\" referred to the backup key store, ie, the filesystem based one.  It\u0027s gone.  So the only keystore functionality left to test is without backup.  I can rename this to \"test_keystore\" or something.\n\nAnd yes, now *almost* every test is using the import functionality implicitly.  There are some tests which generate keys.  They were never in this file.",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4044b57b_898cf9c6",
         "filename": "zuul/cmd/scheduler.py",
         "patchSetId": 3
@@ -42,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "0f07dcdc_d92c351a",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-22T22:09:33Z",
+      "side": 1,
+      "message": "Correct; existing commands don\u0027t have path arguments.\n\nA better commit message would have said something like:\n  Converted existing zuul-scheduler command arguments to \u0027subcommands\u0027 for consistency with new import-keys and export-keys commands.",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5e90850f_dbd54af9",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 3
@@ -56,6 +90,23 @@
       "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d3aad5c6_d2681377",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-22T22:09:33Z",
+      "side": 1,
+      "message": "Good point; we should get that information into stderr.",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -76,6 +127,23 @@
     },
     {
       "key": {
+        "uuid": "5c5e0216_0a6aef5b",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-22T22:09:33Z",
+      "side": 1,
+      "message": "To be clear: are you suggesting that the default mode should be to refuse to overwrite existing keys in ZK, and then only if --force is added, then we would allow that?\n\n(Note that at the moment there is not yet a way to delete all the keys from ZK, but that\u0027s on the to-do list).",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3bfc0414_a68dd22f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -93,6 +161,23 @@
     },
     {
       "key": {
+        "uuid": "ee0c0a53_b708b573",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-22T22:09:33Z",
+      "side": 1,
+      "message": "Yeah, I\u0027ve been toying around with that as well.  I think the only thing this has going for it is the ease with which keys could be added or removed.  But a sufficiently clever operator can perform JSON surgery if necessary.\n\nI\u0027m open to this idea.",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "655d431c_343c5975",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -107,6 +192,23 @@
       "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f92a506e_11125e51",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2035,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-22T22:09:33Z",
+      "side": 1,
+      "message": "++",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
