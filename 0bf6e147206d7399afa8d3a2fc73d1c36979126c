@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "53bc8be3_d5ffb0f8",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T21:42:59Z",
+      "side": 1,
+      "message": "Would it make sense to test from a backup explicitly as well? I think the fixtures are set up such that every test is doing this but not explicitly.",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4044b57b_898cf9c6",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T21:42:59Z",
+      "side": 1,
+      "message": "Are we not adding the new commands to this list so that you can add the path arguments below?",
+      "range": {
+        "startLine": 47,
+        "startChar": 23,
+        "endLine": 47,
+        "endChar": 46
+      },
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e90850f_dbd54af9",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T21:42:59Z",
+      "side": 1,
+      "message": "Might want to record that the walk and consequently the export had errors somewhere? That way operators can see the export may have problems that need to be addressed?",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d372b34_0a8c2d11",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T21:42:59Z",
+      "side": 1,
+      "message": "Having a force flag might be a good idea here so that users can avoid restoring from a stale backup?",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bfc0414_a68dd22f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T21:42:59Z",
+      "side": 1,
+      "message": "Writing a separate file for each record isn\u0027t a regression on how it was working before. I wonder if it might be simpler for users to have an aggregated serialization of some sort. Like a list of objects in a single json file ?",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "655d431c_343c5975",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2035,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-22T21:42:59Z",
+      "side": 1,
+      "message": "This is an important string update. I wonder if we should explicitly test the case where path is provided without a trailing \u0027/\u0027 and with one?",
+      "revId": "0bf6e147206d7399afa8d3a2fc73d1c36979126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
