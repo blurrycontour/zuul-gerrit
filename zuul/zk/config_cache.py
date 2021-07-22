@@ -21,6 +21,7 @@ from urllib.parse import quote_plus, unquote_plus
 
 from kazoo.exceptions import NoNodeError
 
+from zuul import model
 from zuul.zk import sharding, ZooKeeperSimpleBase
 
 
@@ -168,3 +169,48 @@ class UnparsedConfigCache(ZooKeeperSimpleBase):
             path = _safe_path(self.cache_path, project_cname, branch_name)
         with contextlib.suppress(NoNodeError):
             self.kazoo_client.delete(path, recursive=True)
+
+
+class SystemConfigCache(ZooKeeperSimpleBase):
+
+    SYSTEM_ROOT = "/zuul/system"
+    log = logging.getLogger("zuul.zk.SystemConfigCache")
+
+    def __init__(self, client):
+        super().__init__(client)
+        self.conf_path = f"{self.SYSTEM_ROOT}/conf"
+        self.lock_path = f"{self.SYSTEM_ROOT}/conf-lock"
+
+    @property
+    def ltime(self):
+        with self.kazoo_client.ReadLock(self.lock_path):
+            zstat = self.kazoo_client.exists(self.conf_path)
+        return -1 if zstat is None else zstat.last_modified_transaction_id
+
+    @property
+    def is_valid(self):
+        return self.ltime > 0
+
+    def get(self):
+        with self.kazoo_client.ReadLock(self.lock_path):
+            try:
+                with sharding.BufferedShardReader(
+                    self.kazoo_client, self.conf_path
+                ) as stream:
+                    data = json.loads(stream.read())
+            except Exception:
+                raise RuntimeError("No valid system config")
+            return (model.UnparsedAbideConfig.fromDict(data["unparsed_abide"]),
+                    data["system_attributes"])
+
+    def set(self, unparsed_abide, system_attributes):
+        with self.kazoo_client.WriteLock(self.lock_path):
+            data = {
+                "unparsed_abide": unparsed_abide.toDict(),
+                "system_attributes": system_attributes,
+            }
+            with sharding.BufferedShardWriter(
+                self.kazoo_client, self.conf_path
+            ) as stream:
+                stream.truncate(0)
+                stream.write(json.dumps(data).encode("utf8"))
