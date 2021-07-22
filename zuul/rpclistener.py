@@ -330,7 +330,7 @@ class RPCListener(RPCListenerBase):
 
     def handle_tenant_list(self, job):
         output = []
-        for tenant_name, tenant in self.sched.abide.tenants.items():
+        for tenant_name, tenant in sorted(self.sched.abide.tenants.items()):
             queue_size = 0
             for pipeline_name, pipeline in tenant.layout.pipelines.items():
                 for queue in pipeline.queues:
