@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1efe676d_da6461dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-23T22:24:32Z",
+      "side": 1,
+      "message": "Indeed I had the same thought -- I did move all of the reportBuildEnd calls into the scheduler (though there\u0027s still more than one because of the way the scheduler sometimes forces builds to end out of the normal sequence).\n\nThe buildset end calls are still spread across both files though; I don\u0027t see a way to coalesce them at the moment.",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "69703cf1_25465fd5",
         "filename": "tests/base.py",
         "patchSetId": 2
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "303e5b56_d917a824",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4507,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-23T22:24:32Z",
+      "side": 1,
+      "message": "No problem; they don\u0027t use any other kind of connection.  In fact, this aligns the tests with what we actually specify in cmd/executor.py.  We should have done this all along.",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c49f3244_bc06a59e",
         "filename": "tests/base.py",
         "patchSetId": 2
@@ -50,6 +84,23 @@
       "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09a5fc51_fa9ed4ae",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4841,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-23T22:24:32Z",
+      "side": 1,
+      "message": "Er, copy-pasta from elsewhere in the test suite; I assume the author had a good reason.  That doesn\u0027t appear to be the case and this can be removed.",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
