@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46efaffb_cf9ac0cf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-23T22:18:03Z",
+      "side": 1,
+      "message": "Is there a reason to not have the scheduler do all of the reporting? Seems like that might simplify things a bit if we can keep it all in one place?",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69703cf1_25465fd5",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4507,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-23T22:18:03Z",
+      "side": 1,
+      "message": "Is it a problem to always only load source only connections for the executors? It seems that this is what this change will do since this is a base test class?",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c49f3244_bc06a59e",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4841,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-23T22:18:03Z",
+      "side": 1,
+      "message": "Why wrap the table in a list? You just want the rows from a single table right?",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b4661ee1_685bf495",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4851,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-23T22:18:03Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "2a79191b8600dfa74cac74239a7b4e8c45666b70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
