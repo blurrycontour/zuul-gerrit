@@ -60,7 +60,7 @@ class PipelineManager(metaclass=ABCMeta):
         self.ref_filters = []
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
-        self.sql = self.sched.connections.getSqlReporter(pipeline)
+        self.sql = self.sched.sql
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -196,7 +196,7 @@ class PipelineManager(metaclass=ABCMeta):
                 )
         # This might be called after canceljobs, which also sets a
         # non-final 'cancel' result.
-        self.sql.reportBuildsetEnd(item.current_build_set, 'cancel',
+        self.sql.reportBuildsetEnd(item.current_build_set, 'dequeue',
                                    final=False)
 
     def sendReport(self, action_reporters, item, message=None):
@@ -554,6 +554,7 @@ class PipelineManager(metaclass=ABCMeta):
         # Without this check, all items with a valid result would be reported
         # twice.
         if not item.current_build_set.result and item.live:
+            item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
 
     def removeItem(self, item):
@@ -716,8 +717,11 @@ class PipelineManager(metaclass=ABCMeta):
         # reported immediately afterwards during queue processing.
         if (prime and item.current_build_set.ref and not
                 item.didBundleStartReporting()):
+            # Force a dequeued result here because we haven't actually
+            # reported the item, but we are done with this buildset.
             self.sql.reportBuildsetEnd(
-                item.current_build_set, 'dequeue', final=False)
+                item.current_build_set, 'dequeue', final=False,
+                result='DEQUEUED')
             item.resetAllBuilds()
 
         for job in jobs_to_cancel:
@@ -1422,7 +1426,6 @@ class PipelineManager(metaclass=ABCMeta):
         item = build.build_set.item
 
         log.debug("Build %s of %s completed" % (build, item.change))
-        self.sql.reportBuildEnd(build, final=(not build.retry))
         item.pipeline.tenant.semaphore_handler.release(item, build.job)
 
         if item.getJob(build.job.name) is None:

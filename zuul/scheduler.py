@@ -145,6 +145,7 @@ class Scheduler(threading.Thread):
 
         self._zuul_app = app
         self.connections = connections
+        self.sql = self.connections.getSqlReporter(None)
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
         self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
@@ -1124,6 +1125,13 @@ class Scheduler(threading.Thread):
                             item.getJob(request_job),
                         )
                     )
+                try:
+                    self.sql.reportBuildsetEnd(
+                        item.current_build_set, 'dequeue',
+                        final=False, result='DEQUEUED')
+                except Exception:
+                    self.log.exception(
+                        "Error reporting buildset completion to DB:")
 
             for build in builds_to_cancel:
                 self.log.info(
@@ -1216,6 +1224,13 @@ class Scheduler(threading.Thread):
                             item.getJob(request_job),
                         )
                     )
+                try:
+                    self.sql.reportBuildsetEnd(
+                        item.current_build_set, 'dequeue',
+                        final=False, result='DEQUEUED')
+                except Exception:
+                    self.log.exception(
+                        "Error reporting buildset completion to DB:")
 
             for build in builds_to_cancel:
                 self.log.info(
@@ -1826,6 +1841,11 @@ class Scheduler(threading.Thread):
         # internal dict after it's added to the report queue.
         self.executor.removeBuild(build)
 
+        try:
+            self.sql.reportBuildEnd(build, final=(not build.retry))
+        except Exception:
+            log.exception("Error reporting build completion to DB:")
+
         if build.build_set is not build.build_set.item.current_build_set:
             log.debug("Build %s is not in the current build set", build)
             return
@@ -2054,6 +2074,12 @@ class Scheduler(threading.Thread):
                         del self.executor.builds[build.uuid]
                     except KeyError:
                         pass
+                    try:
+                        self.sql.reportBuildEnd(build, final=False)
+                    except Exception:
+                        self.log.exception(
+                            "Error reporting build completion to DB:")
+
             else:
                 nodeset = buildset.getJobNodeSet(job_name)
                 if nodeset:

@@ -90,7 +90,7 @@ class SQLReporter(BaseReporter):
             )
             return db_buildset
 
-    def reportBuildsetEnd(self, buildset, action, final):
+    def reportBuildsetEnd(self, buildset, action, final, result=None):
         if not buildset.uuid:
             return
         if final:
@@ -102,7 +102,7 @@ class SQLReporter(BaseReporter):
             db_buildset = db.getBuildset(
                 tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
             if db_buildset:
-                db_buildset.result = buildset.result
+                db_buildset.result = buildset.result or result
                 db_buildset.message = message
             elif buildset.builds:
                 self.log.error("Unable to find buildset "

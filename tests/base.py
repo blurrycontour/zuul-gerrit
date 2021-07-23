@@ -66,6 +66,7 @@ from git.util import IterableList
 import yaml
 import paramiko
 import prometheus_client.exposition
+import sqlalchemy
 
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import (
@@ -4143,7 +4144,7 @@ class SymLink(object):
 class SchedulerTestApp:
     def __init__(self, log, config, changes, additional_event_queues,
                  upstream_root, rpcclient, poller_events,
-                 git_url_with_auth, source_only, fake_sql,
+                 git_url_with_auth, fake_sql,
                  add_cleanup, validate_tenants, instance_id):
         self.log = log
         self.config = config
@@ -4162,7 +4163,7 @@ class SchedulerTestApp:
             add_cleanup,
             fake_sql,
         )
-        self.connections.configure(self.config, source_only=source_only)
+        self.connections.configure(self.config)
 
         self.sched = TestScheduler(self.config, self.connections, self)
         self.sched.log = logging.getLogger(f"zuul.Scheduler-{instance_id}")
@@ -4212,7 +4213,7 @@ class SchedulerTestManager:
 
     def create(self, log, config, changes, additional_event_queues,
                upstream_root, rpcclient, poller_events,
-               git_url_with_auth, source_only, fake_sql, add_cleanup,
+               git_url_with_auth, fake_sql, add_cleanup,
                validate_tenants):
         # Since the config contains a regex we cannot use copy.deepcopy()
         # as this will raise an exception with Python <3.7
@@ -4233,7 +4234,7 @@ class SchedulerTestManager:
         app = SchedulerTestApp(log, scheduler_config, changes,
                                additional_event_queues, upstream_root,
                                rpcclient, poller_events,
-                               git_url_with_auth, source_only,
+                               git_url_with_auth,
                                fake_sql, add_cleanup,
                                validate_tenants, instance_id)
         self.instances.append(app)
@@ -4346,7 +4347,6 @@ class ZuulTestCase(BaseTestCase):
     use_ssl: bool = False
     git_url_with_auth: bool = False
     log_console_port: int = 19885
-    source_only: bool = False
     fake_sql: bool = False
     validate_tenants = None
 
@@ -4504,7 +4504,7 @@ class ZuulTestCase(BaseTestCase):
             self.upstream_root, self.rpcclient, self.poller_events,
             self.git_url_with_auth, self.addCleanup, True)
         executor_connections.configure(self.config,
-                                       source_only=self.source_only)
+                                       source_only=True)
         self.executor_api = TestingExecutorApi(self.zk_client)
         self.executor_server = RecordingExecutorServer(
             self.config,
@@ -4522,7 +4522,7 @@ class ZuulTestCase(BaseTestCase):
         self.scheds.create(
             self.log, self.config, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
-            self.poller_events, self.git_url_with_auth, self.source_only,
+            self.poller_events, self.git_url_with_auth,
             self.fake_sql, self.addCleanup, self.validate_tenants)
 
         self.merge_server = None
@@ -4830,6 +4830,32 @@ class ZuulTestCase(BaseTestCase):
                 with open(os.path.join(root, fn)) as f:
                     self.assertTrue(f.read() in test_keys)
 
+    def assertSQLState(self):
+        reporter = self.scheds.first.connections.getSqlReporter(None)
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+
+            try:
+                result = conn.execute(
+                    sqlalchemy.sql.select([
+                        reporter.connection.zuul_buildset_table])
+                )
+            except sqlalchemy.exc.ProgrammingError:
+                # Table doesn't exist
+                return
+
+            for buildset in result.fetchall():
+                self.assertIsNotNone(buildset.result)
+
+            result = conn.execute(
+                sqlalchemy.sql.select([reporter.connection.zuul_build_table])
+            )
+
+            for build in result.fetchall():
+                self.assertIsNotNone(build.result)
+                self.assertIsNotNone(build.start_time)
+                self.assertIsNotNone(build.end_time)
+
     def assertFinalState(self):
         self.log.debug("Assert final state")
         # Make sure no jobs are running
@@ -4847,6 +4873,7 @@ class ZuulTestCase(BaseTestCase):
         self.assertEmptyQueues()
         self.assertNodepoolState()
         self.assertNoGeneratedKeys()
+        self.assertSQLState()
         ipm = zuul.manager.independent.IndependentPipelineManager
         for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
