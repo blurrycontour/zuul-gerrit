@@ -32,9 +32,9 @@ from tests.base import (
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
-from zuul.executor.server import AnsibleJob, squash_variables
+from zuul.executor.server import AnsibleJob, JobDir, squash_variables
 from zuul.lib.ansible import AnsibleManager
-from zuul.model import BuildRequest
+from zuul.model import BuildRequest, NodeSet, Group
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -456,59 +456,86 @@ class TestAnsibleJob(ZuulTestCase):
         )
 
         self.test_job = AnsibleJob(self.executor_server, build_request, params)
+        self.test_job.jobdir = JobDir(self.executor_server.jobdir_root,
+                                      self.executor_server.keep_jobdir,
+                                      str(build_request.uuid))
 
-    def test_getHostList_host_keys(self):
+    def test_prepareNodes_host_keys(self):
         # Test without connection_port set
         node = {'name': 'fake-host',
+                'label': 'fake-label',
+                'state': 'ready',
+                'cloud': 'fake',
                 'host_keys': ['fake-host-key'],
                 'interface_ip': 'localhost'}
-        keys = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]['host_keys']
+        nodeset = {
+            "name": "dummy-node",
+            "node_request_id": 0,
+            "nodes": [node],
+            "groups": [],
+        }
+        self.test_job.nodeset = NodeSet.fromDict(nodeset)
+        self.test_job.prepareNodes({'host_vars': {},
+                                    'vars': {},
+                                    'groups': [],
+                                    })
+        keys = self.test_job.host_list[0]['host_keys']
         self.assertEqual(keys[0], 'localhost fake-host-key')
 
         # Test with custom connection_port set
         node['connection_port'] = 22022
-        keys = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]['host_keys']
+        self.test_job.nodeset = NodeSet.fromDict(nodeset)
+        self.test_job.prepareNodes({'host_vars': {},
+                                    'vars': {},
+                                    'groups': [],
+                                    })
+        keys = self.test_job.host_list[0]['host_keys']
         self.assertEqual(keys[0], '[localhost]:22022 fake-host-key')
 
         # Test with no host keys
         node['host_keys'] = []
-        host = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]
+        self.test_job.nodeset = NodeSet.fromDict(nodeset)
+        self.test_job.prepareNodes({'nodes': [node],
+                                    'host_vars': {},
+                                    'vars': {},
+                                    'groups': [],
+                                    })
+        host = self.test_job.host_list[0]
         self.assertEqual(host['host_keys'], [])
         self.assertEqual(
             host['host_vars']['ansible_ssh_common_args'],
             '-o StrictHostKeyChecking=false')
 
-    def test_getHostList_shell_type(self):
+    def test_prepareNodes_shell_type(self):
         # Test without shell type set
         node = {'name': 'fake-host',
+                'label': 'fake-label',
+                'state': 'ready',
+                'cloud': 'fake',
                 'host_keys': ['fake-host-key'],
                 'interface_ip': 'localhost'}
-        host = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]
+        nodeset = {
+            "name": "dummy-node",
+            "node_request_id": 0,
+            "nodes": [node],
+            "groups": [],
+        }
+        self.test_job.nodeset = NodeSet.fromDict(nodeset)
+        self.test_job.prepareNodes({'host_vars': {},
+                                    'vars': {},
+                                    'groups': [],
+                                    })
+        host = self.test_job.host_list[0]
         self.assertNotIn('ansible_shell_type', host['host_vars'])
 
         # Test with custom shell type set.
         node['shell_type'] = 'cmd'
-        host = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]
+        self.test_job.nodeset = NodeSet.fromDict(nodeset)
+        self.test_job.prepareNodes({'host_vars': {},
+                                    'vars': {},
+                                    'groups': [],
+                                    })
+        host = self.test_job.host_list[0]
         self.assertIn('ansible_shell_type', host['host_vars'])
         self.assertEqual(
             host['host_vars']['ansible_shell_type'],
@@ -978,6 +1005,7 @@ class TestExecutorExtraPackages(AnsibleZuulTestCase):
 class TestVarSquash(BaseTestCase):
     def test_squash_variables(self):
         # Test that we correctly squash job variables
+        nodeset = NodeSet()
         nodes = [
             {'name': 'node1', 'host_vars': {
                 'host': 'node1_host',
@@ -988,10 +1016,8 @@ class TestVarSquash(BaseTestCase):
                 'extra': 'node2_extra',
             }},
         ]
-        groups = [
-            {'name': 'group1', 'nodes': ['node1']},
-            {'name': 'group2', 'nodes': ['node2']},
-        ]
+        nodeset.addGroup(Group('group1', ['node1']))
+        nodeset.addGroup(Group('group2', ['node2']))
         groupvars = {
             'group1': {
                 'host': 'group1_host',
@@ -1017,7 +1043,7 @@ class TestVarSquash(BaseTestCase):
             'extra': 'extravar_extra',
         }
         out = squash_variables(
-            nodes, groups, jobvars, groupvars, extravars)
+            nodes, nodeset, jobvars, groupvars, extravars)
 
         expected = {
             'node1': {
