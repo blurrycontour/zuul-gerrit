@@ -539,17 +539,16 @@ class TestMultipleGerrits(ZuulTestCase):
 class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
-    source_only = True
 
     def test_connections_merger(self):
         "Test merger only configures source connections"
 
-        self.assertIn("gerrit", self.scheds.first.connections.connections)
-        self.assertIn("github", self.scheds.first.connections.connections)
-        self.assertNotIn("smtp", self.scheds.first.connections.connections)
-        self.assertNotIn("sql", self.scheds.first.connections.connections)
-        self.assertNotIn("timer", self.scheds.first.connections.connections)
-        self.assertNotIn("zuul", self.scheds.first.connections.connections)
+        self.assertIn("gerrit", self.executor_server.connections.connections)
+        self.assertIn("github", self.executor_server.connections.connections)
+        self.assertNotIn("smtp", self.executor_server.connections.connections)
+        self.assertNotIn("sql", self.executor_server.connections.connections)
+        self.assertNotIn("timer", self.executor_server.connections.connections)
+        self.assertNotIn("zuul", self.executor_server.connections.connections)
 
 
 class TestConnectionsCgit(ZuulTestCase):
