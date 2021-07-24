@@ -17,13 +17,15 @@ import logging
 import socket
 import threading
 from configparser import ConfigParser
-from typing import Optional, Tuple
+from typing import Optional
 
 import zuul.rpcclient
 from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
+from zuul.lib.config import get_default
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import FingerGatewayComponent
+
 
 COMMANDS = ['stop']
 
@@ -106,9 +108,6 @@ class FingerGateway(object):
     def __init__(
         self,
         config: ConfigParser,
-        gearman: Tuple,
-        address: Tuple,
-        user: Optional[str],
         command_socket: Optional[str],
         pid_file: Optional[str],
     ):
@@ -124,12 +123,24 @@ class FingerGateway(object):
         :param str command_socket: Path to the daemon command socket.
         :param str pid_file: Path to the daemon PID file.
         '''
-        self.gear_server = gearman[0]
-        self.gear_port = gearman[1]
-        self.gear_ssl_key = gearman[2]
-        self.gear_ssl_cert = gearman[3]
-        self.gear_ssl_ca = gearman[4]
-        self.address = address
+
+        gear_server = get_default(config, 'gearman', 'server')
+        gear_port = get_default(config, 'gearman', 'port', 4730)
+        gear_ssl_key = get_default(config, 'gearman', 'ssl_key')
+        gear_ssl_cert = get_default(config, 'gearman', 'ssl_cert')
+        gear_ssl_ca = get_default(config, 'gearman', 'ssl_ca')
+
+        self.gear_server = gear_server
+        self.gear_port = gear_port
+        self.gear_ssl_key = gear_ssl_key
+        self.gear_ssl_cert = gear_ssl_cert
+        self.gear_ssl_ca = gear_ssl_ca
+
+        host = get_default(config, 'fingergw', 'listen_address', '::')
+        port = int(get_default(config, 'fingergw', 'port', 79))
+        user = get_default(config, 'fingergw', 'user', None)
+
+        self.address = (host, port)
         self.user = user
         self.pid_file = pid_file
 

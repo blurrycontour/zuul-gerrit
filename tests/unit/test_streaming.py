@@ -522,11 +522,15 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.addCleanup(logfile.close)
 
         # Start the finger gateway daemon
+        self.config.read_dict({
+            'fingergw': {
+                'listen_address': self.host,
+                'port': '0',
+            }
+        })
+
         gateway = FingerGateway(
             self.config,
-            ('127.0.0.1', self.gearman_server.port, None, None, None),
-            (self.host, 0),
-            user=None,
             command_socket=None,
             pid_file=None
         )
