@@ -5092,12 +5092,12 @@ class ZuulTestCase(BaseTestCase):
         return self.executor_api.hold_in_queue
 
     @hold_jobs_in_queue.setter
-    def hold_jobs_in_queue(self, hold_jobs_in_queue: bool):
-        """Helper method to set hold_in_queue on all involved BuildQueues"""
+    def hold_jobs_in_queue(self, hold_in_queue):
+        """Helper method to set hold_in_queue on all involved Executor APIs"""
 
-        self.executor_api.hold_in_queue = hold_jobs_in_queue
+        self.executor_api.hold_in_queue = hold_in_queue
         for app in self.scheds:
-            app.sched.executor.executor_api.hold_in_queue = hold_jobs_in_queue
+            app.sched.executor.executor_api.hold_in_queue = hold_in_queue
 
     @property
     def hold_merge_jobs_in_queue(self):
