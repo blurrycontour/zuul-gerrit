@@ -841,8 +841,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         result_data = {'result': 'ok'}
         server.reportResult(a, result_data)
 
-        self.assertEqual(self._get_zk_tree(client.MERGE_RESULT_ROOT),
-                         ['/zuul/merge-results/A'])
+        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_ROOT)),
+                         set(['/zuul/merge-results/A',
+                              '/zuul/merge-results/A/seq0000000000']))
         self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT),
                          ['/zuul/merge-waiters/A'])
 

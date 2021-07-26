@@ -364,7 +364,10 @@ class EventResultFuture(ZooKeeperSimpleBase):
             return False
         try:
             try:
-                data, _ = self.kazoo_client.get(self._result_path)
+                path = self._result_path
+                with sharding.BufferedShardReader(
+                        self.kazoo_client, path) as stream:
+                    data = stream.read()
                 self.data = json.loads(data.decode("utf-8"))
             except json.JSONDecodeError:
                 self.log.exception(
@@ -373,7 +376,7 @@ class EventResultFuture(ZooKeeperSimpleBase):
                 raise
         finally:
             with suppress(NoNodeError):
-                self.kazoo_client.delete(self._result_path)
+                self.kazoo_client.delete(self._result_path, recursive=True)
         return True
 
 
