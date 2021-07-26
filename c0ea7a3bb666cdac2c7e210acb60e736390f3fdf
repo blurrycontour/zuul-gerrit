@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9b64259d_322233b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T23:31:27Z",
+      "side": 1,
+      "message": "Would it make more sense to create a class and singleton object to store these attributes?  That way there\u0027s a stronger centralized API for getting and setting these values from ZK, and it\u0027s clear when we\u0027re using one of these values.  We\u0027d use them like:\n\n  formatStatusJSON(self.globals.websocket_url)\n\nThat might allow for a nicer integration with the ZK api too.",
+      "revId": "c0ea7a3bb666cdac2c7e210acb60e736390f3fdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
