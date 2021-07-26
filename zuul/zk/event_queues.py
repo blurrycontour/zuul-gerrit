@@ -353,6 +353,11 @@ class EventResultFuture(ZooKeeperSimpleBase):
         # Stop the watch if we got a result
         return False
 
+    def _read(self, path):
+        # Internal method to read the result data; may be overridden
+        # by subclasses.
+        return self.kazoo_client.get(self._result_path)[0]
+
     def wait(self, timeout=None):
         """Wait until the result for this event has been written."""
 
@@ -364,7 +369,8 @@ class EventResultFuture(ZooKeeperSimpleBase):
             return False
         try:
             try:
-                data, _ = self.kazoo_client.get(self._result_path)
+                path = self._result_path
+                data = self._read(path)
                 self.data = json.loads(data.decode("utf-8"))
             except json.JSONDecodeError:
                 self.log.exception(
@@ -373,7 +379,7 @@ class EventResultFuture(ZooKeeperSimpleBase):
                 raise
         finally:
             with suppress(NoNodeError):
-                self.kazoo_client.delete(self._result_path)
+                self.kazoo_client.delete(self._result_path, recursive=True)
         return True
 
 
@@ -391,6 +397,10 @@ class MergerEventResultFuture(EventResultFuture):
         self.files = None
         self.repo_state = None
         self.item_in_branches = None
+
+    def _read(self, path):
+        with sharding.BufferedShardReader(self.kazoo_client, path) as stream:
+            return stream.read()
 
     def wait(self, timeout=None):
         try:

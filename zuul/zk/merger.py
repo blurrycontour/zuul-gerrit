@@ -256,11 +256,14 @@ class MergerApi(ZooKeeperSimpleBase):
             )
 
     def reportResult(self, merge_request, result):
-        self.kazoo_client.create(
-            merge_request.result_path,
-            self._dictToBytes(result),
-            makepath=True,
-        )
+        tr = self.kazoo_client.transaction()
+
+        path = merge_request.result_path
+        tr.create(path)
+        path += '/seq'
+        with sharding.BufferedShardWriter(tr, path) as stream:
+            stream.write(self._dictToBytes(result))
+        self.client.commitTransaction(tr)
 
     def get(self, path):
         """Get a merge request
