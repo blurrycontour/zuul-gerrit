@@ -11,8 +11,8 @@ walk through setting up a basic gating configuration which protects
 projects from merging broken code.
 
 This tutorial is entirely self-contained and may safely be run on a
-workstation.  The only requirements are a network connection and the
-ability to run Docker containers.
+workstation.  The only requirements are a network connection, the
+ability to run Docker containers, and at least 2GiB of RAM.
 
 This tutorial supplies a working Gerrit for code review, though the
 concepts you will learn apply equally to GitHub.
@@ -49,6 +49,7 @@ Before you start, ensure that some needed packages are installed.
 
    # Ubuntu / Debian:
 
+   sudo apt-get update
    sudo apt-get install docker-compose docker.io git python3-pip
    sudo python3 -m pip install git-review
 
