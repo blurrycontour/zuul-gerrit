@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6cc4ca7a_d825ab27",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3201,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T20:48:53Z",
+      "side": 1,
+      "message": "This should use _test_getMergeJobsInState to avoid races.",
+      "revId": "1d07501bb65bd9dba11eef7310cac15a20efd79d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "110fdbb4_a49ffb1d",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5208,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T20:48:53Z",
+      "side": 1,
+      "message": "When you switch all() to use _test_getMergeJobsInState, you can switch this to use all()",
+      "revId": "1d07501bb65bd9dba11eef7310cac15a20efd79d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "db2f1936_76002313",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T20:48:53Z",
+      "side": 1,
+      "message": "This mutates a supplied argument.  I don\u0027t think we should do that.  Why not add this as an extra parameter to the merge request rather than updating the data?",
+      "revId": "1d07501bb65bd9dba11eef7310cac15a20efd79d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "77d2c8a3_813a7849",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T20:48:53Z",
+      "side": 1,
+      "message": "If we unlock before deleting, we definitely need to update the state, otherwise another merger could start processing this.\n\nHowever, we can delete before unlocking, which will avoid that case and be more efficient.\n\nThere could still be a case where the merger crashes after submitting the complete event and before deleting.  We can ignore that case (there will be a duplicate result) or we write the result, delete, and even unlock all within a transaction.",
+      "revId": "1d07501bb65bd9dba11eef7310cac15a20efd79d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
