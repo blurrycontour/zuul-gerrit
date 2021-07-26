@@ -70,7 +70,9 @@ from zuul.model import (
     STATE_FAILED,
 )
 from zuul.zk import ZooKeeperClient
-from zuul.zk.cleanup import SemaphoreCleanupLock, BuildRequestCleanupLock
+from zuul.zk.cleanup import (
+    SemaphoreCleanupLock, BuildRequestCleanupLock, MergeRequestCleanupLock
+)
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, SchedulerComponent
 )
@@ -124,6 +126,7 @@ class Scheduler(threading.Thread):
     _semaphore_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _config_cache_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _build_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
+    _merge_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
 
@@ -198,6 +201,8 @@ class Scheduler(threading.Thread):
 
         self.semaphore_cleanup_lock = SemaphoreCleanupLock(self.zk_client)
         self.build_request_cleanup_lock = BuildRequestCleanupLock(
+            self.zk_client)
+        self.merge_request_cleanup_lock = MergeRequestCleanupLock(
             self.zk_client)
 
         self.abide = Abide()
@@ -464,6 +469,8 @@ class Scheduler(threading.Thread):
                                  trigger=self._semaphore_cleanup_interval)
             self.apsched.add_job(self._runBuildRequestCleanup,
                                  trigger=self._build_request_cleanup_interval)
+            self.apsched.add_job(self._runMergeRequestCleanup,
+                                 trigger=self._merge_request_cleanup_interval)
             self.apsched.add_job(self._runConfigCacheCleanup,
                                  trigger=self._config_cache_cleanup_interval)
             return
@@ -505,6 +512,15 @@ class Scheduler(threading.Thread):
                 self.executor.cleanupLostBuildRequests()
             finally:
                 self.build_request_cleanup_lock.release()
+
+    def _runMergeRequestCleanup(self):
+        # If someone else is running the cleanup, skip it.
+        if self.merge_request_cleanup_lock.acquire(blocking=False):
+            try:
+                self.log.debug("Starting merge request cleanup")
+                self.merger.cleanupLostMergeRequests()
+            finally:
+                self.merge_request_cleanup_lock.release()
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()

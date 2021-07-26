@@ -15,10 +15,13 @@
 import logging
 from uuid import uuid4
 
+from kazoo.exceptions import BadVersionError
+
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import MergeRequest, PRECEDENCE_HIGH, PRECEDENCE_NORMAL
 from zuul.zk.merger import MergerApi
+from zuul.zk.exceptions import MergeRequestNotFound
 
 
 class MergeClient(object):
@@ -135,3 +138,30 @@ class MergeClient(object):
             event=event,
         )
         return job
+
+    def cleanupLostMergeRequests(self):
+        for merge_request in self.merger_api.lostMergeRequests():
+            try:
+                self.cleanupLostMergeRequest(merge_request)
+            except Exception:
+                self.log.exception("Exception cleaning up lost merge request:")
+
+    def cleanupLostMergeRequest(self, merge_request):
+        merge_request.state = MergeRequest.COMPLETED
+        try:
+            self.merger_api.update(merge_request)
+            # No need to unlock the build, as it is by definition unlocked.
+            # TODO (felix): If we want to optimize ZK requests, we could only
+            # call the remove() here.
+            self.merger_api.remove(merge_request)
+        except MergeRequestNotFound as e:
+            self.log.warning("Could not complete merge: %s", str(e))
+            return
+        except BadVersionError:
+            # There could be a race condition:
+            # The merge request is found by lost_merge_requests in
+            # state RUNNING but gets completed/unlocked before the
+            # is_locked() check. Since we use the znode version, the
+            # update will fail in this case and we can simply ignore
+            # the exception.
+            return

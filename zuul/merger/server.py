@@ -18,11 +18,8 @@ import os
 import socket
 import sys
 import threading
-import time
 from abc import ABCMeta
 from configparser import ConfigParser
-
-from kazoo.exceptions import BadVersionError
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
@@ -97,11 +94,6 @@ class BaseMergeServer(metaclass=ABCMeta):
             name="MergerServerMergerWorkerThread",
         )
 
-        self.merger_cleanup_worker = threading.Thread(
-            target=self.runMergerCleanupWorker,
-            name="MergerServerCleanupWorkerThread",
-        )
-
         self.merger_loop_wake_event = threading.Event()
         self.merger_cleanup_election = self.zk_client.client.Election(
             f"{MergerApi.MERGE_REQUEST_ROOT}/election"
@@ -173,7 +165,6 @@ class BaseMergeServer(metaclass=ABCMeta):
                             'Unable to remove stale git lock: '
                             '%s this may result in failed merges' % fp)
         self.merger_worker.start()
-        self.merger_cleanup_worker.start()
 
     def stop(self):
         self.log.debug('Stopping merger worker')
@@ -181,13 +172,11 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.merger_loop_wake_event.set()
         self.merger_worker.join()
         self.merger_cleanup_election.cancel()
-        self.merger_cleanup_worker.join()
         self.zk_client.disconnect()
 
     def join(self):
         self.merger_loop_wake_event.set()
         self.merger_worker.join()
-        self.merger_cleanup_worker.join()
 
     def pause(self):
         self.log.debug('Pausing merger worker')
@@ -197,32 +186,6 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def unpause(self):
         self.log.debug('Resuming merger worker')
-
-    def runMergerCleanupWorker(self):
-        while self._merger_running:
-            try:
-                self.merger_cleanup_election.run(self._runMergerCleanupWorker)
-            except Exception:
-                self.log.exception("Exception in merger cleanup worker")
-
-    def _runMergerCleanupWorker(self):
-        while self._merger_running:
-            for merge_request in self.merger_api.lostMergeRequests():
-                try:
-                    self.completeMergeJob(merge_request, None)
-                except BadVersionError:
-                    # There could be a race condition:
-                    # The merge request is found by lost_merge_requests in
-                    # state RUNNING but gets completed/unlocked before the
-                    # is_locked() check. Since we use the znode version, the
-                    # update will fail in this case and we can simply ignore
-                    # the exception.
-                    pass
-                if not self._merger_running:
-                    return
-            # TODO (felix): Move the cleanup to the appscheduler cleanup thread
-            # in the Zuul scheduler.
-            time.sleep(5)
 
     def runMergerWorker(self):
         while self._merger_running:
