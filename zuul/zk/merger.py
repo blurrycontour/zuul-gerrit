@@ -55,6 +55,7 @@ class MergerApi(ZooKeeperBase):
 
     def register(self):
         self.kazoo_client.ensure_path(self.MERGE_REQUEST_ROOT)
+        self.kazoo_client.ensure_path(self.MERGE_RESULT_ROOT)
 
         # Register a child watch that listens for new merge requests
         self.kazoo_client.ChildrenWatch(
@@ -182,6 +183,7 @@ class MergerApi(ZooKeeperBase):
         log = get_annotated_logger(self.log, event=event)
 
         path = "/".join([self.MERGE_REQUEST_ROOT, merge_request.uuid])
+        merge_request.path = path
         result = None
 
         # If a result is needed, create the result_path with the same UUID and

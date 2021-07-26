@@ -2081,7 +2081,6 @@ class MergeRequest:
         build_set_uuid,
         tenant_name,
         pipeline_name,
-        queue_name,
     ):
         self.uuid = uuid
         self.state = state
@@ -2091,7 +2090,6 @@ class MergeRequest:
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
-        self.queue_name = queue_name
 
         # Path to the future result if requested
         self.result_path = None
@@ -2111,7 +2109,6 @@ class MergeRequest:
             "build_set_uuid": self.build_set_uuid,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
-            "queue_name": self.queue_name,
             "result_path": self.result_path,
         }
 
@@ -2126,7 +2123,6 @@ class MergeRequest:
             data["build_set_uuid"],
             data["tenant_name"],
             data["pipeline_name"],
-            data["queue_name"],
         )
         job.result_path = data.get("result_path")
         return job
