@@ -34,6 +34,7 @@ class MergerApi(ZooKeeperSimpleBase):
 
     MERGE_REQUEST_ROOT = "/zuul/merge-requests"
     MERGE_RESULT_ROOT = "/zuul/merge-results"
+    MERGE_WAITER_ROOT = "/zuul/merge-waiters"
     LOCK_ROOT = "/zuul/merge-request-locks"
 
     log = logging.getLogger("zuul.zk.merger.MergerApi")
@@ -56,6 +57,7 @@ class MergerApi(ZooKeeperSimpleBase):
     def register(self):
         self.kazoo_client.ensure_path(self.MERGE_REQUEST_ROOT)
         self.kazoo_client.ensure_path(self.MERGE_RESULT_ROOT)
+        self.kazoo_client.ensure_path(self.MERGE_WAITER_ROOT)
 
         # Register a child watch that listens for new merge requests
         self.kazoo_client.ChildrenWatch(
@@ -193,13 +195,18 @@ class MergerApi(ZooKeeperSimpleBase):
             result_path = "/".join(
                 [self.MERGE_RESULT_ROOT, merge_request.uuid]
             )
-            result = MergerEventResultFuture(self.client, result_path)
+            waiter_path = "/".join(
+                [self.MERGE_WAITER_ROOT, merge_request.uuid]
+            )
+            result = MergerEventResultFuture(self.client, result_path,
+                                             waiter_path)
             merge_request.result_path = result_path
 
         log.debug("Submitting merge request to ZooKeeper %s", merge_request)
 
         tr = self.kazoo_client.transaction()
 
+        tr.create(waiter_path, b'', ephemeral=True)
         tr.create(
             path,
             self._dictToBytes(merge_request.toDict()),

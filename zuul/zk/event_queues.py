@@ -381,9 +381,10 @@ class MergerEventResultFuture(EventResultFuture):
 
     log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
 
-    def __init__(self, client, result_path):
+    def __init__(self, client, result_path, waiter_path):
         super().__init__(client, result_path)
 
+        self._waiter_path = waiter_path
         self.merged = None
         self.updated = None
         self.commit = None
@@ -392,7 +393,11 @@ class MergerEventResultFuture(EventResultFuture):
         self.item_in_branches = None
 
     def wait(self, timeout=None):
-        res = super().wait(timeout)
+        try:
+            res = super().wait(timeout)
+        finally:
+            with suppress(NoNodeError):
+                self.kazoo_client.delete(self._waiter_path)
         if self.data is not None:
             self.merged = self.data.get("merged", False)
             self.updated = self.data.get("updated", False)
