@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9850728_4e80968a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T16:28:38Z",
+      "side": 1,
+      "message": "It would be good to go ahead and add some simple tests as part of this change so we at least exercise the code a little.",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "605bd85e_93821db3",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T16:28:38Z",
+      "side": 1,
+      "message": "Note to reviewers: I don\u0027t think this can happen; the management job would have to return the literal json string \"null\", and the old code didn\u0027t handle that.  But it\u0027s a reasonably safety check.",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd00f089_7e9651bd",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T16:28:38Z",
+      "side": 1,
+      "message": "What requires a result?  How do leaks get cleaned?  Can they be large enough to require sharding?\nResults may be required by synchronous operations like cat jobs and file change jobs.  Some thoughts:\n\n1) We need to be able to clean up leaked results in the case that the calling scheduler crashes.\n2) The results can be quite large, and we should accomodate sharding.\n\nTo address #1, we could add an ephemeral node to indicate that we\u0027re waiting on a result.  It would be natural to consider pre-creating the result node as an ephemeral node, but once we consider #2 and that the result may require sharding, we must remember that we can\u0027t create children under an ephemeral node.\n\nIn short, these would be the paths:\n\n/zuul/merge-requests/abcdef: the merge request object; deleted as soon as request completed\n/zuul/merge-results/abcdef: the result object for merge request abcdef, written to only if a result is required\n/zuul/merge-result-waiters/abcdef: an ephemeral node indicating there is a scheduler waiting on the results of abcdef\n\nA cleanup thread could look for merge-results/abcdef and iff there is not merge-result-waiters/abcdef, delete it.\n\nThe scheduler waiting for the result would need to delete the waiter znode when it has received the result.",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f2e97116_5bab5b7d",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T16:28:38Z",
+      "side": 1,
+      "message": "Yes, we may.  The scheduleMerge method accepts the repo state as input, and that can be quite large.\n\nIt\u0027s probably simplest to just copy what we\u0027re doing for the executor api now.  We could consider moving both of them to only shard when necessary (as we do with events), which could save some time.",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2a11c7ee_4cb96371",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T16:28:38Z",
+      "side": 1,
+      "message": "As discussed in IRC -- the next change will add cleanup to the merger, then a later will move it to the scheduler.  This is done to simplify the change series.",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
