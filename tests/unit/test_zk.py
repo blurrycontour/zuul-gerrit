@@ -712,15 +712,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
+        payload = {'merge': 'test'}
         merge_request = MergeRequest(uuid='A',
                                      state=MergeRequest.REQUESTED,
                                      job_type=MergeRequest.MERGE,
-                                     payload={'merge': 'test'},
                                      precedence=model.PRECEDENCE_NORMAL,
                                      build_set_uuid='AA',
                                      tenant_name='tenant',
                                      pipeline_name='check')
-        client.submit(merge_request)
+        client.submit(merge_request, payload)
         request_queue.get(timeout=30)
 
         # Merger receives request
@@ -728,13 +728,11 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 1)
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
-        self.assertEqual(a.payload, {'merge': 'test'})
-        # TODO: shard
-        # params = client.getMergeParams(a)
-        # self.assertEqual(params, {'job': 'test'})
-        # client.clearMergeParams(a)
-        # params = client.getMergeParams(a)
-        # self.assertIsNone(params)
+        params = client.getMergeParams(a)
+        self.assertEqual(params, payload)
+        client.clearMergeParams(a)
+        params = client.getMergeParams(a)
+        self.assertIsNone(params)
 
         # Merger locks request
         self.assertTrue(server.lock(a, blocking=False))
@@ -770,15 +768,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
+        payload = {'merge': 'test'}
         merge_request = MergeRequest(uuid='A',
                                      state=MergeRequest.HOLD,
                                      job_type=MergeRequest.MERGE,
-                                     payload={'merge': 'test'},
                                      precedence=model.PRECEDENCE_NORMAL,
                                      build_set_uuid='AA',
                                      tenant_name='tenant',
                                      pipeline_name='check')
-        client.submit(merge_request)
+        client.submit(merge_request, payload)
         request_queue.get(timeout=30)
 
         # Merger receives nothing
@@ -816,15 +814,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
+        payload = {'merge': 'test'}
         merge_request = MergeRequest(uuid='A',
                                      state=MergeRequest.REQUESTED,
                                      job_type=MergeRequest.MERGE,
-                                     payload={'merge': 'test'},
                                      precedence=model.PRECEDENCE_NORMAL,
                                      build_set_uuid='AA',
                                      tenant_name='tenant',
                                      pipeline_name='check')
-        future = client.submit(merge_request, needs_result=True)
+        future = client.submit(merge_request, payload, needs_result=True)
         request_queue.get(timeout=30)
 
         # Merger receives request
@@ -866,15 +864,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         client = MergerApi(self.zk_client)
 
         # Scheduler submits request
+        payload = {'merge': 'test'}
         merge_request = MergeRequest(uuid='A',
                                      state=MergeRequest.REQUESTED,
                                      job_type=MergeRequest.MERGE,
-                                     payload={'merge': 'test'},
                                      precedence=model.PRECEDENCE_NORMAL,
                                      build_set_uuid='AA',
                                      tenant_name='tenant',
                                      pipeline_name='check')
-        client.submit(merge_request)
+        client.submit(merge_request, payload)
         client_a = client.get(merge_request.path)
 
         # Simulate the server side
@@ -892,10 +890,10 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         # requests
         merger_api = MergerApi(self.zk_client)
 
+        payload = {'merge': 'test'}
         a = MergeRequest(uuid='A',
                          state=MergeRequest.REQUESTED,
                          job_type=MergeRequest.MERGE,
-                         payload={'merge': 'test'},
                          precedence=model.PRECEDENCE_NORMAL,
                          build_set_uuid='AA',
                          tenant_name='tenant',
@@ -903,7 +901,6 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         b = MergeRequest(uuid='B',
                          state=MergeRequest.REQUESTED,
                          job_type=MergeRequest.MERGE,
-                         payload={'merge': 'test'},
                          precedence=model.PRECEDENCE_NORMAL,
                          build_set_uuid='BB',
                          tenant_name='tenant',
@@ -911,7 +908,6 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         c = MergeRequest(uuid='C',
                          state=MergeRequest.REQUESTED,
                          job_type=MergeRequest.MERGE,
-                         payload={'merge': 'test'},
                          precedence=model.PRECEDENCE_NORMAL,
                          build_set_uuid='CC',
                          tenant_name='tenant',
@@ -919,16 +915,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         d = MergeRequest(uuid='D',
                          state=MergeRequest.REQUESTED,
                          job_type=MergeRequest.MERGE,
-                         payload={'merge': 'test'},
                          precedence=model.PRECEDENCE_NORMAL,
                          build_set_uuid='DD',
                          tenant_name='tenant',
                          pipeline_name='check')
 
-        merger_api.submit(a)
-        merger_api.submit(b)
-        merger_api.submit(c)
-        merger_api.submit(d)
+        merger_api.submit(a, payload)
+        merger_api.submit(b, payload)
+        merger_api.submit(c, payload)
+        merger_api.submit(d, payload)
 
         a = merger_api.get(a.path)
         b = merger_api.get(b.path)
@@ -977,15 +972,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Simulate the client side
         client = MergerApi(self.zk_client)
+        payload = {'merge': 'test'}
         a = MergeRequest(uuid='A',
                          state=MergeRequest.REQUESTED,
                          job_type=MergeRequest.MERGE,
-                         payload={'merge': 'test'},
                          precedence=model.PRECEDENCE_NORMAL,
                          build_set_uuid='AA',
                          tenant_name='tenant',
                          pipeline_name='check')
-        client.submit(a)
+        client.submit(a, payload)
 
         # Simulate the server side
         server = MergerApi(self.zk_client,

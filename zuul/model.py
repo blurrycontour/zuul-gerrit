@@ -2076,7 +2076,6 @@ class MergeRequest:
         uuid,
         state,
         job_type,
-        payload,
         precedence,
         build_set_uuid,
         tenant_name,
@@ -2085,7 +2084,6 @@ class MergeRequest:
         self.uuid = uuid
         self.state = state
         self.job_type = job_type
-        self.payload = payload
         self.precedence = precedence
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
@@ -2104,7 +2102,6 @@ class MergeRequest:
             "uuid": self.uuid,
             "state": self.state,
             "job_type": self.job_type,
-            "payload": self.payload,
             "precedence": self.precedence,
             "build_set_uuid": self.build_set_uuid,
             "tenant_name": self.tenant_name,
@@ -2118,7 +2115,6 @@ class MergeRequest:
             data["uuid"],
             data["state"],
             data["job_type"],
-            data["payload"],
             data["precedence"],
             data["build_set_uuid"],
             data["tenant_name"],

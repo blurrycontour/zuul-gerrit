@@ -25,12 +25,12 @@ from kazoo.recipe.lock import Lock
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import MergeRequest
-from zuul.zk import ZooKeeperBase
+from zuul.zk import ZooKeeperSimpleBase, sharding
 from zuul.zk.event_queues import MergerEventResultFuture
 from zuul.zk.exceptions import MergeRequestNotFound
 
 
-class MergerApi(ZooKeeperBase):
+class MergerApi(ZooKeeperSimpleBase):
 
     MERGE_REQUEST_ROOT = "/zuul/merge-requests"
     MERGE_RESULT_ROOT = "/zuul/merge-results"
@@ -179,7 +179,7 @@ class MergerApi(ZooKeeperBase):
     def next(self):
         yield from self.inState(MergeRequest.REQUESTED)
 
-    def submit(self, merge_request, needs_result=False, event=None):
+    def submit(self, merge_request, params, needs_result=False, event=None):
         log = get_annotated_logger(self.log, event=event)
 
         path = "/".join([self.MERGE_REQUEST_ROOT, merge_request.uuid])
@@ -198,10 +198,18 @@ class MergerApi(ZooKeeperBase):
 
         log.debug("Submitting merge request to ZooKeeper %s", merge_request)
 
-        # TODO (felix): Do we need transaction (sharded data) for merges?
-        self.kazoo_client.create(
-            path, self._dictToBytes(merge_request.toDict()), makepath=True
+        tr = self.kazoo_client.transaction()
+
+        tr.create(
+            path,
+            self._dictToBytes(merge_request.toDict()),
         )
+        params_path = self._getParamsPath(path)
+        tr.create(params_path)
+        params_path = '/'.join([params_path, 'seq'])
+        with sharding.BufferedShardWriter(tr, params_path) as stream:
+            stream.write(self._dictToBytes(params))
+        self.client.commitTransaction(tr)
 
         return result
 
@@ -347,3 +355,26 @@ class MergerApi(ZooKeeperBase):
     def _dictToBytes(data):
         # The custom json_dumps() will also serialize MappingProxyType objects
         return json_dumps(data).encode("utf-8")
+
+    def _getParamsPath(self, root):
+        return '/'.join([root, 'params'])
+
+    def clearMergeParams(self, merge_request):
+        """Erase the merge parameters from ZK to save space"""
+        self.kazoo_client.delete(self._getParamsPath(merge_request.path),
+                                 recursive=True)
+
+    def getMergeParams(self, merge_request):
+        """Return the parameters for a merge request, if they exist.
+
+        Once a merge request is accepted by an executor, the params
+        may be erased from ZK; this will return None in that case.
+
+        """
+        with sharding.BufferedShardReader(
+            self.kazoo_client,
+                self._getParamsPath(merge_request.path)) as stream:
+            data = stream.read()
+            if not data:
+                return None
+            return self._bytesToDict(data)
