@@ -861,6 +861,61 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
         self.assertEqual(self._get_watches(), {})
 
+    def test_lost_merge_request_result(self):
+        # Test that we can clean up orphaned merge results
+        request_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        merge_request = MergeRequest(uuid='A',
+                                     state=MergeRequest.REQUESTED,
+                                     job_type=MergeRequest.MERGE,
+                                     precedence=model.PRECEDENCE_NORMAL,
+                                     build_set_uuid='AA',
+                                     tenant_name='tenant',
+                                     pipeline_name='check')
+        future = client.submit(merge_request, payload, needs_result=True)
+        request_queue.get(timeout=30)
+
+        # Merger receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # Merger locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = MergeRequest.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, MergeRequest.RUNNING)
+
+        # Merger reports result
+        result_data = {'result': 'ok'}
+        server.reportResult(a, result_data)
+
+        # Merger removes and unlocks merge request on completion
+        server.remove(a)
+        server.unlock(a)
+
+        # Scheduler "disconnects"
+        self.zk_client.client.delete(future._waiter_path)
+
+        # Find orphaned results
+        lost_merge_results = list(client.lostMergeResults())
+
+        self.assertEqual(1, len(lost_merge_results))
+        self.assertEqual(merge_request.result_path, lost_merge_results[0])
+
     def test_nonexistent_lock(self):
         request_queue = queue.Queue()
 

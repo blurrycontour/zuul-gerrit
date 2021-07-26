@@ -388,3 +388,14 @@ class MergerApi(ZooKeeperSimpleBase):
             if not data:
                 return None
             return self._bytesToDict(data)
+
+    def lostMergeResults(self):
+        # Get a list of merge results which don't have a connection
+        # waiting for them.
+        waiters1 = set(self.kazoo_client.get_children(self.MERGE_WAITER_ROOT))
+        results = set(self.kazoo_client.get_children(self.MERGE_RESULT_ROOT))
+        waiters2 = set(self.kazoo_client.get_children(self.MERGE_WAITER_ROOT))
+
+        waiters = waiters1.union(waiters2)
+        lost = results - waiters
+        return ['/'.join([self.MERGE_RESULT_ROOT, x]) for x in lost]
