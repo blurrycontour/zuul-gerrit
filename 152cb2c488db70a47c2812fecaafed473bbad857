@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "6abefd0a_486d7bd8",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T22:37:32Z",
+      "side": 1,
+      "message": "Why not ZooKeeperSimpleBase?",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bd00f089_7e9651bd",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 4
