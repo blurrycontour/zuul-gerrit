@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "c90d4369_4407bd34",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2084,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-26T19:36:50Z",
+      "side": 1,
+      "message": "queue_name is not needed",
+      "revId": "152cb2c488db70a47c2812fecaafed473bbad857",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "605bd85e_93821db3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 4
