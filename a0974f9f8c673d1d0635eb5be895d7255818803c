@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3d8836fc_de658ce9",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T21:58:20Z",
+      "side": 1,
+      "message": "Yeah, let me make a quick followup.",
+      "revId": "a0974f9f8c673d1d0635eb5be895d7255818803c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d1f2a7a2_12101b33",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 4
@@ -33,6 +50,23 @@
       "revId": "a0974f9f8c673d1d0635eb5be895d7255818803c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6ed5fa2_c6b06f3c",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T21:58:20Z",
+      "side": 1,
+      "message": "Probably, but it\u0027s technically a behavior change, so i\u0027d have to dig into it.",
+      "revId": "a0974f9f8c673d1d0635eb5be895d7255818803c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
