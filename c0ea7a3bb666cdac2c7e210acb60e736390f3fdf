@@ -16,6 +16,24 @@
       "revId": "c0ea7a3bb666cdac2c7e210acb60e736390f3fdf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cacdaa7b_f06eb050",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-27T08:24:41Z",
+      "side": 1,
+      "message": "Yep, I think that makes sense. Implemented in PS3.",
+      "parentUuid": "9b64259d_322233b9",
+      "revId": "c0ea7a3bb666cdac2c7e210acb60e736390f3fdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
