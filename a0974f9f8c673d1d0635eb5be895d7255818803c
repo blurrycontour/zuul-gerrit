@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "700bf0c9_5918952e",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T21:46:01Z",
+      "side": 1,
+      "message": "Does it make sense to find all fingergw\u0027s in a zone and return a random selection to distribute the potential proxy load?",
+      "revId": "a0974f9f8c673d1d0635eb5be895d7255818803c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d1f2a7a2_12101b33",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T21:46:01Z",
+      "side": 1,
+      "message": "Nit you can probably just set this value without checking if use_ssl is truthy?",
+      "revId": "a0974f9f8c673d1d0635eb5be895d7255818803c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
