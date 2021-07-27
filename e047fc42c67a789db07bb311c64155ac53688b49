@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0786df7d_e512b851",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1354,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T22:46:02Z",
+      "side": 1,
+      "message": "I think this is roughly where you would want to document that the CA here (and associated certs and keys) should be controlled and not a CA like LE? Otherwise we would validate connections for certs that anyone could provision.",
+      "revId": "e047fc42c67a789db07bb311c64155ac53688b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
