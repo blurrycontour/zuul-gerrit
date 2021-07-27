@@ -1364,6 +1364,13 @@ sections of ``zuul.conf`` are used by the finger gateway:
 
       The path to the PEM encoded CA certificate file.
 
+   .. attr:: tls_verify_hostnames
+      :default: true
+
+      In the case of a private CA it may be both safe and convenient
+      to disable hostname checks.  However, if the certificates are
+      issued by a public CA, hostname verification should be enabled.
+
    .. attr:: tls_client_only
       :default: false
 
