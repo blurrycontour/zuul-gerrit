@@ -17,14 +17,7 @@ import PropTypes from 'prop-types'
 import { connect, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
-import {
-  Button,
-  Modal,
-  ModalVariant,
-  Form,
-  FormGroup,
-  TextInput
-} from '@patternfly/react-core'
+
 import {
   BookIcon,
   BuildIcon,
@@ -46,40 +39,25 @@ import 'moment-duration-format'
 import { BuildResultBadge, BuildResultWithIcon } from './Misc'
 import { buildExternalLink, ExternalLink, IconProperty } from '../../Misc'
 
-import { autohold } from '../../api'
-import { addNotification, addApiError } from '../../actions/notifications'
-
+import renderAutoholdModal from '../autohold/autoholdModal'
 
 function Build({ build, tenant, timezone, user }) {
   const [showAutoholdModal, setShowAutoholdModal] = useState(false)
+  const [ahFormChange, setAhFormChange] = useState(build.change ? build.change : '')
+  const [ahFormRef, setAhFormRef] = useState(build.change ? '' : build.ref)
+  const [ahFormProject, setAhFormProject] = useState(build.project)
+  const [ahFormJob_name, setAhFormJob_name] = useState(build.job_name)
   let default_form_reason = 'Debugging'
-  let ah_owner = user.user ? user.user.profile.preferred_username : '[unknown]'
-  let reason_prefix = 'Requested by ' + ah_owner + ': '
   const [ahFormReason, setAhFormReason] = useState(default_form_reason)
   const [ahFormCount, setAhFormCount] = useState(1)
+  // TODO there should be a check against the max hold age defined in nodepool's config.
+  // But we don't have access to it ...
   const [ahFormNodeHoldExpiration, setAhFormNodeHoldExpiration] = useState(86400)
 
   const build_link = buildExternalLink(build)
 
   const dispatch = useDispatch()
 
-  function handleConfirm() {
-    let change = build.change ? build.change : null
-    let ref = change ? null : build.ref
-    autohold(tenant.apiPrefix, build.project, build.job_name, change, ref, reason_prefix + ahFormReason, parseInt(ahFormCount), parseInt(ahFormNodeHoldExpiration), user.token)
-      .then(() => {
-        dispatch(addNotification(
-          {
-            text: 'Autohold request set successfully.',
-            type: 'success',
-            status: '',
-            url: '',
-          }))
-      })
-      .catch(error => {
-        dispatch(addApiError(error))
-      })
-  }
 
   function renderAutoholdButton() {
     const value = (
@@ -105,71 +83,6 @@ function Build({ build, tenant, timezone, user }) {
     )
   }
 
-  function renderAutoholdModal() {
-    return (
-      <Modal
-        variant={ModalVariant.small}
-        titleIconVariant={LockIcon}
-        isOpen={showAutoholdModal}
-        title='Create an Autohold Request'
-        onClose={() => { setShowAutoholdModal(false) }}
-        actions={[
-          <Button
-            key="autohold_confirm"
-            variant="primary"
-            onClick={() => {
-              handleConfirm()
-              setShowAutoholdModal(false)
-            }}>Create</Button>,
-          <Button
-            key="autohold_cancel"
-            variant="link"
-            onClick={() => { setShowAutoholdModal(false) }}>Cancel</Button>
-        ]}>
-        <Form isHorizontal>
-          <FormGroup
-            label="Reason"
-            isRequired
-            fieldId="ah-form-reason"
-            helperText="A descriptive reason for holding the next failing build">
-            <TextInput
-              value={ahFormReason}
-              isRequired
-              type="text"
-              id="ah-form-reason"
-              name="ahFormReason"
-              onChange={(value) => { setAhFormReason(value) }} />
-          </FormGroup>
-          <FormGroup
-            label="Count"
-            isRequired
-            fieldId="ah-form-count"
-            helperText="How many times a failing build should be held">
-            <TextInput
-              value={ahFormCount}
-              isRequired
-              type="number"
-              id="ah-form-count"
-              name="ahFormCount"
-              onChange={(value) => { setAhFormCount(value) }} />
-          </FormGroup>
-          <FormGroup
-            label="Node Hold Expires in (s)"
-            isRequired
-            fieldId="ah-form-nhe"
-            helperText="How long nodes should be kept in HELD state (seconds)">
-            <TextInput
-              value={ahFormNodeHoldExpiration}
-              isRequired
-              type="number"
-              id="ah-form-count"
-              name="ahFormNodeHoldExpiration"
-              onChange={(value) => { setAhFormNodeHoldExpiration(value) }} />
-          </FormGroup>
-        </Form>
-      </Modal>
-    )
-  }
 
   return (
     <>
@@ -366,7 +279,26 @@ function Build({ build, tenant, timezone, user }) {
           </FlexItem>
         </Flex>
       </Flex>
-      {renderAutoholdModal()}
+      {renderAutoholdModal(
+        tenant,
+        user,
+        showAutoholdModal,
+        setShowAutoholdModal,
+        ahFormChange,
+        setAhFormChange,
+        ahFormRef,
+        setAhFormRef,
+        ahFormProject,
+        setAhFormProject,
+        ahFormJob_name,
+        setAhFormJob_name,
+        ahFormReason,
+        setAhFormReason,
+        ahFormCount,
+        setAhFormCount,
+        ahFormNodeHoldExpiration,
+        setAhFormNodeHoldExpiration,
+        dispatch)}
     </>
   )
 }
