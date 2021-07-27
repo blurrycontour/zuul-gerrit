@@ -43,8 +43,9 @@ import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 
 import { autohold_delete } from '../../api'
+import { addNotification } from '../../actions/notifications'
+import { addAutoholdError } from '../../actions/adminActions'
 import { fetchAutoholds } from '../../actions/autoholds'
-import { addNotification, addApiError } from '../../actions/notifications'
 
 import { IconProperty } from '../../Misc'
 
@@ -98,7 +99,7 @@ function AutoholdTable(props) {
         dispatch(fetchAutoholds(tenant))
       })
       .catch(error => {
-        dispatch(addApiError(error))
+        dispatch(addAutoholdError(error))
       })
   }
 
