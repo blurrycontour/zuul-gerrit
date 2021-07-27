@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d226f5d_516c2ce7",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3196,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-27T10:09:50Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we use this, but in case we do, we should also use the _test_getMergeJobsInState() here.",
+      "revId": "443bc474755ce64ef4d51985645f90b090d9596b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
