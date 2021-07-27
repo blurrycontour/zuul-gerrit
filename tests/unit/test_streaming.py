@@ -619,8 +619,6 @@ class CountingFingerRequestHandler(zuul.lib.fingergw.RequestHandler):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # if not hasattr(self.fingergw, 'history'):
-        #     self.fingergw.history = []
 
     def _fingerClient(self, server, port, build_uuid, use_ssl):
         self.fingergw.history.append(build_uuid)
