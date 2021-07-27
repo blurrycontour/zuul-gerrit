@@ -43,6 +43,8 @@ import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 
 import { autohold_delete } from '../../api'
+import { addNotification } from '../../actions/notifications'
+import { addAutoholdError } from '../../actions/adminActions'
 import { fetchAutoholdsIfNeeded } from '../../actions/autoholds'
 
 import { IconProperty } from '../../Misc'
@@ -75,7 +77,7 @@ function AutoholdTable(props) {
       dataLabel: 'Reason',
     },
     {
-      title: <IconProperty icon={<OutlinedClockIcon />} value="Hold Duration" />,
+      title: <IconProperty icon={<OutlinedClockIcon />} value="Hold for" />,
       dataLabel: 'Hold Duration',
     },
     {
@@ -87,11 +89,16 @@ function AutoholdTable(props) {
   function handleAutoholdDelete(requestId) {
     autohold_delete(tenant.apiPrefix, requestId, user.token)
       .then(() => {
-        alert('Autohold request deleted succesfully.')
+        dispatch(addNotification({
+          text: 'Autohold query deleted successfully.',
+          type: 'success',
+          status: '',
+          url: '',
+        }))
         dispatch(fetchAutoholdsIfNeeded(tenant, true))
       })
       .catch(error => {
-        alert(error)
+        dispatch(addAutoholdError(error))
       })
   }
 
@@ -99,8 +106,10 @@ function AutoholdTable(props) {
     return (
       <TrashIcon
         title="Delete Autohold request"
-        style={{ cursor: 'pointer' }}
-        color='#A30000'
+        style={{
+          cursor: 'pointer',
+          color: 'var(--pf-global--danger-color--100)'
+        }}
         onClick={(event) => {
           event.preventDefault()
           handleAutoholdDelete(requestId)
