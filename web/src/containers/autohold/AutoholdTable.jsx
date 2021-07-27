@@ -43,8 +43,9 @@ import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 
 import { autohold_delete } from '../../api'
+import { addNotification } from '../../actions/notifications'
+import { addAutoholdError } from '../../actions/adminActions'
 import { fetchAutoholdsIfNeeded } from '../../actions/autoholds'
-import { addNotification, addApiError } from '../../actions/notifications'
 
 import { IconProperty } from '../../Misc'
 
@@ -88,17 +89,16 @@ function AutoholdTable(props) {
   function handleAutoholdDelete(requestId) {
     autohold_delete(tenant.apiPrefix, requestId, user.token)
       .then(() => {
-        dispatch(addNotification(
-          {
-            text: 'Autohold request deleted successfully.',
-            type: 'success',
-            status: '',
-            url: '',
-          }))
+        dispatch(addNotification({
+          text: 'Autohold query deleted successfully.',
+          type: 'success',
+          status: '',
+          url: '',
+        }))
         dispatch(fetchAutoholdsIfNeeded(tenant, true))
       })
       .catch(error => {
-        dispatch(addApiError(error))
+        dispatch(addAutoholdError(error))
       })
   }
 
