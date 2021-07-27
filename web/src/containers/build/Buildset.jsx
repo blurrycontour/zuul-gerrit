@@ -69,7 +69,15 @@ function Buildset({ buildset, tenant, user }) {
           alert('Change queued successfully.')
         })
         .catch(error => {
-          alert('An error occured: ' + error)
+          if (error.response) {
+            var parser = new DOMParser()
+            var htmlError = parser.parseFromString(error.response.data, 'text/html')
+            var error_description = htmlError.getElementsByTagName('p')[0].innerText
+            alert("Error: " + error_description)
+          }
+          else {
+            alert(error)
+          }
         })
     } else {
       enqueue(tenant.apiPrefix, buildset.project, buildset.pipeline, changeId, user.token)
@@ -77,7 +85,15 @@ function Buildset({ buildset, tenant, user }) {
           alert('Change queued successfully.')
         })
         .catch(error => {
-          alert('An error occured: ' + error)
+          if (error.response) {
+            var parser = new DOMParser()
+            var htmlError = parser.parseFromString(error.response.data, 'text/html')
+            var error_description = htmlError.getElementsByTagName('p')[0].innerText
+            alert("Error: " + error_description)
+          }
+          else {
+            alert(error)
+          }
         })
     }
   }
@@ -195,7 +211,7 @@ function Buildset({ buildset, tenant, user }) {
           </FlexItem>
         </Flex>
       </Flex>
-      { renderEnqueueModal()}
+      {renderEnqueueModal()}
     </>
   )
 }
