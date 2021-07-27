@@ -48,6 +48,7 @@ class MQTTReporter(BaseReporter):
                 item, with_jobs=False),
             'trigger_time': item.event.timestamp,
             'enqueue_time': item.enqueue_time,
+            'uuid': item.uuid,
             'buildset': {
                 'uuid': item.current_build_set.uuid,
                 'result': item.current_build_set.result,

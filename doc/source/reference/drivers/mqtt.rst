@@ -13,6 +13,12 @@ An MQTT report uses this schema:
 
 .. attr:: <mqtt schema>
 
+   .. attr:: uuid
+
+      The item UUID.  Each item enqueued into a Zuul pipeline is
+      assigned a UUID which remains the same even as Zuul's
+      speculative execution algorithm re-orders pipeline contents.
+
    .. attr:: action
 
       The reporter action name, e.g.: 'start', 'success', 'failure',
