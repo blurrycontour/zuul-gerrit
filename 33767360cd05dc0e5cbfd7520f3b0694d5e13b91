@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "72c2fb59_b8595e62",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T16:10:43Z",
+      "side": 1,
+      "message": "I wonder about setting a watch so that we don\u0027t have to do a read to check whether it\u0027s valid, but that might open up some opportunities for race conditions.  Something to keep in mind I guess.",
+      "revId": "33767360cd05dc0e5cbfd7520f3b0694d5e13b91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
