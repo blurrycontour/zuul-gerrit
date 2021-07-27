@@ -703,6 +703,61 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
 
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab')
+    def test_api_token(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, project = tenant.getProject('org/project1')
+
+        project_git_url = self.fake_gitlab.real_getGitUrl(project)
+        # cloneurl created from config 'server' should be used
+        # without credentials
+        self.assertEqual("https://gitlab/org/project1.git", project_git_url)
+
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab2')
+    def test_api_token_cloneurl(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, project = tenant.getProject('org/project1')
+
+        project_git_url = self.fake_gitlab2.real_getGitUrl(project)
+        # cloneurl from config file should be used as it defines token name and
+        # secret
+        self.assertEqual("http://myusername:2222@gitlab/org/project1.git",
+                         project_git_url)
+
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab3')
+    def test_api_token_name_cloneurl(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, project = tenant.getProject('org/project1')
+
+        project_git_url = self.fake_gitlab3.real_getGitUrl(project)
+        # cloneurl from config file should be used as it defines token name and
+        # secret, even if token name and token secret are defined
+        self.assertEqual("http://myusername:2222@gitlabthree/org/project1.git",
+                         project_git_url)
+
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab4')
+    def test_api_token_name(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, project = tenant.getProject('org/project1')
+
+        project_git_url = self.fake_gitlab4.real_getGitUrl(project)
+        # cloneurl is not set, generate one from token name, token secret and
+        # server
+        self.assertEqual("https://tokenname4:444@gitlabfour/org/project1.git",
+                         project_git_url)
+
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab5')
+    def test_api_token_name_cloneurl_server(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, project = tenant.getProject('org/project1')
+
+        project_git_url = self.fake_gitlab5.real_getGitUrl(project)
+        # cloneurl defines a url, without credentials. As token name is
+        # set, include token name and secret in cloneurl, 'server' is
+        # overwritten
+        self.assertEqual("http://tokenname5:555@gitlabfivvve/org/project1.git",
+                         project_git_url)
+
 
 class TestGitlabUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-gitlab-driver.conf'

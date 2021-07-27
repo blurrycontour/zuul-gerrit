@@ -1836,6 +1836,9 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
     def getGitUrl(self, project):
         return 'file://' + os.path.join(self.upstream_root, project.name)
 
+    def real_getGitUrl(self, project):
+        return super(FakeGitlabConnection, self).getGitUrl(project)
+
     def openFakeMergeRequest(self, project,
                              branch, title, description='', files=[]):
         self.mr_number += 1

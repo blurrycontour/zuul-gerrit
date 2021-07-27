@@ -17,19 +17,34 @@ Zuul needs to interact with projects by:
 - receiving events via web-hooks
 - performing actions via the API
 
-The Zuul user's API token configured in zuul.conf must have the
-following ACL rights: "api". The API token must be created in user Settings,
-Access tokens.
+web-hooks
+^^^^^^^^^
 
-Each project to be integrated with Zuul needs in "Settings/Webhooks":
+Projects to be integrated with Zuul needs to send events using webhooks.
+This can be enabled at Group level or Project level in "Settings/Webhooks"
 
 - "URL" set to
-  ``http://<zuul-web>/zuul/api/connection/<conn-name>/payload``
+  ``http://<zuul-web>/api/connection/<conn-name>/payload``
 - "Merge request events" set to "on"
 - "Push events" set to "on"
 - "Tag push events" set to "on"
 - "Comments" set to "on"
 - Define a "Secret Token"
+
+
+API
+^^^
+
+| Even though bot users exist: https://docs.gitlab.com/ce/user/project/settings/project_access_tokens.html#project-bot-users
+| They are only available at project level.
+
+In order to manage multiple projects using a single connection, Zuul needs a
+global access to projects, which can only be achieved by creating a specific
+Zuul user. This user counts as a licensed seat.
+
+The API token must be created in user Settings, Access tokens. The Zuul user's
+API token configured in zuul.conf must have the following ACL rights: "api".
+
 
 Connection Configuration
 ------------------------
@@ -45,13 +60,18 @@ The supported options in ``zuul.conf`` connections are:
 
          The connection must set ``driver=gitlab`` for GitLab connections.
 
+   .. attr:: api_token_name
+
+      The user's personal access token name (Used if **cloneurl** is http(s))
+      Set this parameter if authentication to clone projects is required
+
    .. attr:: api_token
 
-      The user's API token.
+      The user's personal access token
 
    .. attr:: webhook_token
 
-      The project's webhook secret token.
+      The webhook secret token.
 
    .. attr:: server
       :default: gitlab.com
@@ -75,10 +95,19 @@ The supported options in ``zuul.conf`` connections are:
 
       Path to the GitLab web and API interface.
 
+   .. attr:: sshkey
+
+      Path to SSH key to use (Used if **cloneurl** is ssh)
+
    .. attr:: cloneurl
       :default: {baseurl}
-
-      Path to the GitLab Git repositories. Used to clone.
+      
+      Omit to clone using http(s) or set to ``ssh://git@{server}``.
+      If **api_token_name** is set and **cloneurl** is either omitted or is
+      set without credentials, **cloneurl** will be modified to use credentials
+      as this: ``http(s)://<api_token_name>:<api_token>@<server>``.
+      If **cloneurl** is defined with credentials, it will be used as is,
+      without modification from the driver.
 
 
 Trigger Configuration
