@@ -55,7 +55,7 @@ encryption tag may be a list rather than a scalar.  For example:
           - HdWDS9lCBaBJnhMsm/O9tpzCq+GKRELpRzUwVgU5k822uBwhZemeSrUOLQ8hQ7q/vVHln
             ...
 
-The `zuul-client utility <https://zuul-ci.org/docs/zuul-client/>`_` provides a
+The `zuul-client utility <https://zuul-ci.org/docs/zuul-client/>`_ provides a
 simple way to encrypt secrets for a Zuul project:
 
 .. program-output:: zuul-client encrypt --help
