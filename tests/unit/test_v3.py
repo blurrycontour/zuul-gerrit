@@ -415,10 +415,10 @@ class TestBranchDeletion(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.waitUntilSettled()
 
-        self.delete_branch('org/project', 'stable/queens')
+        oldrev = self.delete_branch('org/project', 'stable/queens')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project', 'stable/queens'))
+                'org/project', 'stable/queens', oldrev=oldrev))
         self.waitUntilSettled()
 
         in_repo_conf = textwrap.dedent(

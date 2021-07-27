@@ -255,6 +255,7 @@ class TestZuulClientAdmin(BaseTestWeb):
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A_parent = str(upstream[p].commit('master'))
         A.setMerged()
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
@@ -274,7 +275,7 @@ class TestZuulClientAdmin(BaseTestWeb):
              'enqueue-ref', '--tenant', 'tenant-one',
              '--project', 'org/project',
              '--pipeline', 'post', '--ref', 'master',
-             '--oldrev', '90f173846e3af9154517b88543ffbd1691f31366',
+             '--oldrev', A_parent,
              '--newrev', A_commit],
             stdout=subprocess.PIPE)
         output = p.communicate()
