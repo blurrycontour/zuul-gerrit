@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c48e4186_90b82add",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T22:15:31Z",
+      "side": 1,
+      "message": "Does this get cleaned up at some point?",
+      "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "662ad638_701103a4",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T22:15:31Z",
+      "side": 1,
+      "message": "This is an odd one to debug? I guess they should all be equivalent?",
+      "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b68adb9_e03fb67f",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T22:15:31Z",
+      "side": 1,
+      "message": "I know this doesn\u0027t matter much as the next change deletes this code, but probably better to use uuid4 if this sticks around?",
+      "range": {
+        "startLine": 329,
+        "startChar": 38,
+        "endLine": 329,
+        "endChar": 49
+      },
+      "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
