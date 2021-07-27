@@ -17,22 +17,33 @@ export const ADMIN_ENQUEUE_FAIL = 'ADMIN_ENQUEUE_FAIL'
 export const ADMIN_AUTOHOLD_FAIL = 'ADMIN_AUTOHOLD_FAIL'
 export const ADMIN_PROMOTE_FAIL = 'ADMIN_PROMOTE_FAIL'
 
+function parseAPIerror(error) {
+  if (error.response) {
+    let parser = new DOMParser()
+    let htmlError = parser.parseFromString(error.response.data, 'text/html')
+    let error_description = htmlError.getElementsByTagName('p')[0].innerText
+    return (error_description)
+  } else {
+    return (error)
+  }
+}
+
 export const addDequeueError = error => ({
   type: ADMIN_DEQUEUE_FAIL,
-  notification: error
+  notification: parseAPIerror(error)
 })
 
 export const addEnqueueError = error => ({
   type: ADMIN_ENQUEUE_FAIL,
-  notification: error
+  notification: parseAPIerror(error)
 })
 
 export const addAutoholdError = error => ({
   type: ADMIN_AUTOHOLD_FAIL,
-  notification: error
+  notification: parseAPIerror(error)
 })
 
 export const addPromoteError = error => ({
   type: ADMIN_PROMOTE_FAIL,
-  notification: error
+  notification: parseAPIerror(error)
 })
