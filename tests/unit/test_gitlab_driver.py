@@ -22,7 +22,7 @@ import zuul.rpcclient
 from zuul.lib import strings
 from zuul.zk.layout import LayoutState
 
-from tests.base import random_sha1, simple_layout
+from tests.base import simple_layout
 from tests.base import ZuulTestCase, ZuulWebFixture
 
 from testtools.matchers import MatchesRegex
@@ -265,7 +265,13 @@ class TestGitlabDriver(ZuulTestCase):
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_ref_updated(self):
 
-        event = self.fake_gitlab.getPushEvent('org/project')
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        oldrev = repo.head.commit.hexsha
+        newrev = repo.commit('refs/heads/master').hexsha
+        event = self.fake_gitlab.getPushEvent('org/project',
+                                              before=oldrev,
+                                              after=newrev)
         expected_newrev = event[1]['after']
         expected_oldrev = event[1]['before']
         self.fake_gitlab.emitEvent(event)
@@ -290,10 +296,7 @@ class TestGitlabDriver(ZuulTestCase):
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_ref_created(self):
 
-        self.create_branch('org/project', 'stable-1.0')
-        path = os.path.join(self.upstream_root, 'org/project')
-        repo = git.Repo(path)
-        newrev = repo.commit('refs/heads/stable-1.0').hexsha
+        newrev = self.create_branch('org/project', 'stable-1.0')
         event = self.fake_gitlab.getPushEvent(
             'org/project', branch='refs/heads/stable-1.0',
             before='0' * 40, after=newrev)
@@ -319,9 +322,11 @@ class TestGitlabDriver(ZuulTestCase):
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_ref_deleted(self):
-
+        branch_sha = self.create_branch('org/project', 'stable-1.0')
+        self.waitUntilSettled()
         event = self.fake_gitlab.getPushEvent(
-            'org/project', 'stable-1.0', after='0' * 40)
+            'org/project', branch='stable-1.0',
+            before=branch_sha, after='0' * 40)
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
         self.assertEqual(0, len(self.history))
@@ -403,13 +408,16 @@ class TestGitlabDriver(ZuulTestCase):
             }}
         ]
         playbook = "- hosts: all\n  tasks: []"
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        currentrev = repo.heads['master'].commit.hexsha
         self.create_commit(
             'org/project',
             {'.zuul.yaml': yaml.dump(zuul_yaml),
              'job.yaml': playbook},
             message='Add InRepo configuration'
         )
-        event = self.fake_gitlab.getPushEvent('org/project')
+        event = self.fake_gitlab.getPushEvent('org/project', before=currentrev)
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
 
@@ -781,7 +789,15 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         # now enable branch protection and trigger reload
         self.fake_gitlab.protectBranch('org', 'project2', 'master')
-        pevent = self.fake_gitlab.getPushEvent(project='org/project2')
+
+        path = os.path.join(self.upstream_root, 'org/project2')
+        repo = git.Repo(path)
+        oldrev = repo.head.commit.hexsha
+        newrev = repo.commit('refs/heads/master').hexsha
+        pevent = self.fake_gitlab.getPushEvent('org/project2',
+                                               before=oldrev,
+                                               after=newrev)
+
         self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
 
@@ -888,11 +904,12 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         ]
 
         A.addCommit({'zuul.yaml': yaml.dump(zuul_yaml)})
+        oldsha = A.getTargetBranchHeadSha()
         A.mergeMergeRequest()
 
         # Do a push on top of A
         pevent = self.fake_gitlab.getPushEvent(project='org/project2',
-                                               before=A.sha,
+                                               before=oldsha,
                                                branch='refs/heads/master')
 
         # record previous tenant reconfiguration time, which may not be set
@@ -925,9 +942,15 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         # Prepare repo with an initial commit and enable branch protection
         self.fake_gitlab.protectBranch('org', 'project2', 'master')
+
+        path = os.path.join(self.upstream_root, 'org/project2')
+        repo = git.Repo(path)
+        oldrev = repo.head.commit.hexsha
+        newrev = repo.commit('refs/heads/master').hexsha
         self.fake_gitlab.emitEvent(
-            self.fake_gitlab.getPushEvent(
-                project='org/project2', branch='refs/heads/master'))
+            self.fake_gitlab.getPushEvent('org/project2',
+                                          branch='refs/heads/master',
+                                          before=oldrev, after=newrev))
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project2', 'master',
                                                   'A')
@@ -935,12 +958,13 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         # add a spare branch so that the project is not empty after master gets
         # deleted.
-        self.create_branch('org/project2', 'feat-x')
+        newrev = self.create_branch('org/project2', 'feat-x')
         self.fake_gitlab.protectBranch('org', 'project2', 'feat-x',
                                        protected=False)
         self.fake_gitlab.emitEvent(
             self.fake_gitlab.getPushEvent(
-                project='org/project2', branch='refs/heads/feat-x'))
+                project='org/project2', branch='refs/heads/feat-x',
+                before='0' * 40, after=newrev))
         self.waitUntilSettled()
 
         # record previous tenant reconfiguration time, which may not be set
@@ -949,10 +973,14 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         self.waitUntilSettled()
 
         # Delete the branch
+        path = os.path.join(self.upstream_root, 'org/project2')
+        repo = git.Repo(path)
+        repo.git.checkout('feat-x')
+        oldrev = self.delete_branch('org/project2', 'master')
         self.fake_gitlab.deleteBranch('org', 'project2', 'master')
 
         pevent = self.fake_gitlab.getPushEvent(project='org/project2',
-                                               before=A.sha,
+                                               before=oldrev,
                                                after='0' * 40,
                                                branch='refs/heads/master')
 
@@ -1052,21 +1080,23 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         project = 'org/project2'
 
         # prepare an existing branch
-        self.create_branch(project, branch)
-
-        self.fake_gitlab.protectBranch(*project.split('/'), branch,
-                                       protected=False)
-
+        branch_sha = self.create_branch(project, branch)
         self.fake_gitlab.emitEvent(
             self.fake_gitlab.getPushEvent(
                 project,
+                before='0' * 40,
+                after=branch_sha,
                 branch='refs/heads/%s' % branch))
         self.waitUntilSettled()
 
+        self.fake_gitlab.protectBranch(*project.split('/'), branch,
+                                       protected=False)
+        self.waitUntilSettled()
+
         A = self.fake_gitlab.openFakeMergeRequest(project, branch, 'A')
-        old_sha = A.sha
+        old_sha = A.getTargetBranchHeadSha()
         A.mergeMergeRequest()
-        new_sha = random_sha1()
+        new_sha = A.getTargetBranchHeadSha()
 
         # branch is not protected, no reconfiguration even if config file
         self._test_push_event_reconfigure(project, branch,

@@ -1784,6 +1784,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A_parent = str(upstream[p].commit('master'))
         A.setMerged()
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
@@ -1792,7 +1793,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         enqueue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
         ref = {'ref': 'master',
-               'oldrev': '90f173846e3af9154517b88543ffbd1691f31366',
+               'oldrev': A_parent,
                'newrev': A_commit,
                'pipeline': 'post', }
         if use_trigger:
@@ -2545,6 +2546,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A_parent = str(upstream[p].commit('master'))
         A.setMerged()
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
@@ -2564,7 +2566,7 @@ class TestCLIViaWebApi(BaseTestWeb):
              'enqueue-ref', '--tenant', 'tenant-one',
              '--project', 'org/project',
              '--pipeline', 'post', '--ref', 'master',
-             '--oldrev', '90f173846e3af9154517b88543ffbd1691f31366',
+             '--oldrev', A_parent,
              '--newrev', A_commit],
             stdout=subprocess.PIPE)
         output = p.communicate()
