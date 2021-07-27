@@ -16,6 +16,23 @@
       "revId": "9fdd5705c11bb0df716b3028ba702ed4a5ecbf22",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "939fa736_d9b36567",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T17:05:35Z",
+      "side": 1,
+      "message": "I think we should only shard the merger events.  I\u0027ll update.",
+      "revId": "9fdd5705c11bb0df716b3028ba702ed4a5ecbf22",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
