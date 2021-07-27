@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8b10d70_4894062b",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-07-27T22:34:20Z",
+      "side": 1,
+      "message": "I think this may want to be False then in TestStreamingZonesSSL we override this to true to test ssl. Currently we test with only ssl if I read this correctly.",
+      "range": {
+        "startLine": 103,
+        "startChar": 23,
+        "endLine": 103,
+        "endChar": 27
+      },
+      "revId": "7304c31c2f6827bb467525baa8a4c7679c252c68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
