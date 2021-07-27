@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d7748da_3e0c231b",
+        "filename": "doc/source/reference/drivers/smtp.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T17:31:53Z",
+      "side": 1,
+      "message": "The double negative makes this hard to read.  I think this means:\n\nOnly used when `use_starttls` is enabled.",
+      "revId": "629ed85000c6fb36d6531f72ab246f0e760d5b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
