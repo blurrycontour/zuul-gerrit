@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "b83dfbfe_a372b3c5",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T22:19:23Z",
+      "side": 1,
+      "message": "Nope, I\u0027ll make a followup.",
+      "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "662ad638_701103a4",
         "filename": "tests/unit/test_streaming.py",
         "patchSetId": 23
@@ -33,6 +50,23 @@
       "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56e66de9_01521fd5",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T22:19:23Z",
+      "side": 1,
+      "message": "Yeah, can always add more later.",
+      "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -56,6 +90,23 @@
       "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7d106a2_19ea26fa",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-27T22:19:23Z",
+      "side": 1,
+      "message": "Yeah.  It\u0027s a copy pasta from rpcclient; apparently it\u0027s worked well enough, but I agree, uuid4 is better.",
+      "revId": "5c4e8d7ddddafc1f4964a0498dfcaa7ac28da09d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
