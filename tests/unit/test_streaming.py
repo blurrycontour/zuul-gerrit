@@ -195,6 +195,7 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
                        os.path.join(FIXTURE_DIR, 'fingergw/fingergw.pem'))
             config.set('fingergw', 'tls_key',
                        os.path.join(FIXTURE_DIR, 'fingergw/fingergw.key'))
+            config.set('fingergw', 'tls_verify_hostnames', False)
 
         gateway = FingerGateway(
             config,

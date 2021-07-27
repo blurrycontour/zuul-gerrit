@@ -196,7 +196,7 @@ class LogStreamer(object):
         if use_ssl:
             context = ssl.SSLContext(ssl.PROTOCOL_TLS)
             context.verify_mode = ssl.CERT_REQUIRED
-            context.check_hostname = False
+            context.check_hostname = self.zuulweb.finger_tls_verify_hostnames
             context.load_cert_chain(
                 self.zuulweb.finger_tls_cert, self.zuulweb.finger_tls_key)
             context.load_verify_locations(self.zuulweb.finger_tls_ca)
@@ -1306,6 +1306,8 @@ class ZuulWeb(object):
             self.config, 'fingergw', 'tls_cert')
         self.finger_tls_ca = get_default(
             self.config, 'fingergw', 'tls_ca')
+        self.finger_tls_verify_hostnames = get_default(
+            self.config, 'fingergw', 'tls_verify_hostnames')
 
         route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
