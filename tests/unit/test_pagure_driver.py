@@ -389,6 +389,7 @@ class TestPagureDriver(ZuulTestCase):
     def test_client_enqueue_ref_pagure(self):
         repo_path = os.path.join(self.upstream_root, 'org/project')
         repo = git.Repo(repo_path)
+        parentsha = repo.head.commit.parents[0].hexsha
         headsha = repo.head.commit.hexsha
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
@@ -400,7 +401,7 @@ class TestPagureDriver(ZuulTestCase):
             project='org/project',
             trigger='pagure',
             ref='master',
-            oldrev='90f173846e3af9154517b88543ffbd1691f31366',
+            oldrev=parentsha,
             newrev=headsha)
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-post-job').result,
