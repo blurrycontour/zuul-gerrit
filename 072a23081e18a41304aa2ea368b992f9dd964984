@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "487d3b5e_6984cd6d",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "nit: I\u0027d prefer if we could keep some kind of import order (like you usually do in python as well) and keep the classes/constants/names per import sorted alphabetically. In my changes I did something like (the comments are just here for explanation:\n\n# base imports\nimport React from \u0027react\u0027\nimport PropTypes from \u0027prop-types\u0027\nimport { connect } from \u0027react-redux\u0027\n\n# patternfly imports (first core, then everything else like icons, table, ...)\n...\n\n# other third party imports (like moment.js)\n...\n\n# local imports (everything that is referenced by a (relative) path)\n\nMaybe it would be also worth to write a small style guide for this. I know that the zuul project doesn\u0027t want to be too restrictive, but I find that this is extremely helpful - especially in JavaScript, where you usually need some time to get used to the code 😄 .",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9388c19_a815f62f",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "Just as a general note: I\u0027d prefer to use functional components over class based components as they come with much less boilerplate code and IMHO most of their parts are easier to read and understand (especially the usage of states and props). I don\u0027t think we should update all the components in this patch as this is now open for quite some time, but if somebody wants to create new components in the future I\u0027d be glad if those are functional components 😊",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bdb3ab8a_c6ae18a0",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "AFAIK the super() call is deprecated",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "134e4c7a_8fad6d4e",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "nit: I would place the icon in front of the text, so it\u0027s similar to most of the icons we use. But maybe that\u0027s only me and the typical \"sign out\" button has the icon placed behind the text 😄",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b4e16e4_cc23216d",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "Although this renders nicely in (I\u0027d assume all) modern browsers, it gives some nasty exceptions in the console log because a \u003cdl\u003e or \u003cdiv\u003e cannot be part of a \u003cp\u003e.\n\nOne solution to this would be to use \u003cdiv\u003e tags instead of \u003cp\u003e and take care of the padding/margin via styling/CSS. Another solution could be something like the \"About modal\" example (which is using a grid) https://www.patternfly.org/v4/components/about-modal",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ea26874f_badd2d6d",
+        "filename": "web/src/reducers/auth.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "You could put the default state into the initialState.js file. This allows us to keep all initial states in a single file and simply use them for testing as well. This file could then be changed like this:\n\nimport initialState from \u0027./initialState\u0027\n\nexport default (state \u003d initialState.build, action) \u003d\u003e {",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c37a623_d0356674",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "I find it much easier to use the JavaScript spread operator (...) here instead of the immutability-helper. This could be simplified to:\n\nreturn { ...state, isFetching: true }\n\nThis basically says: Copy the old state dictionary and overwrite isFetching with true.\n\nYou can check out the reducers/build.js file for more complex examples (like nested dicts) if necessary.",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c376ccf_39c7be70",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "Could be simplified to\n\nreturn { ...state, isFetching: false, scope: [], asAdmin: false }",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3a27331_144bcdcc",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "Could be simplified to\n\nreturn { ...state, isFetching: false, scope: action.scope, isAdmin: action.isAdmin }",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ebd9ac94_4f545859",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-28T14:41:04Z",
+      "side": 1,
+      "message": "Is there a specific reason why we have to exclude those values here? This typically means that we do not handle the state correctly in those cases. Do we mutate their state or does this come from a third-party library?",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
