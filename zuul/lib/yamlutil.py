@@ -152,7 +152,11 @@ AnsibleUnsafeLoader.add_constructor(AnsibleUnsafeStr.yaml_tag,
                                     AnsibleUnsafeStr.from_yaml)
 
 
-def ansible_unsafe_dump(data, *args, **kwargs):
+def ansible_unsafe_dump(data, ignore_aliases=False, *args, **kwargs):
+    setattr(
+        AnsibleUnsafeDumper,
+        "ignore_aliases",
+        lambda self, data: ignore_aliases)
     return yaml.dump(data, *args, Dumper=AnsibleUnsafeDumper, **kwargs)
 
 
