@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30911c87_f347b530",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-07-28T09:58:08Z",
+      "side": 1,
+      "message": "this doesn\u0027t seem to be used?",
+      "range": {
+        "startLine": 236,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 28
+      },
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bcca9dbc_0e3e5212",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-07-28T09:58:08Z",
+      "side": 1,
+      "message": "Could we set it to UTC by default? It\u0027d make more sense than the first one in the list by default (Africa/Abidjan)",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 20
+      },
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "814c9fe4_bb09637a",
+        "filename": "web/src/containers/config/Timezone.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-07-28T09:58:08Z",
+      "side": 1,
+      "message": "Ah, nevermind my previous comment, this seems to be set here",
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
