@@ -4169,7 +4169,7 @@ class SchedulerTestApp:
             self.sched.reconfigure_event_queue,
         ]
 
-    def start(self, validate_tenants: list):
+    def start(self, validate_tenants=None):
         self.sched.start()
         if validate_tenants is None:
             self.sched.prime(self.config)

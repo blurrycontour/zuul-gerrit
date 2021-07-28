@@ -719,19 +719,25 @@ class TestLocks(ZooKeeperBaseTestCase):
 class TestLayoutStore(ZooKeeperBaseTestCase):
 
     def test_layout_state(self):
-        store = LayoutStateStore(self.zk_client)
+        store = LayoutStateStore(self.zk_client, lambda: None)
         state = LayoutState("tenant", "hostname", 0)
         store["tenant"] = state
         self.assertEqual(state, store["tenant"])
         self.assertNotEqual(state.ltime, -1)
         self.assertNotEqual(store["tenant"].ltime, -1)
 
+    def test_ordering(self):
+        state_one = LayoutState("tenant", "hostname", 1, ltime=1)
+        state_two = LayoutState("tenant", "hostname", 2, ltime=2)
+
+        self.assertGreater(state_two, state_one)
+
 
 class TestSystemConfigCache(ZooKeeperBaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.config_cache = SystemConfigCache(self.zk_client)
+        self.config_cache = SystemConfigCache(self.zk_client, lambda: None)
 
     def test_set_get(self):
         uac = model.UnparsedAbideConfig()

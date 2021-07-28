@@ -183,10 +183,15 @@ class SystemConfigCache(ZooKeeperSimpleBase):
     SYSTEM_ROOT = "/zuul/system"
     log = logging.getLogger("zuul.zk.SystemConfigCache")
 
-    def __init__(self, client):
+    def __init__(self, client, callback):
         super().__init__(client)
         self.conf_path = f"{self.SYSTEM_ROOT}/conf"
         self.lock_path = f"{self.SYSTEM_ROOT}/conf-lock"
+        self._callback = callback
+        self.kazoo_client.DataWatch(self.conf_path, self._configChanged)
+
+    def _configChanged(self, data, stat, event):
+        self._callback()
 
     @property
     def ltime(self):
