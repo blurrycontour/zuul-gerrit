@@ -139,7 +139,8 @@ class AnsibleUnsafeStr:
 
 
 class AnsibleUnsafeDumper(yaml.SafeDumper):
-    pass
+    def ignore_aliases(self, data):
+        return True
 
 
 class AnsibleUnsafeLoader(yaml.SafeLoader):
