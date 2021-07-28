@@ -82,3 +82,29 @@ list:
 """
         yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
         self.assertEqual(yaml_out, expected)
+
+    def test_ansible_dumper_with_aliases(self):
+        foo = {'bar': 'baz'}
+        data = {'foo1': foo, 'foo2': foo}
+        expected = """\
+foo1: &id001
+  bar: baz
+foo2: *id001
+"""
+        yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
+        self.assertEqual(yaml_out, expected)
+
+    def test_ansible_dumper_ignore_aliases(self):
+        foo = {'bar': 'baz'}
+        data = {'foo1': foo, 'foo2': foo}
+        expected = """\
+foo1:
+  bar: baz
+foo2:
+  bar: baz
+"""
+        yaml_out = yamlutil.ansible_unsafe_dump(
+            data,
+            ignore_aliases=True,
+            default_flow_style=False)
+        self.assertEqual(yaml_out, expected)
