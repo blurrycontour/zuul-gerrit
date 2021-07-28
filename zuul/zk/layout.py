@@ -93,6 +93,22 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
 
     layout_root = "/zuul/layout"
 
+    def __init__(self, client, callback):
+        super().__init__(client)
+        self._watched_tenants = set()
+        self._callback = callback
+        self.kazoo_client.ensure_path(self.layout_root)
+        self.kazoo_client.ChildrenWatch(self.layout_root, self._layoutCallback)
+
+    def _layoutCallback(self, tenant_list, event=None):
+        new_tenants = set(tenant_list) - self._watched_tenants
+        for tenant_name in new_tenants:
+            self.kazoo_client.DataWatch(f"{self.layout_root}/{tenant_name}",
+                                        self._callbackWrapper)
+
+    def _callbackWrapper(self, data, stat, event):
+        self._callback()
+
     def __getitem__(self, tenant_name):
         try:
             data, zstat = self.kazoo_client.get(

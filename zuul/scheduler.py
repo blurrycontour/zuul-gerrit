@@ -24,6 +24,7 @@ import threading
 import time
 import traceback
 import uuid
+from contextlib import suppress
 from collections import defaultdict
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -173,7 +174,8 @@ class Scheduler(threading.Thread):
         self.component_info = SchedulerComponent(self.zk_client, self.hostname)
         self.component_info.register()
         self.component_registry = ComponentRegistry(self.zk_client)
-        self.system_config_cache = SystemConfigCache(self.zk_client)
+        self.system_config_cache = SystemConfigCache(self.zk_client,
+                                                     self.wake_event.set)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
         # TODO (swestphahl): Remove after we've refactored reconfigurations
@@ -208,7 +210,9 @@ class Scheduler(threading.Thread):
 
         self.abide = Abide()
         self.unparsed_abide = UnparsedAbideConfig()
-        self.tenant_layout_state = LayoutStateStore(self.zk_client)
+        self.tenant_layout_state = LayoutStateStore(self.zk_client,
+                                                    self.wake_event.set)
+        self.local_layout_state = {}
 
         if not testonly:
             time_dir = self._get_time_database_dir()
@@ -638,12 +642,52 @@ class Scheduler(threading.Thread):
         self.repl = None
 
     def prime(self, config):
-        self.log.debug("Priming scheduler config")
-        event = ReconfigureEvent()
-        event.zuul_event_ltime = self.zk_client.getCurrentLtime()
-        self._doReconfigureEvent(event)
-        self.log.debug("Config priming complete")
-        self.last_reconfigured = int(time.time())
+        self.log.info("Priming scheduler config")
+        start = time.monotonic()
+
+        if self.system_config_cache.is_valid:
+            self.log.info("Using system config from Zookeeper")
+            self.updateSystemConfig()
+        else:
+            self.log.info("Creating initial system config")
+            self.primeSystemConfig()
+
+        loader = configloader.ConfigLoader(
+            self.connections, self, self.merger, self.keystore)
+        new_tenants = (set(self.unparsed_abide.tenants)
+                       - self.abide.tenants.keys())
+
+        with self.layout_lock:
+            for tenant_name in new_tenants:
+                layout_state = self.tenant_layout_state.get(tenant_name)
+                # In case we don't have a cached layout state we need to
+                # acquire the write lock since we load a new tenant.
+                if layout_state is None:
+                    tlock = tenant_write_lock(self.zk_client, tenant_name)
+                else:
+                    tlock = tenant_read_lock(self.zk_client, tenant_name)
+
+                # Consider all caches valid (min. ltime -1)
+                min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
+                with tlock:
+                    tenant = loader.loadTenant(
+                        self.abide, tenant_name, self.ansible_manager,
+                        self.unparsed_abide, min_ltimes=min_ltimes)
+
+                    # Refresh the layout state now that we are holding the lock
+                    # and we can be sure it won't be changed concurrently.
+                    layout_state = self.tenant_layout_state.get(tenant_name)
+                    if layout_state is None:
+                        # Reconfigure only tenants w/o an existing layout state
+                        self._reconfigureTenant(tenant)
+                    else:
+                        self.local_layout_state[tenant_name] = layout_state
+                    self.connections.reconfigureDrivers(tenant)
+
+        duration = round(time.monotonic() - start, 3)
+        self.log.info("Config priming complete (duration: %s seconds)",
+                      duration)
+        self.wake_event.set()
 
     def reconfigure(self, config, smart=False):
         self.log.debug("Submitting reconfiguration event")
@@ -815,6 +859,29 @@ class Scheduler(threading.Thread):
                             "current mode is %o" % (key_dir, mode))
         return key_dir
 
+    def updateTenantLayout(self, tenant_name):
+        self.log.debug("Updating layout of tenant %s", tenant_name)
+        if self.unparsed_abide.ltime < self.system_config_cache.ltime:
+            self.updateSystemConfig()
+
+        # Consider all caches valid (min. ltime -1)
+        min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
+        loader = configloader.ConfigLoader(
+            self.connections, self, self.merger, self.keystore)
+        with self.layout_lock:
+            self.log.debug("Updating local layout of tenant %s ", tenant_name)
+            tenant = loader.loadTenant(self.abide, tenant_name,
+                                       self.ansible_manager,
+                                       self.unparsed_abide,
+                                       min_ltimes=min_ltimes)
+            if tenant is not None:
+                layout_state = self.tenant_layout_state[tenant.name]
+                self.local_layout_state[tenant_name] = layout_state
+                self.connections.reconfigureDrivers(tenant)
+            else:
+                with suppress(KeyError):
+                    del self.local_layout_state[tenant_name]
+
     def _checkTenantSourceConf(self, config):
         tenant_config = None
         script = False
@@ -956,6 +1023,9 @@ class Scheduler(threading.Thread):
     def _doTenantReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
         # a request
+        if self.unparsed_abide.ltime < self.system_config_cache.ltime:
+            self.updateSystemConfig()
+
         with self.layout_lock:
             self.log.info("Tenant reconfiguration beginning for %s due to "
                           "projects %s",
@@ -1167,6 +1237,9 @@ class Scheduler(threading.Thread):
             hostname=self.hostname,
             last_reconfigured=int(time.time()),
         )
+        # We need to update the local layout state before the remote state,
+        # to avoid race conditions in the layout changed callback.
+        self.local_layout_state[tenant.name] = layout_state
         self.tenant_layout_state[tenant.name] = layout_state
 
         if self.statsd:
@@ -1374,20 +1447,40 @@ class Scheduler(threading.Thread):
                 if not self._stopped:
                     self.process_reconfigure_queue()
 
-                # Process tenant management events separate from other events
-                # as they might reload the tenant.
-                for tenant in self.abide.tenants.values():
-                    if not self._stopped:
-                        # This will also forward events for the pipelines
-                        # (e.g. enqueue or dequeue events) to the matching
-                        # pipeline event queues that are processed afterwards.
-                        self.process_tenant_management_queue(tenant)
+                if self.unparsed_abide.ltime < self.system_config_cache.ltime:
+                    self.updateSystemConfig()
 
-                for tenant in self.abide.tenants.values():
+                for tenant_name in self.unparsed_abide.tenants:
+                    if self._stopped:
+                        break
+
+                    tenant = self.abide.tenants.get(tenant_name)
+                    if not tenant:
+                        continue
+
+                    # This will also forward events for the pipelines
+                    # (e.g. enqueue or dequeue events) to the matching
+                    # pipeline event queues that are processed afterwards.
+                    self.process_tenant_management_queue(tenant)
+
+                    if self._stopped:
+                        break
+
                     try:
                         with tenant_read_lock(
-                            self.zk_client, tenant.name, blocking=False
+                            self.zk_client, tenant_name, blocking=False
                         ):
+                            if (self.tenant_layout_state[tenant_name]
+                                    > self.local_layout_state[tenant_name]):
+                                self.log.debug(
+                                    "Local layout of tenant %s not up to date",
+                                    tenant.name)
+                                self.updateTenantLayout(tenant_name)
+
+                            # Get tenant again, as it might have been updated
+                            # by a tenant reconfig or layout change.
+                            tenant = self.abide.tenants[tenant_name]
+
                             if not self._stopped:
                                 # This will forward trigger events to pipeline
                                 # event queues that are processed below.
@@ -1397,12 +1490,39 @@ class Scheduler(threading.Thread):
                     except LockException:
                         self.log.debug("Skipping locked tenant %s",
                                        tenant.name)
+                        if (self.tenant_layout_state[tenant_name]
+                                > self.local_layout_state[tenant_name]):
+                            # Let's keep looping until we've updated to the
+                            # latest tenant layout.
+                            self.wake_event.set()
             except Exception:
                 self.log.exception("Exception in run handler:")
                 # There may still be more events to process
                 self.wake_event.set()
             finally:
                 self.run_handler_lock.release()
+
+    def primeSystemConfig(self):
+        with self.layout_lock:
+            loader = configloader.ConfigLoader(
+                self.connections, self, self.merger, self.keystore)
+            tenant_config, script = self._checkTenantSourceConf(self.config)
+            self.unparsed_abide = loader.readConfig(
+                tenant_config, from_script=script)
+            self.system_config_cache.set(self.unparsed_abide, self.globals)
+
+            loader.loadTPCs(self.abide, self.unparsed_abide)
+            loader.loadAdminRules(self.abide, self.unparsed_abide)
+
+    def updateSystemConfig(self):
+        with self.layout_lock:
+            self.unparsed_abide, self.globals = self.system_config_cache.get()
+            self.ansible_manager = AnsibleManager(
+                default_version=self.globals.default_ansible_version)
+            loader = configloader.ConfigLoader(
+                self.connections, self, self.merger, self.keystore)
+            loader.loadTPCs(self.abide, self.unparsed_abide)
+            loader.loadAdminRules(self.abide, self.unparsed_abide)
 
     def process_pipelines(self, tenant):
         for pipeline in tenant.layout.pipelines.values():
