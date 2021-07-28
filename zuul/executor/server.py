@@ -2430,7 +2430,10 @@ class AnsibleJob(object):
         inventory['all']['vars']['zuul'] = self.zuul_vars
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
-                yaml.ansible_unsafe_dump(inventory, default_flow_style=False))
+                yaml.ansible_unsafe_dump(
+                    inventory,
+                    ignore_aliases=True,
+                    default_flow_style=False))
 
     def writeSetupInventory(self):
         jobdir_playbook = self.jobdir.setup_playbook
