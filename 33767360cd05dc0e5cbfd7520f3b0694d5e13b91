@@ -16,6 +16,24 @@
       "revId": "33767360cd05dc0e5cbfd7520f3b0694d5e13b91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6035fcd6_34b79c88",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-07-28T07:27:27Z",
+      "side": 1,
+      "message": "Yea there could be some room for optimization here. I\u0027m just not sure how \"eventual consistent\" we can allow this to be.",
+      "parentUuid": "72c2fb59_b8595e62",
+      "revId": "33767360cd05dc0e5cbfd7520f3b0694d5e13b91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
