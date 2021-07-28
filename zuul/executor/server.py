@@ -2452,7 +2452,7 @@ class AnsibleJob(object):
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
-                yaml.ansible_unsafe_dump(inventory, default_flow_style=False))
+                yaml.ansible_unsafe_dump(inventory, ignore_aliases=True, default_flow_style=False))
 
     def writeLoggingConfig(self):
         self.log.debug("Writing logging config for job %s %s",
