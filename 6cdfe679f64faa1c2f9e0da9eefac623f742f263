@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "afb7815b_46e9ef51",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T01:23:49Z",
+      "side": 0,
+      "message": "Just because we can optimize this, it doesn\u0027t mean we should.  When making a change like this which doesn\u0027t appear to be strictly necessary, it\u0027s a good practice to include your reasoning in the commit message.  Like \"we can remove the secondary merger from test_branch_deletion because...\".\n\nHowever, I don\u0027t think we can.  I used git blame to look for the original reasoning for this, and the reason is mentioned in the commit message.  See da5bb7eea65776ea7f953ae1476e06d9062eaaab\n\nOf course, it should also have been a code comment, but we deal with what we have.\n\nI think you should restructure this to keep the secondary merger (while disabling the executor merger).  I think you have done that in other tests.",
+      "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

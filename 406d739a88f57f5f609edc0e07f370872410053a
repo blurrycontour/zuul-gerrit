@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c6fcab82_385394ed",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T01:23:49Z",
+      "side": 1,
+      "message": "Can use .all() here",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "02030583_5202eb76",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T01:23:49Z",
+      "side": 1,
+      "message": "This could be:\n  cat_jobs \u003d self.merge_job_history[MergeRequest.CAT]\n\nThere\u0027s a subtle difference between these: the old is getting all of the merge jobs from any source, the new is getting all of the merge jobs submitted by the schedulers.  They should be equivalent since only the schedulers should submit merge jobs.  But it\u0027s a difference to be aware of (perhaps in the case of a test that submits a merge job directly).",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4f88d75_0a4d32e0",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T01:23:49Z",
+      "side": 1,
+      "message": "We should check if we\u0027re running after the wait, otherwise we might pick up a job (if one arrives just after we are requested to stop).",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
