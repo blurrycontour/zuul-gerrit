@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "afae1abc_a37b332f",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T02:44:30Z",
+      "side": 1,
+      "message": "Disregard this comment, the check after we enter the iterator is sufficient.",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2f3d2cdd_3ef7e0e7",
         "filename": "zuul/merger/server.py",
         "patchSetId": 5
