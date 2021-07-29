@@ -1240,6 +1240,12 @@ class GithubConnection(CachedBranchConnection):
     def getGithubClient(self,
                         project_name=None,
                         zuul_event_id=None):
+
+        # if app_id is configured but self.app_id is empty we are not
+        # authenticated yet against github as app
+        if not self._github_client_manager.initialized:
+            self._github_client_manager.initialize()
+
         return self._github_client_manager.getGithubClient(
             project_name=project_name, zuul_event_id=zuul_event_id)
 
