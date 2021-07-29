@@ -16,6 +16,23 @@
       "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "71a83d25_7de96c71",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T02:19:23Z",
+      "side": 0,
+      "message": "What\u0027s the reason for dropping this?",
+      "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
