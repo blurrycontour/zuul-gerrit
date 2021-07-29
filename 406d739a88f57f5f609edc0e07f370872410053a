@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "9b139e9e_ea6e0edc",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T02:58:29Z",
+      "side": 1,
+      "message": "The name \"MergerWorker\" is a bit confusing.  Previously, the Merger was implemented as a gearman Worker, so that\u0027s why the \"worker\" was started by the \"merger\".\n\nBut now we really just have the main merger thread; there aren\u0027t two distinct components.  I think we can drop the word \"worker\" from ewherewhere it\u0027s used (or maybe in some cases, like self.merger_worker change it to self.merger_thread).",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b4f88d75_0a4d32e0",
         "filename": "zuul/merger/server.py",
         "patchSetId": 5
@@ -64,6 +81,23 @@
       "writtenOn": "2021-07-29T02:44:30Z",
       "side": 1,
       "message": "Disregard this comment, the check after we enter the iterator is sufficient.",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7efe20a_63cb5510",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-29T02:58:29Z",
+      "side": 1,
+      "message": "There is no exception handling within the merger thread, so if any job raises an exception, the thread will exit.  Previously, the gearman worker handled that for us, but now we need to do it.\n\nBasically, any exception in self._runMergerWorker (which I suggest renaming to _runMergeJob) should still report completion (but also, failure).  And separately, if that report has an error, it should log it and continue.  The thread should never exit unless explicitly requested.\n\nIt\u0027s possible this is what\u0027s causing the test errors, but I still haven\u0027t caught it in logs.",
       "revId": "406d739a88f57f5f609edc0e07f370872410053a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
