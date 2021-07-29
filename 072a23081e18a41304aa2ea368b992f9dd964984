@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "5344c23d_f031543d",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-29T06:10:57Z",
+      "side": 1,
+      "message": "I wanted to suggest that we use a \"copy to clipboard\" functionality here, but I just discovered that this is already there 😊\nHowever, this wasn\u0027t obvious to me in the first place as a click on the button also expands the accordion.\nThat raised the question for me if we even need to show the token or simply change the \"Show Token\" entry to something like \"Copy zuul-client command\" that only copies the command on click (we might want to change the onClick handler to work on the whole paragraph and not just the icon).\n\nI think this depends on what the main purpose of this field should be. Do we want to show the user the token or is the copy-to-clipboard functionality more beneficially. Although I like the design with the accordion, I find that showing the token doesn\u0027t provide too much benefit, if I could simply copy it via a single click instead.\n\nIf we can\u0027t decide on that, we might also provide two actions here. One to copy the token and one to copy the zuul-client command.\n\nThis would also avoid the issue with the console errors I\u0027ve mentioned above since there would be no \u003cdiv\u003e and \u003cdl\u003e elements nested into \u003cp\u003e.",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ea26874f_badd2d6d",
         "filename": "web/src/reducers/auth.js",
         "patchSetId": 26
