@@ -18,6 +18,7 @@ import os
 import socket
 import sys
 import threading
+import time
 from abc import ABCMeta
 from configparser import ConfigParser
 
@@ -89,9 +90,9 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.zk_client
         )
 
-        self.merger_worker = threading.Thread(
-            target=self.runMergerWorker,
-            name="MergerServerMergerWorkerThread",
+        self.merger_thread = threading.Thread(
+            target=self.runMerger,
+            name="Merger",
         )
 
         self.merger_loop_wake_event = threading.Event()
@@ -144,7 +145,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                                zuul_event_id=zuul_event_id)
 
     def start(self):
-        self.log.debug('Starting merger worker')
+        self.log.debug('Starting merger')
         self._merger_running = True
         self.log.debug('Cleaning any stale git index.lock files')
         for (dirpath, dirnames, filenames) in os.walk(self.merge_root):
@@ -164,39 +165,43 @@ class BaseMergeServer(metaclass=ABCMeta):
                         self.log.exception(
                             'Unable to remove stale git lock: '
                             '%s this may result in failed merges' % fp)
-        self.merger_worker.start()
+        self.merger_thread.start()
 
     def stop(self):
-        self.log.debug('Stopping merger worker')
+        self.log.debug('Stopping merger')
         self._merger_running = False
         self.merger_loop_wake_event.set()
-        self.merger_worker.join()
+        self.merger_thread.join()
         self.merger_cleanup_election.cancel()
         self.zk_client.disconnect()
 
     def join(self):
         self.merger_loop_wake_event.set()
-        self.merger_worker.join()
+        self.merger_thread.join()
 
     def pause(self):
-        self.log.debug('Pausing merger worker')
-        # TODO (felix): How to pause/unpause the merger worker? We could pause
+        self.log.debug('Pausing merger')
+        # TODO (felix): How to pause/unpause the merger? We could pause
         # the Merger API as well, so any cache updates don't set the wake
         # event. Not sure if that is a proper solution though.
 
     def unpause(self):
-        self.log.debug('Resuming merger worker')
+        self.log.debug('Resuming merger')
 
-    def runMergerWorker(self):
+    def runMerger(self):
         while self._merger_running:
             self.merger_loop_wake_event.wait()
             self.merger_loop_wake_event.clear()
-            for merge_request in self.merger_api.next():
-                if not self._merger_running:
-                    break
-                self._runMergerWorker(merge_request)
+            try:
+                for merge_request in self.merger_api.next():
+                    if not self._merger_running:
+                        break
+                    self._runMergeJob(merge_request)
+            except Exception:
+                self.log.exception("Error in merge thread:")
+                time.sleep(5)
 
-    def _runMergerWorker(self, merge_request):
+    def _runMergeJob(self, merge_request):
         if not self.merger_api.lock(merge_request, blocking=False):
             return
 
@@ -210,7 +215,16 @@ class BaseMergeServer(metaclass=ABCMeta):
         # when it's currently not accepting work? Do we have to ignore
         # merge requests in that case as well?
         self.log.debug("Next executed merge job: %s", merge_request)
-        self.executeMergeJob(merge_request, params)
+        result = None
+        try:
+            result = self.executeMergeJob(merge_request, params)
+        except Exception:
+            self.log.exception("Error running merge job:")
+        finally:
+            try:
+                self.completeMergeJob(merge_request, result)
+            except Exception:
+                self.log.exception("Error completing merge job:")
 
     def executeMergeJob(self, merge_request, params):
         result = None
@@ -222,8 +236,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             result = self.refstate(merge_request, params)
         elif merge_request.job_type == MergeRequest.FILES_CHANGES:
             result = self.fileschanges(merge_request, params)
-
-        self.completeMergeJob(merge_request, result)
+        return result
 
     def cat(self, merge_request, args):
         self.log.debug("Got cat job: %s", merge_request.uuid)

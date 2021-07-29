@@ -898,7 +898,7 @@ class TestMerger(ZuulTestCase):
         # things during test boostrapping but now it is just in the way.
         self.executor_server._merger_running = False
         self.executor_server.merger_loop_wake_event.set()
-        self.executor_server.merger_worker.join()
+        self.executor_server.merger_thread.join()
         # Start a dedicated merger and do a merge to populate the repo on disk
         self._startMerger()
 

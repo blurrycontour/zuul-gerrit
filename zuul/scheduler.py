@@ -518,7 +518,7 @@ class Scheduler(threading.Thread):
         if self.merge_request_cleanup_lock.acquire(blocking=False):
             try:
                 self.log.debug("Starting merge request cleanup")
-                self.merger.cleanupLostMergeRequests()
+                self.merger.merger_api.cleanupLostMergeRequests()
             finally:
                 self.merge_request_cleanup_lock.release()
 

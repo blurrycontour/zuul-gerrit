@@ -550,6 +550,14 @@ class TestScheduler(ZuulTestCase):
     @simple_layout('layouts/branch-deletion.yaml')
     def test_branch_deletion(self):
         "Test the correct variant of a job runs on a branch"
+
+        # Start a secondary merger so this test exercises branch
+        # deletion on both a merger and a separate executor.
+        self.executor_server._merger_running = False
+        self.executor_server.merger_loop_wake_event.set()
+        self.executor_server.merger_thread.join()
+        self._startMerger()
+
         self.create_branch('org/project', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchCreatedEvent(

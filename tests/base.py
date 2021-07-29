@@ -5227,7 +5227,7 @@ class ZuulTestCase(BaseTestCase):
 
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
         # Look up the queued merge jobs directly from ZooKeeper
-        queued_merge_jobs = list(self.merger_api._test_getMergeJobsInState())
+        queued_merge_jobs = list(self.merger_api.all())
         # Always ignore merge jobs which are on hold
         for job in queued_merge_jobs:
             if job.state != MergeRequest.HOLD:
