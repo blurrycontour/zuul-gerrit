@@ -1144,7 +1144,7 @@ class AnsibleJob(object):
                 )
 
     def _base_job_data(self):
-        return {
+        data = {
             # TODO(mordred) worker_name is needed as a unique name for the
             # client to use for cancelling jobs on an executor. It's
             # defaulting to the hostname for now, but in the future we
@@ -1154,6 +1154,9 @@ class AnsibleJob(object):
             'worker_hostname': self.executor_server.hostname,
             'worker_log_port': self.executor_server.log_streaming_port,
         }
+        if self.executor_server.zone:
+            data['worker_zone'] = self.executor_server.zone
+        return data
 
     def _send_aborted(self):
         result = dict(result='ABORTED')
