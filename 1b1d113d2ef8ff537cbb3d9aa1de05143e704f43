@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09be5a27_47f1c88e",
+        "filename": "web/src/api.js",
+        "patchSetId": 17
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:49:32Z",
+      "side": 1,
+      "message": "Do we have to provide the null parameter or can this also be handled by the backend?",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d4cc97d_b30d19ff",
+        "filename": "web/src/api.js",
+        "patchSetId": 17
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:49:32Z",
+      "side": 1,
+      "message": "Same like above?",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5f5998cc_7ebb8c46",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:49:32Z",
+      "side": 1,
+      "message": "I think we should make this button less prominent.\n\nI have two proposals in mind (depending on how prominent we want to make this action):\n\n1. We could add a third column to the buildset page (like the link column on the build page) just with a slightly different styling so that one could differentiate between a link and an action. This might work a little better in case we also add links to the build page as on the buildset page this action button might get a little lost.\n\n2. Keep it where it is, but change the styling to look less like a button and more like an action icon. (I\u0027m just writing down what comes to my mind here, but hopefully it\u0027s somewhat understandable). E.g. something like the REBASE/ABANDON/EDIT section when viewing a change in Gerrit (top right corner). This could also work if we put the actions between the title and the content  with the different actions next to each other in a single row.\n\n3. Like 2, but with a tooltip instead of the text next to the icon. Depending on the kind of \"actions\" we are planning to add in the future we could also add some colors to the icons (as long as it doesn\u0027t look like a rainbow in the end 😄)\n\nMaybe there is also a combination of 2 and 3 that allows us to show both, icon and text without providing too much visual noise.\n\nThe 3. solution might also work as an additional action column in the buildsets table and it would fit the \"button/action bar\" for the dequeue/promote actions in the change panel.\n\nI\u0027d prefer the 3. solution. For what I have in my mind this feels nice and clean and allows to add additional actions without breaking the style.",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8de490cd_a6376e82",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:49:32Z",
+      "side": 1,
+      "message": "Would it make sense to provide a custom modal/popup instead that looks similar to the confirmation modal? Using an alert here breaks the flow a little.\n\nMaybe it would be even better to provide the success message in form of a toast (I think that is what most modern websites do by now). Green if success, read if failure.",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
