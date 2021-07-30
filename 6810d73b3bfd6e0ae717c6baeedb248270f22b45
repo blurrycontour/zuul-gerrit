@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8ab70990_566ff7f8",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T06:26:33Z",
+      "side": 0,
+      "message": "Why are we moving this to the merger api? I don\u0027t mind any of the versions, I just put it in here as the equivalent build request cleanup methods are part of the executor client. If we move it here, we should also move the build request cleanup methods to the executor API.",
+      "revId": "6810d73b3bfd6e0ae717c6baeedb248270f22b45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
