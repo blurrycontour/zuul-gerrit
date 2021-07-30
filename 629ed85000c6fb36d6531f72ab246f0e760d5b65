@@ -16,6 +16,24 @@
       "revId": "629ed85000c6fb36d6531f72ab246f0e760d5b65",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "477f6698_ec137d43",
+        "filename": "doc/source/reference/drivers/smtp.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2021-07-30T14:54:23Z",
+      "side": 1,
+      "message": "Updated, thanks !",
+      "parentUuid": "2d7748da_3e0c231b",
+      "revId": "629ed85000c6fb36d6531f72ab246f0e760d5b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
