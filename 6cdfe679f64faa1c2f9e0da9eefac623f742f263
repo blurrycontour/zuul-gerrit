@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "8c6a9f8c_f9e2ad3c",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T05:58:10Z",
+      "side": 0,
+      "message": "Update on my last comment (somehow this sentence went missing): But now I see that I understood this part wrong and the test is intended to do so.",
+      "parentUuid": "a00007a5_fc538d5e",
+      "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "71a83d25_7de96c71",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
