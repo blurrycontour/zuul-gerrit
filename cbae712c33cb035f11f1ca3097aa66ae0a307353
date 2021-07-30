@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92971ad5_413cfcdd",
+        "filename": "web/src/containers/status/Change.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:20:46Z",
+      "side": 1,
+      "message": "nit: Wrapping this into a fragment shouldn\u0027t be necessary as it\u0027s only a single node.",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ddd3b082_ddf1471b",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:20:46Z",
+      "side": 1,
+      "message": "Maybe https://fontawesome.com/v5.15/icons/ban?style\u003dsolid fits a little better to the use case than a trash icon.",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a7d4db6_9f1e37e8",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:20:46Z",
+      "side": 1,
+      "message": "I\u0027d prefer to use some of the color constants from PF4 to ensure that the colors fit to each other. E.g. something like\n\nstyle\u003d{{ color: \u0027var(--pf-global--danger-color--100)\u0027 }}",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "224d6b48_454aef72",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T13:20:46Z",
+      "side": 1,
+      "message": "I feel that the dequeue icon is mingled together with the content a little too much.\n\nMaybe it helps to put the button in the top right corner of the change panel in a separate row (something like a \"button bar\" above the content) to keep them separated from the content. This might also work well when more buttons are coming (like the promote button from one of the follow up changes).\n\nI hope one can understand what I mean. If not I could also provide an example for this.",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
