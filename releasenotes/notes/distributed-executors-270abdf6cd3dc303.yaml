@@ -3,5 +3,5 @@ features:
   - |
     Zuul now can route live log streams via finger gateways to make it possible
     to distribute executors over multiple datacenters without the possibility
-    to directly contact every executor from within zuul-web. This is typical
-    the case in an k8s based deployment.
+    to directly contact every executor from within zuul-web. This is typically
+    the case in a Kubernetes based deployment.

@@ -150,6 +150,14 @@ class MergerComponent(BaseComponent):
 class FingerGatewayComponent(BaseComponent):
     kind = "fingergw"
 
+    def __init__(self, client, hostname):
+        super().__init__(client, hostname)
+        self.initial_state = {
+            "zone": None,
+            "public_port": None,
+        }
+        self.content.update(self.initial_state)
+
 
 class WebComponent(BaseComponent):
     kind = "web"

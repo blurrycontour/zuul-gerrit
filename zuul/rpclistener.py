@@ -260,6 +260,11 @@ class RPCListener(RPCListenerBase):
 
         job.sendWorkComplete(json.dumps(running_items))
 
+    def _get_fingergw_in_zone(self, zone):
+        for gw in self.sched.component_registry.all('fingergw'):
+            if gw.zone == zone:
+                return gw
+
     def handle_get_job_log_stream_address(self, job):
         # TODO: map log files to ports. Currently there is only one
         #       log stream for a given job. But many jobs produce many
@@ -287,26 +292,28 @@ class RPCListener(RPCListenerBase):
             # If zone and worker zone are both given check if we need to route
             # via a finger gateway in that zone.
             source_zone = args.get('source_zone')
-            if (source_zone and build.worker.zone and
-                    source_zone != build.worker.zone):
-                info = self.sched.finger_client.get_fingergw_in_zone(
-                    build.worker.zone)
+            if (build.worker.zone and source_zone != build.worker.zone):
+                info = self._get_fingergw_in_zone(build.worker.zone)
                 if info:
-                    job_log_stream_address['server'] = info['server']
-                    job_log_stream_address['port'] = info['port']
-                    use_ssl = info.get('use_ssl')
+                    job_log_stream_address['server'] = info.hostname
+                    job_log_stream_address['port'] = info.public_port
+                    use_ssl = getattr(info, 'use_ssl', False)
                     if use_ssl:
                         job_log_stream_address['use_ssl'] = use_ssl
-                    self.log.debug('Source and worker zone are different, '
-                                   'routing via %s:%s', info['server'],
-                                   info['port'])
+                    self.log.debug('Source (%s) and worker (%s) zone '
+                                   'are different, routing via %s:%s',
+                                   source_zone, build.worker.zone,
+                                   info.hostname, info.public_port)
                 else:
-                    self.log.warning('Source and worker zone are different '
-                                     'but no fingergw in target zone found. '
-                                     'Falling back to direct connection.')
+                    self.log.warning('Source (%s) and worker (%s) zone '
+                                     'are different but no fingergw in '
+                                     'target zone found. '
+                                     'Falling back to direct connection.',
+                                     source_zone, build.worker.zone)
             else:
-                self.log.debug('Source or worker zone undefined or equal, no'
-                               ' routing is needed.')
+                self.log.debug('Source (%s) or worker zone (%s) undefined '
+                               'or equal, no routing is needed.',
+                               source_zone, build.worker.zone)
 
             if 'server' not in job_log_stream_address:
                 job_log_stream_address['server'] = build.worker.hostname
