@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a00007a5_fc538d5e",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-07-30T05:55:39Z",
+      "side": 0,
+      "message": "I think I removed the second merger (line 553) by accident. My intention was to remove only the part after that where the gear functions are unregistered (merger_gear.unRegisterFunction()) since that shouldn\u0027t be necessary anymore with the merges via ZooKeeper.",
+      "parentUuid": "afb7815b_46e9ef51",
+      "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "71a83d25_7de96c71",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
