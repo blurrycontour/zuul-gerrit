@@ -16,6 +16,23 @@
       "revId": "6810d73b3bfd6e0ae717c6baeedb248270f22b45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c336d56_e843ebb1",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-31T19:59:28Z",
+      "side": 0,
+      "message": "Oh I\u0027m sorry I should have commented on that.\n\nThe easiest way to test this code is to use it in test_zk, which doesn\u0027t start a full zuul so it\u0027s difficult to instantiate a merge client.  But it is easy to instantiate a merger api.  This code also fits very well into the merger api (possibly it\u0027s even better there), so I think it\u0027s okay to move.\n\nAnd yes, I agree we should move the equivalent executor code into the executor api.",
+      "revId": "6810d73b3bfd6e0ae717c6baeedb248270f22b45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
