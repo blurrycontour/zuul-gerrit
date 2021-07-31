@@ -36,6 +36,40 @@
     },
     {
       "key": {
+        "uuid": "6c48e54b_52601e06",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-31T20:00:26Z",
+      "side": 1,
+      "message": "Disregard this comment.  I stand corrected; this is the merger api history not the merger client history.  It\u0027s possible those no longer need to be distinct.  But we don\u0027t need to change that in this patch.",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b23a36fb_5235e45f",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-07-31T20:00:26Z",
+      "side": 1,
+      "message": "We should probably clean up the results too.\n\nAlso, do the tests exercise this?  I\u0027m not sure they do.  Maybe we can move it into the executor api and call it from test_zk.",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9b139e9e_ea6e0edc",
         "filename": "zuul/merger/server.py",
         "patchSetId": 5
