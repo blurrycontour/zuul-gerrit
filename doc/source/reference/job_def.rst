@@ -797,8 +797,8 @@ Here is an example of two job definitions:
       it is used to determine whether each variant on which it appears
       will be used when running the job.
 
-      If there is no job definition for a given job which matches the
-      branch of an item, then that job is not run for the item.
+      If none of the defined job variants contain a branches setting which
+      matches the branch of an item, then that job is not run for the item.
       Otherwise, all of the job variants which match that branch are
       used when freezing the job.  However, if
       :attr:`job.override-checkout` or
