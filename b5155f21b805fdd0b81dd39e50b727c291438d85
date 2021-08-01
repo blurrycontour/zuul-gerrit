@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ff5aed4_cf1d6307",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-01T14:23:30Z",
+      "side": 1,
+      "message": "I think the easiest thing to do is to just set an internal flag.  Below in runMerger, we would just \"continue\" after clearing the wake event if the pause flag is set.",
+      "revId": "b5155f21b805fdd0b81dd39e50b727c291438d85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b68baae1_0aa44100",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-01T14:23:30Z",
+      "side": 1,
+      "message": "No, the merger doesn\u0027t know anything about the executor.  The executor pauses its internal merger when it is paused (but it doesn\u0027t pause it when it stops accepting jobs).",
+      "revId": "b5155f21b805fdd0b81dd39e50b727c291438d85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
