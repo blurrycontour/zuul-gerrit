@@ -16,6 +16,7 @@
 import json
 import logging
 import time
+import random
 from abc import ABCMeta
 from typing import List
 
@@ -261,9 +262,11 @@ class RPCListener(RPCListenerBase):
         job.sendWorkComplete(json.dumps(running_items))
 
     def _get_fingergw_in_zone(self, zone):
-        for gw in self.sched.component_registry.all('fingergw'):
-            if gw.zone == zone:
-                return gw
+        gws = [gw for gw in self.sched.component_registry.all('fingergw')
+               if gw.zone == zone]
+        if gws:
+            return random.choice(gws)
+        return None
 
     def handle_get_job_log_stream_address(self, job):
         # TODO: map log files to ports. Currently there is only one
