@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "cd610c42_5b40a4c5",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-08-01T07:18:59Z",
+      "side": 1,
+      "message": "i think Is an old attribue, i remove it",
+      "parentUuid": "",
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bcca9dbc_0e3e5212",
         "filename": "web/src/containers/config/Config.jsx",
         "patchSetId": 31
@@ -48,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "727ad22d_f9c63c7a",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-08-01T07:18:59Z",
+      "side": 1,
+      "message": "this state is updated by config redux",
+      "parentUuid": "bcca9dbc_0e3e5212",
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "814c9fe4_bb09637a",
         "filename": "web/src/containers/config/Timezone.jsx",
         "patchSetId": 31
@@ -59,6 +95,41 @@
       "writtenOn": "2021-07-28T09:58:08Z",
       "side": 1,
       "message": "Ah, nevermind my previous comment, this seems to be set here",
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a98177d9_94076143",
+        "filename": "web/src/containers/config/Timezone.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-08-01T07:18:59Z",
+      "side": 1,
+      "message": "this part is just an order to add \"UTC\" on top of list with spécial Key -1",
+      "parentUuid": "814c9fe4_bb09637a",
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "05e62e56_a5040695",
+        "filename": "web/src/reducers/preferences.js",
+        "patchSetId": 31
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-08-01T07:18:59Z",
+      "side": 1,
+      "message": "the default value \"UTC\" us here",
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
