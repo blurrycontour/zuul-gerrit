@@ -155,6 +155,7 @@ class FingerGatewayComponent(BaseComponent):
         self.initial_state = {
             "zone": None,
             "public_port": None,
+            "use_ssl": False,
         }
         self.content.update(self.initial_state)
 
