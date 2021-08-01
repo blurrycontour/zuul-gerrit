@@ -68,6 +68,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     ):
         self.connections = connections
         self._merger_running = False
+        self._merger_paused = False
         self.merge_email = get_default(config, 'merger', 'git_user_email',
                                        'zuul.merger.default@example.com')
         self.merge_name = get_default(config, 'merger', 'git_user_name',
@@ -181,17 +182,19 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def pause(self):
         self.log.debug('Pausing merger')
-        # TODO (felix): How to pause/unpause the merger? We could pause
-        # the Merger API as well, so any cache updates don't set the wake
-        # event. Not sure if that is a proper solution though.
+        self._merger_paused = True
 
     def unpause(self):
         self.log.debug('Resuming merger')
+        self._merger_paused = False
+        self.merger_loop_wake_event.set()
 
     def runMerger(self):
         while self._merger_running:
             self.merger_loop_wake_event.wait()
             self.merger_loop_wake_event.clear()
+            if self._merger_paused:
+                continue
             try:
                 for merge_request in self.merger_api.next():
                     if not self._merger_running:
