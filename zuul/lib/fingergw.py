@@ -55,7 +55,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
             if use_ssl:
                 context = ssl.SSLContext(ssl.PROTOCOL_TLS)
                 context.verify_mode = ssl.CERT_REQUIRED
-                context.check_hostname = False
+                context.check_hostname = self.fingergw.tls_verify_hostnames
                 context.load_cert_chain(self.fingergw.tls_cert,
                                         self.fingergw.tls_key)
                 context.load_verify_locations(self.fingergw.tls_ca)
@@ -170,6 +170,8 @@ class FingerGateway(object):
         self.tls_key = get_default(config, 'fingergw', 'tls_key')
         self.tls_cert = get_default(config, 'fingergw', 'tls_cert')
         self.tls_ca = get_default(config, 'fingergw', 'tls_ca')
+        self.tls_verify_hostnames = get_default(
+            config, 'fingergw', 'tls_verify_hostnames', default=True)
         client_only = get_default(config, 'fingergw', 'tls_client_only',
                                   default=False)
         if (all([self.tls_key, self.tls_cert, self.tls_ca])
