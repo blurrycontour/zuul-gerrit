@@ -69,6 +69,24 @@
       "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e7a301a_b2eb935a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T08:11:46Z",
+      "side": 0,
+      "message": "I dropped the self.jobs list in the merger client as I thought that this is not needed anymore. This method is not used in the \"production code\", and in the tests we could always retrieve the outstanding/queued jobs via the central merger api in the ZuulTestCase class (e.g. what\u0027s currently done in the __areAllMergeJobsWaiting() function in tests/base.py.",
+      "parentUuid": "71a83d25_7de96c71",
+      "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

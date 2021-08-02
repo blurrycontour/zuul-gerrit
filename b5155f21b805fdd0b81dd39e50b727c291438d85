@@ -50,6 +50,24 @@
       "revId": "b5155f21b805fdd0b81dd39e50b727c291438d85",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "869d5ce5_ea700bb6",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T08:11:46Z",
+      "side": 1,
+      "message": "Ok, so we can just remove this todo here",
+      "parentUuid": "b68baae1_0aa44100",
+      "revId": "b5155f21b805fdd0b81dd39e50b727c291438d85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

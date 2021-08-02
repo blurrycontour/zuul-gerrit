@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "36aa4990_ad836d7e",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T08:11:46Z",
+      "side": 1,
+      "message": "I have removed the RecordingMergeClient.history in a later change to combine both history approaches: https://review.opendev.org/c/zuul/zuul/+/773030/9\n\nRegarding the subtle difference: That\u0027s right, but I didn\u0027t find a better solution to this. Should we add a comment somewhere (maybe in the commit message, as it\u0027s bound to this change)?",
+      "parentUuid": "02030583_5202eb76",
+      "revId": "406d739a88f57f5f609edc0e07f370872410053a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b23a36fb_5235e45f",
         "filename": "zuul/merger/client.py",
         "patchSetId": 5
