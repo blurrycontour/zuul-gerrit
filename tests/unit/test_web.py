@@ -2928,6 +2928,9 @@ class TestTenantScopedWebAPICORSEnabledBadOrigin(TestTenantScopedWebApi):
     def test_autohold_delete_wrong_tenant(self):
         self.skipTest('N/A')
 
+class TestTenantScopedWebAPICORSEnabledRegEx(TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web-CORS-regex.conf'
+    extra_headers = {'Origin': 'nodanaonly.zuul'}
 
 class TestTenantScopedWebAPICORSEnabledWildcard(TestTenantScopedWebApi):
     config_file = 'zuul-admin-web-CORS-wildcard.conf'

@@ -417,17 +417,11 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.reported, 2)
 
 
+# zuul-client does not make CORS calls, ensure this does not
+# conflict with CORS enablement
 class TestZuulClientAdminCORSEnabled(TestZuulClientAdmin):
     """Test the admin commands of zuul-client, CORS enabled"""
     config_file = 'zuul-admin-web-CORS-multiple-origins.conf'
-
-
-class TestZuulClientAdminCORSEnabledWildCard(TestZuulClientAdmin):
-    """
-    Test the admin commands of zuul-client, CORS enabled with origin
-    wildcard
-    """
-    config_file = 'zuul-admin-web-CORS-wildcard.conf'
 
 
 class TestZuulClientQueryData(BaseTestWeb):

@@ -28,6 +28,7 @@ import json
 import logging
 import os
 import time
+import re
 import select
 import ssl
 import threading
@@ -157,8 +158,25 @@ class CORSTool(cherrypy.Tool):
                                self.handle_CORS,
                                priority=50)
         self.CORS_enabled = CORS_enabled
-        self.allowed_origins = allowed_origins
+        self.allowed_origins = allowed_origins or []
         self.log = get_request_logger()
+        self.patterns = []
+        for o in self.allowed_origins:
+            try:
+                self.patterns.append(re.compile(o))
+            except re.error:
+                if o != '*':
+                    self.log.error(
+                        'Could not compile origin "%s" as a regular '
+                        'expression, it will be skipped' % o)
+        # set the "Vary" header if we have multiple origins or
+        # at least one regex
+        special_chars = {'?', '^', '$', '+', '[', '{', '(', '|', '\\'}
+        self.vary = (
+            len(self.allowed_origins) > 1
+            or any(len(set(o) & special_chars) > 0
+                   for o in self.allowed_origins)
+        )
 
     def handle_CORS(self, allowed_methods=None):
 
@@ -175,19 +193,20 @@ class CORSTool(cherrypy.Tool):
         # to the API issued without a browser (zuul-client for example)
         # won't run through this check.
         if self.CORS_enabled and origin is not None:
-            if origin in self.allowed_origins:
-                self.log.debug(
-                    'Accepted request from allowed origin "%s"' % origin
-                )
-                resp.headers['Access-Control-Allow-Origin'] = origin
-                if len(self.allowed_origins) > 1:
-                    resp.headers['Vary'] = 'Origin'
-            elif '*' in self.allowed_origins:
+            if '*' in self.allowed_origins:
                 self.log.debug(
                     'Accepted request from origin "%s" since '
                     '"*" is in allowed origins' % origin
                 )
                 resp.headers['Access-Control-Allow-Origin'] = '*'
+            elif any(o.search(origin) for o in self.patterns):
+                resp.headers['Access-Control-Allow-Origin'] = origin
+                self.log.debug(
+                    'Accepted request from allowed origin "%s"' % origin
+                )
+
+                if self.vary:
+                    resp.headers['Vary'] = 'Origin'
             else:
                 # Use the first allowed origin as default
                 resp.headers['Access-Control-Allow-Origin'] =\
