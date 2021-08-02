@@ -87,6 +87,23 @@
       "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa29c3b3_e2be59bd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1346,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T14:11:36Z",
+      "side": 0,
+      "message": "Okay, the only place this is used is a test which doesn\u0027t involve any merge jobs, so this is probably okay.\n\n(In another change, we can probably remove the whole thing and update the test to use the typical test methods.)",
+      "revId": "6cdfe679f64faa1c2f9e0da9eefac623f742f263",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
