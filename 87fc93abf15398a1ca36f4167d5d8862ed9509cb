@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "32a9ab29_2e645717",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T10:08:56Z",
+      "side": 1,
+      "message": "1. I was just thinking if it is a good idea to put all the functionality into a single icon. Maybe it\u0027s better to just show the pipeline-specific icon add a second helper icon that provides the tooltip and the link to the zuul documentation.\n\nThis helper icon could be a greyed-out question-circle (https://fontawesome.com/v5.15/icons/question-circle?style\u003dregular) icon that is placed right behind the pipeline name and wrapped into a \u003csup\u003e tag (similar to the external link icon that is shown next to the \"View log\" link on the build result page).\n\nMaybe you could use the ExternalLink component https://opendev.org/zuul/zuul/src/branch/master/web/src/Misc.jsx#L24 (which should provide most of the style) and just allow to override the icon.\n\nI\u0027m not sure if this adds to much noice to the status page, but I would give it a try.\n\n2. It might be a good idea to ensure that external links are always opened in a new tab.",
+      "revId": "87fc93abf15398a1ca36f4167d5d8862ed9509cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
