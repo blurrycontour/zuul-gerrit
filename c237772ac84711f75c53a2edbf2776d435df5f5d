@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a19943f_2cf1b249",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-02T23:19:28Z",
+      "side": 1,
+      "message": "Previously this wasn\u0027t wrapped in a lock (because we relied on mtimes to determine what was safe to cleanup and that can happen in parallel). Calling this out in case there is concern that having a lock here will result in this happening too infrequently. I suspect it will be fine though.",
+      "revId": "c237772ac84711f75c53a2edbf2776d435df5f5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
