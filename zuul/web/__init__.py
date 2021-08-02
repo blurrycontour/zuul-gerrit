@@ -25,6 +25,7 @@ import json
 import logging
 import os
 import time
+import re
 import select
 import ssl
 import threading
@@ -82,7 +83,8 @@ class CORSTool(cherrypy.Tool):
         cherrypy.Tool.__init__(self, 'on_start_resource',
                                self.handle_CORS)
         self.CORS_enabled = CORS_enabled
-        self.allowed_origins = allowed_origins
+        self.allowed_origins = allowed_origins or []
+        self.patterns = [re.compile(o) for o in allowed_origins]
 
     def handle_CORS(self, allowed_methods=None):
 
@@ -99,12 +101,10 @@ class CORSTool(cherrypy.Tool):
         # to the API issued without a browser (zuul-client for example)
         # won't run through this check.
         if self.CORS_enabled and origin is not None:
-            if origin in self.allowed_origins:
+            if any(o.search(origin) for o in self.patterns):
                 resp.headers['Access-Control-Allow-Origin'] = origin
                 if len(self.allowed_origins) > 1:
                     resp.headers['Vary'] = 'Origin'
-            elif '*' in self.allowed_origins:
-                resp.headers['Access-Control-Allow-Origin'] = '*'
             else:
                 # Pick arbitrarily the first allowed origin
                 resp.headers['Access-Control-Allow-Origin'] =\
