@@ -52,24 +52,33 @@ MANAGEMENT_EVENT_TYPE_MAP = {
 # /zuul/events/tenant   TENANT_ROOT
 #   /{tenant}           TENANT_NAME_ROOT
 #     /management       TENANT_MANAGEMENT_ROOT
+#       /queue          TENANT_MANAGEMENT_QUEUE
 #     /trigger          TENANT_TRIGGER_ROOT
+#       /queue          TENANT_TRIGGER_QUEUE
 #     /pipelines        PIPELINE_ROOT
 #       /{pipeline}     PIPELINE_NAME_ROOT
 #         /management   PIPELINE_MANAGEMENT_ROOT
+#           /queue      PIPELINE_MANAGEMENT_QUEUE
 #         /trigger      PIPELINE_TRIGGER_ROOT
+#           /queue      PIPELINE_TRIGGER_QUEUE
 #         /result       PIPELINE_RESULT_ROOT
+#           /queue      PIPELINE_RESULT_QUEUE
 
 TENANT_ROOT = "/zuul/events/tenant"
 TENANT_NAME_ROOT = TENANT_ROOT + "/{tenant}"
 TENANT_MANAGEMENT_ROOT = TENANT_NAME_ROOT + "/management"
+TENANT_MANAGEMENT_QUEUE = TENANT_MANAGEMENT_ROOT + "/queue"
 TENANT_TRIGGER_ROOT = TENANT_NAME_ROOT + "/trigger"
+TENANT_TRIGGER_QUEUE = TENANT_TRIGGER_ROOT + "/queue"
 PIPELINE_ROOT = TENANT_NAME_ROOT + "/pipelines"
 PIPELINE_NAME_ROOT = PIPELINE_ROOT + "/{pipeline}"
 PIPELINE_MANAGEMENT_ROOT = PIPELINE_NAME_ROOT + "/management"
+PIPELINE_MANAGEMENT_QUEUE = PIPELINE_MANAGEMENT_ROOT + "/queue"
 PIPELINE_TRIGGER_ROOT = PIPELINE_NAME_ROOT + "/trigger"
+PIPELINE_TRIGGER_QUEUE = PIPELINE_TRIGGER_ROOT + "/queue"
 PIPELINE_RESULT_ROOT = PIPELINE_NAME_ROOT + "/result"
+PIPELINE_RESULT_QUEUE = PIPELINE_RESULT_ROOT + "/queue"
 
-EVENT_DATA_ROOT = "/zuul/events/data"
 CONNECTION_ROOT = "/zuul/events/connection"
 
 # This is the path to the serialized from of the event in ZK (along
@@ -111,8 +120,8 @@ class EventWatcher(ZooKeeperSimpleBase):
             if tenant_name in self.watched_tenants:
                 continue
 
-            for path in (TENANT_MANAGEMENT_ROOT,
-                         TENANT_TRIGGER_ROOT):
+            for path in (TENANT_MANAGEMENT_QUEUE,
+                         TENANT_TRIGGER_QUEUE):
                 path = path.format(tenant=tenant_name)
                 self.kazoo_client.ensure_path(path)
                 self.kazoo_client.ChildrenWatch(
@@ -131,9 +140,9 @@ class EventWatcher(ZooKeeperSimpleBase):
             if key in self.watched_pipelines:
                 continue
 
-            for path in (PIPELINE_MANAGEMENT_ROOT,
-                         PIPELINE_TRIGGER_ROOT,
-                         PIPELINE_RESULT_ROOT):
+            for path in (PIPELINE_MANAGEMENT_QUEUE,
+                         PIPELINE_TRIGGER_QUEUE,
+                         PIPELINE_RESULT_QUEUE):
                 path = path.format(tenant=tenant_name,
                                    pipeline=pipeline_name)
 
@@ -182,11 +191,13 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
 
     log = logging.getLogger("zuul.zk.event_queues.ZooKeeperEventQueue")
 
-    def __init__(self, client, event_root):
+    def __init__(self, client, queue_root):
         super().__init__(client)
-        self.event_root = event_root
+        self.queue_root = queue_root
+        self.event_root = f'{queue_root}/queue'
+        self.data_root = f'{queue_root}/data'
         self.kazoo_client.ensure_path(self.event_root)
-        self.kazoo_client.ensure_path(EVENT_DATA_ROOT)
+        self.kazoo_client.ensure_path(self.data_root)
 
     def _listEvents(self):
         return self.kazoo_client.get_children(self.event_root)
@@ -210,32 +221,30 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             self.log.warning("Event %s was already acknowledged", event)
 
     def _put(self, data):
-        # Within a transaction, we need something after the / in order
-        # to cause the sequence node to be created under the node
-        # before the /.  So we use "seq" for that.  This will produce
-        # paths like event_root/seq-0000.
-        event_path = f"{self.event_root}/seq"
-
         # Event data can be large, so we want to shard it.  But events
         # also need to be atomic (we don't want an event listener to
         # start processing a half-stored event).  A natural solution
-        # is to use a ZK transaction to write the sharded data along
-        # with the event.  However, our events are sequence nodes in
-        # order to maintain ordering, and we can't use our sharding
-        # helper to write shards underneath a sequence node inside the
-        # transaction because we don't know the path of the sequence
-        # node within the transaction.  To resolve this, we store the
-        # event data in two places: the event itself and associated
-        # metadata are in the event queue as a single sequence node.
-        # The event data are stored in a separate tree under a uuid.
-        # The event metadata includes the UUID of the data.  We call
-        # the separated data "side channel data" to indicate it's
-        # stored outside the main event queue.
+        # is to write the sharded data along with the event.  However,
+        # our events are sequence nodes in order to maintain ordering,
+        # and we can't write shard nodes under the event without
+        # creating the event first.  We can't use transactions because
+        # they are subject to the same size limit.  To resolve this,
+        # we store the event data in two places: the event itself and
+        # associated metadata are in the event queue as a single
+        # sequence node.  The event data are stored in a separate tree
+        # under a UUID.  We have to use a UUID because we don't know
+        # the sequence node when we write it.  The event metadata
+        # includes the UUID of the data.  We call the separated data
+        # "side channel data" to indicate it's stored outside the main
+        # event queue.
         #
         # To make the API simpler to work with, we assume "event_data"
         # contains the bulk of the data.  We extract it here into the
         # side channel data, then in _iterEvents we re-constitute it
         # into the dictionary.
+
+        # Add a trailing / for our sequence nodes
+        event_path = f"{self.event_root}/"
 
         side_channel_data = None
         encoded_data = json.dumps(data).encode("utf-8")
@@ -243,7 +252,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             and 'event_data' in data):
             # Get a unique data node
             data_id = str(uuid.uuid4())
-            data_root = f'{EVENT_DATA_ROOT}/{data_id}'
+            data_root = f'{self.data_root}/{data_id}'
             side_channel_data = json.dumps(data['event_data']).encode("utf-8")
             data = data.copy()
             del data['event_data']
@@ -324,6 +333,42 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             return True
         except NoNodeError:
             return False
+
+    def _findLostSideChannelData(self):
+        first_events = set(self._listEvents())
+        data_nodes = set(
+            [f'{self.data_root}/{data_id}' for data_id in
+             self.kazoo_client.get_children(self.data_root)])
+        second_events = set(self._listEvents())
+
+        events = first_events.union(second_events)
+        for event_id in events:
+            # Load the event metadata
+            path = "/".join((self.event_root, event_id))
+            data, zstat = self.kazoo_client.get(path)
+            try:
+                event = json.loads(data)
+            except json.JSONDecodeError:
+                self.log.exception("Malformed event data in %s", path)
+                self._remove(path)
+                continue
+
+            side_channel_path = event.get('event_data_path')
+            if side_channel_path:
+                data_nodes.remove(side_channel_path)
+        return data_nodes
+
+    def cleanup(self):
+        try:
+            for path in self._findLostSideChannelData():
+                try:
+                    self.log.error("Removing side channel data: %s", path)
+                    self.kazoo_client.delete(path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete side channel data %s", path)
+        except Exception:
+            self.log.exception("Error cleaning up event queue %s", self)
 
 
 class ManagementEventResultFuture(ZooKeeperSimpleBase):
@@ -465,10 +510,10 @@ class PipelineManagementEventQueue(ManagementEventQueue):
     )
 
     def __init__(self, client, tenant_name, pipeline_name):
-        event_root = PIPELINE_MANAGEMENT_ROOT.format(
+        queue_root = PIPELINE_MANAGEMENT_ROOT.format(
             tenant=tenant_name,
             pipeline=pipeline_name)
-        super().__init__(client, event_root)
+        super().__init__(client, queue_root)
 
     @classmethod
     def createRegistry(cls, client):
@@ -493,9 +538,9 @@ class TenantManagementEventQueue(ManagementEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.TenantManagementEventQueue")
 
     def __init__(self, client, tenant_name):
-        event_root = TENANT_MANAGEMENT_ROOT.format(
+        queue_root = TENANT_MANAGEMENT_ROOT.format(
             tenant=tenant_name)
-        super().__init__(client, event_root)
+        super().__init__(client, queue_root)
 
     def ackWithoutResult(self, event):
         """
@@ -526,10 +571,10 @@ class PipelineResultEventQueue(ZooKeeperEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.PipelineResultEventQueue")
 
     def __init__(self, client, tenant_name, pipeline_name):
-        event_root = PIPELINE_RESULT_ROOT.format(
+        queue_root = PIPELINE_RESULT_ROOT.format(
             tenant=tenant_name,
             pipeline=pipeline_name)
-        super().__init__(client, event_root)
+        super().__init__(client, queue_root)
 
     @classmethod
     def createRegistry(cls, client):
@@ -575,9 +620,9 @@ class TriggerEventQueue(ZooKeeperEventQueue):
 
     log = logging.getLogger("zuul.zk.event_queues.TriggerEventQueue")
 
-    def __init__(self, client, event_root, connections):
+    def __init__(self, client, queue_root, connections):
         self.connections = connections
-        super().__init__(client, event_root)
+        super().__init__(client, queue_root)
 
     def put(self, driver_name, event):
         data = {
@@ -607,9 +652,9 @@ class TenantTriggerEventQueue(TriggerEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.TenantTriggerEventQueue")
 
     def __init__(self, client, connections, tenant_name):
-        event_root = TENANT_TRIGGER_ROOT.format(
+        queue_root = TENANT_TRIGGER_ROOT.format(
             tenant=tenant_name)
-        super().__init__(client, event_root, connections)
+        super().__init__(client, queue_root, connections)
 
     @classmethod
     def createRegistry(cls, client, connections):
@@ -629,10 +674,10 @@ class PipelineTriggerEventQueue(TriggerEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.PipelineTriggerEventQueue")
 
     def __init__(self, client, tenant_name, pipeline_name, connections):
-        event_root = PIPELINE_TRIGGER_ROOT.format(
+        queue_root = PIPELINE_TRIGGER_ROOT.format(
             tenant=tenant_name,
             pipeline=pipeline_name)
-        super().__init__(client, event_root, connections)
+        super().__init__(client, queue_root, connections)
 
     @classmethod
     def createRegistry(cls, client, connections):
@@ -664,8 +709,8 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
     log = logging.getLogger("zuul.zk.event_queues.ConnectionEventQueue")
 
     def __init__(self, client, connection_name):
-        event_root = "/".join((CONNECTION_ROOT, connection_name, "events"))
-        super().__init__(client, event_root)
+        queue_root = "/".join((CONNECTION_ROOT, connection_name, "events"))
+        super().__init__(client, queue_root)
         self.election_root = "/".join(
             (CONNECTION_ROOT, connection_name, "election")
         )
