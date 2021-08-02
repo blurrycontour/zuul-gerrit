@@ -41,6 +41,7 @@ class BuildRequestEvent(Enum):
 class ExecutorApi(ZooKeeperSimpleBase):
 
     BUILD_REQUEST_ROOT = "/zuul/build-requests"
+    BUILD_PARAMS_ROOT = "/zuul/build-params"
     LOCK_ROOT = "/zuul/build-request-locks"
 
     log = logging.getLogger("zuul.zk.executor.ExecutorApi")
@@ -58,6 +59,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
         # path -> build request
         self._cached_build_requests = {}
 
+        self.kazoo_client.ensure_path(self.BUILD_PARAMS_ROOT)
         if zone_filter is None:
             self.registerAllZones()
         else:
@@ -240,19 +242,14 @@ class ExecutorApi(ZooKeeperSimpleBase):
         log.debug("Submitting build request to ZooKeeper %s", build_request)
 
         self.kazoo_client.ensure_path(zone_root)
-        tr = self.kazoo_client.transaction()
 
-        tr.create(
-            path,
-            self._dictToBytes(build_request.toDict()),
-        )
-        params_path = self._getParamsPath(path)
-        tr.create(params_path)
-        params_path = '/'.join([params_path, 'seq'])
-        with sharding.BufferedShardWriter(tr, params_path) as stream:
+        params_path = self._getParamsPath(uuid)
+        with sharding.BufferedShardWriter(
+                self.kazoo_client, params_path) as stream:
             stream.write(self._dictToBytes(params))
-        self.client.commitTransaction(tr)
-        return path
+
+        return self.kazoo_client.create(
+            path, self._dictToBytes(build_request.toDict()))
 
     # We use child nodes here so that we don't need to lock the build
     # request node.
@@ -331,6 +328,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
         except NoNodeError:
             # Nothing to do if the node is already deleted
             pass
+        self.clearBuildParams(build_request)
         try:
             # Delete the lock parent node as well.
             path = "/".join([self.LOCK_ROOT, build_request.uuid])
@@ -435,12 +433,12 @@ class ExecutorApi(ZooKeeperSimpleBase):
         # The custom json_dumps() will also serialize MappingProxyType objects
         return json_dumps(data).encode("utf-8")
 
-    def _getParamsPath(self, root):
-        return '/'.join([root, 'params'])
+    def _getParamsPath(self, build_uuid):
+        return '/'.join([self.BUILD_PARAMS_ROOT, build_uuid])
 
     def clearBuildParams(self, build_request):
         """Erase the build parameters from ZK to save space"""
-        self.kazoo_client.delete(self._getParamsPath(build_request.path),
+        self.kazoo_client.delete(self._getParamsPath(build_request.uuid),
                                  recursive=True)
 
     def getBuildParams(self, build_request):
@@ -452,7 +450,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
         """
         with sharding.BufferedShardReader(
             self.kazoo_client,
-                self._getParamsPath(build_request.path)) as stream:
+                self._getParamsPath(build_request.uuid)) as stream:
             data = stream.read()
             if not data:
                 return None
