@@ -1468,6 +1468,7 @@ class Scheduler(threading.Thread):
                                       "to tenant %s", event, tenant.name)
                     finally:
                         self.trigger_events[tenant.name].ack(event)
+                self.trigger_events[tenant.name].cleanup()
         except LockException:
             self.log.debug("Skipping locked trigger event queue in tenant %s",
                            tenant.name)
@@ -1549,6 +1550,7 @@ class Scheduler(threading.Thread):
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
                 ].ack(event)
+        self.pipeline_trigger_events[tenant.name][pipeline.name].cleanup()
 
     def _process_trigger_event(self, tenant, pipeline, event):
         log = get_annotated_logger(
@@ -1598,6 +1600,7 @@ class Scheduler(threading.Thread):
                         event)
                 else:
                     self.management_events[tenant.name].ack(event)
+        self.management_events[tenant.name].cleanup()
 
     def _forward_management_event(self, event):
         event_forwarded = False
@@ -1648,6 +1651,7 @@ class Scheduler(threading.Thread):
                 self.pipeline_management_events[tenant.name][
                     pipeline.name
                 ].ack(event)
+        self.pipeline_management_events[tenant.name][pipeline.name].cleanup()
 
     def _process_management_event(self, event):
         try:
@@ -1682,6 +1686,7 @@ class Scheduler(threading.Thread):
                 self.pipeline_result_events[tenant.name][
                     pipeline.name
                 ].ack(event)
+        self.pipeline_result_events[tenant.name][pipeline.name].cleanup()
 
     def _process_result_event(self, event, pipeline):
         if isinstance(event, BuildStartedEvent):

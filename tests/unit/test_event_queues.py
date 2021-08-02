@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import random
+import string
 import threading
 
 import testtools
@@ -138,7 +140,9 @@ class TestTriggerEventQueue(EventQueueBaseTestCase):
         self.assertFalse(queue.hasEvents())
 
         event = DummyTriggerEvent()
-        data = {'test': "x" * (sharding.NODE_BYTE_SIZE_LIMIT + 1)}
+        data = {'test': ''.join(
+            random.choice(string.ascii_letters + string.digits)
+            for x in range(sharding.NODE_BYTE_SIZE_LIMIT * 2))}
         event.data = data
 
         queue.put(self.driver.driver_name, event)
@@ -165,6 +169,48 @@ class TestTriggerEventQueue(EventQueueBaseTestCase):
         self.assertEqual(acked, 2)
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
+
+    def test_lost_sharded_tenant_trigger_events(self):
+        # Test cleanup when we write out side-channel data but not an
+        # event.
+        queue = event_queues.TenantTriggerEventQueue(
+            self.zk_client, self.connections, "tenant"
+        )
+
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+        event = DummyTriggerEvent()
+        data = {'test': ''.join(
+            random.choice(string.ascii_letters + string.digits)
+            for x in range(sharding.NODE_BYTE_SIZE_LIMIT * 2))}
+        event.data = data
+
+        queue.put(self.driver.driver_name, event)
+        queue.put(self.driver.driver_name, event)
+
+        self.assertEqual(len(queue), 2)
+        self.assertTrue(queue.hasEvents())
+
+        # Delete the first event (but not its sharded data)
+        events = list(queue)
+        self.zk_client.client.delete(events[0].ack_ref.path)
+        # There should still be 2 data nodes
+        self.assertEqual(len(
+            self.zk_client.client.get_children(queue.data_root)), 2)
+
+        # Clean up lost data
+        queue.cleanup(age=0)
+        # There should only be one data node remaining
+        self.assertEqual(len(
+            self.zk_client.client.get_children(queue.data_root)), 1)
+
+        # Ack the second event
+        queue.ack(events[1])
+
+        # Assert there are no side channel data nodes
+        self.assertEqual(len(
+            self.zk_client.client.get_children(queue.data_root)), 0)
 
     def test_tenant_trigger_events(self):
         # Test enqueue/dequeue of the tenant trigger event queue.
