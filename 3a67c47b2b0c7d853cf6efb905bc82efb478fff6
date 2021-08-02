@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a520fa49_fc2d8460",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T14:21:32Z",
+      "side": 1,
+      "message": "We don\u0027t need \u0027seq\u0027 any more.",
+      "revId": "3a67c47b2b0c7d853cf6efb905bc82efb478fff6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "efb8df80_24b17eee",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T14:21:32Z",
+      "side": 1,
+      "message": "This comment needs to be rewritten.\n\nWe need a cleanup mechanism to deal with orphaned side-channel nodes.",
+      "revId": "3a67c47b2b0c7d853cf6efb905bc82efb478fff6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
