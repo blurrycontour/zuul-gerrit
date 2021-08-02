@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fda50465_334c8228",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-02T22:38:31Z",
+      "side": 1,
+      "message": "You should probably add the /data paths in here for a complete picture.",
+      "revId": "ceaafbc2c574e22f1d061237bd56839428e1f99a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "caa05f21_c91db0ec",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-02T22:38:31Z",
+      "side": 1,
+      "message": "Union means give me the set containing elements from both sets. In this case I think we want the first_events - second_events ? However, I\u0027m not sure that will do the right thing if we have multiple writers to the queues.",
+      "range": {
+        "startLine": 344,
+        "startChar": 30,
+        "endLine": 344,
+        "endChar": 35
+      },
+      "revId": "ceaafbc2c574e22f1d061237bd56839428e1f99a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
