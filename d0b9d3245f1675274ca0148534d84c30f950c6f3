@@ -68,6 +68,24 @@
       "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29b541c4_a8dde2aa",
+        "filename": "web/src/pages/Autohold.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T13:16:42Z",
+      "side": 1,
+      "message": "I think I found the issue: Since we are not in Python, but in JavaScript, empty objects (including Arrays) will evaluate to True. Thus, you have to change line 101 to\n\nconst buildsContent \u003d autohold.nodes.length \u003e 0 ? ( ...\n\nI think the version without the length check works in other places only because the property which is checked is set null and not to [].",
+      "parentUuid": "143cbe4d_5b8ce643",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
