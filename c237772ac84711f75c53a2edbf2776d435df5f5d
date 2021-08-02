@@ -16,6 +16,23 @@
       "revId": "c237772ac84711f75c53a2edbf2776d435df5f5d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf655b28_d4aea21d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T23:22:31Z",
+      "side": 1,
+      "message": "Yeah, I think it will provide marginally better efficiency not to have two schedulers doing this at once.",
+      "revId": "c237772ac84711f75c53a2edbf2776d435df5f5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
