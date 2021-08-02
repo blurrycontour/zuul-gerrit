@@ -608,6 +608,8 @@ Here is an example of two job definitions:
       the working directory for the job.  Speculative merging and
       cross-repo dependencies will be honored.
 
+      This attribute is a union of all applicable parents and variants.
+
       The format for this attribute is either a list of strings or
       dictionaries.  Strings are interpreted as project names,
       dictionaries, if used, may have the following attributes:
