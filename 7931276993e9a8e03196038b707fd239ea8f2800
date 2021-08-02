@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e90ea933_acc3c89a",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T08:25:26Z",
+      "side": 1,
+      "message": "I\u0027d prefer to use a toast here instead of an alert which is what most modern websites do (AFAIK). Green for the success message, red for failure. This would also improve the workflow a little as you don\u0027t have to confirm each alert (which makes the website feel unresponsive).",
+      "revId": "7931276993e9a8e03196038b707fd239ea8f2800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1315b5d4_16f2364e",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T08:25:26Z",
+      "side": 1,
+      "message": "Same idea about the styling of the autohold button like for the re-enqueue in the parent change https://review.opendev.org/c/zuul/zuul/+/736772/17/web/src/containers/build/Buildset.jsx#49",
+      "revId": "7931276993e9a8e03196038b707fd239ea8f2800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
