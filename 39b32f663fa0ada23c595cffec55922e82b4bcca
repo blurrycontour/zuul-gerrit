@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af05ea55_4277e2e2",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T22:15:54Z",
+      "side": 1,
+      "message": "They\u0027re merged; so the union of all applicable parents and variants is used.",
+      "revId": "39b32f663fa0ada23c595cffec55922e82b4bcca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5c94a8bf_5f134ba6",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 623,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T22:15:54Z",
+      "side": 1,
+      "message": "Within the above constraints, we would obviously only use the most recent value of this.",
+      "revId": "39b32f663fa0ada23c595cffec55922e82b4bcca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
