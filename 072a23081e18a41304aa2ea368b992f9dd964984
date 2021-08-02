@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "32b7e38a_21b00f50",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T13:17:27Z",
+      "side": 1,
+      "message": "The rest of the web ui uses classes.  We should maintain consistency.  It\u0027s much harder for part-time JS programmers to deal with both at the same time.  If we want to change, we should discuss changing everything.\nPlease do not change this patch or stack to switch.\n\nFWIW, I personally find the opposite is true.",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bdb3ab8a_c6ae18a0",
         "filename": "web/src/containers/auth/Auth.jsx",
         "patchSetId": 26
