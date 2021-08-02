@@ -2104,8 +2104,8 @@ class TestTenantScopedWebAPICORSEnabledBadOrigin(TestTenantScopedWebApi):
         self.skipTest('N/A')
 
 
-class TestTenantScopedWebAPICORSEnabledWildcard(TestTenantScopedWebApi):
-    config_file = 'zuul-admin-web-CORS-wildcard.conf'
+class TestTenantScopedWebAPICORSEnabledRegEx(TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web-CORS-regex.conf'
     extra_headers = {'Origin': 'nodanaonly.zuul'}
 
 
