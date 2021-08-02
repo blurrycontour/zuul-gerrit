@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bce4b81c_767806f4",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T09:05:21Z",
+      "side": 1,
+      "message": "nit: Maybe we can ensure that the parent changes are directly formatted \"correctly\", which would result in a lot less changed lines especially in this change ;-)\n\nThis doesn\u0027t apply to all format changes. Some of them might also come from my own changes, but it should minimize them.\n\nI know that the zuul devs are not in favour of automatic code formatting, but I\u0027m using prettier to autoformat the JS code and seeing this change it looks like Matthieu is using it as well.",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
