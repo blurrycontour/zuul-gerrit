@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "41e216b0_8eac6347",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "487d3b5e_6984cd6d",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c9388c19_a815f62f",
         "filename": "web/src/containers/auth/Auth.jsx",
         "patchSetId": 26
@@ -71,6 +89,42 @@
     },
     {
       "key": {
+        "uuid": "2e33b1e3_90e11fec",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "I tried but I hit an error with setting states in two different components. It wasn\u0027t very clear ... I\u0027d rather rework this later if needed and keep it that way for now since it works as is.",
+      "parentUuid": "c9388c19_a815f62f",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fe78d2da_c66cce5c",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Definitely a discussion worth having, as new React programmers will most definitely have learned to code using functional components. We don\u0027t want to make it difficult for newcomers to contribute. But I think we all agree that this is something to be decided later.",
+      "parentUuid": "15b63ebe_6b7160d2",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bdb3ab8a_c6ae18a0",
         "filename": "web/src/containers/auth/Auth.jsx",
         "patchSetId": 26
@@ -88,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "7e1248e1_def4e4ba",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "I think an error is thrown if you try to use \"this\" in the constructor without calling super(props) first. This is going to be irrelevant once this is turned into a function anyway.",
+      "parentUuid": "bdb3ab8a_c6ae18a0",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "134e4c7a_8fad6d4e",
         "filename": "web/src/containers/auth/Auth.jsx",
         "patchSetId": 26
@@ -99,6 +171,24 @@
       "writtenOn": "2021-07-28T14:41:04Z",
       "side": 1,
       "message": "nit: I would place the icon in front of the text, so it\u0027s similar to most of the icons we use. But maybe that\u0027s only me and the typical \"sign out\" button has the icon placed behind the text 😄",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4cbf276_cf39a4f8",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "It\u0027s a valid UX discussion. I\u0027ve checked a few interfaces (github, gerrit, gmail, ...) and it turns out \"sign out\" buttons usually don\u0027t have icons (and are hidden so that people tend to forget logging out, making it easier for these apps to track you, but it\u0027s a whole other subject). So I am fine with actually removing it.",
+      "parentUuid": "134e4c7a_8fad6d4e",
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
@@ -139,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "4d41fee6_d00dcae5",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Showing the token was mostly for debugging purposes, so that I could ensure similar behaviors between the GUI and the CLI.\n\nThis should instead be reworked into a way to download a pre-written client.conf file for the tenant. Since many tokens should be expected to be short-lived, the user should be able to choose whether or not to include the current token into the config file.",
+      "parentUuid": "5344c23d_f031543d",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ea26874f_badd2d6d",
         "filename": "web/src/reducers/auth.js",
         "patchSetId": 26
@@ -153,6 +261,24 @@
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "869cf824_74aeabce",
+        "filename": "web/src/reducers/auth.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea26874f_badd2d6d",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -173,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "60eb4e2d_65c12209",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c37a623_d0356674",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c376ccf_39c7be70",
         "filename": "web/src/reducers/user.js",
         "patchSetId": 26
@@ -187,6 +331,24 @@
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "942df830_69597209",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c376ccf_39c7be70",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -207,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "a779a4e9_4c524383",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a3a27331_144bcdcc",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ebd9ac94_4f545859",
         "filename": "web/src/store.dev.js",
         "patchSetId": 26
@@ -218,6 +398,24 @@
       "writtenOn": "2021-07-28T14:41:04Z",
       "side": 1,
       "message": "Is there a specific reason why we have to exclude those values here? This typically means that we do not handle the state correctly in those cases. Do we mutate their state or does this come from a third-party library?",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff05f8b8_59b3bb22",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-02T13:55:17Z",
+      "side": 1,
+      "message": "it comes from the redux-oidc library.",
+      "parentUuid": "ebd9ac94_4f545859",
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
