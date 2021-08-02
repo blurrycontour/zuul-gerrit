@@ -251,18 +251,12 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             data['event_data_path'] = data_root
             encoded_data = json.dumps(data).encode("utf-8")
 
-            tr = self.kazoo_client.transaction()
-            tr.create(data_root)
-
-            with sharding.BufferedShardWriter(tr, data_path) as stream:
+            with sharding.BufferedShardWriter(
+                    self.kazoo_client, data_path) as stream:
                 stream.write(side_channel_data)
 
-            tr.create(event_path, encoded_data, sequence=True)
-            resp = self.client.commitTransaction(tr)
-            return resp[-1]
-        else:
-            return self.kazoo_client.create(
-                event_path, encoded_data, sequence=True)
+        return self.kazoo_client.create(
+            event_path, encoded_data, sequence=True)
 
     def _iterEvents(self):
         try:
