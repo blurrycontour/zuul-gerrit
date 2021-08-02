@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
 import json
 import logging
 from contextlib import suppress
@@ -423,6 +424,76 @@ class ExecutorApi(ZooKeeperSimpleBase):
             lambda b: not self.isLocked(b),
             self.inState(BuildRequest.RUNNING, BuildRequest.PAUSED),
         )
+
+    def _getAllZones(self):
+        # Get a list of all zones without using the cache.
+        try:
+            # Get all available zones from ZooKeeper
+            zones = self.kazoo_client.get_children(
+                '/'.join([self.BUILD_REQUEST_ROOT, 'zones']))
+            zones.append(None)
+        except NoNodeError:
+            zones = [None]
+        return zones
+
+    def _getAllBuildIds(self, zones=None):
+        # Get a list of all build uuids without using the cache.
+        if zones is None:
+            zones = self._getAllZones()
+
+        all_builds = set()
+        for zone in zones:
+            try:
+                zone_path = self._getZoneRoot(zone)
+                all_builds.update(self.kazoo_client.get_children(zone_path))
+            except NoNodeError:
+                # Skip this zone as it doesn't have any builds
+                continue
+        return all_builds
+
+    def _findLostParams(self, age):
+        # Get data nodes which are older than the specified age (we
+        # don't want to delete nodes which are just being written
+        # slowly).
+        # Convert to MS
+        now = int(time.time() * 1000)
+        age = age * 1000
+        data_nodes = dict()
+        for data_id in self.kazoo_client.get_children(self.BUILD_PARAMS_ROOT):
+            data_path = self._getParamsPath(data_id)
+            data_zstat = self.kazoo_client.exists(data_path)
+            if now - data_zstat.mtime > age:
+                data_nodes[data_id] = data_path
+
+        # If there are no candidate data nodes, we don't need to
+        # filter them by known requests.
+        if not data_nodes:
+            return data_nodes.values()
+
+        # Remove current request uuids
+        for request_id in self._getAllBuildIds():
+            if request_id in data_nodes:
+                del data_nodes[request_id]
+
+        # Return the paths
+        return data_nodes.values()
+
+    def cleanup(self, age=300):
+        # Delete build request params which are not associated with
+        # any current build requests.  Note, this does not clean up
+        # lost build requests themselves; the executor client takes
+        # care of that.
+        try:
+            for path in self._findLostParams(age):
+                try:
+                    self.log.error("Removing build request params: %s", path)
+                    self.kazoo_client.delete(path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete build request params %s", path)
+        except Exception:
+            self.log.exception(
+                "Error cleaning up build request queue %s", self)
 
     @staticmethod
     def _bytesToDict(data):
