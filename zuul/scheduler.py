@@ -70,7 +70,11 @@ from zuul.model import (
     STATE_FAILED,
 )
 from zuul.zk import ZooKeeperClient
-from zuul.zk.cleanup import SemaphoreCleanupLock, BuildRequestCleanupLock
+from zuul.zk.cleanup import (
+    SemaphoreCleanupLock,
+    BuildRequestCleanupLock,
+    GeneralCleanupLock,
+)
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, SchedulerComponent
 )
@@ -122,7 +126,7 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
     _semaphore_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
-    _config_cache_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
+    _general_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _build_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
@@ -196,6 +200,7 @@ class Scheduler(threading.Thread):
             self.zk_client
         )
 
+        self.general_cleanup_lock = GeneralCleanupLock(self.zk_client)
         self.semaphore_cleanup_lock = SemaphoreCleanupLock(self.zk_client)
         self.build_request_cleanup_lock = BuildRequestCleanupLock(
             self.zk_client)
@@ -464,8 +469,8 @@ class Scheduler(threading.Thread):
                                  trigger=self._semaphore_cleanup_interval)
             self.apsched.add_job(self._runBuildRequestCleanup,
                                  trigger=self._build_request_cleanup_interval)
-            self.apsched.add_job(self._runConfigCacheCleanup,
-                                 trigger=self._config_cache_cleanup_interval)
+            self.apsched.add_job(self._runGeneralCleanup,
+                                 trigger=self._general_cleanup_interval)
             return
 
     def _runSemaphoreCleanup(self):
@@ -483,6 +488,11 @@ class Scheduler(threading.Thread):
                 finally:
                     self.semaphore_cleanup_lock.release()
 
+    def _runGeneralCleanup(self):
+        if self.general_cleanup_lock.acquire(blocking=False):
+            self._runConfigCacheCleanup()
+            self._runExecutorApiCleanup()
+
     def _runConfigCacheCleanup(self):
         with self.layout_lock:
             try:
@@ -496,6 +506,12 @@ class Scheduler(threading.Thread):
                     self.unparsed_config_cache.clearCache(project_cname)
             except Exception:
                 self.log.exception("Error in config cache cleanup:")
+
+    def _runExecutorApiCleanup(self):
+        try:
+            self.executor.executor_api.cleanup()
+        except Exception:
+            self.log.exception("Error in executor API cleanup:")
 
     def _runBuildRequestCleanup(self):
         # If someone else is running the cleanup, skip it.
