@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5568d648_d103ed34",
+        "filename": "web/src/containers/Misc.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T09:22:19Z",
+      "side": 1,
+      "message": "Why are we adding the IconProperty here? I think it should be enough to move it from src/containers/build/Misc.jsx to src/Misc.jsx and import it from that new location where needed.",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bce4b81c_767806f4",
         "filename": "web/src/containers/build/Build.jsx",
         "patchSetId": 14
@@ -31,6 +48,23 @@
       "side": 1,
       "message": "Update:\n\nI just can\u0027t use it as git pre-commit hook as it would change too much depending on the files that were edited. So I have to run it manually - and when you have to run stuff manually you forget it from time to time. But I\u0027m happy to see that more people are following the style \"suggestions\", which makes the code much easier to read.",
       "parentUuid": "bce4b81c_767806f4",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "143cbe4d_5b8ce643",
+        "filename": "web/src/pages/Autohold.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T09:22:19Z",
+      "side": 1,
+      "message": "The else branch doesn\u0027t seem to apply here. I couldn\u0027t see the empty state even if the autohold didn\u0027t held any builds/nodes. In that case the list was just empty.",
       "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
