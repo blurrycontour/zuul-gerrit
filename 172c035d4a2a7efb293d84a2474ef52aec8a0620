@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baf4612e_22f54776",
+        "filename": "web/src/pages/Autoholds.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T12:14:00Z",
+      "side": 1,
+      "message": "As these fields (change, ref, project, ...) are the form fields of the AutoholdModal component, I think their state should also be kept inside the AutoholdModal component. Doing so would also avoid all those setter method which are provided as callbacks to the AutoholdModal component. Or is there a specific reason why we have to deal with the state in here?",
+      "revId": "172c035d4a2a7efb293d84a2474ef52aec8a0620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b058b39d_b6a90317",
+        "filename": "web/src/pages/Autoholds.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T12:14:00Z",
+      "side": 1,
+      "message": "I kind of like the design of this button, but I think it\u0027s too prominent for this use case. I think it would fit the overall design of the page a little better if we use a toolbar (similar to the builds and buildsets table pages) to provide a simple create (+) button. This might also come in handy if we want to add some filter functionality to the autoholds page later on.",
+      "revId": "172c035d4a2a7efb293d84a2474ef52aec8a0620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
