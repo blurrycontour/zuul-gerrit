@@ -336,10 +336,6 @@ class ExecutorApi(ZooKeeperSimpleBase):
             self.kazoo_client.delete(path, recursive=True)
         except NoNodeError:
             pass
-        try:
-            self.kazoo_client.get(build_request.path)
-        except NoNodeError:
-            pass
 
     def _watchBuildEvents(self, actions, event=None):
         if event is None:
