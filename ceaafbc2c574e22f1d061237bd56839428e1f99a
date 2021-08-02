@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3adce3a9_52397e13",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T22:44:30Z",
+      "side": 1,
+      "message": "Agree.",
+      "revId": "ceaafbc2c574e22f1d061237bd56839428e1f99a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "caa05f21_c91db0ec",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 1
@@ -39,6 +56,23 @@
       "revId": "ceaafbc2c574e22f1d061237bd56839428e1f99a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ffe8b5c_d24fc42f",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-02T22:44:30Z",
+      "side": 1,
+      "message": "Yeah, it was an insufficient attempt to make sure that we avoided a race.  Next PS uses timestamps to make that more robust (since otherwise, we could delete data out from underneath a very slow writer).",
+      "revId": "ceaafbc2c574e22f1d061237bd56839428e1f99a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
