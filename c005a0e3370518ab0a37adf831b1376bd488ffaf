@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c7d27a6_d99cea3a",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-02T22:50:35Z",
+      "side": 1,
+      "message": "You might consider checking if data_nodes has any entries here. If not we can short circuit and return an empty set.\n\nThis will reduce the number of queries made against zookeeper.",
+      "revId": "c005a0e3370518ab0a37adf831b1376bd488ffaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
