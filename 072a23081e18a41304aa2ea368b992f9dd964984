@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "15b63ebe_6b7160d2",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-02T13:39:32Z",
+      "side": 1,
+      "message": "Like I said, I don\u0027t think we should change this stack in that regard. I\u0027m also only an \"occasional JS developer\". When I started with React, they already changed a lot to previous versions (like including the functional components) and there were quite some parts which were marked as deprecated (like the super() call in the class components constructor and AFAIK some of the lifecycle methods changed their name or were also marked as deprecated, e.g. componentWillMount).\n\nAnd from all I\u0027ve seen so far, there is clearly a trend in React to move to functional components.\n\nThe drawback with all this frontend development is clearly that it changes so fast that you can\u0027t really follow-up if you are not working full time on that. But I also think that you should not always stick to one approach because you always did it like that and that from time to time you should try to follow-up on the newer approaches and try to incorporate them. Especially for new features this is something you could do without much of a problem. I did the same when I started with the new UI and I think it was definitely not drawback to do so.",
+      "parentUuid": "32b7e38a_21b00f50",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bdb3ab8a_c6ae18a0",
         "filename": "web/src/containers/auth/Auth.jsx",
         "patchSetId": 26
