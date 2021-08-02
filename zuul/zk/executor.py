@@ -27,7 +27,7 @@ from zuul.model import BuildRequest
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.exceptions import BuildRequestNotFound
 from zuul.zk import sharding
-from zuul.zk.watchers import ExistingDataWatch
+from zuul.zk.vendor.watchers import ExistingDataWatch
 
 
 class BuildRequestEvent(Enum):
