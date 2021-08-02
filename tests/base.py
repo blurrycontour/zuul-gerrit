@@ -3176,25 +3176,11 @@ class TestingExecutorApi(HoldableExecutorApi):
         zones = []
         if self.zone_filter:
             zones = self.zone_filter
-        else:
-            try:
-                # Get all available zones from ZooKeeper
-                zones = self.kazoo_client.get_children(
-                    '/'.join([self.BUILD_REQUEST_ROOT, 'zones']))
-                zones.append(None)
-            except kazoo.exceptions.NoNodeError:
-                zones = [None]
 
         all_builds = []
         for zone in zones:
-            try:
-                zone_path = self._getZoneRoot(zone)
-                builds = self.kazoo_client.get_children(zone_path)
-            except kazoo.exceptions.NoNodeError:
-                # Skip this zone as it doesn't have any builds
-                continue
-
-            for build_uuid in builds:
+            zone_path = self._getZoneRoot(zone)
+            for build_uuid in self._getAllBuildIds([zone]):
                 build = self.get("/".join([zone_path, build_uuid]))
                 if build and (not states or build.state in states):
                     all_builds.append(build)

@@ -424,6 +424,59 @@ class ExecutorApi(ZooKeeperSimpleBase):
             self.inState(BuildRequest.RUNNING, BuildRequest.PAUSED),
         )
 
+    def _getAllZones(self):
+        # Get a list of all zones without using the cache.
+        try:
+            # Get all available zones from ZooKeeper
+            zones = self.kazoo_client.get_children(
+                '/'.join([self.BUILD_REQUEST_ROOT, 'zones']))
+            zones.append(None)
+        except NoNodeError:
+            zones = [None]
+        return zones
+
+    def _getAllBuildIds(self, zones=None):
+        # Get a list of all build uuids without using the cache.
+        if zones is None:
+            zones = self._getAllZones()
+
+        all_builds = set()
+        for zone in zones:
+            try:
+                zone_path = self._getZoneRoot(zone)
+                all_builds.update(self.kazoo_client.get_children(zone_path))
+            except NoNodeError:
+                # Skip this zone as it doesn't have any builds
+                continue
+        return all_builds
+
+    def _findLostParams(self):
+        first_requests = self._getAllBuildIds()
+        data_nodes = set(self.kazoo_client.get_children(
+            self.BUILD_PARAMS_ROOT))
+        second_requests = self._getAllBuildIds()
+
+        requests = first_requests.union(second_requests)
+        lost = data_nodes - requests
+        return [self._getParamsPath(x) for x in lost]
+
+    def cleanup(self):
+        # Delete build request params which are not associated with
+        # any current build requests.  Note, this does not clean up
+        # lost build requests themselves; the executor client takes
+        # care of that.
+        try:
+            for path in self._findLostParams():
+                try:
+                    self.log.error("Removing build request params: %s", path)
+                    self.kazoo_client.delete(path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete build request params %s", path)
+        except Exception:
+            self.log.exception(
+                "Error cleaning up build request queue %s", self)
+
     @staticmethod
     def _bytesToDict(data):
         return json.loads(data.decode("utf-8"))

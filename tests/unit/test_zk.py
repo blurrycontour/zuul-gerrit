@@ -629,6 +629,29 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(2, len(lost_build_requests))
         self.assertEqual(b.path, lost_build_requests[0].path)
 
+    def test_lost_build_request_params(self):
+        # Test cleaning up orphaned request parameters
+        executor_api = ExecutorApi(self.zk_client)
+
+        path_a = executor_api.submit(
+            "A", "tenant", "pipeline", {}, "zone", '1')
+
+        params_root = executor_api.BUILD_PARAMS_ROOT
+        self.assertEqual(len(executor_api._getAllBuildIds()), 1)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 1)
+
+        # Delete the request but not the params
+        self.zk_client.client.delete(path_a)
+        self.assertEqual(len(executor_api._getAllBuildIds()), 0)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 1)
+
+        # Clean up leaked params
+        executor_api.cleanup()
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 0)
+
     def test_existing_build_request(self):
         # Test that an executor sees an existing build request when
         # coming online

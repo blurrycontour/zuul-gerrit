@@ -229,6 +229,7 @@ class ExecutorClient(object):
                 self.cleanupLostBuildRequest(build_request)
             except Exception:
                 self.log.exception("Exception cleaning up lost build request:")
+        self.executor_api.cleanup()
 
     def cleanupLostBuildRequest(self, build_request):
         result = {"result": "ABORTED"}
