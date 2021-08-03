@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "06b84f46_84cb408a",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2021-08-03T21:15:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af05ea55_4277e2e2",
+      "revId": "39b32f663fa0ada23c595cffec55922e82b4bcca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c94a8bf_5f134ba6",
         "filename": "doc/source/reference/job_def.rst",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2021-08-02T22:15:54Z",
       "side": 1,
       "message": "Within the above constraints, we would obviously only use the most recent value of this.",
+      "revId": "39b32f663fa0ada23c595cffec55922e82b4bcca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3165b000_10e708b1",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 623,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2021-08-03T21:15:55Z",
+      "side": 1,
+      "message": "This attribute is not a list so there is no ambiguity whether it\u0027s overriden or extended, so I don\u0027t clarify it here.",
+      "parentUuid": "5c94a8bf_5f134ba6",
       "revId": "39b32f663fa0ada23c595cffec55922e82b4bcca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
