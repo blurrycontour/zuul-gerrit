@@ -455,7 +455,11 @@ class MergerEventResultFuture(EventResultFuture):
         self.item_in_branches = None
 
     def _read(self, path):
-        with sharding.BufferedShardReader(self.kazoo_client, path) as stream:
+        result_node = self.kazoo_client.get(self._result_path)[0]
+        result = json.loads(result_node)
+        result_data_path = result['result_data_path']
+        with sharding.BufferedShardReader(
+                self.kazoo_client, result_data_path) as stream:
             return stream.read()
 
     def wait(self, timeout=None):

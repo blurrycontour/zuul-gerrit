@@ -869,8 +869,10 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         server.reportResult(a, result_data)
 
         self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_ROOT)),
-                         set(['/zuul/merge-results/A',
-                              '/zuul/merge-results/A/seq0000000000']))
+                         set(['/zuul/merge-results/A']))
+        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_DATA_ROOT)),
+                         set(['/zuul/merge-result-data/A',
+                              '/zuul/merge-result-data/A/0000000000']))
         self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT),
                          ['/zuul/merge-waiters/A'])
 
@@ -887,6 +889,40 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT), [])
         self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
         self.assertEqual(self._get_watches(), {})
+
+    def test_lost_merge_request_params(self):
+        # Test cleaning up orphaned request parameters
+        merger_api = MergerApi(self.zk_client)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        merger_api.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+            needs_result=True,
+        )
+        path_a = '/'.join([merger_api.MERGE_REQUEST_ROOT, 'A'])
+
+        params_root = merger_api.MERGE_PARAMS_ROOT
+        self.assertEqual(len(merger_api._getAllRequestIds()), 1)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 1)
+
+        # Delete the request but not the params
+        self.zk_client.client.delete(path_a)
+        self.assertEqual(len(merger_api._getAllRequestIds()), 0)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 1)
+
+        # Clean up leaked params
+        merger_api.cleanup(0)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 0)
 
     def test_lost_merge_request_result(self):
         # Test that we can clean up orphaned merge results
@@ -932,6 +968,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         result_data = {'result': 'ok'}
         server.reportResult(a, result_data)
 
+        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_ROOT)),
+                         set(['/zuul/merge-results/A']))
+        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_DATA_ROOT)),
+                         set(['/zuul/merge-result-data/A',
+                              '/zuul/merge-result-data/A/0000000000']))
+        self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT),
+                         ['/zuul/merge-waiters/A'])
+
         # Merger removes and unlocks merge request on completion
         server.remove(a)
         server.unlock(a)
@@ -940,10 +984,11 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.zk_client.client.delete(future._waiter_path)
 
         # Find orphaned results
-        lost_merge_results = list(client.lostMergeResults())
+        client.cleanup(age=0)
 
-        self.assertEqual(1, len(lost_merge_results))
-        self.assertEqual(future._result_path, lost_merge_results[0])
+        self.assertEqual(self._get_zk_tree(client.MERGE_RESULT_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.MERGE_RESULT_DATA_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT), [])
 
     def test_nonexistent_lock(self):
         request_queue = queue.Queue()

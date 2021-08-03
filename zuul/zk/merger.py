@@ -14,6 +14,7 @@
 
 import json
 import logging
+import time
 from contextlib import suppress
 
 from kazoo.exceptions import LockTimeout, NoNodeError
@@ -34,6 +35,7 @@ class MergerApi(ZooKeeperSimpleBase):
     MERGE_REQUEST_ROOT = "/zuul/merge-requests"
     MERGE_PARAMS_ROOT = "/zuul/merge-params"
     MERGE_RESULT_ROOT = "/zuul/merge-results"
+    MERGE_RESULT_DATA_ROOT = "/zuul/merge-result-data"
     MERGE_WAITER_ROOT = "/zuul/merge-waiters"
     LOCK_ROOT = "/zuul/merge-request-locks"
 
@@ -256,14 +258,18 @@ class MergerApi(ZooKeeperSimpleBase):
             )
 
     def reportResult(self, merge_request, result):
-        tr = self.kazoo_client.transaction()
-
-        path = merge_request.result_path
-        tr.create(path)
-        path += '/seq'
-        with sharding.BufferedShardWriter(tr, path) as stream:
+        # Write the result data first since it may be multiple nodes.
+        result_data_path = "/".join(
+            [self.MERGE_RESULT_DATA_ROOT, merge_request.uuid]
+        )
+        with sharding.BufferedShardWriter(
+                self.kazoo_client, result_data_path) as stream:
             stream.write(self._dictToBytes(result))
-        self.client.commitTransaction(tr)
+
+        # Then write the (empty) result note to signify it's ready.
+        data = {'result_data_path': result_data_path}
+        self.kazoo_client.create(merge_request.result_path,
+                                 self._dictToBytes(data))
 
     def get(self, path):
         """Get a merge request
@@ -366,17 +372,90 @@ class MergerApi(ZooKeeperSimpleBase):
             self.inState(MergeRequest.RUNNING),
         )
 
-    def lostMergeResults(self):
+    def _getAllRequestIds(self):
+        # Get a list of all request ids without using the cache.
+        return self.kazoo_client.get_children(self.MERGE_REQUEST_ROOT)
+
+    def _findLostParams(self, age):
+        # Get data nodes which are older than the specified age (we
+        # don't want to delete nodes which are just being written
+        # slowly).
+        # Convert to MS
+        now = int(time.time() * 1000)
+        age = age * 1000
+        data_nodes = dict()
+        for data_id in self.kazoo_client.get_children(self.MERGE_PARAMS_ROOT):
+            data_path = self._getParamsPath(data_id)
+            data_zstat = self.kazoo_client.exists(data_path)
+            if now - data_zstat.mtime > age:
+                data_nodes[data_id] = data_path
+
+        # If there are no candidate data nodes, we don't need to
+        # filter them by known requests.
+        if not data_nodes:
+            return data_nodes.values()
+
+        # Remove current request uuids
+        for request_id in self._getAllRequestIds():
+            if request_id in data_nodes:
+                del data_nodes[request_id]
+
+        # Return the paths
+        return data_nodes.values()
+
+    def _findLostMergeResults(self):
         # Get a list of merge results which don't have a connection waiting for
         # them. As the results and waiters are not part of our cache, we have
         # to look them up directly from ZK.
         waiters1 = set(self.kazoo_client.get_children(self.MERGE_WAITER_ROOT))
         results = set(self.kazoo_client.get_children(self.MERGE_RESULT_ROOT))
+        result_data = set(self.kazoo_client.get_children(
+            self.MERGE_RESULT_DATA_ROOT))
         waiters2 = set(self.kazoo_client.get_children(self.MERGE_WAITER_ROOT))
 
         waiters = waiters1.union(waiters2)
-        lost = results - waiters
-        return ['/'.join([self.MERGE_RESULT_ROOT, x]) for x in lost]
+        lost_results = results - waiters
+        lost_data = result_data - waiters
+        return lost_results, lost_data
+
+    def cleanup(self, age=300):
+        # Delete build request params which are not associated with
+        # any current build requests.  Note, this does not clean up
+        # lost build requests themselves; the merger client takes
+        # care of that.
+        try:
+            for path in self._findLostParams(age):
+                try:
+                    self.log.error("Removing merge request params: %s", path)
+                    self.kazoo_client.delete(path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete merge request params %s", path)
+        except Exception:
+            self.log.exception(
+                "Error cleaning up merge request queue %s", self)
+        try:
+            lost_results, lost_data = self._findLostMergeResults()
+            for result_id in lost_results:
+                try:
+                    path = '/'.join([self.MERGE_RESULT_ROOT, result_id])
+                    self.log.error("Removing merge request result: %s", path)
+                    self.kazoo_client.delete(path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete merge request params %s", result_id)
+            for result_id in lost_data:
+                try:
+                    path = '/'.join([self.MERGE_RESULT_DATA_ROOT, result_id])
+                    self.log.error(
+                        "Removing merge request result data: %s", path)
+                    self.kazoo_client.delete(path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete merge request params %s", result_id)
+        except Exception:
+            self.log.exception(
+                "Error cleaning up merge result queue %s", self)
 
     @staticmethod
     def _bytesToDict(data):
