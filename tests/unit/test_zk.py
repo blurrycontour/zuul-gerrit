@@ -945,6 +945,12 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(1, len(lost_merge_results))
         self.assertEqual(future._result_path, lost_merge_results[0])
 
+        # Exercise the cleanup code
+        client.cleanupLostMergeRequests()
+
+        lost_merge_results = list(client.lostMergeResults())
+        self.assertEqual(0, len(lost_merge_results))
+
     def test_nonexistent_lock(self):
         request_queue = queue.Queue()
 
@@ -1052,6 +1058,12 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         self.assertEqual(1, len(lost_merge_requests))
         self.assertEqual(b.path, lost_merge_requests[0].path)
+
+        # Exercise the cleanup code
+        merger_api.cleanupLostMergeRequests()
+
+        lost_merge_requests = list(merger_api.lostMergeRequests())
+        self.assertEqual(0, len(lost_merge_requests))
 
     def test_existing_merge_request(self):
         # Test that a merger sees an existing merge request when

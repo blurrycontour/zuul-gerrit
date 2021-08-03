@@ -16,7 +16,7 @@ import json
 import logging
 from contextlib import suppress
 
-from kazoo.exceptions import LockTimeout, NoNodeError
+from kazoo.exceptions import BadVersionError, LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType
 from kazoo.recipe.lock import Lock
 
@@ -378,6 +378,42 @@ class MergerApi(ZooKeeperSimpleBase):
         lost = results - waiters
         return ['/'.join([self.MERGE_RESULT_ROOT, x]) for x in lost]
 
+    def cleanupLostMergeRequests(self):
+        for merge_request in self.lostMergeRequests():
+            try:
+                self.cleanupLostMergeRequest(merge_request)
+            except Exception:
+                self.log.exception("Exception cleaning up lost merge request:")
+        for merge_result in self.lostMergeResults():
+            try:
+                self.cleanupLostMergeResult(merge_result)
+            except Exception:
+                self.log.exception("Exception cleaning up lost merge result:")
+
+    def cleanupLostMergeRequest(self, merge_request):
+        merge_request.state = MergeRequest.COMPLETED
+        try:
+            self.update(merge_request)
+            # No need to unlock the build, as it is by definition unlocked.
+            # TODO (felix): If we want to optimize ZK requests, we could only
+            # call the remove() here.
+            self.remove(merge_request)
+        except MergeRequestNotFound as e:
+            self.log.warning("Could not complete merge: %s", str(e))
+            return
+        except BadVersionError:
+            # There could be a race condition:
+            # The merge request is found by lost_merge_requests in
+            # state RUNNING but gets completed/unlocked before the
+            # is_locked() check. Since we use the znode version, the
+            # update will fail in this case and we can simply ignore
+            # the exception.
+            return
+
+    def cleanupLostMergeResult(self, path):
+        with suppress(NoNodeError):
+            self.kazoo_client.delete(path, recursive=True)
+
     @staticmethod
     def _bytesToDict(data):
         return json.loads(data.decode("utf-8"))
@@ -409,7 +445,3 @@ class MergerApi(ZooKeeperSimpleBase):
             if not data:
                 return None
             return self._bytesToDict(data)
-
-    def deleteMergeResult(self, path):
-        with suppress(NoNodeError):
-            self.kazoo_client.delete(path, recursive=True)
