@@ -22,6 +22,20 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
+# TODO (felix): Use this class to overwrite the _handleNodeRequestEvent
+# callback function and keep a local list of provisioned_requests to assert in
+# the nodepool tests.
+class NodepoolWithCallback(zuul.nodepool.Nodepool):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.provisioned_requests = []
+
+    def _handleNodeRequestEvent(self, request, event, reqid=None):
+        super()._handleNodeRequestEvent(request, event, reqid)
+        self.provisioned_requests.append(request)
+
+
 class TestNodepoolBase(BaseTestCase):
     # Tests the Nodepool interface class using a fake nodepool and
     # scheduler.
@@ -45,7 +59,7 @@ class TestNodepoolBase(BaseTestCase):
         self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
-        self.nodepool = zuul.nodepool.Nodepool(
+        self.nodepool = NodepoolWithCallback(
             self.zk_client, self.hostname, self.statsd, self)
 
         self.fake_nodepool = FakeNodepool(self.zk_chroot_fixture)
@@ -53,9 +67,13 @@ class TestNodepoolBase(BaseTestCase):
 
     def waitForRequests(self):
         # Wait until all requests are complete.
+        # TODO (felix): Would it make sense to provide a data watch here on the
+        # node requests to wait for the updates and directly get the data so
+        # we can assert the node request state in the tests?
         while self.nodepool.requests:
             time.sleep(0.1)
 
+    # TODO (felix): How to overwrite this method for the test?
     def onNodesProvisioned(self, request):
         # This is a scheduler method that the nodepool class calls
         # back when a request is provisioned.
@@ -74,8 +92,11 @@ class TestNodepool(TestNodepoolBase):
         request = self.nodepool.requestNodes(
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
-        self.assertEqual(request.state, 'fulfilled')
+        self.assertEqual(len(self.nodepool.provisioned_requests), 1)
+        # TODO (felix): We have to look up the request from ZK directly to
+        # check the state.
+        zk_request = self.zk_nodepool.getNodeRequest(request.id)
+        self.assertEqual(zk_request.state, 'fulfilled')
 
         # Accept the nodes
         new_nodeset = self.nodepool.checkNodeRequest(
