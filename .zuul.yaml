@@ -266,41 +266,30 @@
     parent: opendev-release-python
     pre-run: playbooks/release/pre.yaml
 
+- job:
+    name: job-a
+    parent: run-test-command
+    abstract: true
+    required-projects:
+      - zuul/zuul-registry # just an example
+
+- job:
+    name: job-b
+    parent: job-a
+    required-projects:
+      - zuul/zuul-client
+    vars:
+      test_command:
+        # in the output we expect required-projects from both job-a and job
+        - find ~/src -type d -maxdepth 3
+
 - project:
     vars:
       node_version: 14
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-        - zuul-tox-py36
-        - zuul-tox-py38
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
+        - job-b
     gate:
       jobs:
         - zuul-upload-image
