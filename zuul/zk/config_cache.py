@@ -22,6 +22,7 @@ from urllib.parse import quote_plus, unquote_plus
 from kazoo.exceptions import NoNodeError
 
 from zuul.zk import sharding, ZooKeeperSimpleBase
+from zuul.zk.vendor import lock
 
 CONFIG_ROOT = "/zuul/config"
 
@@ -144,12 +145,12 @@ class UnparsedConfigCache(ZooKeeperSimpleBase):
         self.lock_path = f"{config_root}/lock"
 
     def readLock(self, project_cname):
-        return self.kazoo_client.ReadLock(
-            _safe_path(self.lock_path, project_cname))
+        return lock.ReadLock(
+            self.kazoo_client, _safe_path(self.lock_path, project_cname))
 
     def writeLock(self, project_cname):
-        return self.kazoo_client.WriteLock(
-            _safe_path(self.lock_path, project_cname))
+        return lock.WriteLock(
+            self.kazoo_client, _safe_path(self.lock_path, project_cname))
 
     def getFilesCache(self, project_cname, branch_name):
         path = _safe_path(self.cache_path, project_cname, branch_name)

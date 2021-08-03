@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from urllib.parse import quote_plus
 
 from zuul.zk.exceptions import LockException
+from zuul.zk.vendor.lock import ReadLock, WriteLock
 
 LOCK_ROOT = "/zuul/locks"
 TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"
@@ -40,7 +41,7 @@ def locked(lock, blocking=True, timeout=None):
 def tenant_read_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     with locked(
-        client.client.ReadLock(f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
+        ReadLock(client.client, f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
         blocking=blocking
     ) as lock:
         yield lock
@@ -50,7 +51,7 @@ def tenant_read_lock(client, tenant_name, blocking=True):
 def tenant_write_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     with locked(
-        client.client.WriteLock(f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
+        WriteLock(client.client, f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
         blocking=blocking
     ) as lock:
         yield lock
