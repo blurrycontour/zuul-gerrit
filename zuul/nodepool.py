@@ -16,8 +16,9 @@ import time
 from collections import defaultdict
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
+from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.exceptions import LockException
-from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.nodepool import NodeRequestEvent, ZooKeeperNodepool
 
 
 def add_resources(target, source):
@@ -33,18 +34,52 @@ def subtract_resources(target, source):
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
 
-    def __init__(self, zk_client, system_id, statsd, scheduler=None):
+    def __init__(self, zk_client, system_id, statsd, scheduler=False):
         self.system_id = system_id
         self.statsd = statsd
-        # TODO (felix): Remove the scheduler parameter once the nodes are
-        # locked on the executor side.
-        self.sched = scheduler
 
-        self.zk_nodepool = ZooKeeperNodepool(zk_client)
+        if scheduler:
+            # Only enable the node request cache/callback for the scheduler.
+            self.zk_nodepool = ZooKeeperNodepool(
+                zk_client,
+                enable_node_request_cache=True,
+                node_request_event_callback=self._handleNodeRequestEvent)
+        else:
+            self.zk_nodepool = ZooKeeperNodepool(zk_client)
+
+        self.pipeline_result_events = PipelineResultEventQueue.createRegistry(
+            zk_client
+        )
 
         self.requests = {}
         self.current_resources_by_tenant = {}
         self.current_resources_by_project = {}
+
+    def _handleNodeRequestEvent(self, request, event, request_id=None):
+        # TODO (felix): This callback should be wrapped by leader election, so
+        # that only one scheduler puts NodesProvisionedEvents in the queue.
+        log = get_annotated_logger(self.log, event=request.event_id)
+
+        if request.uid not in self.requests:
+            log.debug("Node request %s is unknown", request)
+            return False
+
+        log.debug("Node request %s %s", request, request.state)
+        if event == NodeRequestEvent.COMPLETED:
+            del self.requests[request.uid]
+            self.emitStats(request)
+
+            tenant_name = request.tenant_name
+            pipeline_name = request.pipeline_name
+            event = model.NodesProvisionedEvent(
+                request.id, request.job_name, request.build_set_uuid)
+            self.pipeline_result_events[tenant_name][pipeline_name].put(event)
+        elif event == NodeRequestEvent.DELETED:
+            # Presumably we already removed it when it was complete.
+            req = self.requests.pop(request.uid, None)
+            if req is not None:
+                self.log.error("Node request %s was removed out of band",
+                               request)
 
     def emitStats(self, request):
         # Implements the following :
@@ -123,30 +158,35 @@ class Nodepool(object):
         self.requests[req.uid] = req
 
         if job.nodeset.nodes:
-            self.zk_nodepool.submitNodeRequest(
-                req, priority, self._updateNodeRequest)
+            self.zk_nodepool.submitNodeRequest(req, priority)
             # Logged after submission so that we have the request id
             log.info("Submitted node request %s", req)
             self.emitStats(req)
         else:
-            log.info("Fulfilling empty node request %s", req)
+            # Directly fulfill the node request before submitting it to ZK, so
+            # nodepool doesn't have to deal with it.
             req.state = model.STATE_FULFILLED
-            if self.sched is not None:
-                # TODO (felix): Remove this call once the nodes are locked on
-                # the executor side.
-                self.sched.onNodesProvisioned(req)
-            del self.requests[req.uid]
+            self.zk_nodepool.submitNodeRequest(req, priority)
+            # Logged after submission so that we have the request id
+            log.info("Submitted empty node request %s", req)
         return req
 
     def cancelRequest(self, request):
         log = get_annotated_logger(self.log, request.event_id)
         log.info("Canceling node request %s", request)
+        # TODO (felix): This flag might not be relevant anymore as it's not
+        # stored in ZK. Should we just remove the condition and always delete
+        # the request?
         if not request.canceled:
             try:
                 request.canceled = True
                 self.zk_nodepool.deleteNodeRequest(request)
             except Exception:
                 log.exception("Error deleting node request:")
+
+        if request.uid in self.requests:
+            del self.requests[request.uid]
+            self.emitStats(request)
 
     def reviseRequest(self, request, relative_priority=None):
         '''Attempt to update the node request, if it is not currently being
@@ -377,40 +417,6 @@ class Nodepool(object):
             self.log.exception("Error locking nodes:")
             self._unlockNodes(locked_nodes)
             raise
-
-    def _updateNodeRequest(self, request, priority):
-        log = get_annotated_logger(self.log, request.event_id)
-        # Return False to indicate that we should stop watching the
-        # node.
-        log.debug("Updating node request %s", request)
-
-        if request.uid not in self.requests:
-            log.debug("Request %s is unknown", request)
-            return False
-
-        if request.canceled:
-            log.debug("Node request %s was canceled", request)
-            del self.requests[request.uid]
-            self.emitStats(request)
-            return False
-
-        # TODOv3(jeblair): handle allocation failure
-        if request.state in (model.STATE_FULFILLED, model.STATE_FAILED):
-            log.info("Node request %s %s", request, request.state)
-
-            # Give our results to the scheduler.
-            if self.sched is not None:
-                # TODO (felix): Remove this call once the nodes are locked on
-                # the executor side.
-                self.sched.onNodesProvisioned(request)
-            del self.requests[request.uid]
-
-            self.emitStats(request)
-
-            # Stop watching this request node.
-            return False
-
-        return True
 
     def checkNodeRequest(self, request, request_id, job_nodeset):
         """
