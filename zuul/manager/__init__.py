@@ -643,6 +643,8 @@ class PipelineManager(metaclass=ABCMeta):
                 priority, relative_priority, event=item.event)
             log.debug("Adding node request %s for job %s to item %s",
                       req, job, item)
+            # TODO (felix): Do we still have to store the node requests on the
+            # buildset?
             build_set.setJobNodeRequest(job.name, req)
         return True
 
