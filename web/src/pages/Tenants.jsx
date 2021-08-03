@@ -12,9 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import * as React from 'react'
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   BuildIcon,
@@ -32,97 +30,84 @@ import {
   TableBody,
   TableVariant,
 } from '@patternfly/react-table'
-import { Fetching } from '../containers/Fetching'
-import { fetchTenantsIfNeeded } from '../actions/tenants'
+import { useDispatch } from 'react-redux'
+
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { IconProperty } from '../containers/build/Misc'
+import { fetchTenants } from '../api.js'
 
-class TenantsPage extends React.Component {
-  static propTypes = {
-    remoteData: PropTypes.object,
-    dispatch: PropTypes.func
-  }
-
-  updateData = (force) => {
-    this.props.dispatch(fetchTenantsIfNeeded(force))
-  }
-
-  componentDidMount () {
+const TenantsPage = () => {
+  const [data, setData] = useState([])
+  const dispatch = useDispatch()
+  // TODO: use a custom hook to take care of catching and dispatching network errors
+  useEffect(() => {
     document.title = 'Zuul Tenants'
-    this.updateData()
-  }
+    fetchTenants()
+      .then(response => setData(response.data))
+      .catch(error => dispatch({type: 'TENANTS_FETCH_FAIL', error}))
+  }, [])
 
-  // TODO: fix Refreshable class to work with tenant less page.
-  componentDidUpdate () { }
-
-  render () {
-    const { remoteData } = this.props
-    if (remoteData.isFetching) {
-      return <Fetching />
+  const tenants = data.map((tenant) => {
+    return {
+      cells: [
+        {title: (<b>{tenant.name}</b>)},
+        {title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)},
+        tenant.projects,
+        tenant.queue
+      ]}})
+  const columns = [
+    {
+      title: <IconProperty icon={<HomeIcon />} value="Name"/>,
+      dataLabel: 'Name',
+    },
+    {
+      title: <IconProperty icon={<DesktopIcon />} value="Status"/>,
+      dataLabel: 'Status',
+    },
+    {
+      title: <IconProperty icon={<CubeIcon />} value="Projects"/>,
+      dataLabel: 'Projects',
+    },
+    {
+      title: <IconProperty icon={<BuildIcon />} value="Jobs"/>,
+      dataLabel: 'Jobs',
+    },
+    {
+      title: <IconProperty icon={<FolderIcon />} value="Builds"/>,
+      dataLabel: 'Builds',
+    },
+    {
+      title: <IconProperty icon={<RepositoryIcon />} value="Buildsets"/>,
+      dataLabel: 'Buildsets',
+    },
+    {
+      title: <IconProperty icon={<CubesIcon />} value="Project count"/>,
+      dataLabel: 'Project count',
+    },
+    {
+      title: <IconProperty icon={<TrendUpIcon />} value="Queue"/>,
+      dataLabel: 'Queue',
     }
+  ]
 
-    const tenants = remoteData.tenants.map((tenant) => {
-      return {
-        cells: [
-          {title: (<b>{tenant.name}</b>)},
-          {title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)},
-          tenant.projects,
-          tenant.queue
-        ]}})
-    const columns = [
-      {
-        title: <IconProperty icon={<HomeIcon />} value="Name"/>,
-        dataLabel: 'Name',
-      },
-      {
-        title: <IconProperty icon={<DesktopIcon />} value="Status"/>,
-        dataLabel: 'Status',
-      },
-      {
-        title: <IconProperty icon={<CubeIcon />} value="Projects"/>,
-        dataLabel: 'Projects',
-      },
-      {
-        title: <IconProperty icon={<BuildIcon />} value="Jobs"/>,
-        dataLabel: 'Jobs',
-      },
-      {
-        title: <IconProperty icon={<FolderIcon />} value="Builds"/>,
-        dataLabel: 'Builds',
-      },
-      {
-        title: <IconProperty icon={<RepositoryIcon />} value="Buildsets"/>,
-        dataLabel: 'Buildsets',
-      },
-      {
-        title: <IconProperty icon={<CubesIcon />} value="Project count"/>,
-        dataLabel: 'Project count',
-      },
-      {
-        title: <IconProperty icon={<TrendUpIcon />} value="Queue"/>,
-        dataLabel: 'Queue',
-      }
-    ]
-
-    return (
-      <PageSection variant={PageSectionVariants.light}>
-        <Table
-          aria-label="Tenant Table"
-          variant={TableVariant.compact}
-          cells={columns}
-          rows={tenants}
-          className="zuul-tenant-table"
-        >
-          <TableHeader />
-          <TableBody />
-        </Table>
-      </PageSection>
-    )
-  }
+  return (
+    <PageSection variant={PageSectionVariants.light}>
+      <Table
+        aria-label="Tenant Table"
+        variant={TableVariant.compact}
+        cells={columns}
+        rows={tenants}
+        className="zuul-tenant-table"
+      >
+        <TableHeader />
+        <TableBody />
+      </Table>
+    </PageSection>
+  )
 }
 
-export default connect(state => ({remoteData: state.tenants}))(TenantsPage)
+export default TenantsPage
