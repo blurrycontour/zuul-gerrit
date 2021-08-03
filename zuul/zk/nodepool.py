@@ -13,15 +13,23 @@
 import json
 import logging
 import time
+from enum import Enum
 from typing import Optional, List
 
 from kazoo.exceptions import NoNodeError, LockTimeout
+from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.lib.jsonutil import json_dumps
 from zuul.model import HoldRequest, NodeRequest
-from zuul.zk import ZooKeeperClient, ZooKeeperBase
+from zuul.zk import ZooKeeperBase
 from zuul.zk.exceptions import LockException
+
+
+class NodeRequestEvent(Enum):
+    COMPLETED = 0  # FULFILLED | FAILED
+    DELETED = 2
 
 
 class ZooKeeperNodepool(ZooKeeperBase):
@@ -36,27 +44,35 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     log = logging.getLogger("zuul.zk.nodepool.ZooKeeperNodepool")
 
-    def __init__(self, client: ZooKeeperClient, enable_cache=True):
+    def __init__(self, client, enable_node_request_cache=True,
+                 node_request_event_callback=None):
         super().__init__(client)
-        self.enable_cache = enable_cache
+        self.enable_node_request_cache = enable_node_request_cache
+        self.node_request_event_callback = node_request_event_callback
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for
         # storing that data serialized as objects. This allows us to return
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
-        # TODO: init cache
+        self._node_request_tree = None
+        self._node_request_cache = {}
+
         if self.client.connected:
             self._onConnect()
 
     def _onConnect(self):
-        if self.enable_cache:
-            # TODO: setup cache
-            pass
+        if self.enable_node_request_cache:
+            self._node_request_tree = TreeCache(self.kazoo_client,
+                                                self.REQUEST_ROOT)
+            self._node_request_tree.listen_fault(self._cacheFaultListener)
+            self._node_request_tree.listen(self.requestCacheListener)
+            self._node_request_tree.start()
 
     def _onDisconnect(self):
-        # TODO: close cache
-        pass
+        if self._node_request_tree is not None:
+            self._node_request_tree.close()
+            self._node_request_tree = None
 
     def _launcherPath(self, launcher):
         return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
@@ -66,6 +82,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     def _cacheFaultListener(self, e):
         self.log.exception(e)
+
+    def register(self):
+        self.kazoo_client.ensure_path(self.REQUEST_ROOT)
 
     def getRegisteredLaunchers(self):
         """
@@ -309,21 +328,75 @@ class ZooKeeperNodepool(ZooKeeperBase):
         request.lock.release()
         request.lock = None
 
-    def submitNodeRequest(self, node_request, priority, watcher):
+    def requestCacheListener(self, event):
+        try:
+            self._requestCacheListener(event)
+        except Exception:
+            self.log.exception(
+                "Exception in request cache update for event: %s",
+                event)
+
+    def _requestCacheListener(self, event):
+        if hasattr(event.event_data, 'path'):
+            # Ignore root node
+            path = event.event_data.path
+            if path == self.REQUEST_ROOT:
+                return
+
+            # Ignore lock nodes
+            if '/lock' in path:
+                return
+
+        # Ignore any non-node related events such as connection events here
+        if event.event_type not in (TreeEvent.NODE_ADDED,
+                                    TreeEvent.NODE_UPDATED,
+                                    TreeEvent.NODE_REMOVED):
+            return
+
+        path = event.event_data.path
+        request_id = path.rsplit('/', 1)[1]
+
+        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED):
+            # Requests with empty data are invalid so skip add or update these.
+            if not event.event_data.data:
+                return
+
+            # Perform an in-place update of the cached request if possible
+            d = self._bytesToDict(event.event_data.data)
+            request = self._node_request_cache.get(request_id)
+            if request:
+                if event.event_data.stat.version <= request.stat.version:
+                    # Don't update to older data
+                    return
+                old_state = request.state
+                request.updateFromDict(d)
+                request.stat = event.event_data.stat
+            else:
+                old_state = None
+                request = NodeRequest.fromDict(d)
+                request.id = request_id
+                request.stat = event.event_data.stat
+                self._node_request_cache[request_id] = request
+
+            if (request.state in {zuul.model.STATE_FULFILLED,
+                                  zuul.model.STATE_FAILED}
+                and request.state != old_state
+                and self.node_request_event_callback):
+                self.node_request_event_callback(
+                    request, NodeRequestEvent.COMPLETED, request_id=request_id)
+
+        elif event.event_type == TreeEvent.NODE_REMOVED:
+            request = self._node_request_cache.pop(request_id)
+            if self.node_request_event_callback:
+                self.node_request_event_callback(
+                    request, NodeRequestEvent.DELETED, request_id=request_id)
+
+    def submitNodeRequest(self, node_request, priority):
         """
         Submit a request for nodes to Nodepool.
 
         :param NodeRequest node_request: A NodeRequest with the
             contents of the request.
-
-        :param callable watcher: A callable object that will be
-            invoked each time the request is updated.  It is called
-            with two arguments: (node_request, deleted) where
-            node_request is the same argument passed to this method,
-            and deleted is a boolean which is True if the node no
-            longer exists (notably, this will happen on disconnection
-            from ZooKeeper).  The watcher should return False when
-            further updates are no longer necessary.
         """
         node_request.created_time = time.time()
         data = node_request.toDict()
@@ -333,13 +406,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
                                         makepath=True, sequence=True)
         reqid = path.split("/")[-1]
         node_request.id = reqid
-
-        def callback(value, _):
-            if value:
-                self.updateNodeRequest(node_request, value)
-            return watcher(node_request, priority)
-
-        self.kazoo_client.DataWatch(path, callback)
 
     def getNodeRequests(self):
         '''
@@ -360,6 +426,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         :param str node_request_id: The ID of the node request to retrieve.
         """
+        req = self._node_request_cache.get(node_request_id)
+        if req:
+            return req
 
         path = f"{self.REQUEST_ROOT}/{node_request_id}"
         try:
@@ -578,6 +647,15 @@ class ZooKeeperNodepool(ZooKeeperBase):
                     node_data.get('hold_job') == identifier):
                 count += 1
         return count
+
+    @staticmethod
+    def _bytesToDict(data):
+        return json.loads(data.decode("utf-8"))
+
+    @staticmethod
+    def _dictToBytes(data):
+        # The custom json_dumps() will also serialize MappingProxyType objects
+        return json_dumps(data).encode("utf-8")
 
 
 class Launcher:
