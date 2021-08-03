@@ -498,6 +498,7 @@ class Scheduler(threading.Thread):
         if self.general_cleanup_lock.acquire(blocking=False):
             self._runConfigCacheCleanup()
             self._runExecutorApiCleanup()
+            self._runMergeParamsCleanup()
 
     def _runConfigCacheCleanup(self):
         with self.layout_lock:
@@ -518,6 +519,12 @@ class Scheduler(threading.Thread):
             self.executor.executor_api.cleanup()
         except Exception:
             self.log.exception("Error in executor API cleanup:")
+
+    def _runMergeParamsCleanup(self):
+        try:
+            self.merger.merger_api.cleanupLostMergeParams()
+        except Exception:
+            self.log.exception("Error in merge params cleanup:")
 
     def _runBuildRequestCleanup(self):
         # If someone else is running the cleanup, skip it.

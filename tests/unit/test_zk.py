@@ -1065,6 +1065,38 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         lost_merge_requests = list(merger_api.lostMergeRequests())
         self.assertEqual(0, len(lost_merge_requests))
 
+    def test_lost_merge_request_params(self):
+        # Test cleaning up orphaned request parameters
+        merger_api = MergerApi(self.zk_client)
+
+        merger_api.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params={},
+            event_id='1',
+        )
+
+        path_a = f"{merger_api.MERGE_REQUEST_ROOT}/A"
+
+        params_root = merger_api.MERGE_PARAMS_ROOT
+        self.assertEqual(len(merger_api._getAllMergeIds()), 1)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 1)
+
+        # Delete the request but not the params
+        self.zk_client.client.delete(path_a)
+        self.assertEqual(len(merger_api._getAllMergeIds()), 0)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 1)
+
+        # Clean up leaked params
+        merger_api.cleanupLostMergeParams(0)
+        self.assertEqual(len(
+            self.zk_client.client.get_children(params_root)), 0)
+
     def test_existing_merge_request(self):
         # Test that a merger sees an existing merge request when
         # coming online

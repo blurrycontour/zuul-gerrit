@@ -3190,9 +3190,7 @@ class TestingMergerApi(HoldableMergerApi):
         # the merge requests directly from ZooKeeper and not from a cache
         # layer.
         all_merge_requests = []
-        for merge_uuid in self.kazoo_client.get_children(
-            self.MERGE_REQUEST_ROOT
-        ):
+        for merge_uuid in self._getAllMergeIds():
             merge_request = self.get("/".join(
                 [self.MERGE_REQUEST_ROOT, merge_uuid]))
             if merge_request and (not states or merge_request.state in states):
