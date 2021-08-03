@@ -861,9 +861,10 @@ class NodeRequest(object):
         """
         # Start with any previously read data
         d = self._zk_data.copy()
-        # The requestor_data is opaque to nodepool and won't be touched when
-        # by nodepool when it fulfills the request.
+        # The requestor_data is opaque to nodepool and won't be touched by
+        # nodepool when it fulfills the request.
         d["requestor_data"] = {
+            "uid": self.uid,
             "build_set_uuid": self.build_set_uuid,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
@@ -909,6 +910,7 @@ class NodeRequest(object):
             relative_priority=data.get("relative_priority", 0),
         )
 
+        request.uid = requestor_data["uid"]
         request.updateFromDict(data)
 
         return request
@@ -2463,6 +2465,10 @@ class BuildSet(object):
     def getRetryBuildsForJob(self, job_name):
         return self.retry_builds.get(job_name, [])
 
+    # TODO (felix): As we are now looking up the node request from ZK directly,
+    # do we need to store the nodesets and noderequests on the buildset at all?
+    # Maybe we could change this dict to only store the node request ids and
+    # look the node requests up from ZK if needed.
     def getJobNodeSet(self, job_name: str) -> NodeSet:
         # Return None if not provisioned; empty NodeSet if no nodes
         # required
@@ -4166,13 +4172,17 @@ class FilesChangesCompletedEvent(ResultEvent):
 class NodesProvisionedEvent(ResultEvent):
     """Nodes have been provisioned for a build_set
 
-    :arg NodeRequest request: The fulfilled node request.
+    :arg int request_id: The id of the fulfilled node request.
+    :arg str job_name: The name of the job this node request belongs to.
+    :arg str build_set_uuid: UUID of the buildset this node request belongs to
     """
 
     def __init__(self, request_id, job_name, build_set_uuid):
         self.request_id = request_id
         # We have to use the job_name to look up empty node requests from the
         # buildset (as empty node requests don't have an id).
+        # TODO (felix): Is the job_name still needed? We are now also storing
+        # empty node requests in ZK, so they have an ID.
         self.job_name = job_name
         self.build_set_uuid = build_set_uuid
 

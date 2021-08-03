@@ -247,7 +247,7 @@ class Scheduler(threading.Thread):
             self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
             self.nodepool = nodepool.Nodepool(
-                self.zk_client, self.hostname, self.statsd, self)
+                self.zk_client, self.hostname, self.statsd, scheduler=True)
 
     def start(self):
         super(Scheduler, self).start()
@@ -662,12 +662,6 @@ class Scheduler(threading.Thread):
                     self.statsd.timing(key, dt)
         except Exception:
             self.log.exception("Exception reporting runtime stats")
-
-    def onNodesProvisioned(self, req):
-        tenant_name = req.tenant_name
-        pipeline_name = req.pipeline_name
-        event = NodesProvisionedEvent(req.id, req.job_name, req.build_set_uuid)
-        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def reconfigureTenant(self, tenant, project, event):
         self.log.debug("Submitting tenant reconfiguration event for "
@@ -2071,15 +2065,17 @@ class Scheduler(threading.Thread):
         pipeline.manager.onFilesChangesCompleted(event, build_set)
 
     def _doNodesProvisionedEvent(self, event, pipeline):
-        request_id = event.request_id
+        request = self.zk_nodepool.getNodeRequest(event.request_id)
+
+        if not request:
+            # TODO (felix): What to do in this case? We can't return the nodes
+            # if we don't have a noderequest in ZK, but most probably we don't
+            # need to do that anyways as nodepool will take care.
+            return
 
         # Look up the buildset to access the local node request object
         build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
-            return
-
-        request = build_set.getJobNodeRequest(event.job_name)
-        if not request:
             return
 
         log = get_annotated_logger(self.log, request.event_id)
@@ -2091,7 +2087,10 @@ class Scheduler(threading.Thread):
             build_set.removeJobNodeRequest(request.job_name)
             return
 
-        nodeset = self.nodepool.checkNodeRequest(request, request_id,
+        # TODO (felix): Since we are now using the request from ZK directly, do
+        # we still have to validate the request ID? As we are using the same ID
+        # for the lookup in ZK this check should now always succeed.
+        nodeset = self.nodepool.checkNodeRequest(request, event.request_id,
                                                  job.nodeset)
         if nodeset is None:
             return
@@ -2195,6 +2194,8 @@ class Scheduler(threading.Thread):
         try:
             # Cancel node request if needed
             req = buildset.getJobNodeRequest(job_name)
+            # TODO (felix): Not sure if this still works as we are using the
+            # local node request object which might not be up-to-date.
             if req:
                 self.nodepool.cancelRequest(req)
                 buildset.removeJobNodeRequest(job_name)
