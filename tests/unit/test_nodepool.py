@@ -22,6 +22,17 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
+class NodepoolWithCallback(zuul.nodepool.Nodepool):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.provisioned_requests = []
+
+    def _handleNodeRequestEvent(self, request, event, request_id=None):
+        super()._handleNodeRequestEvent(request, event, request_id)
+        self.provisioned_requests.append(request)
+
+
 class TestNodepoolBase(BaseTestCase):
     # Tests the Nodepool interface class using a fake nodepool and
     # scheduler.
@@ -42,10 +53,9 @@ class TestNodepoolBase(BaseTestCase):
         self.zk_client.connect()
         self.hostname = 'nodepool-test-hostname'
 
-        self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
-        self.nodepool = zuul.nodepool.Nodepool(
+        self.nodepool = NodepoolWithCallback(
             self.zk_client, self.hostname, self.statsd, self)
 
         self.fake_nodepool = FakeNodepool(self.zk_chroot_fixture)
@@ -53,13 +63,11 @@ class TestNodepoolBase(BaseTestCase):
 
     def waitForRequests(self):
         # Wait until all requests are complete.
+        # TODO (felix): Would it make sense to provide a data watch here on the
+        # node requests to wait for the updates and directly get the data so
+        # we can assert the node request state in the tests?
         while self.nodepool.requests:
             time.sleep(0.1)
-
-    def onNodesProvisioned(self, request):
-        # This is a scheduler method that the nodepool class calls
-        # back when a request is provisioned.
-        self.provisioned_requests.append(request)
 
 
 class TestNodepool(TestNodepoolBase):
@@ -74,8 +82,12 @@ class TestNodepool(TestNodepoolBase):
         request = self.nodepool.requestNodes(
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
-        self.assertEqual(request.state, 'fulfilled')
+        request = self.nodepool.zk_nodepool.getNodeRequest(request.id)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 1)
+        # TODO (felix): We have to look up the request from ZK directly to
+        # check the state.
+        zk_request = self.zk_nodepool.getNodeRequest(request.id)
+        self.assertEqual(zk_request.state, 'fulfilled')
 
         # Accept the nodes
         new_nodeset = self.nodepool.checkNodeRequest(
@@ -115,7 +127,7 @@ class TestNodepool(TestNodepoolBase):
         self.nodepool.cancelRequest(request)
 
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 0)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 0)
 
     def test_node_request_priority(self):
         # Test that requests are satisfied in priority order
@@ -132,7 +144,9 @@ class TestNodepool(TestNodepoolBase):
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.fake_nodepool.unpause()
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 2)
+        request1 = self.nodepool.zk_nodepool.getNodeRequest(request1.id)
+        request2 = self.nodepool.zk_nodepool.getNodeRequest(request2.id)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 2)
         self.assertEqual(request1.state, 'fulfilled')
         self.assertEqual(request2.state, 'fulfilled')
         self.assertTrue(request2.state_time < request1.state_time)
