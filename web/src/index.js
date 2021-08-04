@@ -39,6 +39,7 @@ import registerServiceWorker from './registerServiceWorker'
 import { fetchInfoIfNeeded } from './actions/info'
 import configureStore from './store'
 import App from './App'
+import { StateProvider } from './hooks.js'
 
 // Importing our custom css file after the App allows us to also overwrite the
 // style attributes of PF4 component (as their CSS is loaded when the component
@@ -52,6 +53,8 @@ store.dispatch(fetchInfoIfNeeded())
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    <StateProvider>
+      <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    </StateProvider>
   </Provider>, document.getElementById('root'))
 registerServiceWorker()

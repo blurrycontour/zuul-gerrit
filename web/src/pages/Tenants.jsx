@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState, useEffect } from 'react'
+import * as React from 'react'
 import { Link } from 'react-router-dom'
 import {
   BuildIcon,
@@ -30,23 +30,14 @@ import {
   TableBody,
   TableVariant,
 } from '@patternfly/react-table'
-import { useDispatch } from 'react-redux'
 
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { IconProperty } from '../containers/build/Misc'
 import { fetchTenants } from '../api.js'
+import { useRemoteData } from '../hooks.js'
 
 const TenantsPage = () => {
-  const [data, setData] = useState([])
-  const dispatch = useDispatch()
-  // TODO: use a custom hook to take care of catching and dispatching network errors
-  useEffect(() => {
-    document.title = 'Zuul Tenants'
-    fetchTenants()
-      .then(response => setData(response.data))
-      .catch(error => dispatch({type: 'TENANTS_FETCH_FAIL', error}))
-  }, [dispatch])
-
+  const data = useRemoteData('Tenants', fetchTenants)
   const tenants = data.map((tenant) => {
     return {
       cells: [
