@@ -1015,8 +1015,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
         self.assertEqual(queue[0].zone, None)
-        params = self.executor_server.executor_api.getBuildParams(
-            queue[0])
+        params = self.executor_server.executor_api.getParams(queue[0])
         self.assertEqual(params['job'], 'project-merge')
         self.assertEqual(params['items'][0]['number'], '%d' % A.number)
 
@@ -1027,8 +1026,8 @@ class TestScheduler(ZuulTestCase):
         self.executor_api.release('.*-merge')
         self.waitUntilSettled()
         queue = list(self.executor_api.queued())
-        params = [self.executor_server.executor_api.getBuildParams(
-            item) for item in queue]
+        params = [self.executor_server.executor_api.getParams(item)
+                  for item in queue]
 
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)

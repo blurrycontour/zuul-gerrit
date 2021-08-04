@@ -27,9 +27,5 @@ class NoClientException(ZuulZooKeeperException):
         super().__init__("No zookeeper client!")
 
 
-class BuildRequestNotFound(ZuulZooKeeperException):
-    pass
-
-
-class MergeRequestNotFound(ZuulZooKeeperException):
+class JobRequestNotFound(ZuulZooKeeperException):
     pass
