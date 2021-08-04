@@ -16,6 +16,23 @@
       "revId": "211a0a2a65f0eb8689a1a766419d5d898cdff7d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8f7aad38_8040aa2b",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T14:50:25Z",
+      "side": 1,
+      "message": "I think this field is what ties the new request created to the existing buildset. Then the job_name below associates it with the specific job.",
+      "revId": "211a0a2a65f0eb8689a1a766419d5d898cdff7d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
