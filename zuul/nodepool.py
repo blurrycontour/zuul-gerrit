@@ -42,7 +42,7 @@ class Nodepool(object):
 
         self.zk_nodepool = ZooKeeperNodepool(zk_client)
 
-        self.requests = {}
+        self.requests = 0
         self.current_resources_by_tenant = {}
         self.current_resources_by_project = {}
 
@@ -78,7 +78,7 @@ class Nodepool(object):
         pipe.incr(key + '.size.%s' % len(request.nodeset.nodes))
         if dt:
             pipe.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
-        pipe.gauge('zuul.nodepool.current_requests', len(self.requests))
+        pipe.gauge('zuul.nodepool.current_requests', self.requests)
         pipe.send()
 
     def emitStatsResources(self):
@@ -117,10 +117,14 @@ class Nodepool(object):
         # Create a copy of the nodeset to represent the actual nodes
         # returned by nodepool.
         nodeset = job.nodeset.copy()
+        if event:
+            event_id = event.zuul_event_id
+        else:
+            event_id = None
         req = model.NodeRequest(self.hostname, build_set_uuid, tenant_name,
                                 pipeline_name, job.name, nodeset, provider,
-                                relative_priority, event=event)
-        self.requests[req.uid] = req
+                                relative_priority, event_id)
+        self.requests += 1
 
         if nodeset.nodes:
             self.zk_nodepool.submitNodeRequest(
@@ -135,7 +139,7 @@ class Nodepool(object):
                 # TODO (felix): Remove this call once the nodes are locked on
                 # the executor side.
                 self.sched.onNodesProvisioned(req)
-            del self.requests[req.uid]
+            self.requests -= 1
         return req
 
     def cancelRequest(self, request):
@@ -384,12 +388,9 @@ class Nodepool(object):
         # node.
         log.debug("Updating node request %s", request)
 
-        if request.uid not in self.requests:
-            log.debug("Request %s is unknown", request.uid)
-            return False
-
         if request.canceled:
-            del self.requests[request.uid]
+            log.debug("Node request %s was canceled", request)
+            self.requests -= 1
             self.emitStats(request)
             return False
 
@@ -409,7 +410,7 @@ class Nodepool(object):
                 # TODO (felix): Remove this call once the nodes are locked on
                 # the executor side.
                 self.sched.onNodesProvisioned(request)
-            del self.requests[request.uid]
+            self.requests -= 1
 
             self.emitStats(request)
 
@@ -456,14 +457,28 @@ class Nodepool(object):
             if not self.zk_nodepool.nodeRequestExists(request):
                 log.info("Request %s no longer exists, resubmitting",
                          request.id)
-                # Look up the priority from the old request id before resetting
-                # it.
+                # Look up the priority from the old request id.
                 priority = request.id.partition("-")[0]
-                request.id = None
-                request.state = model.STATE_REQUESTED
-                self.requests[request.uid] = request
+                # It's possible that our node request was updated with
+                # real node info before it disappeared.  Our
+                # replacement must not contain any nodes, otherwise
+                # nodepool will append to it and we'll have double the
+                # node count.  To ensure this doesn't happen, copy the
+                # nodeset (which produces a new nodeset with no real
+                # node info).
+                nodeset = request.nodeset.copy()
+                new_req = model.NodeRequest(
+                    self.hostname,
+                    request.build_set_uuid,
+                    request.tenant_name,
+                    request.pipeline_name,
+                    request.job_name,
+                    nodeset,
+                    request.provider,
+                    request.relative_priority,
+                    request.event_id)
                 self.zk_nodepool.submitNodeRequest(
-                    request, priority, self._updateNodeRequest)
+                    new_req, priority, self._updateNodeRequest)
                 return False
         except Exception:
             # If we cannot retrieve the node request from ZK we probably lost

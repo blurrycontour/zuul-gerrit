@@ -793,7 +793,8 @@ class NodeRequest(object):
     """A request for a set of nodes."""
 
     def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
-                 job_name, nodeset, provider, relative_priority, event=None):
+                 job_name, nodeset, provider, relative_priority,
+                 event_id=None):
         self.requestor = requestor
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
@@ -810,10 +811,7 @@ class NodeRequest(object):
         self.provider = provider
         self.id = None
         self._zk_data = {}  # Data that we read back from ZK
-        if event is not None:
-            self.event_id = event.zuul_event_id
-        else:
-            self.event_id = None
+        self.event_id = event_id
         # Zuul internal flags (not stored in ZK so they are not
         # overwritten).
         self.failed = False
