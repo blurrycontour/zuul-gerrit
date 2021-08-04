@@ -67,7 +67,8 @@ from zuul.nodepool import Nodepool
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.components import ExecutorComponent
 from zuul.zk.exceptions import BuildRequestNotFound
-from zuul.zk.executor import BuildRequestEvent, ExecutorApi
+from zuul.zk.executor import ExecutorApi
+from zuul.zk.request_queue import JobRequestEvent
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',

@@ -2054,131 +2054,31 @@ class JobGraph(object):
         return None
 
 
-@total_ordering
-class MergeRequest:
-
+class JobRequest:
     # States:
+    UNSUBMITTED = "unsubmitted"
     REQUESTED = "requested"
     HOLD = "hold"  # Used by tests to stall processing
     RUNNING = "running"
     COMPLETED = "completed"
 
-    ALL_STATES = (REQUESTED, HOLD, RUNNING, COMPLETED)
+    ALL_STATES = (UNSUBMITTED, REQUESTED, HOLD, RUNNING, COMPLETED)
 
-    # Types:
-    MERGE = "merge"
-    CAT = "cat"
-    REF_STATE = "refstate"
-    FILES_CHANGES = "fileschanges"
-
-    def __init__(
-        self,
-        uuid,
-        state,
-        job_type,
-        precedence,
-        build_set_uuid,
-        tenant_name,
-        pipeline_name,
-        event_id
-    ):
+    def __init__(self, uuid, precedence=None, state=None, result_path=None):
         self.uuid = uuid
-        self.state = state
-        self.job_type = job_type
-        self.precedence = precedence
-        self.build_set_uuid = build_set_uuid
-        self.tenant_name = tenant_name
-        self.pipeline_name = pipeline_name
-        self.event_id = event_id
-
-        # Path to the future result if requested
-        self.result_path = None
-
-        # ZK related data
-        self.path = None
-        self._zstat = None
-        self.lock = None
-
-    def toDict(self):
-        return {
-            "uuid": self.uuid,
-            "state": self.state,
-            "job_type": self.job_type,
-            "precedence": self.precedence,
-            "build_set_uuid": self.build_set_uuid,
-            "tenant_name": self.tenant_name,
-            "pipeline_name": self.pipeline_name,
-            "result_path": self.result_path,
-            "event_id": self.event_id,
-        }
-
-    @classmethod
-    def fromDict(cls, data):
-        job = cls(
-            data["uuid"],
-            data["state"],
-            data["job_type"],
-            data["precedence"],
-            data["build_set_uuid"],
-            data["tenant_name"],
-            data["pipeline_name"],
-            data["event_id"],
-        )
-        job.result_path = data.get("result_path")
-        return job
-
-    def __lt__(self, other):
-        # Sort jobs by precedence and their creation time in ZooKeeper in
-        # ascending order to prevent older jobs from starving.
-        if self.precedence == other.precedence:
-            if self._zstat and other._zstat:
-                return self._zstat.ctime < other._zstat.ctime
-            return self.uuid < other.uuid
-        return self.precedence < other.precedence
-
-    def __eq__(self, other):
-        same_prec = self.precedence == other.precedence
-        if self._zstat and other._zstat:
-            same_ctime = self._zstat.ctime == other._zstat.ctime
+        if precedence is None:
+            self.precedence = precedence
         else:
-            same_ctime = self.uuid == other.uuid
+            self.precedence = 0
 
-        return same_prec and same_ctime
+        if state is None:
+            self.state = self.UNSUBMITTED
+        else:
+            self.state = state
+        # Path to the future result if requested
+        self.result_path = result_path
 
-    def __repr__(self):
-        return (
-            f"<MergeRequest {self.uuid}, job_type={self.job_type}, "
-            f"state={self.state}, path={self.path}>"
-        )
-
-
-@total_ordering
-class BuildRequest:
-    """A request for a build in a specific zone"""
-
-    # States:
-    # Waiting
-    REQUESTED = 'requested'
-    HOLD = 'hold'  # Used by tests to stall processing
-    # Running
-    RUNNING = 'running'
-    PAUSED = 'paused'
-    # Finished
-    COMPLETED = 'completed'
-
-    ALL_STATES = (REQUESTED, HOLD, RUNNING, PAUSED, COMPLETED)
-
-    def __init__(self, uuid, state, precedence, zone,
-                 tenant_name, pipeline_name, event_id):
-        self.uuid = uuid
-        self.state = state
-        self.precedence = precedence
-        self.zone = zone
-        self.tenant_name = tenant_name
-        self.pipeline_name = pipeline_name
-        self.event_id = event_id
-
-        # ZK related data
+        # ZK related data not serialized
         self.path = None
         self._zstat = None
         self.lock = None
@@ -2188,34 +2088,27 @@ class BuildRequest:
             "uuid": self.uuid,
             "state": self.state,
             "precedence": self.precedence,
-            "zone": self.zone,
-            "tenant_name": self.tenant_name,
-            "pipeline_name": self.pipeline_name,
-            "event_id": self.event_id,
+            "result_path": self.result_path,
         }
 
     @classmethod
     def fromDict(cls, data):
-        build_request = cls(
+        return cls(
             data["uuid"],
-            data["state"],
-            data["precedence"],
-            data["zone"],
-            data["tenant_name"],
-            data["pipeline_name"],
-            data["event_id"],
+            precedence=data["precedence"],
+            state=data["state"],
+            result_path=data["result_path"]
         )
 
-        return build_request
-
     def __lt__(self, other):
-        # Sort build requests by precedence and their creation time in
-        # ZooKeeper in ascending order to prevent older builds from starving.
+        # Sort requests by precedence and their creation time in
+        # ZooKeeper in ascending order to prevent older requests from
+        # starving.
         if self.precedence == other.precedence:
             if self._zstat and other._zstat:
                 return self._zstat.ctime < other._zstat.ctime
             # NOTE (felix): As the _zstat should always be set when retrieving
-            # the build request from ZooKeeper, this branch shouldn't matter
+            # the request from ZooKeeper, this branch shouldn't matter
             # much. It's just there, because the _zstat could - theoretically -
             # be None.
             return self.uuid < other.uuid
@@ -2227,8 +2120,104 @@ class BuildRequest:
             same_ctime = self._zstat.ctime == other._zstat.ctime
         else:
             same_ctime = self.uuid == other.uuid
-
         return same_prec and same_ctime
+
+    def __repr__(self):
+        return (f"<JobRequest {self.uuid}, state={self.state}, "
+                f"path={self.path} zone={self.zone}>")
+
+
+@total_ordering
+class MergeRequest(JobRequest):
+
+    # Types:
+    MERGE = "merge"
+    CAT = "cat"
+    REF_STATE = "refstate"
+    FILES_CHANGES = "fileschanges"
+
+    def __init__(self, uuid, job_type, build_set_uuid, tenant_name,
+                 pipeline_name, event_id, precedence=None, state=None,
+                 result_path=None):
+        super().__init__(uuid, precedence, state, result_path)
+        self.job_type = job_type
+        self.build_set_uuid = build_set_uuid
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.event_id = event_id
+
+    def toDict(self):
+        d = super().toDict()
+        d.update({
+            "job_type": self.job_type,
+            "build_set_uuid": self.build_set_uuid,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+            "event_id": self.event_id,
+        })
+        return d
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data["uuid"],
+            data["job_type"],
+            data["build_set_uuid"],
+            data["tenant_name"],
+            data["pipeline_name"],
+            data["event_id"],
+            precedence=data["precedence"],
+            state=data["state"],
+            result_path=data["result_path"]
+        )
+
+    def __repr__(self):
+        return (
+            f"<MergeRequest {self.uuid}, job_type={self.job_type}, "
+            f"state={self.state}, path={self.path}>"
+        )
+
+
+@total_ordering
+class BuildRequest(JobRequest):
+    """A request for a build in a specific zone"""
+
+    # States:
+    PAUSED = 'paused'
+
+    ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)
+
+    def __init__(self, uuid, zone,
+                 tenant_name, pipeline_name, event_id,
+                 precedence=None, state=None, result_path=None):
+        super().__init__(uuid, precedence, state, result_path)
+        self.zone = zone
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.event_id = event_id
+
+    def toDict(self):
+        d = super().toDict()
+        d.update({
+            "zone": self.zone,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+            "event_id": self.event_id,
+        })
+        return d
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data["uuid"],
+            data["zone"],
+            data["tenant_name"],
+            data["pipeline_name"],
+            data["event_id"],
+            precedence=data["precedence"],
+            state=data["state"],
+            result_path=data["result_path"]
+        )
 
     def __repr__(self):
         return (

@@ -19,7 +19,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import MergeRequest, PRECEDENCE_HIGH, PRECEDENCE_NORMAL
 from zuul.zk.merger import MergerApi
-from zuul.zk.exceptions import MergeRequestNotFound
+from zuul.zk.exceptions import JobRequestNotFound
 from kazoo.exceptions import BadVersionError
 
 
@@ -142,7 +142,7 @@ class MergeClient(object):
             # TODO (felix): If we want to optimize ZK requests, we could only
             # call the remove() here.
             self.merger_api.remove(merge_request)
-        except MergeRequestNotFound as e:
+        except JobRequestNotFound as e:
             self.log.warning("Could not complete merge: %s", str(e))
             return
         except BadVersionError:
