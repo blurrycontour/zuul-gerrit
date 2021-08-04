@@ -27,7 +27,7 @@ from zuul.model import (
 )
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.executor import ExecutorApi
-from zuul.zk.exceptions import BuildRequestNotFound
+from zuul.zk.exceptions import JobRequestNotFound
 from kazoo.exceptions import BadVersionError
 
 
@@ -131,15 +131,16 @@ class ExecutorClient(object):
                 # Fall back to the default zone
                 executor_zone = None
 
-        build.build_request_ref = self.executor_api.submit(
+        request = BuildRequest(
             uuid=uuid,
             tenant_name=build.build_set.item.pipeline.tenant.name,
             pipeline_name=build.build_set.item.pipeline.name,
-            params=params,
             zone=executor_zone,
             event_id=item.event.zuul_event_id,
-            precedence=PRIORITY_MAP[pipeline.precedence],
+            precedence=PRIORITY_MAP[pipeline.precedence]
         )
+        self.executor_api.submit(request, params)
+        build.build_request_ref = request.path
 
     def cancel(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,
@@ -224,7 +225,7 @@ class ExecutorClient(object):
         del self.builds[build.uuid]
 
     def cleanupLostBuildRequests(self):
-        for build_request in self.executor_api.lostBuildRequests():
+        for build_request in self.executor_api.lostRequests():
             try:
                 self.cleanupLostBuildRequest(build_request)
             except Exception:
@@ -241,7 +242,7 @@ class ExecutorClient(object):
         build_request.state = BuildRequest.COMPLETED
         try:
             self.executor_api.update(build_request)
-        except BuildRequestNotFound as e:
+        except JobRequestNotFound as e:
             self.log.warning("Could not complete build: %s", str(e))
             return
         except BadVersionError:

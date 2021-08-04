@@ -441,9 +441,9 @@ class EventResultFuture(ZooKeeperSimpleBase):
         return True
 
 
-class MergerEventResultFuture(EventResultFuture):
+class JobResultFuture(EventResultFuture):
 
-    log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
+    log = logging.getLogger("zuul.JobResultFuture")
 
     def __init__(self, client, result_path, waiter_path):
         super().__init__(client, result_path)

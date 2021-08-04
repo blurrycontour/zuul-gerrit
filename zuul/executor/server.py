@@ -66,8 +66,9 @@ import zuul.model
 from zuul.nodepool import Nodepool
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.components import ExecutorComponent
-from zuul.zk.exceptions import BuildRequestNotFound
-from zuul.zk.executor import BuildRequestEvent, ExecutorApi
+from zuul.zk.exceptions import JobRequestNotFound
+from zuul.zk.executor import ExecutorApi
+from zuul.zk.job_request_queue import JobRequestEvent
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -3511,13 +3512,13 @@ class ExecutorServer(BaseMergeServer):
         # not we could avoid this ZK update. The cancel request can anyway
         # only be fulfilled by the executor that executes the job. So, if
         # that executor died, no other can pick up the request.
-        if build_event == BuildRequestEvent.CANCELED:
+        if build_event == JobRequestEvent.CANCELED:
             self.executor_api.fulfillCancel(build_request)
             self.stopJob(build_request)
-        elif build_event == BuildRequestEvent.RESUMED:
+        elif build_event == JobRequestEvent.RESUMED:
             self.executor_api.fulfillResume(build_request)
             self.resumeJob(build_request)
-        elif build_event == BuildRequestEvent.DELETED:
+        elif build_event == JobRequestEvent.DELETED:
             self.stopJob(build_request)
 
     def runBuildWorker(self):
@@ -3558,8 +3559,8 @@ class ExecutorServer(BaseMergeServer):
             return
 
         build_request.state = BuildRequest.RUNNING
-        params = self.executor_api.getBuildParams(build_request)
-        self.executor_api.clearBuildParams(build_request)
+        params = self.executor_api.getParams(build_request)
+        self.executor_api.clearParams(build_request)
         # Directly update the build in ZooKeeper, so we don't
         # loop over and try to lock it again and again.
         self.executor_api.update(build_request)
@@ -3809,7 +3810,7 @@ class ExecutorServer(BaseMergeServer):
         build_request.state = BuildRequest.PAUSED
         try:
             self.executor_api.update(build_request)
-        except BuildRequestNotFound as e:
+        except JobRequestNotFound as e:
             self.log.warning("Could not pause build: %s", str(e))
             return
 
@@ -3821,7 +3822,7 @@ class ExecutorServer(BaseMergeServer):
         build_request.state = BuildRequest.RUNNING
         try:
             self.executor_api.update(build_request)
-        except BuildRequestNotFound as e:
+        except JobRequestNotFound as e:
             self.log.warning("Could not resume build: %s", str(e))
             return
 
@@ -3864,7 +3865,7 @@ class ExecutorServer(BaseMergeServer):
         build_request.state = BuildRequest.COMPLETED
         try:
             self.executor_api.update(build_request)
-        except BuildRequestNotFound as e:
+        except JobRequestNotFound as e:
             self.log.warning("Could not complete build: %s", str(e))
             return
 
