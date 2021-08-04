@@ -51,6 +51,23 @@
       "revId": "211a0a2a65f0eb8689a1a766419d5d898cdff7d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5d951b2_f8593cf6",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T16:30:01Z",
+      "side": 1,
+      "message": "This is the issue: https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L2295\n\nThat will be changing as part of the v5 work, but hasn\u0027t yet.  I guess we\u0027re halfway there, with part of the scheduler no longer using cached build requests, but the pipelines / buildsets still do.\n\nI think rather than anticipating that change, we should simplify this one to narrowly fix the issue with the existing framework.",
+      "revId": "211a0a2a65f0eb8689a1a766419d5d898cdff7d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
