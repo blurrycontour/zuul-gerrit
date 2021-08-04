@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "2f21adfc_b547b86a",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Sure, but maybe we can refactor tests in a followup?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "66d23825_9383c046",
         "filename": "tests/unit/test_zk.py",
         "patchSetId": 9
@@ -50,6 +67,23 @@
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91060677_3e931b00",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Will do.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -70,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "bdecc127_baa44a2d",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Yup.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "329e65b7_4f744281",
         "filename": "zuul/model.py",
         "patchSetId": 9
@@ -84,6 +135,23 @@
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c409aa2b_a23cd887",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Maybe in a later refactor?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -104,6 +172,23 @@
     },
     {
       "key": {
+        "uuid": "cf377f1c_50de6457",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Good point; we can probably drop this conditional.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c26707ea_0106b221",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 9
@@ -118,6 +203,23 @@
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72d87393_b0724dd4",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "And this.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -138,6 +240,23 @@
     },
     {
       "key": {
+        "uuid": "4bac9b84_e263daf8",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Yes.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc1cf55f_fea9535c",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 9
@@ -152,6 +271,23 @@
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "250ab12a_c9d6d632",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "I think that\u0027s now the default.  Technically it\u0027s slightly more efficient in kazoo.  I like the idea of always sending the event.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -172,6 +308,23 @@
     },
     {
       "key": {
+        "uuid": "c1ae7ec9_449b4b67",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Will remove.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ba3e873_b752ff8d",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 9
@@ -186,6 +339,23 @@
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3465197d_245155ea",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Nope; the callback is registered on construction.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -206,6 +376,23 @@
     },
     {
       "key": {
+        "uuid": "a34270ba_f4f5793b",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "This is used by clients.  If a new client starts up and there are a bunch of existing merge requests, we do want to process them.  So that behavior is correct.  But maybe the assertion in the comment is misleading.  Maybe rather than saying we never want to fire on the inital callback, it should say:\n\n  When we register the data watch, we will receive an initial callback immediately.  The list of children may be empty in that case, so we should not fire our callback since there are no merge requests to handle.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8a980428_ddf6790f",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 9
@@ -223,6 +410,23 @@
     },
     {
       "key": {
+        "uuid": "ea1d49c3_4893b2e2",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Not a bad idea.  I\u0027d like to leave this as-is for now and look at doing that in a refactor.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a47cf91a_68585331",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 9
@@ -237,6 +441,23 @@
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "012f5fec_95852e6d",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-04T17:28:33Z",
+      "side": 1,
+      "message": "Yes; the executor does that but we missed that here.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
