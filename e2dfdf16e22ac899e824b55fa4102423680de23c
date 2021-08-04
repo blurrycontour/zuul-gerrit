@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "51c17d06_16cb5921",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "I want to say a very similar method is used elsewhere. Maybe we should just add it to the zk utilities we have?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab674c21_a118067a",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "See above. I think might be generally useful?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "66d23825_9383c046",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "I\u0027ve got a note about param cleanup in the api file, but I think you should consider asserting param path state in these tests too.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d21154af_4414ed9f",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "You might want to make these assertions after the server.remove() and unlock() below. That way we know the \"disconnect\" is what side effects the end state and not the remove().",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "329e65b7_4f744281",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "Should merge requests and build requests share a common parent to specify states and ordering code?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d1e9a91e_3cce7cd3",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "What sets self.data to None? Above we initialize it to {} then we set it with json.loads(). I expect that means it will always be either {} or {stuff in here}.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c26707ea_0106b221",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f5344c2_511ee7ac",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "This is where the request data is sharded?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc1cf55f_fea9535c",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "Why do we send the event? It looks like makeMergeRequestWatcher() returns a function that accepts the event but then does nothing with it.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e564bdcb_6e7fd136",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "This seems to be unused.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ba3e873_b752ff8d",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "Does something need to keep this watch in scope in order for it to keep watching properly?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6a18ea0_edecd857",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "If there are requests by other schedulers then new_merge_requests will have content when this one starts up. I think you may want to check if self._cached_merge_requests is empty instead? As the first time through this we should be empty. But only if we check that state before creating the ExistingDataWatches above.\n\nAnother simpler approach may just be to have an internal flag that we toggle on the first call?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a980428_ddf6790f",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "Thinking out loud should get assume the merge request path prefix? Then you get(uuid) rather than a full path? This could help avoid accidentally reading other resources as merge requests.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a47cf91a_68585331",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T16:46:03Z",
+      "side": 1,
+      "message": "We also need to delete the params data path right?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
