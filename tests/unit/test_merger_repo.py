@@ -1023,17 +1023,16 @@ class TestMerger(ZuulTestCase):
         merger_api = MergerApi(self.zk_client)
 
         payload = {'merge': 'test'}
-        merger_api.submit(
+        merger_api.submit(MergeRequest(
             uuid='B',
             job_type=MergeRequest.MERGE,
             build_set_uuid='BB',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
+        ), payload)
 
-        b = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/B")
+        b = merger_api.get(f"{merger_api.REQUEST_ROOT}/B")
 
         b.state = MergeRequest.RUNNING
         merger_api.update(b)
@@ -1044,14 +1043,14 @@ class TestMerger(ZuulTestCase):
         # DataWatch might be triggered for the correct event, but the cache
         # might still be outdated as the DataWatch that updates the cache
         # itself wasn't triggered yet.
-        cache = merger_api._cached_merge_requests
+        cache = merger_api._cached_requests
         for _ in iterate_timeout(30, "cache to be up-to-date"):
             if (cache and cache[b.path].state == MergeRequest.RUNNING):
                 break
 
         # The lost_merges method should only return merges which are running
         # but not locked by any merger, in this case merge b
-        lost_merge_requests = list(merger_api.lostMergeRequests())
+        lost_merge_requests = list(merger_api.lostRequests())
 
         self.assertEqual(1, len(lost_merge_requests))
         self.assertEqual(b.path, lost_merge_requests[0].path)
@@ -1060,7 +1059,7 @@ class TestMerger(ZuulTestCase):
         merger_client = self.scheds.first.sched.merger
         merger_client.cleanupLostMergeRequests()
 
-        lost_merge_requests = list(merger_api.lostMergeRequests())
+        lost_merge_requests = list(merger_api.lostRequests())
         self.assertEqual(0, len(lost_merge_requests))
 
         self.executor_server.zk_client.client.start()
