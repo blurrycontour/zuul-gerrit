@@ -117,9 +117,13 @@ class Nodepool(object):
         # Create a copy of the nodeset to represent the actual nodes
         # returned by nodepool.
         nodeset = job.nodeset.copy()
+        if event:
+            event_id = event.zuul_event_id
+        else:
+            event_id = None
         req = model.NodeRequest(self.hostname, build_set_uuid, tenant_name,
                                 pipeline_name, job.name, nodeset, provider,
-                                relative_priority, event=event)
+                                relative_priority, event_id)
         self.requests[req.uid] = req
 
         if nodeset.nodes:
@@ -361,8 +365,8 @@ class Nodepool(object):
         try:
             for node in nodeset.getNodes():
                 if node.allocated_to != request_id:
-                    raise Exception("Node %s allocated to %s, not %s",
-                                    node.id, node.allocated_to, request_id)
+                    raise Exception("Node %s allocated to %s, not %s" %
+                                    (node.id, node.allocated_to, request_id))
                 self.log.debug("Locking node %s" % (node,))
                 self.zk_nodepool.lockNode(node, timeout=30)
                 # Check the allocated_to again to ensure that nodepool didn't
@@ -370,8 +374,8 @@ class Nodepool(object):
                 # were locking them.
                 if node.allocated_to != request_id:
                     raise Exception(
-                        "Node %s was reallocated during locking %s, not %s",
-                        node.id, node.allocated_to, request_id)
+                        "Node %s was reallocated during locking %s, not %s" %
+                        (node.id, node.allocated_to, request_id))
                 locked_nodes.append(node)
         except Exception:
             self.log.exception("Error locking nodes:")
@@ -385,10 +389,11 @@ class Nodepool(object):
         log.debug("Updating node request %s", request)
 
         if request.uid not in self.requests:
-            log.debug("Request %s is unknown", request.uid)
+            log.debug("Request %s is unknown", request)
             return False
 
         if request.canceled:
+            log.debug("Node request %s was canceled", request)
             del self.requests[request.uid]
             self.emitStats(request)
             return False
@@ -396,7 +401,7 @@ class Nodepool(object):
         # TODOv3(jeblair): handle allocation failure
         if deleted:
             log.debug("Resubmitting lost node request %s", request)
-            request.id = None
+            request.reset()
             self.zk_nodepool.submitNodeRequest(
                 request, priority, self._updateNodeRequest)
             # Stop watching this request node
@@ -456,12 +461,10 @@ class Nodepool(object):
             if not self.zk_nodepool.nodeRequestExists(request):
                 log.info("Request %s no longer exists, resubmitting",
                          request.id)
-                # Look up the priority from the old request id before resetting
-                # it.
+                # Look up the priority from the old request id.
                 priority = request.id.partition("-")[0]
-                request.id = None
-                request.state = model.STATE_REQUESTED
                 self.requests[request.uid] = request
+                request.reset()
                 self.zk_nodepool.submitNodeRequest(
                     request, priority, self._updateNodeRequest)
                 return False

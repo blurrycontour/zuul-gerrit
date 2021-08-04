@@ -3669,7 +3669,7 @@ class FakeNodepool(object):
             request['state'] = 'failed'
         else:
             request['state'] = 'fulfilled'
-            nodes = []
+            nodes = request.get('nodes', [])
             for node in request['node_types']:
                 nodeid = self.makeNode(oid, node)
                 nodes.append(nodeid)

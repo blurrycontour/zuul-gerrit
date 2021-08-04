@@ -13,12 +13,13 @@
 # under the License.
 
 
+import threading
 import time
 
 from zuul import model
 import zuul.nodepool
 
-from tests.base import BaseTestCase, FakeNodepool
+from tests.base import BaseTestCase, FakeNodepool, iterate_timeout
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
@@ -266,3 +267,56 @@ class TestNodepool(BaseTestCase):
         # original ones from the config
         self.assertEqual(restored_nodes[0].name, "ubuntu-xenial-0")
         self.assertEqual(restored_nodes[1].name, "ubuntu-xenial-1")
+
+
+class TestNodepoolResubmit(TestNodepool):
+
+    def setUp(self):
+        super().setUp()
+        self.run_once = False
+        self.disconnect_event = threading.Event()
+
+    def onNodesProvisioned(self, request):
+        # This is a scheduler method that the nodepool class calls
+        # back when a request is provisioned.
+        d = request.toDict()
+        d['_oid'] = request.id
+        self.provisioned_requests.append(d)
+        if not self.run_once:
+            self.run_once = True
+            self.disconnect_event.set()
+
+    def _disconnect_thread(self):
+        self.disconnect_event.wait()
+        self.zk_client.client.stop()
+        self.zk_client.client.start()
+        self.nodepool.checkNodeRequest(self.request, self.request.id)
+
+    def test_node_request_disconnect_late(self):
+        # Test that node requests are re-submitted after a disconnect
+        # which happens right before we accept the node request.
+
+        disconnect_thread = threading.Thread(target=self._disconnect_thread)
+        disconnect_thread.daemon = True
+        disconnect_thread.start()
+
+        nodeset = model.NodeSet()
+        nodeset.addNode(model.Node(['controller'], 'ubuntu-xenial'))
+        nodeset.addNode(model.Node(['compute'], 'ubuntu-xenial'))
+        job = model.Job('testjob')
+        job.nodeset = nodeset
+        self.request = self.nodepool.requestNodes(
+            "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
+        for x in iterate_timeout(30, 'fulfill request'):
+            if len(self.provisioned_requests) == 2:
+                break
+        # Both requests should be fulfilled and have nodes.  The
+        # important thing here is that they both have the same number
+        # of nodes (and the second request did not append extra nodes
+        # to the first).
+        self.assertEqual(self.provisioned_requests[0]['state'], 'fulfilled')
+        self.assertEqual(self.provisioned_requests[1]['state'], 'fulfilled')
+        self.assertNotEqual(self.provisioned_requests[0]['_oid'],
+                            self.provisioned_requests[1]['_oid'])
+        self.assertEqual(len(self.provisioned_requests[0]['nodes']), 2)
+        self.assertEqual(len(self.provisioned_requests[1]['nodes']), 2)
