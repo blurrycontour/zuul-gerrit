@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "2237e5dd_1dbcd739",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T17:35:12Z",
+      "side": 1,
+      "message": "Refactor is fine with me.",
+      "parentUuid": "2f21adfc_b547b86a",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "66d23825_9383c046",
         "filename": "tests/unit/test_zk.py",
         "patchSetId": 9
@@ -149,6 +167,24 @@
       "writtenOn": "2021-08-04T17:28:33Z",
       "side": 1,
       "message": "Maybe in a later refactor?",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b42ed55c_133c00f4",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T17:35:12Z",
+      "side": 1,
+      "message": "Refactor is fine with me.",
+      "parentUuid": "c409aa2b_a23cd887",
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -393,6 +429,24 @@
     },
     {
       "key": {
+        "uuid": "cc9e4e68_18909e61",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T17:35:12Z",
+      "side": 1,
+      "message": "This reads much more clearly. We are optimizing for the null case not nooping every time we start.",
+      "parentUuid": "a34270ba_f4f5793b",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8a980428_ddf6790f",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 9
@@ -421,6 +475,24 @@
       "writtenOn": "2021-08-04T17:28:33Z",
       "side": 1,
       "message": "Not a bad idea.  I\u0027d like to leave this as-is for now and look at doing that in a refactor.",
+      "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "47f9304a_1e3d0839",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-04T17:35:12Z",
+      "side": 1,
+      "message": "Refactor is fine with me.",
+      "parentUuid": "ea1d49c3_4893b2e2",
       "revId": "e2dfdf16e22ac899e824b55fa4102423680de23c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
