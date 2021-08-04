@@ -33,6 +33,24 @@
       "revId": "211a0a2a65f0eb8689a1a766419d5d898cdff7d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3759dcd9_6a23a929",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-04T14:52:31Z",
+      "side": 1,
+      "message": "Yes, the request references the build set, but the problem is that the build set doesn\u0027t know about the new request.",
+      "parentUuid": "8f7aad38_8040aa2b",
+      "revId": "211a0a2a65f0eb8689a1a766419d5d898cdff7d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
