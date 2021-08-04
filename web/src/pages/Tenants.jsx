@@ -13,8 +13,6 @@
 // under the License.
 
 import * as React from 'react'
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import {
   BuildIcon,
@@ -32,36 +30,29 @@ import {
   TableBody,
   TableVariant,
 } from '@patternfly/react-table'
-import { Fetching } from '../containers/Fetching'
-import { fetchTenantsIfNeeded } from '../actions/tenants'
+import { fetchTenants } from '../api.js'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { IconProperty } from '../containers/build/Misc'
+import { dispatch } from '../store'
 
 class TenantsPage extends React.Component {
-  static propTypes = {
-    remoteData: PropTypes.object,
-    dispatch: PropTypes.func
-  }
-
-  updateData = (force) => {
-    this.props.dispatch(fetchTenantsIfNeeded(force))
+  constructor(props) {
+    super(props)
+    this.state = {
+      ...this.state,
+      data: [],
+    }
   }
 
   componentDidMount () {
     document.title = 'Zuul Tenants'
-    this.updateData()
+    fetchTenants()
+      .then(response => {this.setState({data: response.data})})
+      .catch(error => dispatch({type: 'TENANTS_FETCH_FAIL', error}))
   }
 
-  // TODO: fix Refreshable class to work with tenant less page.
-  componentDidUpdate () { }
-
   render () {
-    const { remoteData } = this.props
-    if (remoteData.isFetching) {
-      return <Fetching />
-    }
-
-    const tenants = remoteData.tenants.map((tenant) => {
+    const tenants = this.state.data.map((tenant) => {
       return {
         cells: [
           {title: (<b>{tenant.name}</b>)},
@@ -125,4 +116,4 @@ class TenantsPage extends React.Component {
   }
 }
 
-export default connect(state => ({remoteData: state.tenants}))(TenantsPage)
+export default TenantsPage
