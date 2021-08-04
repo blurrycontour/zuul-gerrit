@@ -22,7 +22,8 @@ from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
-from zuul.zk.executor import ExecutorApi, BuildRequestEvent
+from zuul.zk.executor import ExecutorApi
+from zuul.zk.job_request_queue import JobRequestEvent
 from zuul.zk.merger import MergerApi
 from zuul.zk.layout import LayoutStateStore, LayoutState
 from zuul.zk.locks import locked
@@ -386,7 +387,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        client.submit("A", "tenant", "pipeline", {'job': 'test'}, None, '1')
+        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        client.submit(request, {'job': 'test'})
         request_queue.get(timeout=30)
 
         # Executor receives request
@@ -394,10 +396,10 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 1)
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
-        params = client.getBuildParams(a)
+        params = client.getParams(a)
         self.assertEqual(params, {'job': 'test'})
-        client.clearBuildParams(a)
-        params = client.getBuildParams(a)
+        client.clearParams(a)
+        params = client.getParams(a)
         self.assertIsNone(params)
 
         # Executor locks request
@@ -421,7 +423,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         client.requestResume(sched_a)
         (build_request, event) = event_queue.get(timeout=30)
         self.assertEqual(build_request, a)
-        self.assertEqual(event, BuildRequestEvent.RESUMED)
+        self.assertEqual(event, JobRequestEvent.RESUMED)
 
         # Executor resumes build
         a.state = BuildRequest.RUNNING
@@ -435,7 +437,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         client.requestCancel(sched_a)
         (build_request, event) = event_queue.get(timeout=30)
         self.assertEqual(build_request, a)
-        self.assertEqual(event, BuildRequestEvent.CANCELED)
+        self.assertEqual(event, JobRequestEvent.CANCELED)
 
         # Executor aborts build
         a.state = BuildRequest.COMPLETED
@@ -450,12 +452,14 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Scheduler removes build request on completion
         client.remove(sched_a)
 
-        self.assertEqual(set(self._get_zk_tree(client.BUILD_REQUEST_ROOT)),
-                         set(['/zuul/build-requests/unzoned',
-                              '/zuul/build-requests/zones']))
-        self.assertEqual(self._get_zk_tree(
-            client.BUILD_REQUEST_ROOT + '/zones'), [])
-        self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
+        self.assertEqual(set(self._get_zk_tree('/zuul/executor')),
+                         set(['/zuul/executor/unzoned',
+                              '/zuul/executor/unzoned/locks',
+                              '/zuul/executor/unzoned/params',
+                              '/zuul/executor/unzoned/requests',
+                              '/zuul/executor/unzoned/result-data',
+                              '/zuul/executor/unzoned/results',
+                              '/zuul/executor/unzoned/waiters']))
         self.assertEqual(self._get_watches(), {})
 
     def test_build_request_remove(self):
@@ -478,7 +482,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        client.submit("A", "tenant", "pipeline", {}, None, '1')
+        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        client.submit(request, {})
         request_queue.get(timeout=30)
 
         # Executor receives request
@@ -505,7 +510,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Make sure it shows up as deleted
         (build_request, event) = event_queue.get(timeout=30)
         self.assertEqual(build_request, a)
-        self.assertEqual(event, BuildRequestEvent.DELETED)
+        self.assertEqual(event, JobRequestEvent.DELETED)
 
         # Executor should not write anything else since the request
         # was deleted.
@@ -530,7 +535,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        a_path = client.submit("A", "tenant", "pipeline", {}, None, '1')
+        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        client.submit(request, {})
         request_queue.get(timeout=30)
 
         # Executor receives nothing
@@ -538,7 +544,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 0)
 
         # Test releases hold
-        a = client.get(a_path)
+        a = client.get(request.path)
         self.assertEqual(a.uuid, 'A')
         a.state = BuildRequest.REQUESTED
         client.update(a)
@@ -566,15 +572,16 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         client = ExecutorApi(self.zk_client)
 
         # Scheduler submits request
-        a_path = client.submit("A", "tenant", "pipeline", {}, None, '1')
-        sched_a = client.get(a_path)
+        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        client.submit(request, {})
+        sched_a = client.get(request.path)
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
-        exec_a = server.get(a_path)
+        exec_a = server.get(request.path)
         client.remove(sched_a)
 
         # Try to lock a request that was just removed
@@ -585,15 +592,24 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # requests
         executor_api = ExecutorApi(self.zk_client)
 
-        executor_api.submit("A", "tenant", "pipeline", {}, "zone", '1')
-        path_b = executor_api.submit("B", "tenant", "pipeline", {},
-                                     None, '1')
-        path_c = executor_api.submit("C", "tenant", "pipeline", {},
-                                     "zone", '1')
-        path_d = executor_api.submit("D", "tenant", "pipeline", {},
-                                     "zone", '1')
-        path_e = executor_api.submit("E", "tenant", "pipeline", {},
-                                     "zone", '1')
+        br = BuildRequest("A", "zone", "tenant", "pipeline", '1')
+        executor_api.submit(br, {})
+
+        br = BuildRequest("B", None, "tenant", "pipeline", '1')
+        executor_api.submit(br, {})
+        path_b = br.path
+
+        br = BuildRequest("C", "zone", "tenant", "pipeline", '1')
+        executor_api.submit(br, {})
+        path_c = br.path
+
+        br = BuildRequest("D", "zone", "tenant", "pipeline", '1')
+        executor_api.submit(br, {})
+        path_d = br.path
+
+        br = BuildRequest("E", "zone", "tenant", "pipeline", '1')
+        executor_api.submit(br, {})
+        path_e = br.path
 
         b = executor_api.get(path_b)
         c = executor_api.get(path_c)
@@ -619,15 +635,16 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # DataWatch might be triggered for the correct event, but the cache
         # might still be outdated as the DataWatch that updates the cache
         # itself wasn't triggered yet.
-        cache = executor_api._cached_build_requests
+        b_cache = executor_api.zone_queues[None]._cached_requests
+        e_cache = executor_api.zone_queues['zone']._cached_requests
         for _ in iterate_timeout(30, "cache to be up-to-date"):
-            if (cache[path_b].state == BuildRequest.RUNNING and
-                cache[path_e].state == BuildRequest.PAUSED):
+            if (b_cache[path_b].state == BuildRequest.RUNNING and
+                e_cache[path_e].state == BuildRequest.PAUSED):
                 break
 
         # The lost_builds method should only return builds which are running or
         # paused, but not locked by any executor, in this case build b and e.
-        lost_build_requests = list(executor_api.lostBuildRequests())
+        lost_build_requests = list(executor_api.lostRequests())
 
         self.assertEqual(2, len(lost_build_requests))
         self.assertEqual(b.path, lost_build_requests[0].path)
@@ -636,17 +653,17 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Test cleaning up orphaned request parameters
         executor_api = ExecutorApi(self.zk_client)
 
-        path_a = executor_api.submit(
-            "A", "tenant", "pipeline", {}, "zone", '1')
+        br = BuildRequest("A", "zone", "tenant", "pipeline", '1')
+        executor_api.submit(br, {})
 
-        params_root = executor_api.BUILD_PARAMS_ROOT
-        self.assertEqual(len(executor_api._getAllBuildIds()), 1)
+        params_root = executor_api.zone_queues['zone'].PARAM_ROOT
+        self.assertEqual(len(executor_api._getAllRequestIds()), 1)
         self.assertEqual(len(
             self.zk_client.client.get_children(params_root)), 1)
 
         # Delete the request but not the params
-        self.zk_client.client.delete(path_a)
-        self.assertEqual(len(executor_api._getAllBuildIds()), 0)
+        self.zk_client.client.delete(br.path)
+        self.assertEqual(len(executor_api._getAllRequestIds()), 0)
         self.assertEqual(len(
             self.zk_client.client.get_children(params_root)), 1)
 
@@ -673,7 +690,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # Simulate the client side
         client = ExecutorApi(self.zk_client)
-        client.submit("A", "tenant", "pipeline", {}, None, '1')
+        client.submit(
+            BuildRequest("A", None, "tenant", "pipeline", '1'), {})
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
@@ -720,14 +738,13 @@ class TestMergerApi(ZooKeeperBaseTestCase):
                     sessions = None
         return ret
 
-    def _assertEmptyRoots(self):
-        api = MergerApi
-        self.assertEqual(self._get_zk_tree(api.MERGE_REQUEST_ROOT), [])
-        self.assertEqual(self._get_zk_tree(api.MERGE_PARAMS_ROOT), [])
-        self.assertEqual(self._get_zk_tree(api.MERGE_RESULT_ROOT), [])
-        self.assertEqual(self._get_zk_tree(api.MERGE_RESULT_DATA_ROOT), [])
-        self.assertEqual(self._get_zk_tree(api.MERGE_WAITER_ROOT), [])
-        self.assertEqual(self._get_zk_tree(api.LOCK_ROOT), [])
+    def _assertEmptyRoots(self, client):
+        self.assertEqual(self._get_zk_tree(client.REQUEST_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.PARAM_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.RESULT_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.RESULT_DATA_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.WAITER_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
         self.assertEqual(self._get_watches(), {})
 
     def test_merge_request(self):
@@ -746,15 +763,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Scheduler submits request
         payload = {'merge': 'test'}
-        client.submit(
+        request = MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
         )
+        client.submit(request, payload)
         request_queue.get(timeout=30)
 
         # Merger receives request
@@ -762,10 +779,10 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 1)
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
-        params = client.getMergeParams(a)
+        params = client.getParams(a)
         self.assertEqual(params, payload)
-        client.clearMergeParams(a)
-        params = client.getMergeParams(a)
+        client.clearParams(a)
+        params = client.getParams(a)
         self.assertIsNone(params)
 
         # Merger locks request
@@ -782,7 +799,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         server.remove(a)
         server.unlock(a)
 
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(client)
 
     def test_merge_request_hold(self):
         # Test that we can hold a merge request in "queue"
@@ -800,15 +817,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Scheduler submits request
         payload = {'merge': 'test'}
-        client.submit(
+        client.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
+        ), payload)
         request_queue.get(timeout=30)
 
         # Merger receives nothing
@@ -817,7 +833,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Test releases hold
         # We have to get a new merge_request object to update it.
-        a = client.get(f"{client.MERGE_REQUEST_ROOT}/A")
+        a = client.get(f"{client.REQUEST_ROOT}/A")
         self.assertEqual(a.uuid, 'A')
         a.state = MergeRequest.REQUESTED
         client.update(a)
@@ -831,7 +847,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         server.remove(a)
         # The rest is redundant.
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(client)
 
     def test_merge_request_result(self):
         # Test the lifecycle of a merge request
@@ -849,16 +865,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Scheduler submits request
         payload = {'merge': 'test'}
-        future = client.submit(
+        future = client.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-            needs_result=True,
-        )
+        ), payload, needs_result=True)
         request_queue.get(timeout=30)
 
         # Merger receives request
@@ -877,13 +891,13 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         result_data = {'result': 'ok'}
         server.reportResult(a, result_data)
 
-        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_ROOT)),
-                         set(['/zuul/merge-results/A']))
-        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_DATA_ROOT)),
-                         set(['/zuul/merge-result-data/A',
-                              '/zuul/merge-result-data/A/0000000000']))
-        self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT),
-                         ['/zuul/merge-waiters/A'])
+        self.assertEqual(set(self._get_zk_tree(client.RESULT_ROOT)),
+                         set(['/zuul/merger/results/A']))
+        self.assertEqual(set(self._get_zk_tree(client.RESULT_DATA_ROOT)),
+                         set(['/zuul/merger/result-data/A',
+                              '/zuul/merger/result-data/A/0000000000']))
+        self.assertEqual(self._get_zk_tree(client.WAITER_ROOT),
+                         ['/zuul/merger/waiters/A'])
 
         # Merger removes and unlocks merge request on completion
         server.remove(a)
@@ -893,7 +907,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertTrue(future.wait())
         self.assertEqual(future.data, result_data)
 
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(client)
 
     def test_lost_merge_request_params(self):
         # Test cleaning up orphaned request parameters
@@ -901,18 +915,17 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Scheduler submits request
         payload = {'merge': 'test'}
-        merger_api.submit(
+        merger_api.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
-        path_a = '/'.join([merger_api.MERGE_REQUEST_ROOT, 'A'])
+        ), payload)
+        path_a = '/'.join([merger_api.REQUEST_ROOT, 'A'])
 
-        params_root = merger_api.MERGE_PARAMS_ROOT
+        params_root = merger_api.PARAM_ROOT
         self.assertEqual(len(merger_api._getAllRequestIds()), 1)
         self.assertEqual(len(
             self.zk_client.client.get_children(params_root)), 1)
@@ -928,7 +941,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(
             self.zk_client.client.get_children(params_root)), 0)
 
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(merger_api)
 
     def test_lost_merge_request_result(self):
         # Test that we can clean up orphaned merge results
@@ -946,16 +959,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Scheduler submits request
         payload = {'merge': 'test'}
-        future = client.submit(
+        future = client.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-            needs_result=True,
-        )
+        ), payload, needs_result=True)
+
         request_queue.get(timeout=30)
 
         # Merger receives request
@@ -978,13 +990,13 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         server.remove(a)
         server.unlock(a)
 
-        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_ROOT)),
-                         set(['/zuul/merge-results/A']))
-        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_DATA_ROOT)),
-                         set(['/zuul/merge-result-data/A',
-                              '/zuul/merge-result-data/A/0000000000']))
-        self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT),
-                         ['/zuul/merge-waiters/A'])
+        self.assertEqual(set(self._get_zk_tree(client.RESULT_ROOT)),
+                         set(['/zuul/merger/results/A']))
+        self.assertEqual(set(self._get_zk_tree(client.RESULT_DATA_ROOT)),
+                         set(['/zuul/merger/result-data/A',
+                              '/zuul/merger/result-data/A/0000000000']))
+        self.assertEqual(self._get_zk_tree(client.WAITER_ROOT),
+                         ['/zuul/merger/waiters/A'])
 
         # Scheduler "disconnects"
         self.zk_client.client.delete(future._waiter_path)
@@ -992,7 +1004,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         # Find orphaned results
         client.cleanup(age=0)
 
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(client)
 
     def test_nonexistent_lock(self):
         request_queue = queue.Queue()
@@ -1005,16 +1017,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Scheduler submits request
         payload = {'merge': 'test'}
-        client.submit(
+        client.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
-        client_a = client.get(f"{client.MERGE_REQUEST_ROOT}/A")
+        ), payload)
+        client_a = client.get(f"{client.REQUEST_ROOT}/A")
 
         # Simulate the server side
         server = MergerApi(self.zk_client,
@@ -1025,7 +1036,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Try to lock a request that was just removed
         self.assertFalse(server.lock(server_a))
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(client)
 
     def test_lost_merge_requests(self):
         # Test that lostMergeRequests() returns unlocked running merge
@@ -1033,46 +1044,42 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         merger_api = MergerApi(self.zk_client)
 
         payload = {'merge': 'test'}
-        merger_api.submit(
+        merger_api.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
-        merger_api.submit(
+        ), payload)
+        merger_api.submit(MergeRequest(
             uuid='B',
             job_type=MergeRequest.MERGE,
             build_set_uuid='BB',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
-        merger_api.submit(
+        ), payload)
+        merger_api.submit(MergeRequest(
             uuid='C',
             job_type=MergeRequest.MERGE,
             build_set_uuid='CC',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
-        merger_api.submit(
+        ), payload)
+        merger_api.submit(MergeRequest(
             uuid='D',
             job_type=MergeRequest.MERGE,
             build_set_uuid='DD',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
+        ), payload)
 
-        b = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/B")
-        c = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/C")
-        d = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/D")
+        b = merger_api.get(f"{merger_api.REQUEST_ROOT}/B")
+        c = merger_api.get(f"{merger_api.REQUEST_ROOT}/C")
+        d = merger_api.get(f"{merger_api.REQUEST_ROOT}/D")
 
         b.state = MergeRequest.RUNNING
         merger_api.update(b)
@@ -1090,7 +1097,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         # DataWatch might be triggered for the correct event, but the cache
         # might still be outdated as the DataWatch that updates the cache
         # itself wasn't triggered yet.
-        cache = merger_api._cached_merge_requests
+        cache = merger_api._cached_requests
         for _ in iterate_timeout(30, "cache to be up-to-date"):
             if (cache[b.path].state == MergeRequest.RUNNING and
                 cache[c.path].state == MergeRequest.RUNNING):
@@ -1098,7 +1105,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # The lost_merges method should only return merges which are running
         # but not locked by any merger, in this case merge b
-        lost_merge_requests = list(merger_api.lostMergeRequests())
+        lost_merge_requests = list(merger_api.lostRequests())
 
         self.assertEqual(1, len(lost_merge_requests))
         self.assertEqual(b.path, lost_merge_requests[0].path)
@@ -1119,15 +1126,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         # Simulate the client side
         client = MergerApi(self.zk_client)
         payload = {'merge': 'test'}
-        client.submit(
+        client.submit(MergeRequest(
             uuid='A',
             job_type=MergeRequest.MERGE,
             build_set_uuid='AA',
             tenant_name='tenant',
             pipeline_name='check',
-            params=payload,
             event_id='1',
-        )
+        ), payload)
 
         # Simulate the server side
         server = MergerApi(self.zk_client,
@@ -1143,7 +1149,7 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(a.uuid, 'A')
 
         client.remove(a)
-        self._assertEmptyRoots()
+        self._assertEmptyRoots(client)
 
 
 class TestLocks(ZooKeeperBaseTestCase):

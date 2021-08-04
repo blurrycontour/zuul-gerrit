@@ -19,7 +19,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import MergeRequest, PRECEDENCE_HIGH, PRECEDENCE_NORMAL
 from zuul.zk.merger import MergerApi
-from zuul.zk.exceptions import MergeRequestNotFound
+from zuul.zk.exceptions import JobRequestNotFound
 from kazoo.exceptions import BadVersionError
 
 
@@ -64,17 +64,17 @@ class MergeClient(object):
         log = get_annotated_logger(self.log, event)
         log.debug("Submitting job %s with data %s", uuid, data)
 
-        return self.merger_api.submit(
+        request = MergeRequest(
             uuid=uuid,
             job_type=job_type,
             build_set_uuid=build_set_uuid,
             tenant_name=tenant_name,
             pipeline_name=pipeline_name,
-            params=data,
             event_id=event.zuul_event_id if event else None,
-            precedence=precedence,
-            needs_result=needs_result,
+            precedence=precedence
         )
+        return self.merger_api.submit(request, data,
+                                      needs_result=needs_result)
 
     def mergeChanges(self, items, build_set, files=None, dirs=None,
                      repo_state=None, precedence=PRECEDENCE_NORMAL,
@@ -128,7 +128,7 @@ class MergeClient(object):
         return job
 
     def cleanupLostMergeRequests(self):
-        for merge_request in self.merger_api.lostMergeRequests():
+        for merge_request in self.merger_api.lostRequests():
             try:
                 self.cleanupLostMergeRequest(merge_request)
             except Exception:
@@ -142,7 +142,7 @@ class MergeClient(object):
             # TODO (felix): If we want to optimize ZK requests, we could only
             # call the remove() here.
             self.merger_api.remove(merge_request)
-        except MergeRequestNotFound as e:
+        except JobRequestNotFound as e:
             self.log.warning("Could not complete merge: %s", str(e))
             return
         except BadVersionError:
