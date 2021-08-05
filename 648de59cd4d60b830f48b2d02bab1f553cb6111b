@@ -104,6 +104,24 @@
     },
     {
       "key": {
+        "uuid": "f7c3c900_e21c50e3",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T21:36:25Z",
+      "side": 1,
+      "message": "Ah got it, I see now that the event.zuul_event_id was passed via data and then event was also passed. I agree this is better.",
+      "parentUuid": "88318168_64cd778b",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9c912abc_9fd865ee",
         "filename": "zuul/merger/client.py",
         "patchSetId": 13
@@ -132,6 +150,24 @@
       "writtenOn": "2021-08-05T20:42:11Z",
       "side": 1,
       "message": "We only call this function if the merge request is unlocked.\n\nBut a lost merge request is defined as \"a merge request in running state that is unlocked\".\n\nWe check the state first, then we check the lock.  The following sequence can produce the error (prefixed by thread id for clarity):\n\n* [1] merge job is locked and in running state\n* [2] findLostMergeRequests lists all the merge jobs\n* [2] it performs a get on our merge job [note 1]\n* [2] it observes the state is \"running\"\n* [1] the merger finishes and updates the merge job state \"completed\"\n* [1] the merger unlocks the merge job\n* [2] findLostMergeRequests checks the lock on our merge job and sees it unlocked\n* [2] findLostMergeRequests declares the job lost\n* [2] this method updates the merge job to set it to \"completed\", using the zstat from the previous get (note 1 above)\n* [2] the update produces a BadVersionError because the zstat doesn\u0027t contain the latest node version\n\nTherefore we know we should ignore this job.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "155b9e8e_8381214a",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T21:36:25Z",
+      "side": 1,
+      "message": "Got it this helps a bunch thanks.",
+      "parentUuid": "8e2e366a_16e18917",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -195,6 +231,24 @@
     },
     {
       "key": {
+        "uuid": "2a4306f5_3cff5ecf",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T21:36:25Z",
+      "side": 1,
+      "message": "Yup basically we should call self.join() here I think.",
+      "parentUuid": "b50bcce0_cc025b10",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83f32098_08bd1def",
         "filename": "zuul/merger/server.py",
         "patchSetId": 13
@@ -223,6 +277,24 @@
       "writtenOn": "2021-08-05T20:42:11Z",
       "side": 1,
       "message": "We probably could; it would be a little verbose.  But this is the same behavior in the executor and we haven\u0027t needed it there yet.  I think I\u0027d prefer to wait and see if we need to add it.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "099735d1_9449b5d5",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T21:36:25Z",
+      "side": 1,
+      "message": "Ok",
+      "parentUuid": "c7d6ba9d_197b9932",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -303,6 +375,24 @@
     },
     {
       "key": {
+        "uuid": "e5a87458_8de4e5cc",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T21:36:25Z",
+      "side": 1,
+      "message": "Keeping the two in sync makes sense to me. We can update in followups if we have a preference change.",
+      "parentUuid": "825ec72a_172d4530",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "34ecf23e_02e87e0c",
         "filename": "zuul/merger/server.py",
         "patchSetId": 13
@@ -337,6 +427,24 @@
       "writtenOn": "2021-08-05T20:42:11Z",
       "side": 1,
       "message": "Yes, the objective of this log line was to track down the problem caused by writing packets that were too large to ZK.  (The issue we just fixed with the sharding changes.)\n\nMaybe we don\u0027t need it now, but this change isn\u0027t changing that, it\u0027s just retaining the existing logging.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9136c6bb_200b3ac2",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T21:36:25Z",
+      "side": 1,
+      "message": "Got it. And I agree this isn\u0027t changing the old log behavior but now we check against None above. I thought maybe we were looking for 0 vs not 0 length but we are looking for small vs large instead.",
+      "parentUuid": "532327e2_0b846b39",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
