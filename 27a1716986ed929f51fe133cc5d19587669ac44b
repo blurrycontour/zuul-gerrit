@@ -16,6 +16,24 @@
       "revId": "27a1716986ed929f51fe133cc5d19587669ac44b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a1542dc6_afe1831f",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-08-05T10:15:02Z",
+      "side": 1,
+      "message": "The inital motivation is to quickly identify the failed jobs (i assumed all non-success jobs), so I only selected two types of emojis. \nI was also thinking about select a emoji for each type, but not sure if it is necessary. \nHow about a compromise: introduce 3 types of emoji: Success/Fail/Other, the \"Other\" type can be indicated with a \":warning:\" (https://github.com/ikatyang/emoji-cheat-sheet/blob/master/README.md)?",
+      "parentUuid": "bd058527_88a83525",
+      "revId": "27a1716986ed929f51fe133cc5d19587669ac44b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
