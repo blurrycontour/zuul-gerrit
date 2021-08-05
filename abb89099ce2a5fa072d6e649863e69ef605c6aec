@@ -33,6 +33,24 @@
       "revId": "abb89099ce2a5fa072d6e649863e69ef605c6aec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d70a9a67_5393caeb",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T23:29:18Z",
+      "side": 1,
+      "message": "Ok",
+      "parentUuid": "6d9468fd_6c16569a",
+      "revId": "abb89099ce2a5fa072d6e649863e69ef605c6aec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

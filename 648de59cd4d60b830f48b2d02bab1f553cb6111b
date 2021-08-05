@@ -423,6 +423,24 @@
     },
     {
       "key": {
+        "uuid": "115fc0ef_899f1ad9",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T23:29:18Z",
+      "side": 1,
+      "message": "Got it.",
+      "parentUuid": "10567ed1_cbe4682d",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83f32098_08bd1def",
         "filename": "zuul/merger/server.py",
         "patchSetId": 13
@@ -509,6 +527,24 @@
       "writtenOn": "2021-08-05T20:42:11Z",
       "side": 1,
       "message": "I agree.  It is worth noting that if the ZK connection disappears, so will our lock, so we don\u0027t need to worry about that.  But if there\u0027s some sort of error that we accidentally don\u0027t handle lower in the call stack then we could leak the lock.  So better safe than sorry.\n\nThe executor actually handles this by adding the unlock in the equivalent of the runMerger method.  We should do that here.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7583f40_0678d1b1",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T23:29:18Z",
+      "side": 1,
+      "message": "This was corrected in ps14",
+      "parentUuid": "0e49ebcc_764b8292",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
