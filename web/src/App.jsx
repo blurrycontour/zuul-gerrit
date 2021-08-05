@@ -66,6 +66,13 @@ import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
+import { useSetTenant } from './hooks.js'
+
+// A simple component to store the tenant name in the global state
+const TenantName = (prop) => {
+  useSetTenant(prop.tenant)
+  return <>{prop.tenant.name}</>
+}
 
 class App extends React.Component {
   static propTypes = {
@@ -357,7 +364,7 @@ class App extends React.Component {
             <PageHeaderToolsItem>
               <Link to={tenant.defaultRoute}>
                 <Button variant={ButtonVariant.plain}>
-                  <strong>Tenant</strong> {tenant.name}
+                  <strong>Tenant</strong> <TenantName tenant={tenant} />
                 </Button>
               </Link>
             </PageHeaderToolsItem>

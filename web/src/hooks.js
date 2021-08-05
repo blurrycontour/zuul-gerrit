@@ -44,3 +44,10 @@ export const useRemoteData = (title, fetch) => {
   }, [fetch, dispatch, title, setState])
   return state[title] || []
 }
+
+export const useSetTenant = (tenant) => {
+  const [, setState] = useContext(store)
+  useEffect(() => {
+    setState(state => ({...state, tenant: tenant}))
+  }, [setState, tenant])
+}
