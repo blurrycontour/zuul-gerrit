@@ -101,12 +101,41 @@ class GithubReporter(BaseReporter):
                 except Exception as e:
                     self.addPullComment(item, str(e))
 
+    def _formatJobResult(self, job_fields):
+        # We select different emojis to represents build results:
+        # heavy_check_mark: SUCCESS
+        # warning: SKIPPED/ABORTED
+        # x: all types of FAILUREs
+        # In addition, failure results are in bold text
+
+        job_result = job_fields[2]
+        # Also need to handle user defined success_message.
+        # The job_fields[6]: the user defined seccess_message (if available)
+        success_message = job_fields[6]
+
+        emoji = 'x'
+        bold_result = True
+
+        if job_result in ('SUCCESS', success_message):
+            emoji = 'heavy_check_mark'
+            bold_result = False
+        elif job_result in ('SKIPPED', 'ABORTED'):
+            emoji = 'warning'
+            bold_result = False
+
+        if bold_result:
+            return '<sub><sup>:%s:</sup></sub> [%s](%s) **%s**%s%s%s\n' % (
+                (emoji,) + job_fields[:6])
+        else:
+            return '<sub><sup>:%s:</sup></sub> [%s](%s) %s%s%s%s\n' % (
+                (emoji,) + job_fields[:6])
+
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
         ret = ''
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
-            ret += '- [%s](%s) : %s%s%s%s\n' % job_fields
+            ret += self._formatJobResult(job_fields)
         return ret
 
     def addPullComment(self, item, comment=None):
