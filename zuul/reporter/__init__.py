@@ -268,7 +268,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             # the url field to match old behavior until we can deal with
             # the gerrit-side piece as well
             url = url or job.name
-            jobs_fields.append((name, url, result, error, elapsed, voting))
+            success_message = job.success_message
+            jobs_fields.append((name, url, result, error, elapsed, voting, success_message))
         return jobs_fields
 
     def _formatItemReportJobs(self, item):
