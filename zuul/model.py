@@ -2184,7 +2184,7 @@ class BuildRequest(JobRequest):
     # States:
     PAUSED = 'paused'
 
-    ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)  # type: ignore
+    ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)
 
     def __init__(self, uuid, zone,
                  tenant_name, pipeline_name, event_id,

@@ -23,7 +23,7 @@ from zuul.zk.job_request_queue import JobRequestQueue
 
 class ExecutorQueue(JobRequestQueue):
     log = logging.getLogger("zuul.ExecutorQueue")
-    request_class = BuildRequest  # type: ignore
+    request_class = BuildRequest
 
     def __init__(self, client, root,
                  initial_state_getter,
