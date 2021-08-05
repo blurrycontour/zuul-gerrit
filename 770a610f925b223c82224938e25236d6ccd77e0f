@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6f9dce00_a81f0fbd",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 4964,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 0,
+      "message": "For anyone wondering why this goes away the scheduler doesn\u0027t run a merger client thread anymore. Do we need to clean up the executor.stop() just above for similar reasons?",
+      "revId": "770a610f925b223c82224938e25236d6ccd77e0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}

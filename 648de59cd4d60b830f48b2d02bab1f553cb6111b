@@ -1,0 +1,243 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfdbfdef_99a90a7b",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5130,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Since the keys of the history dict are job types I think the last sched\u0027s history will win and overwrite the others. I suspect we want to do some sort of appending of all the type history lists instead.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "82f3a661_cce03ec6",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Do we use a distinct zk_client object here? Wonder why it wasn\u0027t stopped above.\n\nAbove in the diff we stop the executor servers merger via a more merger specific method without touching the zk_client. Would that be a better approach?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac6938eb_106dffd4",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "This is where we call getChangeFilesUpdated and we don\u0027t pass in needs_results. We also don\u0027t use needs_results above. Was the change above initially necessary and now no longer used?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9644384f_484d4eda",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "This might be a good place to be clear when we pass an event or when we pass an event_id. The old code seemed to get an event here which it then passed the event_id of to submitJob(). But now we seem to pass the event the whole way through?\n\nIs that ok for the annotated logger? will it handle both types?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c912abc_9fd865ee",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "I\u0027m having a hard time understanding this comment. Above it is stated that this request is by definition unlocked. I don\u0027t understand where there would be an is_locked() check that can fail if it wasn\u0027t already unlocked?\n\nSeparately we seem to acquire a scheduler cleanup lock before calling this method which should mean no other cleanups are running at the same time. This means we can only race the mergers?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f569be54_67f3501a",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Might consider setting this flag immediately before starting the thread below. This way there is less time where the thread is not running but the flag is set?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "28603fac_0e0ecff5",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Why not replace this with self.join() or remove the join def below?",
+      "range": {
+        "startLine": 174,
+        "startChar": 0,
+        "endLine": 175,
+        "endChar": 33
+      },
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "83f32098_08bd1def",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Is this worthy of logging? We will skip the merge request on the assumption something else has the lock and is handling it. Might be painful to debug lost merges if we don\u0027t record this?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1957d18f_74a3dea3",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "I think these calls can raise as they interact with zookeeper. If they raise we will not unlock the lock we grabbed above.\n\nPerhaps we should run everything after the lock acquisition in the try block?",
+      "range": {
+        "startLine": 212,
+        "startChar": 8,
+        "endLine": 216,
+        "endChar": 45
+      },
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "998403ec_6e12a421",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "I have a slight preference for maintaining symmetry with the lock and unlock calls if we can. I know completeMergeJob does the unlock but moving that here would make it clearer to see we are unlocking.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "34ecf23e_02e87e0c",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Does the length of the serialized json object tell us something that None or not None wouldn\u0027t?",
+      "range": {
+        "startLine": 325,
+        "startChar": 49,
+        "endLine": 325,
+        "endChar": 66
+      },
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4f4ed5c5_8146c0ae",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "Seems like this log message provides far more info than the one above.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1196f876_701d1ae8",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T18:54:35Z",
+      "side": 1,
+      "message": "This method appears to be unused.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
