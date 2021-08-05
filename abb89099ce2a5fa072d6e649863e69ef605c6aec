@@ -16,6 +16,23 @@
       "revId": "abb89099ce2a5fa072d6e649863e69ef605c6aec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d9468fd_6c16569a",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T23:27:07Z",
+      "side": 1,
+      "message": "We could, but it\u0027s not straightforward -- this is exactly equivalent to what we already did in the executor, and I\u0027d like to keep them in sync.",
+      "revId": "abb89099ce2a5fa072d6e649863e69ef605c6aec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
