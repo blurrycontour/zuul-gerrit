@@ -1315,6 +1315,22 @@ class TestGithubDriver(ZuulTestCase):
                          self.getJobFromHistory('project-test2').result)
 
 
+class TestMultiGithubDriver(ZuulTestCase):
+    config_file = 'zuul-multi-github.conf'
+    tenant_config_file = 'config/multi-github/main.yaml'
+
+    def test_multi_app(self):
+        """Test that we can handle multiple app."""
+        A = self.fake_github_ro.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github_ro.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-test').result)
+
+
 class TestGithubUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
     tenant_config_file = 'config/unprotected-branches/main.yaml'
