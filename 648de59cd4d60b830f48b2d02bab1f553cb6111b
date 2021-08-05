@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "f91c9d33_51d1e295",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "Yes, the executor server creates its own zk client connection.  We could probably shut down the whole executor for this test.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ac6938eb_106dffd4",
         "filename": "zuul/driver/git/gitconnection.py",
         "patchSetId": 13
@@ -70,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "88318168_64cd778b",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "We\u0027re not changing what\u0027s passed to submitJob; instead we\u0027re removing zuul_event_id from the payload for the job.\n\nI think what Felix is doing here is streamlining the code by putting the event id outside of the job parameters (but still it will be included in the request data).  Then if you check the merger server update in this change, it pulls the event id from the merge request instead of the payload.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9c912abc_9fd865ee",
         "filename": "zuul/merger/client.py",
         "patchSetId": 13
@@ -84,6 +118,23 @@
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e2e366a_16e18917",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "We only call this function if the merge request is unlocked.\n\nBut a lost merge request is defined as \"a merge request in running state that is unlocked\".\n\nWe check the state first, then we check the lock.  The following sequence can produce the error (prefixed by thread id for clarity):\n\n* [1] merge job is locked and in running state\n* [2] findLostMergeRequests lists all the merge jobs\n* [2] it performs a get on our merge job [note 1]\n* [2] it observes the state is \"running\"\n* [1] the merger finishes and updates the merge job state \"completed\"\n* [1] the merger unlocks the merge job\n* [2] findLostMergeRequests checks the lock on our merge job and sees it unlocked\n* [2] findLostMergeRequests declares the job lost\n* [2] this method updates the merge job to set it to \"completed\", using the zstat from the previous get (note 1 above)\n* [2] the update produces a BadVersionError because the zstat doesn\u0027t contain the latest node version\n\nTherefore we know we should ignore this job.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -127,6 +178,23 @@
     },
     {
       "key": {
+        "uuid": "b50bcce0_cc025b10",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "Or remove this join in favor of the one below?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83f32098_08bd1def",
         "filename": "zuul/merger/server.py",
         "patchSetId": 13
@@ -141,6 +209,23 @@
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7d6ba9d_197b9932",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "We probably could; it would be a little verbose.  But this is the same behavior in the executor and we haven\u0027t needed it there yet.  I think I\u0027d prefer to wait and see if we need to add it.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -167,6 +252,23 @@
     },
     {
       "key": {
+        "uuid": "0e49ebcc_764b8292",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "I agree.  It is worth noting that if the ZK connection disappears, so will our lock, so we don\u0027t need to worry about that.  But if there\u0027s some sort of error that we accidentally don\u0027t handle lower in the call stack then we could leak the lock.  So better safe than sorry.\n\nThe executor actually handles this by adding the unlock in the equivalent of the runMerger method.  We should do that here.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "998403ec_6e12a421",
         "filename": "zuul/merger/server.py",
         "patchSetId": 13
@@ -181,6 +283,23 @@
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "825ec72a_172d4530",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "I think if we structure this like we do the executor, it will be robust and easy to follow.  It won\u0027t be exactly symmetrical here, but I think we can handle it.\n\nI\u0027d at least like this change to be structured like the executor, and then if we don\u0027t like that, maybe we can change both simultaneously in a followup?",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -207,6 +326,23 @@
     },
     {
       "key": {
+        "uuid": "532327e2_0b846b39",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "Yes, the objective of this log line was to track down the problem caused by writing packets that were too large to ZK.  (The issue we just fixed with the sharding changes.)\n\nMaybe we don\u0027t need it now, but this change isn\u0027t changing that, it\u0027s just retaining the existing logging.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f4ed5c5_8146c0ae",
         "filename": "zuul/merger/server.py",
         "patchSetId": 13
@@ -224,6 +360,23 @@
     },
     {
       "key": {
+        "uuid": "203f7d21_2a905ffa",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "Different data; different level.  I\u0027m happy to revisit these, but this log message is also just retained in this change, this isn\u0027t a change.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1196f876_701d1ae8",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 13
@@ -238,6 +391,23 @@
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ca58980_232d7621",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T20:42:11Z",
+      "side": 1,
+      "message": "Agreed.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
