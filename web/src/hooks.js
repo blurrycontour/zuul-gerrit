@@ -14,9 +14,10 @@
 
 // Custom hooks used in zuul components
 
-import React, {createContext, useContext, useState, useEffect} from 'react'
+import React, {createContext, useCallback, useContext, useState, useEffect} from 'react'
 
 import { useDispatch } from 'react-redux'
+import * as API from './api'
 
 const store = createContext({})
 const { Provider } = store
@@ -50,4 +51,14 @@ export const useSetTenant = (tenant) => {
   useEffect(() => {
     setState(state => ({...state, tenant: tenant}))
   }, [setState, tenant])
+}
+
+export const useTenant = () => {
+  const [state,] = useContext(store)
+  return state.tenant
+}
+
+export const useBuild = (tenant, buildId) => {
+  const fetch = useCallback(() => API.fetchBuild(tenant.apiPrefix, buildId), [tenant, buildId])
+  return useRemoteData('Build ' + buildId, fetch)
 }
