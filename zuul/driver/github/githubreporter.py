@@ -101,12 +101,23 @@ class GithubReporter(BaseReporter):
                 except Exception as e:
                     self.addPullComment(item, str(e))
 
+    def _getEmoji(self, job_result):
+        # Show check mark for success
+        # Show 'x' for failure
+        # Show warning sign for other results
+        if job_result == 'SUCCESS':
+            return ':white_check_mark:'
+        elif job_result == 'FAILURE':
+            return ':x:'
+        else:
+            return ':warning:'
+
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
         ret = ''
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
-            ret += '- [%s](%s) : %s%s%s%s\n' % job_fields
+            ret += '- %s [%s](%s) : %s%s%s%s\n' % ((self._getEmoji(job_fields[2]),) + job_fields)
         return ret
 
     def addPullComment(self, item, comment=None):
