@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "08e3655a_845cba78",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T22:26:08Z",
+      "side": 1,
+      "message": "I think the keys of the history are job uuids.  Since this is a merger_api history, see HoldableMergerApi.submit for where it\u0027s appended.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "82f3a661_cce03ec6",
         "filename": "tests/unit/test_merger_repo.py",
         "patchSetId": 13
@@ -53,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "23b65291_d8b3ffd2",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T22:26:08Z",
+      "side": 1,
+      "message": "Okay, it\u0027s harder to fully stop and start the executor than it is to do this.  I\u0027d like to just leave it as is since it works.\n\n(Detail: you can\u0027t start the executor after stopping it, and the test shutdown stops it automatically.  So we\u0027d need a different base class to handle this.)",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ac6938eb_106dffd4",
         "filename": "zuul/driver/git/gitconnection.py",
         "patchSetId": 13
@@ -67,6 +101,23 @@
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "05d5984c_581a3491",
+        "filename": "zuul/driver/git/gitconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T22:26:08Z",
+      "side": 1,
+      "message": "This calls the method on line 67 of this file.  We do use needs_results above.  Basically, a merge request has 2 modes of operation:\n\n* needs_results\u003dFalse: the typical asynchronous request to merge a change in a pipeline and produce the results so zuul can proceed with a build.  The result of the merge will be placed in the pipeline results queue.\n* needs_results\u003dTrue: either the git driver or the configloader performing a synchronous merge request to find out something about a repo immediately.  In that case, there is no pipeline results queue for the request; instead the result will be placed in ZK and the merger api will return a future object which will contain the result after wait() completes.\n\nHaving said all that, we could probably infer needs_results from whether a buildset was provided with the requests, but this seems good for now.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -243,6 +294,23 @@
       "side": 1,
       "message": "Yup basically we should call self.join() here I think.",
       "parentUuid": "b50bcce0_cc025b10",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28beeafb_e3a1f6db",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T22:26:08Z",
+      "side": 1,
+      "message": "Well, the reason we have stop and join separate is so that when we shut down, we can stop() everything and the join() everything; that way shutdown is parallel, not serial.  That\u0027s why I think we should drop this join and keep the one below.",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -445,6 +513,23 @@
       "side": 1,
       "message": "Got it. And I agree this isn\u0027t changing the old log behavior but now we check against None above. I thought maybe we were looking for 0 vs not 0 length but we are looking for small vs large instead.",
       "parentUuid": "532327e2_0b846b39",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f176ece_dfbfc194",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T22:26:08Z",
+      "side": 1,
+      "message": "Yep.",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
