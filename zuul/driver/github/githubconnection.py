@@ -1626,6 +1626,9 @@ class GithubConnection(CachedBranchConnection):
 
         labels = [l['name'] for l in pr['labels']]
         pr['labels'] = labels
+
+        self._sha_pr_cache.update(project_name, pr)
+
         log.debug('Got PR %s#%s', project_name, number)
         return (pr, probj)
 
