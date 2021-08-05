@@ -37,13 +37,14 @@ const addKeyValue = (obj, key, value) => {
 export const useRemoteData = (title, fetch) => {
   const [state, setState] = useContext(store)
   const dispatch = useDispatch()
+  const doFetch = () => fetch()
+    .then(response => setState(state => addKeyValue(state, title, response.data)))
+    .catch(error => dispatch({type: 'TENANTS_FETCH_FAIL', error}))
   useEffect(() => {
     document.title = 'Zuul ' + title
-    fetch()
-      .then(response => setState(state => addKeyValue(state, title, response.data)))
-      .catch(error => dispatch({type: 'TENANTS_FETCH_FAIL', error}))
-  }, [fetch, dispatch, title, setState])
-  return state[title] || []
+    if (state[title] === undefined) { doFetch () }
+  })
+  return [state[title] || [], doFetch]
 }
 
 export const useSetTenant = (tenant) => {

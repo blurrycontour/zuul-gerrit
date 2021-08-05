@@ -37,7 +37,7 @@ import { fetchTenants } from '../api.js'
 import { useRemoteData } from '../hooks.js'
 
 const TenantsPage = () => {
-  const data = useRemoteData('Tenants', fetchTenants)
+  const [data,] = useRemoteData('Tenants', fetchTenants)
   const tenants = data.map((tenant) => {
     return {
       cells: [

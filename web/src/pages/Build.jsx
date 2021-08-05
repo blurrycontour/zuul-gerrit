@@ -41,7 +41,7 @@ import { useTenant, useBuild } from '../hooks.js'
 
 const BuildPage = (prop) => {
   const tenant = prop.tenant
-  const build = useBuild(tenant, prop.match.params.buildId)
+  const [build,] = useBuild(tenant, prop.match.params.buildId)
 
   const hash = window.location.hash.substring(1).split('/')
 
