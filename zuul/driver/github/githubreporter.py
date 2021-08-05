@@ -16,6 +16,7 @@ import json
 import logging
 import voluptuous as v
 import time
+import urllib.parse
 
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import MERGER_MERGE_RESOLVE, MERGER_MERGE, MERGER_MAP, \
@@ -101,12 +102,47 @@ class GithubReporter(BaseReporter):
                 except Exception as e:
                     self.addPullComment(item, str(e))
 
+    def _formatJobResult(self, job_fields):
+        # We select different emojis to represents build results:
+        # heavy_check_mark: SUCCESS
+        # warning: SKIPPED/ABORTED
+        # x: all types of FAILUREs
+        # In addition, failure results are in bold text
+
+        job_result = job_fields[2]
+        # Also need to handle user defined success_message.
+        # The job_fields[6]: the user defined seccess_message (if available)
+        success_message = job_fields[6]
+
+        emoji = 'cross.png'
+        bold_result = True
+
+        if job_result in ('SUCCESS', success_message):
+            emoji = 'check_mark.png'
+            bold_result = False
+        elif job_result in ('SKIPPED', 'ABORTED'):
+            emoji = 'warning.png'
+            bold_result = False
+
+        emoji_url = self._extract_root_url(job_fields[1]) + emoji
+
+        if bold_result:
+            return '<sub><sub>![](%s)</sub></sub> [%s](%s) **%s**%s%s%s\n' % (
+                (emoji_url,) + job_fields[:6])
+        else:
+            return '<sub><sub>![](%s)</sub></sub> [%s](%s) %s%s%s%s\n' % (
+                (emoji_url,) + job_fields[:6])
+
+    def _extract_root_url(self, url):
+        parsed_uri = urllib.parse.urlparse(url)
+        return '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
         ret = ''
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
-            ret += '- [%s](%s) : %s%s%s%s\n' % job_fields
+            ret += self._formatJobResult(job_fields)
         return ret
 
     def addPullComment(self, item, comment=None):
