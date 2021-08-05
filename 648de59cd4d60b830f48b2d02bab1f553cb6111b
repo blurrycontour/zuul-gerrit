@@ -123,6 +123,23 @@
     },
     {
       "key": {
+        "uuid": "07a392ed_a6ea6aec",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T23:27:11Z",
+      "side": 1,
+      "message": "That looks okay too.",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ac6938eb_106dffd4",
         "filename": "zuul/driver/git/gitconnection.py",
         "patchSetId": 13
@@ -383,6 +400,23 @@
       "side": 1,
       "message": "I think I may be confused now. What join call below? We define a join method but MergeServer.stop() doesn\u0027t seem to call it?",
       "parentUuid": "28beeafb_e3a1f6db",
+      "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10567ed1_cbe4682d",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-05T23:27:11Z",
+      "side": 1,
+      "message": "Right, other places call it.\n\nTo shut down a merger:\n\nmerger.stop()\nmerger.join()\n\nSame is true for the executor.",
       "revId": "648de59cd4d60b830f48b2d02bab1f553cb6111b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
