@@ -22,8 +22,15 @@ const store = createContext({})
 const { Provider } = store
 
 export const StateProvider = (prop) => {
-  const value = useState([])
+  const value = useState({})
   return <Provider value={value}>{prop.children}</Provider>
+}
+
+// Create a new object with arbitrary key value
+const addKeyValue = (obj, key, value) => {
+  const newObj = {}
+  newObj[key] = value
+  return {...obj, ...newObj}
 }
 
 export const useRemoteData = (title, fetch) => {
@@ -32,8 +39,8 @@ export const useRemoteData = (title, fetch) => {
   useEffect(() => {
     document.title = 'Zuul ' + title
     fetch()
-      .then(response => setState(response.data))
+      .then(response => setState(state => addKeyValue(state, title, response.data)))
       .catch(error => dispatch({type: 'TENANTS_FETCH_FAIL', error}))
   }, [fetch, dispatch, title, setState])
-  return state
+  return state[title] || []
 }
