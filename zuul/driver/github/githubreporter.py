@@ -101,12 +101,43 @@ class GithubReporter(BaseReporter):
                 except Exception as e:
                     self.addPullComment(item, str(e))
 
+    def _formatJobResult(self, job_fields):
+        # We select different colors of ball emojis to represents build results
+        # In genral it is same as zuul convension, except orange is merge to
+        # red, to avoid too colorful UI. In a nutshell:
+        # green ball for SUCCESS
+        # blue ball for SKIPPED
+        # yellow ball for ABORTED
+        # red ball for all other failures
+        # In addition, failure results are in bold text
+
+        job_result = job_fields[2]
+
+        emoji = 'red_circle'
+        bold_result = False
+
+        if job_result == 'SUCCESS':
+            emoji = 'green_circle'
+        elif job_result == 'SKIPPED':
+            emoji = 'large_blue_circle'
+        elif job_result == 'ABORTED':
+            emoji = 'yellow_circle'
+        else:
+            bold_result = True
+
+        if bold_result:
+            return '<sub><sup>:%s:</sup></sub> [%s](%s) : **%s**%s%s%s\n' % (
+                (emoji,) + job_fields)
+        else:
+            return '<sub><sup>:%s:</sup></sub> [%s](%s) : %s%s%s%s\n' % (
+                (emoji,) + job_fields)
+
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
         ret = ''
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
-            ret += '- [%s](%s) : %s%s%s%s\n' % job_fields
+            ret += self._formatJobResult(job_fields)
         return ret
 
     def addPullComment(self, item, comment=None):
