@@ -20,7 +20,7 @@ from zuul.zk.job_request_queue import JobRequestQueue
 
 class MergerApi(JobRequestQueue):
     log = logging.getLogger("zuul.MergerApi")
-    request_class = MergeRequest  # type: ignore
+    request_class = MergeRequest
 
     def __init__(self, client, merge_request_callback=None):
         root = '/zuul/merger'
