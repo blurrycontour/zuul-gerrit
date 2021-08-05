@@ -194,39 +194,34 @@ class BaseMergeServer(metaclass=ABCMeta):
                 for merge_request in self.merger_api.next():
                     if not self._merger_running:
                         break
-                    try:
-                        self._runMergeJob(merge_request)
-                    except Exception:
-                        log = get_annotated_logger(
-                            self.log, merge_request.event_id
-                        )
-                        log.exception("Exception while performing merge")
-                        self.completeMergeJob(merge_request, None)
+                    self._runMergeJob(merge_request)
             except Exception:
                 self.log.exception("Error in merge thread:")
                 time.sleep(5)
 
     def _runMergeJob(self, merge_request):
+        log = get_annotated_logger(
+            self.log, merge_request.event_id
+        )
+
         if not self.merger_api.lock(merge_request, blocking=False):
             return
 
-        merge_request.state = MergeRequest.RUNNING
-        params = self.merger_api.getParams(merge_request)
-        self.merger_api.clearParams(merge_request)
-        # Directly update the merge request in ZooKeeper, so we don't loop over
-        # and try to lock it again and again.
-        self.merger_api.update(merge_request)
-        self.log.debug("Next executed merge job: %s", merge_request)
-        result = None
         try:
-            result = self.executeMergeJob(merge_request, params)
-        except Exception:
-            self.log.exception("Error running merge job:")
-        finally:
+            merge_request.state = MergeRequest.RUNNING
+            params = self.merger_api.getParams(merge_request)
+            self.merger_api.clearParams(merge_request)
+            # Directly update the merge request in ZooKeeper, so we
+            # don't loop over and try to lock it again and again.
+            self.merger_api.update(merge_request)
+            self.log.debug("Next executed merge job: %s", merge_request)
+            result = None
             try:
-                self.completeMergeJob(merge_request, result)
+                result = self.executeMergeJob(merge_request, params)
             except Exception:
-                self.log.exception("Error completing merge job:")
+                log.exception("Error running merge job:")
+        finally:
+            self.completeMergeJob(merge_request, result)
 
     def executeMergeJob(self, merge_request, params):
         result = None

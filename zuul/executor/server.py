@@ -3534,19 +3534,7 @@ class ExecutorServer(BaseMergeServer):
                         break
                     if not self._running:
                         break
-
-                    try:
-                        self._runBuildWorker(build_request)
-                    except Exception:
-                        log = get_annotated_logger(
-                            self.log, event=None, build=build_request.uuid
-                        )
-                        log.exception("Exception while running job")
-                        result = {
-                            "result": "ERROR",
-                            "exception": traceback.format_exc(),
-                        }
-                        self.completeBuild(build_request, result)
+                    self._runBuildWorker(build_request)
             except Exception:
                 self.log.exception("Error in build loop:")
                 time.sleep(5)
@@ -3558,14 +3546,26 @@ class ExecutorServer(BaseMergeServer):
         if not self.executor_api.lock(build_request, blocking=False):
             return
 
-        build_request.state = BuildRequest.RUNNING
-        params = self.executor_api.getParams(build_request)
-        self.executor_api.clearParams(build_request)
-        # Directly update the build in ZooKeeper, so we don't
-        # loop over and try to lock it again and again.
-        self.executor_api.update(build_request)
-        log.debug("Next executed job: %s", build_request)
-        self.executeJob(build_request, params)
+        try:
+            build_request.state = BuildRequest.RUNNING
+            params = self.executor_api.getParams(build_request)
+            self.executor_api.clearParams(build_request)
+            # Directly update the build in ZooKeeper, so we don't
+            # loop over and try to lock it again and again.
+            self.executor_api.update(build_request)
+            log.debug("Next executed job: %s", build_request)
+            self.executeJob(build_request, params)
+        except Exception:
+            # Note, this is not a finally clause, because if we
+            # sucessfuly start executing the job, it's the
+            # AnsibleJob's responsibility to call completeBuild and
+            # unlock the request.
+            log.exception("Exception while running job")
+            result = {
+                "result": "ERROR",
+                "exception": traceback.format_exc(),
+            }
+            self.completeBuild(build_request, result)
 
     def run_governor(self):
         while not self.governor_stop_event.wait(10):
