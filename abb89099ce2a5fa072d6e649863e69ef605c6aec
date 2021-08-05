@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "747743ae_089c009d",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T22:54:02Z",
+      "side": 1,
+      "message": "Can we move this into a finally block and drop the finally block call in _runMergeJob()? Then we aren\u0027t tracking two places we can call completeMergeJob() through.",
+      "revId": "abb89099ce2a5fa072d6e649863e69ef605c6aec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
