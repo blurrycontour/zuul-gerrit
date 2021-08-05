@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "02e34d91_f1dd5daa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-05T14:30:57Z",
+      "side": 1,
+      "message": "Looking at the history of that change I notice that patchset2 had no pr cache at all on the base side and patchset3 did have one that get removed.\n\nI think this was the result of a poor rebase conflict resolution. Apologies for that.",
+      "revId": "3d9b9fa46b90f572d4be83fc718d0f78fff92e7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
