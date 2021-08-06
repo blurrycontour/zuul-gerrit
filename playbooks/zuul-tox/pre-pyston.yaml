@@ -1,0 +1,9 @@
+- hosts: all
+  tasks:
+    - name: Install rust
+      include_role:
+        name: ensure-rust
+    - name: Install pyston
+      become: true
+      apt:
+        deb: https://github.com/pyston/pyston/releases/download/v2.3/pyston_2.3_20.04.deb
