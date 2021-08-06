@@ -109,6 +109,15 @@
       python_version: 3.8
 
 - job:
+    name: zuul-tox-pyston
+    parent: zuul-tox
+    pre-run: playbooks/zuul-tox/pre-pyston.yaml
+    timeout: 5400  # 90 minutes
+    nodeset: ubuntu-focal
+    vars:
+      tox_envlist: pyston
+
+- job:
     name: zuul-build-dashboard
     parent: build-javascript-deployment
     description: |
@@ -272,82 +281,5 @@
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-        - zuul-tox-py36
         - zuul-tox-py38
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
-    gate:
-      jobs:
-        - zuul-upload-image
-        - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-        - zuul-tox-py36
-        - zuul-tox-py38
-        - zuul-build-dashboard
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-upload-image
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
-    promote:
-      jobs:
-        - zuul-promote-image
-        - zuul-promote-docs
-        - opendev-promote-python:
-            vars:
-              download_artifact_job: zuul-build-python-release
-        - opendev-promote-javascript-deployment-tarball:
-            files: *zuul_build_dashboard_files
-            vars:
-              download_artifact_job: zuul-build-dashboard
-    release:
-      jobs:
-        - zuul-release-python
-        - zuul-publish-tox-docs
-        - upload-docker-image:
-            secrets:
-              name: docker_credentials
-              secret: zuul-dockerhub
-              pass-to-parent: true
-            vars:
-              <<: *zuul_image_vars
-              upload_docker_image_promote: false
+        - zuul-tox-pyston
