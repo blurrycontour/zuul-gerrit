@@ -60,8 +60,11 @@ RUN /output/install-from-bindep zuul_base \
 # where it becomes the default.
   && git config --system protocol.version 2
 
+RUN curl -L -o /dev/shm/pyston.deb https://github.com/pyston/pyston/releases/download/pyston_2.3.1/pyston_2.3.1_20.04.deb && \
+    apt-get install --no-install-recommends -y /dev/shm/pyston.deb
+
 VOLUME /var/lib/zuul
-CMD ["/usr/local/bin/zuul"]
+CMD ["/usr/bin/pyston", "/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
 ENV DEBIAN_FRONTEND=noninteractive
@@ -77,16 +80,16 @@ RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontai
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-CMD ["/usr/local/bin/zuul-executor", "-f"]
+CMD ["/usr/bin/pyston", "/usr/local/bin/zuul-executor", "-f"]
 
 FROM zuul as zuul-fingergw
-CMD ["/usr/local/bin/zuul-fingergw", "-f"]
+CMD ["/usr/bin/pyston", "/usr/local/bin/zuul-fingergw", "-f"]
 
 FROM zuul as zuul-merger
-CMD ["/usr/local/bin/zuul-merger", "-f"]
+CMD ["/usr/bin/pyston", "/usr/local/bin/zuul-merger", "-f"]
 
 FROM zuul as zuul-scheduler
-CMD ["/usr/local/bin/zuul-scheduler", "-f"]
+CMD ["/usr/bin/pyston", "/usr/local/bin/zuul-scheduler", "-f"]
 
 FROM zuul as zuul-web
-CMD ["/usr/local/bin/zuul-web", "-f"]
+CMD ["/usr/bin/pyston", "/usr/local/bin/zuul-web", "-f"]
