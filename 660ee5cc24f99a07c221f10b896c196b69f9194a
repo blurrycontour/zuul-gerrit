@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "f9b973c9_e41d52e7",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2071,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T18:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "30096881_372848f1",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a0fa5ec3_9b7f7ae4",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -50,6 +68,24 @@
       "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d166a55f_69849b75",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2076,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T18:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a0fa5ec3_9b7f7ae4",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +157,24 @@
     },
     {
       "key": {
+        "uuid": "b8e35690_70f7fd9f",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T18:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8cb3915f_93c22118",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b13afcee_85d1fb06",
         "filename": "zuul/zk/merger.py",
         "patchSetId": 6
@@ -155,6 +209,30 @@
       "writtenOn": "2021-08-06T18:32:42Z",
       "side": 1,
       "message": "Two part question:\n\n1) Why change \"merge\" to \"merger\"?  Symmetry with executor.\n2) Why move \"results\" under \"merger\"?  Keep the ZK tree tidy.  Especially once we have a job queue per zone, I wanted everything for a queue under a single root.\n\nSo when you ls /zuul you\u0027ll see: [executor, merger, keystore, components, ...]\nThen under merger: [requests, results, ...]\nAnd under executor:\n  * unzoned\n    * requests\n    * results\n    * ...\n  * zones\n    * foo\n      * requests\n      * results\n      * ...",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bebe2bfd_243fbfc8",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T18:36:05Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b13afcee_85d1fb06",
+      "range": {
+        "startLine": 26,
+        "startChar": 22,
+        "endLine": 26,
+        "endChar": 28
+      },
       "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
