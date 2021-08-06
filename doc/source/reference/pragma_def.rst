@@ -38,7 +38,7 @@ pragma directives may not be set and then unset within the same file.
 
    .. attr:: implied-branches
 
-      This is a list of regular expressions, just as
+      This is a list of :ref:`regular expressions <regex>`, just as
       :attr:`job.branches`, which may be used to supply the value of
       the implied branch matcher for all jobs and project-templates in
       a file.

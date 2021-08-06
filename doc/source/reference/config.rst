@@ -59,6 +59,17 @@ As soon as a change containing a Zuul configuration change merges to
 any Zuul-managed repository, the new configuration takes effect
 immediately.
 
+.. _regex:
+
+Regular Expressions
+-------------------
+
+Many options accept literal strings or regular expressions.  In these
+cases, the regular expression matching starts at the beginning of the
+string as if there were an implicit ``^`` at the start of the regular
+expression. To match at an arbitrary position, prepend ``.*`` to the
+regular expression.
+
 .. _configuration-items:
 
 Configuration Items
