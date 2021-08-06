@@ -629,7 +629,7 @@ class PipelineManager(metaclass=ABCMeta):
             return False
         build_set = item.current_build_set
         log.debug("Requesting nodes for change %s", item.change)
-        if self.sched.use_relative_priority:
+        if self.sched.globals.use_relative_priority:
             relative_priority = item.getNodePriority()
         else:
             relative_priority = 0
@@ -1296,7 +1296,8 @@ class PipelineManager(metaclass=ABCMeta):
         if failing_reasons:
             log.debug("%s is a failing item because %s" %
                       (item, failing_reasons))
-        if item.live and not dequeued and self.sched.use_relative_priority:
+        if (item.live and not dequeued
+                and self.sched.globals.use_relative_priority):
             priority = item.getNodePriority()
             for node_request in item.current_build_set.node_requests.values():
                 if node_request.fulfilled:
