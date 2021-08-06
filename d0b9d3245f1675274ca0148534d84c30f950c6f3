@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "917998ce_dd84b55e",
+        "filename": "web/src/containers/Misc.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T17:08:23Z",
+      "side": 1,
+      "message": "this must have been an oversight when cleaning code. I don\u0027t think this one is ever used.",
+      "parentUuid": "5568d648_d103ed34",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bce4b81c_767806f4",
         "filename": "web/src/containers/build/Build.jsx",
         "patchSetId": 14
@@ -48,6 +66,24 @@
       "side": 1,
       "message": "Update:\n\nI just can\u0027t use it as git pre-commit hook as it would change too much depending on the files that were edited. So I have to run it manually - and when you have to run stuff manually you forget it from time to time. But I\u0027m happy to see that more people are following the style \"suggestions\", which makes the code much easier to read.",
       "parentUuid": "bce4b81c_767806f4",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42013206_3daf47a6",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T17:08:23Z",
+      "side": 1,
+      "message": "I am using VSCode personally, and I guess some javascript/react extensions including a code formatter came in with it.\nI agree that in the case of jsx, nested anchors can quickly become really painful to read. I would also be in favor of a soft enforcing of code formatting - maybe a non-voting job?",
+      "parentUuid": "65069440_936477e1",
       "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
@@ -86,6 +122,24 @@
       "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7984c475_5fc525d5",
+        "filename": "web/src/pages/Autohold.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T17:08:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29b541c4_a8dde2aa",
+      "revId": "d0b9d3245f1675274ca0148534d84c30f950c6f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
