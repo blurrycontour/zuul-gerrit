@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5856f65e_28af93fd",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-08-06T19:33:22Z",
+      "side": 1,
+      "message": "What\u0027s the reason to throw an exception and directly catch it?",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 189,
+        "endChar": 25
+      },
+      "revId": "d567fae882651746ba43449be58762556914b9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
