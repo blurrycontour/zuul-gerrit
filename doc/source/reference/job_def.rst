@@ -78,13 +78,6 @@ Here is an example of two job definitions:
            - name: test-node
              label: fedora
 
-.. warning::
-
-   Regular expression matching in Zuul *starts at the beginning of
-   the string*, i.e., as if there was an implicit ``^`` at the beginning
-   of the regular expression. To match at an arbitrary position, prepend
-   ``.*`` to the regular expression.
-
 .. attr:: job
 
    The following attributes are available on a job; all are optional
@@ -796,9 +789,10 @@ Here is an example of two job definitions:
 
    .. attr:: branches
 
-      A regular expression (or list of regular expressions) which
-      describe on what branches a job should run (or in the case of
-      variants, to alter the behavior of a job for a certain branch).
+      A :ref:`regular expression <regex>` (or list of regular
+      expressions) which describe on what branches a job should run
+      (or in the case of variants, to alter the behavior of a job for
+      a certain branch).
 
       This attribute is not inherited in the usual manner.  Instead,
       it is used to determine whether each variant on which it appears
@@ -864,7 +858,7 @@ Here is an example of two job definitions:
       specified files are modified.  Unlike **branches**, this value
       is subject to inheritance and overriding, so only the final
       value is used to determine if the job should run. This is a
-      regular expression or list of regular expressions.
+      :ref:`regular expression <regex>` or list of regular expressions.
 
    .. attr:: irrelevant-files
 
@@ -872,8 +866,8 @@ Here is an example of two job definitions:
       the job should run unless *all* of the files changed match this
       list.  In other words, if the regular expression ``docs/.*`` is
       supplied, then this job will not run if the only files changed
-      are in the docs directory.  A regular expression or list of
-      regular expressions.
+      are in the docs directory.  A :ref:`regular expression <regex>`
+      or list of regular expressions.
 
    .. attr:: match-on-config-updates
       :default: true
