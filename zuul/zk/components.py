@@ -216,9 +216,7 @@ class ComponentRegistry(ZooKeeperBase):
             root = self._getComponentRoot(kind)
             self.kazoo_client.ensure_path(root)
             self.kazoo_client.ChildrenWatch(
-                root, self._makeComponentRootWatcher(kind),
-                send_event=True
-            )
+                root, self._makeComponentRootWatcher(kind))
 
     def _makeComponentRootWatcher(self, kind):
         def watch(children, event=None):
@@ -232,9 +230,7 @@ class ComponentRegistry(ZooKeeperBase):
                 self.log.info("Noticed new %s component %s", kind, hostname)
                 root = self._getComponentPath(kind, hostname)
                 self.kazoo_client.DataWatch(
-                    root, self._makeComponentWatcher(kind, hostname),
-                    send_event=True
-                )
+                    root, self._makeComponentWatcher(kind, hostname))
 
     def _makeComponentWatcher(self, kind, hostname):
         def watch(data, stat, event=None):
