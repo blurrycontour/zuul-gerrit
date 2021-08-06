@@ -160,6 +160,9 @@ class TestWeb(BaseTestWeb):
                     self.assertEqual(q['window'], 20)
                 else:
                     self.assertEqual(q['window'], 0)
+                # This test uses unbranched queues so validate that the branch
+                # information is missing.
+                self.assertIsNone(q['branch'])
                 for head in q['heads']:
                     for change in head:
                         self.assertIn(
@@ -1104,6 +1107,38 @@ class TestWeb(BaseTestWeb):
         }
 
         self.assertEqual(job_params, resp.json())
+
+
+class TestWebStatusDisplayBranch(BaseTestWeb):
+    tenant_config_file = 'config/change-queues/main.yaml'
+
+    def add_changes(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        C = self.fake_gerrit.addFakeChange('org/project3', 'master', 'C')
+        C.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        D = self.fake_gerrit.addFakeChange('org/project4', 'master', 'D')
+        D.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(D.addApproval('Approved', 1))
+
+    def test_web_status_display_branch(self):
+        "Test that we can retrieve JSON status info with branch name"
+        self.add_changes()
+        self.waitUntilSettled()
+        resp = self.get_url("api/tenant/tenant-one/status")
+        self.executor_server.release()
+        data = resp.json()
+
+        for p in data['pipelines']:
+            if p['name'] == 'gate':
+                for q in p['change_queues']:
+                    # 'per-branch: true' is configured for all gate queues
+                    self.assertEqual(q['branch'], 'master')
 
 
 class TestWebMultiTenant(BaseTestWeb):

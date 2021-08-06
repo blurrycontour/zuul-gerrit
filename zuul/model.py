@@ -383,6 +383,11 @@ class Pipeline(object):
             j_queue['heads'] = []
             j_queue['window'] = queue.window
 
+            if queue.project_branches and queue.project_branches[0][1]:
+                j_queue['branch'] = queue.project_branches[0][1]
+            else:
+                j_queue['branch'] = None
+
             j_changes = []
             for e in queue.queue:
                 if not e.item_ahead:
