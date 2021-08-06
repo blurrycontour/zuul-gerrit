@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31269392_5d6abdf6",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-08-06T19:13:26Z",
+      "side": 1,
+      "message": "When we have the pipeline state in zk I think it makes sense to put the repo state directly there instead of forwarding it through multiple copies via events.",
+      "revId": "c4129036a6802a776c4a2928bcd75611d188b2dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
