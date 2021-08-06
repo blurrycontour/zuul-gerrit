@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "253b0496_12c4e958",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-08-06T20:12:29Z",
+      "side": 1,
+      "message": "This should also be changed to log instead of self.log",
+      "revId": "0b615723839e3c91e174756ff89d97aa0b95edcc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
