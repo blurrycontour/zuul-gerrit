@@ -70,7 +70,7 @@ import sqlalchemy
 
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import (
-    BuildRequest, Change, PRECEDENCE_NORMAL, WebInfo
+    BuildRequest, Change, MergeRequest, PRECEDENCE_NORMAL, WebInfo
 )
 from zuul.rpcclient import RPCClient
 
@@ -93,6 +93,7 @@ from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient
 from zuul.zk.event_queues import ConnectionEventQueue
 from zuul.zk.executor import ExecutorApi
+from zuul.zk.merger import MergerApi
 from psutil import Popen
 
 import zuul.driver.gerrit.gerritsource as gerritsource
@@ -3138,6 +3139,78 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     def _send_aborted(self):
         self.recordResult('ABORTED')
         super()._send_aborted()
+
+
+FakeMergeRequest = namedtuple(
+    "FakeMergeRequest", ("uuid", "job_type", "payload")
+)
+
+
+class HoldableMergerApi(MergerApi):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hold_in_queue = False
+        self.history = {}
+
+    def submit(self, uuid, job_type, build_set_uuid, tenant_name,
+               pipeline_name, params, event_id, precedence=0,
+               needs_result=False):
+        self.log.debug("Appending merge job to history: %s", uuid)
+        self.history[uuid] = FakeMergeRequest(uuid, job_type, params)
+        return super().submit(
+            uuid, job_type, build_set_uuid, tenant_name, pipeline_name, params,
+            event_id, precedence, needs_result)
+
+    @property
+    def initial_state(self):
+        if self.hold_in_queue:
+            return MergeRequest.HOLD
+        return MergeRequest.REQUESTED
+
+
+class TestingMergerApi(HoldableMergerApi):
+
+    log = logging.getLogger("zuul.test.TestingMergerApi")
+
+    def _test_getMergeJobsInState(self, *states):
+        # As this method is used for assertions in the tests, it should look up
+        # the merge requests directly from ZooKeeper and not from a cache
+        # layer.
+        all_merge_requests = []
+        for merge_uuid in self.kazoo_client.get_children(
+            self.MERGE_REQUEST_ROOT
+        ):
+            merge_request = self.get("/".join(
+                [self.MERGE_REQUEST_ROOT, merge_uuid]))
+            if merge_request and (not states or merge_request.state in states):
+                all_merge_requests.append(merge_request)
+
+        return all_merge_requests
+
+    def release(self, merge_request=None):
+        """
+        Releases a merge request which was previously put on hold for testing.
+
+        If no merge_request is provided, all merge request that are currently
+        in state HOLD will be released.
+        """
+        # Either release all jobs in HOLD state or the one specified.
+        if merge_request is not None:
+            merge_request.state = MergeRequest.REQUESTED
+            self.update(merge_request)
+            return
+
+        for merge_request in self._test_getMergeJobsInState(MergeRequest.HOLD):
+            merge_request.state = MergeRequest.REQUESTED
+            self.update(merge_request)
+
+    def queued(self):
+        return self.inState(
+            MergeRequest.REQUESTED, MergeRequest.HOLD
+        )
+
+    def all(self):
+        return self._test_getMergeJobsInState()
 
 
 class RecordingMergeClient(zuul.merger.client.MergeClient):
