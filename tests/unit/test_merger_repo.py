@@ -21,8 +21,12 @@ import git
 import testtools
 
 from zuul.merger.merger import MergerTree, Repo
+from zuul.zk.merger import MergerApi
 import zuul.model
-from tests.base import BaseTestCase, ZuulTestCase, FIXTURE_DIR, simple_layout
+from zuul.model import MergeRequest
+from tests.base import (
+    BaseTestCase, ZuulTestCase, FIXTURE_DIR, simple_layout, iterate_timeout
+)
 
 
 class TestMergerRepo(ZuulTestCase):
@@ -896,9 +900,10 @@ class TestMerger(ZuulTestCase):
     def test_stale_index_lock_cleanup(self):
         # Stop the running executor's merger. We needed it running to merge
         # things during test boostrapping but now it is just in the way.
-        self.executor_server.merger_gearworker.stop()
-        self.executor_server.merger_gearworker.join()
-        # Start the merger and do a merge to populate the repo on disk
+        self.executor_server._merger_running = False
+        self.executor_server.merger_loop_wake_event.set()
+        self.executor_server.merger_thread.join()
+        # Start a dedicated merger and do a merge to populate the repo on disk
         self._startMerger()
 
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -1003,6 +1008,62 @@ class TestMerger(ZuulTestCase):
                          zuul_repo.commit('refs/heads/master').hexsha)
         self.assertEqual(upstream_repo.commit(change_ref).hexsha,
                          zuul_repo.commit('HEAD').hexsha)
+
+    def test_lost_merge_requests(self):
+        # Test the cleanupLostMergeRequests method of the merger
+        # client.  This is normally called from apsched from the
+        # scheduler.  To exercise it, we need to produce a fake lost
+        # merge request and then invoke it ourselves.
+
+        # Stop the actual merger which will see this as garbage:
+        self.executor_server._merger_running = False
+        self.executor_server.merger_loop_wake_event.set()
+        self.executor_server.merger_thread.join()
+
+        # Create a fake lost merge request.  This is based on
+        # test_lost_merge_requests in test_zk.
+        merger_api = MergerApi(self.zk_client)
+
+        payload = {'merge': 'test'}
+        merger_api.submit(
+            uuid='B',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='BB',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+
+        b = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/B")
+
+        b.state = MergeRequest.RUNNING
+        merger_api.update(b)
+
+        # Wait until the latest state transition is reflected in the Merger
+        # APIs cache. Using a DataWatch for this purpose could lead to race
+        # conditions depending on which DataWatch is executed first. The
+        # DataWatch might be triggered for the correct event, but the cache
+        # might still be outdated as the DataWatch that updates the cache
+        # itself wasn't triggered yet.
+        cache = merger_api._cached_merge_requests
+        for _ in iterate_timeout(30, "cache to be up-to-date"):
+            if (cache and cache[b.path].state == MergeRequest.RUNNING):
+                break
+
+        # The lost_merges method should only return merges which are running
+        # but not locked by any merger, in this case merge b
+        lost_merge_requests = list(merger_api.lostMergeRequests())
+
+        self.assertEqual(1, len(lost_merge_requests))
+        self.assertEqual(b.path, lost_merge_requests[0].path)
+
+        # Exercise the cleanup code
+        merger_client = self.scheds.first.sched.merger
+        merger_client.cleanupLostMergeRequests()
+
+        lost_merge_requests = list(merger_api.lostMergeRequests())
+        self.assertEqual(0, len(lost_merge_requests))
 
 
 class TestMergerTree(BaseTestCase):
