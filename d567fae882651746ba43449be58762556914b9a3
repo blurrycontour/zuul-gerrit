@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "2c8eaf07_f1da1493",
+        "filename": "tests/fixtures/zuul-multi-github.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T20:49:14Z",
+      "side": 1,
+      "message": "I don\u0027t know if the tests use it or not, but it might be more clear what the goal is here (and possibly more future proof) if you used a different value for the app_id.",
+      "revId": "d567fae882651746ba43449be58762556914b9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5856f65e_28af93fd",
         "filename": "zuul/executor/common.py",
         "patchSetId": 2
@@ -46,6 +63,23 @@
       "revId": "d567fae882651746ba43449be58762556914b9a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "745338d0_4b5fa8da",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T20:49:14Z",
+      "side": 1,
+      "message": "TBH, I\u0027m not sure the below is strictly necessary at this point with the current state of (lack of) foreign project support.",
+      "revId": "d567fae882651746ba43449be58762556914b9a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
