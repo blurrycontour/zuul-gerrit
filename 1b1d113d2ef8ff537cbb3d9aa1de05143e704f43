@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4d437607_2e26817f",
+        "filename": "web/src/api.js",
+        "patchSetId": 17
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T15:41:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09be5a27_47f1c88e",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5d4cc97d_b30d19ff",
         "filename": "web/src/api.js",
         "patchSetId": 17
@@ -33,6 +51,24 @@
       "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "958e2e36_c7c0aab6",
+        "filename": "web/src/api.js",
+        "patchSetId": 17
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T15:41:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d4cc97d_b30d19ff",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "abdae82d_f4cdd559",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T15:41:09Z",
+      "side": 1,
+      "message": "I removed the button, and moved the action icon to the right side of the buildset summary. This can become an \"action column\" in the future.",
+      "parentUuid": "5f5998cc_7ebb8c46",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8de490cd_a6376e82",
         "filename": "web/src/containers/build/Buildset.jsx",
         "patchSetId": 17
@@ -67,6 +121,24 @@
       "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "449fef5c_d0986a2b",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-06T15:41:09Z",
+      "side": 1,
+      "message": "I turned this into a notification toast.",
+      "parentUuid": "8de490cd_a6376e82",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
