@@ -1,4 +1,5 @@
 # Copyright 2021 BMW Group
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,6 +17,7 @@ import json
 import logging
 import time
 from contextlib import suppress
+from enum import Enum
 
 from kazoo.exceptions import LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType
@@ -23,60 +25,70 @@ from kazoo.recipe.lock import Lock
 
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import MergeRequest
+from zuul.model import JobRequest
 from zuul.zk import ZooKeeperSimpleBase, sharding
-from zuul.zk.event_queues import MergerEventResultFuture
-from zuul.zk.exceptions import MergeRequestNotFound
+from zuul.zk.event_queues import JobResultFuture
+from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.vendor.watchers import ExistingDataWatch
 
 
-class MergerApi(ZooKeeperSimpleBase):
+class JobRequestEvent(Enum):
+    CREATED = 0
+    UPDATED = 1
+    RESUMED = 2
+    CANCELED = 3
+    DELETED = 4
 
-    MERGE_REQUEST_ROOT = "/zuul/merge-requests"
-    MERGE_PARAMS_ROOT = "/zuul/merge-params"
-    MERGE_RESULT_ROOT = "/zuul/merge-results"
-    MERGE_RESULT_DATA_ROOT = "/zuul/merge-result-data"
-    MERGE_WAITER_ROOT = "/zuul/merge-waiters"
-    LOCK_ROOT = "/zuul/merge-request-locks"
 
-    log = logging.getLogger("zuul.zk.merger.MergerApi")
+class JobRequestQueue(ZooKeeperSimpleBase):
+    log = logging.getLogger("zuul.JobRequestQueue")
+    request_class = JobRequest
 
-    def __init__(self, client, merge_request_callback=None):
+    def __init__(self, client, root,
+                 request_callback=None, event_callback=None):
         super().__init__(client)
 
-        self.merge_request_callback = merge_request_callback
+        self.REQUEST_ROOT = f"{root}/requests"
+        self.LOCK_ROOT = f"{root}/locks"
+        self.PARAM_ROOT = f"{root}/params"
+        self.RESULT_ROOT = f"{root}/results"
+        self.RESULT_DATA_ROOT = f"{root}/result-data"
+        self.WAITER_ROOT = f"{root}/waiters"
 
-        # path -> merge request
-        self._cached_merge_requests = {}
+        self.request_callback = request_callback
+        self.event_callback = event_callback
+
+        # path -> request
+        self._cached_requests = {}
+
+        self.kazoo_client.ensure_path(self.REQUEST_ROOT)
+        self.kazoo_client.ensure_path(self.PARAM_ROOT)
+        self.kazoo_client.ensure_path(self.RESULT_ROOT)
+        self.kazoo_client.ensure_path(self.RESULT_DATA_ROOT)
+        self.kazoo_client.ensure_path(self.WAITER_ROOT)
+        self.kazoo_client.ensure_path(self.LOCK_ROOT)
 
         self.register()
 
     @property
     def initial_state(self):
-        # This supports holding merge requests in tests
-        return MergeRequest.REQUESTED
+        # This supports holding requests in tests
+        return self.request_class.REQUESTED
 
     def register(self):
-        self.kazoo_client.ensure_path(self.MERGE_REQUEST_ROOT)
-        self.kazoo_client.ensure_path(self.MERGE_PARAMS_ROOT)
-        self.kazoo_client.ensure_path(self.MERGE_RESULT_ROOT)
-        self.kazoo_client.ensure_path(self.MERGE_RESULT_DATA_ROOT)
-        self.kazoo_client.ensure_path(self.MERGE_WAITER_ROOT)
-        self.kazoo_client.ensure_path(self.LOCK_ROOT)
-
-        # Register a child watch that listens for new merge requests
+        # Register a child watch that listens for new requests
         self.kazoo_client.ChildrenWatch(
-            self.MERGE_REQUEST_ROOT,
-            self._makeMergeRequestWatcher(self.MERGE_REQUEST_ROOT),
+            self.REQUEST_ROOT,
+            self._makeRequestWatcher(self.REQUEST_ROOT),
             send_event=True,
         )
 
-    def _makeMergeStateWatcher(self, path):
+    def _makeStateWatcher(self, path):
         def watch(data, stat, event=None):
-            return self._watchMergeState(path, data, stat, event)
+            return self._watchState(path, data, stat, event)
         return watch
 
-    def _watchMergeState(self, path, data, stat, event=None):
+    def _watchState(self, path, data, stat, event=None):
         if not event or event.type == EventType.CHANGED:
             # Don't process change events w/o any data. This can happen when a
             # "slow" change watch tried to retrieve the data of a znode that
@@ -90,197 +102,182 @@ class MergerApi(ZooKeeperSimpleBase):
                 return
 
             # We need this one for the HOLD -> REQUESTED check further down
-            old_merge_request = self._cached_merge_requests.get(path)
+            old_request = self._cached_requests.get(path)
 
-            merge_request = MergeRequest.fromDict(content)
-            merge_request.path = path
-            merge_request._zstat = stat
-            self._cached_merge_requests[path] = merge_request
+            request = self.request_class.fromDict(content)
+            request.path = path
+            request._zstat = stat
+            self._cached_requests[path] = request
 
             # NOTE (felix): This is a test-specific condition: For test cases
-            # which are using hold_merge_jobs_in_queue the state change on the
-            # merge request from HOLD to REQUESTED is done outside of the
-            # merger.
+            # which are using hold_*_jobs_in_queue the state change on the
+            # request from HOLD to REQUESTED is done outside of the server.
             # Thus, we must also set the wake event (the callback) so the
-            # merger can pick up those jobs after they are released. To not
+            # servercan pick up those jobs after they are released. To not
             # cause a thundering herd problem in production for each cache
             # update, the callback is only called under this very specific
             # condition that can only occur in the tests.
             if (
-                self.merge_request_callback
-                and old_merge_request
-                and old_merge_request.state == MergeRequest.HOLD
-                and merge_request.state == MergeRequest.REQUESTED
+                self.request_callback
+                and old_request
+                and old_request.state == self.request_class.HOLD
+                and request.state == self.request_class.REQUESTED
             ):
-                self.merge_request_callback()
+                self.request_callback()
 
         elif event.type == EventType.DELETED:
+            request = self._cached_requests.get(path)
             with suppress(KeyError):
-                del self._cached_merge_requests[path]
+                del self._cached_requests[path]
+
+            if request and self.event_callback:
+                self.event_callback(request, JobRequestEvent.DELETED)
 
             # Return False to stop the datawatch as the build got deleted.
             return False
 
-    def _makeMergeRequestWatcher(self, path):
-        def watch(merge_requests, event=None):
-            return self._watchMergeRequests(path, merge_requests)
+    def _makeRequestWatcher(self, path):
+        def watch(requests, event=None):
+            return self._watchRequests(path, requests)
         return watch
 
-    def _watchMergeRequests(self, path, merge_requests):
-        # The merge_requests list always contains all active children. Thus, we
-        # first have to find the new ones by calculating the delta between the
-        # merge_requests list and our current cache entries.
-        # NOTE (felix): We could also use this list to determine the deleted
-        # merge requests, but it's easier to do this in the DataWatch for the
-        # single merge request instead. Otherwise we have to deal with race
-        # conditions between the children and the data watch as one watch might
-        # update a cache entry while the other tries to remove it.
+    def _watchRequests(self, path, requests):
+        # The requests list always contains all active children. Thus,
+        # we first have to find the new ones by calculating the delta
+        # between the requests list and our current cache entries.
+        # NOTE (felix): We could also use this list to determine the
+        # deleted requests, but it's easier to do this in the
+        # DataWatch for the single request instead. Otherwise we have
+        # to deal with race conditions between the children and the
+        # data watch as one watch might update a cache entry while the
+        # other tries to remove it.
 
-        merge_request_paths = {
-            f"{path}/{uuid}" for uuid in merge_requests
+        request_paths = {
+            f"{path}/{uuid}" for uuid in requests
         }
 
-        new_merge_requests = merge_request_paths - set(
-            self._cached_merge_requests.keys()
+        new_requests = request_paths - set(
+            self._cached_requests.keys()
         )
 
-        for req_path in new_merge_requests:
+        for req_path in new_requests:
             ExistingDataWatch(self.kazoo_client,
                               req_path,
-                              self._makeMergeStateWatcher(req_path))
+                              self._makeStateWatcher(req_path))
 
-        # Notify the user about new merge requests if a callback is provided.
+        # Notify the user about new requests if a callback is provided.
         # When we register the data watch, we will receive an initial
         # callback immediately.  The list of children may be empty in
         # that case, so we should not fire our callback since there
-        # are no merge requests to handle.
+        # are no requests to handle.
 
-        if new_merge_requests and self.merge_request_callback:
-            self.merge_request_callback()
-
-    def _iterMergeRequests(self):
-        # As the entries in the cache dictionary are added and removed via
-        # data and children watches, we can't simply iterate over it in here,
-        # as the values might change during iteration.
-        for key in list(self._cached_merge_requests.keys()):
-            try:
-                merge_request = self._cached_merge_requests[key]
-            except KeyError:
-                continue
-            yield merge_request
+        if new_requests and self.request_callback:
+            self.request_callback()
 
     def inState(self, *states):
         if not states:
             # If no states are provided, build a tuple containing all available
             # ones to always match. We need a tuple to be compliant to the
             # type of *states above.
-            states = MergeRequest.ALL_STATES
+            states = self.request_class.ALL_STATES
 
-        merge_requests = list(
-            filter(lambda b: b.state in states, self._iterMergeRequests())
-        )
+        requests = [
+            req for req in self._cached_requests.values()
+            if req.state in states
+        ]
 
-        # Sort the list of merge requests by precedence and their creation time
+        # Sort the list of requests by precedence and their creation time
         # in ZooKeeper in ascending order to prevent older requests from
         # starving.
-        return (b for b in sorted(merge_requests))
+        return sorted(requests)
 
     def next(self):
-        yield from self.inState(MergeRequest.REQUESTED)
+        yield from self.inState(self.request_class.REQUESTED)
 
-    def submit(self, uuid, job_type, build_set_uuid, tenant_name,
-               pipeline_name, params, event_id, precedence=0,
-               needs_result=False):
-        log = get_annotated_logger(self.log, event=event_id)
+    def submit(self, request, params, needs_result=False):
+        log = get_annotated_logger(self.log, event=request.event_id)
 
-        path = "/".join([self.MERGE_REQUEST_ROOT, uuid])
+        path = "/".join([self.REQUEST_ROOT, request.uuid])
+        request.path = path
 
-        merge_request = MergeRequest(
-            uuid,
-            self.initial_state,
-            job_type,
-            precedence,
-            build_set_uuid,
-            tenant_name,
-            pipeline_name,
-            event_id,
-        )
+        assert isinstance(request, self.request_class)
+        assert request.state == self.request_class.UNSUBMITTED
+        request.state = self.initial_state
 
         result = None
 
-        # If a result is needed, create the result_path with the same UUID and
-        # store it on the merge request, so the merger server can store the
-        # result there.
+        # If a result is needed, create the result_path with the same
+        # UUID and store it on the request, so the server can store
+        # the result there.
         if needs_result:
             result_path = "/".join(
-                [self.MERGE_RESULT_ROOT, merge_request.uuid]
+                [self.RESULT_ROOT, request.uuid]
             )
             waiter_path = "/".join(
-                [self.MERGE_WAITER_ROOT, merge_request.uuid]
+                [self.WAITER_ROOT, request.uuid]
             )
             self.kazoo_client.create(waiter_path, ephemeral=True)
-            result = MergerEventResultFuture(self.client, result_path,
-                                             waiter_path)
-            merge_request.result_path = result_path
+            result = JobResultFuture(self.client, result_path, waiter_path)
+            request.result_path = result_path
 
-        log.debug("Submitting merge request to ZooKeeper %s", merge_request)
+        log.debug("Submitting job request to ZooKeeper %s", request)
 
-        params_path = self._getParamsPath(uuid)
+        params_path = self._getParamsPath(request.uuid)
         with sharding.BufferedShardWriter(
             self.kazoo_client, params_path
         ) as stream:
             stream.write(self._dictToBytes(params))
 
-        self.kazoo_client.create(
-            path, self._dictToBytes(merge_request.toDict()))
+        self.kazoo_client.create(path, self._dictToBytes(request.toDict()))
 
         return result
 
-    def update(self, merge_request):
+    def update(self, request):
         log = get_annotated_logger(
-            self.log, event=None, build=merge_request.uuid
+            self.log, event=request.event_id, build=request.uuid
         )
-        log.debug("Updating merge request %s", merge_request)
+        log.debug("Updating request %s", request)
 
-        if merge_request._zstat is None:
+        if request._zstat is None:
             log.debug(
-                "Cannot update merge request %s: Missing version information.",
-                merge_request.uuid,
+                "Cannot update request %s: Missing version information.",
+                request.uuid,
             )
             return
         try:
             zstat = self.kazoo_client.set(
-                merge_request.path,
-                self._dictToBytes(merge_request.toDict()),
-                version=merge_request._zstat.version,
+                request.path,
+                self._dictToBytes(request.toDict()),
+                version=request._zstat.version,
             )
             # Update the zstat on the item after updating the ZK node
-            merge_request._zstat = zstat
+            request._zstat = zstat
         except NoNodeError:
-            raise MergeRequestNotFound(
-                f"Could not update {merge_request.path}"
+            raise JobRequestNotFound(
+                f"Could not update {request.path}"
             )
 
-    def reportResult(self, merge_request, result):
+    def reportResult(self, request, result):
         # Write the result data first since it may be multiple nodes.
         result_data_path = "/".join(
-            [self.MERGE_RESULT_DATA_ROOT, merge_request.uuid]
+            [self.RESULT_DATA_ROOT, request.uuid]
         )
         with sharding.BufferedShardWriter(
                 self.kazoo_client, result_data_path) as stream:
             stream.write(self._dictToBytes(result))
 
-        # Then write the (empty) result note to signify it's ready.
+        # Then write the result node to signify it's ready.
         data = {'result_data_path': result_data_path}
-        self.kazoo_client.create(merge_request.result_path,
+        self.kazoo_client.create(request.result_path,
                                  self._dictToBytes(data))
 
     def get(self, path):
-        """Get a merge request
+        """Get a request
 
         Note: do not mix get with iteration; iteration returns cached
-        MergeRequests while get returns a newly created object each time. If
-        you lock a MergeRequest, you must use the same object to unlock it.
+        requests while get returns a newly created object each
+        time. If you lock a request, you must use the same object to
+        unlock it.
 
         """
         try:
@@ -293,29 +290,57 @@ class MergerApi(ZooKeeperSimpleBase):
 
         content = self._bytesToDict(data)
 
-        merge_request = MergeRequest.fromDict(content)
-        merge_request.path = path
-        merge_request._zstat = zstat
+        request = self.request_class.fromDict(content)
+        request.path = path
+        request._zstat = zstat
 
-        return merge_request
+        return request
 
-    def remove(self, merge_request):
-        self.log.debug("Removing merge request %s", merge_request)
+    def remove(self, request):
+        self.log.debug("Removing request %s", request)
         try:
-            self.kazoo_client.delete(merge_request.path, recursive=True)
+            self.kazoo_client.delete(request.path, recursive=True)
         except NoNodeError:
             # Nothing to do if the node is already deleted
             pass
-        self.clearMergeParams(merge_request)
+        self.clearParams(request)
         try:
             # Delete the lock parent node as well
-            path = "/".join([self.LOCK_ROOT, merge_request.uuid])
+            path = "/".join([self.LOCK_ROOT, request.uuid])
             self.kazoo_client.delete(path, recursive=True)
         except NoNodeError:
             pass
 
-    def lock(self, merge_request, blocking=True, timeout=None):
-        path = "/".join([self.LOCK_ROOT, merge_request.uuid])
+    # We use child nodes here so that we don't need to lock the
+    # request node.
+    def requestResume(self, request):
+        self.kazoo_client.ensure_path(f"{request.path}/resume")
+
+    def requestCancel(self, request):
+        self.kazoo_client.ensure_path(f"{request.path}/cancel")
+
+    def fulfillResume(self, request):
+        self.kazoo_client.delete(f"{request.path}/resume")
+
+    def fulfillCancel(self, request):
+        self.kazoo_client.delete(f"{request.path}/cancel")
+
+    def _watchEvents(self, actions, event=None):
+        if event is None:
+            return
+
+        job_event = None
+        if "cancel" in actions:
+            job_event = JobRequestEvent.CANCELED
+        elif "resume" in actions:
+            job_event = JobRequestEvent.RESUMED
+
+        if job_event:
+            request = self._cached_requests.get(event.path)
+            self.event_callback(request, job_event)
+
+    def lock(self, request, blocking=True, timeout=None):
+        path = "/".join([self.LOCK_ROOT, request.uuid])
         have_lock = False
         lock = None
         try:
@@ -324,7 +349,7 @@ class MergerApi(ZooKeeperSimpleBase):
         except LockTimeout:
             have_lock = False
             self.log.error(
-                "Timeout trying to acquire lock: %s", merge_request.uuid
+                "Timeout trying to acquire lock: %s", request.uuid
             )
 
         # If we aren't blocking, it's possible we didn't get the lock
@@ -332,53 +357,59 @@ class MergerApi(ZooKeeperSimpleBase):
         if not have_lock:
             return False
 
-        if not self.kazoo_client.exists(merge_request.path):
+        if not self.kazoo_client.exists(request.path):
             lock.release()
             self.log.error(
-                "Merge not found for locking: %s", merge_request.uuid
+                "Request not found for locking: %s", request.uuid
             )
 
             # We may have just re-created the lock parent node just after the
             # scheduler deleted it; therefore we should (re-) delete it.
             try:
                 # Delete the lock parent node as well.
-                path = "/".join([self.LOCK_ROOT, merge_request.uuid])
+                path = "/".join([self.LOCK_ROOT, request.uuid])
                 self.kazoo_client.delete(path, recursive=True)
             except NoNodeError:
                 pass
 
             return False
 
-        merge_request.lock = lock
+        request.lock = lock
+
+        # Create the children watch to listen for cancel/resume actions on this
+        # build request.
+        if self.event_callback:
+            self.kazoo_client.ChildrenWatch(
+                request.path, self._watchEvents, send_event=True)
 
         return True
 
-    def unlock(self, merge_request):
-        if merge_request.lock is None:
+    def unlock(self, request):
+        if request.lock is None:
             self.log.warning(
-                "MergeRequest %s does not hold a lock", merge_request
+                "Request %s does not hold a lock", request
             )
         else:
-            merge_request.lock.release()
-            merge_request.lock = None
+            request.lock.release()
+            request.lock = None
 
-    def isLocked(self, merge_request):
-        path = "/".join([self.LOCK_ROOT, merge_request.uuid])
+    def isLocked(self, request):
+        path = "/".join([self.LOCK_ROOT, request.uuid])
         lock = Lock(self.kazoo_client, path)
         is_locked = len(lock.contenders()) > 0
         return is_locked
 
-    def lostMergeRequests(self):
-        # Get a list of merge requests which are running but not locked by any
-        # merger.
+    def lostRequests(self):
+        # Get a list of requests which are running but not locked by
+        # any client.
         yield from filter(
             lambda b: not self.isLocked(b),
-            self.inState(MergeRequest.RUNNING),
+            self.inState(self.request_class.RUNNING),
         )
 
     def _getAllRequestIds(self):
         # Get a list of all request ids without using the cache.
-        return self.kazoo_client.get_children(self.MERGE_REQUEST_ROOT)
+        return self.kazoo_client.get_children(self.REQUEST_ROOT)
 
     def _findLostParams(self, age):
         # Get data nodes which are older than the specified age (we
@@ -388,7 +419,7 @@ class MergerApi(ZooKeeperSimpleBase):
         now = int(time.time() * 1000)
         age = age * 1000
         data_nodes = dict()
-        for data_id in self.kazoo_client.get_children(self.MERGE_PARAMS_ROOT):
+        for data_id in self.kazoo_client.get_children(self.PARAM_ROOT):
             data_path = self._getParamsPath(data_id)
             data_zstat = self.kazoo_client.exists(data_path)
             if now - data_zstat.mtime > age:
@@ -407,15 +438,15 @@ class MergerApi(ZooKeeperSimpleBase):
         # Return the paths
         return data_nodes.values()
 
-    def _findLostMergeResults(self):
-        # Get a list of merge results which don't have a connection waiting for
+    def _findLostResults(self):
+        # Get a list of results which don't have a connection waiting for
         # them. As the results and waiters are not part of our cache, we have
         # to look them up directly from ZK.
-        waiters1 = set(self.kazoo_client.get_children(self.MERGE_WAITER_ROOT))
-        results = set(self.kazoo_client.get_children(self.MERGE_RESULT_ROOT))
+        waiters1 = set(self.kazoo_client.get_children(self.WAITER_ROOT))
+        results = set(self.kazoo_client.get_children(self.RESULT_ROOT))
         result_data = set(self.kazoo_client.get_children(
-            self.MERGE_RESULT_DATA_ROOT))
-        waiters2 = set(self.kazoo_client.get_children(self.MERGE_WAITER_ROOT))
+            self.RESULT_DATA_ROOT))
+        waiters2 = set(self.kazoo_client.get_children(self.WAITER_ROOT))
 
         waiters = waiters1.union(waiters2)
         lost_results = results - waiters
@@ -425,41 +456,40 @@ class MergerApi(ZooKeeperSimpleBase):
     def cleanup(self, age=300):
         # Delete build request params which are not associated with
         # any current build requests.  Note, this does not clean up
-        # lost build requests themselves; the merger client takes
-        # care of that.
+        # lost requests themselves; the client takes care of that.
         try:
             for path in self._findLostParams(age):
                 try:
-                    self.log.error("Removing merge request params: %s", path)
+                    self.log.error("Removing request params: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
                     self.log.execption(
-                        "Unable to delete merge request params %s", path)
+                        "Unable to delete request params %s", path)
         except Exception:
             self.log.exception(
-                "Error cleaning up merge request queue %s", self)
+                "Error cleaning up request queue %s", self)
         try:
-            lost_results, lost_data = self._findLostMergeResults()
+            lost_results, lost_data = self._findLostResults()
             for result_id in lost_results:
                 try:
-                    path = '/'.join([self.MERGE_RESULT_ROOT, result_id])
-                    self.log.error("Removing merge request result: %s", path)
+                    path = '/'.join([self.RESULT_ROOT, result_id])
+                    self.log.error("Removing request result: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
                     self.log.execption(
-                        "Unable to delete merge request params %s", result_id)
+                        "Unable to delete request params %s", result_id)
             for result_id in lost_data:
                 try:
-                    path = '/'.join([self.MERGE_RESULT_DATA_ROOT, result_id])
+                    path = '/'.join([self.RESULT_DATA_ROOT, result_id])
                     self.log.error(
-                        "Removing merge request result data: %s", path)
+                        "Removing request result data: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
                     self.log.execption(
-                        "Unable to delete merge request params %s", result_id)
+                        "Unable to delete request params %s", result_id)
         except Exception:
             self.log.exception(
-                "Error cleaning up merge result queue %s", self)
+                "Error cleaning up result queue %s", self)
 
     @staticmethod
     def _bytesToDict(data):
@@ -471,24 +501,28 @@ class MergerApi(ZooKeeperSimpleBase):
         return json_dumps(data).encode("utf-8")
 
     def _getParamsPath(self, uuid):
-        return '/'.join([self.MERGE_PARAMS_ROOT, uuid])
+        return '/'.join([self.PARAM_ROOT, uuid])
 
-    def clearMergeParams(self, merge_request):
-        """Erase the merge parameters from ZK to save space"""
-        self.kazoo_client.delete(self._getParamsPath(merge_request.uuid),
+    def clearParams(self, request):
+        """Erase the parameters from ZK to save space"""
+        self.kazoo_client.delete(self._getParamsPath(request.uuid),
                                  recursive=True)
 
-    def getMergeParams(self, merge_request):
-        """Return the parameters for a merge request, if they exist.
+    def getParams(self, request):
+        """Return the parameters for a request, if they exist.
 
-        Once a merge request is accepted by an executor, the params
+        Once a request is accepted by an executor, the params
         may be erased from ZK; this will return None in that case.
 
         """
         with sharding.BufferedShardReader(
-            self.kazoo_client, self._getParamsPath(merge_request.uuid)
+            self.kazoo_client, self._getParamsPath(request.uuid)
         ) as stream:
             data = stream.read()
             if not data:
                 return None
             return self._bytesToDict(data)
+
+    def deleteResult(self, path):
+        with suppress(NoNodeError):
+            self.kazoo_client.delete(path, recursive=True)
