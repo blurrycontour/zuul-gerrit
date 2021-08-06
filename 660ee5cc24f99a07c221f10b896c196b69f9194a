@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30096881_372848f1",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2071,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T17:54:38Z",
+      "side": 1,
+      "message": "Nit, maybe default precedence to 0 in the arg list?",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0fa5ec3_9b7f7ae4",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2076,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T17:54:38Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c5d552c_868d5561",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T17:54:38Z",
+      "side": 1,
+      "message": "Nit: We aren\u0027t really overriding those methods becuase we are not a child class of JobRequestQueue. More like proxying them to multiple queues.",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8cb3915f_93c22118",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T17:54:38Z",
+      "side": 1,
+      "message": "I guess ensure_path will recursively create the whole path and we don\u0027t have to do that ourselves? For example I think in the case of executors nothing is explicitly creating zones/ and zones/foo/ before we request zones/foo/requests here.",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b13afcee_85d1fb06",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-06T17:54:38Z",
+      "side": 1,
+      "message": "Curious why you decided to switch from /zuul/merge-results* to /zuul/merger/results. Note the extra \u0027r\u0027 at the end of merge. I don\u0027t really think it matters much one way or another, but was wondering if that was intentional for some reason.",
+      "range": {
+        "startLine": 26,
+        "startChar": 22,
+        "endLine": 26,
+        "endChar": 28
+      },
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
