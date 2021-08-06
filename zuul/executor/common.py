@@ -181,11 +181,18 @@ def construct_build_params(uuid, sched, nodeset, job, item, pipeline,
             projects.add(project)
             required_projects.add(project)
     for change in dependent_changes:
-        # We have to find the project this way because it may not
-        # be registered in the tenant (ie, a foreign project).
-        source = sched.connections.getSourceByCanonicalHostname(
-            change['project']['canonical_hostname'])
-        project = source.getProject(change['project']['name'])
+        try:
+            (_, project) = item.pipeline.tenant.getProject(
+                change['project']['canonical_name'])
+            if not project:
+                raise KeyError()
+        except Exception:
+            # We have to find the project this way because it may not
+            # be registered in the tenant (ie, a foreign project).
+            source = sched.connections.getSourceByCanonicalHostname(
+                change['project']['canonical_hostname'])
+            project = source.getProject(change['project']['name'])
+
         if project not in projects:
             params['projects'].append(make_project_dict(project))
             projects.add(project)
