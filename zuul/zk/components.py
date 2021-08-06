@@ -249,10 +249,8 @@ class ComponentRegistry(ZooKeeperBase):
         self.log.debug(
             "Registry %s got event %s for %s %s",
             self, etype, kind, hostname)
-        if etype in (None, EventType.CHANGED, EventType.CREATED):
-            # Ignore events without data
-            if not data:
-                return
+        if (etype in (None, EventType.CHANGED, EventType.CREATED) and
+            data is not None):
 
             # Perform an in-place update of the cached component (if any)
             component = self._cached_components.get(kind, {}).get(hostname)
@@ -280,7 +278,7 @@ class ComponentRegistry(ZooKeeperBase):
                 component._zstat = stat
 
             self._cached_components[kind][hostname] = component
-        elif etype == EventType.DELETED:
+        elif (etype == EventType.DELETED or data is None):
             self.log.info(
                 "Noticed %s component %s disappeared",
                 kind, hostname)
