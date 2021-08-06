@@ -16,6 +16,23 @@
       "revId": "c4129036a6802a776c4a2928bcd75611d188b2dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d3c8b7ab_62f8df42",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T18:32:42Z",
+      "side": 0,
+      "message": "Correct.",
+      "revId": "c4129036a6802a776c4a2928bcd75611d188b2dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

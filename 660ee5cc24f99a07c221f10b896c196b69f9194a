@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "385d6b62_0704c74c",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2071,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T18:32:42Z",
+      "side": 1,
+      "message": "I thought about that and waffled on it a bit, but eventually decided on this because we have to duplicate the default values to make kwargs in the subclass constructors, and just using \"None\" everywhere and then realizing the actual values in one location here seemed a little cleaner/less error prone than copying 0/UNSUBMITTED everywhere and making sure they were in sync.\n\nI don\u0027t think it\u0027s a big deal, but that was my line of thinking at least.",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a0fa5ec3_9b7f7ae4",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -53,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "1da32738_582c8597",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T18:32:42Z",
+      "side": 1,
+      "message": "Yep, that\u0027s poor phrasing.  I think I wrote that before this was fully realized.",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8cb3915f_93c22118",
         "filename": "zuul/zk/job_request_queue.py",
         "patchSetId": 6
@@ -67,6 +101,23 @@
       "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93db40cc_c36f1280",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T18:32:42Z",
+      "side": 1,
+      "message": "Correct.",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -90,6 +141,23 @@
       "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2476b87a_f5b6ce0c",
+        "filename": "zuul/zk/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-06T18:32:42Z",
+      "side": 1,
+      "message": "Two part question:\n\n1) Why change \"merge\" to \"merger\"?  Symmetry with executor.\n2) Why move \"results\" under \"merger\"?  Keep the ZK tree tidy.  Especially once we have a job queue per zone, I wanted everything for a queue under a single root.\n\nSo when you ls /zuul you\u0027ll see: [executor, merger, keystore, components, ...]\nThen under merger: [requests, results, ...]\nAnd under executor:\n  * unzoned\n    * requests\n    * results\n    * ...\n  * zones\n    * foo\n      * requests\n      * results\n      * ...",
+      "revId": "660ee5cc24f99a07c221f10b896c196b69f9194a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
