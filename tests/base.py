@@ -3165,14 +3165,11 @@ class HoldableMergerApi(MergerApi):
         self.hold_in_queue = False
         self.history = {}
 
-    def submit(self, uuid, job_type, build_set_uuid, tenant_name,
-               pipeline_name, params, event_id, precedence=0,
-               needs_result=False):
-        self.log.debug("Appending merge job to history: %s", uuid)
-        self.history[uuid] = FakeMergeRequest(uuid, job_type, params)
-        return super().submit(
-            uuid, job_type, build_set_uuid, tenant_name, pipeline_name, params,
-            event_id, precedence, needs_result)
+    def submit(self, request, params, needs_result=False):
+        self.log.debug("Appending merge job to history: %s", request.uuid)
+        self.history[request.uuid] = FakeMergeRequest(
+            request.uuid, request.job_type, params)
+        return super().submit(request, params, needs_result)
 
     @property
     def initial_state(self):
@@ -3190,15 +3187,13 @@ class TestingMergerApi(HoldableMergerApi):
         # the merge requests directly from ZooKeeper and not from a cache
         # layer.
         all_merge_requests = []
-        for merge_uuid in self.kazoo_client.get_children(
-            self.MERGE_REQUEST_ROOT
-        ):
+        for merge_uuid in self._getAllRequestIds():
             merge_request = self.get("/".join(
-                [self.MERGE_REQUEST_ROOT, merge_uuid]))
+                [self.REQUEST_ROOT, merge_uuid]))
             if merge_request and (not states or merge_request.state in states):
                 all_merge_requests.append(merge_request)
 
-        return all_merge_requests
+        return sorted(all_merge_requests)
 
     def release(self, merge_request=None):
         """
@@ -3251,11 +3246,10 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
 
 class HoldableExecutorApi(ExecutorApi):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.hold_in_queue = False
+        super().__init__(*args, **kwargs)
 
-    @property
-    def initial_state(self):
+    def _getInitialState(self):
         if self.hold_in_queue:
             return BuildRequest.HOLD
         return BuildRequest.REQUESTED
@@ -3268,16 +3262,12 @@ class TestingExecutorApi(HoldableExecutorApi):
         # As this method is used for assertions in the tests, it
         # should look up the build requests directly from ZooKeeper
         # and not from a cache layer.
-        if self.zone_filter:
-            zones = self.zone_filter
-        else:
-            zones = self._getAllZones()
 
         all_builds = []
-        for zone in zones:
-            zone_path = self._getZoneRoot(zone)
-            for build_uuid in self._getAllBuildIds([zone]):
-                build = self.get("/".join([zone_path, build_uuid]))
+        for zone in self._getAllZones():
+            queue = self.zone_queues[zone]
+            for build_uuid in queue._getAllRequestIds():
+                build = queue.get(f'{queue.REQUEST_ROOT}/{build_uuid}')
                 if build and (not states or build.state in states):
                     all_builds.append(build)
 
@@ -3293,7 +3283,7 @@ class TestingExecutorApi(HoldableExecutorApi):
             self._test_build_request_job_map = {}
         if build_request.uuid in self._test_build_request_job_map:
             return self._test_build_request_job_map[build_request.uuid]
-        d = self.getBuildParams(build_request)
+        d = self.getParams(build_request)
         if d:
             data = d.get('job', '')
         else:

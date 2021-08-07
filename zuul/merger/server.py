@@ -97,9 +97,6 @@ class BaseMergeServer(metaclass=ABCMeta):
         )
 
         self.merger_loop_wake_event = threading.Event()
-        self.merger_cleanup_election = self.zk_client.client.Election(
-            f"{MergerApi.MERGE_REQUEST_ROOT}/election"
-        )
 
         self.merger_api = MergerApi(
             self.zk_client,
@@ -172,7 +169,6 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.log.debug('Stopping merger')
         self._merger_running = False
         self.merger_loop_wake_event.set()
-        self.merger_cleanup_election.cancel()
         self.zk_client.disconnect()
 
     def join(self):
@@ -215,8 +211,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             return
 
         merge_request.state = MergeRequest.RUNNING
-        params = self.merger_api.getMergeParams(merge_request)
-        self.merger_api.clearMergeParams(merge_request)
+        params = self.merger_api.getParams(merge_request)
+        self.merger_api.clearParams(merge_request)
         # Directly update the merge request in ZooKeeper, so we don't loop over
         # and try to lock it again and again.
         self.merger_api.update(merge_request)
