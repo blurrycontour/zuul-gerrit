@@ -286,6 +286,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+        self.join()
         self.zk_client.disconnect()
 
     def runCommand(self):
