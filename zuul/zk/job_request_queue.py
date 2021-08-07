@@ -127,12 +127,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         return watch
 
     def _watchState(self, path, data, stat, event=None):
-        if not event or event.type == EventType.CHANGED:
-            # Don't process change events w/o any data. This can happen when a
-            # "slow" change watch tried to retrieve the data of a znode that
-            # was deleted in the meantime.
-            if not data:
-                return
+        if not event or (event.type == EventType.CHANGED and data is not None):
             # As we already get the data and the stat value, we can directly
             # use it without asking ZooKeeper for the data again.
             content = self._bytesToDict(data)
@@ -163,7 +158,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             ):
                 self.request_callback()
 
-        elif event.type == EventType.DELETED:
+        elif (event.type == EventType.DELETED or data is None):
             request = self._cached_requests.get(path)
             with suppress(KeyError):
                 del self._cached_requests[path]
