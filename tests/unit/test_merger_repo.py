@@ -1061,8 +1061,10 @@ class TestMerger(ZuulTestCase):
         merger_client = self.scheds.first.sched.merger
         merger_client.cleanupLostMergeRequests()
 
-        lost_merge_requests = list(merger_api.lostRequests())
-        self.assertEqual(0, len(lost_merge_requests))
+        cache = merger_api._cached_requests
+        for _ in iterate_timeout(30, "cache to be empty"):
+            if not cache:
+                break
 
 
 class TestMergerTree(BaseTestCase):
