@@ -125,36 +125,35 @@ class ChangePanel extends React.Component {
       <div className='progress zuul-change-total-result'>
         {change.jobs.map((job, idx) => {
           let result = this.jobStrResult(job)
-          if (result !== 'queued') {
-            let className = ''
-            switch (result) {
-              case 'success':
-                className = ' progress-bar-success'
-                break
-              case 'lost':
-              case 'failure':
-                className = ' progress-bar-danger'
-                break
-              case 'unstable':
-              case 'retry_limit':
-              case 'post_failure':
-              case 'node_failure':
-                className = ' progress-bar-warning'
-                break
-              case 'paused':
-              case 'skipped':
-                className = ' progress-bar-info'
-                break
-              default:
-                break
-            }
-            return <div className={'progress-bar' + className}
-              key={idx}
-              title={job.name}
-              style={{width: jobPercent + '%'}}/>
-          } else {
+          if (['queued', 'waiting'].includes(result)) {
             return ''
           }
+          let className = ''
+          switch (result) {
+            case 'success':
+              className = ' progress-bar-success'
+              break
+            case 'lost':
+            case 'failure':
+              className = ' progress-bar-danger'
+              break
+            case 'unstable':
+            case 'retry_limit':
+            case 'post_failure':
+            case 'node_failure':
+              className = ' progress-bar-warning'
+              break
+            case 'paused':
+            case 'skipped':
+              className = ' progress-bar-info'
+              break
+            default:
+              break
+          }
+          return <div className={'progress-bar' + className}
+            key={idx}
+            title={job.name}
+            style={{width: jobPercent + '%'}}/>
         })}
       </div>
     )
