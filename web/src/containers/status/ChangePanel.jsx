@@ -125,7 +125,7 @@ class ChangePanel extends React.Component {
       <div className='progress zuul-change-total-result'>
         {change.jobs.map((job, idx) => {
           let result = this.jobStrResult(job)
-          if (result !== 'queued') {
+          if (!['queued', 'waiting'].includes(result)) {
             let className = ''
             switch (result) {
               case 'success':
