@@ -70,6 +70,9 @@ string as if there were an implicit ``^`` at the start of the regular
 expression. To match at an arbitrary position, prepend ``.*`` to the
 regular expression.
 
+Zuul uses `RE2 library <https://github.com/google/re2/wiki/Syntax>`_
+which has restricted regular expression syntax compared to PCRE.
+
 .. _configuration-items:
 
 Configuration Items
