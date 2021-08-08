@@ -70,6 +70,11 @@ string as if there were an implicit ``^`` at the start of the regular
 expression. To match at an arbitrary position, prepend ``.*`` to the
 regular expression.
 
+Zuul uses Google RE2 library (via ``fb-re2`` binding) for regular
+expressions parsing. Due to security considerations RE2 supports
+`restricted syntax <https://github.com/google/re2/wiki/Syntax>`_
+(e.g. lookahead and lookbehind are not supported).
+
 .. _configuration-items:
 
 Configuration Items
