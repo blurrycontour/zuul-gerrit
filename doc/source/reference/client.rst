@@ -224,3 +224,21 @@ import-keys
 Example::
 
   zuul import-keys /var/backup/zuul-keys.json
+
+copy-keys
+^^^^^^^^^
+
+.. program-output:: zuul copy-keys --help
+
+Example::
+
+  zuul copy-keys gerrit old_project gerrit new_project
+
+delete-keys
+^^^^^^^^^^^
+
+.. program-output:: zuul delete-keys --help
+
+Example::
+
+  zuul delete-keys gerrit old_project
