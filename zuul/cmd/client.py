@@ -395,6 +395,41 @@ class Client(zuul.cmd.ZuulApp):
                                      help='key export file path')
         cmd_export_keys.set_defaults(func=self.export_keys)
 
+        cmd_copy_keys = subparsers.add_parser(
+            'copy-keys',
+            help='copy keys from one project to another',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Copy secret keys from one project to another
+
+            When projects are renamed, this command may be used to
+            copy the secret keys from the current name to the new name
+            in order to avoid service interruption.'''))
+        cmd_copy_keys.set_defaults(command='copy-keys')
+        cmd_copy_keys.add_argument('src_connection', type=str,
+                                   help='original connection name')
+        cmd_copy_keys.add_argument('src_project', type=str,
+                                   help='original project name')
+        cmd_copy_keys.add_argument('dest_connection', type=str,
+                                   help='new connection name')
+        cmd_copy_keys.add_argument('dest_project', type=str,
+                                   help='new project name')
+        cmd_copy_keys.set_defaults(func=self.copy_keys)
+
+        cmd_delete_keys = subparsers.add_parser(
+            'delete-keys',
+            help='delete project keys',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Delete the ssh and secrets keys for a project
+            '''))
+        cmd_delete_keys.set_defaults(command='delete-keys')
+        cmd_delete_keys.add_argument('connection', type=str,
+                                     help='connection name')
+        cmd_delete_keys.add_argument('project', type=str,
+                                     help='project name')
+        cmd_delete_keys.set_defaults(func=self.delete_keys)
+
         return parser
 
     def parseArguments(self, args=None):
@@ -814,6 +849,47 @@ class Client(zuul.cmd.ZuulApp):
         with open(self.args.path, 'r') as f:
             import_data = json.load(f)
         keystore.importKeys(import_data, self.args.force)
+
+    def copy_keys(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        try:
+            password = self.config["keystore"]["password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")
+        keystore = KeyStorage(zk_client, password=password)
+        args = self.args
+        # Load
+        ssh = keystore.loadProjectSSHKeys(args.src_connection,
+                                          args.src_project)
+        secrets = keystore.loadProjectsSecretsKeys(args.src_connection,
+                                                   args.src_project)
+        # Save
+        keystore.saveProjectSSHKeys(args.dest_connection,
+                                    args.dest_project, ssh)
+        keystore.saveProjectsSecretsKeys(args.dest_connection,
+                                         args.dest_project, secrets)
+        self.log.info("Copied keys from %s %s to %s %s",
+                      args.src_connection, args.src_project,
+                      args.dest_connection, args.dest_project)
+
+    def delete_keys(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        try:
+            password = self.config["keystore"]["password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")
+        keystore = KeyStorage(zk_client, password=password)
+        args = self.args
+        keystore.deleteProjectSSHKeys(args.connection, args.project)
+        keystore.deleteProjectsSecretsKeys(args.connection, args.project)
+        self.log.info("Delete keys from %s %s",
+                      args.connection, args.project)
 
 
 def main():
