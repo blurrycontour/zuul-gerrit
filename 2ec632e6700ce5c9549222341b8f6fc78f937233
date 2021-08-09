@@ -16,6 +16,23 @@
       "revId": "2ec632e6700ce5c9549222341b8f6fc78f937233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4dac1c0_eea8caa6",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-09T20:59:08Z",
+      "side": 1,
+      "message": "I think at this point the remainder of the test is covered by testv3.TestProjectKeys.testkey_generation and we can delete this.",
+      "revId": "2ec632e6700ce5c9549222341b8f6fc78f937233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
