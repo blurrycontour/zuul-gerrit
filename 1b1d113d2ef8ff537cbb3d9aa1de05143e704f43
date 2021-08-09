@@ -125,6 +125,24 @@
     },
     {
       "key": {
+        "uuid": "d4c05910_398025b2",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T07:05:08Z",
+      "side": 1,
+      "message": "Another idea: It could also work if we move this action to the second column (below the buildset message) for now. The same could be done for the equivalent action on the build that could be placed below the links in the third column). If we add more actions later on, we could still create a new column.",
+      "parentUuid": "bb4d5f49_ea6120cb",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8de490cd_a6376e82",
         "filename": "web/src/containers/build/Buildset.jsx",
         "patchSetId": 17

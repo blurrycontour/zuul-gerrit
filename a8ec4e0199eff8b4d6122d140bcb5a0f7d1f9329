@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a22679c2_719141ce",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 18
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T07:05:08Z",
+      "side": 1,
+      "message": "I think we should use a redo icon here instead (https://fontawesome.com/v5.15/icons/redo?style\u003dsolid)",
+      "revId": "a8ec4e0199eff8b4d6122d140bcb5a0f7d1f9329",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
