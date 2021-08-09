@@ -170,7 +170,7 @@ class TestWebTokenClient(BaseClientTestCase):
                         (token['exp'], now))
 
 
-class TestKeyExportImport(ZuulTestCase):
+class TestKeyOperations(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     def test_export_import(self):
@@ -211,3 +211,43 @@ class TestKeyExportImport(ZuulTestCase):
         # Make sure the new data matches the original
         new_data = self.getZKTree('/keystorage')
         self.assertEqual(new_data, old_data)
+
+    def test_copy_delete(self):
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'copy-keys',
+             'gerrit', 'org/project',
+             'gerrit', 'org/newproject',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        data = self.getZKTree('/keystorage')
+        self.assertEqual(
+            data['/keystorage/gerrit/org/org%2Fproject/secrets'],
+            data['/keystorage/gerrit/org/org%2Fnewproject/secrets'])
+        self.assertEqual(
+            data['/keystorage/gerrit/org/org%2Fproject/ssh'],
+            data['/keystorage/gerrit/org/org%2Fnewproject/ssh'])
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-keys',
+             'gerrit', 'org/project',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        data = self.getZKTree('/keystorage')
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject/secrets'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject/ssh'))

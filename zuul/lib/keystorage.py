@@ -16,6 +16,7 @@ import io
 import json
 import logging
 import time
+from contextlib import suppress
 
 import cachetools
 import kazoo
@@ -83,10 +84,9 @@ class KeyStorage(ZooKeeperBase):
 
     @cachetools.cached(cache={})
     def getProjectSSHKeys(self, connection_name, project_name):
-        key_path = self.getSSHKeysPath(connection_name, project_name)
-
+        """Return the public and private keys"""
         try:
-            key = self._getSSHKey(key_path)
+            key = self._getSSHKey(connection_name, project_name)
         except kazoo.exceptions.NoNodeError:
             self.log.info("Generating a new SSH key for %s/%s",
                           connection_name, project_name)
@@ -95,11 +95,12 @@ class KeyStorage(ZooKeeperBase):
             key_created = int(time.time())
 
             try:
-                self._storeSSHKey(key_path, key, key_version, key_created)
+                self._storeSSHKey(connection_name, project_name, key,
+                                  key_version, key_created)
             except kazoo.exceptions.NodeExistsError:
                 # Handle race condition between multiple schedulers
                 # creating the same SSH key.
-                key = self._getSSHKey(key_path)
+                key = self._getSSHKey(connection_name, project_name)
 
         with io.StringIO() as o:
             key.write_private_key(o)
@@ -108,14 +109,37 @@ class KeyStorage(ZooKeeperBase):
 
         return private_key, public_key
 
-    def _getSSHKey(self, key_path):
-        data, _ = self.kazoo_client.get(key_path)
-        keydata = json.loads(data)
+    def loadProjectSSHKeys(self, connection_name, project_name):
+        """Return the complete internal data structure"""
+        key_path = self.getSSHKeysPath(connection_name, project_name)
+        try:
+            data, _ = self.kazoo_client.get(key_path)
+            return json.loads(data)
+        except kazoo.exceptions.NoNodeError:
+            return None
+
+    def saveProjectSSHKeys(self, connection_name, project_name, keydata):
+        """Store the complete internal data structure"""
+        key_path = self.getSSHKeysPath(connection_name, project_name)
+        data = json.dumps(keydata).encode("utf-8")
+        self.kazoo_client.create(key_path, value=data, makepath=True)
+
+    def deleteProjectSSHKeys(self, connection_name, project_name):
+        """Delete the complete internal data structure"""
+        key_path = self.getSSHKeysPath(connection_name, project_name)
+        with suppress(kazoo.exceptions.NoNodeError):
+            self.kazoo_client.delete(key_path)
+
+    def _getSSHKey(self, connection_name, project_name):
+        """Load and return the public and private keys"""
+        keydata = self.loadProjectSSHKeys(connection_name, project_name)
         encrypted_key = keydata['keys'][0]["private_key"]
         with io.StringIO(encrypted_key) as o:
             return paramiko.RSAKey.from_private_key(o, self.password)
 
-    def _storeSSHKey(self, key_path, key, version, created):
+    def _storeSSHKey(self, connection_name, project_name, key,
+                     version, created):
+        """Create the internal data structure from the key and store it"""
         # key is an rsa key object
         with io.StringIO() as o:
             key.write_private_key(o, self.password)
@@ -129,8 +153,7 @@ class KeyStorage(ZooKeeperBase):
             'schema': 1,
             'keys': keys
         }
-        data = json.dumps(keydata).encode("utf-8")
-        self.kazoo_client.create(key_path, value=data, makepath=True)
+        self.saveProjectSSHKeys(connection_name, project_name, keydata)
 
     def getProjectSecretsKeysPath(self, connection_name, project_name):
         key_project_name = strings.unique_project_name(project_name)
@@ -139,11 +162,10 @@ class KeyStorage(ZooKeeperBase):
 
     @cachetools.cached(cache={})
     def getProjectSecretsKeys(self, connection_name, project_name):
-        key_path = self.getProjectSecretsKeysPath(
-            connection_name, project_name)
-
+        """Return the public and private keys"""
         try:
-            pem_private_key = self._getSecretsKeys(key_path)
+            pem_private_key = self._getSecretsKey(
+                connection_name, project_name)
         except kazoo.exceptions.NoNodeError:
             self.log.info("Generating a new secrets key for %s/%s",
                           connection_name, project_name)
@@ -154,24 +176,53 @@ class KeyStorage(ZooKeeperBase):
             key_created = int(time.time())
 
             try:
-                self._storeSecretsKeys(key_path, pem_private_key,
-                                       key_version, key_created)
+                self._storeSecretsKey(connection_name, project_name,
+                                      pem_private_key, key_version,
+                                      key_created)
             except kazoo.exceptions.NodeExistsError:
                 # Handle race condition between multiple schedulers
                 # creating the same secrets key.
-                pem_private_key = self._getSecretsKeys(key_path)
+                pem_private_key = self._getSecretsKey(
+                    connection_name, project_name)
 
         private_key, public_key = encryption.deserialize_rsa_keypair(
             pem_private_key, self.password_bytes)
 
         return private_key, public_key
 
-    def _getSecretsKeys(self, key_path):
-        data, _ = self.kazoo_client.get(key_path)
-        keydata = json.loads(data)
+    def loadProjectsSecretsKeys(self, connection_name, project_name):
+        """Return the complete internal data structure"""
+        key_path = self.getProjectSecretsKeysPath(
+            connection_name, project_name)
+        try:
+            data, _ = self.kazoo_client.get(key_path)
+            return json.loads(data)
+        except kazoo.exceptions.NoNodeError:
+            return None
+
+    def saveProjectsSecretsKeys(self, connection_name, project_name, keydata):
+        """Store the complete internal data structure"""
+        key_path = self.getProjectSecretsKeysPath(
+            connection_name, project_name)
+        data = json.dumps(keydata).encode("utf-8")
+        self.kazoo_client.create(key_path, value=data, makepath=True)
+
+    def deleteProjectsSecretsKeys(self, connection_name, project_name):
+        """Delete the complete internal data structure"""
+        key_path = self.getProjectSecretsKeysPath(
+            connection_name, project_name)
+        with suppress(kazoo.exceptions.NoNodeError):
+            self.kazoo_client.delete(key_path)
+
+    def _getSecretsKey(self, connection_name, project_name):
+        """Load and return the private key"""
+        keydata = self.loadProjectsSecretsKeys(
+            connection_name, project_name)
         return keydata['keys'][0]["private_key"].encode("utf-8")
 
-    def _storeSecretsKeys(self, key_path, key, version, created):
+    def _storeSecretsKey(self, connection_name, project_name, key,
+                         version, created):
+        """Create the internal data structure from the key and store it"""
         # key is a pem-encoded (base64) private key stored in bytes
         keys = [{
             "version": version,
@@ -182,5 +233,4 @@ class KeyStorage(ZooKeeperBase):
             'schema': 1,
             'keys': keys
         }
-        data = json.dumps(keydata).encode("utf-8")
-        self.kazoo_client.create(key_path, value=data, makepath=True)
+        self.saveProjectsSecretsKeys(connection_name, project_name, keydata)
