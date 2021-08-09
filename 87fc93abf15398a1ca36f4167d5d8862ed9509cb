@@ -34,6 +34,24 @@
       "revId": "87fc93abf15398a1ca36f4167d5d8862ed9509cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c1ef053_d45024fd",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T05:58:28Z",
+      "side": 1,
+      "message": "I like the icon, but I think we should place it next to the pipeline name rather than between icon and pipeline name. Having an info icon next to another icon looks a little awkward in my opinion.\n\nAlthough the icon is used to show the type of pipeline, I still see the icon more like an extension to the pipeline name, so I think it\u0027s fine to add the icon to the pipeline name rather than the type icon. I also think that most users are used to the pipeline names already (which in most cases already reflect different types of pipelines), we just had no icon to visualize this pipeline type so far.",
+      "parentUuid": "64ca982f_d724fd1b",
+      "revId": "87fc93abf15398a1ca36f4167d5d8862ed9509cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
