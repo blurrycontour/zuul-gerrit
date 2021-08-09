@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9bc7089_fc2f9303",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-09T22:07:54Z",
+      "side": 1,
+      "message": "This condition is no longer necessary due to the check above.",
+      "range": {
+        "startLine": 134,
+        "startChar": 12,
+        "endLine": 135,
+        "endChar": 22
+      },
+      "revId": "e7455647d97a237889da41727f89392c297eb1ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
