@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb42c30c_7256fb8a",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-09T21:01:03Z",
+      "side": 1,
+      "message": "Nit spelling should be project not projcet.",
+      "range": {
+        "startLine": 403,
+        "startChar": 42,
+        "endLine": 403,
+        "endChar": 44
+      },
+      "revId": "5b7ec3a19291e7b52971ecb67442a35a770463cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b7cf0ca_cfe3c485",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-09T21:01:03Z",
+      "side": 1,
+      "message": "Elsewhere we seem to rely on this exception being raised all the way up to callers. For example in getProjectSSHKeys above. Below in _getSSHKey it indexes keydata as returned from here assuming that this is a valid dict.",
+      "revId": "5b7ec3a19291e7b52971ecb67442a35a770463cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3d78ea5_ea1c0966",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-09T21:01:03Z",
+      "side": 1,
+      "message": "See above for symmetry considerations.",
+      "revId": "5b7ec3a19291e7b52971ecb67442a35a770463cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
