@@ -473,6 +473,24 @@
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "54cf0d78_81f99d7b",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T20:41:45Z",
+      "side": 1,
+      "message": "So what happens is that without adding these, the dev deployment seems to be stuck in a loop. Nothing appears in the console. If someone has an idea how to figure out what is going on exactly, I\u0027ll gladly take the suggestion.",
+      "parentUuid": "fa7bff6b_892e3473",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
