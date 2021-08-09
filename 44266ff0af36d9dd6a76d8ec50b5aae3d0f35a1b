@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9ba54ebb_3a835fb5",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T17:15:24Z",
+      "side": 1,
+      "message": "I turned it into a kebab in the next patchset, let me know what you think. However I put it outside of the change panel because I wasn\u0027t sure I could get a visually pleasing effect.",
+      "parentUuid": "d0408444_60e77d2e",
+      "revId": "44266ff0af36d9dd6a76d8ec50b5aae3d0f35a1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2e0b6683_b2def98a",
         "filename": "web/src/containers/status/ChangePanel.jsx",
         "patchSetId": 21
@@ -33,6 +51,24 @@
       "revId": "44266ff0af36d9dd6a76d8ec50b5aae3d0f35a1b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "828456d7_c232ba35",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T17:15:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e0b6683_b2def98a",
+      "revId": "44266ff0af36d9dd6a76d8ec50b5aae3d0f35a1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }

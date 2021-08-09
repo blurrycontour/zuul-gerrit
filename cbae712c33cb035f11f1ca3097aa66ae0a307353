@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b1844a7b_16df842b",
+        "filename": "web/src/containers/status/Change.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T17:15:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92971ad5_413cfcdd",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ddd3b082_ddf1471b",
         "filename": "web/src/containers/status/ChangePanel.jsx",
         "patchSetId": 19
@@ -33,6 +51,24 @@
       "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "833f4060_aa605ef2",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T17:15:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ddd3b082_ddf1471b",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "123e4374_d8d6aed6",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T17:15:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a7d4db6_9f1e37e8",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "224d6b48_454aef72",
         "filename": "web/src/containers/status/ChangePanel.jsx",
         "patchSetId": 19
@@ -64,6 +118,24 @@
       "writtenOn": "2021-07-30T13:20:46Z",
       "side": 1,
       "message": "I feel that the dequeue icon is mingled together with the content a little too much.\n\nMaybe it helps to put the button in the top right corner of the change panel in a separate row (something like a \"button bar\" above the content) to keep them separated from the content. This might also work well when more buttons are coming (like the promote button from one of the follow up changes).\n\nI hope one can understand what I mean. If not I could also provide an example for this.",
+      "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adf62e42_4072ee70",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 19
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T17:15:24Z",
+      "side": 1,
+      "message": "I\u0027ve created a togglable \"actions\" menu on top of the change panel, would that fit the bill?",
+      "parentUuid": "224d6b48_454aef72",
       "revId": "cbae712c33cb035f11f1ca3097aa66ae0a307353",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
