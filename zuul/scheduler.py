@@ -705,6 +705,13 @@ class Scheduler(threading.Thread):
                     else:
                         self.local_layout_state[tenant_name] = layout_state
                     self.connections.reconfigureDrivers(tenant)
+            # TODO(corvus): This isn't quite accurate; we don't really
+            # know when the last reconfiguration took place.  But we
+            # need to set some value here in order for the cleanup
+            # start thread to know that it can proceed.  We should
+            # store the last reconfiguration times in ZK and use them
+            # here.
+            self.last_reconfigured = int(time.time())
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Config priming complete (duration: %s seconds)",
