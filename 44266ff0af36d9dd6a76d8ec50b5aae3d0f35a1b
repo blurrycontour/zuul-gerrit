@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0408444_60e77d2e",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T12:34:51Z",
+      "side": 1,
+      "message": "I like the design of the new buttons (colord icon + text), but I think having such an expandable section for each change on the status page is too noisy. My original idea would only work without showing the text, but seeing this change now, that one might be also too much.\n\nAnother idea: What about using a menu icon (the three dots https://fontawesome.com/v5.15/icons/ellipsis-v?style\u003dsolid) and open a small dropdown showing available actions? This way we could keep the style of the actions, but just list them vertically rather than horizontally.\n\nThis menu icon could be placed in the top right corner of the current change panel (next to the \"remaining time\") so we wouldn\u0027t need an additional row in each panel.\n\nWhat do you think about that?\n\nFrom a usability point of view, we would need two clicks to reach an action, but this is the same for the expandable view (at least in the common case when the view is not expanded yet).",
+      "revId": "44266ff0af36d9dd6a76d8ec50b5aae3d0f35a1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e0b6683_b2def98a",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T12:34:51Z",
+      "side": 1,
+      "message": "Could we include the \"Dequeue\" into the button and make both clickable?",
+      "revId": "44266ff0af36d9dd6a76d8ec50b5aae3d0f35a1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
