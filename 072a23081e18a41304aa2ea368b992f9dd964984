@@ -265,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "6387a98e_6e884bd3",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-09T11:24:11Z",
+      "side": 1,
+      "message": "\u003e Then it might be a good idea to start with only the \"copy zuul-client command to clipboard\" (without showing the token). This would avoid the warnings in the console and we can simply add more functionality (like downloading/copying) a whole client.conf file.\n\u003e \n\nThe client configuration is between pre tags now. It doesn\u0027t seem to raise warnings in the console anymore.\n\n\u003e Regarding the life time of the tokens: Is that something we want to address later on? This feels a little like the \"copy login command\" functionality from OpenShift (which I use quite often), but there the token is valid for ~1 day. Providing such a functionality for short-lived tokens (~10 mins if I\u0027m not mistaken), would result in a lot of copy-and-paste which feels a little inconvenient.\n\nThe lifetime of tokens is set at the identity provider level. If you\u0027re using the test compose, keycloak sets tokens to be valid 15 minutes by default only. It is up to the admin of the identity provider to decide how long-lived the tokens will be, and to provide a way to hand out more permanent tokens if necessary.\n(this can be also handled by a zuul operator with `zuul create-auth-token` if a local authenticator is configured)",
+      "parentUuid": "d486bcad_56204f19",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ea26874f_badd2d6d",
         "filename": "web/src/reducers/auth.js",
         "patchSetId": 26
