@@ -143,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "0498cb39_98ca1ee5",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T07:09:31Z",
+      "side": 1,
+      "message": "Hopefully the final update: We should place the icon in front of the action (like for the other links/actions we have so far).",
+      "parentUuid": "d4c05910_398025b2",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8de490cd_a6376e82",
         "filename": "web/src/containers/build/Buildset.jsx",
         "patchSetId": 17
