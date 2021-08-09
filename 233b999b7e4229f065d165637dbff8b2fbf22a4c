@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fee21f2a_3767bea0",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 29
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-09T13:08:37Z",
+      "side": 1,
+      "message": "should this be set back to false when the user logged in?",
+      "range": {
+        "startLine": 37,
+        "startChar": 20,
+        "endLine": 37,
+        "endChar": 24
+      },
+      "revId": "233b999b7e4229f065d165637dbff8b2fbf22a4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d06cebb2_42c22939",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 29
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-09T13:08:37Z",
+      "side": 1,
+      "message": "it seems like USER_IN_LOCALSTORAGE is equivalent to USER_LOGGED_IN, perhaps we could drop one of the two.",
+      "range": {
+        "startLine": 44,
+        "startChar": 9,
+        "endLine": 44,
+        "endChar": 29
+      },
+      "revId": "233b999b7e4229f065d165637dbff8b2fbf22a4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "78f42c2e_2d873be1",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 29
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-09T13:08:37Z",
+      "side": 1,
+      "message": "In the other reducer we use the `_FAIL` prefix for that action which is then interpreted by the error reducer to display a notification. Is there a reason not doing that here?",
+      "range": {
+        "startLine": 63,
+        "startChar": 9,
+        "endLine": 63,
+        "endChar": 25
+      },
+      "revId": "233b999b7e4229f065d165637dbff8b2fbf22a4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}

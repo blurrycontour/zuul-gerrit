@@ -455,6 +455,24 @@
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa7bff6b_892e3473",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-09T13:08:37Z",
+      "side": 1,
+      "message": "That seems suspicious. Is it conflicting with the other state added to the store?\n\nPerhaps this need a comment to explain the motivation of ignoring the redux state invariant.",
+      "parentUuid": "ff05f8b8_59b3bb22",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
