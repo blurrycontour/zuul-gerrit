@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c93b6fcc_7210ab38",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-09T17:26:17Z",
+      "side": 1,
+      "message": "nit: perhaps using `and` would make that condition easier to read.\n\nAlso shouldn\u0027t the `_capabilities` attribute be named `capabilities`?",
+      "revId": "c4d0ec24d218a6167954e6db2c62fd0b57024536",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
