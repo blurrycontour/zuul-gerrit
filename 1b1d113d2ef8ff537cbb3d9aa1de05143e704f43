@@ -193,6 +193,24 @@
       "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "723c7116_438c63f2",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-09T11:49:07Z",
+      "side": 1,
+      "message": "I like the toast. Does it also close by itself? So far I always had to close the toast manually. I think it would be sufficient if it\u0027s shown for ~5 seconds and then closes automatically.",
+      "parentUuid": "449fef5c_d0986a2b",
+      "revId": "1b1d113d2ef8ff537cbb3d9aa1de05143e704f43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
