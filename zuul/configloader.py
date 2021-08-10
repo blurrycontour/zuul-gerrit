@@ -1644,17 +1644,6 @@ class TenantParser(object):
             branches = ['master'] + branches
         tpc.branches = branches
 
-    def _loadProjectKeys(self, connection_name, project):
-        project.private_secrets_key, project.public_secrets_key = (
-            self.keystorage.getProjectSecretsKeys(
-                connection_name, project.name
-            )
-        )
-
-        project.private_ssh_key, project.public_ssh_key = (
-            self.keystorage.getProjectSSHKeys(connection_name, project.name)
-        )
-
     @staticmethod
     def _getProject(source, conf, current_include):
         extra_config_files = ()
@@ -1748,7 +1737,6 @@ class TenantParser(object):
                 # tpcs = TenantProjectConfigs
                 tpcs = self._getProjects(source, conf_repo, current_include)
                 for tpc in tpcs:
-                    self._loadProjectKeys(source_name, tpc.project)
                     config_projects.append(tpc)
 
             current_include = frozenset(default_include - set(['pipeline']))
@@ -1756,7 +1744,6 @@ class TenantParser(object):
                 tpcs = self._getProjects(source, conf_repo,
                                          current_include)
                 for tpc in tpcs:
-                    self._loadProjectKeys(source_name, tpc.project)
                     untrusted_projects.append(tpc)
 
         return config_projects, untrusted_projects
