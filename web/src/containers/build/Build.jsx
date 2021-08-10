@@ -16,7 +16,9 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
+import {
+  Button, Flex, FlexItem, List, ListItem, Title
+} from '@patternfly/react-core'
 
 import {
   BookIcon,
@@ -58,19 +60,18 @@ function Build({ build, tenant, timezone, user }) {
 
   function renderAutoholdButton() {
     return (
-      <div style={{
-        cursor: 'pointer',
-        color: 'var(--pf-global--primary-color--100)'
-      }}
+      (user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
+      <Button
+        variant="link"
+        icon={<LockIcon />}
         title="Hold nodes on next build failure"
         onClick={(event) => {
           event.preventDefault()
           setShowAutoholdModal(true)
         }}
       >
-        AUTOHOLD &nbsp;
-        <LockIcon />
-      </div>
+        Autohold
+      </Button>
     )
   }
 
@@ -93,6 +94,7 @@ function Build({ build, tenant, timezone, user }) {
           {build.job_name} {!build.voting && ' (non-voting)'}
         </BuildResultWithIcon>
         <BuildResultBadge result={build.result} /> &nbsp;
+        {renderAutoholdButton()}
       </Title>
       {/* We handle the spacing for the body and the flex items by ourselves
           so they go hand in hand. By default, the flex items' spacing only
@@ -262,10 +264,6 @@ function Build({ build, tenant, timezone, user }) {
             </List>
           </FlexItem>
         </Flex>
-        {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
-          <Flex>
-            <FlexItem>{renderAutoholdButton()}</FlexItem>
-          </Flex>}
       </Flex>
       {renderAutoholdModal(
         tenant,
