@@ -283,6 +283,24 @@
     },
     {
       "key": {
+        "uuid": "bdc741ba_27e3c103",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-10T06:12:59Z",
+      "side": 1,
+      "message": "Ok, that\u0027s fine with me. Just one thing: Could we add a `cursor: pointer` style to the PasteIcon? Otherwise it\u0027s not clear that you can click it. Or we wrap it into a button that doesn\u0027t provide any additional styling.",
+      "parentUuid": "6387a98e_6e884bd3",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ea26874f_badd2d6d",
         "filename": "web/src/reducers/auth.js",
         "patchSetId": 26
