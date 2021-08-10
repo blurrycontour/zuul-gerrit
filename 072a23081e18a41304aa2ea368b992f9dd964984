@@ -301,6 +301,24 @@
     },
     {
       "key": {
+        "uuid": "f6e1ea68_7cfd130a",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-10T08:52:29Z",
+      "side": 1,
+      "message": "I just found out there\u0027s a clipboard copy component from react, I\u0027ll use this in the next PS.",
+      "parentUuid": "bdc741ba_27e3c103",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ea26874f_badd2d6d",
         "filename": "web/src/reducers/auth.js",
         "patchSetId": 26
