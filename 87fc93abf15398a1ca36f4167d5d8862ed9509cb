@@ -52,6 +52,24 @@
       "revId": "87fc93abf15398a1ca36f4167d5d8862ed9509cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6de0c83b_d5238648",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-10T12:53:07Z",
+      "side": 1,
+      "message": "Fair enough! The next PS will fix this.",
+      "parentUuid": "6c1ef053_d45024fd",
+      "revId": "87fc93abf15398a1ca36f4167d5d8862ed9509cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
