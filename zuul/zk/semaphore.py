@@ -71,7 +71,10 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                 all_acquired = False
                 break
         if not all_acquired:
-            self.release(item, job)
+            # Since we know we have less than all the required
+            # semaphores, set quiet=True so we don't log an inability
+            # to release them.
+            self.release(item, job, quiet=True)
             return False
         return True
 
@@ -130,15 +133,16 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         except NoNodeError:
             return []
 
-    def _release(self, log, semaphore_path, semaphore_handle):
+    def _release(self, log, semaphore_path, semaphore_handle, quiet):
         while True:
             try:
                 semaphore_holders, zstat = self.getHolders(semaphore_path)
                 semaphore_holders.remove(semaphore_handle)
             except (ValueError, NoNodeError):
-                log.error("Semaphore %s can not be released for %s "
-                          "because the semaphore is not held", semaphore_path,
-                          semaphore_handle)
+                if not quiet:
+                    log.error("Semaphore %s can not be released for %s "
+                              "because the semaphore is not held",
+                              semaphore_path, semaphore_handle)
                 break
 
             try:
@@ -156,21 +160,21 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             self._emitStats(semaphore_path, len(semaphore_holders))
             break
 
-    def release(self, item, job):
+    def release(self, item, job, quiet=False):
         if not job.semaphores:
             return
 
         log = get_annotated_logger(self.log, item.event)
 
         for semaphore in job.semaphores:
-            self._release_one(log, item, job, semaphore)
+            self._release_one(log, item, job, semaphore, quiet)
 
-    def _release_one(self, log, item, job, semaphore):
+    def _release_one(self, log, item, job, semaphore, quiet):
         semaphore_key = quote_plus(semaphore.name)
         semaphore_path = f"{self.tenant_root}/{semaphore_key}"
         semaphore_handle = f"{item.uuid}-{job.name}"
 
-        self._release(log, semaphore_path, semaphore_handle)
+        self._release(log, semaphore_path, semaphore_handle, quiet)
 
     def semaphoreHolders(self, semaphore_name):
         semaphore_key = quote_plus(semaphore_name)
@@ -222,4 +226,4 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                 semaphore_path = f"{self.tenant_root}/{semaphore_key}"
                 self.log.error("Releasing leaked semaphore %s held by %s",
                                semaphore_path, holder)
-                self._release(self.log, semaphore_path, holder)
+                self._release(self.log, semaphore_path, holder, quiet=False)
