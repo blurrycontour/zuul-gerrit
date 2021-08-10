@@ -21,7 +21,6 @@ import git
 import testtools
 
 from zuul.merger.merger import MergerTree, Repo
-from zuul.zk.merger import MergerApi
 import zuul.model
 from zuul.model import MergeRequest
 from tests.base import (
@@ -1020,9 +1019,11 @@ class TestMerger(ZuulTestCase):
         self.executor_server.merger_loop_wake_event.set()
         self.executor_server.merger_thread.join()
 
+        merger_client = self.scheds.first.sched.merger
+        merger_api = merger_client.merger_api
+
         # Create a fake lost merge request.  This is based on
         # test_lost_merge_requests in test_zk.
-        merger_api = MergerApi(self.zk_client)
 
         payload = {'merge': 'test'}
         merger_api.submit(MergeRequest(
@@ -1058,11 +1059,13 @@ class TestMerger(ZuulTestCase):
         self.assertEqual(b.path, lost_merge_requests[0].path)
 
         # Exercise the cleanup code
-        merger_client = self.scheds.first.sched.merger
+        self.log.debug("Removing lost merge requests")
         merger_client.cleanupLostMergeRequests()
 
-        lost_merge_requests = list(merger_api.lostRequests())
-        self.assertEqual(0, len(lost_merge_requests))
+        cache = merger_api._cached_requests
+        for _ in iterate_timeout(30, "cache to be empty"):
+            if not cache:
+                break
 
 
 class TestMergerTree(BaseTestCase):
