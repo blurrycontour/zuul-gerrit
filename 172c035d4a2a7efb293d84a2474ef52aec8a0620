@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "cf46780c_2f5afa45",
+        "filename": "web/src/pages/Autoholds.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-08-10T06:47:18Z",
+      "side": 1,
+      "message": "I think in this case, we should convert the renderAutoholdModal function into a component and render this component instead where it\u0027s needed. We could then provide the default values directly as props and can handle the state inside.",
+      "parentUuid": "8fbf43d6_c61137a7",
+      "revId": "172c035d4a2a7efb293d84a2474ef52aec8a0620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b058b39d_b6a90317",
         "filename": "web/src/pages/Autoholds.jsx",
         "patchSetId": 2
