@@ -527,6 +527,24 @@
       "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b3a406f9_1433bcd6",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 26
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-10T11:41:09Z",
+      "side": 1,
+      "message": "Is the prod deployment also getting stuck? Such symptom can happen when the state is mutated in place instead of using a new record (e.g. with the spread operator). To figure what is going on, you can add a `console.log(action, state)` in the reducer.",
+      "parentUuid": "54cf0d78_81f99d7b",
+      "revId": "072a23081e18a41304aa2ea368b992f9dd964984",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
