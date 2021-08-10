@@ -52,19 +52,18 @@ function Buildset({ buildset, tenant, user }) {
 
   function renderEnqueueButton() {
     return (
-      <div style={{
-        cursor: 'pointer',
-        color: 'var(--pf-global--primary-color--100)'
-      }}
+      (user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
+      <Button
+        variant="link"
+        icon={<RedoAltIcon />}
         title="Re-enqueue this change"
         onClick={(event) => {
           event.preventDefault()
           setShowEnqueueModal(true)
         }}
       >
-        <RedoAltIcon /> &nbsp;
-        RE-ENQUEUE &nbsp;
-      </div>
+        Re-enqueue
+      </Button>
     )
   }
 
@@ -129,6 +128,7 @@ function Buildset({ buildset, tenant, user }) {
           Buildset result
         </BuildResultWithIcon>
         <BuildResultBadge result={buildset.result} /> &nbsp;
+        {renderEnqueueButton()}
       </Title>
       {/* We handle the spacing for the body and the flex items by ourselves
             so they go hand in hand. By default, the flex items' spacing only
@@ -213,12 +213,7 @@ function Buildset({ buildset, tenant, user }) {
             </List>
           </FlexItem>
         </Flex>
-
       </Flex>
-      {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
-        <PageSection variant={PageSectionVariants.light}>
-          {renderEnqueueButton()}
-        </PageSection>}
       {renderEnqueueModal()}
     </>
   )
