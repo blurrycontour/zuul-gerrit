@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ed8b428_f070708c",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-11T16:50:34Z",
+      "side": 1,
+      "message": "I\u0027m not really a fan of monkeypatching for this.  Let\u0027s just do something more straightforward, even if it\u0027s a bit more verbose.  It will be easier to read and maintain.",
+      "revId": "12489af1a34a105fc2f128a830bd254fa9c033a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
