@@ -109,6 +109,9 @@ class EventWatcher(ZooKeeperSimpleBase):
 
     def __init__(self, client, callback):
         super().__init__(client)
+        import traceback
+        traceback.print_stack()
+        print('stack', self)
         self.callback = callback
         self.watched_tenants = set()
         self.watched_pipelines = set()
@@ -121,6 +124,7 @@ class EventWatcher(ZooKeeperSimpleBase):
         return watch
 
     def _tenantWatch(self, tenants):
+        print('watch', self)
         for tenant_name in tenants:
             if tenant_name in self.watched_tenants:
                 continue
