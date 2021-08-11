@@ -1632,6 +1632,7 @@ class Scheduler(threading.Thread):
                       e.change, project.source)
             return
 
+        tpc = tenant.project_configs.get(project.canonical_name)
         reconfigure_tenant = False
         if ((event.branch_updated and
              hasattr(change, 'files') and
@@ -1661,6 +1662,14 @@ class Scheduler(threading.Thread):
         if (reconfigure_tenant and not
             event.branch_protected and
             tenant.getExcludeUnprotectedBranches(project)):
+
+            reconfigure_tenant = False
+
+        # If we are listing included branches and this branch
+        # is not included, skip reconfig.
+        if (reconfigure_tenant and
+            tpc.include_branches is not None and
+            event.branch not in tpc.include_branches):
 
             reconfigure_tenant = False
 

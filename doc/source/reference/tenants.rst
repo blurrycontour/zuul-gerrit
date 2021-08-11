@@ -203,6 +203,13 @@ configuration. Some examples of tenant definitions are:
             exclude-unprotected-branches. This currently only affects
             GitHub and GitLab projects.
 
+         .. attr:: include-branches
+
+            A list of branches which should be processed.  If omitted,
+            all branches are included.  Operates after
+            *exclude-unprotected-branches* and so may be used to
+            further reduce the set of branches (but not increase it).
+
          .. attr:: extra-config-paths
 
             Normally Zuul loads in-repo configuration from the first
