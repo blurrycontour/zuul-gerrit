@@ -24,6 +24,8 @@ import jwt
 import testtools
 from kazoo.exceptions import NoNodeError
 
+from zuul.zk import ZooKeeperClient
+
 from tests.base import BaseTestCase, ZuulTestCase
 from tests.base import FIXTURE_DIR
 
@@ -251,3 +253,50 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org/org%2Fproject/secrets'))
         self.assertIsNone(
             data.get('/keystorage/gerrit/org/org%2Fproject/ssh'))
+
+
+class TestZKOperations(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def shutdown(self):
+        pass
+
+    def assertFinalState(self):
+        pass
+
+    def test_delete_state(self):
+        # Shut everything down (as much as possible) to reduce
+        # logspam and errors.
+        ZuulTestCase.shutdown(self)
+
+        # Re-start the client connection because we need one for the
+        # test.
+        self.zk_client = ZooKeeperClient.fromConfig(self.config)
+        self.zk_client.connect()
+
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        # Save a copy of the keys in ZK
+        old_data = self.getZKTree('/keystorage')
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-state',
+             ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate(b'yes\n')
+        self.log.debug(out.decode('utf8'))
+
+        # Make sure the keys are still around
+        new_data = self.getZKTree('/keystorage')
+        self.assertEqual(new_data, old_data)
+
+        # Make sure we really deleted everything
+        with testtools.ExpectedException(NoNodeError):
+            self.getZKTree('/zuul')
+
+        self.zk_client.disconnect()
