@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Added a new *include-branches* tenant project configuration
+    option.  Similar to *exclude-unprotected-branches*, this may be
+    used to reduce the set of branches from which Zuul will load
+    configuration.

@@ -1488,6 +1488,7 @@ class TenantParser(object):
         'exclude-unprotected-branches': bool,
         'extra-config-paths': to_list(str),
         'load-branch': str,
+        'include-branches': to_list(str),
         'allow-circular-dependencies': bool,
     }}
 
@@ -1639,6 +1640,8 @@ class TenantParser(object):
     def _getProjectBranches(self, tenant, tpc):
         branches = sorted(tpc.project.source.getProjectBranches(
             tpc.project, tenant))
+        if tpc.include_branches is not None:
+            branches = [b for b in branches if b in tpc.include_branches]
         if 'master' in branches:
             branches.remove('master')
             branches = ['master'] + branches
@@ -1666,6 +1669,7 @@ class TenantParser(object):
             project_include = current_include
             shadow_projects = []
             project_exclude_unprotected_branches = None
+            project_include_branches = None
             project_load_branch = None
         else:
             project_name = list(conf.keys())[0]
@@ -1684,6 +1688,8 @@ class TenantParser(object):
                 project_include = frozenset(project_include - project_exclude)
             project_exclude_unprotected_branches = conf[project_name].get(
                 'exclude-unprotected-branches', None)
+            project_include_branches = conf[project_name].get(
+                'include-branches', None)
             if conf[project_name].get('extra-config-paths') is not None:
                 extra_config_paths = as_list(
                     conf[project_name]['extra-config-paths'])
@@ -1699,6 +1705,7 @@ class TenantParser(object):
         tenant_project_config.shadow_projects = shadow_projects
         tenant_project_config.exclude_unprotected_branches = \
             project_exclude_unprotected_branches
+        tenant_project_config.include_branches = project_include_branches
         tenant_project_config.extra_config_files = extra_config_files
         tenant_project_config.extra_config_dirs = extra_config_dirs
         tenant_project_config.load_branch = project_load_branch
