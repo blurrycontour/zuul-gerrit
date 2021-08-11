@@ -1552,7 +1552,13 @@ class Scheduler(threading.Thread):
             loader.loadAdminRules(self.abide, self.unparsed_abide)
 
     def process_pipelines(self, tenant):
-        for pipeline in tenant.layout.pipelines.values():
+        # Order pipelines by precedence (HIGH to LOW) to help ensure highest
+        # get access to resources first (eg: semaphores)
+        pipelines = sorted(
+            tenant.layout.pipelines.values(),
+            key=lambda p: p.precedence,
+            reverse=True)
+        for pipeline in pipelines:
             if self._stopped:
                 return
             try:
