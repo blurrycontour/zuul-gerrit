@@ -6312,6 +6312,8 @@ class TenantProjectConfig(object):
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
+        self.include_branches = None
+        self.exclude_branches = None
         self.parsed_branch_config = {}  # branch -> ParsedConfig
         # The list of paths to look for extra zuul config files
         self.extra_config_files = ()
@@ -6319,6 +6321,28 @@ class TenantProjectConfig(object):
         self.extra_config_dirs = ()
         # Load config from a different branch if this is a config project
         self.load_branch = None
+
+    def includesBranch(self, branch):
+        if self.include_branches is not None:
+            included = False
+            for r in self.include_branches:
+                if r.fullmatch(branch):
+                    included = True
+                    break
+        else:
+            included = True
+        if not included:
+            return False
+
+        excluded = False
+        if self.exclude_branches is not None:
+            for r in self.exclude_branches:
+                if r.fullmatch(branch):
+                    excluded = True
+                    break
+        if excluded:
+            return False
+        return True
 
 
 class ProjectPipelineConfig(ConfigObject):
@@ -7411,6 +7435,7 @@ class Tenant(object):
         self.max_nodes_per_job = 5
         self.max_job_timeout = 10800
         self.exclude_unprotected_branches = False
+        self.include_branches = None
         self.default_base_job = None
         self.layout = None
         # The unparsed configuration from the main zuul config for
