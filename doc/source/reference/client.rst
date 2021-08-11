@@ -242,3 +242,12 @@ delete-keys
 Example::
 
   zuul delete-keys gerrit old_project
+
+delete-state
+^^^^^^^^^^^^
+
+.. program-output:: zuul delete-state --help
+
+Example::
+
+  zuul delete-state

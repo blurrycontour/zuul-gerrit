@@ -431,6 +431,30 @@ class Client(zuul.cmd.ZuulApp):
                                      help='project name')
         cmd_delete_keys.set_defaults(func=self.delete_keys)
 
+        # ZK Maintenance
+        cmd_delete_state = subparsers.add_parser(
+            'delete-state',
+            help='delete ephemeral ZooKeeper state',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Delete all ephemeral state stored in ZooKeeper
+
+            Zuul stores a considerable amount of ephemeral state
+            information in ZooKeeper.  Generally it should be able to
+            detect and correct any errors, but if the state becomes
+            corrupted and it is unable to recover, this command may be
+            used to delete all ephemeral data from ZooKeeper and start
+            anew.
+
+            Do not run this command while any Zuul component is
+            running (perform a complete shutdown first).
+
+            This command will only remove ephemeral Zuul data from
+            ZooKeeper; it will not remove private keys or Nodepool
+            data.'''))
+        cmd_delete_state.set_defaults(command='delete-state')
+        cmd_delete_state.set_defaults(func=self.delete_state)
+
         return parser
 
     def parseArguments(self, args=None):
@@ -892,6 +916,16 @@ class Client(zuul.cmd.ZuulApp):
         keystore.deleteProjectsSecretsKeys(args.connection, args.project)
         self.log.info("Delete keys from %s %s",
                       args.connection, args.project)
+
+    def delete_state(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        confirm = input("Are you sure you want to delete "
+                        "all ephemeral data from ZooKeeper? (yes/no) ")
+        if confirm.strip().lower() == 'yes':
+            zk_client.client.delete('/zuul', recursive=True)
 
 
 def main():
