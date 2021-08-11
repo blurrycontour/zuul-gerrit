@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33b77229_bf441671",
+        "filename": "releasenotes/notes/tenant-information-in-node-request-1ce98b86f7388cd0.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-11T17:09:56Z",
+      "side": 1,
+      "message": "Sorry I wasn\u0027t clear earlier.  I also think you should omit this first sentence (\"Add the name of the tenant\").  That\u0027s not actually a feature users can take advantage of.  It\u0027s more of a requirement for an upcoming nodepool feature.  The rest is fine.",
+      "revId": "92da26194bb67545ec8705152346164df141ec5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
