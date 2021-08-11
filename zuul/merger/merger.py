@@ -778,7 +778,7 @@ class Merger(object):
             self.log = logging.getLogger("zuul.Merger")
         else:
             self.log = logger
-        self.repos = {}  # type: ignore
+        self.repos = {}
         self.working_root = working_root
         os.makedirs(working_root, exist_ok=True)
         self.connections = connections
