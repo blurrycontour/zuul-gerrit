@@ -7610,6 +7610,46 @@ class TestSemaphore(ZuulTestCase):
             'zuul.tenant.tenant-one.semaphore.test-semaphore.holders',
             value='0', kind='g')
 
+    def test_semaphore_precedence(self):
+        "Test semaphores are order based on pipeline precedence"
+        self.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project5', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project5', 'master', 'B')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
+        self.waitUntilSettled()
+
+        # Run one build at a time to ensure non-race order:
+        self.orderedRelease()
+        self.executor_server.hold_jobs_in_build = False
+        self.waitUntilSettled()
+
+        self.log.debug(self.history)
+        # Ensure semaphore-one-test1 from gate pipeline is before check.
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS',
+                 changes='2,1', pipeline='gate'),
+            dict(name='semaphore-one-test1', result='SUCCESS',
+                 changes='2,1', pipeline='gate'),
+            dict(name='project-test1', result='SUCCESS',
+                 changes='1,1', pipeline='check'),
+            dict(name='project-test1', result='SUCCESS',
+                 changes='2,1', pipeline='check'),
+            dict(name='semaphore-one-test1', result='SUCCESS',
+                 changes='1,1', pipeline='check'),
+            dict(name='semaphore-one-test1', result='SUCCESS',
+                 changes='2,1', pipeline='check'),
+        ], ordered=True)
+
     def test_semaphore_two(self):
         "Test semaphores with max>1"
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
