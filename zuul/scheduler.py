@@ -2179,6 +2179,7 @@ class Scheduler(threading.Thread):
                       e.change, project.source)
             return
 
+        tpc = tenant.project_configs.get(project.canonical_name)
         reconfigure_tenant = False
         if (event.branch_updated and
             hasattr(change, 'files') and
@@ -2218,6 +2219,12 @@ class Scheduler(threading.Thread):
         # to trigger a reconfiguration.
         tpc = tenant.project_configs.get(project.canonical_name)
         if tpc and not tpc.load_classes:
+            reconfigure_tenant = False
+
+        # If we are listing included branches and this branch
+        # is not included, skip reconfig.
+        if (reconfigure_tenant and
+            not tpc.includesBranch(event.branch)):
             reconfigure_tenant = False
 
         # But if the event is that branch protection status has
