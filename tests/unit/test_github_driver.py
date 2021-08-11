@@ -1424,6 +1424,12 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project('org/project1')
         self.create_branch('org/project1', 'feat-x')
+        repo._create_branch('feat-x')
+        self.fake_github.emitEvent(
+            self.fake_github.getPushEvent(
+                'org/project1',
+                ref='refs/heads/feat-x'))
+        self.waitUntilSettled()
         repo._set_branch_protection('master', True)
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()

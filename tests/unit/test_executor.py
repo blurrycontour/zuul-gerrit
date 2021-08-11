@@ -280,6 +280,10 @@ class TestExecutorRepos(ZuulTestCase):
         p1 = 'review.example.com/org/project1'
         projects = [p1]
         self.create_branch('org/project1', 'stable/havana')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable/havana'))
+        self.waitUntilSettled()
 
         # Start timer trigger - also org/project
         self.commitConfigUpdate('common-config',

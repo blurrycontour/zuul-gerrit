@@ -844,6 +844,13 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         # Enable branch protection on org/project1@master
         self.create_branch('org/project1', 'feat-x')
+        self.fake_gitlab.protectBranch('org', 'project1', 'feat-x',
+                                       protected=False)
+        self.fake_gitlab.emitEvent(
+            self.fake_gitlab.getPushEvent(
+                before='0' * 40,
+                project='org/project1', branch='refs/heads/feat-x'))
+        self.waitUntilSettled()
         self.fake_gitlab.protectBranch('org', 'project1', 'master',
                                        protected=True)
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
