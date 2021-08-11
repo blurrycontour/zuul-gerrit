@@ -534,6 +534,58 @@ class TestTenantUnprotectedBranches(TenantParserTestCase):
         self.assertIsNone(tpc[project_name].exclude_unprotected_branches)
 
 
+class TestTenantIncludeBranches(TenantParserTestCase):
+    tenant_config_file = 'config/tenant-parser/include-branches.yaml'
+
+    def test_tenant_branches(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+
+        self.assertEqual(['common-config'],
+                         [x.name for x in tenant.config_projects])
+        self.assertEqual(['org/project1', 'org/project2'],
+                         [x.name for x in tenant.untrusted_projects])
+
+        tpc = tenant.project_configs
+        project_name = tenant.config_projects[0].canonical_name
+        self.assertEqual(['master'], tpc[project_name].branches)
+
+        # No branches pass the filter at the start
+        project_name = tenant.untrusted_projects[0].canonical_name
+        self.assertEqual([], tpc[project_name].branches)
+
+        # Create the foo branch
+        self.create_branch('org/project1', 'foo')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'foo'))
+        self.waitUntilSettled()
+
+        # It should pass the filter
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        tpc = tenant.project_configs
+        project_name = tenant.untrusted_projects[0].canonical_name
+        self.assertEqual(['foo'], tpc[project_name].branches)
+
+        # Create the baz branch
+        self.create_branch('org/project1', 'baz')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'baz'))
+        self.waitUntilSettled()
+
+        # It should not pass the filter
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        tpc = tenant.project_configs
+        project_name = tenant.untrusted_projects[0].canonical_name
+        self.assertEqual(['foo'], tpc[project_name].branches)
+
+
+class TestTenantExcludeBranches(TestTenantIncludeBranches):
+    tenant_config_file = 'config/tenant-parser/exclude-branches.yaml'
+
+    # Same test results as include-branches
+
+
 class TestTenantExcludeAll(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/exclude-all.yaml'
 

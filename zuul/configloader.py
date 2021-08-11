@@ -1516,6 +1516,8 @@ class TenantParser(object):
         'exclude-unprotected-branches': bool,
         'extra-config-paths': no_dup_config_paths,
         'load-branch': str,
+        'include-branches': to_list(str),
+        'exclude-branches': to_list(str),
         'allow-circular-dependencies': bool,
     }}
 
@@ -1698,6 +1700,7 @@ class TenantParser(object):
             min_ltime = -1
         branches = sorted(tpc.project.source.getProjectBranches(
             tpc.project, tenant, min_ltime))
+        branches = [b for b in branches if tpc.includesBranch(b)]
         if 'master' in branches:
             branches.remove('master')
             branches = ['master'] + branches
@@ -1725,6 +1728,8 @@ class TenantParser(object):
             project_include = current_include
             shadow_projects = []
             project_exclude_unprotected_branches = None
+            project_include_branches = None
+            project_exclude_branches = None
             project_load_branch = None
         else:
             project_name = list(conf.keys())[0]
@@ -1743,6 +1748,18 @@ class TenantParser(object):
                 project_include = frozenset(project_include - project_exclude)
             project_exclude_unprotected_branches = conf[project_name].get(
                 'exclude-unprotected-branches', None)
+            project_include_branches = conf[project_name].get(
+                'include-branches', None)
+            if project_include_branches is not None:
+                project_include_branches = [
+                    re.compile(b) for b in as_list(project_include_branches)
+                ]
+            project_exclude_branches = conf[project_name].get(
+                'exclude-branches', None)
+            if project_exclude_branches is not None:
+                project_exclude_branches = [
+                    re.compile(b) for b in as_list(project_exclude_branches)
+                ]
             if conf[project_name].get('extra-config-paths') is not None:
                 extra_config_paths = as_list(
                     conf[project_name]['extra-config-paths'])
@@ -1758,6 +1775,8 @@ class TenantParser(object):
         tenant_project_config.shadow_projects = shadow_projects
         tenant_project_config.exclude_unprotected_branches = \
             project_exclude_unprotected_branches
+        tenant_project_config.include_branches = project_include_branches
+        tenant_project_config.exclude_branches = project_exclude_branches
         tenant_project_config.extra_config_files = extra_config_files
         tenant_project_config.extra_config_dirs = extra_config_dirs
         tenant_project_config.load_branch = project_load_branch

@@ -2220,6 +2220,12 @@ class Scheduler(threading.Thread):
         if tpc and not tpc.load_classes:
             reconfigure_tenant = False
 
+        # If we are listing included branches and this branch
+        # is not included, skip reconfig.
+        if (reconfigure_tenant and
+            not tpc.includesBranch(event.branch)):
+            reconfigure_tenant = False
+
         # But if the event is that branch protection status has
         # changed, do reconfigure.
         if (event.isBranchProtectionChanged()):
