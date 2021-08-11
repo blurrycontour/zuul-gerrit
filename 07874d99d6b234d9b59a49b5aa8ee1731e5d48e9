@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b40ac91f_82d6a90a",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 32
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-11T23:56:04Z",
+      "side": 1,
+      "message": "Perhaps that could be solved by using another store, it seems like we could create it with another react-redux Provider in the App, e.g. after the oidc configuration is known.\n\nAlternatively we could also check if there is a conflict with the state variable name.\n\nThough this may not be a big deal, and we could address that particular issue in a follow-up, to avoid delaying the current stack.",
+      "revId": "07874d99d6b234d9b59a49b5aa8ee1731e5d48e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
