@@ -44,14 +44,18 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        graceful = os.environ.get('ZUUL_EXECUTOR_SIGTERM_METHOD', 'graceful')
+        if self.config.has_option('executor', 'sigterm_method'):
+            graceful = self.config.get('executor', 'sigterm_method')
+        else:
+            graceful = 'graceful'
         if graceful.lower() == 'graceful':
             self.executor.graceful()
         elif graceful.lower() == 'stop':
             self.executor.stop()
         else:
-            self.log.error("Unknown value for ZUUL_EXECUTOR_SIGTERM_METHOD:"
+            self.log.error("Unknown value for executor.sigterm_method:"
                            f"'{graceful}'. Expected 'graceful' or 'stop'")
+            self.executor.graceful()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()

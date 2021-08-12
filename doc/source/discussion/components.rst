@@ -865,6 +865,21 @@ The following sections of ``zuul.conf`` are used by the executor:
       perform merge operations for any events. The executor will still perform
       the merge operations required for the build they are executing.
 
+   .. attr:: sigterm_method
+      :default: graceful
+
+      Determines how the executor responds to a ``SIGTERM`` signal.
+
+      .. value:: graceful
+
+         Stop accepting new jobs and wait for all running jobs to
+         complete before exiting.
+
+      .. value:: stop
+
+         Abort all running jobs and exit as soon as possible.
+
+
 .. attr:: keystore
 
    .. attr:: password
@@ -929,9 +944,7 @@ running on the stopped executor will be rescheduled on other executors.
 
 The executor normally responds to a ``SIGTERM`` signal in the same way
 as the ``graceful`` command, however you can change this behavior to match
-``stop`` by setting the environment variable
-``ZUUL_EXECUTOR_SIGTERM_METHOD`` to ``stop`` (the default is
-``graceful``).
+``stop`` with the :attr:`executor.sigterm_method` setting.
 
 To enable or disable running Ansible in verbose mode (with the
 ``-vvv`` argument to ansible-playbook) run ``zuul-executor verbose``
