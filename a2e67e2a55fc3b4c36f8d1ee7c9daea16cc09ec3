@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f96529ea_ae488c89",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-08-12T07:33:13Z",
+      "side": 1,
+      "message": "My two cents: make the parameter \u0027ignore_aliases\u0027 explicit with default value False would be more clear for the function support.",
+      "revId": "a2e67e2a55fc3b4c36f8d1ee7c9daea16cc09ec3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
