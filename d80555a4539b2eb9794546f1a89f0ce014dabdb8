@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8ff2e8da_6a5f53ad",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-12T21:25:56Z",
+      "side": 1,
+      "message": "This was a suggestion from Jeremy in the previous PS.",
+      "revId": "d80555a4539b2eb9794546f1a89f0ce014dabdb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
