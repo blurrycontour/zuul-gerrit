@@ -16,6 +16,24 @@
       "revId": "07874d99d6b234d9b59a49b5aa8ee1731e5d48e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "530df5be_7c4495a3",
+        "filename": "web/src/store.dev.js",
+        "patchSetId": 32
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-12T07:56:12Z",
+      "side": 1,
+      "message": "I\u0027ve looked into using several stores, but everything I\u0027ve seen advised against doing that. Granted, we seem to allow something bad already, so \"in for a penny ...\"\n\nI am going to take this opportunity to look into other libraries. Now that I am more at ease with react and redux, it might be easier to use other libs than I previously thought. That\u0027d be ideal too since redux-oidc seems to be dead (lots of issues on GH without answers in the last year).",
+      "parentUuid": "b40ac91f_82d6a90a",
+      "revId": "07874d99d6b234d9b59a49b5aa8ee1731e5d48e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
