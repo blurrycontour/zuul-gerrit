@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "96dc100d_c4d0fbe9",
+        "filename": "web/src/reducers/job.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:19:12Z",
+      "side": 1,
+      "message": "Reading the docs on how ... works in objects [0] I\u0027m wondering if this first ...state is redundant? It will put isFetching and jobs keys in the dict which we then override below.\n\n[0] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax#spread_in_object_literals",
+      "revId": "6f7b02f0451981b32e055edfd5e2294b4384f91f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
