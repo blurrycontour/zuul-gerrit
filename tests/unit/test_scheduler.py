@@ -6495,6 +6495,17 @@ For CI problems and help debugging, contact ci@example.org"""
                  result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
+    @simple_layout('layouts/success-message.yaml')
+    def test_success_message(self):
+        # Test the success_message (and failure_message) job attrs
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.executor_server.failJob('badjob', A)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(A.messages), 1)
+        self.assertTrue('YAY' in A.messages[0])
+        self.assertTrue('BOO' in A.messages[0])
+
 
 class TestChangeQueues(ZuulTestCase):
     tenant_config_file = 'config/change-queues/main.yaml'
