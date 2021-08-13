@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from requests.packages.urllib3.util import Retry
 from zuul.connection import BaseConnection
 from zuul.model import Project, Branch, Ref
 from zuul.driver.bitbucketcloud.bitbucketcloudmodel import (
@@ -55,12 +56,12 @@ class BitbucketCloudClient():
             url = '{}{}'.format(self.baseurl, path)
 
         r = requests.get(url, auth=HTTPBasicAuth(self.user, self.pw),
-                         timeout=1)
+                         timeout=5, retries=3, backoff_factor=1)
 
         if r.status_code != 200:
             raise BitbucketCloudConnectionError(
-                "Connection to server returned status {} path {}"
-                .format(r.status_code, url)
+            "Connection to server returned status {} path {}"
+            .format(r.status_code, url)
             )
 
         response_json = r.json()
@@ -74,7 +75,7 @@ class BitbucketCloudClient():
                 auth=HTTPBasicAuth(
                     self.user,
                     self.pw),
-                timeout=1)
+                timeout=5)
             response_json = r.json()
             vals = vals + response_json.get('values')
 
@@ -86,10 +87,10 @@ class BitbucketCloudClient():
         auth = HTTPBasicAuth(self.user, self.pw)
         if payload:
             r = requests.post(url, auth=auth,
-                              json=payload, timeout=1)
+                              json=payload, timeout=5)
         else:
             r = requests.post(url, auth=auth,
-                              timeout=1,
+                              timeout=5,
                               json=payload)
 
         return r.json()
@@ -99,10 +100,10 @@ class BitbucketCloudClient():
         auth = HTTPBasicAuth(self.user, self.pw)
         if payload:
             r = requests.delete(url, auth=auth,
-                                json=payload, timeout=1)
+                                json=payload, timeout=5)
         else:
             r = requests.delete(url, auth=auth,
-                                timeout=1, json=None)
+                                timeout=5, json=None)
 
         return r.status_code
 
