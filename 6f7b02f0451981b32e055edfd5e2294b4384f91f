@@ -16,6 +16,24 @@
       "revId": "6f7b02f0451981b32e055edfd5e2294b4384f91f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b95afd29_c827c4bb",
+        "filename": "web/src/reducers/job.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-13T16:35:40Z",
+      "side": 1,
+      "message": "That\u0027s correct, we could drop it, though we might want to keep it just in case the state is extended in the future.",
+      "parentUuid": "96dc100d_c4d0fbe9",
+      "revId": "6f7b02f0451981b32e055edfd5e2294b4384f91f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
