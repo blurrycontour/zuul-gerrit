@@ -16,7 +16,6 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { ReactHeight } from 'react-height'
 import ReactJson from 'react-json-view'
 import {
   Icon,
@@ -30,7 +29,6 @@ import JobProject from './JobProject'
 
 class JobVariant extends React.Component {
   static propTypes = {
-    descriptionMaxHeight: PropTypes.number.isRequired,
     parent: PropTypes.object,
     tenant: PropTypes.object,
     variant: PropTypes.object.isRequired
@@ -79,7 +77,7 @@ class JobVariant extends React.Component {
   }
 
   render () {
-    const { tenant, variant, descriptionMaxHeight } = this.props
+    const { tenant, variant } = this.props
     const rows = []
 
     const jobInfos = [
@@ -137,22 +135,10 @@ class JobVariant extends React.Component {
         )
       }
       if (label === 'description') {
-        const style = {
-          whiteSpace: 'pre-wrap'
-        }
-        if (descriptionMaxHeight > 0) {
-          style.minHeight = descriptionMaxHeight
-        }
         value = (
-          <ReactHeight onHeightReady={height => {
-            if (height > descriptionMaxHeight) {
-              this.props.parent.setState({descriptionMaxHeight: height})
-            }
-          }}>
-            <div style={style}>
+            <div style={{whiteSpace: 'pre-wrap'}}>
               {value}
             </div>
-          </ReactHeight>
         )
       }
       rows.push({label: label, value: value})
