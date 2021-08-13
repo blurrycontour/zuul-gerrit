@@ -18,8 +18,16 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import ReactJson from 'react-json-view'
 import {
-  Icon,
-} from 'patternfly-react'
+  List,
+  ListItem,
+  ListVariant
+} from '@patternfly/react-core'
+import {
+  LockedIcon,
+  InfrastructureIcon,
+  ConnectedIcon,
+  DisconnectedIcon
+} from '@patternfly/react-icons'
 
 import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
@@ -36,43 +44,40 @@ class JobVariant extends React.Component {
 
   renderStatus (variant) {
     const status = [{
-      icon: variant.voting ? 'connected' : 'disconnected',
+      icon: variant.voting ? <ConnectedIcon /> : <DisconnectedIcon />,
       name: variant.voting ? 'Voting' : 'Non-voting'
     }]
     if (variant.abstract) {
       status.push({
-        icon: 'infrastructure',
+        icon: <InfrastructureIcon />,
         name: 'Abstract'
       })
     }
     if (variant.final) {
       status.push({
-        icon: 'infrastructure',
+        icon: <InfrastructureIcon />,
         name: 'Final'
       })
     }
     if (variant.post_review) {
       status.push({
-        icon: 'locked',
+        icon: <LockedIcon />,
         name: 'Post review'
       })
     }
     if (variant.protected) {
       status.push({
-        icon: 'locked',
+        icon: <LockedIcon />,
         name: 'Protected'
       })
     }
 
     return (
-      <div className="list-view-pf-additional-info">
+      <List iconSize="large" variant={ListVariant.inline}>
         {status.map((item, idx) => (
-          <div key={idx} className="list-view-pf-additional-info-item">
-            <Icon type='pf' name={item.icon} />
-            {item.name}
-          </div>
+          <ListItem key={idx} icon={item.icon}>{item.name}</ListItem>
         ))}
-      </div>
+      </List>
     )
   }
 
