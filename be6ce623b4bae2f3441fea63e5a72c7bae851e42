@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5b9dd4b9_e602316a",
+        "filename": "web/src/containers/job/Nodeset.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T17:04:58Z",
+      "side": 1,
+      "message": "The linter doesn\u0027t like that these vars are unused. I suspect that onSelect is a defined interface though. Not sure how to make the linter ignore this.",
+      "range": {
+        "startLine": 38,
+        "startChar": 21,
+        "endLine": 38,
+        "endChar": 40
+      },
+      "revId": "be6ce623b4bae2f3441fea63e5a72c7bae851e42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
