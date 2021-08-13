@@ -18,8 +18,6 @@ import {
   JOB_FETCH_SUCCESS
 } from '../actions/job'
 
-import update from 'immutability-helper'
-
 export default (state = {
   isFetching: false,
   jobs: {},
@@ -30,19 +28,17 @@ export default (state = {
         isFetching: true,
         jobs: state.jobs,
       }
-    case JOB_FETCH_SUCCESS:
-      if (!state.jobs[action.tenant]) {
-        state.jobs = update(state.jobs, {$merge: {[action.tenant]: {}}})
-      }
+  case JOB_FETCH_SUCCESS:
       return {
-        isFetching: false,
-        jobs: update(state.jobs, {
-          [action.tenant]: {
-            $merge: {
-              [action.jobname]: action.job
-            }
+          ...state,
+          isFetching: false,
+          jobs: {
+              ...state.jobs,
+              [action.tenant]: {
+                  ...state.jobs[action.tenant],
+                  [action.jobname]: action.job
+              }
           }
-        })
       }
     case JOB_FETCH_FAIL:
       return {
