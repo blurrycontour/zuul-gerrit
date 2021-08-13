@@ -15,74 +15,94 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import {
-  AggregateStatusCount,
-  AggregateStatusNotifications,
-  AggregateStatusNotification,
-  Card,
-  CardBody,
-  CardTitle,
-  Icon,
-} from 'patternfly-react'
+  List,
+  ListItem,
+  TreeView
+} from '@patternfly/react-core'
 
+import {
+  ServerIcon,
+  TagIcon
+} from '@patternfly/react-icons'
 
 class Nodeset extends React.Component {
   static propTypes = {
     nodeset: PropTypes.object.isRequired
   }
 
+  constructor(props) {
+    super(props)
+
+    this.state = { activeItems: {} }
+
+    this.onSelect = (event, treeViewItem) => {
+      this.setState({
+        /* NOTE(ianw) 2021-08-13 : override this
+         * from standard [treeViewItem] as we don't want
+         * anything selectable.
+         */
+        activeItems: {}
+      })
+    }
+  }
+
   render () {
     const { nodeset } = this.props
-    const nodes = (
-      <ul className="list-group">
-        {nodeset.nodes.map((item, idx) => {
-          const groups = []
-          nodeset.groups.forEach(group => {
-            if (group.nodes.indexOf(item.name) !== -1) {
-              groups.push(group.name)
-            }
-          })
-          return (
-            <li className="list-group-item" key={idx}>
-              <span title="Node name">
-                {item.name}
-              </span> -&nbsp;
-              <span title="Label name">
-                {item.label}
-              </span>
-              <span title="Groups">
-                {groups.length > 0 && ' (' + groups.map(item => (item)) + ') '}
-              </span>
-            </li>)
-        })}
-      </ul>
-    )
+
+    const { activeItems } = this.state
+
+    const nodes = []
+    nodeset.nodes.forEach((node) => {
+      nodes.push(
+        {
+          name: (
+            <List isPlain>
+              <ListItem icon={<TagIcon />}>{node.name}</ListItem>
+              <ListItem icon={<ServerIcon />}>{node.label}</ListItem>
+            </List>),
+          id: node.name + node.label,
+        }
+      )
+    })
+    const groups = []
+    nodeset.groups.forEach((group) => {
+      let group_children = []
+      group.nodes.forEach((child_node) => {
+        group_children.push(
+          {
+            name: (
+              <List isPlain>
+                <ListItem icon={<TagIcon />}>{child_node}</ListItem>
+              </List>
+            ),
+            id: child_node
+          }
+        )})
+      groups.push(
+        {
+          name: group.name,
+          id: group.name,
+          children: group_children
+        }
+      )
+    })
+    const options = [
+      {
+        name: 'Nodeset ' + nodeset.name,
+        id: 'nodes',
+        children: nodes
+      },
+      {
+        name: 'Node Groups',
+        id: 'groups',
+        children: groups
+      }
+    ]
+
     return (
-      <Card accented aggregated>
-        <CardTitle>
-          {nodeset.name}
-        </CardTitle>
-        <CardBody>
-          <AggregateStatusNotifications>
-            <AggregateStatusNotification>
-              <span title="Nodes">
-                <Icon type="pf" name="server" />
-                <AggregateStatusCount>
-                  {nodeset.nodes.length}
-                </AggregateStatusCount>
-              </span>
-            </AggregateStatusNotification>
-            <AggregateStatusNotification>
-              <span title="Groups">
-                <Icon type="pf" name="server-group" />
-                <AggregateStatusCount>
-                  {nodeset.groups.length}
-                </AggregateStatusCount>
-              </span>
-            </AggregateStatusNotification>
-          </AggregateStatusNotifications>
-          {nodes}
-        </CardBody>
-      </Card>
+      <React.Fragment>
+        <TreeView data={options} activeItems={activeItems} onSelect={this.onSelect} />
+      </React.Fragment>
     )
   }
 }
