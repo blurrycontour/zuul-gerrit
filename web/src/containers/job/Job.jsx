@@ -15,12 +15,12 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Nav,
-  NavItem,
-  TabContainer,
-  TabPane,
-  TabContent,
-} from 'patternfly-react'
+  PageSection,
+  Tab,
+  Tabs,
+  TabTitleText,
+  Title
+} from '@patternfly/react-core'
 
 import JobVariant from './JobVariant'
 
@@ -30,10 +30,10 @@ class Job extends React.Component {
   }
 
   state = {
-    variantIdx: 0,
+    activeTabeKey: 0
   }
 
-  renderVariantTitle (variant, selected) {
+  renderVariantTitle (variant) {
     let title = variant.variant_description
     if (!title) {
       title = ''
@@ -44,42 +44,39 @@ class Job extends React.Component {
         title += item
       })
     }
-    if (selected) {
-      title = <strong>{title}</strong>
-    }
     return title
+  }
+
+  handleTabClick ( tabIndex ) {
+    this.setState({
+      activeTabKey: tabIndex
+    })
   }
 
   render () {
     const { job } = this.props
-    const { variantIdx } = this.state
+    const { activeTabKey } = this.state
 
     return (
       <React.Fragment>
-        <h2>{job[0].name}</h2>
-        <TabContainer id="zuul-job">
-          <div>
-            <Nav bsClass="nav nav-tabs nav-tabs-pf">
-              {job.map((variant, idx) => (
-                <NavItem
-                  key={idx}
-                  onClick={() => this.setState({variantIdx: idx})}>
-                  <div>
-                    {this.renderVariantTitle(variant, variantIdx === idx)}
-                  </div>
-                </NavItem>
-              ))}
-            </Nav>
-            <TabContent>
-              <TabPane>
+        <PageSection>
+          <Title headingLevel="h2">
+            Details for job <span style={{color: 'var(--pf-global--primary-color--100)'}}>{job[0].name}</span>
+          </Title>
+          <Tabs activeKey={activeTabKey}
+                onSelect={(event, tabIndex) => this.handleTabClick(tabIndex)}
+                isBox>
+            {job.map((variant, idx) => (
+              <Tab eventKey={idx} key={idx}
+                   title={<TabTitleText>{this.renderVariantTitle(variant)}</TabTitleText>}>
                 <JobVariant
-                  variant={job[variantIdx]}
+                  variant={job[idx]}
                   parent={this}
                 />
-              </TabPane>
-            </TabContent>
-          </div>
-        </TabContainer>
+              </Tab>
+            ))}
+          </Tabs>
+        </PageSection>
       </React.Fragment>
     )
   }
