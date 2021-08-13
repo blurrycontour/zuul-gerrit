@@ -1,0 +1,237 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "822c2b59_2da1ca55",
+        "filename": "web/src/containers/job/Job.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "This seems to fix the issue with the tiny tab and no name I called out in an earlier change.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22cc3aa5_8bc70805",
+        "filename": "web/src/containers/job/Job.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "This is apparently an extra semicolon according to the linter.",
+      "range": {
+        "startLine": 45,
+        "startChar": 45,
+        "endLine": 45,
+        "endChar": 46
+      },
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "febb8c77_91001410",
+        "filename": "web/src/containers/job/Job.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "This should probably be removed?",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dea770df_7938765f",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "Linter says use single quotes.\n\nAlso maybe for consistency we want to capitalize the first letter of every work? \u0027Defined At\u0027",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dabdd2fa_abfec343",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "Linter says use single quotes.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "55379495_dabc7231",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "Nit I think it might read better just as Retry Attempts.",
+      "range": {
+        "startLine": 132,
+        "startChar": 22,
+        "endLine": 132,
+        "endChar": 29
+      },
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0453783_66623113",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "27562528_de938f87",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee4e4fae_495bbe74",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "505473e1_5c699eac",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "790b188c_1d89f611",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee15a7da_9e416538",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89882539_99edfaa5",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-13T16:56:06Z",
+      "side": 1,
+      "message": "See above about consistency in caps.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
