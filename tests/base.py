@@ -5260,11 +5260,11 @@ class ZuulTestCase(BaseTestCase):
                 self.log.error("Timeout waiting for Zuul to settle")
                 self._logQueueStatus(
                     self.log.error, matcher,
+                    self.__areZooKeeperEventQueuesEmpty(matcher),
                     self.__areAllMergeJobsWaiting(matcher),
                     self.__haveAllBuildsReported(matcher),
                     self.__areAllBuildsWaiting(matcher),
                     self.__areAllNodeRequestsComplete(matcher),
-                    self.__areZooKeeperEventQueuesEmpty(matcher),
                     all(self.__eventQueuesEmpty(matcher))
                 )
                 raise Exception("Timeout waiting for Zuul to settle")
