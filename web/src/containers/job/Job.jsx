@@ -37,12 +37,20 @@ class Job extends React.Component {
     let title = variant.variant_description
     if (!title) {
       title = ''
-      variant.branches.forEach((item) => {
-        if (title) {
-          title += ', '
-        }
-        title += item
-      })
+      /* NOTE(ianw) 2021-08-13 : it seems like if this is only defined
+         for one branch we don't get the branches.  This might be a
+         bug.  In this case, use the source context branch (i.e. where
+         it's defined */
+      if (variant.branches.length === 0) {
+        title = variant.source_context.branch;
+      } else {
+        variant.branches.forEach((item) => {
+          if (title) {
+            title += ', '
+          }
+          title += item
+        })
+      }
     }
     return title
   }
@@ -56,6 +64,7 @@ class Job extends React.Component {
   render () {
     const { job } = this.props
     const { activeTabKey } = this.state
+    console.log(job)
 
     return (
       <React.Fragment>
