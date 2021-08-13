@@ -25,7 +25,7 @@ class Role extends React.Component {
     const { role } = this.props
     return (
       <span>
-        {role.target_name} ( {role.project_canonical_name})
+        {role.target_name} ({role.project_canonical_name})
       </span>
     )
   }
