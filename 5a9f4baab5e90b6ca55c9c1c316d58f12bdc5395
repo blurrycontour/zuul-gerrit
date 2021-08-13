@@ -16,6 +16,24 @@
       "revId": "5a9f4baab5e90b6ca55c9c1c316d58f12bdc5395",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "88123915_3577b97a",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-08-13T06:42:06Z",
+      "side": 1,
+      "message": "I think the main point of your suggestion is to define explicitly the class AnsibleUnsafeDumperWithoutAliases instead of dynamically adding the ignore_aliases.\n\nWhy shouldn\u0027t we put ignore_aliases parameter (with default value) in positional list?",
+      "parentUuid": "69df490b_588e6202",
+      "revId": "5a9f4baab5e90b6ca55c9c1c316d58f12bdc5395",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
