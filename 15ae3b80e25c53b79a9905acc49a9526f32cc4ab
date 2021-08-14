@@ -76,6 +76,23 @@
     },
     {
       "key": {
+        "uuid": "9a12640b_243123bb",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-14T14:05:20Z",
+      "side": 1,
+      "message": "I\u0027d go the other direction: let\u0027s use \"Defined at\" and change \"Build History\" to match.  That\u0027s the approach used in the build page, which I think is a great model.  I think sentence capitalization reads better for these.",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dabdd2fa_abfec343",
         "filename": "web/src/containers/job/JobVariant.jsx",
         "patchSetId": 2
