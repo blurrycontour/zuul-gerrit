@@ -34,6 +34,24 @@
       "revId": "6f7b02f0451981b32e055edfd5e2294b4384f91f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bfdbce4d_a08833bf",
+        "filename": "web/src/reducers/job.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-15T23:51:31Z",
+      "side": 1,
+      "message": "Yep, Tristan\u0027s point was my intention in writing it like this",
+      "parentUuid": "b95afd29_c827c4bb",
+      "revId": "6f7b02f0451981b32e055edfd5e2294b4384f91f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
