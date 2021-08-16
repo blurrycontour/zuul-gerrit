@@ -16,6 +16,24 @@
       "revId": "19c631e3f30ab3ee29b9b6e4f5a4ec3d11de4b8b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0408d02_248be942",
+        "filename": "tests/fixtures/config/semaphore/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2021-08-16T16:50:08Z",
+      "side": 1,
+      "message": "Ah, I thought I did. yes, let me push that up",
+      "parentUuid": "92c76f0d_d7385ead",
+      "revId": "19c631e3f30ab3ee29b9b6e4f5a4ec3d11de4b8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
