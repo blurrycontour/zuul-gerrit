@@ -18,6 +18,10 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import ReactJson from 'react-json-view'
 import {
+  DescriptionList,
+  DescriptionListTerm,
+  DescriptionListGroup,
+  DescriptionListDescription,
   List,
   ListItem,
   ListVariant,
@@ -43,18 +47,11 @@ import {
   RedoIcon,
   WrenchIcon
 } from '@patternfly/react-icons'
-import {
-  TableComposable,
-  Tbody,
-  Tr,
-  Td,
-} from '@patternfly/react-table'
 
 import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
 import Role from './Role'
 import JobProject from './JobProject'
-
 
 class JobVariant extends React.Component {
   static propTypes = {
@@ -186,6 +183,7 @@ class JobVariant extends React.Component {
         )
         nice_label = (<span><CodeIcon /> Job variables</span>)
       }
+
       if (label === 'description') {
         value = (
           <div style={{whiteSpace: 'pre-wrap'}}>
@@ -245,17 +243,21 @@ class JobVariant extends React.Component {
       )
       rows.push({label: nice_label, value: items})
     })
-    return (
-      <TableComposable variant='compact' borders={false}>
-        <Tbody>
-            {rows.map(item => (
-              <Tr key={item.label}>
-                <Td style={{width: '10%'}}><strong>{item.label}</strong></Td>
-                <Td>{item.value}</Td>
-              </Tr>
+      return (
+        <div className='pf-u-m-xl'>
+          <DescriptionList isHorizontal>
+            {rows.map((item, idx) => (
+              <DescriptionListGroup key={idx}>
+                <DescriptionListTerm>
+                  {item.label}
+                </DescriptionListTerm>
+                <DescriptionListDescription>
+                  {item.value}
+                </DescriptionListDescription>
+              </DescriptionListGroup>
             ))}
-          </Tbody>
-        </TableComposable>
+          </DescriptionList>
+        </div>
     )
   }
 }
