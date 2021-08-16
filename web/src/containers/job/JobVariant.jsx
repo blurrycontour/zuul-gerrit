@@ -52,6 +52,7 @@ import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
 import Role from './Role'
 import JobProject from './JobProject'
+import JobDescriptionCard from './JobDescriptionCard'
 
 class JobVariant extends React.Component {
   static propTypes = {
@@ -104,7 +105,7 @@ class JobVariant extends React.Component {
     const rows = []
 
     const jobInfos = [
-      'description', 'source_context', 'builds', 'status',
+      'source_context', 'builds', 'status',
       'parent', 'attempts', 'timeout', 'semaphores',
       'nodeset', 'variables', 'override_checkout',
     ]
@@ -243,21 +244,22 @@ class JobVariant extends React.Component {
       )
       rows.push({label: nice_label, value: items})
     })
-      return (
-        <div className='pf-u-m-xl'>
-          <DescriptionList isHorizontal>
-            {rows.map((item, idx) => (
-              <DescriptionListGroup key={idx}>
-                <DescriptionListTerm>
-                  {item.label}
-                </DescriptionListTerm>
-                <DescriptionListDescription>
-                  {item.value}
-                </DescriptionListDescription>
-              </DescriptionListGroup>
-            ))}
-          </DescriptionList>
-        </div>
+     return (
+       <div className='pf-u-m-xl'>
+         <JobDescriptionCard description={variant.description}/>
+        <DescriptionList isHorizontal columnModifier={{ lg: '2Col', xl: '3Col' }}>
+          {rows.map((item, idx) => (
+            <DescriptionListGroup key={idx}>
+              <DescriptionListTerm>
+                {item.label}
+              </DescriptionListTerm>
+              <DescriptionListDescription>
+                {item.value}
+              </DescriptionListDescription>
+            </DescriptionListGroup>
+          ))}
+        </DescriptionList>
+      </div>
     )
   }
 }
