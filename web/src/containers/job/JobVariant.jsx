@@ -28,6 +28,12 @@ import {
   ConnectedIcon,
   DisconnectedIcon
 } from '@patternfly/react-icons'
+import {
+  TableComposable,
+  Tbody,
+  Tr,
+  Td,
+} from '@patternfly/react-table'
 
 import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
@@ -186,18 +192,16 @@ class JobVariant extends React.Component {
       rows.push({label: label, value: items})
     })
     return (
-      <div>
-        <table className='table table-striped table-bordered'>
-          <tbody>
+      <TableComposable variant='compact' borders={false}>
+        <Tbody>
             {rows.map(item => (
-              <tr key={item.label}>
-                <td style={{width: '10%'}}>{item.label}</td>
-                <td>{item.value}</td>
-              </tr>
+              <Tr key={item.label}>
+                <Td style={{width: '10%'}}><strong>{item.label}</strong></Td>
+                <Td>{item.value}</Td>
+              </Tr>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </Tbody>
+        </TableComposable>
     )
   }
 }
