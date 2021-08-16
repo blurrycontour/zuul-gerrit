@@ -10,6 +10,7 @@
     failure:
       gerrit:
         Verified: -1
+    precedence: normal
 
 - pipeline:
     name: gate
