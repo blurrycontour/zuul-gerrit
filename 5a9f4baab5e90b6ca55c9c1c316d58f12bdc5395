@@ -34,6 +34,23 @@
       "revId": "5a9f4baab5e90b6ca55c9c1c316d58f12bdc5395",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a46f194_b47f75ef",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-16T23:05:10Z",
+      "side": 1,
+      "message": "As written, the calling convention for this method is very unclear.  ignore_aliases is a required argument if any further positional arguments without default values are going to be supplied (and since we accept them, we should assume they may be).\n\nansible_unsafe_dump(inventory, ignore_aliases\u003dTrue) is valid\nansible_unsafe_dump(inventory, foo, ignore_aliases\u003dTrue) is invalid\n\nThat\u0027s very confusing.  Let\u0027s do something more straightforward.  Here are the choices I think would be okay (with the most preferable first):\n\n1) kwargs.pop() -- it is simple and doesn\u0027t rely on any special understanding of the function signature\n2) (data, *args, ignore_aliases\u003dFalse, **kwargs) -- behaves the same way, but maintainers may blink a few times at seeing *args and *kwargs separated like that.\n3) (data, ignore_aliases, *args, **kwargs) -- the positional equivalent of #2.  This breaks compatibility with the similar safe_dump methods, but is at least explicit.",
+      "revId": "5a9f4baab5e90b6ca55c9c1c316d58f12bdc5395",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
