@@ -28,6 +28,8 @@ import 'patternfly/dist/css/patternfly-additions.min.css'
 // Usually it should be imported at the uppermost positon, but as we don't want
 // PF3 to overrule PF4, we import PF4 styles after PF3.
 import '@patternfly/react-core/dist/styles/base.css'
+import '@patternfly/react-styles/css/utilities/Sizing/sizing.css'
+import '@patternfly/react-styles/css/utilities/Spacing/spacing.css'
 // To avoid that PF4 breaks existing PF3 components by some wildcard CSS rules,
 // we include our own migration CSS file that restores relevant parts of those
 // rules.
