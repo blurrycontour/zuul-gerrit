@@ -31,17 +31,6 @@ class Job extends React.Component {
 
   state = {
     variantIdx: 0,
-    descriptionMaxHeight: 0
-  }
-
-  resetMaxHeight = () => {
-    this.setState({descriptionMaxHeight: 0})
-  }
-
-  componentDidUpdate (prevProps, prevState) {
-    if (prevState.descriptionMaxHeight > 0) {
-      this.resetMaxHeight()
-    }
   }
 
   renderVariantTitle (variant, selected) {
@@ -63,7 +52,7 @@ class Job extends React.Component {
 
   render () {
     const { job } = this.props
-    const { variantIdx, descriptionMaxHeight } = this.state
+    const { variantIdx } = this.state
 
     return (
       <React.Fragment>
@@ -85,7 +74,6 @@ class Job extends React.Component {
               <TabPane>
                 <JobVariant
                   variant={job[variantIdx]}
-                  descriptionMaxHeight={descriptionMaxHeight}
                   parent={this}
                 />
               </TabPane>
