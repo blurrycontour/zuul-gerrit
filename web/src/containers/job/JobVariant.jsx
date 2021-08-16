@@ -20,13 +20,15 @@ import ReactJson from 'react-json-view'
 import {
   List,
   ListItem,
-  ListVariant
+  ListVariant,
 } from '@patternfly/react-core'
 import {
+  ExternalLinkAltIcon,
   LockedIcon,
   InfrastructureIcon,
   ConnectedIcon,
-  DisconnectedIcon
+  DisconnectedIcon,
+  OutlinedClockIcon
 } from '@patternfly/react-icons'
 import {
   TableComposable,
@@ -92,46 +94,74 @@ class JobVariant extends React.Component {
     const rows = []
 
     const jobInfos = [
-      'description', 'context', 'builds', 'status',
+      'description', 'source_context', 'builds', 'status',
       'parent', 'attempts', 'timeout', 'semaphores',
       'nodeset', 'variables', 'override_checkout',
     ]
     jobInfos.forEach(key => {
       let label = key
+      let nice_label = key
       let value = variant[key]
 
-      if (label === 'context' && value) {
+      if (label === 'source_context' && value) {
         value = (
           <SourceContext
             context={variant.source_context}
             showBranch={true}/>
         )
+        nice_label = 'Defined at'
       }
       if (label === 'builds') {
         value = (
           <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + variant.name}>
-            build history
+            <ExternalLinkAltIcon />&nbsp;{variant.name}
           </Link>
         )
+        nice_label = 'Build history'
       }
       if (label === 'status') {
         value = this.renderStatus(variant)
+        nice_label = 'Job flags'
       }
 
       if (!value) {
         return
       }
 
+      if (label === 'attempts') {
+        nice_label = 'Retry attempts'
+      }
+
+      if (label === 'timeout') {
+        value = (
+          <span>
+            <OutlinedClockIcon /> {value} seconds
+          </span>
+        )
+        nice_label = 'Timeout'
+      }
+
+      if (label === 'semaphores') {
+        nice_label = 'Semaphores required'
+        if (value.length === 0) {
+          value = (<i>none</i>)
+        }
+      }
+
       if (label === 'nodeset') {
-        value = <Nodeset nodeset={value} />
+        value = (
+          <Nodeset nodeset={value} />
+        )
+        nice_label = 'Required nodes'
       }
 
       if (label === 'parent') {
         value = (
           <Link to={tenant.linkPrefix + '/job/' + value}>
-            {value}
+            <ExternalLinkAltIcon />&nbsp;{value}
           </Link>
         )
+        nice_label = 'Parent'
       }
       if (label === 'variables') {
         value = (
@@ -139,11 +169,13 @@ class JobVariant extends React.Component {
             <ReactJson
               src={value}
               name={null}
+              collapsed={true}
               sortKeys={true}
               enableClipboard={false}
               displayDataTypes={false}/>
           </span>
         )
+        nice_label = 'Job variables'
       }
       if (label === 'description') {
         value = (
@@ -151,45 +183,56 @@ class JobVariant extends React.Component {
               {value}
             </div>
         )
+        nice_label = 'Description'
       }
-      rows.push({label: label, value: value})
+      rows.push({label: nice_label, value: value})
     })
     const jobInfosList = [
       'required_projects', 'dependencies', 'files', 'irrelevant_files', 'roles'
     ]
     jobInfosList.forEach(key => {
       let label = key
+      let nice_label = key
       let values = variant[key]
 
       if (values.length === 0) {
         return
       }
       const items = (
-        <ul className='list-group'>
+        <List isPlain>
           {values.map((value, idx) => {
             let item
             if (label === 'required_projects') {
+              nice_label = 'Required Projects'
               item = <JobProject project={value} />
             } else if (label === 'roles') {
+              nice_label = 'Uses roles from'
               item = <Role role={value} />
             } else if (label === 'dependencies') {
+              nice_label = 'Job dependencies'
               if (value['soft']) {
                 item = value['name'] + ' (soft)'
               } else {
                 item = value['name']
               }
+            } else if (label === 'irrelevant_files') {
+              nice_label = 'Irrelevant files matchers'
+              item = value
+            } else if (label === 'files') {
+              nice_label = 'Files matchers'
+              item = value
             } else {
               item = value
             }
             return (
-              <li className='list-group-item' key={idx}>
+              <ListItem key={idx}>
                 {item}
-              </li>
+              </ListItem>
             )
           })}
-        </ul>
+        </List>
       )
-      rows.push({label: label, value: items})
+      rows.push({label: nice_label, value: items})
     })
     return (
       <TableComposable variant='compact' borders={false}>
