@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e3fac389_09c2eab5",
+        "filename": "web/src/containers/job/Job.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "yep, it seems we\u0027re ok leaving it here.  to avoid too much shuffling i\u0027ll leave it here.",
+      "parentUuid": "822c2b59_2da1ca55",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "22cc3aa5_8bc70805",
         "filename": "web/src/containers/job/Job.jsx",
         "patchSetId": 2
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "b6e3ff12_536c419b",
+        "filename": "web/src/containers/job/Job.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22cc3aa5_8bc70805",
+      "range": {
+        "startLine": 45,
+        "startChar": 45,
+        "endLine": 45,
+        "endChar": 46
+      },
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "febb8c77_91001410",
         "filename": "web/src/containers/job/Job.jsx",
         "patchSetId": 2
@@ -56,6 +98,24 @@
       "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6a899ff_dac0dd32",
+        "filename": "web/src/containers/job/Job.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "febb8c77_91001410",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -93,6 +153,24 @@
     },
     {
       "key": {
+        "uuid": "2807fb98_14a7ac88",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "Ok, I\u0027ve used more sentence approaches where only first letter captialised.",
+      "parentUuid": "9a12640b_243123bb",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dabdd2fa_abfec343",
         "filename": "web/src/containers/job/JobVariant.jsx",
         "patchSetId": 2
@@ -107,6 +185,24 @@
       "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e900464_8336062f",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dabdd2fa_abfec343",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -133,6 +229,30 @@
     },
     {
       "key": {
+        "uuid": "d809f621_527b3c2c",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55379495_dabc7231",
+      "range": {
+        "startLine": 132,
+        "startChar": 22,
+        "endLine": 132,
+        "endChar": 29
+      },
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a0453783_66623113",
         "filename": "web/src/containers/job/JobVariant.jsx",
         "patchSetId": 2
@@ -147,6 +267,24 @@
       "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "92941154_1b9b1590",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "a0453783_66623113",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -167,6 +305,24 @@
     },
     {
       "key": {
+        "uuid": "137dc033_37aa006c",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "27562528_de938f87",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ee4e4fae_495bbe74",
         "filename": "web/src/containers/job/JobVariant.jsx",
         "patchSetId": 2
@@ -181,6 +337,24 @@
       "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c81ec11_581d0044",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "ee4e4fae_495bbe74",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -201,6 +375,24 @@
     },
     {
       "key": {
+        "uuid": "d8ffa749_67775284",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "505473e1_5c699eac",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "790b188c_1d89f611",
         "filename": "web/src/containers/job/JobVariant.jsx",
         "patchSetId": 2
@@ -215,6 +407,24 @@
       "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7cc19c9_fcfe3dfe",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "790b188c_1d89f611",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -235,6 +445,24 @@
     },
     {
       "key": {
+        "uuid": "f93bf768_e3c4a854",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "ee15a7da_9e416538",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "89882539_99edfaa5",
         "filename": "web/src/containers/job/JobVariant.jsx",
         "patchSetId": 2
@@ -249,6 +477,24 @@
       "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3f8675d_43286d6b",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T00:54:22Z",
+      "side": 1,
+      "message": "left as is with sentence approach",
+      "parentUuid": "89882539_99edfaa5",
+      "revId": "15ae3b80e25c53b79a9905acc49a9526f32cc4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
