@@ -22,6 +22,30 @@
       "revId": "be6ce623b4bae2f3441fea63e5a72c7bae851e42",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57185986_c3c6e862",
+        "filename": "web/src/containers/job/Nodeset.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-16T01:08:52Z",
+      "side": 1,
+      "message": "I think probably you are supposed to use () ... but I think that\u0027s wrong and throws away intrinsic documentation about what\u0027s going on here.  I\u0027ll add a disable flag for it.",
+      "parentUuid": "5b9dd4b9_e602316a",
+      "range": {
+        "startLine": 38,
+        "startChar": 21,
+        "endLine": 38,
+        "endChar": 40
+      },
+      "revId": "be6ce623b4bae2f3441fea63e5a72c7bae851e42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
