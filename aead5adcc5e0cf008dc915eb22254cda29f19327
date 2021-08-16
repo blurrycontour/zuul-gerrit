@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b42ac43c_bf765959",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-16T16:10:14Z",
+      "side": 1,
+      "message": "Is there any concern that the ansible project might prefer we not use this icon? Branding rules and such?",
+      "revId": "aead5adcc5e0cf008dc915eb22254cda29f19327",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
