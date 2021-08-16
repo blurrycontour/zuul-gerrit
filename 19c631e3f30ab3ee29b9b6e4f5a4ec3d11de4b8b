@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92c76f0d_d7385ead",
+        "filename": "tests/fixtures/config/semaphore/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-16T15:51:48Z",
+      "side": 1,
+      "message": "Nit may want to set an explicit precedence on this pipeline. That way if defaults change this test is still happy. But can always update the config here if that happens.",
+      "revId": "19c631e3f30ab3ee29b9b6e4f5a4ec3d11de4b8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
