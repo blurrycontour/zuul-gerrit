@@ -23,12 +23,25 @@ import {
   ListVariant,
 } from '@patternfly/react-core'
 import {
-  ExternalLinkAltIcon,
-  LockedIcon,
-  InfrastructureIcon,
+  AnsibleTowerIcon,
+  BanIcon,
+  CatalogIcon,
+  ClipboardCheckIcon,
+  ClusterIcon,
+  CodeBranchIcon,
+  CodeIcon,
   ConnectedIcon,
   DisconnectedIcon,
-  OutlinedClockIcon
+  ExternalLinkAltIcon,
+  FlagIcon,
+  HistoryIcon,
+  InfrastructureIcon,
+  LockIcon,
+  LockedIcon,
+  OutlinedClockIcon,
+  PackageIcon,
+  RedoIcon,
+  WrenchIcon
 } from '@patternfly/react-icons'
 import {
   TableComposable,
@@ -109,7 +122,7 @@ class JobVariant extends React.Component {
             context={variant.source_context}
             showBranch={true}/>
         )
-        nice_label = 'Defined at'
+        nice_label = (<span><PackageIcon /> Defined at</span>)
       }
       if (label === 'builds') {
         value = (
@@ -117,11 +130,11 @@ class JobVariant extends React.Component {
             <ExternalLinkAltIcon />&nbsp;{variant.name}
           </Link>
         )
-        nice_label = 'Build history'
+        nice_label = (<span><HistoryIcon/> Build history</span>)
       }
       if (label === 'status') {
         value = this.renderStatus(variant)
-        nice_label = 'Job flags'
+        nice_label = (<span><FlagIcon/> Job flags</span>)
       }
 
       if (!value) {
@@ -129,30 +142,26 @@ class JobVariant extends React.Component {
       }
 
       if (label === 'attempts') {
-        nice_label = 'Retry attempts'
+        nice_label = (<span><RedoIcon/> Retry attempts</span>)
       }
 
       if (label === 'timeout') {
-        value = (
-          <span>
-            <OutlinedClockIcon /> {value} seconds
-          </span>
-        )
-        nice_label = 'Timeout'
+        value = (<span>{value} seconds</span>)
+        nice_label = (<span><OutlinedClockIcon /> Timeout</span>)
       }
 
       if (label === 'semaphores') {
-        nice_label = 'Semaphores required'
         if (value.length === 0) {
           value = (<i>none</i>)
         }
+        nice_label = (<span><LockIcon /> Semaphores required</span>)
       }
 
       if (label === 'nodeset') {
         value = (
           <Nodeset nodeset={value} />
         )
-        nice_label = 'Required nodes'
+        nice_label = (<span><ClusterIcon /> Required nodes</span>)
       }
 
       if (label === 'parent') {
@@ -161,7 +170,7 @@ class JobVariant extends React.Component {
             <ExternalLinkAltIcon />&nbsp;{value}
           </Link>
         )
-        nice_label = 'Parent'
+        nice_label = (<span><CodeBranchIcon /> Parent</span>)
       }
       if (label === 'variables') {
         value = (
@@ -175,17 +184,19 @@ class JobVariant extends React.Component {
               displayDataTypes={false}/>
           </span>
         )
-        nice_label = 'Job variables'
+        nice_label = (<span><CodeIcon /> Job variables</span>)
       }
       if (label === 'description') {
         value = (
-            <div style={{whiteSpace: 'pre-wrap'}}>
-              {value}
-            </div>
+          <div style={{whiteSpace: 'pre-wrap'}}>
+            {value}
+          </div>
         )
-        nice_label = 'Description'
+        nice_label = (<span><CatalogIcon /> Description</span>)
       }
+
       rows.push({label: nice_label, value: value})
+
     })
     const jobInfosList = [
       'required_projects', 'dependencies', 'files', 'irrelevant_files', 'roles'
@@ -206,20 +217,20 @@ class JobVariant extends React.Component {
               nice_label = 'Required Projects'
               item = <JobProject project={value} />
             } else if (label === 'roles') {
-              nice_label = 'Uses roles from'
+              nice_label = (<span><AnsibleTowerIcon /> Uses roles from</span>)
               item = <Role role={value} />
             } else if (label === 'dependencies') {
-              nice_label = 'Job dependencies'
+              nice_label = (<span><WrenchIcon /> Job dependencies</span>)
               if (value['soft']) {
                 item = value['name'] + ' (soft)'
               } else {
                 item = value['name']
               }
             } else if (label === 'irrelevant_files') {
-              nice_label = 'Irrelevant files matchers'
+              nice_label = (<span><BanIcon /> Irrelevant files matchers</span>)
               item = value
             } else if (label === 'files') {
-              nice_label = 'Files matchers'
+              nice_label = (<span><ClipboardCheckIcon />Files matchers</span>)
               item = value
             } else {
               item = value
