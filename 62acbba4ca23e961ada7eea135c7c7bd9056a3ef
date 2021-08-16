@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a064353b_c1ab0b47",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2021-08-16T11:02:15Z",
+      "side": 0,
+      "message": "zzzeek says this is a SQLAlchemy 1.4+ thing only, so don\u0027t forget to bump your lower version here\n\nLater: Ah, seems you\u0027ve (correctly) stripped all the lower constraint information from requirements.txt (y)",
+      "revId": "62acbba4ca23e961ada7eea135c7c7bd9056a3ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
