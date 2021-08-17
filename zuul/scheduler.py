@@ -706,13 +706,23 @@ class Scheduler(threading.Thread):
                     else:
                         self.local_layout_state[tenant_name] = layout_state
                     self.connections.reconfigureDrivers(tenant)
-            # TODO(corvus): This isn't quite accurate; we don't really
-            # know when the last reconfiguration took place.  But we
-            # need to set some value here in order for the cleanup
-            # start thread to know that it can proceed.  We should
-            # store the last reconfiguration times in ZK and use them
-            # here.
-            self.last_reconfigured = int(time.time())
+
+        # TODO(corvus): Consider removing this implicit reconfigure
+        # event with v5.  Currently the expectation is that if you
+        # stop a scheduler, change the tenant config, and start it,
+        # the new tenant config should take effect.  If we change that
+        # expectation with multiple schedulers, we can remove this.
+        event = ReconfigureEvent(smart=True)
+        event.zuul_event_ltime = self.zk_client.getCurrentLtime()
+        self._doReconfigureEvent(event)
+
+        # TODO(corvus): This isn't quite accurate; we don't really
+        # know when the last reconfiguration took place.  But we
+        # need to set some value here in order for the cleanup
+        # start thread to know that it can proceed.  We should
+        # store the last reconfiguration times in ZK and use them
+        # here.
+        self.last_reconfigured = int(time.time())
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Config priming complete (duration: %s seconds)",
