@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baea97a8_da8fc354",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-08-17T10:06:52Z",
+      "side": 1,
+      "message": "Code looks good, but I think it might be a good idea to test the force flag in the test as well.",
+      "revId": "13850c1c86aed39f22c64a9173f8789095dc45c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
