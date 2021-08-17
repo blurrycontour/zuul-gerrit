@@ -14,6 +14,7 @@
 
 import logging
 import time
+from contextlib import suppress
 from uuid import uuid4
 
 import zuul.executor.common
@@ -214,15 +215,17 @@ class ExecutorClient(object):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         log.debug("Removing build %s", build.uuid)
 
+        with suppress(KeyError):
+            del self.builds[build.uuid]
+
         if not build.build_request_ref:
-            log.debug("Build has not been submitted to ZooKeeper")
+            log.debug("Build %s has not been submitted to ZooKeeper",
+                      build.uuid)
             return
 
         build_request = self.executor_api.get(build.build_request_ref)
         if build_request:
             self.executor_api.remove(build_request)
-
-        del self.builds[build.uuid]
 
     def cleanupLostBuildRequests(self):
         for build_request in self.executor_api.lostRequests():

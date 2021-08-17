@@ -5151,15 +5151,6 @@ class ZuulTestCase(BaseTestCase):
             for build in builds:
                 seen_builds.add(build.uuid)
 
-                # Noop jobs are now added to the local build list in the
-                # executor client, so they can be looked up in the scheduler
-                # when the build result events are processed.
-                # As most of the following tests don't make much sense for
-                # those builds and they are - per definition - completed
-                # immediately, we can simply skip them.
-                if build.job.name == "noop":
-                    continue
-
                 if not build.build_request_ref:
                     self.log.debug("%s has not been submitted", build)
                     return False
