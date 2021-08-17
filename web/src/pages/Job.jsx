@@ -55,12 +55,6 @@ class JobPage extends React.Component {
     const jobName = this.props.match.params.jobName
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <PageSection style={{paddingRight: '5px'}}>
-          <Fetchable
-            isFetching={remoteData.isFetching}
-            fetchCallback={this.updateData}
-          />
-        </PageSection>
         {tenantJobs && tenantJobs[jobName] && <Job job={tenantJobs[jobName]} />}
       </PageSection>
     )
