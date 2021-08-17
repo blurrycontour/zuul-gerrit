@@ -1241,12 +1241,22 @@ class GerritConnection(BaseConnection):
         return data, related
 
     def queryChange(self, number, event=None):
-        if self.session:
-            data, related = self.queryChangeHTTP(number, event=event)
-            return GerritChangeData(GerritChangeData.HTTP, data, related)
-        else:
-            data = self.queryChangeSSH(number, event=event)
-            return GerritChangeData(GerritChangeData.SSH, data)
+        for attempt in range(3):
+            try:
+                if self.session:
+                    data, related = self.queryChangeHTTP(number, event=event)
+                    return GerritChangeData(GerritChangeData.HTTP,
+                                            data,
+                                            related)
+                else:
+                    data = self.queryChangeSSH(number, event=event)
+                    return GerritChangeData(GerritChangeData.SSH, data)
+            except:
+                if attempt >= 3:
+                    raise
+                # The internet is a flaky place try again.
+                self.log.exception("Failed to query change.")
+                time.sleep(1)
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):
