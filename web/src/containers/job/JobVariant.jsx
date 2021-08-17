@@ -52,6 +52,7 @@ import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
 import Role from './Role'
 import JobProject from './JobProject'
+import JobDescriptionCard from './JobDescriptionCard'
 
 class JobVariant extends React.Component {
   static propTypes = {
@@ -104,7 +105,7 @@ class JobVariant extends React.Component {
     const rows = []
 
     const jobInfos = [
-      'description', 'source_context', 'builds', 'status',
+      'source_context', 'builds', 'status',
       'parent', 'attempts', 'timeout', 'semaphores',
       'nodeset', 'variables', 'override_checkout',
     ]
@@ -243,23 +244,24 @@ class JobVariant extends React.Component {
       )
       rows.push({label: nice_label, value: items})
     })
-      return (
-        <div className='pf-u-m-xl'>
-          <DescriptionList isHorizontal
-            style={{'--pf-c-description-list--RowGap': '0.5rem'}}
-          >
-            {rows.map((item, idx) => (
-              <DescriptionListGroup key={idx}>
-                <DescriptionListTerm>
-                  {item.label}
-                </DescriptionListTerm>
-                <DescriptionListDescription>
-                  {item.value}
-                </DescriptionListDescription>
-              </DescriptionListGroup>
-            ))}
-          </DescriptionList>
-        </div>
+     return (
+       <React.Fragment>
+         <JobDescriptionCard description={variant.description}/>
+         <DescriptionList isHorizontal
+                          style={{'--pf-c-description-list--RowGap': '0.5rem'}}
+                          className='pf-u-m-xl'>
+          {rows.map((item, idx) => (
+            <DescriptionListGroup key={idx}>
+              <DescriptionListTerm>
+                {item.label}
+              </DescriptionListTerm>
+              <DescriptionListDescription>
+                {item.value}
+              </DescriptionListDescription>
+            </DescriptionListGroup>
+          ))}
+        </DescriptionList>
+      </React.Fragment>
     )
   }
 }
