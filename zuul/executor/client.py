@@ -215,7 +215,12 @@ class ExecutorClient(object):
         log.debug("Removing build %s", build.uuid)
 
         if not build.build_request_ref:
-            log.debug("Build has not been submitted to ZooKeeper")
+            log.debug("Build %s has not been submitted to ZooKeeper",
+                      build.uuid)
+
+            # Noop jobs don't get submitted to zookeeper so we still need to
+            # remove it from the list to not leak it.
+            del self.builds[build.uuid]
             return
 
         build_request = self.executor_api.get(build.build_request_ref)
