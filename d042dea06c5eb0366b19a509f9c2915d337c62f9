@@ -16,6 +16,24 @@
       "revId": "d042dea06c5eb0366b19a509f9c2915d337c62f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc9793d1_d95dd7dc",
+        "filename": "web/package.json",
+        "patchSetId": 19
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-08-17T13:34:45Z",
+      "side": 1,
+      "message": "As of PS33 the dependency to redux-oidc is replaced by oidc-react, which is more actively maintained. Both libraries however depend on oidc-client-js, which is looking for a new maintainer.\n\nthe oidc-react devs discuss the problem here: https://github.com/bjerkio/oidc-react/issues/652 and intend to keep maintaining oidc-react regardless of what happens.",
+      "parentUuid": "1b8c4408_6a1ec699",
+      "revId": "d042dea06c5eb0366b19a509f9c2915d337c62f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
