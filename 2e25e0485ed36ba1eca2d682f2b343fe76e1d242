@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c728fbc_2e101fb9",
+        "filename": "web/src/pages/AuthCallback.jsx",
+        "patchSetId": 33
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-17T14:27:32Z",
+      "side": 1,
+      "message": "Could you try adding `console.log(userManagerConfig)` before the useEffect call, and in the effect add another `console.log(\"running\")`. Then you should have only one running event per userManagerConfig.",
+      "revId": "2e25e0485ed36ba1eca2d682f2b343fe76e1d242",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
