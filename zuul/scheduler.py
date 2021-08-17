@@ -2186,19 +2186,12 @@ class Scheduler(threading.Thread):
             # Cancel build if needed
             build = build or buildset.getBuild(job_name)
             if build:
-                was_running = False
                 try:
-                    was_running = self.executor.cancel(build)
+                    self.executor.cancel(build)
                 except Exception:
                     log.exception(
                         "Exception while canceling build %s for change %s",
                         build, item.change)
-
-                if (not was_running) or force:
-                    nodeset = buildset.getJobNodeSet(job_name)
-                    if nodeset:
-                        self.nodepool.returnNodeSet(
-                            nodeset, zuul_event_id=item.event)
 
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset
@@ -2229,11 +2222,6 @@ class Scheduler(threading.Thread):
                             "Error reporting build completion to DB:")
 
             else:
-                nodeset = buildset.getJobNodeSet(job_name)
-                if nodeset:
-                    self.nodepool.returnNodeSet(
-                        nodeset, zuul_event_id=item.event)
-
                 if final:
                     # If final is set make sure that the job is not resurrected
                     # later by re-requesting nodes.
