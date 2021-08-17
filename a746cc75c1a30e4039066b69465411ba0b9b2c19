@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9545d7a_89d484a4",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-17T11:21:47Z",
+      "side": 1,
+      "message": "It seems like KeyError exception was previously thrown, is it necessary to suppress them now?",
+      "revId": "a746cc75c1a30e4039066b69465411ba0b9b2c19",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06866f28_572b9dfc",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-08-17T11:21:47Z",
+      "side": 1,
+      "message": "Perhaps we could handle both cases here (e.g. if request_ref then remove build request else log that the build has not been submitted), and then keep the del statement at the end.",
+      "revId": "a746cc75c1a30e4039066b69465411ba0b9b2c19",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
