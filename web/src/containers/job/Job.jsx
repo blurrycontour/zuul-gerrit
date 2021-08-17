@@ -15,7 +15,6 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import {
-  PageSection,
   Tab,
   Tabs,
   TabTitleText,
@@ -67,24 +66,22 @@ class Job extends React.Component {
 
     return (
       <React.Fragment>
-        <PageSection>
-          <Title headingLevel="h2">
-            Details for job <span style={{color: 'var(--pf-global--primary-color--100)'}}>{job[0].name}</span>
-          </Title>
-          <Tabs activeKey={activeTabKey}
-                onSelect={(event, tabIndex) => this.handleTabClick(tabIndex)}
-                isBox>
-            {job.map((variant, idx) => (
-              <Tab eventKey={idx} key={idx}
-                   title={<TabTitleText>{this.renderVariantTitle(variant)}</TabTitleText>}>
-                <JobVariant
-                  variant={job[idx]}
-                  parent={this}
-                />
-              </Tab>
-            ))}
-          </Tabs>
-        </PageSection>
+        <Title headingLevel="h2">
+          Details for job <span style={{color: 'var(--pf-global--primary-color--100)'}}>{job[0].name}</span>
+        </Title>
+        <Tabs activeKey={activeTabKey}
+              onSelect={(event, tabIndex) => this.handleTabClick(tabIndex)}
+              isBox>
+          {job.map((variant, idx) => (
+            <Tab eventKey={idx} key={idx}
+                 title={<TabTitleText>{this.renderVariantTitle(variant)}</TabTitleText>}>
+              <JobVariant
+                variant={job[idx]}
+                parent={this}
+              />
+            </Tab>
+          ))}
+        </Tabs>
       </React.Fragment>
     )
   }
