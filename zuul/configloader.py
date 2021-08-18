@@ -1818,6 +1818,7 @@ class TenantParser(object):
                 job.ltime = ltime
                 job.source_context = source_context
                 jobs.append(job)
+        del project
 
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
@@ -1839,7 +1840,8 @@ class TenantParser(object):
             files_cache = self.unparsed_config_cache.getFilesCache(
                 job.source_context.project.canonical_name,
                 job.source_context.branch)
-            with self.unparsed_config_cache.writeLock(project.canonical_name):
+            with self.unparsed_config_cache.writeLock(
+                    job.source_context.project.canonical_name):
                 for fn, content in job.files.items():
                     # Cache file in Zookeeper
                     if content is not None:
@@ -1854,11 +1856,12 @@ class TenantParser(object):
                 for fn in files_cache.keys():
                     if ((fn in ok_files) or
                         any([fn.startswith(d + '/') for d in ok_dirs])):
-                        if fn not in job.files:
+                        if job.files.get(fn) is None:
                             self.log.debug(
                                 "Removing file from cache for project "
                                 "%s @%s: %s",
-                                project.canonical_name, branch, fn)
+                                job.source_context.project.canonical_name,
+                                branch, fn)
                             del files_cache[fn]
                 files_cache.setValidFor(job.extra_config_files,
                                         job.extra_config_dirs,

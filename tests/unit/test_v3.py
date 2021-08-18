@@ -2440,6 +2440,55 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Debug information:',
                       A.messages[0], "A should have debug info")
 
+    def test_file_move(self):
+        # Tests that a zuul config file can be renamed
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test2
+                parent: project-test1
+
+            - project:
+                check:
+                  jobs:
+                    - project-test2
+            """)
+        file_dict = {'.zuul.yaml': None,
+                     '.zuul.d/newfile.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+        ], ordered=True)
+
+        self.scheds[0].sched.stop()
+        self.scheds[0].sched.join()
+        del self.scheds[0]
+        self.log.debug("Restarting scheduler")
+        self.createScheduler()
+        self.scheds[0].start(self.validate_tenants)
+
+        self.waitUntilSettled()
+
+        # The fake gerrit was lost with the scheduler shutdown;
+        # restore the state we care about:
+        self.fake_gerrit.change_number = 2
+
+        C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='3,1'),
+        ], ordered=True)
+
 
 class TestInRepoConfigDir(ZuulTestCase):
     # Like TestInRepoConfig, but the fixture test files are in zuul.d
