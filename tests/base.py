@@ -4324,8 +4324,8 @@ class SchedulerTestManager:
     def __setitem__(self, key: int, value: SchedulerTestApp):
         raise Exception("Not implemented, use create method!")
 
-    def __delitem__(self, key, value):
-        raise Exception("Not implemented!")
+    def __delitem__(self, key):
+        del self.instances[key]
 
     def __iter__(self):
         return iter(self.instances)
@@ -4595,11 +4595,7 @@ class ZuulTestCase(BaseTestCase):
         self.builds = self.executor_server.running_builds
 
         self.scheds = SchedulerTestManager(self.validate_tenants)
-        self.scheds.create(
-            self.log, self.config, self.changes,
-            self.additional_event_queues, self.upstream_root, self.rpcclient,
-            self.poller_events, self.git_url_with_auth,
-            self.fake_sql, self.addCleanup, self.validate_tenants)
+        self.createScheduler()
 
         self.merge_server = None
 
@@ -4610,6 +4606,13 @@ class ZuulTestCase(BaseTestCase):
 
         self.scheds.execute(
             lambda app: app.start(self.validate_tenants))
+
+    def createScheduler(self):
+        self.scheds.create(
+            self.log, self.config, self.changes,
+            self.additional_event_queues, self.upstream_root, self.rpcclient,
+            self.poller_events, self.git_url_with_auth,
+            self.fake_sql, self.addCleanup, self.validate_tenants)
 
     def __event_queues(self, matcher) -> List[Queue]:
         # TODO (felix): Can be removed when the nodes provisioned events are
