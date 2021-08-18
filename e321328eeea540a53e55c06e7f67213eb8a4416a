@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c440df2d_1e235a20",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-18T15:54:17Z",
+      "side": 1,
+      "message": "I guess changes here are not supposed to end up in the final impl.",
+      "revId": "e321328eeea540a53e55c06e7f67213eb8a4416a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
