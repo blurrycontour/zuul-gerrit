@@ -1787,8 +1787,10 @@ class TenantParser(object):
                         pb_ltime = min_ltimes[project.canonical_name][branch]
                         if files_cache.isValidFor(tpc, pb_ltime):
                             self.log.debug(
-                                "Using files from cache for project %s @%s",
-                                project.canonical_name, branch)
+                                "Using files from cache for project "
+                                "%s @%s: %s",
+                                project.canonical_name, branch,
+                                list(files_cache.keys()))
                             branch_cache = abide.getUnparsedBranchCache(
                                 project.canonical_name, branch)
                             if branch_cache.isValidFor(tpc, files_cache.ltime):
@@ -1842,6 +1844,22 @@ class TenantParser(object):
                     # Cache file in Zookeeper
                     if content is not None:
                         files_cache[fn] = content
+                # If there are any files in the cache which match our
+                # set of requested files but aren't in the set
+                # returned by the cat job, then they must have been
+                # deleted.  Remove them from the cache so that the
+                # file list in the cache is correct.
+                ok_files = ('zuul.yaml', '.zuul.yaml') + tpc.extra_config_files
+                ok_dirs = ('zuul.d', '.zuul.d') + tpc.extra_config_dirs
+                for fn in files_cache.keys():
+                    if ((fn in ok_files) or
+                        any([fn.startswith(d + '/') for d in ok_dirs])):
+                        if fn not in job.files:
+                            self.log.debug(
+                                "Removing file from cache for project "
+                                "%s @%s: %s",
+                                project.canonical_name, branch, fn)
+                            del files_cache[fn]
                 files_cache.setValidFor(job.extra_config_files,
                                         job.extra_config_dirs,
                                         job.ltime)
@@ -2405,10 +2423,10 @@ class ConfigLoader(object):
                 if fn.startswith(".zuul.d/"):
                     fns2.append(fn)
                 for ef in tpc.extra_config_files:
-                    if fn.startswith(ef):
+                    if fn == ef:
                         fns3.append(fn)
                 for ed in tpc.extra_config_dirs:
-                    if fn.startswith(ed):
+                    if fn.startswith(ed + '/'):
                         fns4.append(fn)
             fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                    sorted(fns2) + fns3 + sorted(fns4))
