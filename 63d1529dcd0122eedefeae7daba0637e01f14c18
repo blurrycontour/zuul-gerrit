@@ -16,6 +16,24 @@
       "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "422b9398_f8aa8c29",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-19T22:57:10Z",
+      "side": 1,
+      "message": "Does having the description called out in a card make as much sense in that model though?\n\nCertainly we can, just remove the columnModifier and set isHorizontal \n\nI found it better to have it mostly all in front of me in the wider format, but it is clearly only a subjective measure.",
+      "parentUuid": "bcc1c2de_0855af78",
+      "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
