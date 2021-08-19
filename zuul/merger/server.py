@@ -198,6 +198,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             except Exception:
                 self.log.exception("Error in merge thread:")
                 time.sleep(5)
+                self.merger_loop_wake_event.set()
 
     def _runMergeJob(self, merge_request):
         log = get_annotated_logger(
@@ -207,6 +208,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         if not self.merger_api.lock(merge_request, blocking=False):
             return
 
+        result = None
         try:
             merge_request.state = MergeRequest.RUNNING
             params = self.merger_api.getParams(merge_request)
@@ -215,7 +217,6 @@ class BaseMergeServer(metaclass=ABCMeta):
             # don't loop over and try to lock it again and again.
             self.merger_api.update(merge_request)
             self.log.debug("Next executed merge job: %s", merge_request)
-            result = None
             try:
                 result = self.executeMergeJob(merge_request, params)
             except Exception:
