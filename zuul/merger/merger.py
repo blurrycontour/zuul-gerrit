@@ -68,10 +68,12 @@ def nullcontext():
 class Repo(object):
     commit_re = re.compile(r'^commit ([0-9a-f]{40})$')
     diff_re = re.compile(r'^@@ -\d+,\d \+(\d+),\d @@$')
+    retry_attempts = 3
+    retry_interval = 30
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 retry_attempts=3, retry_interval=30, zuul_event_id=None):
+                 zuul_event_id=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
@@ -92,8 +94,6 @@ class Repo(object):
         self.username = username
         self.cache_path = cache_path
         self._initialized = False
-        self.retry_attempts = retry_attempts
-        self.retry_interval = retry_interval
         try:
             self._setup_known_hosts()
         except Exception:

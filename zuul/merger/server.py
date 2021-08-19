@@ -317,61 +317,65 @@ class BaseMergeServer(metaclass=ABCMeta):
     def completeMergeJob(self, merge_request, result):
         log = get_annotated_logger(self.log, merge_request.event_id)
 
-        if result is not None:
-            payload = json.dumps(result)
-            self.log.debug("Completed %s job %s: payload size: %s",
-                           merge_request.job_type, merge_request.uuid,
-                           sys.getsizeof(payload))
-            merged = result.get("merged", False)
-            updated = result.get("updated", False)
-            commit = result.get("commit")
-            repo_state = result.get("repo_state", {})
-            item_in_branches = result.get("item_in_branches", [])
-            files = result.get("files", {})
+        # Always provide a result event, even if we have no
+        # information; otherwise items can get stuck in the queue.
+        if result is None:
+            result = {}
 
-            log.info(
-                "Merge %s complete, merged: %s, updated: %s, commit: %s, "
-                "branches: %s",
+        payload = json.dumps(result)
+        self.log.debug("Completed %s job %s: payload size: %s",
+                       merge_request.job_type, merge_request.uuid,
+                       sys.getsizeof(payload))
+        merged = result.get("merged", False)
+        updated = result.get("updated", False)
+        commit = result.get("commit")
+        repo_state = result.get("repo_state", {})
+        item_in_branches = result.get("item_in_branches", [])
+        files = result.get("files", {})
+
+        log.info(
+            "Merge %s complete, merged: %s, updated: %s, commit: %s, "
+            "branches: %s",
+            merge_request,
+            merged,
+            updated,
+            commit,
+            item_in_branches,
+        )
+
+        # Provide a result either via a result future or a result event
+        if merge_request.result_path:
+            log.debug(
+                "Providing synchronous result via future for %s",
                 merge_request,
-                merged,
-                updated,
-                commit,
-                item_in_branches,
             )
+            self.merger_api.reportResult(merge_request, result)
 
-            # Provide a result either via a result future or a result event
-            if merge_request.result_path:
-                log.debug(
-                    "Providing synchronous result via future for %s",
-                    merge_request,
+        elif merge_request.build_set_uuid:
+            log.debug(
+                "Providing asynchronous result via result event for %s",
+                merge_request,
+            )
+            if merge_request.job_type == MergeRequest.FILES_CHANGES:
+                event = FilesChangesCompletedEvent(
+                    merge_request.build_set_uuid, files
                 )
-                self.merger_api.reportResult(merge_request, result)
-
-            elif merge_request.build_set_uuid:
-                log.debug(
-                    "Providing asynchronous result via result event for %s",
-                    merge_request,
+            else:
+                event = MergeCompletedEvent(
+                    merge_request.uuid,
+                    merge_request.build_set_uuid,
+                    merged,
+                    updated,
+                    commit,
+                    files,
+                    repo_state,
+                    item_in_branches,
                 )
-                if merge_request.job_type == MergeRequest.FILES_CHANGES:
-                    event = FilesChangesCompletedEvent(
-                        merge_request.build_set_uuid, files
-                    )
-                else:
-                    event = MergeCompletedEvent(
-                        merge_request.uuid,
-                        merge_request.build_set_uuid,
-                        merged,
-                        updated,
-                        commit,
-                        files,
-                        repo_state,
-                        item_in_branches,
-                    )
 
-                tenant_name = merge_request.tenant_name
-                pipeline_name = merge_request.pipeline_name
+            tenant_name = merge_request.tenant_name
+            pipeline_name = merge_request.pipeline_name
 
-                self.result_events[tenant_name][pipeline_name].put(event)
+            self.result_events[tenant_name][pipeline_name].put(event)
 
         # Set the merge request to completed, unlock and delete it. Although
         # the state update is mainly for consistency reasons, it might come in
