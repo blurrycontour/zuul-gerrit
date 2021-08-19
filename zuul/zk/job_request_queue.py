@@ -486,6 +486,19 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         except Exception:
             self.log.exception(
                 "Error cleaning up result queue %s", self)
+        try:
+            for lock_id in self.kazoo_client.get_children(self.LOCK_ROOT):
+                try:
+                    lock_path = "/".join([self.LOCK_ROOT, lock_id])
+                    request_path = "/".join([self.REQUEST_ROOT, lock_id])
+                    if not self.kazoo_client.exists(request_path):
+                        self.log.error("Removing stale lock: %s", lock_path)
+                        self.kazoo_client.delete(lock_path, recursive=True)
+                except Exception:
+                    self.log.execption(
+                        "Unable to delete lock %s", path)
+        except Exception:
+            self.log.exception("Error cleaning up locks %s", self)
 
     @staticmethod
     def _bytesToDict(data):
