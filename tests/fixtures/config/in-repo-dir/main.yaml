@@ -6,3 +6,17 @@
           - common-config
         untrusted-projects:
           - org/project
+          - org/project1:
+              exclude: project
+
+- tenant:
+    name: tenant-two
+    source:
+      gerrit:
+        config-projects:
+          - common-config:
+              exclude: project
+        untrusted-projects:
+          - org/project1:
+              extra-config-paths:
+                - extra.d/

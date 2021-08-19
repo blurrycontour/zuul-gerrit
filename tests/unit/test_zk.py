@@ -196,6 +196,10 @@ class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
             self.assertEqual(master_files["/path/to/file"], "content")
             self.assertEqual(len(master_files), 1)
 
+        with self.config_cache.writeLock("project"):
+            master_files.clear()
+            self.assertEqual(len(master_files), 0)
+
     def test_valid_for(self):
         tpc = model.TenantProjectConfig("project")
         tpc.extra_config_files = {"foo.yaml", "bar.yaml"}
