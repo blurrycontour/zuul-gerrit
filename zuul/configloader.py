@@ -1818,10 +1818,18 @@ class TenantParser(object):
                 job.ltime = ltime
                 job.source_context = source_context
                 jobs.append(job)
-        # Remove project from scope, so it's not accidentally used in
-        # the following section.
-        del project
+        try:
+            self._processCatJobs(abide, tenant, loading_errors, jobs)
+        except Exception:
+            self.log.debug("Error processing cat jobs, canceling")
+            for job in jobs:
+                try:
+                    self.log.debug("Canceling cat job %s", job)
+                    self.merger.cancel(job)
+                except Exception:
+                    self.log.exception("Unable to cancel job %s", job)
 
+    def _processCatJobs(self, abide, tenant, loading_errors, jobs):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait(self.merger.git_timeout)

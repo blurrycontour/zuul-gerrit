@@ -212,7 +212,8 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                 [self.WAITER_ROOT, request.uuid]
             )
             self.kazoo_client.create(waiter_path, ephemeral=True)
-            result = JobResultFuture(self.client, result_path, waiter_path)
+            result = JobResultFuture(self.client, request.path,
+                                     result_path, waiter_path)
             request.result_path = result_path
 
         log.debug("Submitting job request to ZooKeeper %s", request)
