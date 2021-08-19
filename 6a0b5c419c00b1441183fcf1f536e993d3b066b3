@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "5f5754f5_a7cd3d8b",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 693,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-19T23:30:19Z",
+      "side": 1,
+      "message": "Probably so, but they also might diverge over time.  But I guess we could handle that when/if it happens.",
+      "revId": "6a0b5c419c00b1441183fcf1f536e993d3b066b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d696291_a0ba7348",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 3
@@ -39,6 +56,23 @@
       "revId": "6a0b5c419c00b1441183fcf1f536e993d3b066b3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89a67be9_805dd5e7",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-19T23:30:19Z",
+      "side": 1,
+      "message": "Correct as written: I mean to say that if we\u0027re here because something has gone wrong.  Either this job is running and about to return results, or is stuck in some git operation that will take an hour to complete and will then report results, or it has already failed and won\u0027t be doing anything.  Net result, it may or may not return data, and if it does, it may be soon or much much later than now.  If it happens, it will be GC\u0027d.",
+      "revId": "6a0b5c419c00b1441183fcf1f536e993d3b066b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
