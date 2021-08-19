@@ -2543,6 +2543,62 @@ class TestInRepoConfigDir(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='3,1'),
         ], ordered=True)
 
+    def test_extra_config_move(self):
+        # Tests that a extra config file can be renamed
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project1-test2
+
+            - project:
+                name: org/project1
+                check:
+                  jobs:
+                    - project1-test2
+            """)
+        # Wait until settled so that we process both tenant reconfig
+        # events in one pass through the scheduler loop.
+        self.waitUntilSettled()
+        # Add an empty zuul.yaml here so we are triggering a tenant
+        # reconfig for both tenants as the extra config dir is only
+        # considered for tenant-two.
+        file_dict = {'zuul.yaml': '',
+                     'extra.d/project.yaml': None,
+                     'extra.d/newfile.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project1-test2', result='SUCCESS', changes='2,1'),
+        ], ordered=True)
+
+        self.scheds[0].sched.stop()
+        self.scheds[0].sched.join()
+        del self.scheds[0]
+        self.log.debug("Restarting scheduler")
+        self.createScheduler()
+        self.scheds[0].start(self.validate_tenants)
+
+        self.waitUntilSettled()
+
+        # The fake gerrit was lost with the scheduler shutdown;
+        # restore the state we care about:
+        self.fake_gerrit.change_number = 2
+
+        C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project1-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project1-test2', result='SUCCESS', changes='3,1'),
+        ], ordered=True)
+
 
 class TestGlobalRepoState(AnsibleZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'

@@ -134,6 +134,10 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
             children = []
         return len(children)
 
+    def clear(self):
+        with contextlib.suppress(NoNodeError):
+            self.kazoo_client.delete(self.root_path, recursive=True)
+
 
 class UnparsedConfigCache(ZooKeeperSimpleBase):
     """Zookeeper cache for unparsed config files."""
