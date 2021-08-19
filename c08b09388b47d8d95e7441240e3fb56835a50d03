@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "208f9f86_947e1e4a",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-19T23:12:13Z",
+      "side": 1,
+      "message": "Super minor nit: we only need the lock path if the request path does not exist. We could save some cycles by creating this string in the if block below.",
+      "revId": "c08b09388b47d8d95e7441240e3fb56835a50d03",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
