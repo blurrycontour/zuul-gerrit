@@ -34,6 +34,24 @@
       "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e56610f_3d72a9df",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-19T23:39:34Z",
+      "side": 1,
+      "message": "Having the description front and center if it is provided makes sense to me since that is a human written version of what this thing is for so signal to noise should be very good for it.\n\nWith the multiple columns I find it hard to scan for the data as the data is so spread out. If others like this rendering I don\u0027t feel so strongly that I would prevent it from landing though.",
+      "parentUuid": "422b9398_f8aa8c29",
+      "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
