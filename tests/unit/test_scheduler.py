@@ -36,6 +36,7 @@ from zuul.driver.gerrit import gerritreporter
 import zuul.scheduler
 import zuul.rpcclient
 import zuul.model
+import zuul.merger.merger
 
 from tests.base import (
     SSLZuulTestCase,
@@ -45,6 +46,7 @@ from tests.base import (
     iterate_timeout,
     RecordingExecutorServer,
     TestConnectionRegistry,
+    FIXTURE_DIR,
 )
 from zuul.zk.layout import LayoutState
 
@@ -6505,6 +6507,17 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(len(A.messages), 1)
         self.assertTrue('YAY' in A.messages[0])
         self.assertTrue('BOO' in A.messages[0])
+
+    def test_merge_error(self):
+        # Test we don't get stuck on a merger error
+        self.waitUntilSettled()
+        self.patch(zuul.merger.merger.Repo, 'retry_attempts', 1)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.patch(git.Git, 'GIT_PYTHON_GIT_EXECUTABLE',
+                   os.path.join(FIXTURE_DIR, 'git_fail.sh'))
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
 
 
 class TestChangeQueues(ZuulTestCase):
