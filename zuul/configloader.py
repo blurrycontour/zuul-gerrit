@@ -1818,6 +1818,8 @@ class TenantParser(object):
                 job.ltime = ltime
                 job.source_context = source_context
                 jobs.append(job)
+        # Remove project from scope, so it's not accidentally used in
+        # the following section.
         del project
 
         for job in jobs:
@@ -1842,27 +1844,15 @@ class TenantParser(object):
                 job.source_context.branch)
             with self.unparsed_config_cache.writeLock(
                     job.source_context.project.canonical_name):
+                # Since the cat job returns all required config files
+                # for ALL tenants the project is a part of, we can
+                # clear the whole cache and then populate it with the
+                # updated content.
+                files_cache.clear()
                 for fn, content in job.files.items():
                     # Cache file in Zookeeper
                     if content is not None:
                         files_cache[fn] = content
-                # If there are any files in the cache which match our
-                # set of requested files but aren't in the set
-                # returned by the cat job, then they must have been
-                # deleted.  Remove them from the cache so that the
-                # file list in the cache is correct.
-                ok_files = ('zuul.yaml', '.zuul.yaml') + tpc.extra_config_files
-                ok_dirs = ('zuul.d', '.zuul.d') + tpc.extra_config_dirs
-                for fn in files_cache.keys():
-                    if ((fn in ok_files) or
-                        any([fn.startswith(d + '/') for d in ok_dirs])):
-                        if job.files.get(fn) is None:
-                            self.log.debug(
-                                "Removing file from cache for project "
-                                "%s @%s: %s",
-                                job.source_context.project.canonical_name,
-                                branch, fn)
-                            del files_cache[fn]
                 files_cache.setValidFor(job.extra_config_files,
                                         job.extra_config_dirs,
                                         job.ltime)
