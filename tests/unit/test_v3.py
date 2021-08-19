@@ -485,6 +485,8 @@ class TestBranchDeletion(ZuulTestCase):
         self.assertHistory([
             dict(name='base', result='SUCCESS', changes='2,1')])
 
+        self.scheds.first.sched.merger.merger_api.cleanup(0)
+
 
 class TestBranchTag(ZuulTestCase):
     tenant_config_file = 'config/branch-tag/main.yaml'

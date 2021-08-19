@@ -153,3 +153,17 @@ class MergeClient(object):
             # update will fail in this case and we can simply ignore
             # the exception.
             return
+
+    def cancel(self, job):
+        try:
+            # Try to remove the request first
+            request = self.merger_api.get(job.request_path)
+            if request:
+                if self.merger_api.lock(request, blocking=False):
+                    try:
+                        self.merger_api.remove(request)
+                    finally:
+                        self.executor_api.unlock(build_request)
+        finally:
+            # Regardless of that, remove the waiter node
+            job.cancel()

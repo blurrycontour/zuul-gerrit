@@ -26,15 +26,6 @@ class TestComponentRegistry(ZuulTestCase):
     def setUp(self):
         super().setUp()
 
-        self.host = '::'
-        self.zk_client = ZooKeeperClient(
-            self.zk_chroot_fixture.zk_hosts,
-            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
-            tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
-        )
-        self.addCleanup(self.zk_client.disconnect)
-        self.zk_client.connect()
         self.component_registry = ComponentRegistry(self.zk_client)
 
     def assertComponentAttr(self, component_name, attr_name,
@@ -114,7 +105,7 @@ class TestComponentRegistry(ZuulTestCase):
         config.read_dict(self.config)
         config.read_dict({
             'fingergw': {
-                'listen_address': self.host,
+                'listen_address': '::',
                 'port': '0',
                 'hostname': 'janine',
             }
