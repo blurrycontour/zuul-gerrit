@@ -16,6 +16,23 @@
       "revId": "bda3854247501952e7b3bdc2d02d3d1693498dd0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "38ccf896_1687fe8a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-19T13:44:49Z",
+      "side": 1,
+      "message": "We followed up in IRC and I understand now.  The test can submit the event while the main loop is running; waiting until settled at the start of the test should fix it.",
+      "revId": "bda3854247501952e7b3bdc2d02d3d1693498dd0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
