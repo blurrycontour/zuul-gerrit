@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c11e89f_d645ee5d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1855,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-19T11:53:47Z",
+      "side": 0,
+      "message": "Just noticed that the tpc is also leaked from the same scope as the project before and shouldn\u0027t be used at all.",
+      "revId": "60f846aa7a5abfd7e7ffcc6918bf138c4f112fc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
