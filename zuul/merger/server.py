@@ -358,6 +358,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                     )
                 else:
                     event = MergeCompletedEvent(
+                        merge_request.uuid,
                         merge_request.build_set_uuid,
                         merged,
                         updated,

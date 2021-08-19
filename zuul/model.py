@@ -4085,6 +4085,7 @@ class BuildCompletedEvent(ResultEvent):
 class MergeCompletedEvent(ResultEvent):
     """A remote merge operation has completed
 
+    :arg str request_uuid: The UUID of the merge request job.
     :arg str build_set_uuid: The UUID of the build_set which is ready.
     :arg bool merged: Whether the merge succeeded (changes with refs).
     :arg bool updated: Whether the repo was updated (changes without refs).
@@ -4094,8 +4095,9 @@ class MergeCompletedEvent(ResultEvent):
         commit in the merge list appears (changes without refs).
     """
 
-    def __init__(self, build_set_uuid, merged, updated, commit,
-                 files, repo_state, item_in_branches):
+    def __init__(self, request_uuid, build_set_uuid, merged, updated,
+                 commit, files, repo_state, item_in_branches):
+        self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.merged = merged
         self.updated = updated
@@ -4104,8 +4106,15 @@ class MergeCompletedEvent(ResultEvent):
         self.repo_state = repo_state or {}
         self.item_in_branches = item_in_branches or []
 
+    def __repr__(self):
+        return ('<MergeCompletedEvent job: %s buildset: %s merged: %s '
+                'updated: %s commit: %s>' % (
+                    self.request_uuid, self.build_set_uuid,
+                    self.merged, self.updated, self.commit))
+
     def toDict(self):
         return {
+            "request_uuid": self.request_uuid,
             "build_set_uuid": self.build_set_uuid,
             "merged": self.merged,
             "updated": self.updated,
@@ -4118,6 +4127,7 @@ class MergeCompletedEvent(ResultEvent):
     @classmethod
     def fromDict(cls, data):
         return cls(
+            data.get("request_uuid"),
             data.get("build_set_uuid"),
             data.get("merged"),
             data.get("updated"),
