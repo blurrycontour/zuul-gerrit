@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bcc1c2de_0855af78",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-19T15:42:25Z",
+      "side": 1,
+      "message": "I don\u0027t mind the new card, but I definitely preferred the list for everything else. The new 2 column setup with header keys and data bodies is much harder to scan than a single column of key: value horizontal pairs.\n\nWould it be possible to put the card above the list then use the list as before?",
+      "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
