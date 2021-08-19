@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "69376e7e_a39b6fc3",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 693,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-19T23:24:59Z",
+      "side": 1,
+      "message": "Could the above call self.assertCleanZooKeeper()?",
+      "revId": "6a0b5c419c00b1441183fcf1f536e993d3b066b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d696291_a0ba7348",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-19T23:24:59Z",
+      "side": 1,
+      "message": "Nit I think this is meant to be \u0027never\u0027.",
+      "range": {
+        "startLine": 491,
+        "startChar": 56,
+        "endLine": 491,
+        "endChar": 60
+      },
+      "revId": "6a0b5c419c00b1441183fcf1f536e993d3b066b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
