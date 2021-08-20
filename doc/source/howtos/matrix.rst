@@ -2,15 +2,13 @@ Chatting with Matrix
 ====================
 
 The Zuul community uses mailing lists for long-form communication and
-IRC for real-time (or near real-time) chat.  We are working on moving
-our chat platform to Matrix.  You can start using Matrix now to chat
-with us on IRC and when we move, the transition will be seamless.
+Matrix for real-time (or near real-time) chat.
 
 This guide will walk you through getting started with Matrix and how
 to use it to join communities like Zuul on IRC.
 
 Familiar with Matrix already and want to jump straight to the room?
-Follow this link: `https://matrix.to/#/#_oftc_#zuul:matrix.org <https://matrix.to/#/#_oftc_#zuul:matrix.org>`_
+Follow this link: `https://matrix.to/#/#zuul:opendev.org <https://matrix.to/#/#zuul:opendev.org>`_
 
 Why Use Matrix?
 ---------------
@@ -78,12 +76,8 @@ You can follow the link to sign in.
 .. image:: /images/matrix/account-signin.png
    :align: center
 
-Join the #zuul Channel
-----------------------
-
-The ``#zuul`` channel is hosted on the OFTC IRC network, and is
-accessible via a bridge run by the Matrix community.  To join
-``#zuul``, perform the following steps:
+Join the #zuul Room
+-------------------
 
 Click the plus icon next to `Rooms` on the left of the screen, then
 click `Explore public rooms` in the dropdown that appears.
@@ -91,41 +85,12 @@ click `Explore public rooms` in the dropdown that appears.
 .. image:: /images/matrix/account-rooms-dropdown.png
    :align: center
 
-A popup dialog will appear; below the search bar in the dialog, click
-the dropdown selector labeled `Matrix rooms (matrix.org)` and change
-it to `OFTC rooms (matrix.org)`.  Then enter ``#zuul`` into the search
-box.
+A popup dialog will appear; enter ``#zuul:opendev.org`` into the
+search box and hit `enter` or click `Join`, and you will join the
+room.
 
 .. image:: /images/matrix/account-rooms-zuul.png
    :align: center
-
-It will display `No results for "#zuul"` which is an unfortunate
-consequence of one of the anti-spam measures that is necessary on IRC.
-Disregard that and hit `enter` or click `Join`, and you will join the
-room.
-
-If this is your first time joining an OFTC channel, you will also
-receive an invitation to join the `OFTC IRC Bridge status` room.
-
-.. image:: /images/matrix/account-rooms-invite.png
-   :align: center
-
-Accept the invitation.
-
-.. image:: /images/matrix/account-rooms-accept.png
-   :align: center
-
-This is a private control channel between you and the system that
-operates the OFTC bridge.  Here you can perform some IRC commands such
-as changing your nickname and setting up nick registration.  That is
-out of scope for this HOWTO, but advanced IRC users may be interested
-in doing so.
-
-You may repeat this procedure for any other IRC channels on the OFTC,
-Freenode, or libera.chat networks.
-
-Click the `#zuul` room name on the left of the screen to return the
-Zuul room.
 
 Go ahead and say hi, introduce yourself, and let us know what you're
 working on or any questions you have.  Keep in mind that the Zuul
@@ -147,3 +112,4 @@ improve your experience.
 
    matrix-encryption
    matrix-id
+   matrix-irc
