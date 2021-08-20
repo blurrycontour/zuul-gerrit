@@ -4210,6 +4210,35 @@ class BaseTestCase(testtools.TestCase):
             ChrootedKazooFixture(self.id())
         )
 
+    def getZKWatches(self):
+        chroot = self.zk_chroot_fixture.zookeeper_chroot
+        data = self.zk_client.client.command(b'wchp')
+        ret = {}
+        sessions = None
+        for line in data.split('\n'):
+            if line.startswith('\t'):
+                if sessions is not None:
+                    sessions.append(line.strip())
+            else:
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith(chroot):
+                    line = line[len(chroot):]
+                    sessions = []
+                    ret[line] = sessions
+                else:
+                    sessions = None
+        return ret
+
+    def getZKTree(self, root):
+        items = []
+        for x in self.zk_client.client.get_children(root):
+            path = '/'.join([root, x])
+            items.append(path)
+            items.extend(self.getZKTree(path))
+        return items
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -4953,6 +4982,7 @@ class ZuulTestCase(BaseTestCase):
         self.assertNodepoolState()
         self.assertNoGeneratedKeys()
         self.assertSQLState()
+        self.assertCleanZooKeeper()
         ipm = zuul.manager.independent.IndependentPipelineManager
         for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
@@ -5385,6 +5415,16 @@ class ZuulTestCase(BaseTestCase):
                             pipeline_queue.queue))
                     self.assertEqual(len(pipeline_queue.queue), 0,
                                      "Pipelines queues should be empty")
+
+    def assertCleanZooKeeper(self):
+        # Make sure there are no extraneous ZK nodes
+        client = self.merger_api
+        self.assertEqual(self.getZKTree(client.REQUEST_ROOT), [])
+        self.assertEqual(self.getZKTree(client.PARAM_ROOT), [])
+        self.assertEqual(self.getZKTree(client.RESULT_ROOT), [])
+        self.assertEqual(self.getZKTree(client.RESULT_DATA_ROOT), [])
+        self.assertEqual(self.getZKTree(client.WAITER_ROOT), [])
+        self.assertEqual(self.getZKTree(client.LOCK_ROOT), [])
 
     def assertReportedStat(self, key, value=None, kind=None):
         """Check statsd output

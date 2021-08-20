@@ -445,9 +445,10 @@ class JobResultFuture(EventResultFuture):
 
     log = logging.getLogger("zuul.JobResultFuture")
 
-    def __init__(self, client, result_path, waiter_path):
+    def __init__(self, client, request_path, result_path, waiter_path):
         super().__init__(client, result_path)
 
+        self.request_path = request_path
         self._waiter_path = waiter_path
         self._result_data_path = None
         self.merged = None
@@ -485,6 +486,12 @@ class JobResultFuture(EventResultFuture):
         self.repo_state = self.data.get("repo_state", {})
         self.item_in_branches = self.data.get("item_in_branches", [])
         return res
+
+    def cancel(self):
+        # Remove our waiter node so that if a result is ever reported,
+        # it will be garbage collected.
+        with suppress(NoNodeError):
+            self.kazoo_client.delete(self._waiter_path)
 
 
 class ManagementEventResultFuture(EventResultFuture):
