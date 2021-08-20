@@ -215,6 +215,11 @@ def registerProjects(source_name, client, config):
                 client.addProjectByName(project)
 
 
+class StatException(Exception):
+    # Used by assertReportedStat
+    pass
+
+
 class GerritDriverMock(GerritDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
                  upstream_root: str, additional_event_queues, poller_events,
@@ -5426,7 +5431,7 @@ class ZuulTestCase(BaseTestCase):
         self.assertEqual(self.getZKTree(client.WAITER_ROOT), [])
         self.assertEqual(self.getZKTree(client.LOCK_ROOT), [])
 
-    def assertReportedStat(self, key, value=None, kind=None):
+    def assertReportedStat(self, key, value=None, kind=None, timeout=5):
         """Check statsd output
 
         Check statsd return values.  A ``value`` should specify a
@@ -5443,6 +5448,8 @@ class ZuulTestCase(BaseTestCase):
           - ``ms`` timing
           - ``s`` set
 
+        :arg int timeout: How long to wait for the stat to appear
+
         :returns: The value
         """
 
@@ -5450,7 +5457,7 @@ class ZuulTestCase(BaseTestCase):
             self.assertNotEqual(kind, None)
 
         start = time.time()
-        while time.time() < (start + 5):
+        while time.time() <= (start + timeout):
             # Note our fake statsd just queues up results in a queue.
             # We just keep going through them until we find one that
             # matches, or fail out.  If statsd pipelines are used,
@@ -5480,7 +5487,7 @@ class ZuulTestCase(BaseTestCase):
                     already_set_keys.update([k])
             for k in already_set_keys:
                 if key != k and key.startswith(k):
-                    raise Exception(
+                    raise StatException(
                         "Key %s is a gauge/counter and "
                         "we are trying to set subkey %s" % (k, key))
 
@@ -5513,7 +5520,16 @@ class ZuulTestCase(BaseTestCase):
                     return s_value
             time.sleep(0.1)
 
-        raise Exception("Key %s not found in reported stats" % key)
+        raise StatException("Key %s not found in reported stats" % key)
+
+    def assertUnReportedStat(self, key, value=None, kind=None):
+        try:
+            value = self.assertReportedStat(key, value=value,
+                                            kind=kind, timeout=0)
+        except StatException:
+            return
+        raise StatException("Key %s found in reported stats: %s" %
+                            (key, value))
 
     def assertBuilds(self, builds):
         """Assert that the running builds are as described.
