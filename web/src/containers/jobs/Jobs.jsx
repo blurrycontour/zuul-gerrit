@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
+  Button,
   Label,
   PageSection,
   Title,
@@ -290,15 +291,20 @@ class JobsList extends React.Component {
     }
   };
 
+  setExpanded = () => {
+    this.setState({isFiltered: true})
+  }
+
   render () {
     const { tenant } = this.props
     const { filteredItems, isFiltered } = this.state
 
     return (
-      <React.Fragment>
+        <React.Fragment>
         <Title headingLevel="h2">Job definitions for
-          <span style={{color: 'var(--pf-global--primary-color--100)'}}> {tenant.name}</span>
+            <span style={{color: 'var(--pf-global--primary-color--100)'}}> {tenant.name}</span>
         </Title>
+        <Button onClick={this.setExpanded} >Expand everything</Button>
         <PageSection>
           <TreeView
             onSearch={this.onSearch}
