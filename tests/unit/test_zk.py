@@ -984,6 +984,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertFalse(server.lock(server_a))
         self._assertEmptyRoots(client)
 
+    def test_leaked_lock(self):
+        client = MergerApi(self.zk_client)
+
+        # Manually create a lock with no underlying request
+        self.zk_client.client.create(f"{client.LOCK_ROOT}/A", b'')
+
+        client.cleanup(0)
+        self._assertEmptyRoots(client)
+
     def test_lost_merge_requests(self):
         # Test that lostMergeRequests() returns unlocked running merge
         # requests
