@@ -17,6 +17,7 @@ import * as API from '../api'
 export const NODES_FETCH_REQUEST = 'NODES_FETCH_REQUEST'
 export const NODES_FETCH_SUCCESS = 'NODES_FETCH_SUCCESS'
 export const NODES_FETCH_FAIL = 'NODES_FETCH_FAIL'
+export const NODES_SORT = 'NODES_SORT'
 
 export const requestNodes = () => ({
   type: NODES_FETCH_REQUEST
@@ -31,6 +32,12 @@ export const receiveNodes = (tenant, json) => ({
 const failedNodes = error => ({
   type: NODES_FETCH_FAIL,
   error
+})
+
+export const sortNodes = (sortIndex, sortDirection) => ({
+  type: NODES_SORT,
+  sortIndex: sortIndex,
+  sortDirection: sortDirection
 })
 
 const fetchNodes = (tenant) => dispatch => {

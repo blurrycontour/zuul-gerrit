@@ -15,18 +15,38 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
 import * as moment from 'moment'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
-import { fetchNodesIfNeeded } from '../actions/nodes'
+import {
+  Flex,
+  FlexItem,
+  Label,
+  PageSection,
+  PageSectionVariants,
+  Title
+} from '@patternfly/react-core'
+
+import {
+  TableComposable,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td
+} from '@patternfly/react-table'
+
+import { fetchNodesIfNeeded, sortNodes } from '../actions/nodes'
 import { Fetchable } from '../containers/Fetching'
 
-
-class NodesPage extends React.Component {
+class NodesPage extends React.PureComponent {
   static propTypes = {
     tenant: PropTypes.object,
-    remoteData: PropTypes.object,
+    nodes: PropTypes.array,
+    isFetching: PropTypes.bool,
+    activeSortIndex: PropTypes.number,
+    activeSortDirection: PropTypes.string,
+    table_columns: PropTypes.array,
+    table_column_descriptions: PropTypes.array,
     dispatch: PropTypes.func
   }
 
@@ -47,74 +67,119 @@ class NodesPage extends React.Component {
     }
   }
 
-  render () {
-    const { remoteData } = this.props
-    const nodes = remoteData.nodes
+  onSort = (event, index, direction) => {
+    this.props.dispatch(sortNodes(index, direction))
+  }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = value => <Table.Cell>{value}</Table.Cell>
-    const cellLabelsFormat = value => <Table.Cell>{value.join(',')}</Table.Cell>
-    const cellPreFormat = value => (
-      <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
-        {value}
-      </Table.Cell>)
-    const cellAgeFormat = value => (
-      <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
-        {moment.unix(value).fromNow()}
-      </Table.Cell>)
-
-    const columns = []
-    const myColumns = [
-      'id', 'labels', 'connection', 'server', 'provider', 'state',
-      'age', 'comment'
-    ]
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      if (column === 'labels') {
-        prop = 'type'
-        formatter = cellLabelsFormat
-      } else if (column === 'connection') {
-        prop = 'connection_type'
-      } else if (column === 'server') {
-        prop = 'external_id'
-        formatter = cellPreFormat
-      } else if (column === 'age') {
-        prop = 'state_time'
-        formatter = cellAgeFormat
+  cellFormat = (field, node) => {
+    if (field === 'id') {
+      return (<tt>{node.id}</tt>)
+    }
+    if (field === 'external_id') {
+      return (<tt>{node.external_id}</tt>)
+    }
+    if (field === 'labels') {
+      if (node.type && node.type.length > 0) {
+        return (<React.Fragment>
+                  {node.type.map((x,idx) => (
+                    <Label key={idx} variant='outline'>{x}</Label>
+                  ))}
+                </React.Fragment>)
+      } else {
+        return null
       }
-      columns.push({
-        header: {label: column, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
-    })
+    }
+    else if (field === 'state_time') {
+      return moment.unix(node['state_time']).fromNow()
+    }
+    else if (field === 'state') {
+      const value = node.state
+      if (value === 'in-use') {
+        return (<Label color="green">in-use</Label>)
+      }
+      else if (value === 'deleting') {
+        return (<Label color="orange">deleting</Label>)
+      }
+      else if (value === 'ready') {
+        return (<Label color="cyan">ready</Label>)
+      }
+      else if (value === 'hold') {
+        return (<Label color="purple">hold</Label>)
+      }
+      else {
+        return (<Label color="grey">{value}</Label>)
+      }
+    }
+    else {
+      return node[field]
+    }
+  }
+
+  render () {
     return (
-      <PageSection variant={PageSectionVariants.light}>
-        <PageSection style={{paddingRight: '5px'}}>
-          <Fetchable
-            isFetching={remoteData.isFetching}
-            fetchCallback={this.updateData}
-          />
+      <React.Fragment>
+        <PageSection>
+          <Flex>
+            <FlexItem>
+              <Title headingLevel="h2">Node overview</Title>
+            </FlexItem>
+            <FlexItem align={{ default: 'alignRight' }}>
+              <Fetchable
+                isFetching={this.props.isFetching}
+                fetchCallback={this.updateData}
+              />
+            </FlexItem>
+          </Flex>
         </PageSection>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
-        >
-          <Table.Header/>
-          <Table.Body
-            rows={nodes}
-            rowKey="id"
-          />
-        </Table.PfProvider>
-      </PageSection>
+        <PageSection variant={PageSectionVariants.light}>
+          <TableComposable variant='compact'>
+            <Thead>
+              <Tr>
+                {this.props.table_column_descriptions.map((column, idx) => {
+                  const sortParams = {
+                    sort: {
+                      sortBy: {
+                        index: this.props.activeSortIndex,
+                        direction: this.props.activeSortDirection
+                      },
+                      onSort: this.onSort,
+                      columnIndex: idx
+                    }
+                  }
+                  return(
+                    <Th key={idx} {...sortParams}>{column}</Th>
+                  ) })
+                }
+              </Tr>
+            </Thead>
+            <Tbody>
+              {this.props.nodes.map((row, rowIdx) => (
+                <Tr key={rowIdx}>
+                  {this.props.table_columns.map((colName, cellIdx) => (
+                    <Td key={`${rowIdx}_${cellIdx}`}
+                        dataLabel={this.props.table_column_descriptions[cellIdx]}>
+                      {this.cellFormat(colName, row)}
+                    </Td>)
+                                               )}
+                </Tr>))}
+            </Tbody>
+          </TableComposable>
+        </PageSection>
+      </React.Fragment>
     )
   }
 }
 
-export default connect(state => ({
-  tenant: state.tenant,
-  remoteData: state.nodes,
-}))(NodesPage)
+function mapStateToProps(state) {
+  return {
+    tenant: state.tenant,
+    isFetching: state.nodes.isFetching,
+    nodes: state.nodes.nodes,
+    activeSortDirection: state.nodes.activeSortDirection,
+    activeSortIndex: state.nodes.activeSortIndex,
+    table_columns: state.nodes.table_columns,
+    table_column_descriptions: state.nodes.table_column_descriptions
+  }
+}
+
+export default connect(mapStateToProps)(NodesPage)
