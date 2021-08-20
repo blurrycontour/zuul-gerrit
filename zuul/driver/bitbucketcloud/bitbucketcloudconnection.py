@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from requests.packages.urllib3.util import Retry
 from zuul.connection import BaseConnection
 from zuul.model import Project, Branch, Ref
 from zuul.driver.bitbucketcloud.bitbucketcloudmodel import (
@@ -60,8 +59,8 @@ class BitbucketCloudClient():
 
         if r.status_code != 200:
             raise BitbucketCloudConnectionError(
-            "Connection to server returned status {} path {}"
-            .format(r.status_code, url)
+                "Connection to server returned status {} path {}"
+                .format(r.status_code, url)
             )
 
         response_json = r.json()
