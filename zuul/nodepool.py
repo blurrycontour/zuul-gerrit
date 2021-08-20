@@ -256,16 +256,15 @@ class Nodepool(object):
         # When holding a nodeset we need to update the gauges to avoid
         # leaking resources
         if tenant and project and resources:
-            project_name = project.canonical_name
             subtract_resources(
                 self.current_resources_by_tenant[tenant], resources)
             subtract_resources(
-                self.current_resources_by_project[project_name], resources)
+                self.current_resources_by_project[project], resources)
             self.emitStatsResources()
 
             if duration:
                 self.emitStatsResourceCounters(
-                    tenant, project_name, resources, duration)
+                    tenant, project, resources, duration)
 
     # TODO (felix): Switch back to use a build object here rather than the
     # ansible_job once it's available via ZK.

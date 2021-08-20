@@ -1922,6 +1922,13 @@ class TestScheduler(ZuulTestCase):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
+        # Set resources so we can examine the code path for updating
+        # the stats on autohold.
+        self.fake_nodepool.resources = {
+            'cores': 2,
+            'ram': 1024,
+            'instances': 1,
+        }
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
         self.assertTrue(r)
@@ -1959,17 +1966,24 @@ class TestScheduler(ZuulTestCase):
                 break
         self.assertIsNone(held_node)
 
+        self.hold_jobs_in_queue = True
         # Now test that failed jobs are autoheld
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         self.executor_server.failJob('project-test2', B)
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
+        build = list(self.scheds.first.sched.executor.builds.values())[0]
+
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
+        self.waitUntilSettled()
 
         self.assertEqual(B.data['status'], 'NEW')
         self.assertEqual(B.reported, 1)
         # project-test2
         self.assertEqual(self.history[1].result, 'FAILURE')
+        self.assertTrue(build.held)
 
         # Check nodepool for a held node
         held_node = None
@@ -2021,6 +2035,15 @@ class TestScheduler(ZuulTestCase):
         node_states = [n['state'] for n in self.fake_nodepool.getNodes()]
         self.assertEqual(3, len(node_states))
         self.assertEqual([zuul.model.STATE_USED] * 3, node_states)
+
+        # The resources should be reported
+        self.assertReportedStat(
+            'zuul.nodepool.resources.tenant.tenant-one.ram',
+            value='1024', kind='g')
+        self.assertReportedStat(
+            'zuul.nodepool.resources.project.'
+            'review_example_com/org/project.ram',
+            value='1024', kind='g')
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_info(self):
