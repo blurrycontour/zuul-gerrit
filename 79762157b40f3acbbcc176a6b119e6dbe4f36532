@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "16c4dcfd_82ffd1ae",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1926,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-20T14:32:47Z",
+      "side": 1,
+      "message": "Does this test assert anything about the emitted stats?",
+      "revId": "79762157b40f3acbbcc176a6b119e6dbe4f36532",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
