@@ -76,6 +76,14 @@ class BaseSource(object, metaclass=abc.ABCMeta):
 
         """
 
+    def getChangeByKey(self, key):
+        """Get the change corresponding to the supplied change key.
+
+        The key may not correspond to this source. Return None if it
+        doesn't.
+        """
+        raise NotImplementedError
+
     @abc.abstractmethod
     def getChangesDependingOn(self, change, projects, tenant):
         """Return changes which depend on changes at the supplied URIs.
@@ -126,3 +134,18 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getRejectFilters(self, config):
         """Return a list of ChangeFilters for the scheduler to match against.
         """
+
+    def setFiles(self, change, files):
+        # TODO (swestphahl): docstring + make this an abstrace method
+        # after all drivers support this interface.
+        change.files = files
+
+    def setDependencies(self, change, dependencies):
+        # TODO (swestphahl): docstring + make this an abstrace method
+        # after all drivers support this interface.
+        change.commit_needs_changes = dependencies
+
+    def setRefreshDeps(self, change, refresh=True):
+        # TODO (swestphahl): docstring + make this an abstrace method
+        # after all drivers support this interface.
+        change.refresh_deps = refresh

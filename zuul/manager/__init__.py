@@ -599,7 +599,6 @@ class PipelineManager(metaclass=ABCMeta):
 
         # Search for Depends-On headers and find appropriate changes
         log.debug("  Updating commit dependencies for %s", change)
-        change.refresh_deps = False
         dependencies = []
         seen = set()
         for match in find_dependency_headers(change.message):
@@ -620,7 +619,9 @@ class PipelineManager(metaclass=ABCMeta):
             if dep and (not dep.is_merged) and dep not in dependencies:
                 log.debug("  Adding dependency: %s", dep)
                 dependencies.append(dep)
-        change.commit_needs_changes = dependencies
+        source = self.sched.connections.getSource(change.project.connection_name)
+        source.setDependencies(change, dependencies)
+        source.setRefreshDeps(change, refresh=False)
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
@@ -1458,7 +1459,10 @@ class PipelineManager(metaclass=ABCMeta):
 
     def onFilesChangesCompleted(self, event, build_set):
         item = build_set.item
-        item.change.files = event.files
+        source = self.sched.connections.getSource(
+            item.change.project.connection_name)
+        # item.change.files = event.files
+        source.setFiles(item.change, event.files)
         build_set.files_state = build_set.COMPLETE
 
     def onMergeCompleted(self, event, build_set):
