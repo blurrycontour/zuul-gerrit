@@ -17,6 +17,8 @@ import * as API from '../api'
 export const PROJECTS_FETCH_REQUEST = 'PROJECTS_FETCH_REQUEST'
 export const PROJECTS_FETCH_SUCCESS = 'PROJECTS_FETCH_SUCCESS'
 export const PROJECTS_FETCH_FAIL = 'PROJECTS_FETCH_FAIL'
+export const PROJECTS_SORT = 'PROJECTS_SORT'
+export const PROJECTS_FILTER = 'PROJECTS_FILTER'
 
 export const requestProjects = () => ({
   type: PROJECTS_FETCH_REQUEST
@@ -42,7 +44,7 @@ const fetchProjects = (tenant) => dispatch => {
 }
 
 const shouldFetchProjects = (tenant, state) => {
-  const projects = state.projects.projects[tenant.name]
+  const projects = state.projects.projects
   if (!projects || projects.length === 0) {
     return true
   }
@@ -59,3 +61,15 @@ export const fetchProjectsIfNeeded = (tenant, force) => (
   }
   return Promise.resolve()
 }
+
+export const sortProjects = (sortIndex, sortDirection) => ({
+  type: PROJECTS_SORT,
+  sortIndex: sortIndex,
+  sortDirection: sortDirection
+})
+
+export const filterProjects = (filterTerms, filterString) => ({
+  type: PROJECTS_FILTER,
+  filterTerms: filterTerms,
+  filterString: filterString
+})
