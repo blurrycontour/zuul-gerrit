@@ -21,6 +21,7 @@ import time
 import uuid
 import re
 import requests
+import urllib3
 
 import dateutil.parser
 
@@ -234,6 +235,10 @@ class GitlabAPIClient():
 
     def __init__(self, baseurl, api_token):
         self.session = requests.Session()
+        retry = urllib3.util.Retry(total=8,
+                                   backoff_factor=0.1)
+        adapter = requests.adapters.HTTPAdapter(retry)
+        self.session.mount(baseurl, adapter)
         self.baseurl = '%s/api/v4' % baseurl
         self.api_token = api_token
         self.headers = {'Authorization': 'Bearer %s' % (
