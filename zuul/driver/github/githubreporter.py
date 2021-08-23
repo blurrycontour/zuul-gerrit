@@ -172,7 +172,8 @@ class GithubReporter(BaseReporter):
                 self.connection.mergePull(project, pr_number, message, sha=sha,
                                           method=merge_mode,
                                           zuul_event_id=item.event)
-                item.change.is_merged = True
+                self.connection.updateChangeAttributes(item.change,
+                                                       is_merged=True)
                 return
             except MergeFailure as e:
                 log.exception('Merge attempt of change %s  %s/2 failed.',
