@@ -52,6 +52,24 @@
       "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a1ba49c_8687162d",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-23T00:15:57Z",
+      "side": 1,
+      "message": "\u003e Having the description front and center if it is provided makes sense to me since that is a human written version of what this thing is for so signal to noise should be very good for it.\n\nSure we can split this",
+      "parentUuid": "5e56610f_3d72a9df",
+      "revId": "63d1529dcd0122eedefeae7daba0637e01f14c18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
