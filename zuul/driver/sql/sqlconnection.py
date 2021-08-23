@@ -19,7 +19,6 @@ import alembic
 import alembic.command
 import alembic.config
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import orm
 import sqlalchemy.pool
 
@@ -237,7 +236,8 @@ class SQLConnection(BaseConnection):
             self.engine = sa.create_engine(
                 self.dburi,
                 poolclass=sqlalchemy.pool.QueuePool,
-                pool_recycle=self.connection_config.get('pool_recycle', 1))
+                pool_recycle=self.connection_config.get('pool_recycle', 1),
+                future=True)
 
             # If we want the objects returned from query() to be
             # usable outside of the session, we need to expunge them
@@ -247,7 +247,8 @@ class SQLConnection(BaseConnection):
             # objects when it does so.
             self.session_factory = orm.sessionmaker(bind=self.engine,
                                                     expire_on_commit=False,
-                                                    autoflush=False)
+                                                    autoflush=False,
+                                                    future=True)
             self.session = orm.scoped_session(self.session_factory)
         except sa.exc.NoSuchModuleError:
             self.log.error(
@@ -292,7 +293,7 @@ class SQLConnection(BaseConnection):
             time.sleep(10)
 
     def _setup_models(self):
-        Base = declarative_base(metadata=self.metadata)
+        Base = orm.declarative_base(metadata=self.metadata)
 
         class BuildSetModel(Base):
             __tablename__ = self.table_prefix + BUILDSET_TABLE

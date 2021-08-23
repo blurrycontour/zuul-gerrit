@@ -60,20 +60,23 @@ class TestMysqlDatabase(BaseTestCase):
         # Test that SQLAlchemy create_all produces the same output as
         # a full migration run.
         sqlalchemy_tables = {}
-        self.connection.engine.execute("set foreign_key_checks=0")
-        for table in self.connection.engine.execute("show tables"):
-            table = table[0]
-            sqlalchemy_tables[table] = self.connection.engine.execute(
-                f"show create table {table}").one()[1]
-            self.connection.engine.execute(f"drop table {table}")
-        self.connection.engine.execute("set foreign_key_checks=1")
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                sqlalchemy_tables[table] = connection.exec_driver_sql(
+                    f"show create table {table}").one()[1]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
         self.connection.force_migrations = True
         self.connection.onLoad()
-        for table in self.connection.engine.execute("show tables"):
-            table = table[0]
-            create = self.connection.engine.execute(
-                f"show create table {table}").one()[1]
-            self.compareMysql(create, sqlalchemy_tables[table])
+        with self.connection.engine.begin() as connection:
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                create = connection.exec_driver_sql(
+                    f"show create table {table}").one()[1]
+                self.compareMysql(create, sqlalchemy_tables[table])
 
     def test_buildsets(self):
         tenant = 'tenant1',
@@ -141,14 +144,15 @@ class TestPostgresqlDatabase(BaseTestCase):
             env={'PGPASSWORD': self.db.passwd}
         )
 
-        tables = [x[0] for x in self.connection.engine.execute(
-            "select tablename from pg_catalog.pg_tables "
-            "where schemaname='public'"
-        ).all()]
+        with self.connection.engine.begin() as connection:
+            tables = [x[0] for x in connection.exec_driver_sql(
+                "select tablename from pg_catalog.pg_tables "
+                "where schemaname='public'"
+            ).all()]
 
-        self.assertTrue(len(tables) > 0)
-        for table in tables:
-            self.connection.engine.execute(f"drop table {table} cascade")
+            self.assertTrue(len(tables) > 0)
+            for table in tables:
+                connection.exec_driver_sql(f"drop table {table} cascade")
 
         self.connection.force_migrations = True
         self.connection.onLoad()
