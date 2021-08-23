@@ -2146,8 +2146,10 @@ class Scheduler(threading.Thread):
                     continue
                 for dep in other_change.commit_needs_changes:
                     if change.isUpdateOf(dep):
-                        other_change.refresh_deps = True
-        change.refresh_deps = True
+                        source.setRefreshDeps(other_change)
+
+        source = self.connections.getSource(change.project.connection_name)
+        source.setRefreshDeps(change)
 
     def cancelJob(self, buildset, job, build=None, final=False,
                   force=False):
