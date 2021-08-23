@@ -176,30 +176,32 @@ class GitlabEventConnector(threading.Thread):
         if self._stopped:
             return
 
+        zuul_event_id = str(uuid.uuid4())
+        log = get_annotated_logger(self.log, zuul_event_id)
         timestamp = time.time()
         json_body = connection_event["payload"]
-        self.log.info(json_body)
+        log.debug("Received payload: %s", json_body)
 
         event_type = json_body['object_kind']
-        self.log.info("Received event: %s", event_type)
+        log.debug("Received event: %s", event_type)
 
         if event_type not in self.event_handler_mapping:
             message = "Unhandled Gitlab event: %s" % event_type
-            self.log.info(message)
+            log.info(message)
             return
 
         if event_type in self.event_handler_mapping:
-            self.log.debug("Handling event: %s" % event_type)
+            log.info("Handling event: %s" % event_type)
 
         try:
             event = self.event_handler_mapping[event_type](json_body)
         except Exception:
-            self.log.exception(
+            log.exception(
                 'Exception when handling event: %s' % event_type)
             event = None
 
         if event:
-            event.zuul_event_id = str(uuid.uuid4())
+            event.zuul_event_id = zuul_event_id
             event.timestamp = timestamp
             event.project_hostname = self.connection.canonical_hostname
             if event.change_number:
