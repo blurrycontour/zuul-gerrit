@@ -599,7 +599,6 @@ class PipelineManager(metaclass=ABCMeta):
 
         # Search for Depends-On headers and find appropriate changes
         log.debug("  Updating commit dependencies for %s", change)
-        change.refresh_deps = False
         dependencies = []
         seen = set()
         for match in find_dependency_headers(change.message):
@@ -620,7 +619,12 @@ class PipelineManager(metaclass=ABCMeta):
             if dep and (not dep.is_merged) and dep not in dependencies:
                 log.debug("  Adding dependency: %s", dep)
                 dependencies.append(dep)
-        change.commit_needs_changes = dependencies
+        source = self.sched.connections.getSource(
+            change.project.connection_name)
+        source.setChangeAttributes(
+            change,
+            commit_needs_changes=[d for d in dependencies],
+            refresh_deps=False)
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
@@ -1458,7 +1462,9 @@ class PipelineManager(metaclass=ABCMeta):
 
     def onFilesChangesCompleted(self, event, build_set):
         item = build_set.item
-        item.change.files = event.files
+        source = self.sched.connections.getSource(
+            item.change.project.connection_name)
+        source.setChangeAttributes(item.change, files=event.files)
         build_set.files_state = build_set.COMPLETE
 
     def onMergeCompleted(self, event, build_set):
@@ -1469,7 +1475,11 @@ class PipelineManager(metaclass=ABCMeta):
 
     def _onMergeCompleted(self, event, build_set):
         item = build_set.item
-        item.change.containing_branches = event.item_in_branches
+        source = self.sched.connections.getSource(
+            item.change.project.connection_name)
+        if isinstance(item.change, model.Tag):
+            source.setChangeAttributes(
+                item.change, containing_branches=event.item_in_branches)
         build_set.merge_state = build_set.COMPLETE
         build_set.repo_state = event.repo_state
         if event.merged:
