@@ -126,3 +126,15 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getRejectFilters(self, config):
         """Return a list of ChangeFilters for the scheduler to match against.
         """
+
+    def setChangeAttributes(self, change, **attrs):
+        """"Set the provided attributes on the given change.
+
+        This method must be used when modifying attributes of a change
+        outside the driver context. The driver needs to make sure that
+        the change is also reflected in the cache in Zookeeper.
+        """
+        # TODO (swestphahl): Remove this workaround after all drivers
+        # have been converted to use a Zookeeper backed changed cache.
+        for name, value in attrs.items():
+            setattr(change, name, value)
