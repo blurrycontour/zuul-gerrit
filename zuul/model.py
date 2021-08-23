@@ -3716,6 +3716,10 @@ class Change(Branch):
     def cache_version(self):
         return -1 if self.cache_stat is None else self.cache_stat.version
 
+    @property
+    def cache_key(self):
+        return (self.project.connection_name, self.cache_stat[0])
+
     def deserialize(self, data):
         super().deserialize(data)
         self.number = data.get("number")
