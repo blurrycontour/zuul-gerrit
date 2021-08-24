@@ -1922,13 +1922,6 @@ class TestScheduler(ZuulTestCase):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
-        # Set resources so we can examine the code path for updating
-        # the stats on autohold.
-        self.fake_nodepool.resources = {
-            'cores': 2,
-            'ram': 1024,
-            'instances': 1,
-        }
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
         self.assertTrue(r)
@@ -1966,17 +1959,40 @@ class TestScheduler(ZuulTestCase):
                 break
         self.assertIsNone(held_node)
 
-        self.hold_jobs_in_queue = True
+        # Hold in build to check the stats
+        self.executor_server.hold_jobs_in_build = True
+
         # Now test that failed jobs are autoheld
+
+        # Set resources only for this node so we can examine the code
+        # path for updating the stats on autohold.
+        self.fake_nodepool.resources = {
+            'cores': 2,
+            'ram': 1024,
+            'instances': 1,
+        }
+        # Some convenience variables for checking these stats.
+        tenant_ram_stat = 'zuul.nodepool.resources.tenant.tenant-one.ram'
+        project_ram_stat = ('zuul.nodepool.resources.project.'
+                            'review_example_com/org/project.ram')
+
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         self.executor_server.failJob('project-test2', B)
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
+
+        # Get the build request object
         build = list(self.scheds.first.sched.executor.builds.values())[0]
 
-        self.hold_jobs_in_queue = False
-        self.executor_api.release()
+        # We should report using the held node's resources
+        self.assertReportedStat(tenant_ram_stat, value='1024', kind='g')
+        self.assertReportedStat(project_ram_stat, value='1024', kind='g')
+        self.assertUnReportedStat(tenant_ram_stat, value='0', kind='g')
+        self.assertUnReportedStat(project_ram_stat, value='0', kind='g')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(B.data['status'], 'NEW')
@@ -2009,7 +2025,14 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(1, len(request2.nodes))
         self.assertEqual(1, len(request2.nodes[0]["nodes"]))
 
+        # We should now report that we no longer use the nodes resources
+        self.assertReportedStat(tenant_ram_stat, value='1024', kind='g')
+        self.assertReportedStat(project_ram_stat, value='1024', kind='g')
+        self.assertReportedStat(tenant_ram_stat, value='0', kind='g')
+        self.assertReportedStat(project_ram_stat, value='0', kind='g')
+
         # Another failed change should not hold any more nodes
+        self.fake_nodepool.resources = {}
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         self.executor_server.failJob('project-test2', C)
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
@@ -2035,15 +2058,6 @@ class TestScheduler(ZuulTestCase):
         node_states = [n['state'] for n in self.fake_nodepool.getNodes()]
         self.assertEqual(3, len(node_states))
         self.assertEqual([zuul.model.STATE_USED] * 3, node_states)
-
-        # The resources should be reported
-        self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.ram',
-            value='1024', kind='g')
-        self.assertReportedStat(
-            'zuul.nodepool.resources.project.'
-            'review_example_com/org/project.ram',
-            value='1024', kind='g')
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_info(self):
