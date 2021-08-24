@@ -76,6 +76,14 @@ class BaseSource(object, metaclass=abc.ABCMeta):
 
         """
 
+    def getChangeByKey(self, key):
+        """Get the change corresponding to the supplied cache key.
+
+        The key may not correspond to this source. Return None if it
+        doesn't.
+        """
+        raise NotImplementedError
+
     @abc.abstractmethod
     def getChangesDependingOn(self, change, projects, tenant):
         """Return changes which depend on changes at the supplied URIs.
