@@ -26,7 +26,7 @@ import voluptuous as v
 from zuul.connection import BaseConnection
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
-from zuul.model import Ref, Branch, Tag
+from zuul.model import Ref, Branch, Tag, CacheStat
 from zuul.lib import dependson
 from zuul.zk.event_queues import ConnectionEventQueue
 
@@ -626,6 +626,7 @@ class PagureConnection(BaseConnection):
             change.uris = [
                 '%s/%s/pull/%s' % (self.baseurl, project, number),
             ]
+        change.cache_stat = CacheStat(key, None, None)
         self._change_cache[key] = change
         try:
             self.log.debug("Getting change pr#%s from project %s" % (
@@ -761,6 +762,9 @@ class PagureConnection(BaseConnection):
             "Got pull-request CI status for PR %s on %s status: %s" % (
                 number, project, flag.get('status')))
         return flag.get('status')
+
+    def getChangeByKey(self, key):
+        return self._change_cache.get(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of PR depending on this one
