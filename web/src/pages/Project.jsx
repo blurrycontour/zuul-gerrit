@@ -25,8 +25,9 @@ import { Fetchable } from '../containers/Fetching'
 class ProjectPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
+    isFetching: PropTypes.bool,
+    project: PropTypes.object,
     tenant: PropTypes.object,
-    remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
 
@@ -49,25 +50,26 @@ class ProjectPage extends React.Component {
   }
 
   render () {
-    const { remoteData } = this.props
-    const tenantProjects = remoteData.projects[this.props.tenant.name]
-    const projectName = this.props.match.params.projectName
     return (
       <PageSection variant={PageSectionVariants.light}>
         <PageSection style={{paddingRight: '5px'}}>
           <Fetchable
-            isFetching={remoteData.isFetching}
+            isFetching={this.props.isFetching}
             fetchCallback={this.updateData}
           />
+          {this.props.project && <Project project={this.props.project} />}
         </PageSection>
-        {tenantProjects && tenantProjects[projectName] &&
-         <Project project={tenantProjects[projectName]} />}
       </PageSection>
     )
   }
 }
 
-export default connect(state => ({
-  tenant: state.tenant,
-  remoteData: state.project,
-}))(ProjectPage)
+function mapStateToProps(state) {
+  return {
+    tenant: state.tenant,
+    isFetching: state.project.isFetching,
+    project: state.project.project
+  }
+}
+
+export default connect(mapStateToProps)(ProjectPage)

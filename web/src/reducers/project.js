@@ -18,38 +18,29 @@ import {
   PROJECT_FETCH_SUCCESS
 } from '../actions/project'
 
-import update from 'immutability-helper'
-
 export default (state = {
   isFetching: false,
-  projects: {},
+  project: null
 }, action) => {
   switch (action.type) {
-    case PROJECT_FETCH_REQUEST:
-      return {
-        isFetching: true,
-        projects: state.projects,
-      }
-    case PROJECT_FETCH_SUCCESS:
-      if (!state.projects[action.tenant]) {
-        state.projects = update(state.projects, {$merge: {[action.tenant]: {}}})
-      }
-      return {
-        isFetching: false,
-        projects: update(state.projects, {
-          [action.tenant]: {
-            $merge: {
-              [action.projectName]: action.project
-            }
-          }
-        })
-      }
+  case PROJECT_FETCH_REQUEST:
+    return {
+      ...state,
+      isFetching: true,
+    }
+  case PROJECT_FETCH_SUCCESS:
+    return {
+      ...state,
+      isFetching: false,
+      project: action.project,
+    }
     case PROJECT_FETCH_FAIL:
-      return {
-        isFetching: false,
-        projects: state.projects,
-      }
-    default:
-      return state
+    return {
+      ...state,
+      isFetching: false,
+      project: null
+    }
+  default:
+    return state
   }
 }
