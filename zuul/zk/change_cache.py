@@ -111,7 +111,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             return
 
         key = _keyFromPath(event.path)
-        self.get(key)
+        self._get(key, force=True)
 
     def cleanup(self):
         valid_uuids = {c.cache_stat.uuid
@@ -136,6 +136,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                 yield change
 
     def get(self, key):
+        return self._get(key)
+
+    def _get(self, key, force=False):
         cache_path = self._cachePath(key)
         try:
             value, zstat = self.kazoo_client.get(cache_path)
@@ -144,7 +147,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
         data_uuid = value.decode("utf8")
         change = self._change_cache.get(key)
-        if change and change.cache_stat.uuid == data_uuid:
+        if change and change.cache_stat.uuid == data_uuid and not force:
             # Change in our local cache is up-to-date
             return change
 
