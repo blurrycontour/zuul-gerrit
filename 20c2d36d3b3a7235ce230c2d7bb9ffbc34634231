@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7908d06_d7dbfa9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-24T20:56:11Z",
+      "side": 1,
+      "message": "That might be a way to untangle the permanent vs temporary data confusion we have here (git dependencies are immutable aspects of a change(patchset); header dependencies are mutable, in that saying Depends-On: foo could mean foo patchset 1, or foo patchset 2 depending on when it was resolved).  Storing the mutable references on the change object always seemed awkward.\n\nBut maybe we can store only the immutable references on the change object, and then have the pipeline manager determine the mutable references and store the results (as cache keys, since we know this is going into ZK too) on queue items, then have the pipeline manager pull the actual change objects out of the cache from those keys as needed?",
+      "revId": "20c2d36d3b3a7235ce230c2d7bb9ffbc34634231",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
