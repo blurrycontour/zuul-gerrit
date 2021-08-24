@@ -15,6 +15,7 @@
 
 import abc
 from collections import OrderedDict, defaultdict, UserDict
+import contextlib
 import copy
 import json
 import logging
@@ -3669,8 +3670,10 @@ class Tag(Ref):
 
 class Change(Branch):
     """A proposed new state for a Project."""
-    def __init__(self, project):
+    def __init__(self, project, connection_registry=None):
         super(Change, self).__init__(project)
+        self.connection_registry = connection_registry
+
         self.number = None
         # The gitweb url for browsing the change
         self.url = None
@@ -3681,17 +3684,17 @@ class Change(Branch):
 
         # Changes that the source determined are needed due to the
         # git DAG:
-        self.git_needs_changes = []
-        self.git_needed_by_changes = []
+        self._git_needs_changes = []
+        self._git_needed_by_changes = []
 
         # Changes that the source determined are needed by backwards
         # compatible processing of Depends-On headers (Gerrit only):
-        self.compat_needs_changes = []
-        self.compat_needed_by_changes = []
+        self._compat_needs_changes = []
+        self._compat_needed_by_changes = []
 
         # Changes that the pipeline manager determined are needed due
         # to Depends-On headers (all drivers):
-        self.commit_needs_changes = None
+        self._commit_needs_changes = None
         self.refresh_deps = False
 
         self.is_current_patchset = True
@@ -3711,6 +3714,92 @@ class Change(Branch):
 
         # Cache info about this change (cache key, uuid, version)
         self.cache_stat = None
+        self._dependency_cache = {}
+
+    @property
+    def git_needs_changes(self):
+        return self._getLazyChangeList("_git_needs_changes")
+
+    @git_needs_changes.setter
+    def git_needs_changes(self, changes):
+        self._setLazyChangeList("_git_needs_changes", changes)
+
+    @property
+    def git_needed_by_changes(self):
+        return self._getLazyChangeList("_git_needed_by_changes")
+
+    @git_needed_by_changes.setter
+    def git_needed_by_changes(self, changes):
+        self._setLazyChangeList("_git_needed_by_changes", changes)
+
+    @property
+    def compat_needs_changes(self):
+        return self._getLazyChangeList("_compat_needs_changes")
+
+    @compat_needs_changes.setter
+    def compat_needs_changes(self, changes):
+        self._setLazyChangeList("_compat_needs_changes", changes)
+
+    @property
+    def compat_needed_by_changes(self):
+        return self._getLazyChangeList("_compat_needed_by_changes")
+
+    @compat_needed_by_changes.setter
+    def compat_needed_by_changes(self, changes):
+        self._setLazyChangeList("_compat_needed_by_changes", changes)
+
+    @property
+    def commit_needs_changes(self):
+        if self._commit_needs_changes is None:
+            return None
+        return self._getLazyChangeList("_commit_needs_changes")
+
+    @commit_needs_changes.setter
+    def commit_needs_changes(self, changes):
+        self._setLazyChangeList("_commit_needs_changes", changes)
+
+    def _getLazyChangeList(self, attribute_name):
+        # TODO: Remove after all drivers have been converted to use
+        # lazy change lists.
+        if self.connection_registry is None:
+            return getattr(self, attribute_name)
+
+        return [self._resolveChangeByKey(c)
+                for c in getattr(self, attribute_name)]
+
+    def _setLazyChangeList(self, attribute_name, changes):
+        # TODO: Remove after all drivers have been converted to use
+        # lazy change lists.
+        if self.connection_registry is None:
+            return setattr(self, attribute_name, changes)
+
+        deps = {c.cache_key: c for c in changes}
+        setattr(self, attribute_name, list(deps.keys()))
+        self._dependency_cache.update(deps)
+        self._maintainDependencyCache()
+
+    def _resolveChangeByKey(self, change_key):
+        change = self._dependency_cache.get(change_key)
+        if change is None:
+            connection_name, key = change_key
+            source = self.connection_registry.getSource(connection_name)
+            change = source.getChangeByKey(key)
+        self._dependency_cache[change.cache_key] = change
+        return change
+
+    def _maintainDependencyCache(self):
+        commit_needs_changes = self._commit_needs_changes or []
+        valid_keys = {
+            *self._git_needs_changes,
+            *self._git_needed_by_changes,
+            *self._compat_needs_changes,
+            *self._compat_needed_by_changes,
+            *commit_needs_changes,
+        }
+        outdated = set(self._dependency_cache.keys()) - valid_keys
+        for key in outdated:
+            with contextlib.suppress(KeyError):
+                del self._dependency_cache[key]
 
     @property
     def cache_version(self):
@@ -3726,11 +3815,11 @@ class Change(Branch):
         self.urls = data.get("urls")
         self.uris = data.get("uris", [])
         self.patchset = data.get("patchset")
-        self.git_needs_changes = data.get("git_needs_changes", [])
-        self.git_needed_by_changes = data.get("git_needed_by_changes", [])
-        self.compat_needs_changes = data.get("git_needs_changes", [])
-        self.compat_needed_by_changes = data.get("git_needed_by_changes", [])
-        self.commit_needs_changes = data.get("commit_needs_changes")
+        self._git_needs_changes = data.get("_git_needs_changes", [])
+        self._git_needed_by_changes = data.get("_git_needed_by_changes", [])
+        self._compat_needs_changes = data.get("_git_needs_changes", [])
+        self._compat_needed_by_changes = data.get("_git_needed_by_changes", [])
+        self._commit_needs_changes = data.get("_commit_needs_changes")
         self.refresh_deps = data.get("refresh_deps", False)
         self.is_current_patchset = data.get("is_current_patchset", True)
         self.can_merge = data.get("can_merge", False)
@@ -3748,11 +3837,11 @@ class Change(Branch):
             "url": self.url,
             "uris": self.uris,
             "patchset": self.patchset,
-            "git_needs_changes": self.git_needs_changes,
-            "git_needed_by_changes": self.git_needed_by_changes,
-            "compat_needs_changes": self.git_needs_changes,
-            "compat_needed_by_changes": self.git_needed_by_changes,
-            "commit_needs_changes": self.commit_needs_changes,
+            "_git_needs_changes": self._git_needs_changes,
+            "_git_needed_by_changes": self._git_needed_by_changes,
+            "_compat_needs_changes": self._git_needs_changes,
+            "_compat_needed_by_changes": self._git_needed_by_changes,
+            "_commit_needs_changes": self._commit_needs_changes,
             "refresh_deps": self.refresh_deps,
             "is_current_patchset": self.is_current_patchset,
             "can_merge": self.can_merge,
