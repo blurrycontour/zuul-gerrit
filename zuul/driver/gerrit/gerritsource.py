@@ -81,6 +81,9 @@ class GerritSource(BaseSource):
             event=event)
         return change
 
+    def getChangeByKey(self, key):
+        return self.connection.getChangeByKey(key)
+
     def getChangesDependingOn(self, change, projects, tenant):
         changes = []
         if not change.uris:
