@@ -14,7 +14,7 @@
 # under the License.
 
 import abc
-from collections import OrderedDict, defaultdict, UserDict
+from collections import OrderedDict, defaultdict, namedtuple, UserDict
 import copy
 import json
 import logging
@@ -3643,6 +3643,10 @@ class Tag(Ref):
         self.containing_branches = []
 
 
+# Cache info of a change
+CacheStat = namedtuple("CacheStat", ["key", "uuid", "version"])
+
+
 class Change(Branch):
     """A proposed new state for a Project."""
     def __init__(self, project):
@@ -3684,6 +3688,13 @@ class Change(Branch):
         # This can be the commit id of the patchset enqueued or
         # in the case of a PR the id of HEAD of the branch.
         self.commit_id = None
+
+        # Cache info about this change: CacheStat(cache key, uuid, version)
+        self.cache_stat = None
+
+    @property
+    def cache_key(self):
+        return (self.project.connection_name, self.cache_stat.key)
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
