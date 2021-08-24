@@ -41,7 +41,7 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Tag, Branch, Project
+from zuul.model import Ref, Tag, Branch, Project, CacheStat
 from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 
 # HTTP timeout in seconds
@@ -798,6 +798,8 @@ class GerritConnection(BaseConnection):
             change = GerritChange(None)
             change.number = number
             change.patchset = patchset
+        change.cache_stat = CacheStat((change.number, change.patchset),
+                                      None, None)
         self._change_cache.setdefault(change.number, {})
         self._change_cache[change.number][change.patchset] = change
         try:
@@ -958,6 +960,13 @@ class GerritConnection(BaseConnection):
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
         change.compat_needed_by_changes = compat_needed_by_changes
+
+    def getChangeByKey(self, key):
+        try:
+            number, patchset = key
+            return self._change_cache[number][patchset]
+        except (KeyError, ValueError):
+            return None
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)

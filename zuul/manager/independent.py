@@ -86,7 +86,7 @@ class IndependentPipelineManager(PipelineManager):
             log.debug("  No changes needed")
             return True
         changes_needed = []
-        for needed_change in change.needs_changes:
+        for needed_change in self.resolveChangeKeys(change.needs_changes):
             log.debug("  Change %s needs change %s:" % (
                 change, needed_change))
             if needed_change.is_merged:

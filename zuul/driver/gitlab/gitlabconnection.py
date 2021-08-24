@@ -31,7 +31,7 @@ from zuul.connection import CachedBranchConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.exceptions import MergeFailure
-from zuul.model import Branch, Project, Ref, Tag
+from zuul.model import Branch, CacheStat, Project, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 from zuul.zk.event_queues import ConnectionEventQueue
 
@@ -522,6 +522,7 @@ class GitlabConnection(CachedBranchConnection):
             change.patchset = patch_number
             change.url = url or self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
+        change.cache_stat = CacheStat(key, None, None)
         self._change_cache[key] = change
         try:
             log.debug("Getting change mr#%s from project %s" % (
@@ -600,6 +601,9 @@ class GitlabConnection(CachedBranchConnection):
             log.info(
                 "Set approval: %s on MR %s#%s (%s)", approve,
                 project_name, number, patchset)
+
+    def getChangeByKey(self, key):
+        return self._change_cache.get(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of MR depending on this one
