@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a17397f1_ad3bcb14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-24T01:31:05Z",
+      "side": 1,
+      "message": "For an example of this, see for example\n\nhttps://zuul.opendev.org/t/openstack/project/opendev.org/airship/airshipctl\n\nfrom api call\n\nhttps://zuul.opendev.org/api/tenant/openstack/project/airship/airshipctl\n\nwhere you have three tabs all named \"master\" because it doesn\u0027t have info about where the jobs are defined.  This can be updated here to use \"source_context\" when available.",
+      "revId": "7b429a76cb8637e69d4a7425ca045331188fba36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
