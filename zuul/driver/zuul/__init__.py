@@ -111,7 +111,8 @@ class ZuulDriver(Driver, TriggerInterface):
         # This is very inefficient, especially on systems with large
         # numbers of github installations.  This can be improved later
         # with persistent storage of dependency information.
-        needed_by_changes = set(change.needed_by_changes)
+        needed_by_changes = set(
+            pipeline.manager.resolveChangeKeys(change.needed_by_changes))
         for source in self.sched.connections.getSources():
             log.debug("  Checking source: %s", source)
             needed_by_changes.update(

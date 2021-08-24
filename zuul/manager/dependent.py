@@ -85,8 +85,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         for project, _ in change_queue.project_branches:
             sources.add(project.source)
 
-        seen = set(change.needed_by_changes)
-        needed_by_changes = change.needed_by_changes[:]
+        needed_by_changes = self.resolveChangeKeys(change.needed_by_changes)
+        seen = set(needed_by_changes)
         for source in sources:
             log.debug("  Checking source: %s", source)
             projects = [project_branch[0]
@@ -157,7 +157,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             # a git level dependency, we need to enqueue it before the current
             # change.
             if (needed_change not in history or
-                needed_change in change.git_needs_changes):
+                    needed_change.cache_key in change.git_needs_changes):
                 r = self.addChange(needed_change, event, quiet=quiet,
                                    ignore_requirements=ignore_requirements,
                                    change_queue=change_queue, history=history,
@@ -185,7 +185,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         changes_needed = []
         # Ignore supplied change_queue
         with self.getChangeQueue(change, event) as change_queue:
-            for needed_change in change.needs_changes:
+            for needed_change in self.resolveChangeKeys(change.needs_changes):
                 log.debug("  Change %s needs change %s:" % (
                     change, needed_change))
                 if needed_change.is_merged:
@@ -234,7 +234,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         if not item.change.needs_changes:
             return None
         failing_items = set()
-        for needed_change in item.change.needs_changes:
+        for needed_change in self.resolveChangeKeys(item.change.needs_changes):
             needed_item = self.getItemForChange(needed_change)
             if not needed_item:
                 continue
