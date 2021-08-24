@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b027f46b_f1e47ec8",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3544,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-24T13:04:25Z",
+      "side": 1,
+      "message": "Methods are called (de)serialize() since toDict() are already used for other purposes. The main problem is the toDict() of the Change class here as it currently seems to return an executor specific representation.",
+      "revId": "1b2db8938d49de9fdeb862221e85349bf1768ae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
