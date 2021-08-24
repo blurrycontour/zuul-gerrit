@@ -88,6 +88,9 @@ class PagureSource(BaseSource):
             event=event)
         return change
 
+    def getChangeByKey(self, key):
+        return self.connection.getChangeByKey(key)
+
     def getChangesDependingOn(self, change, projects, tenant):
         return self.connection.getChangesDependingOn(
             change, projects, tenant)

@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import collections
+import contextlib
 import logging
 import textwrap
 import time
@@ -61,6 +62,7 @@ class PipelineManager(metaclass=ABCMeta):
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
         self.sql = self.sched.sql
+        self._change_cache = {}
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -149,6 +151,44 @@ class PipelineManager(metaclass=ABCMeta):
                  if i.change.project in queue and
                  i.live]
         return items.index(item)
+
+    def resolveChangeKeys(self, change_keys):
+        resolved_changes = []
+        for key in change_keys:
+            change = self._change_cache.get(key)
+            if change is None:
+                connection_name, connection_key = key
+                source = self.sched.connections.getSource(connection_name)
+                change = source.getChangeByKey(connection_key)
+                self._change_cache[change.cache_key] = change
+            resolved_changes.append(change)
+        return resolved_changes
+
+    def _maintainCache(self):
+        active_layout_uuids = set()
+        referenced_change_keys = set()
+        for item in self.pipeline.getAllItems():
+            if item.layout_uuid:
+                active_layout_uuids.add(item.layout_uuid)
+
+            if isinstance(item.change, model.Change):
+                referenced_change_keys.update(item.change.needs_changes)
+                referenced_change_keys.update(item.change.needed_by_changes)
+
+        # Clean up unused layouts in the cache
+        unused_layouts = set(self._layout_cache.keys()) - active_layout_uuids
+        if unused_layouts:
+            self.log.debug("Removing unused layouts %s from cache",
+                           unused_layouts)
+            for uid in unused_layouts:
+                with contextlib.suppress(KeyError):
+                    del self._layout_cache[uid]
+
+        # Clean up change cache
+        unused_keys = set(self._change_cache.keys()) - referenced_change_keys
+        for key in unused_keys:
+            with contextlib.suppress(KeyError):
+                del self._change_cache[key]
 
     def isChangeAlreadyInPipeline(self, change):
         # Checks live items in the pipeline
@@ -623,7 +663,7 @@ class PipelineManager(metaclass=ABCMeta):
             change.project.connection_name)
         source.setChangeAttributes(
             change,
-            commit_needs_changes=[d for d in dependencies],
+            commit_needs_changes=[d.cache_key for d in dependencies],
             refresh_deps=False)
 
     def provisionNodes(self, item):
@@ -1350,17 +1390,7 @@ class PipelineManager(metaclass=ABCMeta):
                     self.log.debug("Queue %s status is now:\n %s" %
                                    (queue.name, status))
 
-        # Cleanup unused layouts in the cache
-        active_layout_uuids = {i.layout_uuid
-                               for i in self.pipeline.getAllItems()
-                               if i.layout_uuid}
-        unused_layouts = set(self._layout_cache.keys()) - active_layout_uuids
-        if unused_layouts:
-            self.log.debug("Removing unused layouts %s from cache",
-                           unused_layouts)
-        for uid in unused_layouts:
-            del self._layout_cache[uid]
-
+        self._maintainCache()
         self.log.debug("Finished queue processor: %s (changed: %s)" %
                        (self.pipeline.name, changed))
         return changed

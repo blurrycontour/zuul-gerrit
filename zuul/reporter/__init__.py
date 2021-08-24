@@ -223,8 +223,10 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         return msg
 
     def _formatItemReportOtherBundleItems(self, item):
+        related_changes = item.pipeline.manager.resolveChangeKeys(
+            item.change.needs_changes)
         return "Related changes:\n{}".format("\n".join(
-            c.url for c in item.change.needs_changes if c is not item.change))
+            c.url for c in related_changes if c is not item.change))
 
     def _getItemReportJobsFields(self, item):
         # Extract the report elements from an item
