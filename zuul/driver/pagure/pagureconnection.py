@@ -626,6 +626,7 @@ class PagureConnection(BaseConnection):
             change.uris = [
                 '%s/%s/pull/%s' % (self.baseurl, project, number),
             ]
+        change.cache_stat = (key, None, None)
         self._change_cache[key] = change
         try:
             self.log.debug("Getting change pr#%s from project %s" % (
@@ -780,6 +781,9 @@ class PagureConnection(BaseConnection):
         pagure = self.get_project_api_client(project)
         pagure.merge_pr(number)
         self.log.debug("Merged PR %s#%s", project, number)
+
+    def getChangeByKey(self, key):
+        return self._change_cache[key]
 
 
 class PagureWebController(BaseWebController):
