@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "409c17fa_8f1b19dc",
+        "filename": "web/src/actions/projects.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-24T23:04:45Z",
+      "side": 1,
+      "message": "Is this check still valid now that we are not looking at the tenant string? The internet makes it look like we want to get the keys of the object then check the length of that list.",
+      "range": {
+        "startLine": 48,
+        "startChar": 19,
+        "endLine": 48,
+        "endChar": 40
+      },
+      "revId": "938640655a633408fa2fd77e161454f83b533336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8618bea2_2867dfbf",
+        "filename": "web/src/actions/projects.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-24T23:04:45Z",
+      "side": 1,
+      "message": "Nit this exists in the old code so not really a problem with this change, but this returns the same thing as the fall through case below. We shouldn\u0027t need this check at all.",
+      "revId": "938640655a633408fa2fd77e161454f83b533336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e4c06b8_2755cd91",
+        "filename": "web/src/pages/Projects.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-08-24T23:04:45Z",
+      "side": 1,
+      "message": "It would be nice if hitting return after typing a string caused the filter to happen. Seems you have to click on the arrow instead.\n\nSeparately if you do a search that returns a small number of results then click the dropdown menu for the search bar it only renders in the area taken up by the small number of search result rows. I think beacuse we are part of the PageSection above which includes the search and the items below? Might want to split things out so that the dropdown renders in a larger space even if the returned results are small?",
+      "revId": "938640655a633408fa2fd77e161454f83b533336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
