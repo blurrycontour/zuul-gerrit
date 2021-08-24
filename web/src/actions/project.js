@@ -51,7 +51,6 @@ export const receiveProject = (tenant, projectName, project) => {
   for (idx = templateIdx.length - 1; idx >= 0; idx -= 1) {
     project.configs.splice(templateIdx[idx], 1)
   }
-
   return {
     type: PROJECT_FETCH_SUCCESS,
     tenant: tenant,
@@ -74,24 +73,19 @@ const fetchProject = (tenant, project) => dispatch => {
     .catch(error => dispatch(failedProject(error)))
 }
 
-const shouldFetchProject = (tenant, projectName, state) => {
-  const tenantProjects = state.project.projects[tenant.name]
-  if (tenantProjects) {
-    const project = tenantProjects[projectName]
-    if (!project) {
-      return true
-    }
-    if (project.isFetching) {
-      return false
-    }
+const shouldFetchProject = (state) => {
+  if (state.project.isFetching) {
     return false
   }
-  return true
+  if (!state.project.project) {
+    return true
+  }
+  return false
 }
 
 export const fetchProjectIfNeeded = (tenant, project, force) => (
   dispatch, getState) => {
-  if (force || shouldFetchProject(tenant, project, getState())) {
+    if (force || shouldFetchProject(getState())) {
     return dispatch(fetchProject(tenant, project))
   }
   return Promise.resolve()
