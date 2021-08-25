@@ -1020,15 +1020,6 @@ class TestWeb(BaseTestWeb):
             'projects': [],
             'branch': 'master',
             'cleanup_playbooks': [],
-            'groups': [],
-            'nodes': [{
-                'comment': None,
-                'hold_job': None,
-                'id': None,
-                'label': 'label1',
-                'name': ['controller'],
-                'state': 'unknown'
-            }],
             'nodeset': {
                 'groups': [],
                 'name': '',
