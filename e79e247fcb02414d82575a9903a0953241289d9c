@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da3ac886_de12f668",
+        "filename": "Dockerfile",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-25T22:42:49Z",
+      "side": 1,
+      "message": "nite: from my reading, I think you can just do \"dockerfile:1\" and it takes the latest point release, which is sufficient for this feature; so we don\u0027t need the experimental bit?",
+      "revId": "e79e247fcb02414d82575a9903a0953241289d9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
