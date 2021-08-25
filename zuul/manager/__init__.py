@@ -1501,11 +1501,12 @@ class PipelineManager(metaclass=ABCMeta):
                     repo_state[connection] = event.repo_state[connection]
             build_set.repo_state_state = build_set.COMPLETE
 
-    def onNodesProvisioned(self, request, build_set):
+    def onNodesProvisioned(self, request, nodeset, build_set):
         # TODOv3(jeblair): handle provisioning failure here
         log = get_annotated_logger(self.log, request.event_id)
 
-        build_set.jobNodeRequestComplete(request.job_name, request.nodeset)
+        if nodeset is not None:
+            build_set.jobNodeRequestComplete(request.job_name, nodeset)
         # TODO (felix): Check if the failed is still needed as the
         # NodesProvisionedEvents are now in ZooKeeper.
         if request.failed or not request.fulfilled:
@@ -1519,7 +1520,7 @@ class PipelineManager(metaclass=ABCMeta):
 
         log.info("Completed node request %s for job %s of item %s "
                  "with nodes %s",
-                 request, request.job_name, build_set.item, request.nodeset)
+                 request, request.job_name, build_set.item, request.nodes)
 
     def reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)

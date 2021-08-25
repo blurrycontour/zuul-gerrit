@@ -71,13 +71,13 @@ class Nodepool(object):
 
         if dt:
             pipe.timing(key, dt)
-        for node in request.nodeset.getNodes():
-            pipe.incr(key + '.label.%s' % node.label)
+        for label in request.labels:
+            pipe.incr(key + '.label.%s' % label)
             if dt:
-                pipe.timing(key + '.label.%s' % node.label, dt)
-        pipe.incr(key + '.size.%s' % len(request.nodeset.nodes))
+                pipe.timing(key + '.label.%s' % label, dt)
+        pipe.incr(key + '.size.%s' % len(request.labels))
         if dt:
-            pipe.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
+            pipe.timing(key + '.size.%s' % len(request.labels), dt)
         pipe.gauge('zuul.nodepool.current_requests', len(self.requests))
         pipe.send()
 
@@ -114,19 +114,17 @@ class Nodepool(object):
     def requestNodes(self, build_set_uuid, job, tenant_name, pipeline_name,
                      provider, priority, relative_priority, event=None):
         log = get_annotated_logger(self.log, event)
-        # Create a copy of the nodeset to represent the actual nodes
-        # returned by nodepool.
-        nodeset = job.nodeset.copy()
+        labels = [n.label for n in job.nodeset.getNodes()]
         if event:
             event_id = event.zuul_event_id
         else:
             event_id = None
         req = model.NodeRequest(self.hostname, build_set_uuid, tenant_name,
-                                pipeline_name, job.name, nodeset, provider,
+                                pipeline_name, job.name, labels, provider,
                                 relative_priority, event_id)
         self.requests[req.uid] = req
 
-        if nodeset.nodes:
+        if job.nodeset.nodes:
             self.zk_nodepool.submitNodeRequest(
                 req, priority, self._updateNodeRequest)
             # Logged after submission so that we have the request id
@@ -316,7 +314,7 @@ class Nodepool(object):
                 except Exception:
                     log.exception("Exception storing node %s "
                                   "while unlocking:", node)
-        self._unlockNodes(nodeset.getNodes())
+        self.unlockNodeSet(nodeset)
 
         if not ansible_job:
             return
@@ -356,25 +354,26 @@ class Nodepool(object):
             except Exception:
                 self.log.exception("Error unlocking node:")
 
-    def lockNodeSet(self, nodeset, request_id):
+    def lockNodes(self, request, nodeset):
         # Try to lock all of the supplied nodes.  If any lock fails,
         # try to unlock any which have already been locked before
         # re-raising the error.
         locked_nodes = []
         try:
-            for node in nodeset.getNodes():
-                if node.allocated_to != request_id:
+            for node_id, node in zip(request.nodes, nodeset.getNodes()):
+                self.zk_nodepool.updateNode(node, node_id)
+                if node.allocated_to != request.id:
                     raise Exception("Node %s allocated to %s, not %s" %
-                                    (node.id, node.allocated_to, request_id))
+                                    (node.id, node.allocated_to, request.id))
                 self.log.debug("Locking node %s" % (node,))
                 self.zk_nodepool.lockNode(node, timeout=30)
                 # Check the allocated_to again to ensure that nodepool didn't
                 # re-allocate the nodes to a different node request while we
                 # were locking them.
-                if node.allocated_to != request_id:
+                if node.allocated_to != request.id:
                     raise Exception(
                         "Node %s was reallocated during locking %s, not %s" %
-                        (node.id, node.allocated_to, request_id))
+                        (node.id, node.allocated_to, request.id))
                 locked_nodes.append(node)
         except Exception:
             self.log.exception("Error locking nodes:")
@@ -422,34 +421,35 @@ class Nodepool(object):
 
         return True
 
-    def checkNodeRequest(self, request, request_id):
+    def checkNodeRequest(self, request, request_id, job_nodeset):
         """
         Called by the scheduler when it wants to accept a node request for
         potential use of its nodes. The nodes itself will be accepted and
         locked by the executor when the corresponding job is started.
 
-        :returns: False if there is a problem with the request (canceled or
-            retrying), True if it is ready to be acted upon (success or
-            failure).
+        :returns: A new NodeSet object which contains information from
+            nodepool about the actual allocated nodes.
         """
         log = get_annotated_logger(self.log, request.event_id)
         log.info("Accepting node request %s", request)
+        # A copy of the nodeset with information about the real nodes
+        nodeset = job_nodeset.copy()
 
         if request_id != request.id:
             log.info("Skipping node accept for %s (resubmitted as %s)",
                      request_id, request.id)
-            return False
+            return None
 
         if request.canceled:
             log.info("Ignoring canceled node request %s", request)
             # The request was already deleted when it was canceled
-            return False
+            return None
 
         # If we didn't request nodes and the request is fulfilled then just
         # reutrn. We don't have to do anything in this case. Further don't even
         # ask ZK for the request as empty requests are not put into ZK.
-        if not request.nodeset.nodes and request.fulfilled:
-            return True
+        if not request.labels and request.fulfilled:
+            return nodeset
 
         # Make sure the request still exists. It's possible it could have
         # disappeared if we lost the ZK session between when the fulfillment
@@ -466,7 +466,10 @@ class Nodepool(object):
                 request.reset()
                 self.zk_nodepool.submitNodeRequest(
                     request, priority, self._updateNodeRequest)
-                return False
+                return None
+            else:
+                for node_id, node in zip(request.nodes, nodeset.getNodes()):
+                    self.zk_nodepool.updateNode(node, node_id)
         except Exception:
             # If we cannot retrieve the node request from ZK we probably lost
             # the connection and thus the ZK session. Resubmitting the node
@@ -475,16 +478,18 @@ class Nodepool(object):
             # with zookeeper and fail here.
             log.exception("Error getting node request %s:", request_id)
             request.failed = True
-            return True
+            return nodeset
 
-        return True
+        return nodeset
 
-    def acceptNodes(self, request):
+    def acceptNodes(self, request, nodeset):
+        # Accept the nodes supplied by request, mutate nodeset with
+        # the real node information.
         locked = False
         if request.fulfilled:
             # If the request succeeded, try to lock the nodes.
             try:
-                self.lockNodeSet(request.nodeset, request.id)
+                nodes = self.lockNodes(request, nodeset)
                 locked = True
             except Exception:
                 log = get_annotated_logger(self.log, request.event_id)
@@ -497,6 +502,7 @@ class Nodepool(object):
 
         if request.failed:
             raise Exception("Accepting nodes failed")
+        return nodes
 
     def deleteNodeRequest(self, request, locked=False):
         log = get_annotated_logger(self.log, request.event_id)
