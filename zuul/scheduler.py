@@ -2026,26 +2026,26 @@ class Scheduler(threading.Thread):
         if not request:
             return
 
-        ready = self.nodepool.checkNodeRequest(request, request_id)
-        if not ready:
+        log = get_annotated_logger(self.log, request.event_id)
+        job = build_set.item.getJob(request.job_name)
+        if job is None:
+            log.warning("Item %s does not contain job %s "
+                        "for node request %s",
+                        build_set.item, request.job_name, request)
+            build_set.removeJobNodeRequest(request.job_name)
             return
 
-        log = get_annotated_logger(self.log, request.event_id)
+        nodeset = self.nodepool.checkNodeRequest(request, request_id,
+                                                 job.nodeset)
+        if nodeset is None:
+            return
 
         # If the request failed, we must directly delete it as the nodes will
         # never be accepted.
         if request.state == STATE_FAILED:
             self.nodepool.deleteNodeRequest(request)
 
-        if request.job_name not in [x.name for x in build_set.item.getJobs()]:
-            log.warning("Item %s does not contain job %s "
-                        "for node request %s",
-                        build_set.item, request.job_name, request)
-            build_set.removeJobNodeRequest(request.job_name)
-            self.nodepool.deleteNodeRequest(request)
-            return
-
-        pipeline.manager.onNodesProvisioned(request, build_set)
+        pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
