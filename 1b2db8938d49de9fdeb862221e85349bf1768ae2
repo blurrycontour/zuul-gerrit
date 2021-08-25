@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "10d6fa54_3d92d190",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-25T14:03:24Z",
+      "side": 1,
+      "message": "Yep, that makes sense.",
+      "parentUuid": "93499c14_22a288c7",
+      "revId": "1b2db8938d49de9fdeb862221e85349bf1768ae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c4c48a7_6668b09c",
         "filename": "zuul/zk/change_cache.py",
         "patchSetId": 2
@@ -64,6 +82,24 @@
       "writtenOn": "2021-08-24T18:42:00Z",
       "side": 1,
       "message": "The three methods below should probably have docstrings describing what we expect subclass implementations to do.",
+      "revId": "1b2db8938d49de9fdeb862221e85349bf1768ae2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be8333b7_f0ba1959",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-25T14:03:24Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "1c4c48a7_6668b09c",
       "revId": "1b2db8938d49de9fdeb862221e85349bf1768ae2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
