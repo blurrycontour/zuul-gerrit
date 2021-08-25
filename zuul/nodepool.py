@@ -60,7 +60,7 @@ class Nodepool(object):
         self.current_resources_by_tenant = {}
         self.current_resources_by_project = {}
 
-    def _handleNodeRequestEvent(self, request, event, reqid=None):
+    def _handleNodeRequestEvent(self, request, event, request_id=None):
         # TODO (felix): This callback should be wrapped by leader election, so
         # that only one scheduler puts NodesProvisionedEvents in the queue.
         log = get_annotated_logger(self.log, event=request.event_id)
@@ -69,8 +69,8 @@ class Nodepool(object):
             log.debug("Node request %s is unknown", request)
             return False
 
+        log.debug("Node request %s %s", request, request.state)
         if event == NodeRequestEvent.COMPLETED:
-            log.info("Node request %s %s", request, request.state)
             del self.requests[request.uid]
             self.emitStats(request)
 
@@ -91,15 +91,15 @@ class Nodepool(object):
             # resubmitted.
             request = None
             for req in self.requests.values():
-                if req.id == reqid:
+                if req.id == request_id:
                     request = req
                     break
 
             if request:
-                log.debug("Resubmitting lost node request %s", request)
+                log.info("Resubmitting lost node request %s", request)
                 request.reset()
                 # Look up the priority from the old request id.
-                priority = reqid.partition("-")[0]
+                priority = request_id.partition("-")[0]
                 self.zk_nodepool.submitNodeRequest(request, priority)
 
     def emitStats(self, request):
