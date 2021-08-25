@@ -540,13 +540,10 @@ class RPCListener(RPCListenerBase):
         if not job:
             gear_job.sendWorkComplete(json.dumps(None))
             return
-        # TODO: check if this is frozen?
-        nodeset = job.nodeset
         job.setBase(tenant.layout)
         uuid = '0' * 32
         params = zuul.executor.common.construct_build_params(
-            uuid, self.sched, nodeset,
-            job, item, pipeline)
+            uuid, self.sched, job, item, pipeline)
         gear_job.sendWorkComplete(json.dumps(params, cls=ZuulJSONEncoder))
 
     def handle_allowed_labels_get(self, job):

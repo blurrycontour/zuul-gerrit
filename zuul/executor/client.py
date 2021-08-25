@@ -61,7 +61,7 @@ class ExecutorClient(object):
             job, uuid, nodeset, item.change, dependent_changes)
 
         params = zuul.executor.common.construct_build_params(
-            uuid, self.sched, nodeset,
+            uuid, self.sched,
             job, item, pipeline, dependent_changes, merger_items,
             redact_secrets_and_keys=False)
         # TODO: deprecate and remove this variable?
@@ -111,9 +111,10 @@ class ExecutorClient(object):
         # availability zone we can get executor_zone from only the first
         # node.
         executor_zone = None
-        if params["nodes"] and params["nodes"][0].get('attributes'):
-            executor_zone = params[
-                "nodes"][0]['attributes'].get('executor-zone')
+        if len(nodeset.nodes):
+            node = nodeset.getNodes()[0]
+            if hasattr(node, 'attributes') and node.attributes:
+                executor_zone = node.attributes.get('executor-zone')
 
         zone_known = False
         if executor_zone:

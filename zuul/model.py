@@ -798,14 +798,15 @@ class NodeRequest(object):
     """A request for a set of nodes."""
 
     def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
-                 job_name, nodeset, provider, relative_priority,
+                 job_name, labels, provider, relative_priority,
                  event_id=None):
         self.requestor = requestor
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.job_name = job_name
-        self.nodeset = nodeset
+        self.labels = labels
+        self.nodes = []
         self._state = STATE_REQUESTED
         self.requested_time = time.time()
         self.state_time = time.time()
@@ -826,7 +827,7 @@ class NodeRequest(object):
         # Reset the node request for re-submission
         self._zk_data = {}
         # Remove any real node information
-        self.nodeset = self.nodeset.copy()
+        self.nodes = []
         self.id = None
         self.state = STATE_REQUESTED
         self.stat = None
@@ -849,7 +850,7 @@ class NodeRequest(object):
         self.state_time = time.time()
 
     def __repr__(self):
-        return '<NodeRequest %s %s>' % (self.id, self.nodeset)
+        return '<NodeRequest %s %s>' % (self.id, self.labels)
 
     def toDict(self):
         """
@@ -868,9 +869,7 @@ class NodeRequest(object):
             "pipeline_name": self.pipeline_name,
             "job_name": self.job_name,
         }
-        nodes = [n.label for n in self.nodeset.getNodes()]
-        # These are immutable once set
-        d.setdefault('node_types', nodes)
+        d.setdefault('node_types', self.labels)
         d.setdefault('requestor', self.requestor)
         d.setdefault('created_time', self.created_time)
         d.setdefault('provider', self.provider)
@@ -887,6 +886,7 @@ class NodeRequest(object):
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
         self.event_id = data['event_id']
+        self.nodes = data.get('nodes', [])
 
     @classmethod
     def fromDict(cls, data):
@@ -904,7 +904,7 @@ class NodeRequest(object):
             tenant_name=requestor_data["tenant_name"],
             pipeline_name=requestor_data["pipeline_name"],
             job_name=requestor_data["job_name"],
-            nodeset=None,
+            labels=data["node_types"],
             provider=data["provider"],
             relative_priority=data.get("relative_priority", 0),
         )
