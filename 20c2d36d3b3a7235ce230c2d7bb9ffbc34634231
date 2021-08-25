@@ -16,6 +16,24 @@
       "revId": "20c2d36d3b3a7235ce230c2d7bb9ffbc34634231",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "abde10f5_521da25b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-25T13:19:38Z",
+      "side": 1,
+      "message": "I think storing the mutable dependencies on the queue item might complicate things regarding the \"refresh_deps\" flag. Currently this is set in the onChangeUpdated() method of the scheduler by looping over the cached changes in all sources.\n\nIf the mutable needed changes are part of the queue item we can no longer access them from outside the run handler. I\u0027m not 100% sure about his, but it seems as if we\u0027d need to dispatch an event to all tenants/pipelines in order to refresh the dependencies. We could turn this around by making the pipeline manager check if the needed change is still up-to-date. But that could cause unnecessary access of the ZK change cache.",
+      "parentUuid": "e7908d06_d7dbfa9b",
+      "revId": "20c2d36d3b3a7235ce230c2d7bb9ffbc34634231",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
