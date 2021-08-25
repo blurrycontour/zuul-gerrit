@@ -1104,8 +1104,7 @@ class AnsibleJob(object):
         if node_request_id:
             zk_nodepool = self.executor_server.nodepool.zk_nodepool
             self.node_request = zk_nodepool.getNodeRequest(
-                self.arguments["noderequest_id"], self.nodeset
-            )
+                self.arguments["noderequest_id"])
 
             if self.node_request is None:
                 self.log.error(
@@ -1122,10 +1121,11 @@ class AnsibleJob(object):
         if self.node_request:
             self.log.debug("Locking nodeset")
             try:
-                self.executor_server.nodepool.acceptNodes(self.node_request)
+                self.executor_server.nodepool.acceptNodes(
+                    self.node_request, self.nodeset)
             except Exception:
                 self.log.exception(
-                    "Error locking nodeset %s", self.node_request.nodeset
+                    "Error locking nodeset %s", self.node_request
                 )
                 raise NodeRequestError
 
@@ -1133,13 +1133,13 @@ class AnsibleJob(object):
         if self.node_request:
             try:
                 self.executor_server.nodepool.returnNodeSet(
-                    self.node_request.nodeset,
+                    self.nodeset,
                     self,
                     zuul_event_id=self.zuul_event_id,
                 )
             except Exception:
                 self.log.exception(
-                    "Unable to return nodeset %s", self.node_request.nodeset
+                    "Unable to return nodeset %s", self.node_request
                 )
 
     def _base_job_data(self):
@@ -1347,9 +1347,7 @@ class AnsibleJob(object):
         # start to run tasks on nodes (prepareVars in particular uses
         # Ansible to freeze hostvars).
         if self.node_request:
-            self.executor_server.nodepool.useNodeSet(
-                self.node_request.nodeset, self
-            )
+            self.executor_server.nodepool.useNodeSet(self.nodeset, self)
 
         # This prepares each playbook and the roles needed for each.
         self.preparePlaybooks(args)
@@ -3786,7 +3784,7 @@ class ExecutorServer(BaseMergeServer):
         if request is not None:
             self.log.debug("Got autohold %s", request)
             self.nodepool.holdNodeSet(
-                ansible_job.node_request.nodeset, request, ansible_job
+                ansible_job.nodeset, request, ansible_job
             )
             return True
         return False
