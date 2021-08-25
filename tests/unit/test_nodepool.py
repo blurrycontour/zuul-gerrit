@@ -31,8 +31,8 @@ class NodepoolWithCallback(zuul.nodepool.Nodepool):
         super().__init__(*args, **kwargs)
         self.provisioned_requests = []
 
-    def _handleNodeRequestEvent(self, request, event, reqid=None):
-        super()._handleNodeRequestEvent(request, event, reqid)
+    def _handleNodeRequestEvent(self, request, event, request_id=None):
+        super()._handleNodeRequestEvent(request, event, request_id)
         self.provisioned_requests.append(request)
 
 
@@ -92,6 +92,7 @@ class TestNodepool(TestNodepoolBase):
         request = self.nodepool.requestNodes(
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
+        request = self.nodepool.zk_nodepool.getNodeRequest(request.id)
         self.assertEqual(len(self.nodepool.provisioned_requests), 1)
         # TODO (felix): We have to look up the request from ZK directly to
         # check the state.
@@ -137,7 +138,8 @@ class TestNodepool(TestNodepoolBase):
         self.zk_client.client.start()
         self.fake_nodepool.unpause()
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+        request = self.nodepool.zk_nodepool.getNodeRequest(request.id)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
     def test_node_request_canceled(self):
@@ -171,6 +173,8 @@ class TestNodepool(TestNodepoolBase):
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.fake_nodepool.unpause()
         self.waitForRequests()
+        request1 = self.nodepool.zk_nodepool.getNodeRequest(request1.id)
+        request2 = self.nodepool.zk_nodepool.getNodeRequest(request2.id)
         self.assertEqual(len(self.provisioned_requests), 2)
         self.assertEqual(request1.state, 'fulfilled')
         self.assertEqual(request2.state, 'fulfilled')
