@@ -21,7 +21,7 @@ from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
-from zuul.model import HoldRequest, Node, NodeRequest, NodeSet
+from zuul.model import HoldRequest, NodeRequest
 from zuul.zk import ZooKeeperClient, ZooKeeperBase
 from zuul.zk.exceptions import LockException
 
@@ -400,14 +400,11 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         self.kazoo_client.DataWatch(path, callback)
 
-    def getNodeRequest(self, node_request_id, nodeset=None):
+    def getNodeRequest(self, node_request_id):
         """
         Retrieve a NodeRequest from a given path in ZooKeeper.
 
-        The serialized version of the NodeRequest doesn't contain a NodeSet, so
-        we have to add this to the request manually. The nodeset provided to
-        this method will be set on the NodeRequest before updating it. This
-        will ensure that all nodes are updated as well.
+        :param str node_request_id: The ID of the node request to retrieve.
         """
 
         path = f"{self.REQUEST_ROOT}/{node_request_id}"
@@ -422,28 +419,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
         json_data = json.loads(data.decode("utf-8"))
 
         obj = NodeRequest.fromDict(json_data)
-        if nodeset is None:
-            # If no NodeSet is provided, we create one on-the-fly based on the
-            # list of labels (node_types) stored in the NodeRequest's znode
-            # data.
-            # This is necessary as the logic in the updateNodeRequest() method
-            # below will update each node "in-place" an thus, we have to ensure
-            # that the NodeRequest has a valid NodeSet with all nodes available
-            # in advance.
-            # This is only used to return the nodes to nodepool in case
-            # something went wrong and the original NodeRequest and/or NodeSet
-            # objects are not available anymore.
-            nodeset = NodeSet()
-            for i, node_type in enumerate(json_data["node_types"]):
-                node = Node(name=f"{node_type}-{i}", label=node_type)
-                nodeset.addNode(node)
-
-        obj.nodeset = nodeset
-        # Using updateNodeRequest() here will ensure that the nodes are also
-        # updated. Doing the update in here directly rather than calling it
-        # from the outside afterwards, saves us one call to ZooKeeper as the
-        # data we just retrieved can directly be reused.
-        self.updateNodeRequest(obj, data)
         obj.id = node_request_id
         obj.stat = stat
         return obj
@@ -498,10 +473,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
             path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
             data, stat = self.kazoo_client.get(path)
         data = json.loads(data.decode('utf8'))
-        request_nodes = list(node_request.nodeset.getNodes())
-        for i, nodeid in enumerate(data.get('nodes', [])):
-            request_nodes[i].id = nodeid
-            self._updateNode(request_nodes[i])
         node_request.updateFromDict(data)
 
     def storeNode(self, node):
@@ -516,13 +487,18 @@ class ZooKeeperNodepool(ZooKeeperBase):
         path = '%s/%s' % (self.NODES_ROOT, node.id)
         self.kazoo_client.set(path, json.dumps(node.toDict()).encode('utf8'))
 
-    def _updateNode(self, node):
+    def updateNode(self, node, node_id):
         """
         Refresh an existing node.
 
         :param Node node: The node to update.
+
+        :param str node_id: The ID of the node to update.  The
+            existing node.id attribute (if any) will be ignored
+            and replaced with this.
         """
-        node_path = '%s/%s' % (self.NODES_ROOT, node.id)
+        node_path = '%s/%s' % (self.NODES_ROOT, node_id)
+        node.id = node_id
         node_data, node_stat = self.kazoo_client.get(node_path)
         node_data = json.loads(node_data.decode('utf8'))
         node.updateFromDict(node_data)
