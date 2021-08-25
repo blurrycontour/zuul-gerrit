@@ -869,16 +869,6 @@ class NodeRequest(object):
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "job_name": self.job_name,
-            # TODO (felix): we need the node labels (and groups) to re-create
-            # the original nodeset. This is now necessary, as the nodeset for
-            # the build params will be taken from the node request that is
-            # restored from ZooKeeper (together with its nodeset). So far, this
-            # nodeset only contained a subset of the original information. As
-            # nodepool strips all "unknown" attributes, we have to work around
-            # the nodepool protocol and provide those information via the
-            # "requestor_data" field.
-            "node_names": [n.name for n in self.nodeset.getNodes()],
-            "node_groups": [g.toDict() for g in self.nodeset.getGroups()]
         }
         d.setdefault('node_types', self.labels)
         d.setdefault('requestor', self.requestor)
@@ -921,7 +911,6 @@ class NodeRequest(object):
         )
 
         request.uid = requestor_data["uid"]
-        request.node_names = requestor_data["node_names"]
         request.updateFromDict(data)
 
         return request

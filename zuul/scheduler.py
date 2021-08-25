@@ -2112,7 +2112,7 @@ class Scheduler(threading.Thread):
         # TODO (felix): Since we are now using the request from ZK directly, do
         # we still have to validate the request ID? As we are using the same ID
         # for the lookup in ZK this check should now always succeed.
-        nodeset = self.nodepool.checkNodeRequest(request, request_id,
+        nodeset = self.nodepool.checkNodeRequest(request, event.request_id,
                                                  job.nodeset)
         if nodeset is None:
             return

@@ -19,14 +19,12 @@ from typing import Optional, List
 from kazoo.exceptions import NoNodeError, LockTimeout
 from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
-from kazoo.protocol.states import EventType
 
 import zuul.model
 from zuul.lib.jsonutil import json_dumps
 from zuul.model import HoldRequest, NodeRequest
 from zuul.zk import ZooKeeperBase
 from zuul.zk.exceptions import LockException
-from zuul.zk.vendor.watchers import ExistingDataWatch
 
 
 class NodeRequestEvent(Enum):
@@ -58,8 +56,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
         self._hold_request_tree = None
-        self._cached_hold_requests = {}
-        self.watched_node_requests = set()
+        self._hold_request_cache = {}
+        self._request_tree = None
+        self._request_cache = {}
 
         if self.client.connected:
             self._onConnect()
@@ -68,8 +67,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
         # callback. Additionally, the scheduler creates two ZookeeperNodepool
         # instances (one via self.nodepool and one directly via
         # self.zk_nodepool). Only one of those should listen for new requests.
-        if self.node_request_event_callback:
-            self.register()
 
     def _onConnect(self):
         if self.enable_cache:
@@ -79,10 +76,19 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self._hold_request_tree.listen(self._holdRequestCacheListener)
             self._hold_request_tree.start()
 
+            self._request_tree = TreeCache(self.kazoo_client,
+                                           self.REQUEST_ROOT)
+            self._request_tree.listen_fault(self._cacheFaultListener)
+            self._request_tree.listen(self.requestCacheListener)
+            self._request_tree.start()
+
     def _onDisconnect(self):
         if self._hold_request_tree is not None:
             self._hold_request_tree.close()
             self._hold_request_tree = None
+        if self._request_tree is not None:
+            self._request_tree.close()
+            self._request_tree = None
 
     def _launcherPath(self, launcher):
         return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
@@ -95,13 +101,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     def register(self):
         self.kazoo_client.ensure_path(self.REQUEST_ROOT)
-
-        # Register a child watch that listens for new merge requests
-        self.kazoo_client.ChildrenWatch(
-            self.REQUEST_ROOT,
-            self._makeNodeRequestWatcher(self.REQUEST_ROOT),
-            send_event=True,
-        )
 
     def getRegisteredLaunchers(self):
         """
@@ -372,7 +371,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
                 # Perform an in-place update of the already cached request
                 d = json.loads(event.event_data.data.decode('utf8'))
-                old_request = self._cached_hold_requests.get(request_id)
+                old_request = self._hold_request_cache.get(request_id)
                 if old_request:
                     if event.event_data.stat.version <= old_request.stat\
                             .version:
@@ -384,79 +383,79 @@ class ZooKeeperNodepool(ZooKeeperBase):
                     request = HoldRequest.fromDict(d)
                     request.id = request_id
                     request.stat = event.event_data.stat
-                    self._cached_hold_requests[request_id] = request
+                    self._hold_request_cache[request_id] = request
 
             elif event.event_type == TreeEvent.NODE_REMOVED:
                 try:
-                    del self._cached_hold_requests[request_id]
+                    del self._hold_request_cache[request_id]
                 except KeyError:
                     pass
         except Exception:
             self.log.exception(
                 "Exception in hold request cache update for event: %s", event)
 
-    def _makeNodeRequestWatcher(self, path):
-        def watch(node_requests, event=None):
-            return self._watchNodeRequests(path, node_requests, event)
-        return watch
+    def requestCacheListener(self, event):
+        try:
+            self._requestCacheListener(event)
+        except Exception:
+            self.log.exception(
+                "Exception in request cache update for event: %s",
+                event)
 
-    def _watchNodeRequests(self, path, node_requests, event=None):
-        node_requests_path = {
-            f"{path}/{req_id}" for req_id in node_requests
-        }
-
-        new_requests = node_requests_path - self.watched_node_requests
-
-        for req_path in new_requests:
-            ExistingDataWatch(self.kazoo_client,
-                              req_path,
-                              self._makeNodeRequestStateWatcher(req_path))
-            self.watched_node_requests.add(req_path)
-
-    def _makeNodeRequestStateWatcher(self, path):
-        def watch(data, stat, event=None):
-            return self._watchNodeRequestState(path, data, stat, event)
-        return watch
-
-    def _watchNodeRequestState(self, path, data, stat, event=None):
-        if not event or event.type == EventType.CHANGED:
-            # Don't process change events w/o any data. This can happen when a
-            # "slow" change watch tried to retrieve the data of a znode that
-            # was already deleted in the meantime.
-            if data is None:
-                return
-            # As we already get the data and the stat value, we can directly
-            # use it without asking ZooKeeper for the data again.
-            content = self._bytesToDict(data)
-            if not content:
+    def _requestCacheListener(self, event):
+        if hasattr(event.event_data, 'path'):
+            # Ignore root node
+            path = event.event_data.path
+            if path == self.REQUEST_ROOT:
                 return
 
-            if (
-                content["state"] in [
-                    zuul.model.STATE_FULFILLED, zuul.model.STATE_FAILED
-                ]
-                and self.node_request_event_callback
-            ):
-                # Look up the request id from the path in ZooKeeper
-                reqid = path.split("/")[-1]
-                request = self.getNodeRequest(reqid)
+            # Ignore lock nodes
+            if '/lock' in path:
+                return
+
+        # Ignore any non-node related events such as connection events here
+        if event.event_type not in (TreeEvent.NODE_ADDED,
+                                    TreeEvent.NODE_UPDATED,
+                                    TreeEvent.NODE_REMOVED):
+            return
+
+        path = event.event_data.path
+        request_id = path.rsplit('/', 1)[1]
+
+        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED):
+            # Requests with empty data are invalid so skip add or update these.
+            if not event.event_data.data:
+                return
+
+            # Perform an in-place update of the cached request if possible
+            d = self._bytesToDict(event.event_data.data)
+            request = self._request_cache.get(request_id)
+            if request:
+                if event.event_data.stat.version <= request.stat.version:
+                    # Don't update to older data
+                    return
+                old_state = request.state
+                request.updateFromDict(d)
+                request.stat = event.event_data.stat
+            else:
+                old_state = None
+                request = NodeRequest.fromDict(d)
+                request.id = request_id
+                request.stat = event.event_data.stat
+                self._request_cache[request_id] = request
+
+            if (request.state in {zuul.model.STATE_FULFILLED,
+                                  zuul.model.STATE_FAILED}
+                and request.state != old_state
+                and self.node_request_event_callback):
                 self.node_request_event_callback(
-                    request, NodeRequestEvent.COMPLETED)
+                    request, NodeRequestEvent.COMPLETED, request_id=request_id)
 
-                # Return False to stop the datawatch as the noderequest is now
-                # fulfilled.
-                self.watched_node_requests.remove(path)
-                return False
-        elif event.type == EventType.DELETED:
-            # TODO (felix): How to deserialize the NR if the node was already
-            # deleted? If that's not possible, we need at least the request.uid
-            # to check the nodepool.requests dictionary.
-            reqid = path.split("/")[-1]
-            self.node_request_event_callback(
-                None, NodeRequestEvent.DELETED, reqid=reqid)
-            # Return False to stop the datawatch as the noderequest got deleted
-            self.watched_node_requests.remove(path)
-            return False
+        elif event.event_type == TreeEvent.NODE_REMOVED:
+            request = self._request_cache.pop(request_id)
+            if self.node_request_event_callback:
+                self.node_request_event_callback(
+                    request, NodeRequestEvent.DELETED, request_id=request_id)
 
     def submitNodeRequest(self, node_request, priority):
         """
@@ -493,6 +492,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         :param str node_request_id: The ID of the node request to retrieve.
         """
+        req = self._request_cache.get(node_request_id)
+        if req:
+            return req
 
         path = f"{self.REQUEST_ROOT}/{node_request_id}"
         try:

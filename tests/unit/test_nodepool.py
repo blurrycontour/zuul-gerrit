@@ -31,8 +31,8 @@ class NodepoolWithCallback(zuul.nodepool.Nodepool):
         super().__init__(*args, **kwargs)
         self.provisioned_requests = []
 
-    def _handleNodeRequestEvent(self, request, event, reqid=None):
-        super()._handleNodeRequestEvent(request, event, reqid)
+    def _handleNodeRequestEvent(self, request, event, request_id=None):
+        super()._handleNodeRequestEvent(request, event, request_id)
         self.provisioned_requests.append(request)
 
 
@@ -56,7 +56,6 @@ class TestNodepoolBase(BaseTestCase):
         self.zk_client.connect()
         self.hostname = 'nodepool-test-hostname'
 
-        self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
         self.nodepool = NodepoolWithCallback(
@@ -73,12 +72,6 @@ class TestNodepoolBase(BaseTestCase):
         while self.nodepool.requests:
             time.sleep(0.1)
 
-    # TODO (felix): How to overwrite this method for the test?
-    def onNodesProvisioned(self, request):
-        # This is a scheduler method that the nodepool class calls
-        # back when a request is provisioned.
-        self.provisioned_requests.append(request)
-
 
 class TestNodepool(TestNodepoolBase):
     def test_node_request(self):
@@ -92,6 +85,7 @@ class TestNodepool(TestNodepoolBase):
         request = self.nodepool.requestNodes(
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.waitForRequests()
+        request = self.nodepool.zk_nodepool.getNodeRequest(request.id)
         self.assertEqual(len(self.nodepool.provisioned_requests), 1)
         # TODO (felix): We have to look up the request from ZK directly to
         # check the state.
@@ -137,7 +131,8 @@ class TestNodepool(TestNodepoolBase):
         self.zk_client.client.start()
         self.fake_nodepool.unpause()
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+        request = self.nodepool.zk_nodepool.getNodeRequest(request.id)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
     def test_node_request_canceled(self):
@@ -154,7 +149,7 @@ class TestNodepool(TestNodepoolBase):
         self.nodepool.cancelRequest(request)
 
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 0)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 0)
 
     def test_node_request_priority(self):
         # Test that requests are satisfied in priority order
@@ -171,7 +166,9 @@ class TestNodepool(TestNodepoolBase):
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
         self.fake_nodepool.unpause()
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 2)
+        request1 = self.nodepool.zk_nodepool.getNodeRequest(request1.id)
+        request2 = self.nodepool.zk_nodepool.getNodeRequest(request2.id)
+        self.assertEqual(len(self.nodepool.provisioned_requests), 2)
         self.assertEqual(request1.state, 'fulfilled')
         self.assertEqual(request2.state, 'fulfilled')
         self.assertTrue(request2.state_time < request1.state_time)
