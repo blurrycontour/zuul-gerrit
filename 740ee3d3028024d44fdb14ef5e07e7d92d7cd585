@@ -16,6 +16,23 @@
       "revId": "740ee3d3028024d44fdb14ef5e07e7d92d7cd585",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d33325b7_90b7de46",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-25T20:01:16Z",
+      "side": 1,
+      "message": "How about we move zuul.nodepool.current_requests too, that way they are in sync?",
+      "revId": "740ee3d3028024d44fdb14ef5e07e7d92d7cd585",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
