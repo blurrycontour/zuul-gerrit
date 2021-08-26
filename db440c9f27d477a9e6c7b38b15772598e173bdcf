@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4ce112a6_35dfe669",
+        "filename": "web/src/pages/Buildset.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-08-26T23:26:38Z",
+      "side": 1,
+      "message": "If we decide to go with this; this looks a bit stuffed in there to me [1].  At a minimum this should add probably \"pf-u-m-l\" (see patternfly spacing doc) to put some margin around it.  Even better I would use a flex and float a OptionsMenu to the right, and have this as a option in there.  I would also turn this around to make it clearer, have it default selected and say \"Hide retried builds\".  That way it feels more explicit that we are currently not showing you something.\n\n[1] https://imgur.com/a/N51JlQs",
+      "revId": "db440c9f27d477a9e6c7b38b15772598e173bdcf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
