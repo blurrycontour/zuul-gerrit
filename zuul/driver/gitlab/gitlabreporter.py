@@ -17,6 +17,7 @@ import logging
 import voluptuous as v
 
 from zuul.reporter import BaseReporter
+from zuul.model import MERGER_MERGE, MERGER_MAP, MERGER_SQUASH_MERGE
 from zuul.lib.logutil import get_annotated_logger
 from zuul.driver.gitlab.gitlabsource import GitlabSource
 from zuul.exceptions import MergeFailure
@@ -27,6 +28,12 @@ class GitlabReporter(BaseReporter):
 
     name = 'gitlab'
     log = logging.getLogger("zuul.GitlabReporter")
+
+    # Merge modes supported by gitlab
+    merge_modes = {
+        MERGER_MERGE: 'merge',
+        MERGER_SQUASH_MERGE: 'squash'
+    }
 
     def __init__(self, driver, connection, pipeline, config=None):
         super(GitlabReporter, self).__init__(driver, connection, config)
@@ -78,9 +85,18 @@ class GitlabReporter(BaseReporter):
         project = item.change.project.name
         mr_number = item.change.number
 
+        merge_mode = item.current_build_set.getMergeMode()
+
+        if merge_mode not in self.merge_modes:
+            mode = [x[0] for x in MERGER_MAP.items() if x[1] == merge_mode][0]
+            self.log.warning('Merge mode %s not supported by Gitlab', mode)
+            raise MergeFailure('Merge mode %s not supported by Gitlab' % mode)
+
+        merge_mode = self.merge_modes[merge_mode]
+
         for i in [1, 2]:
             try:
-                self.connection.mergeMR(project, mr_number)
+                self.connection.mergeMR(project, mr_number, merge_mode)
                 item.change.is_merged = True
                 return
             except MergeFailure:
