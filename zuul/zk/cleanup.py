@@ -41,3 +41,10 @@ class GeneralCleanupLock(kazoo.recipe.lock.Lock):
 
     def __init__(self, client):
         super().__init__(client.client, self._path)
+
+
+class NodeRequestCleanupLock(kazoo.recipe.lock.Lock):
+    _path = '/zuul/cleanup/node_request'
+
+    def __init__(self, client):
+        super().__init__(client.client, self._path)
