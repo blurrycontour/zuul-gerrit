@@ -33,8 +33,8 @@ def subtract_resources(target, source):
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
 
-    def __init__(self, zk_client, hostname, statsd, scheduler=None):
-        self.hostname = hostname
+    def __init__(self, zk_client, system_id, statsd, scheduler=None):
+        self.system_id = system_id
         self.statsd = statsd
         # TODO (felix): Remove the scheduler parameter once the nodes are
         # locked on the executor side.
@@ -119,7 +119,7 @@ class Nodepool(object):
             event_id = event.zuul_event_id
         else:
             event_id = None
-        req = model.NodeRequest(self.hostname, build_set_uuid, tenant_name,
+        req = model.NodeRequest(self.system_id, build_set_uuid, tenant_name,
                                 pipeline_name, job.name, labels, provider,
                                 relative_priority, event_id)
         self.requests[req.uid] = req
@@ -380,7 +380,7 @@ class Nodepool(object):
             self._unlockNodes(locked_nodes)
             raise
 
-    def _updateNodeRequest(self, request, priority, deleted):
+    def _updateNodeRequest(self, request, priority):
         log = get_annotated_logger(self.log, request.event_id)
         # Return False to indicate that we should stop watching the
         # node.
@@ -397,14 +397,7 @@ class Nodepool(object):
             return False
 
         # TODOv3(jeblair): handle allocation failure
-        if deleted:
-            log.debug("Resubmitting lost node request %s", request)
-            request.reset()
-            self.zk_nodepool.submitNodeRequest(
-                request, priority, self._updateNodeRequest)
-            # Stop watching this request node
-            return False
-        elif request.state in (model.STATE_FULFILLED, model.STATE_FAILED):
+        if request.state in (model.STATE_FULFILLED, model.STATE_FAILED):
             log.info("Node request %s %s", request, request.state)
 
             # Give our results to the scheduler.
@@ -436,11 +429,6 @@ class Nodepool(object):
         # A copy of the nodeset with information about the real nodes
         nodeset = job_nodeset.copy()
 
-        if request_id != request.id:
-            log.info("Skipping node accept for %s (resubmitted as %s)",
-                     request_id, request.id)
-            return None
-
         if request.canceled:
             log.info("Ignoring canceled node request %s", request)
             # The request was already deleted when it was canceled
@@ -458,25 +446,13 @@ class Nodepool(object):
         # processing it. Nodepool will automatically reallocate the assigned
         # nodes in that situation.
         try:
-            if not self.zk_nodepool.nodeRequestExists(request):
-                log.info("Request %s no longer exists, resubmitting",
-                         request.id)
-                # Look up the priority from the old request id.
-                priority = request.id.partition("-")[0]
-                self.requests[request.uid] = request
-                request.reset()
-                self.zk_nodepool.submitNodeRequest(
-                    request, priority, self._updateNodeRequest)
-                return None
-            else:
-                for node_id, node in zip(request.nodes, nodeset.getNodes()):
-                    self.zk_nodepool.updateNode(node, node_id)
+            for node_id, node in zip(request.nodes, nodeset.getNodes()):
+                self.zk_nodepool.updateNode(node, node_id)
         except Exception:
-            # If we cannot retrieve the node request from ZK we probably lost
-            # the connection and thus the ZK session. Resubmitting the node
-            # request probably doesn't make sense at this point in time as it
-            # is likely to directly fail again. So just log the problem
-            # with zookeeper and fail here.
+            # If we cannot retrieve the node request from ZK we
+            # probably lost the connection and thus the ZK
+            # session. Just log the problem with zookeeper and fail
+            # here.
             log.exception("Error getting node request %s:", request_id)
             request.failed = True
             return nodeset
