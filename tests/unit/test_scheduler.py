@@ -6092,7 +6092,6 @@ For CI problems and help debugging, contact ci@example.org"""
         for x in iterate_timeout(30, 'fulfill request'):
             if request.fulfilled:
                 break
-        id1 = request.id
 
         # The request is fulfilled, but the scheduler hasn't processed
         # it yet.  Reconnect ZK.
@@ -6103,18 +6102,35 @@ For CI problems and help debugging, contact ci@example.org"""
         # out-of-date) notification that nodes are ready.
         self.scheds.first.sched.run_handler_lock.release()
 
-        # It should resubmit the request, once it's fulfilled, we can
+        # The request should persist; once it's fulfilled, we can
         # wait for it to run jobs and settle.
         for x in iterate_timeout(30, 'fulfill request'):
             if request.fulfilled:
                 break
         self.waitUntilSettled()
 
-        id2 = request.id
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
-        # Make sure it was resubmitted (the id's should be different).
-        self.assertNotEqual(id1, id2)
+
+    def test_nodepool_cleanup(self):
+        "Test that we cleanup leaked node requests"
+        self.fake_nodepool.pause()
+        system_id = self.scheds.first.sched.system.system_id
+        zk_nodepool = self.scheds.first.sched.nodepool.zk_nodepool
+        req1 = zuul.model.NodeRequest(system_id, "uuid1", "tenant",
+                                      "pipeline", "job", ['label'], None,
+                                      0, None)
+        zk_nodepool.submitNodeRequest(req1, 100, lambda x, y: False)
+        req2 = zuul.model.NodeRequest("someone else", "uuid1", "tenant",
+                                      "pipeline", "job", ['label'], None,
+                                      0, None)
+        zk_nodepool.submitNodeRequest(req2, 100, lambda x, y: False)
+        self.assertEqual(zk_nodepool.getNodeRequests(),
+                         ['100-0000000000', '100-0000000001'])
+        self.scheds.first.sched._runNodeRequestCleanup()
+        self.assertEqual(zk_nodepool.getNodeRequests(),
+                         ['100-0000000001'])
+        zk_nodepool.deleteNodeRequest(req2)
 
     def test_nodepool_failure(self):
         "Test that jobs are reported after a nodepool failure"

@@ -76,6 +76,7 @@ from zuul.zk.cleanup import (
     BuildRequestCleanupLock,
     GeneralCleanupLock,
     MergeRequestCleanupLock,
+    NodeRequestCleanupLock,
 )
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, SchedulerComponent
@@ -100,6 +101,7 @@ from zuul.zk.locks import (
     trigger_queue_lock,
 )
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.system import ZuulSystem
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
 
@@ -172,7 +174,9 @@ class Scheduler(threading.Thread):
 
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
-        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
+        self.system = ZuulSystem(self.zk_client)
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client,
+                                             self.system.system_id)
         self.component_info = SchedulerComponent(self.zk_client, self.hostname)
         self.component_info.register()
         self.component_registry = ComponentRegistry(self.zk_client)
@@ -211,6 +215,7 @@ class Scheduler(threading.Thread):
             self.zk_client)
         self.merge_request_cleanup_lock = MergeRequestCleanupLock(
             self.zk_client)
+        self.node_request_cleanup_lock = NodeRequestCleanupLock(self.zk_client)
 
         self.abide = Abide()
         self.unparsed_abide = UnparsedAbideConfig()
@@ -464,6 +469,10 @@ class Scheduler(threading.Thread):
                 self._runBuildRequestCleanup()
             except Exception:
                 self.log.exception("Error in build request cleanup:")
+            try:
+                self._runNodeRequestCleanup()
+            except Exception:
+                self.log.exception("Error in node request cleanup:")
 
             self.apsched.add_job(self._runSemaphoreCleanup,
                                  trigger=self._semaphore_cleanup_interval)
@@ -490,11 +499,58 @@ class Scheduler(threading.Thread):
                 finally:
                     self.semaphore_cleanup_lock.release()
 
+    def _runNodeRequestCleanup(self):
+        # Get the layout lock to make sure the abide doesn't change
+        # under us.
+        with self.layout_lock:
+            if self.node_request_cleanup_lock.acquire(blocking=False):
+                try:
+                    self.log.debug("Starting node request cleanup")
+                    try:
+                        self._cleanupNodeRequests()
+                    except Exception:
+                        self.log.exception("Error in node request cleanup:")
+                finally:
+                    self.semaphore_cleanup_lock.release()
+
+    def _cleanupNodeRequests(self):
+        # Get all the current node requests in the queues
+        outstanding_requests = set()
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for item in pipeline.getAllItems():
+                    for req in item.current_build_set.node_requests.values():
+                        outstanding_requests.add(req.id)
+        # Get all the requests in ZK that belong to us
+        zk_requests = set()
+        for req_id in self.nodepool.zk_nodepool.getNodeRequests():
+            req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
+            if req.requestor == self.system.system_id:
+                zk_requests.add(req_id)
+        # Check for new outstanding requests
+        outstanding_requests = set()
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for item in pipeline.getAllItems():
+                    for req in item.current_build_set.node_requests.values():
+                        outstanding_requests.add(req.id)
+        leaked_requests = zk_requests - outstanding_requests
+        for req_id in leaked_requests:
+            try:
+                self.log.warning("Deleting leaked node request: %s", req_id)
+                req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
+                self.nodepool.zk_nodepool.deleteNodeRequest(req)
+            except Exception:
+                self.log.exception("Error deleting leaked node request: %s",
+                                   req_id)
+
     def _runGeneralCleanup(self):
         if self.general_cleanup_lock.acquire(blocking=False):
             self._runConfigCacheCleanup()
             self._runExecutorApiCleanup()
             self._runMergerApiCleanup()
+        # This has its own locking
+        self._runNodeRequestCleanup()
 
     def _runConfigCacheCleanup(self):
         with self.layout_lock:
