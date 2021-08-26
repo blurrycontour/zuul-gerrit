@@ -51,6 +51,11 @@ a.refresh {
     font-weight: bold;
 }
 
+/* Remove ugly outline when a Switch is selected */
+.pf-c-switch {
+    --pf-c-switch__input--focus__toggle--OutlineWidth: 0;
+}
+
 /* Keep the normal font-size for compact tables */
 .zuul-build-table td {
     font-size: var(--pf-global--FontSize--md);
