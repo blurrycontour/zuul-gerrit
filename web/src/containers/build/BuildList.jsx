@@ -33,6 +33,7 @@ class BuildList extends React.Component {
   static propTypes = {
     builds: PropTypes.array,
     tenant: PropTypes.object,
+    showNonFinalBuilds: PropTypes.bool,
   }
 
   // TODO (felix): Add a property "isCompact" to be used on the buildresult
@@ -53,7 +54,7 @@ class BuildList extends React.Component {
   }
 
   render() {
-    const { builds, tenant } = this.props
+    const { builds, tenant, showNonFinalBuilds } = this.props
     const { selectedBuildId } = this.state
     return (
       <DataList
@@ -63,7 +64,18 @@ class BuildList extends React.Component {
         onSelectDataListItem={this.handleSelectDataListItem}
         style={{ fontSize: 'var(--pf-global--FontSize--md)' }}
       >
-        {builds.map((build) => (
+        {builds.filter((build) => {
+          if (showNonFinalBuilds) {
+            return true
+          }
+          else if (!showNonFinalBuilds && build.final) {
+            return true
+          } else {
+            return false
+          }
+        }
+
+        ).map((build) => (
           <DataListItem key={build.uuid || build.job_name} id={build.uuid}>
             <Link
               to={`${tenant.linkPrefix}/build/${build.uuid}`}

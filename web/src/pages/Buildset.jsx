@@ -16,6 +16,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
+  Checkbox,
   EmptyState,
   EmptyStateIcon,
   EmptyStateVariant,
@@ -38,6 +39,17 @@ class BuildsetPage extends React.Component {
     buildset: PropTypes.object,
     isFetching: PropTypes.bool.isRequired,
     fetchBuildset: PropTypes.func.isRequired,
+  }
+
+  constructor() {
+    super()
+    this.state = {
+      showNonFinalBuilds: false,
+    }
+  }
+
+  handleFinalCheckbox = (checked, event) => {
+    this.setState({ showNonFinalBuilds: event.target.checked })
   }
 
   updateData = () => {
@@ -64,6 +76,7 @@ class BuildsetPage extends React.Component {
 
   render() {
     const { buildset, isFetching, tenant } = this.props
+    const { showNonFinalBuilds } = this.state
 
     // Initial page load
     if (buildset === undefined || isFetching) {
@@ -87,7 +100,7 @@ class BuildsetPage extends React.Component {
     // Return the build list or an empty state if no builds are part of the
     // buildset.
     const buildsContent = buildset.builds ? (
-      <BuildList builds={buildset.builds} />
+      <BuildList builds={buildset.builds} showNonFinalBuilds={showNonFinalBuilds} />
     ) : (
       <>
         {/* Using an hr above the empty state ensures that the space between
@@ -118,6 +131,12 @@ class BuildsetPage extends React.Component {
             />{' '}
             Builds
           </Title>
+          <Checkbox
+            label="Show retries"
+            isChecked={showNonFinalBuilds}
+            onChange={this.handleFinalCheckbox}
+            id="finalJobCheck"
+            name="finalJobCheck" />
           {buildsContent}
         </PageSection>
       </>
