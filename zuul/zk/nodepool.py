@@ -330,18 +330,29 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         path = '{}/{:0>3}-'.format(self.REQUEST_ROOT, priority)
         path = self.kazoo_client.create(path, json.dumps(data).encode('utf8'),
-                                        makepath=True, sequence=True,
-                                        ephemeral=True)
+                                        makepath=True, sequence=True)
         reqid = path.split("/")[-1]
         node_request.id = reqid
 
         def callback(value, _):
             if value:
                 self.updateNodeRequest(node_request, value)
-            deleted = (value is None)  # data *are* none
-            return watcher(node_request, priority, deleted)
+            return watcher(node_request, priority)
 
         self.kazoo_client.DataWatch(path, callback)
+
+    def getNodeRequests(self):
+        '''
+        Get the current list of all node requests in priority sorted order.
+
+        :returns: A list of request ids.
+        '''
+        try:
+            requests = self.kazoo_client.get_children(self.REQUEST_ROOT)
+        except NoNodeError:
+            return []
+
+        return sorted(requests)
 
     def getNodeRequest(self, node_request_id):
         """
