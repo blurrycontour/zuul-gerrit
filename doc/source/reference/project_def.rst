@@ -122,24 +122,24 @@ pipeline.
       .. value:: merge
 
          Uses the default git merge strategy (recursive). This maps to
-         the merge mode ``merge`` in Github.
+         the merge mode ``merge`` in Github and Gitlab.
 
       .. value:: merge-resolve
 
          Uses the resolve git merge strategy.  This is a very
          conservative merge strategy which most closely matches the
          behavior of Gerrit. This maps to the merge mode ``merge`` in
-         Github.
+         Github. This is not supported by Gitlab.
 
       .. value:: cherry-pick
 
          Cherry-picks each change onto the branch rather than
-         performing any merges. This is not supported by Github.
+         performing any merges. This is not supported by Github and Gitlab.
 
       .. value:: squash-merge
 
          Squash merges each change onto the branch. This maps to the
-         merge mode ``squash`` in Github.
+         merge mode ``squash`` in Github and Gitlab.
 
    .. attr:: vars
       :default: None
