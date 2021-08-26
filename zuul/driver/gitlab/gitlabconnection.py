@@ -404,6 +404,10 @@ class GitlabAPIClient():
         resp = self.put(self.baseurl + path, zuul_event_id=zuul_event_id)
         try:
             self._manage_error(*resp, zuul_event_id=zuul_event_id)
+            if resp[0]['state'] != 'merged':
+                raise MergeFailure(
+                    "Merge request merge failed: %s" % resp.get('merge_error')
+                )
         except GitlabAPIClientException as e:
             raise MergeFailure('Merge request merge failed: %s' % e)
         return resp[0]

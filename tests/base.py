@@ -2156,7 +2156,7 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             mr = self._get_mr(match)
             mr.mergeMergeRequest()
 
-        return {}, 200, "", "PUT"
+        return {'state': 'merged'}, 200, "", "PUT"
 
     def addProject(self, project):
         self.addProjectByName(project.name)
