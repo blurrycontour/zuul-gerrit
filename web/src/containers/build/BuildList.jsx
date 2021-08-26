@@ -22,8 +22,15 @@ import {
   DataListItem,
   DataListItemRow,
   DataListItemCells,
+  Flex,
+  FlexItem,
+  Switch,
 } from '@patternfly/react-core'
-import { OutlinedClockIcon } from '@patternfly/react-icons'
+import {
+  AngleDownIcon,
+  AngleRightIcon,
+  OutlinedClockIcon
+} from '@patternfly/react-icons'
 import 'moment-duration-format'
 import * as moment from 'moment'
 
@@ -39,75 +46,164 @@ class BuildList extends React.Component {
   // page. Without this flag we might then even use this (with more
   // information) on the /builds page.
 
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
+    const { builds } = this.props
+    let retriedJobs = builds.filter((build) => {
+      return !build.final
+    }).map((build) => (build.job_name)
+    ).filter((build, idx, self) => {
+      return self.indexOf(build) === idx
+    })
+
     this.state = {
-      selectedBuildId: null,
+      visibleNonFinalBuilds: retriedJobs,
+      retriedJobs: retriedJobs,
     }
   }
 
-  handleSelectDataListItem = (buildId) => {
+  handleFinalSwitch = isChecked => {
+    const { retriedJobs } = this.state
+    this.setState({ visibleNonFinalBuilds: (isChecked ? retriedJobs : []) })
+  }
+
+  handleToggleVisibleNonFinalBuilds = (jobName) => {
+    const { visibleNonFinalBuilds } = this.state
+    const index = visibleNonFinalBuilds.indexOf(jobName)
+    console.log(index)
+    const newVisible =
+      index >= 0 ? [...visibleNonFinalBuilds.slice(0, index), ...visibleNonFinalBuilds.slice(index + 1, visibleNonFinalBuilds.length)] : [...visibleNonFinalBuilds, jobName]
     this.setState({
-      selectedBuildId: buildId,
+      visibleNonFinalBuilds: newVisible,
     })
+  }
+
+  renderRetriesButton = (build, hasRetries) => {
+    const { visibleNonFinalBuilds } = this.state
+    if (!build.final || !hasRetries) {
+      return <DataListCell key={`${build.uuid}-final`} width={1} isIcon={true}>
+        {/* Hide the icon to maintain alignment between final and non-final elements */}
+        <AngleRightIcon visibility="hidden" />
+      </DataListCell >
+    }
+    const isExpanded = (visibleNonFinalBuilds.indexOf(build.job_name) >= 0)
+    const RetryIcon =
+      isExpanded
+        ? AngleDownIcon
+        : AngleRightIcon
+    const retryAltText =
+      isExpanded
+        ? 'Hide retries for this job'
+        : 'Show retries for this job'
+    // TODO either replace this with an ExpandableSection (but this breaks the layout) or figure out CSS animations for the icon.
+    return (
+      <DataListCell key={`${build.uuid}-final`} width={1} isIcon={true}>
+        <RetryIcon onClick={() => { this.handleToggleVisibleNonFinalBuilds(build.job_name) }} title={retryAltText} />
+      </DataListCell >
+    )
   }
 
   render() {
     const { builds, tenant } = this.props
-    const { selectedBuildId } = this.state
+    const { visibleNonFinalBuilds, retriedJobs } = this.state
+
+    let retrySwitch = retriedJobs.length > 0 ?
+      <FlexItem align={{ default: 'alignRight' }}>
+        <span>Show retried jobs &nbsp;</span>
+        <Switch
+          isChecked={visibleNonFinalBuilds === retriedJobs}
+          onChange={this.handleFinalSwitch}
+          isReversed
+        />
+      </FlexItem> :
+      <></>
+
     return (
-      <DataList
-        className="zuul-build-list"
-        isCompact
-        selectedDataListItemId={selectedBuildId}
-        onSelectDataListItem={this.handleSelectDataListItem}
-        style={{ fontSize: 'var(--pf-global--FontSize--md)' }}
-      >
-        {builds.map((build) => (
-          <DataListItem key={build.uuid || build.job_name} id={build.uuid}>
-            <Link
-              to={`${tenant.linkPrefix}/build/${build.uuid}`}
-              style={{
-                textDecoration: 'none',
-                color: build.voting
-                  ? 'inherit'
-                  : 'var(--pf-global--disabled-color--100)',
-              }}
-            >
-              <DataListItemRow>
-                <DataListItemCells
-                  dataListCells={[
-                    <DataListCell key={build.uuid} width={3}>
-                      <BuildResultWithIcon
-                        result={build.result}
-                        colored={build.voting}
-                        size="sm"
-                      >
-                        {build.job_name}
-                        {!build.voting && ' (non-voting)'}
-                      </BuildResultWithIcon>
-                    </DataListCell>,
-                    <DataListCell key={`${build.uuid}-time`}>
-                      <IconProperty
-                        icon={<OutlinedClockIcon />}
-                        value={moment
-                          .duration(build.duration, 'seconds')
-                          .format('h [hr] m [min] s [sec]')}
-                      />
-                    </DataListCell>,
-                    <DataListCell key={`${build.uuid}-result`}>
-                      <BuildResult
-                        result={build.result}
-                        colored={build.voting}
-                      />
-                    </DataListCell>,
-                  ]}
-                />
-              </DataListItemRow>
-            </Link>
-          </DataListItem>
-        ))}
-      </DataList>
+      <Flex direction={{ default: 'column' }}>
+        {retrySwitch}
+        <FlexItem>
+          <DataList
+            className="zuul-build-list"
+            isCompact
+            style={{ fontSize: 'var(--pf-global--FontSize--md)' }}
+          >
+            {builds.sort((a, b) => {
+              // Group builds by job name, then order by decreasing start time; this will ensure retries are together
+              if (a.job_name === b.job_name) {
+                if (a.start_time < b.start_time) {
+                  return 1
+                }
+                if (a.start_time > b.start_time) {
+                  return -1
+                }
+                return 0
+              }
+              if (a.job_name > b.job_name) {
+                return 1
+              } else {
+                return -1
+              }
+            }).filter((build) => {
+              if (build.final || visibleNonFinalBuilds.indexOf(build.job_name) >= 0) {
+                return true
+              }
+              else {
+                return false
+              }
+            }).map((build) => {
+              function linkWrap(cell) {
+                return (<Link
+                  to={`${tenant.linkPrefix}/build/${build.uuid}`}
+                  style={{
+                    textDecoration: 'none',
+                    color: build.voting
+                      ? 'inherit'
+                      : 'var(--pf-global--disabled-color--100)',
+                  }}
+                >
+                  {cell}
+                </Link>)
+              }
+              return (
+                <DataListItem key={build.uuid || build.job_name} id={build.uuid}>
+                  <DataListItemRow
+                    style={!build.final ? { backgroundColor: 'var(--pf-global--BackgroundColor--light-200)' } : {}}>
+                    <DataListItemCells
+                      dataListCells={[
+                        this.renderRetriesButton(build, retriedJobs.indexOf(build.job_name) >= 0),
+                        <DataListCell key={build.uuid} width={3}>
+                          {linkWrap(<BuildResultWithIcon
+                            result={build.result}
+                            colored={build.voting}
+                            size="sm"
+                          >
+                            {build.job_name}
+                            {!build.voting && ' (non-voting)'}
+                          </BuildResultWithIcon>)}
+                        </DataListCell>,
+                        <DataListCell key={`${build.uuid}-time`}>
+                          {linkWrap(<IconProperty
+                            icon={<OutlinedClockIcon />}
+                            value={moment
+                              .duration(build.duration, 'seconds')
+                              .format('h [hr] m [min] s [sec]')}
+                          />)}
+                        </DataListCell>,
+                        <DataListCell key={`${build.uuid}-result`}>
+                          {linkWrap(<BuildResult
+                            result={build.result}
+                            colored={build.voting}
+                          />)}
+                        </DataListCell>,
+                      ]}
+                    />
+                  </DataListItemRow>
+                </DataListItem>
+              )
+            })}
+          </DataList>
+        </FlexItem>
+      </Flex>
     )
   }
 }
