@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "242be4ed_35274f94",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-27T09:36:54Z",
+      "side": 1,
+      "message": "nit: doc string should to be updated.",
+      "revId": "1c1a27d22d9e4cb42f0f4feb4cdd23b133c44e04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "850f5051_f42d44df",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-27T09:36:54Z",
+      "side": 1,
+      "message": "nit: doc string should to be updated.",
+      "revId": "1c1a27d22d9e4cb42f0f4feb4cdd23b133c44e04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
