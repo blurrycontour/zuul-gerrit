@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a476c01a_edaba7d9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2022,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-08-27T10:44:41Z",
+      "side": 1,
+      "message": "Don\u0027t we have to delete the node request here like below?",
+      "revId": "97417b73cb08efc7befae8b90f23b160cf19c15c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
