@@ -142,61 +142,53 @@ export default function LogFile({
       <>
         <ToggleGroup aria-label="Log line severity filter">
           <ToggleGroupItem
-            buttonId="0"
+            buttonId='0'
+            text='All'
             isSelected={severity === 0}
             onChange={handleItemClick}
-          >
-            All
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="1"
+            buttonId='1'
+            text='Debug'
             isSelected={severity === 1}
             onChange={handleItemClick}
-          >
-            Debug
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="2"
+            buttonId='2'
+            text='Info'
             isSelected={severity === 2}
             onChange={handleItemClick}
-          >
-            Info
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="3"
+            buttonId='3'
+            text='Warning'
             isSelected={severity === 3}
             onChange={handleItemClick}
-          >
-            Warning
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="4"
+            buttonId='4'
+            text='Error'
             isSelected={severity === 4}
             onChange={handleItemClick}
-          >
-            Error
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="5"
+            buttonId='5'
+            text='Trace'
             isSelected={severity === 5}
             onChange={handleItemClick}
-          >
-            Trace
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="6"
+            buttonId='6'
+            text='Audit'
             isSelected={severity === 6}
             onChange={handleItemClick}
-          >
-            Audit
-          </ToggleGroupItem>
+          />
           <ToggleGroupItem
-            buttonId="7"
+            buttonId='7'
+            text='Critical'
             isSelected={severity === 7}
             onChange={handleItemClick}
-          >
-            Critical
-          </ToggleGroupItem>
+          />
         </ToggleGroup>
         <Divider />
         <pre className="zuul-log-output">
