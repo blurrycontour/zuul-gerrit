@@ -22,12 +22,10 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 class PullRequest(Change):
     def __init__(self, project):
         super(PullRequest, self).__init__(project)
-        self.project = None
         self.pr = None
         self.updated_at = None
         self.title = None
         self.score = 0
-        self.files = []
         self.tags = []
         self.status = None
 
@@ -52,6 +50,27 @@ class PullRequest(Change):
         if self.open:
             r.append('state: open')
         return ' '.join(r) + '>'
+
+    def serialize(self):
+        d = super().serialize()
+        d.update({
+            "pr": self.pr,
+            "updated_at": self.updated_at,
+            "title": self.title,
+            "score": self.score,
+            "tags": self.tags,
+            "status": self.status,
+        })
+        return d
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.pr = data.get("pr")
+        self.updated_at = data.get("updated_at")
+        self.title = data.get("title")
+        self.score = data.get("score", 0)
+        self.tags = data.get("tags", [])
+        self.status = data.get("status")
 
     def isUpdateOf(self, other):
         if (self.project == other.project and
