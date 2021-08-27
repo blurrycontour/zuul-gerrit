@@ -96,7 +96,7 @@ class PagureSource(BaseSource):
             change, projects, tenant)
 
     def getCachedChanges(self):
-        return list(self.connection._change_cache.values())
+        yield from self.connection._change_cache
 
     def getProject(self, name):
         p = self.connection.getProject(name)
@@ -140,6 +140,9 @@ class PagureSource(BaseSource):
 
     def getRefForChange(self, change):
         raise NotImplementedError()
+
+    def setChangeAttributes(self, change, **attrs):
+        return self.connection.updateChangeAttributes(change, **attrs)
 
 
 # Require model
