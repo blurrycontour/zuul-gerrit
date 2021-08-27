@@ -31,9 +31,30 @@ from zuul.connection import CachedBranchConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.exceptions import MergeFailure
-from zuul.model import Branch, CacheStat, Project, Ref, Tag
+from zuul.model import Branch, Project, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
+from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
 from zuul.zk.event_queues import ConnectionEventQueue
+
+
+class GitlabChangeCache(AbstractChangeCache):
+    log = logging.getLogger("zuul.driver.GitlabChangeCache")
+
+    def __init__(self, client, connection):
+        self.connection = connection
+        super().__init__(client, connection.connection_name)
+
+    def _changeFromData(self, data):
+        project = self.connection.source.getProject(data["project"])
+        mr = MergeRequest(project)
+        mr.deserialize(data)
+        return mr
+
+    def _dataFromChange(self, change):
+        return change.serialize()
+
+    def _updateChange(self, change, data):
+        change.deserialize(data)
 
 
 class GitlabEventConnector(threading.Thread):
@@ -387,7 +408,6 @@ class GitlabConnection(CachedBranchConnection):
         super(GitlabConnection, self).__init__(
             driver, connection_name, connection_config)
         self.projects = {}
-        self._change_cache = {}
         self.server = self.connection_config.get('server', 'gitlab.com')
         self.baseurl = self.connection_config.get(
             'baseurl', 'https://%s' % self.server).rstrip('/')
@@ -420,12 +440,33 @@ class GitlabConnection(CachedBranchConnection):
         self.event_queue = ConnectionEventQueue(
             self.sched.zk_client, self.connection_name
         )
+        self.log.debug('Creating Zookeeper change cache')
+        self._change_cache = GitlabChangeCache(self.sched.zk_client, self)
         self.log.info('Starting event connector')
         self._start_event_connector()
 
     def onStop(self):
         if hasattr(self, 'gitlab_event_connector'):
             self._stop_event_connector()
+
+    def maintainCache(self, relevant):
+        for change in self._change_cache:
+            if change not in relevant:
+                self._change_cache.delete(change.cache_stat.key)
+        # TODO: remove entries older than X
+        self._change_cache.cleanup()
+
+    def updateChangeAttributes(self, change, **attrs):
+        while True:
+            cache_stat = change.cache_stat
+            for name, value in attrs.items():
+                setattr(change, name, value)
+            try:
+                self._change_cache.set(cache_stat.key, change)
+                return
+            except ConcurrentUpdateError:
+                self.log.debug("Conflicting cache update of %s needs to be "
+                               "retried.", change)
 
     def getWebController(self, zuul_web):
         return GitlabWebController(zuul_web, self)
@@ -509,7 +550,7 @@ class GitlabConnection(CachedBranchConnection):
     def _getChange(self, project, number, patch_number=None,
                    refresh=False, url=None, event=None):
         log = get_annotated_logger(self.log, event)
-        key = (project.name, str(number), str(patch_number))
+        key = str((project.name, number, patch_number))
         change = self._change_cache.get(key)
         if change and not refresh:
             log.debug("Getting change from cache %s" % str(key))
@@ -522,23 +563,38 @@ class GitlabConnection(CachedBranchConnection):
             change.patchset = patch_number
             change.url = url or self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
-        change.cache_stat = CacheStat(key, None, None)
-        self._change_cache[key] = change
         try:
             log.debug("Getting change mr#%s from project %s" % (
                 number, project.name))
-            self._updateChange(change, event)
+            log.info("Updating change from Gitlab %s" % change)
+            mr = self.getMR(change.project.name, change.number, event=event)
+            while True:
+                try:
+                    self._updateChange(change, event, mr)
+                    self._change_cache.set(key, change)
+                    break
+                except ConcurrentUpdateError:
+                    self.log.debug("Conflicting cache update of %s "
+                                   "needs to be retried.", change)
+                if change.cache_version == -1:
+                    # Creating the change failed because someone else
+                    # created the change in the meantime. We need
+                    # to get the new change object from the cache in
+                    # order to have the correct version number for the
+                    # update.
+                    change = self._change_cache.get(key)
+
+            if self.sched:
+                self.sched.onChangeUpdated(change, event)
         except Exception:
-            if key in self._change_cache:
-                del self._change_cache[key]
+            self.log.warning("Deleting cache key %s due to exception", key)
+            self._change_cache.delete(key)
             raise
         return change
 
-    def _updateChange(self, change, event):
+    def _updateChange(self, change, event, mr):
         log = get_annotated_logger(self.log, event)
-        log.info("Updating change from Gitlab %s" % change)
-        change.mr = self.getMR(
-            change.project.name, change.number, event=event)
+        change.mr = mr
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.patchset = change.mr['sha']
@@ -559,10 +615,6 @@ class GitlabConnection(CachedBranchConnection):
         change.updated_at = int(dateutil.parser.parse(
             change.mr['updated_at']).timestamp())
         log.info("Updated change from Gitlab %s" % change)
-
-        if self.sched:
-            self.sched.onChangeUpdated(change, event)
-
         return change
 
     def canMerge(self, change, allow_needs, event=None):

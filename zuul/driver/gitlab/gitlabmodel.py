@@ -46,6 +46,21 @@ class MergeRequest(Change):
             r.append('labels: %s' % ', '.join(self.labels))
         return ' '.join(r) + '>'
 
+    def serialize(self):
+        d = super().serialize()
+        d.update({
+            "updated_at": self.updated_at,
+            "approved": self.approved,
+            "labels": self.labels,
+        })
+        return d
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.updated_at = data.get("updated_at")
+        self.approved = data.get("approved")
+        self.labels = data.get("labels")
+
     def isUpdateOf(self, other):
         if (self.project == other.project and
             hasattr(other, 'number') and self.number == other.number and
