@@ -36,6 +36,9 @@ from zuul.model import Branch, Project, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 from zuul.zk.event_queues import ConnectionEventQueue
 
+# HTTP timeout in seconds
+TIMEOUT = 30
+
 
 class GitlabEventConnector(threading.Thread):
     """Move events from Gitlab into the scheduler"""
@@ -256,7 +259,8 @@ class GitlabAPIClient():
     def get(self, url, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Getting resource %s ..." % url)
-        ret = self.session.get(url, headers=self.headers)
+        ret = self.session.get(url, headers=self.headers,
+                               timeout=TIMEOUT)
         log.debug("GET returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'GET'
@@ -265,7 +269,8 @@ class GitlabAPIClient():
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info(
             "Posting on resource %s, params (%s) ..." % (url, params))
-        ret = self.session.post(url, data=params, headers=self.headers)
+        ret = self.session.post(url, data=params, headers=self.headers,
+                                timeout=TIMEOUT)
         log.debug("POST returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'POST'
@@ -274,7 +279,8 @@ class GitlabAPIClient():
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info(
             "Put on resource %s, params (%s) ..." % (url, params))
-        ret = self.session.put(url, data=params, headers=self.headers)
+        ret = self.session.put(url, data=params, headers=self.headers,
+                               timeout=TIMEOUT)
         log.debug("PUT returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'PUT'
