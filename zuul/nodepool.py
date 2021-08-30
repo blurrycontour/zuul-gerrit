@@ -11,12 +11,16 @@
 # under the License.
 
 import logging
+import threading
 import time
 
 from collections import defaultdict
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
-from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.event_queues import (
+    PipelineResultEventQueue,
+    NodepoolEventElection
+)
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import NodeRequestEvent, ZooKeeperNodepool
 
@@ -35,45 +39,106 @@ class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
 
     def __init__(self, zk_client, system_id, statsd, scheduler=False):
+        self._stopped = False
         self.system_id = system_id
         self.statsd = statsd
 
+        self.stop_watcher_event = threading.Event()
+        self.election_won = False
         if scheduler:
             # Only enable the node request cache/callback for the scheduler.
             self.zk_nodepool = ZooKeeperNodepool(
                 zk_client,
                 enable_node_request_cache=True,
                 node_request_event_callback=self._handleNodeRequestEvent)
+            self.election = NodepoolEventElection(zk_client)
+            self.event_thread = threading.Thread(target=self.runEventElection)
+            self.event_thread.daemon = True
+            self.event_thread.start()
         else:
             self.zk_nodepool = ZooKeeperNodepool(zk_client)
+            self.election = None
+            self.event_thread = None
 
         self.pipeline_result_events = PipelineResultEventQueue.createRegistry(
             zk_client
         )
 
+        # TODO: remove internal caches for SOS
         self.requests = {}
         self.current_resources_by_tenant = {}
         self.current_resources_by_project = {}
+
+    def runEventElection(self):
+        while not self._stopped:
+            try:
+                self.log.debug("Running nodepool watcher election")
+                self.election.run(self._electionWon)
+            except Exception:
+                self.log.exception("Error in nodepool watcher:")
+
+    def stop(self):
+        self.log.debug("Stopping")
+        self._stopped = True
+        if self.election:
+            self.election.cancel()
+        if self.event_thread:
+            self.stop_watcher_event.set()
+            self.event_thread.join()
+
+    def _sendNodesProvisionedEvent(self, request):
+        tenant_name = request.tenant_name
+        pipeline_name = request.pipeline_name
+        event = model.NodesProvisionedEvent(
+            request.id, request.job_name, request.build_set_uuid)
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
+
+    def _electionWon(self):
+        self.log.info("Watching nodepool requests")
+        # Iterate over every completed request in case we are starting
+        # up or missed something in the transition.
+        self.election_won = True
+        try:
+            for rid in self.zk_nodepool.getNodeRequests():
+                request = self.zk_nodepool.getNodeRequest(rid)
+                if request.requestor != self.system_id:
+                    continue
+                if (request.state in {model.STATE_FULFILLED,
+                                      model.STATE_FAILED}):
+                    self._sendNodesProvisionedEvent(request)
+            # Now resume normal event processing.
+            self.stop_watcher_event.wait()
+        finally:
+            self.stop_watcher_event.clear()
+            self.election_won = False
 
     def _handleNodeRequestEvent(self, request, event, request_id=None):
         # TODO (felix): This callback should be wrapped by leader election, so
         # that only one scheduler puts NodesProvisionedEvents in the queue.
         log = get_annotated_logger(self.log, event=request.event_id)
 
+        if request.requestor != self.system_id:
+            return
+
         if request.uid not in self.requests:
             log.debug("Node request %s is unknown", request)
-            return False
+            return
 
         log.debug("Node request %s %s", request, request.state)
         if event == NodeRequestEvent.COMPLETED:
+            # This sequence is required for tests -- we can only
+            # remove the request from our internal cache after the
+            # completed event is added to the zk queue.
+            try:
+                if self.election_won:
+                    self.emitStats(request)
+                    self._sendNodesProvisionedEvent(request)
+            except Exception:
+                # If there are any errors moving the event, re-run the
+                # election.
+                self.stop_watcher_event.set()
+                raise
             del self.requests[request.uid]
-            self.emitStats(request)
-
-            tenant_name = request.tenant_name
-            pipeline_name = request.pipeline_name
-            event = model.NodesProvisionedEvent(
-                request.id, request.job_name, request.build_set_uuid)
-            self.pipeline_result_events[tenant_name][pipeline_name].put(event)
         elif event == NodeRequestEvent.DELETED:
             # Presumably we already removed it when it was complete.
             req = self.requests.pop(request.uid, None)
