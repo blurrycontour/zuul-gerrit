@@ -61,7 +61,7 @@ class TestGerritLegacyCRD(ZuulTestCase):
         self.assertEqual(B.data['status'], 'NEW')
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         self.executor_server.hold_jobs_in_build = True
         B.addApproval('Approved', 1)

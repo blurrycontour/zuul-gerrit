@@ -745,14 +745,8 @@ class GerritConnection(BaseConnection):
         except KeyError:
             pass
 
-    def maintainCache(self, relevant):
-        # This lets the user supply a list of change objects that are
-        # still in use.  Anything in our cache that isn't in the supplied
-        # list should be safe to remove from the cache.
-        for change in self._change_cache:
-            if change not in relevant:
-                self._change_cache.delete(change.cache_stat.key)
-        # TODO: remove entries older than X
+    def maintainCache(self, relevant, max_age):
+        self._change_cache.prune(relevant, max_age)
         self._change_cache.cleanup()
 
     def updateChangeAttributes(self, change, **attrs):
