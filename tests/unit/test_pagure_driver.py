@@ -760,7 +760,7 @@ class TestPagureToGerritCRD(ZuulTestCase):
         self.assertEqual(B.data['status'], 'NEW')
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         B.addApproval('Approved', 1)
         self.fake_pagure.emitEvent(
@@ -845,7 +845,7 @@ class TestGerritToPagureCRD(ZuulTestCase):
         self.assertFalse(B.is_merged)
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         B.addFlag('success', 'https://url', 'Build passed')
         B.threshold_reached = True
@@ -922,7 +922,7 @@ class TestPagureToGithubCRD(ZuulTestCase):
         self.assertFalse(B.is_merged)
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         B.addLabel('approved')
         self.fake_pagure.emitEvent(
@@ -991,7 +991,7 @@ class TestGithubToPagureCRD(ZuulTestCase):
         self.assertFalse(B.is_merged)
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         B.addFlag('success', 'https://url', 'Build passed')
         B.threshold_reached = True
