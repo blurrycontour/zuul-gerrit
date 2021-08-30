@@ -845,3 +845,12 @@ class EventReceiverElection(Election):
             (CONNECTION_ROOT, connection_name, f"election-{receiver_name}")
         )
         super().__init__(client.client, self.election_root)
+
+
+
+class NodepoolEventElection(Election):
+    """Election for the nodepool completion event processor."""
+
+    def __init__(self, client):
+        self.election_root = "/zuul/nodepool/election"
+        super().__init__(client.client, self.election_root)
