@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d5125e1_fe35ff52",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T17:31:05Z",
+      "side": 1,
+      "message": "s/github/gerrit/",
+      "revId": "f40b9adf9e724829108ceaadf88f0b787df48342",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
