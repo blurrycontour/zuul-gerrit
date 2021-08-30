@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "237656cf_08387963",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T16:57:16Z",
+      "side": 1,
+      "message": "I don\u0027t completely understand this part.  The attrs we\u0027re talking about are things like files and dependencies.  Deps don\u0027t apply to non-change refs, but files do.  What attrs do we set on non-change refs other than those, and why should they be any different?\n\nUpdate, I think I understand -- tell me if this is right: we only need to put Change objects in the change cache, not other Ref objects.  (The reason we have a change cache at all is because of the cost of asking the code review system for information about it; there is no cost for non-change refs since the code review system doesn\u0027t have any extra information, so no need to cache.)\n\nHowever, see the discussion below about containing_branches.",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "86c61a10_6545a7d6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1470,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T16:57:16Z",
+      "side": 1,
+      "message": "Regardless of how we answer the question below -- why don\u0027t we move this logic into setChangeAttributes so that we can just call that method here (and in similar call sites) and it can decide whether it needs to do something with ZK or just call \"setattr\"?",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "91b56275_faf1b3e6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1482,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T16:57:16Z",
+      "side": 1,
+      "message": "Yes, it\u0027s specifically for Tag refs -- see commit 04ac8287b62f5d66356977d971c2518836615086\n\nMechanically, containing_branchs for tags is a lot like files for changes.  It\u0027s an inherent property of the change, but our code review systems don\u0027t supply it so we ask the merger for it when needed and then augment the change object.\n\nSo IIUC, because this does not apply to Change objects, we don\u0027t need the commented-out code.\n\nHowever, every scheduler that processes this pipeline is going to need access to the list of containing branches of the tag, so we either need to put the ref in the change cache so it can benefit from the same system, or put this information on the queue item instead.\n\nI feel like putting all refs in the change cache might be better because it\u0027s more consistent with changes.",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
