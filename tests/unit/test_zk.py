@@ -1323,7 +1323,8 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         # need to retry because of a concurrent update error.
         change.cache_stat = model.CacheStat(change.cache_stat.key,
                                             uuid.uuid4().hex,
-                                            change.cache_version - 1)
+                                            change.cache_version - 1,
+                                            0)
         updated_change = self.cache.updateChangeWithRetry(
             "foobar", change, updater)
         self.assertEqual(updated_change.foobar, 2)
