@@ -495,6 +495,7 @@ class Scheduler(threading.Thread):
             self._runConfigCacheCleanup()
             self._runExecutorApiCleanup()
             self._runMergerApiCleanup()
+            self.maintainConnectionCache()
 
     def _runConfigCacheCleanup(self):
         with self.layout_lock:
@@ -1225,8 +1226,6 @@ class Scheduler(threading.Thread):
         if old_tenant:
             self._reenqueueTenant(old_tenant, tenant)
 
-        # TODOv3(jeblair): update for tenants
-        # self.maintainConnectionCache()
         self.connections.reconfigureDrivers(tenant)
 
         # TODOv3(jeblair): remove postconfig calls?
@@ -1556,21 +1555,19 @@ class Scheduler(threading.Thread):
             pipeline.state = pipeline.STATE_NORMAL
 
     def maintainConnectionCache(self):
-        # TODOv3(jeblair): update for tenants
         relevant = set()
-        for tenant in self.abide.tenants.values():
-            for pipeline in tenant.layout.pipelines.values():
-                self.log.debug("Gather relevant cache items for: %s" %
-                               pipeline)
+        with self.layout_lock:
+            for tenant in self.abide.tenants.values():
+                for pipeline in tenant.layout.pipelines.values():
+                    self.log.debug("Gather relevant cache items for: %s",
+                                   pipeline)
+                    for item in pipeline.getAllItems():
+                        relevant.add(item.change.cache_stat.key)
+                        relevant.update(item.change.getRelatedChanges())
 
-                for item in pipeline.getAllItems():
-                    relevant.add(item.change)
-                    relevant.update(item.change.getRelatedChanges())
-        for connection in self.connections.values():
-            connection.maintainCache(relevant)
-            self.log.debug(
-                "End maintain connection cache for: %s" % connection)
-        self.log.debug("Connection cache size: %s" % len(relevant))
+        for connection in self.connections.connections.values():
+            connection.maintainCache(relevant, max_age=7200)  # 2h
+            self.log.debug("End maintain connection cache for: %s", connection)
 
     def process_tenant_trigger_queue(self, tenant):
         try:
