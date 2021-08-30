@@ -1302,7 +1302,7 @@ class TestScheduler(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         self.executor_server.hold_jobs_in_build = True
         A.addApproval('Approved', 1)
@@ -1383,6 +1383,34 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(A.queried, 2)  # Initial and isMerged
         self.assertEqual(B.queried, 3)  # Initial A, refresh from B, isMerged
+
+    def test_connection_cache_cleanup(self):
+        "Test that jobs are executed and a change is merged per zone"
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1))
+        self.waitUntilSettled()
+
+        sched = self.scheds.first.sched
+
+        def _getCachedChanges():
+            cached = set()
+            for source in sched.connections.getSources():
+                cached.update(source.getCachedChanges())
+            return cached
+
+        self.assertEqual(len(_getCachedChanges()), 1)
+        sched.maintainConnectionCache()
+        self.assertEqual(len(_getCachedChanges()), 1)
+
+        # Test that outdated but still relevant changes are not cleaned up
+        for connection in sched.connections.connections.values():
+            connection.maintainCache(
+                [c.cache_stat.key for c in _getCachedChanges()], max_age=0)
+        self.assertEqual(len(_getCachedChanges()), 1)
+
+        for connection in sched.connections.connections.values():
+            connection.maintainCache([], max_age=0)
+        self.assertEqual(len(_getCachedChanges()), 0)
 
     def test_can_merge(self):
         "Test whether a change is ready to merge"
