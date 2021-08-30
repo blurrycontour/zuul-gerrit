@@ -277,6 +277,7 @@ class Scheduler(threading.Thread):
     def stop(self):
         self._stopped = True
         self.component_info.state = self.component_info.STOPPED
+        self.nodepool.stop()
         self.stop_event.set()
         self.stopConnections()
         self.wake_event.set()
@@ -2117,7 +2118,11 @@ class Scheduler(threading.Thread):
         if request.state == STATE_FAILED:
             self.nodepool.deleteNodeRequest(request)
 
-        pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
+        if build_set.getJobNodeSet(request.job_name) is None:
+            pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
+        else:
+            self.log.warning("Duplicate nodes provisioned event: %s",
+                             event)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
