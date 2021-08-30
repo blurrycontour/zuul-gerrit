@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a79b328a_175fc062",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 802,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T17:25:48Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s strictly necessary -- but given that we know we need a cache key, maybe we should make those required arguments for the initializer and init the CacheStat there too?",
+      "revId": "68638a18b27bd51164e57d0c53c7252c9f256873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "79a20987_aee8d658",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T17:25:48Z",
+      "side": 1,
+      "message": "Can you elaborate on the purpose of the pipeline change cache?  It\u0027s obviously to avoid us having to go to the driver change cache, but why is that going to be expensive?  Will using the driver cache always involve ZK calls?",
+      "revId": "68638a18b27bd51164e57d0c53c7252c9f256873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
