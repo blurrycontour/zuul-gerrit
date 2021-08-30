@@ -16,6 +16,23 @@
       "revId": "97417b73cb08efc7befae8b90f23b160cf19c15c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33ebba5c_7a6e2db9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2022,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-30T17:42:16Z",
+      "side": 1,
+      "message": "We aren\u0027t doing it now (this code is a noop currently), so I don\u0027t think it\u0027s required.  Note that in these two cases, we don\u0027t actually have a node request to delete.  I don\u0027t think these cases can happen any more (or if they do, the node request should already have been deleted).  But I left the checks in place anyway since they might produce spurious exceptions.\n\nI did add the delete below because in that case there is a node request object for us to delete.  Similarly, I expect that if we hit that code that the request would already be deleted, but since we had the object and it\u0027s harmless to call twice, I went ahead and added it.",
+      "revId": "97417b73cb08efc7befae8b90f23b160cf19c15c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
