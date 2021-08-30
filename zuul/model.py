@@ -3539,7 +3539,8 @@ class Bundle:
 
 
 # Cache info of a ref
-CacheStat = namedtuple("CacheStat", ["key", "uuid", "version"])
+CacheStat = namedtuple("CacheStat",
+                       ["key", "uuid", "version", "last_modified"])
 
 
 class Ref(object):
@@ -3552,7 +3553,7 @@ class Ref(object):
         self.newrev = None
         self.files = []
         # Cache info about this ref:
-        # CacheStat(cache key, uuid, version)
+        # CacheStat(cache key, uuid, version, last_modified)
         self.cache_stat = None
 
     @property

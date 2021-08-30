@@ -55,7 +55,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -108,7 +108,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -172,7 +172,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -223,7 +223,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         self.executor_server.hold_jobs_in_build = True
         A.addApproval("Code-Review", 2)
@@ -285,7 +285,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -398,7 +398,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -447,7 +447,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -535,7 +535,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -1177,7 +1177,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         D.setMerged()
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         # Pretend D was merged so we can gate the cycle
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
@@ -1211,7 +1211,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "-1")
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         A.addApproval("Code-Review", 2)
         B.addApproval("Code-Review", 2)
@@ -1224,7 +1224,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "NEW")
 
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         B.setMerged()
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))

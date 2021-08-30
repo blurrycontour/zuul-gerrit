@@ -16,6 +16,7 @@ import abc
 import contextlib
 import json
 import logging
+import time
 import uuid
 from collections.abc import Iterable
 from urllib.parse import quote_plus, unquote_plus
@@ -112,11 +113,18 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         data_uuid = data.decode("utf8")
         self._get(key, data_uuid, zstat)
 
+    def prune(self, relevant, max_age=3600):  # 1h
+        cutoff_time = time.time() - max_age
+        outdated = {c.cache_stat.key for c in list(self._change_cache.values())
+                    if c.cache_stat.last_modified < cutoff_time}
+        to_prune = outdated - set(relevant)
+        for key in to_prune:
+            self.delete(key)
+
     def cleanup(self):
         valid_uuids = {c.cache_stat.uuid
                        for c in list(self._change_cache.values())}
         stale_uuids = self._data_cleanup_candidates - valid_uuids
-        self.log.debug("Cleaning up stale data: %s", stale_uuids)
         for data_uuid in stale_uuids:
             self.kazoo_client.delete(self._dataPath(data_uuid), recursive=True)
 
@@ -160,7 +168,8 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             self.kazoo_client.delete(cache_path, zstat.version)
             return None
 
-        cache_stat = model.CacheStat(key, data_uuid, zstat.version)
+        cache_stat = model.CacheStat(key, data_uuid, zstat.version,
+                                     zstat.last_modified)
         if change:
             self._updateChange(change, data)
         else:
@@ -185,14 +194,17 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             if change.cache_version == -1:
                 self.kazoo_client.create(cache_path, data_uuid.encode("utf8"))
                 version = 0
+                last_modified = time.time()
             else:
                 zstat = self.kazoo_client.set(
                     cache_path, data_uuid.encode("utf8"), change.cache_version)
                 version = zstat.version
+                last_modified = zstat.last_modified
         except (BadVersionError, NodeExistsError, NoNodeError) as exc:
             raise ConcurrentUpdateError from exc
 
-        change.cache_stat = model.CacheStat(key, data_uuid, version)
+        change.cache_stat = model.CacheStat(key, data_uuid, version,
+                                            last_modified)
         self._change_cache[key] = change
 
     def _setData(self, data):
