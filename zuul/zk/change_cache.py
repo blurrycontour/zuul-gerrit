@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import threading
+import time
 import uuid
 from collections import defaultdict
 from collections.abc import Iterable
@@ -127,11 +128,18 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         data_uuid = data.decode("utf8")
         self._get(key, data_uuid, zstat)
 
+    def prune(self, relevant, max_age=3600):  # 1h
+        cutoff_time = time.time() - max_age
+        outdated = {c.cache_stat.key for c in list(self._change_cache.values())
+                    if c.cache_stat.last_modified < cutoff_time}
+        to_prune = outdated - set(relevant)
+        for key in to_prune:
+            self.delete(key)
+
     def cleanup(self):
         valid_uuids = {c.cache_stat.uuid
                        for c in list(self._change_cache.values())}
         stale_uuids = self._data_cleanup_candidates - valid_uuids
-        self.log.debug("Cleaning up stale data: %s", stale_uuids)
         for data_uuid in stale_uuids:
             self.kazoo_client.delete(self._dataPath(data_uuid), recursive=True)
 
@@ -185,7 +193,8 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             else:
                 change = self._changeFromData(data)
 
-            change.cache_stat = model.CacheStat(key, data_uuid, zstat.version)
+            change.cache_stat = model.CacheStat(key, data_uuid, zstat.version,
+                                                zstat.last_modified)
             # Use setdefault here so we only have a single instance of a change
             # around. In case of a concurrent get this might return a different
             # change instance than the one we just created.
@@ -206,6 +215,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                     self.kazoo_client.create(cache_path,
                                              data_uuid.encode("utf8"))
                     current_version = 0
+                    last_modified = time.time()
                 else:
                     # Sanity check that we only have a single change instance
                     # for a key.
@@ -217,11 +227,12 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                     zstat = self.kazoo_client.set(
                         cache_path, data_uuid.encode("utf8"), version)
                     current_version = zstat.version
+                    last_modified = zstat.last_modified
             except (BadVersionError, NodeExistsError, NoNodeError) as exc:
                 raise ConcurrentUpdateError from exc
 
-            change.cache_stat = model.CacheStat(key, data_uuid,
-                                                current_version)
+            change.cache_stat = model.CacheStat(
+                key, data_uuid, current_version, last_modified)
             self._change_cache[key] = change
 
     def _setData(self, data):
