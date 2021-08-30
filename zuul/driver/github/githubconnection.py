@@ -1262,11 +1262,8 @@ class GithubConnection(CachedBranchConnection):
         return self._github_client_manager.getGithubClient(
             project_name=project_name, zuul_event_id=zuul_event_id)
 
-    def maintainCache(self, relevant):
-        for change in self._change_cache:
-            if change not in relevant:
-                self._change_cache.delete(change.cache_stat.key)
-        # TODO: remove entries older than X
+    def maintainCache(self, relevant, max_age):
+        self._change_cache.prune(relevant, max_age)
         self._change_cache.cleanup()
 
     def updateChangeAttributes(self, change, **attrs):

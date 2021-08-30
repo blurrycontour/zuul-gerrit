@@ -77,13 +77,13 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     def registerScheduler(self, sched) -> None:
         self.sched = sched
 
-    def maintainCache(self, relevant):
+    def maintainCache(self, relevant, max_age):
+        """Remove stale changes from the cache.
 
-        """Make cache contain relevant changes.
-
-        This lets the user supply a list of change objects that are
+        This lets the user supply a list of change cache keys that are
         still in use.  Anything in our cache that isn't in the supplied
-        list should be safe to remove from the cache."""
+        list and is older than the given max. age should be safe to
+        remove from the cache."""
         pass
 
     def getWebController(self, zuul_web):

@@ -1302,7 +1302,7 @@ class TestScheduler(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([])
+            connection.maintainCache([], max_age=0)
 
         self.executor_server.hold_jobs_in_build = True
         A.addApproval('Approved', 1)

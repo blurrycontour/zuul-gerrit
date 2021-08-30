@@ -1320,7 +1320,7 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         change = DummyChange("project", {"foo": "bar"})
         self.cache.set("foo", change)
 
-        self.assertEqual(self.cache.get("foo"), other_cache.get("foo"))
+        self.assertIsNotNone(other_cache.get("foo"))
 
         change_other = other_cache.get("foo")
         change_other.number = 123
