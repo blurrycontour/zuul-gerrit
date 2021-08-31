@@ -539,8 +539,7 @@ class Scheduler(threading.Thread):
         for req_id in leaked_requests:
             try:
                 self.log.warning("Deleting leaked node request: %s", req_id)
-                req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
-                self.nodepool.zk_nodepool.deleteNodeRequest(req)
+                self.nodepool.zk_nodepool.deleteNodeRequest(req_id)
             except Exception:
                 self.log.exception("Error deleting leaked node request: %s",
                                    req_id)
@@ -2003,14 +2002,15 @@ class Scheduler(threading.Thread):
 
         # In case the build didn't show up on any executor, the node request
         # does still exist, so we have to make sure it is removed from ZK.
-        request = build.build_set.getJobNodeRequest(build.job.name)
-        if request:
-            self.nodepool.deleteNodeRequest(request)
+        request_id = build.build_set.getJobNodeRequestID(build.job.name)
+        if request_id:
+            self.nodepool.deleteNodeRequest(
+                request_id, event_id=build.zuul_event_id)
 
         # The build is completed and the nodes were already returned by the
         # executor. For consistency, also remove the node request from the
         # build set.
-        build.build_set.removeJobNodeRequest(build.job.name)
+        build.build_set.removeJobNodeRequestID(build.job.name)
 
         # The test suite expects the build to be removed from the
         # internal dict after it's added to the report queue.
@@ -2085,17 +2085,18 @@ class Scheduler(threading.Thread):
             log.warning("Item %s does not contain job %s "
                         "for node request %s",
                         build_set.item, request.job_name, request)
-            build_set.removeJobNodeRequest(request.job_name)
+            build_set.removeJobNodeRequestID(request.job_name)
             return
 
         # If the request failed, we must directly delete it as the nodes will
         # never be accepted.
         if request.state == STATE_FAILED:
-            self.nodepool.deleteNodeRequest(request)
+            self.nodepool.deleteNodeRequest(request.id,
+                                            event_id=event.request_id)
 
         nodeset = self.nodepool.getNodeSet(request, job.nodeset)
 
-        if build_set.getJobNodeSet(request.job_name) is None:
+        if build_set.getJobNodeSetInfo(request.job_name) is None:
             pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
         else:
             self.log.warning("Duplicate nodes provisioned event: %s",
@@ -2192,12 +2193,12 @@ class Scheduler(threading.Thread):
         job_name = job.name
         try:
             # Cancel node request if needed
-            req = buildset.getJobNodeRequest(job_name)
-            # TODO (felix): Not sure if this still works as we are using the
-            # local node request object which might not be up-to-date.
-            if req:
-                self.nodepool.cancelRequest(req)
-                buildset.removeJobNodeRequest(job_name)
+            req_id = buildset.getJobNodeRequestID(job_name)
+            if req_id:
+                req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
+                if req:
+                    self.nodepool.cancelRequest(req)
+                buildset.removeJobNodeRequestID(job_name)
 
             # Cancel build if needed
             build = build or buildset.getBuild(job_name)
