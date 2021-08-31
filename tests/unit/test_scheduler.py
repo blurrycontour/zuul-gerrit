@@ -6090,7 +6090,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.scheds.first.sched._runNodeRequestCleanup()
         self.assertEqual(zk_nodepool.getNodeRequests(),
                          ['100-0000000001'])
-        zk_nodepool.deleteNodeRequest(req2)
+        zk_nodepool.deleteNodeRequest(req2.id)
 
     def test_nodepool_failure(self):
         "Test that jobs are reported after a nodepool failure"
