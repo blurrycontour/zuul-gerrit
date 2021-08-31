@@ -241,15 +241,11 @@ class Nodepool(object):
     def cancelRequest(self, request):
         log = get_annotated_logger(self.log, request.event_id)
         log.info("Canceling node request %s", request)
-        # TODO (felix): This flag might not be relevant anymore as it's not
-        # stored in ZK. Should we just remove the condition and always delete
-        # the request?
-        if not request.canceled:
-            try:
-                request.canceled = True
-                self.zk_nodepool.deleteNodeRequest(request)
-            except Exception:
-                log.exception("Error deleting node request:")
+        try:
+            request.canceled = True
+            self.zk_nodepool.deleteNodeRequest(request)
+        except Exception:
+            log.exception("Error deleting node request:")
 
         if request.uid in self.requests:
             del self.requests[request.uid]
@@ -499,11 +495,6 @@ class Nodepool(object):
         log.info("Accepting node request %s", request)
         # A copy of the nodeset with information about the real nodes
         nodeset = job_nodeset.copy()
-
-        if request.canceled:
-            log.info("Ignoring canceled node request %s", request)
-            # The request was already deleted when it was canceled
-            return None
 
         # If we didn't request nodes and the request is fulfilled then just
         # reutrn. We don't have to do anything in this case. Further don't even
