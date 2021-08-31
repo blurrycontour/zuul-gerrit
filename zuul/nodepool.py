@@ -479,43 +479,26 @@ class Nodepool(object):
             self._unlockNodes(locked_nodes)
             raise
 
-    def checkNodeRequest(self, request, request_id, job_nodeset):
+    def getNodeSet(self, request, job_nodeset):
         """
-        Called by the scheduler when it wants to accept a node request for
-        potential use of its nodes. The nodes itself will be accepted and
-        locked by the executor when the corresponding job is started.
+        Get a NodeSet object with info about real nodes.
 
-        :returns: False if there is a problem with the request (canceled or
-            retrying), True if it is ready to be acted upon (success or
-            failure).
+        :param NodeRequest request: The fulfilled NodeRequest
+        :param NodeSet job_nodeset: The NodeSet object attached to the job
+
+        :returns: A new NodeSet object which contains information from
+            nodepool about the actual allocated nodes.
         """
-        log = get_annotated_logger(self.log, request.event_id)
-        log.info("Accepting node request %s", request)
         # A copy of the nodeset with information about the real nodes
         nodeset = job_nodeset.copy()
 
         # If we didn't request nodes and the request is fulfilled then just
-        # reutrn. We don't have to do anything in this case. Further don't even
-        # ask ZK for the request as empty requests are not put into ZK.
+        # return. We don't have to do anything in this case.
         if not request.labels and request.fulfilled:
             return nodeset
 
-        # Make sure the request still exists. It's possible it could have
-        # disappeared if we lost the ZK session between when the fulfillment
-        # response was added to our queue, and when we actually get around to
-        # processing it. Nodepool will automatically reallocate the assigned
-        # nodes in that situation.
-        try:
-            for node_id, node in zip(request.nodes, nodeset.getNodes()):
-                self.zk_nodepool.updateNode(node, node_id)
-        except Exception:
-            # If we cannot retrieve the node request from ZK we
-            # probably lost the connection and thus the ZK
-            # session. Just log the problem with zookeeper and fail
-            # here.
-            log.exception("Error getting node request %s:", request_id)
-            request.failed = True
-            return nodeset
+        for node_id, node in zip(request.nodes, nodeset.getNodes()):
+            self.zk_nodepool.updateNode(node, node_id)
 
         return nodeset
 
