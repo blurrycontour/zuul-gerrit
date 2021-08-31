@@ -18,6 +18,7 @@ import time
 import alembic
 import alembic.command
 import alembic.config
+import alembic.migration
 import sqlalchemy as sa
 from sqlalchemy import orm
 import sqlalchemy.pool
