@@ -104,6 +104,23 @@
       "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4707af22_b348a582",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1482,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-08-31T17:07:16Z",
+      "side": 1,
+      "message": "We are doing it unconditionally, but for our use case it only makes sense for Tags, so I think it would be fine to do that conditionally.",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
