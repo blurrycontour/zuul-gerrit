@@ -33,6 +33,24 @@
       "revId": "68638a18b27bd51164e57d0c53c7252c9f256873",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "080150b7_06c6072b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-31T13:00:36Z",
+      "side": 1,
+      "message": "Yes, this is basically to avoid the ZK call to check if a change is up-to-date as we only have a single scheduler ATM.\n\nWhen we have the pipeline state in Zookeeper we probably want to completely clear the cache at the end of each pipeline run, so we are only using the cache to avoid multiple ZK hits for the same cache key.",
+      "parentUuid": "79a20987_aee8d658",
+      "revId": "68638a18b27bd51164e57d0c53c7252c9f256873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
