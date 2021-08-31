@@ -23,6 +23,22 @@ from zuul.connection import BaseConnection
 from zuul.driver.git.gitmodel import GitTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.model import Ref, Branch
+from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+
+
+class GitChangeCache(AbstractChangeCache):
+    log = logging.getLogger("zuul.driver.GitChangeCache")
+
+    CHANGE_TYPE_MAP = {
+        "Ref": Ref,
+        "Branch": Branch,
+    }
+
+    def _getChangeClass(self, change_type):
+        return self.CHANGE_TYPE_MAP[change_type]
+
+    def _getChangeType(self, change):
+        return type(change).__name__
 
 
 class GitConnection(BaseConnection):
@@ -48,7 +64,6 @@ class GitConnection(BaseConnection):
             else:
                 self.canonical_hostname = 'localhost'
         self.projects = {}
-        self._change_cache = {}
 
     def toDict(self):
         d = super().toDict()
@@ -89,42 +104,45 @@ class GitConnection(BaseConnection):
         return refs
 
     def maintainCache(self, relevant):
-        remove = {}
-        for branch, refschange in self._change_cache.items():
-            for ref, change in refschange.items():
-                if change not in relevant:
-                    remove.setdefault(branch, []).append(ref)
-        for branch, refs in remove.items():
-            for ref in refs:
-                del self._change_cache[branch][ref]
-            if not self._change_cache[branch]:
-                del self._change_cache[branch]
+        for change in self._change_cache:
+            if change not in relevant:
+                self._change_cache.delete(change.cache_stat.key)
+        # TODO: remove entries older than X
+        self._change_cache.cleanup()
 
     def getChange(self, event, refresh=False):
+        key = str((event.project_name, event.ref, event.newrev))
+        change = self._change_cache.get(key)
+        if change:
+            return change
+
         if event.ref and event.ref.startswith('refs/heads/'):
             branch = event.ref[len('refs/heads/'):]
-            change = self._change_cache.get(branch, {}).get(event.newrev)
-            if change:
-                return change
             project = self.getProject(event.project_name)
             change = Branch(project)
             change.branch = branch
-            for attr in ('ref', 'oldrev', 'newrev'):
-                setattr(change, attr, getattr(event, attr))
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
             change.url = ""
             change.files = self.getChangeFilesUpdated(
                 event.project_name, change.branch, event.oldrev)
-            self._change_cache.setdefault(branch, {})[event.newrev] = change
         elif event.ref:
             # catch-all ref (ie, not a branch or head)
             project = self.getProject(event.project_name)
             change = Ref(project)
-            for attr in ('ref', 'oldrev', 'newrev'):
-                setattr(change, attr, getattr(event, attr))
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
             change.url = ""
         else:
-            self.log.warning("Unable to get change for %s" % (event,))
-            change = None
+            self.log.warning("Unable to get change for %s", event)
+            return None
+
+        try:
+            self._change_cache.set(key, change)
+        except ConcurrentUpdateError:
+            change = self._change_cache.get(key)
         return change
 
     def getProjectBranches(self, project, tenant):
@@ -132,6 +150,9 @@ class GitConnection(BaseConnection):
         branches = [ref[len('refs/heads/'):] for ref in
                     refs if ref.startswith('refs/heads/')]
         return branches
+
+    def getChangeByKey(self, key):
+        return self._change_cache.get(key)
 
     def getGitUrl(self, project):
         return os.path.join(self.baseurl, project.name)
@@ -156,6 +177,8 @@ class GitConnection(BaseConnection):
         self.sched.addTriggerEvent(self.driver_name, event)
 
     def onLoad(self):
+        self.log.debug("Creating Zookeeper change cache")
+        self._change_cache = GitChangeCache(self.sched.zk_client, self)
         self.log.debug("Starting Git Watcher")
         self._start_watcher_thread()
 
