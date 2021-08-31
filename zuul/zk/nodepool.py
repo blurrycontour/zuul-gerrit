@@ -446,14 +446,13 @@ class ZooKeeperNodepool(ZooKeeperBase):
         obj.stat = stat
         return obj
 
-    def deleteNodeRequest(self, node_request):
+    def deleteNodeRequest(self, node_request_id):
         """
         Delete a request for nodes.
 
-        :param NodeRequest node_request: A NodeRequest with the
-            contents of the request.
+        :param str node_request_id: The node request ID.
         """
-        path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
+        path = '%s/%s' % (self.REQUEST_ROOT, node_request_id)
         try:
             self.kazoo_client.delete(path)
         except NoNodeError:
