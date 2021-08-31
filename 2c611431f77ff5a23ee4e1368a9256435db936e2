@@ -86,6 +86,24 @@
       "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faaec57_9b265bd5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1482,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-31T13:31:13Z",
+      "side": 1,
+      "message": "Is it correct that we are setting the `containing_branches` attribute independent of whether it\u0027s a Tag or some other ref? If it\u0027s only needed for tags we should make this conditional.",
+      "parentUuid": "886939ec_2468d960",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
