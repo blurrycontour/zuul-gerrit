@@ -35,6 +35,10 @@
 - job:
     name: base
     parent: null
+    nodeset:
+      nodes:
+        - name: controller
+          label: controller
     run: playbooks/base.yaml
 
 - job:
