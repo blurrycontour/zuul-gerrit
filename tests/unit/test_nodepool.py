@@ -90,8 +90,7 @@ class TestNodepool(TestNodepoolBase):
         self.assertEqual(zk_request.state, 'fulfilled')
 
         # Accept the nodes
-        new_nodeset = self.nodepool.checkNodeRequest(
-            request, request.id, nodeset)
+        new_nodeset = self.nodepool.getNodeSet(request, nodeset)
         self.assertIsNotNone(new_nodeset)
         # acceptNodes will be called on the executor, but only if the
         # noderequest was accepted before.

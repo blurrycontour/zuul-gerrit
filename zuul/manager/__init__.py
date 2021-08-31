@@ -1507,9 +1507,7 @@ class PipelineManager(metaclass=ABCMeta):
 
         if nodeset is not None:
             build_set.jobNodeRequestComplete(request.job_name, nodeset)
-        # TODO (felix): Check if the failed is still needed as the
-        # NodesProvisionedEvents are now in ZooKeeper.
-        if request.failed or not request.fulfilled:
+        if not request.fulfilled:
             log.info("Node request %s: failure for %s",
                      request, request.job_name)
             job = build_set.item.getJob(request.job_name)
