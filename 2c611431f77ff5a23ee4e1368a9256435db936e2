@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "db7b4381_dde79474",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-31T12:56:48Z",
+      "side": 1,
+      "message": "Correct",
+      "parentUuid": "237656cf_08387963",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "86c61a10_6545a7d6",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 6
@@ -47,6 +65,24 @@
       "writtenOn": "2021-08-30T16:57:16Z",
       "side": 1,
       "message": "Yes, it\u0027s specifically for Tag refs -- see commit 04ac8287b62f5d66356977d971c2518836615086\n\nMechanically, containing_branchs for tags is a lot like files for changes.  It\u0027s an inherent property of the change, but our code review systems don\u0027t supply it so we ask the merger for it when needed and then augment the change object.\n\nSo IIUC, because this does not apply to Change objects, we don\u0027t need the commented-out code.\n\nHowever, every scheduler that processes this pipeline is going to need access to the list of containing branches of the tag, so we either need to put the ref in the change cache so it can benefit from the same system, or put this information on the queue item instead.\n\nI feel like putting all refs in the change cache might be better because it\u0027s more consistent with changes.",
+      "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "886939ec_2468d960",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1482,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-31T12:56:48Z",
+      "side": 1,
+      "message": "Ok, lets put all the refs in the change cache.",
+      "parentUuid": "91b56275_faf1b3e6",
       "revId": "2c611431f77ff5a23ee4e1368a9256435db936e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
