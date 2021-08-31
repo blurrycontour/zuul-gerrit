@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "66085cf9_97887017",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 802,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-08-31T13:53:05Z",
+      "side": 1,
+      "message": "The cache stat we will be set by change cache in the end as we don\u0027t know the version and uuid beforehand. This is just a dummy entry to make it work with the current implementation.",
+      "parentUuid": "a79b328a_175fc062",
+      "revId": "68638a18b27bd51164e57d0c53c7252c9f256873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "79a20987_aee8d658",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 6
