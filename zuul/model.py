@@ -2393,8 +2393,8 @@ class BuildSet(object):
         self.debug_messages = []
         self.warning_messages = []
         self.merge_state = self.NEW
-        self.nodesets = {}  # job -> nodeset
-        self.node_requests = {}  # job -> reqs
+        self.nodeset_info = {}  # job -> dict of nodeset info
+        self.node_requests = {}  # job -> request id
         self.files = RepoFiles()
         self.repo_state = {}
         self.tries = {}
@@ -2465,36 +2465,53 @@ class BuildSet(object):
     def getRetryBuildsForJob(self, job_name):
         return self.retry_builds.get(job_name, [])
 
-    # TODO (felix): As we are now looking up the node request from ZK directly,
-    # do we need to store the nodesets and noderequests on the buildset at all?
-    # Maybe we could change this dict to only store the node request ids and
-    # look the node requests up from ZK if needed.
-    def getJobNodeSet(self, job_name: str) -> NodeSet:
-        # Return None if not provisioned; empty NodeSet if no nodes
-        # required
-        return self.nodesets.get(job_name)
+    def getJobNodeSetInfo(self, job_name):
+        # Return None if not provisioned; dict of info about nodes otherwise
+        return self.nodeset_info.get(job_name)
 
-    def removeJobNodeSet(self, job_name: str):
-        if job_name not in self.nodesets:
+    def getJobNodeProvider(self, job_name):
+        info = self.getJobNodeSetInfo(job_name)
+        if info:
+            return info.get('provider')
+
+    def getJobNodeExecutorZone(self, job_name):
+        info = self.getJobNodeSetInfo(job_name)
+        if info:
+            return info.get('zone')
+
+    def getJobNodeList(self, job_name):
+        info = self.getJobNodeSetInfo(job_name)
+        if info:
+            return info.get('nodes')
+
+    def removeJobNodeSetInfo(self, job_name):
+        if job_name not in self.nodeset_info:
             raise Exception("No job nodeset for %s" % (job_name))
-        del self.nodesets[job_name]
+        del self.nodeset_info[job_name]
 
-    def setJobNodeRequest(self, job_name: str, req: NodeRequest):
+    def setJobNodeRequestID(self, job_name, request_id):
         if job_name in self.node_requests:
             raise Exception("Prior node request for %s" % (job_name))
-        self.node_requests[job_name] = req
+        self.node_requests[job_name] = request_id
 
-    def getJobNodeRequest(self, job_name: str) -> NodeRequest:
+    def getJobNodeRequestID(self, job_name):
         return self.node_requests.get(job_name)
 
-    def removeJobNodeRequest(self, job_name: str):
+    def removeJobNodeRequestID(self, job_name):
         if job_name in self.node_requests:
             del self.node_requests[job_name]
 
-    def jobNodeRequestComplete(self, job_name: str, nodeset: NodeSet):
-        if job_name in self.nodesets:
+    def jobNodeRequestComplete(self, job_name, nodeset):
+        if job_name in self.nodeset_info:
             raise Exception("Prior node request for %s" % (job_name))
-        self.nodesets[job_name] = nodeset
+        info = {}
+        if nodeset.nodes:
+            node = nodeset.getNodes()[0]
+            if hasattr(node, 'attributes') and node.attributes:
+                info['zone'] = node.attributes.get('executor-zone')
+            info['provider'] = node.provider
+            info['nodes'] = [n.id for n in nodeset.getNodes()]
+        self.nodeset_info[job_name] = info
 
     def getTries(self, job_name):
         return self.tries.get(job_name, 0)
@@ -3035,7 +3052,7 @@ class QueueItem(object):
                         if parent_build:
                             job.updateParentData(parent_build)
 
-                nodeset = self.current_build_set.getJobNodeSet(job.name)
+                nodeset = self.current_build_set.getJobNodeSetInfo(job.name)
                 if nodeset is None:
                     # The nodes for this job are not ready, skip
                     # it for now.
@@ -3071,10 +3088,10 @@ class QueueItem(object):
                 failed_job_names.add(job.name)
             else:
                 unexecuted_job_names.add(job.name)
-                nodeset = build_set.getJobNodeSet(job.name)
+                nodeset = build_set.getJobNodeSetInfo(job.name)
                 if nodeset is None:
-                    req = build_set.getJobNodeRequest(job.name)
-                    if req is None:
+                    req_id = build_set.getJobNodeRequestID(job.name)
+                    if req_id is None:
                         jobs_not_requested.add(job)
                     else:
                         # This may have been reset due to a reconfig;

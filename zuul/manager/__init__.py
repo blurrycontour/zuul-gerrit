@@ -643,7 +643,7 @@ class PipelineManager(metaclass=ABCMeta):
                 priority, relative_priority, event=item.event)
             log.debug("Adding node request %s for job %s to item %s",
                       req, job, item)
-            build_set.setJobNodeRequest(job.name, req)
+            build_set.setJobNodeRequestID(job.name, req.id)
         return True
 
     def _getPausedParent(self, build_set, job):
@@ -656,11 +656,9 @@ class PipelineManager(metaclass=ABCMeta):
         return None
 
     def _getPausedParentProvider(self, build_set, job):
-        build = self._getPausedParent(build_set, job)
-        if build:
-            nodeset = build_set.getJobNodeSet(build.job.name)
-            if nodeset and nodeset.nodes:
-                return list(nodeset.nodes.values())[0].provider
+        parent_build = self._getPausedParent(build_set, job)
+        if parent_build:
+            return build_set.getJobNodeProvider(parent_build.job.name)
         return None
 
     def _calculateNodeRequestPriority(self, build_set, job):
@@ -678,8 +676,10 @@ class PipelineManager(metaclass=ABCMeta):
         for job in jobs:
             log.debug("Found job %s for change %s", job, item.change)
             try:
+                zone = build_set.getJobNodeExecutorZone(job.name)
+                nodes = build_set.getJobNodeList(job.name)
                 self.sched.executor.execute(
-                    job, item, self.pipeline,
+                    job, nodes, item, self.pipeline, zone,
                     build_set.dependent_changes,
                     build_set.merger_items)
             except Exception:
@@ -1299,7 +1299,11 @@ class PipelineManager(metaclass=ABCMeta):
         if (item.live and not dequeued
                 and self.sched.globals.use_relative_priority):
             priority = item.getNodePriority()
-            for node_request in item.current_build_set.node_requests.values():
+            for request_id in item.current_build_set.node_requests.values():
+                node_request = self.sched.nodepool.zk_nodepool.getNodeRequest(
+                    request_id)
+                if not node_request:
+                    continue
                 if node_request.fulfilled:
                     # If the node request is already fulfilled, there is no
                     # need to update the relative priority.
@@ -1438,8 +1442,8 @@ class PipelineManager(metaclass=ABCMeta):
         log.debug("Item %s status is now:\n %s", item, item.formatStatus())
 
         if build.retry:
-            if build.build_set.getJobNodeSet(build.job.name):
-                build.build_set.removeJobNodeSet(build.job.name)
+            if build.build_set.getJobNodeSetInfo(build.job.name):
+                build.build_set.removeJobNodeSetInfo(build.job.name)
 
             # in case this was a paused build we need to retry all child jobs
             self._resetDependentBuilds(build.build_set, build)
