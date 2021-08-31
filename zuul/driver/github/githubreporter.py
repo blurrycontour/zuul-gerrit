@@ -106,7 +106,7 @@ class GithubReporter(BaseReporter):
         ret = ''
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
-            ret += '- [%s](%s) : %s%s%s%s\n' % job_fields
+            ret += '- [%s](%s) : %s%s%s%s%s\n' % job_fields
         return ret
 
     def addPullComment(self, item, comment=None):

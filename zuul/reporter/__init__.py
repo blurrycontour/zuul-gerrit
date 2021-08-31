@@ -232,6 +232,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         jobs_fields = []
         for job in item.getJobs():
             build = item.current_build_set.getBuild(job.name)
+            tries = item.current_build_set.getTries(job.name)
             (result, url) = item.formatJobResult(job)
             if not job.voting:
                 voting = ' (non-voting)'
@@ -262,13 +263,20 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             else:
                 error = ''
             name = job.name + ' '
+            if tries > 1:
+                attempts = (tries == 2) \
+                    and ' after 1 retry' \
+                    or ' after %d retries' % (tries - 1)
+            else:
+                attempts = ''
             # TODO(mordred) The gerrit consumption interface depends on
             # something existing in the url field and don't have a great
             # behavior defined for url being none/missing. Put name into
             # the url field to match old behavior until we can deal with
             # the gerrit-side piece as well
             url = url or job.name
-            jobs_fields.append((name, url, result, error, elapsed, voting))
+            jobs_fields.append((name, url, result, error,
+                                elapsed, attempts, voting))
         return jobs_fields
 
     def _formatItemReportJobs(self, item):
@@ -276,5 +284,5 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         ret = ''
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
-            ret += '- %s%s : %s%s%s%s\n' % job_fields
+            ret += '- %s%s : %s%s%s%s%s\n' % job_fields
         return ret
