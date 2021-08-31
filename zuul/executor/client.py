@@ -50,15 +50,14 @@ class ExecutorClient(object):
     def stop(self):
         self.log.debug("Stopping")
 
-    def execute(self, job, item, pipeline, dependent_changes=[],
-                merger_items=[]):
+    def execute(self, job, nodes, item, pipeline, executor_zone,
+                dependent_changes=[], merger_items=[]):
         log = get_annotated_logger(self.log, item.event)
         uuid = str(uuid4().hex)
-        nodeset = item.current_build_set.getJobNodeSet(job.name)
         log.info(
             "Execute job %s (uuid: %s) on nodes %s for change %s "
             "with dependent changes %s",
-            job, uuid, nodeset, item.change, dependent_changes)
+            job, uuid, nodes, item.change, dependent_changes)
 
         params = zuul.executor.common.construct_build_params(
             uuid, self.sched,
@@ -103,18 +102,9 @@ class ExecutorClient(object):
 
         # Store the NodeRequest ID in the job arguments, so we can look it up
         # on the executor side to lock the nodes.
-        node_request = build.build_set.getJobNodeRequest(job.name)
-        if node_request:
-            params["noderequest_id"] = node_request.id
-
-        # Because all nodes belong to the same provider, region and
-        # availability zone we can get executor_zone from only the first
-        # node.
-        executor_zone = None
-        if len(nodeset.nodes):
-            node = nodeset.getNodes()[0]
-            if hasattr(node, 'attributes') and node.attributes:
-                executor_zone = node.attributes.get('executor-zone')
+        req_id = build.build_set.getJobNodeRequestID(job.name)
+        if req_id:
+            params["noderequest_id"] = req_id
 
         zone_known = False
         if executor_zone:

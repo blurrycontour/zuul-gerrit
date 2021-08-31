@@ -241,7 +241,7 @@ class Nodepool(object):
         log.info("Canceling node request %s", request)
         try:
             request.canceled = True
-            self.zk_nodepool.deleteNodeRequest(request)
+            self.zk_nodepool.deleteNodeRequest(request.id)
         except Exception:
             log.exception("Error deleting node request:")
 
@@ -518,22 +518,20 @@ class Nodepool(object):
 
         # Regardless of whether locking (or even the request)
         # succeeded, delete the request.
-        self.deleteNodeRequest(request, locked)
+        if not self.deleteNodeRequest(request.id, locked):
+            request.failed = True
+            self.unlockNodeSet(request.nodeset)
 
         if request.failed:
             raise Exception("Accepting nodes failed")
         return nodes
 
-    def deleteNodeRequest(self, request, locked=False):
-        log = get_annotated_logger(self.log, request.event_id)
-        log.debug("Deleting node request %s", request)
+    def deleteNodeRequest(self, request_id, locked=False, event_id=None):
+        log = get_annotated_logger(self.log, event_id)
+        log.debug("Deleting node request %s", request_id)
         try:
-            self.zk_nodepool.deleteNodeRequest(request)
+            self.zk_nodepool.deleteNodeRequest(request_id)
         except Exception:
             log.exception("Error deleting node request:")
-            request.failed = True
-            # If deleting the request failed, and we did lock the
-            # nodes, unlock the nodes since we're not going to use
-            # them.
-            if locked:
-                self.unlockNodeSet(request.nodeset)
+            return False
+        return True
