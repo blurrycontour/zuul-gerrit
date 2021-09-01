@@ -19,6 +19,47 @@
     },
     {
       "key": {
+        "uuid": "250202da_65a14925",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:27:50Z",
+      "side": 1,
+      "message": "Looks like it is the node-attributes pool config that can be set in the nodepool config.",
+      "parentUuid": "346a043a_7a6b3193",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff4c5f39_cc52ba47",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:27:50Z",
+      "side": 1,
+      "message": "This should be self.nodeset.",
+      "range": {
+        "startLine": 1142,
+        "startChar": 56,
+        "endLine": 1142,
+        "endChar": 68
+      },
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b65147ba_ce793a56",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 5
@@ -54,6 +95,63 @@
     },
     {
       "key": {
+        "uuid": "ccba87d6_d76f0873",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:27:50Z",
+      "side": 1,
+      "message": "Should you set labels here as well? Looks like we preset labels below with the class instantiation then call updateFromDict with the same data input. It isn\u0027t clear to me where data should be set by the class __init__ and where we want to set it in updateFromDict.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fe045f81_6b54beae",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:27:50Z",
+      "side": 1,
+      "message": "Nit: Might be good to check if labels here instead for consistency.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c70e42fc_ba2b92e6",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:27:50Z",
+      "side": 1,
+      "message": "Is the order guaranteed to be stable in these two lists? That is important for ensuring we don\u0027t mixup nodes of different types here.",
+      "range": {
+        "startLine": 363,
+        "startChar": 33,
+        "endLine": 363,
+        "endChar": 71
+      },
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ec38a6f_b75fb254",
         "filename": "zuul/nodepool.py",
         "patchSetId": 5
@@ -83,6 +181,23 @@
       "side": 1,
       "message": "Just noticed that this is method is refactored in 806816 anyways.",
       "parentUuid": "5ec38a6f_b75fb254",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d4b46be6_9347c837",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:27:50Z",
+      "side": 1,
+      "message": "If the node_id doesn\u0027t match node.id is it possible that this get will fail to find json data to load? Should we guard against that?\n\nI\u0027m guessing the change of the node id would only happen to point at another different node in the database so this is probably fine.",
       "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
