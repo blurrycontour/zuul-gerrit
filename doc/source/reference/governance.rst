@@ -64,23 +64,23 @@ for guidance in becoming a Maintainer.
 
 Current Zuul Maintainers:
 
-======================  =============
-Name                    Freenode Nick
-======================  =============
-Clark Boylan            clarkb
-Clint Byrum             SpamapS
-Ian Wienand             ianw
-James E. Blair          corvus
-Jens Harbott            frickler
-Jeremy Stanley          fungi
-Jesse Keating           jlk
-Joshua Hesketh          jhesketh
-Monty Taylor            mordred
-Paul Belanger           pabelanger
-Ricardo Carrillo Cruz   rcarrillocruz
-Tobias Henkel           tobiash
-Tristan Cacqueray       tristanC
-======================  =============
+======================  ===================================
+Name                    Matrix ID
+======================  ===================================
+Clark Boylan            Clark (@clarkb:matrix.org)
+Clint Byrum             spamaps (@spamaps:spamaps.ems.host)
+Ian Wienand             ianw (@iwienand:matrix.org)
+James E. Blair          corvus (@jim:acmegating.com)
+Jens Harbott
+Jeremy Stanley          fungi (@fungicide:matrix.org)
+Jesse Keating
+Joshua Hesketh
+Monty Taylor            mordred (@mordred:inaugust.com)
+Paul Belanger           pabelanger (@pabelanger:matrix.org)
+Ricardo Carrillo Cruz
+Tobias Henkel           tobiash (@tobias.henkel:matrix.org)
+Tristan Cacqueray       tristanC (@tristanc_:matrix.org)
+======================  ===================================
 
 Zuul Project Lead
 -----------------
@@ -124,10 +124,10 @@ Zuul Maintainers).
 
 Current Zuul-Jobs Maintainers (in addition to Zuul Maintainers):
 
-======================  =============
-Name                    Freenode Nick
-======================  =============
-Andreas Jaeger          AJaeger
-Mohammed Naser          mnaser
-Albin Vass              avass
-======================  =============
+======================  ==========================
+Name                    Matrix ID
+======================  ==========================
+Andreas Jaeger
+Mohammed Naser
+Albin Vass              avass (@avass:vassast.org)
+======================  ==========================
