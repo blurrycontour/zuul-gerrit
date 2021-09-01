@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b65147ba_ce793a56",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1508,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T10:13:58Z",
+      "side": 1,
+      "message": "Is this just here as a safeguard or are there certain use-cases where the nodeset can be None?  AFAIKS the scheduler will never call this method if the nodeset is None.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ec38a6f_b75fb254",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T10:13:58Z",
+      "side": 1,
+      "message": "nit: return types need to be updated",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
