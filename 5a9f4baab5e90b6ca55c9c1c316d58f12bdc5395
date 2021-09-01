@@ -51,6 +51,24 @@
       "revId": "5a9f4baab5e90b6ca55c9c1c316d58f12bdc5395",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "953b0544_1a95b672",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-09-01T07:24:12Z",
+      "side": 1,
+      "message": "Now I understand the point, I have uploaded a new patch which reverted it to your original change.",
+      "parentUuid": "7a46f194_b47f75ef",
+      "revId": "5a9f4baab5e90b6ca55c9c1c316d58f12bdc5395",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
