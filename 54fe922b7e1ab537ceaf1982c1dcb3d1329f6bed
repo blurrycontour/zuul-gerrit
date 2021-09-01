@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e575afe2_fbc7857f",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T12:34:21Z",
+      "side": 1,
+      "message": "The election is busy looping if you ever set the event in line 137 as you don\u0027t clear it anywhere. That\u0027s probably the reason for the \"too many open files\" issue.",
+      "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f6610f9e_8b1d354f",
         "filename": "zuul/nodepool.py",
         "patchSetId": 5
@@ -33,6 +50,23 @@
       "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f22f1d62_8b30cba8",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 850,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T12:34:21Z",
+      "side": 1,
+      "message": "I think we should move this to zuul/zk/nodepool.py",
+      "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
