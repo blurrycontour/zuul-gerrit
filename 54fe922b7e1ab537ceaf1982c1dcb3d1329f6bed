@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f6610f9e_8b1d354f",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-01T03:01:39Z",
+      "side": 1,
+      "message": "Stats should be inside the election_won block.",
+      "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "00d192b6_5724d908",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-01T03:01:39Z",
+      "side": 1,
+      "message": "We still need to remove the internal requests cache for SOS.",
+      "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
