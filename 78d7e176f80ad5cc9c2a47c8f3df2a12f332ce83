@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "4127a548_b7d0a385",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-01T17:01:31Z",
+      "side": 1,
+      "message": "I intended to do both loops (ie, line 531 should be removed), but after thinking about it more, I think you\u0027re right, it should be safe to do one loop since we should be deleting the node requests before they disappear from the pipelines.  I\u0027ll remove this first loop.",
+      "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "32fe1fb4_83dd1d77",
         "filename": "zuul/zk/nodepool.py",
         "patchSetId": 5
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "5a34de68_5386a26f",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-01T17:01:31Z",
+      "side": 1,
+      "message": "Yes, I\u0027ll update. (In my defense, this is copied verbatim from nodepool :)",
+      "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f687fe33_aca18231",
         "filename": "zuul/zk/system.py",
         "patchSetId": 5
@@ -50,6 +84,23 @@
       "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "985f5a58_9b9a1252",
+        "filename": "zuul/zk/system.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-01T17:01:31Z",
+      "side": 1,
+      "message": "Since we don\u0027t have a \"nodepool delete-request\" command, it may be better to have this persist.  I\u0027ll move it to \"/zuul-system\" so that /zuul remains our ephemeral state root.",
+      "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
