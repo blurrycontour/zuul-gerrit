@@ -33,6 +33,24 @@
       "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "21c97845_96d7db30",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T12:59:51Z",
+      "side": 1,
+      "message": "Just noticed that this is method is refactored in 806816 anyways.",
+      "parentUuid": "5ec38a6f_b75fb254",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
