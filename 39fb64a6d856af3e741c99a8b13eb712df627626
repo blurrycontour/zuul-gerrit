@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "346a043a_7a6b3193",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T13:40:43Z",
+      "side": 1,
+      "message": "Just wondering what this optional \"attributes\" attr of a node is? Something added by nodepool?  If yes, can we maybe initialize that in our Node class to an empty dict?",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b65147ba_ce793a56",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 5
