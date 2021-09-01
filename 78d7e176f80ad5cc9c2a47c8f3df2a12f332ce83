@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3b539a4_02e1e3ec",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T10:36:51Z",
+      "side": 1,
+      "message": "I think this loop can be removed as we are re-initializing the set of outstanding request in line 531 anyways.",
+      "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "32fe1fb4_83dd1d77",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T10:36:51Z",
+      "side": 1,
+      "message": "nit: maybe \"request ids\" instead of \"request nodes\" would be better here",
+      "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f687fe33_aca18231",
+        "filename": "zuul/zk/system.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T10:36:51Z",
+      "side": 1,
+      "message": "Do we want this to be cleared out by the `zuul delete-state` cmd? I think we will leak node request in that case because the system ID will change.",
+      "revId": "78d7e176f80ad5cc9c2a47c8f3df2a12f332ce83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
