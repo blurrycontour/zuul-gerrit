@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bec5c7ee_f2b12faa",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1508,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-01T13:01:36Z",
+      "side": 1,
+      "message": "Seems that we need that with the change in 806816",
+      "parentUuid": "b65147ba_ce793a56",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ec38a6f_b75fb254",
         "filename": "zuul/nodepool.py",
         "patchSetId": 5
