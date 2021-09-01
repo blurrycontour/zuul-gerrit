@@ -43,10 +43,10 @@ class Nodepool(object):
         self.system_id = system_id
         self.statsd = statsd
 
-        self.stop_watcher_event = threading.Event()
         self.election_won = False
         if scheduler:
             # Only enable the node request cache/callback for the scheduler.
+            self.stop_watcher_event = threading.Event()
             self.zk_nodepool = ZooKeeperNodepool(
                 zk_client,
                 enable_node_request_cache=True,
@@ -56,6 +56,7 @@ class Nodepool(object):
             self.event_thread.daemon = True
             self.event_thread.start()
         else:
+            self.stop_watcher_event = None
             self.zk_nodepool = ZooKeeperNodepool(zk_client)
             self.election = None
             self.event_thread = None
@@ -136,7 +137,8 @@ class Nodepool(object):
             except Exception:
                 # If there are any errors moving the event, re-run the
                 # election.
-                self.stop_watcher_event.set()
+                if self.stop_watcher_event is not None:
+                    self.stop_watcher_event.set()
                 raise
             del self.requests[request.uid]
         elif event == NodeRequestEvent.DELETED:
