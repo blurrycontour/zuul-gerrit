@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d2e1c09_2c7ccf71",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-01T18:42:45Z",
+      "side": 1,
+      "message": "I think this races with _electionWon() above. As there is a period of time between setting self.election_won to False on line 113 and winning the election on line 76 which causes electionWon() to be called and set self.election_won back to True on line 100.\n\nIf there is a watcher event context switch while that period of time is happening then election_won would be False and this is skipped.",
+      "revId": "2d74cde88beb95eb744d111fe8bafff833e421ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
