@@ -2020,22 +2020,10 @@ class Scheduler(threading.Thread):
         # Look up the buildset to access the local node request object
         build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
-            # Directly look up the node request in ZK and provide a dummy
-            # nodeset, so we can return the nodes to nodepool.
-            request = self.zk_nodepool.getNodeRequest(request_id)
-            if request.fulfilled:
-                self.nodepool.returnNodeSet(request.nodeset,
-                                            zuul_event_id=request.event_id)
             return
 
         request = build_set.getJobNodeRequest(event.job_name)
         if not request:
-            # Directly look up the node request in ZK and provide a dummy
-            # nodeset, so we can return the nodes to nodepool.
-            request = self.zk_nodepool.getNodeRequest(request_id)
-            if request.fulfilled:
-                self.nodepool.returnNodeSet(request.nodeset,
-                                            zuul_event_id=request.event_id)
             return
 
         ready = self.nodepool.checkNodeRequest(request, request_id)
@@ -2054,9 +2042,7 @@ class Scheduler(threading.Thread):
                         "for node request %s",
                         build_set.item, request.job_name, request)
             build_set.removeJobNodeRequest(request.job_name)
-            if request.fulfilled:
-                self.nodepool.returnNodeSet(request.nodeset,
-                                            zuul_event_id=request.event_id)
+            self.nodepool.deleteNodeRequest(request)
             return
 
         pipeline.manager.onNodesProvisioned(request, build_set)
@@ -2160,19 +2146,12 @@ class Scheduler(threading.Thread):
             # Cancel build if needed
             build = build or buildset.getBuild(job_name)
             if build:
-                was_running = False
                 try:
-                    was_running = self.executor.cancel(build)
+                    self.executor.cancel(build)
                 except Exception:
                     log.exception(
                         "Exception while canceling build %s for change %s",
                         build, item.change)
-
-                if (not was_running) or force:
-                    nodeset = buildset.getJobNodeSet(job_name)
-                    if nodeset:
-                        self.nodepool.returnNodeSet(
-                            nodeset, zuul_event_id=item.event)
 
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset
@@ -2203,11 +2182,6 @@ class Scheduler(threading.Thread):
                             "Error reporting build completion to DB:")
 
             else:
-                nodeset = buildset.getJobNodeSet(job_name)
-                if nodeset:
-                    self.nodepool.returnNodeSet(
-                        nodeset, zuul_event_id=item.event)
-
                 if final:
                     # If final is set make sure that the job is not resurrected
                     # later by re-requesting nodes.
