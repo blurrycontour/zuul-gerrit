@@ -77,6 +77,14 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     def registerScheduler(self, sched) -> None:
         self.sched = sched
 
+    def cleanupCache(self):
+        """Clean up the connection cache.
+
+        This allows a connection to perform periodic cleanup actions of
+        the cache, e.g. garbage collection.
+        """
+        pass
+
     def maintainCache(self, relevant, max_age):
         """Remove stale changes from the cache.
 
