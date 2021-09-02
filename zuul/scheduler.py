@@ -74,6 +74,7 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.cleanup import (
     SemaphoreCleanupLock,
     BuildRequestCleanupLock,
+    ConnectionCleanupLock,
     GeneralCleanupLock,
     MergeRequestCleanupLock,
     NodeRequestCleanupLock,
@@ -133,6 +134,7 @@ class Scheduler(threading.Thread):
     _general_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _build_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
     _merge_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
+    _connection_cleanup_interval = IntervalTrigger(minutes=5, jitter=10)
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
 
@@ -214,6 +216,7 @@ class Scheduler(threading.Thread):
             self.zk_client)
         self.merge_request_cleanup_lock = MergeRequestCleanupLock(
             self.zk_client)
+        self.connection_cleanup_lock = ConnectionCleanupLock(self.zk_client)
         self.node_request_cleanup_lock = NodeRequestCleanupLock(self.zk_client)
 
         self.abide = Abide()
@@ -502,6 +505,8 @@ class Scheduler(threading.Thread):
                                  trigger=self._build_request_cleanup_interval)
             self.apsched.add_job(self._runMergeRequestCleanup,
                                  trigger=self._merge_request_cleanup_interval)
+            self.apsched.add_job(self._runConnectionCleanup,
+                                 trigger=self._connection_cleanup_interval)
             self.apsched.add_job(self._runGeneralCleanup,
                                  trigger=self._general_cleanup_interval)
             return
@@ -614,6 +619,16 @@ class Scheduler(threading.Thread):
                 self.merger.cleanupLostMergeRequests()
             finally:
                 self.merge_request_cleanup_lock.release()
+
+    def _runConnectionCleanup(self):
+        if self.connection_cleanup_lock.acquire(blocking=False):
+            try:
+                for connection in self.connections.connections.values():
+                    self.log.debug("Cleaning up connection cache for: %s",
+                                   connection)
+                    connection.cleanupCache()
+            finally:
+                self.connection_cleanup_lock.release()
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
