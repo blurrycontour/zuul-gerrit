@@ -6068,6 +6068,45 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
 
+    def test_zookeeper_disconnect2(self):
+        "Test that jobs are executed after a zookeeper disconnect"
+
+        # This tests receiving a ZK disconnect between the arrival of
+        # a fulfilled request and when we accept its nodes.
+        self.fake_nodepool.pause()
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # We're waiting on the nodepool request to complete.  Stop the
+        # scheduler from processing further events, then fulfill the
+        # nodepool request.
+        self.scheds.first.sched.run_handler_lock.acquire()
+
+        # Fulfill the nodepool request.
+        requests = list(self.scheds.first.sched.nodepool.requests.values())
+        self.assertEqual(1, len(requests))
+        self.fake_nodepool.unpause()
+        for x in iterate_timeout(30, 'fulfill request'):
+            requests = list(self.scheds.first.sched.nodepool.requests.values())
+            if not len(requests):
+                break
+
+        # The request is fulfilled, but the scheduler hasn't processed
+        # it yet.  Reconnect ZK.
+        self.scheds.execute(lambda app: app.sched.zk_client.client.stop())
+        self.scheds.execute(lambda app: app.sched.zk_client.client.start())
+
+        # Allow the scheduler to continue and process the (now
+        # out-of-date) notification that nodes are ready.
+        self.scheds.first.sched.run_handler_lock.release()
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+
     def test_nodepool_cleanup(self):
         "Test that we cleanup leaked node requests"
         self.fake_nodepool.pause()
