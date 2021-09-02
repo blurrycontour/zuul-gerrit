@@ -493,8 +493,12 @@ class TestScheduler(ZuulTestCase):
             'zuul.nodepool.requests.requested.size.1', value='1', kind='c')
         self.assertReportedStat(
             'zuul.nodepool.requests.fulfilled.size.1', value='1', kind='c')
+        # just check for existence, since we can not know if a request is
+        # in-flight during the sched._stats_inverval
         self.assertReportedStat(
-            'zuul.nodepool.current_requests', value='1', kind='g')
+            'zuul.nodepool.current_requests', kind='g')
+        self.assertReportedStat(
+            'zuul.nodepool.tenant.tenant-one.current_requests', kind='g')
         self.assertReportedStat(
             'zuul.executors.online', value='1', kind='g')
         self.assertReportedStat(
