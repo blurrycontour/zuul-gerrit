@@ -2960,7 +2960,7 @@ class QueueItem(object):
             fakebuild.result = 'FAILURE'
             self.addBuild(fakebuild)
             self.setResult(fakebuild)
-            ret = True
+            ret = False
         return ret
 
     def findJobsToRun(self, semaphore_handler):
