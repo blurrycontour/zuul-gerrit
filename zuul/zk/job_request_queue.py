@@ -21,7 +21,6 @@ from enum import Enum
 
 from kazoo.exceptions import LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType
-from kazoo.recipe.lock import Lock
 
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
@@ -30,6 +29,7 @@ from zuul.zk import ZooKeeperSimpleBase, sharding
 from zuul.zk.event_queues import JobResultFuture
 from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.vendor.watchers import ExistingDataWatch
+from zuul.zk.locks import SessionAwareLock
 
 
 class JobRequestEvent(Enum):
@@ -292,6 +292,23 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
         return request
 
+    def refresh(self, request):
+        """Refreshs a request object with the current data from ZooKeeper. """
+        try:
+            data, zstat = self.kazoo_client.get(request.path)
+        except NoNodeError:
+            raise JobRequestNotFound(
+                f"Could not refresh {request}, ZooKeeper node is missing")
+
+        if not data:
+            raise JobRequestNotFound(
+                f"Could not refresh {request}, ZooKeeper node is empty")
+
+        content = self._bytesToDict(data)
+
+        request.updateFromDict(content)
+        request._zstat = zstat
+
     def remove(self, request):
         self.log.debug("Removing request %s", request)
         try:
@@ -340,7 +357,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         have_lock = False
         lock = None
         try:
-            lock = Lock(self.kazoo_client, path)
+            lock = SessionAwareLock(self.kazoo_client, path)
             have_lock = lock.acquire(blocking, timeout)
         except LockTimeout:
             have_lock = False
@@ -354,20 +371,14 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             return False
 
         if not self.kazoo_client.exists(request.path):
-            lock.release()
-            self.log.error(
-                "Request not found for locking: %s", request.uuid
-            )
+            self._releaseLock(request, lock)
+            return False
 
-            # We may have just re-created the lock parent node just after the
-            # scheduler deleted it; therefore we should (re-) delete it.
-            try:
-                # Delete the lock parent node as well.
-                path = "/".join([self.LOCK_ROOT, request.uuid])
-                self.kazoo_client.delete(path, recursive=True)
-            except NoNodeError:
-                pass
-
+        # Update the request to ensure that we operate on the newest data.
+        try:
+            self.refresh(request)
+        except JobRequestNotFound:
+            self._releaseLock(request, lock)
             return False
 
         request.lock = lock
@@ -380,6 +391,24 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
         return True
 
+    def _releaseLock(self, request, lock):
+        """Releases a lock.
+
+        This is used directly after acquiring the lock in case something went
+        wrong.
+        """
+        lock.release()
+        self.log.error("Request not found for locking: %s", request.uuid)
+
+        # We may have just re-created the lock parent node just after the
+        # scheduler deleted it; therefore we should (re-) delete it.
+        try:
+            # Delete the lock parent node as well.
+            path = "/".join([self.LOCK_ROOT, request.uuid])
+            self.kazoo_client.delete(path, recursive=True)
+        except NoNodeError:
+            pass
+
     def unlock(self, request):
         if request.lock is None:
             self.log.warning(
@@ -391,7 +420,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
     def isLocked(self, request):
         path = "/".join([self.LOCK_ROOT, request.uuid])
-        lock = Lock(self.kazoo_client, path)
+        lock = SessionAwareLock(self.kazoo_client, path)
         is_locked = len(lock.contenders()) > 0
         return is_locked
 
