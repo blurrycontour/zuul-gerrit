@@ -16,6 +16,23 @@
       "revId": "1222e547d89747149f508398cc6f9c267d9302d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b4117137_1e1406a0",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 6071,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T14:51:55Z",
+      "side": 0,
+      "message": "I think it\u0027s not.  I tried to make it somewhat relevant in a previous change, but since it\u0027s mostly testing the request resubmission workflow, there isn\u0027t much to test since the requests are persistent.  (Previously this made sure that it didn\u0027t try to use the lost request.)\n\nI do have a working version of this test.  I don\u0027t think it\u0027s worth keeping, but I\u0027ll add it back at the end of the stack and we can take a look at it.",
+      "revId": "1222e547d89747149f508398cc6f9c267d9302d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
