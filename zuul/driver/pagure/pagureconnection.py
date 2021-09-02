@@ -545,9 +545,11 @@ class PagureConnection(BaseConnection):
                 "Fetching project %s webhook token from API" % project)
             return token
 
+    def cleanupCache(self):
+        self._change_cache.cleanup()
+
     def maintainCache(self, relevant, max_age):
         self._change_cache.prune(relevant, max_age)
-        self._change_cache.cleanup()
 
     def updateChangeAttributes(self, change, **attrs):
         for attempt in range(1, 6):
