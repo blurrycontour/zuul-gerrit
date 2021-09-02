@@ -36,6 +36,13 @@ class MergeRequestCleanupLock(kazoo.recipe.lock.Lock):
         super().__init__(client.client, self._path)
 
 
+class ConnectionCleanupLock(kazoo.recipe.lock.Lock):
+    _path = '/zuul/cleanup/connection'
+
+    def __init__(self, client):
+        super().__init__(client.client, self._path)
+
+
 class GeneralCleanupLock(kazoo.recipe.lock.Lock):
     _path = '/zuul/cleanup/general'
 
