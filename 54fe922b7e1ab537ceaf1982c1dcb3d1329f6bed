@@ -84,6 +84,24 @@
       "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c24cb0ae_3635d9c4",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 850,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-02T06:09:58Z",
+      "side": 1,
+      "message": "I\u0027ve seen zk/nodepool.py more as a place for all nodepool+ZK related code, not necessarily only the protocol implementation. But I\u0027m totally fine with keeping it here. It just didn\u0027t quite fit my mental map when looking at it :)",
+      "parentUuid": "f2f0ee4e_8a1516d3",
+      "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
