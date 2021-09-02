@@ -67,6 +67,23 @@
       "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2f0ee4e_8a1516d3",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 850,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:46:51Z",
+      "side": 1,
+      "message": "It\u0027s an election to decide who submits events to a zk event queue, just like the one above.  I thought having them in proximity made sense because they are so similar.  Also, zk/nodepool.py is the file that holds the routines for implementing the nodepool protocol, and this is Zuul related.  If we move it anywhere, it should be zuul/nodepool.py.  Or if it really needs to be in zk/ then it should probably be a new file.  I can move it if you still think it doesn\u0027t make sense here, but I\u0027d love to know why, so I can keep my mental map of what the different files are for up to date.",
+      "revId": "54fe922b7e1ab537ceaf1982c1dcb3d1329f6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
