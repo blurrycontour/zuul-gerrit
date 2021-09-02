@@ -2112,6 +2112,11 @@ class JobRequest:
             "result_path": self.result_path,
         }
 
+    def updateFromDict(self, data):
+        self.precedence = data["precedence"]
+        self.state = data["state"]
+        self.result_path = data["result_path"]
+
     @classmethod
     def fromDict(cls, data):
         return cls(
