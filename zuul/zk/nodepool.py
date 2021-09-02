@@ -407,16 +407,21 @@ class ZooKeeperNodepool(ZooKeeperBase):
         reqid = path.split("/")[-1]
         node_request.id = reqid
 
-    def getNodeRequests(self):
+    def getNodeRequests(self, cached=False):
         '''
-        Get the current list of all node requests in priority sorted order.
+        Get the current list of all node request IDs in priority sorted order.
 
+        :param bool cached: Whether to use the internal cache to get the list
+            of ids.
         :returns: A list of request ids.
         '''
-        try:
-            requests = self.kazoo_client.get_children(self.REQUEST_ROOT)
-        except NoNodeError:
-            return []
+        if cached and self.enable_node_request_cache:
+            requests = self._node_request_cache.keys()
+        else:
+            try:
+                requests = self.kazoo_client.get_children(self.REQUEST_ROOT)
+            except NoNodeError:
+                return []
 
         return sorted(requests)
 
@@ -451,12 +456,15 @@ class ZooKeeperNodepool(ZooKeeperBase):
         Delete a request for nodes.
 
         :param str node_request_id: The node request ID.
+
+        :returns: True if the request was deleted, False if it did not exist.
         """
         path = '%s/%s' % (self.REQUEST_ROOT, node_request_id)
         try:
             self.kazoo_client.delete(path)
+            return True
         except NoNodeError:
-            pass
+            return False
 
     def nodeRequestExists(self, node_request):
         """

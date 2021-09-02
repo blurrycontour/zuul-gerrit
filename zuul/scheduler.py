@@ -454,9 +454,6 @@ class Scheduler(threading.Thread):
                 self.statsd.gauge(f"{base}.management_events",
                                   len(management_event_queues[pipeline.name]))
 
-        self.statsd.gauge('zuul.nodepool.current_requests',
-                          len(self.nodepool.requests))
-
         # export current_requests stats per tenant
         tenant_requests = defaultdict(int)
 
@@ -465,12 +462,16 @@ class Scheduler(threading.Thread):
         for tenant_name in self.abide.tenants.keys():
             tenant_requests[tenant_name] = 0
 
-        for r in self.nodepool.requests.values():
+        total_requests = 0
+        for req in self.nodepool.getNodeRequests():
             # might be None, we ignore them for this metric
-            if not r.tenant_name:
+            total_requests += 1
+            if not req.tenant_name:
                 continue
-            tenant_requests[r.tenant_name] += 1
+            tenant_requests[req.tenant_name] += 1
 
+        self.statsd.gauge('zuul.nodepool.current_requests',
+                          total_requests)
         for tenant, request_count in tenant_requests.items():
             self.statsd.gauge(
                 "zuul.nodepool.tenant.{tenant}.current_requests",
