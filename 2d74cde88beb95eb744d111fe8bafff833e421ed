@@ -16,6 +16,23 @@
       "revId": "2d74cde88beb95eb744d111fe8bafff833e421ed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "484f3fec_23171888",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:40:18Z",
+      "side": 1,
+      "message": "That\u0027s okay because when we win the election, the first thing we do is set the flag to allow new events to proceed.  Then we iterate over every request and submit a NodesProvisionedEvent for each.  This may produce duplicate events, which is what makes the race okay.\n\nWe might miss emitting some timing statistics, but that\u0027s okay too.",
+      "revId": "2d74cde88beb95eb744d111fe8bafff833e421ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
