@@ -22,6 +22,8 @@ import time
 from abc import ABCMeta
 from configparser import ConfigParser
 
+from kazoo.exceptions import NoNodeError
+
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
@@ -204,14 +206,34 @@ class BaseMergeServer(metaclass=ABCMeta):
         log = get_annotated_logger(
             self.log, merge_request.event_id
         )
-
+        # Lock and update the merge request
         if not self.merger_api.lock(merge_request, blocking=False):
+            return
+
+        # Ensure that the request is still in state requested. This method is
+        # called based on cached data and there might be a mismatch between the
+        # cached state and the real state of the request. The lock might
+        # have been successful because the request is already completed and
+        # thus unlocked.
+        if merge_request.state != MergeRequest.REQUESTED:
+            self._retry(merge_request.lock, log, self.merger_api.unlock,
+                        merge_request)
+
+        try:
+            merge_request.state = MergeRequest.RUNNING
+            params = self.merger_api.getParams(merge_request)
+        except Exception:
+            log.exception("Exception while preparing to start merge job")
+            # If we failed at this point, we have not written anything
+            # to ZK yet; the only thing we need to do is to ensure
+            # that we release the lock, and another merger will be
+            # able to grab the request.
+            self._retry(merge_request.lock, log, self.merger_api.unlock,
+                        merge_request)
             return
 
         result = None
         try:
-            merge_request.state = MergeRequest.RUNNING
-            params = self.merger_api.getParams(merge_request)
             self.merger_api.clearParams(merge_request)
             # Directly update the merge request in ZooKeeper, so we
             # don't loop over and try to lock it again and again.
@@ -344,13 +366,18 @@ class BaseMergeServer(metaclass=ABCMeta):
             item_in_branches,
         )
 
+        lock_valid = merge_request.lock.is_still_valid()
+        if not lock_valid:
+            return
+
         # Provide a result either via a result future or a result event
         if merge_request.result_path:
             log.debug(
                 "Providing synchronous result via future for %s",
                 merge_request,
             )
-            self.merger_api.reportResult(merge_request, result)
+            self._retry(merge_request.lock, log,
+                        self.merger_api.reportResult, merge_request, result)
 
         elif merge_request.build_set_uuid:
             log.debug(
@@ -373,10 +400,16 @@ class BaseMergeServer(metaclass=ABCMeta):
                     item_in_branches,
                 )
 
-            tenant_name = merge_request.tenant_name
-            pipeline_name = merge_request.pipeline_name
+            def put_complete_event(log, merge_request, event):
+                try:
+                    self.result_events[merge_request.tenant_name][
+                        merge_request.pipeline_name].put(event)
+                except NoNodeError:
+                    log.warning("Pipeline was removed: %s",
+                                merge_request.pipeline_name)
 
-            self.result_events[tenant_name][pipeline_name].put(event)
+            self._retry(merge_request.lock, log,
+                        put_complete_event, log, merge_request, event)
 
         # Set the merge request to completed, unlock and delete it. Although
         # the state update is mainly for consistency reasons, it might come in
@@ -384,11 +417,42 @@ class BaseMergeServer(metaclass=ABCMeta):
         # the merge request was already processed and we have a result in the
         # result queue.
         merge_request.state = MergeRequest.COMPLETED
-        self.merger_api.update(merge_request)
-        self.merger_api.unlock(merge_request)
+        self._retry(merge_request.lock, log,
+                    self.merger_api.update, merge_request)
+        self._retry(merge_request.lock, log,
+                    self.merger_api.unlock, merge_request)
         # TODO (felix): If we want to optimize ZK requests, we could only call
         # the remove() here.
         self.merger_api.remove(merge_request)
+
+    def _retry(self, lock, log, fn, *args, **kw):
+        """Retry a method to deal with ZK connection issues
+
+        This is a helper method to retry ZK operations as long as it
+        makes sense to do so.  If we have encountered a suspended
+        connection, we can probably just retry the ZK operation until
+        it succeeds.  If we have fully lost the connection, then we
+        have lost the lock, so we may not care in that case.
+
+        This method exits when one of the following occurs:
+
+        * The callable function completes.
+        * This server stops.
+        * The lock (if supplied) is invalidated due to connection loss.
+
+        Pass None as the lock parameter if the lock issue is not
+        relevant.
+        """
+        while True:
+            if lock and not lock.is_still_valid():
+                return
+            try:
+                return fn(*args, **kw)
+            except Exception:
+                log.exception("Exception retrying %s", fn)
+            if not self._running:
+                return
+            time.sleep(5)
 
 
 class MergeServer(BaseMergeServer):
