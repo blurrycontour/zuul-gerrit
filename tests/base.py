@@ -897,6 +897,7 @@ class PrometheusServer(object):
     def stop(self):
         self.httpd.shutdown()
         self.thread.join()
+        self.httpd.socket.close()
 
 
 class GerritWebServer(object):
@@ -2862,6 +2863,8 @@ class FakeStatsd(threading.Thread):
 
     def stop(self):
         os.write(self.wake_write, b'1\n')
+        self.join()
+        self.sock.close()
 
 
 class FakeBuild(object):
