@@ -69,6 +69,7 @@ import prometheus_client.exposition
 import sqlalchemy
 
 from zuul.driver.sql.sqlconnection import DatabaseSession
+from zuul import model
 from zuul.model import (
     BuildRequest, Change, MergeRequest, PRECEDENCE_NORMAL, WebInfo
 )
@@ -5232,9 +5233,18 @@ class ZuulTestCase(BaseTestCase):
     def __areAllNodeRequestsComplete(self, matcher) -> bool:
         if self.fake_nodepool.paused:
             return True
-        for app in self.scheds.filter(matcher):
-            if app.sched.nodepool.requests:
+        # Check ZK and the scheduler cache and make sure they are
+        # in sync.
+        for req in self.fake_nodepool.getNodeRequests():
+            if req['state'] != model.STATE_FULFILLED:
                 return False
+            for app in self.scheds.filter(matcher):
+                nodepool = app.sched.nodepool
+                r2 = nodepool.zk_nodepool.getNodeRequest(req['_oid'])
+                if r2 and r2.state != req['state']:
+                    return False
+                if req and not r2:
+                    return False
         return True
 
     def __areAllMergeJobsWaiting(self, matcher) -> bool:

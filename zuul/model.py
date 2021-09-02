@@ -813,7 +813,6 @@ class NodeRequest(object):
         self.state_time = time.time()
         self.created_time = None
         self.stat = None
-        self.uid = uuid4().hex
         self.relative_priority = relative_priority
         self.provider = provider
         self.id = None
@@ -865,7 +864,6 @@ class NodeRequest(object):
         # The requestor_data is opaque to nodepool and won't be touched by
         # nodepool when it fulfills the request.
         d["requestor_data"] = {
-            "uid": self.uid,
             "build_set_uuid": self.build_set_uuid,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
@@ -917,7 +915,6 @@ class NodeRequest(object):
             relative_priority=data.get("relative_priority", 0),
         )
 
-        request.uid = requestor_data["uid"]
         request.updateFromDict(data)
 
         return request
