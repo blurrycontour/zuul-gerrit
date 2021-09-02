@@ -83,9 +83,9 @@ class Nodepool(object):
         self._stopped = True
         if self.election:
             self.election.cancel()
-        if self.event_thread:
             self.stop_watcher_event.set()
             self.event_thread.join()
+            del self.election
 
     def _sendNodesProvisionedEvent(self, request):
         tenant_name = request.tenant_name
