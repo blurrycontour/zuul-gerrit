@@ -44,7 +44,7 @@ class TestNodepoolIntegration(BaseTestCase):
 
     def waitForRequests(self):
         # Wait until all requests are complete.
-        while self.nodepool.requests:
+        while len(list(self.nodepool.getNodeRequests())):
             time.sleep(0.1)
 
     def onNodesProvisioned(self, request):

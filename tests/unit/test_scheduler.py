@@ -6267,7 +6267,8 @@ For CI problems and help debugging, contact ci@example.org"""
         # Fulfill only the first request
         self.fake_nodepool.fulfillRequest(reqs[0])
         for x in iterate_timeout(30, 'fulfill request'):
-            if len(self.scheds.first.sched.nodepool.requests) < 4:
+            reqs = list(self.scheds.first.sched.nodepool.getNodeRequests())
+            if len(reqs) < 4:
                 break
         self.waitUntilSettled()
 
@@ -7972,13 +7973,18 @@ class TestSemaphore(ZuulTestCase):
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(self.scheds.first.sched.nodepool.requests), 2)
+        reqs = list(self.scheds.first.sched.nodepool.getNodeRequests())
+        self.assertEqual(len(reqs), 2)
 
         # Now unpause nodepool to fulfill the node requests. We cannot use
         # waitUntilSettled here because the executor is paused.
         self.fake_nodepool.paused = False
         for _ in iterate_timeout(30, 'fulfill node requests'):
-            if len(self.scheds.first.sched.nodepool.requests) == 0:
+            reqs = [
+                r for r in self.scheds.first.sched.nodepool.getNodeRequests()
+                if r.state != zuul.model.STATE_FULFILLED
+            ]
+            if len(reqs) == 0:
                 break
 
         self.assertEqual(

@@ -66,7 +66,6 @@ class Nodepool(object):
         )
 
         # TODO: remove internal caches for SOS
-        self.requests = {}
         self.current_resources_by_tenant = {}
         self.current_resources_by_project = {}
 
@@ -122,10 +121,6 @@ class Nodepool(object):
         if request.requestor != self.system_id:
             return
 
-        if request.uid not in self.requests:
-            log.debug("Node request %s is unknown", request)
-            return
-
         log.debug("Node request %s %s", request, request.state)
         if event == NodeRequestEvent.COMPLETED:
             # This sequence is required for tests -- we can only
@@ -141,13 +136,6 @@ class Nodepool(object):
                 if self.stop_watcher_event is not None:
                     self.stop_watcher_event.set()
                 raise
-            del self.requests[request.uid]
-        elif event == NodeRequestEvent.DELETED:
-            # Presumably we already removed it when it was complete.
-            req = self.requests.pop(request.uid, None)
-            if req is not None:
-                self.log.error("Node request %s was removed out of band",
-                               request)
 
     def emitStats(self, request):
         # Implements the following :
@@ -223,7 +211,6 @@ class Nodepool(object):
         req = model.NodeRequest(self.system_id, build_set_uuid, tenant_name,
                                 pipeline_name, job.name, labels, provider,
                                 relative_priority, event_id)
-        self.requests[req.uid] = req
 
         if job.nodeset.nodes:
             self.zk_nodepool.submitNodeRequest(req, priority)
@@ -244,13 +231,10 @@ class Nodepool(object):
         log.info("Canceling node request %s", request)
         try:
             request.canceled = True
-            self.zk_nodepool.deleteNodeRequest(request.id)
+            if self.zk_nodepool.deleteNodeRequest(request.id):
+                self.emitStats(request)
         except Exception:
             log.exception("Error deleting node request:")
-
-        if request.uid in self.requests:
-            del self.requests[request.uid]
-            self.emitStats(request)
 
     def reviseRequest(self, request, relative_priority=None):
         '''Attempt to update the node request, if it is not currently being
@@ -539,3 +523,16 @@ class Nodepool(object):
             log.exception("Error deleting node request:")
             return False
         return True
+
+    def getNodeRequests(self):
+        """Get all node requests submitted by Zuul
+
+        Note this relies entirely on the internal cache.
+
+        :returns: An iterator of NodeRequest objects created by this Zuul
+            system.
+        """
+        for req_id in self.zk_nodepool.getNodeRequests(cached=True):
+            req = self.zk_nodepool.getNodeRequest(req_id, cached=True)
+            if req.requestor == self.system_id:
+                yield req
