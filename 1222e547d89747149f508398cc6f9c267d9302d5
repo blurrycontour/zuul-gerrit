@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d21aa30_731c9888",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 6071,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-02T08:09:37Z",
+      "side": 0,
+      "message": "Is this test not relevant anymore?",
+      "revId": "1222e547d89747149f508398cc6f9c267d9302d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
