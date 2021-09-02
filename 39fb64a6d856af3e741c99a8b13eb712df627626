@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "5500a96a_a43a18ef",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:28:01Z",
+      "side": 1,
+      "message": "Yep.  I\u0027m not 100% sure nodepool provides it in all cases, but regardless we can probably init it to {}.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff4c5f39_cc52ba47",
         "filename": "zuul/executor/server.py",
         "patchSetId": 5
@@ -57,6 +74,23 @@
       "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "804caf6a_15361fb6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:28:01Z",
+      "side": 1,
+      "message": "It was intentionally node_request -- it matches lockNodes.  But maybe we can use self.nodeset for both.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -112,6 +146,23 @@
     },
     {
       "key": {
+        "uuid": "4f93efe8_5438bdf0",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:28:01Z",
+      "side": 1,
+      "message": "labels can never change, so it doesn\u0027t need to be updated here.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fe045f81_6b54beae",
         "filename": "zuul/nodepool.py",
         "patchSetId": 5
@@ -126,6 +177,23 @@
       "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c2c8c9c_35dcf4c8",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:28:01Z",
+      "side": 1,
+      "message": "We could, but nodeset.nodes is sort of a cantrip used in lots of places to mean \u0027a non-empty nodeset\u0027.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -149,6 +217,23 @@
       "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cdc18315_5e2d42d8",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:28:01Z",
+      "side": 1,
+      "message": "Yes, that\u0027s the nodepool protocol.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -201,6 +286,23 @@
       "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3f823c75_0fc9225d",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-02T02:28:01Z",
+      "side": 1,
+      "message": "I think if it failed in that manner it would be fine.",
+      "revId": "39fb64a6d856af3e741c99a8b13eb712df627626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
