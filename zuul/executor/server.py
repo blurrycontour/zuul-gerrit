@@ -1,4 +1,5 @@
 # Copyright 2014 OpenStack Foundation
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -3547,12 +3548,14 @@ class ExecutorServer(BaseMergeServer):
             return
 
         try:
-            build_request.state = BuildRequest.RUNNING
             params = self.executor_api.getParams(build_request)
-            self.executor_api.clearParams(build_request)
-            # Directly update the build in ZooKeeper, so we don't
-            # loop over and try to lock it again and again.
+            # Directly update the build in ZooKeeper, so we don't loop
+            # over and try to lock it again and again.  Do this before
+            # clearing the params so if we fail, no one tries to
+            # re-run the job.
+            build_request.state = BuildRequest.RUNNING
             self.executor_api.update(build_request)
+            self.executor_api.clearParams(build_request)
             log.debug("Next executed job: %s", build_request)
             self.executeJob(build_request, params)
         except Exception:
@@ -3560,7 +3563,7 @@ class ExecutorServer(BaseMergeServer):
             # sucessfuly start executing the job, it's the
             # AnsibleJob's responsibility to call completeBuild and
             # unlock the request.
-            log.exception("Exception while running job")
+            log.exception("Exception while starting worker")
             result = {
                 "result": "ERROR",
                 "exception": traceback.format_exc(),
@@ -3832,46 +3835,78 @@ class ExecutorServer(BaseMergeServer):
         # result dict for that.
         result["end_time"] = time.time()
 
-        # NOTE (felix): We store the end_time on the ansible job to calculate
-        # the in-use duration of locked nodes when the nodeset is returned.
-        ansible_job = self.job_workers[build_request.uuid]
-        ansible_job.end_time = time.monotonic()
-
-        params = ansible_job.arguments
-        # If the result is None, check if the build has reached its max
-        # attempts and if so set the result to RETRY_LIMIT.
-        # This must be done in order to correctly process the autohold in the
-        # next step. Since we only want to hold the node if the build has
-        # reached a final result.
-        if result.get("result") is None:
-            attempts = params["zuul"]["attempts"]
-            max_attempts = params["max_attempts"]
-            if attempts >= max_attempts:
-                result["result"] = "RETRY_LIMIT"
-
-        zuul_event_id = params["zuul_event_id"]
-        log = get_annotated_logger(self.log, zuul_event_id,
+        log = get_annotated_logger(self.log, build_request.event_id,
                                    build=build_request.uuid)
 
-        # Provide the hold information back to the scheduler via the build
-        # result.
-        try:
-            held = self._processAutohold(ansible_job, result.get("result"))
-            result["held"] = held
-            log.info("Held status set to %s", held)
-        except Exception:
-            log.exception("Unable to process autohold for %s", ansible_job)
+        # NOTE (felix): We store the end_time on the ansible job to calculate
+        # the in-use duration of locked nodes when the nodeset is returned.
+        # NOTE: this method may be called before we create a job worker.
+        ansible_job = self.job_workers.get(build_request.uuid)
+        if ansible_job:
+            ansible_job.end_time = time.monotonic()
+
+            params = ansible_job.arguments
+            # If the result is None, check if the build has reached its max
+            # attempts and if so set the result to RETRY_LIMIT.
+            # This must be done in order to correctly process the autohold in the
+            # next step. Since we only want to hold the node if the build has
+            # reached a final result.
+            if result.get("result") is None:
+                attempts = params["zuul"]["attempts"]
+                max_attempts = params["max_attempts"]
+                if attempts >= max_attempts:
+                    result["result"] = "RETRY_LIMIT"
+
+            zuul_event_id = params["zuul_event_id"]
+
+            # Provide the hold information back to the scheduler via the build
+            # result.
+            try:
+                held = self._processAutohold(ansible_job, result.get("result"))
+                result["held"] = held
+                log.info("Held status set to %s", held)
+            except Exception:
+                log.exception("Unable to process autohold for %s", ansible_job)
+
+        def update_build_request(build_request):
+            try:
+                self.executor_api.update(build_request)
+                return True
+            except JobRequestNotFound as e:
+                self.log.warning("Could not find build: %s", str(e))
+                return False
 
         build_request.state = BuildRequest.COMPLETED
-        try:
-            self.executor_api.update(build_request)
-        except JobRequestNotFound as e:
-            self.log.warning("Could not complete build: %s", str(e))
+        found = self._retry(update_build_request, build_request)
+        self._retry(self.executor_api.unlock, build_request)
+
+        if not found:
+            # If the build request is gone, don't return a result.
             return
 
-        # Unlock the build request
-        self.executor_api.unlock(build_request)
-
+        # TODO: This is racy.  Once we have set the build request to
+        # completed, the only way for it to be deleted is for the
+        # scheduler to process a BuildRequestCompleted event.  So we
+        # need to try really hard to give it one.  But if we exit
+        # between the section above and the section below, we won't,
+        # which will mean that the scheduler will not automatically
+        # delete the build request and we will not be able to recover.
+        #
+        # This is essentially a two-phase commit problem, but we are
+        # unable to use transactions because the result event is
+        # sharded.  We should be able to redesign the result reporting
+        # mechanism to eliminate the race and be more convergent.
         event = BuildCompletedEvent(build_request.uuid, result)
-        self.result_events[build_request.tenant_name][
-            build_request.pipeline_name].put(event)
+        put = self.result_events[build_request.tenant_name][
+            build_request.pipeline_name].put
+        self._retry(put, event)
+
+    def _retry(self, fn, *args, **kw):
+        while True:
+            try:
+                return fn(*args, **kw)
+            except Exception:
+                log.exception("Exception retrying %s", fn)
+            if not self._running:
+                return
+            time.sleep(5)
