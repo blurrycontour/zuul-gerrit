@@ -13,11 +13,9 @@
 import json
 import logging
 import time
-from typing import Dict, Optional, List
+from typing import Optional, List
 
 from kazoo.exceptions import NoNodeError, LockTimeout
-from kazoo.recipe.cache import TreeCache
-from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
@@ -38,32 +36,27 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     log = logging.getLogger("zuul.zk.nodepool.ZooKeeperNodepool")
 
-    def __init__(self, client: ZooKeeperClient, enable_cache: bool = True):
+    def __init__(self, client: ZooKeeperClient, enable_cache=True):
         super().__init__(client)
-        self.enable_cache = enable_cache  # type: bool
+        self.enable_cache = enable_cache
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for
         # storing that data serialized as objects. This allows us to return
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
-        self._hold_request_tree: Optional[TreeCache] = None
-        self._cached_hold_requests: Optional[Dict[str, HoldRequest]] = {}
+        # TODO: init cache
         if self.client.connected:
             self._onConnect()
 
     def _onConnect(self):
         if self.enable_cache:
-            self._hold_request_tree = TreeCache(self.kazoo_client,
-                                                self.HOLD_REQUEST_ROOT)
-            self._hold_request_tree.listen_fault(self._cacheFaultListener)
-            self._hold_request_tree.listen(self._holdRequestCacheListener)
-            self._hold_request_tree.start()
+            # TODO: setup cache
+            pass
 
     def _onDisconnect(self):
-        if self._hold_request_tree is not None:
-            self._hold_request_tree.close()
-            self._hold_request_tree = None
+        # TODO: close cache
+        pass
 
     def _launcherPath(self, launcher):
         return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
@@ -315,56 +308,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
             raise LockException("Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
-
-    def _holdRequestCacheListener(self, event):
-        """
-        Keep the hold request object cache in sync with the TreeCache.
-        """
-        try:
-            if hasattr(event.event_data, 'path'):
-                # Ignore root node
-                path = event.event_data.path
-                if path == self.HOLD_REQUEST_ROOT:
-                    return
-
-            if event.event_type not in (TreeEvent.NODE_ADDED,
-                                        TreeEvent.NODE_UPDATED,
-                                        TreeEvent.NODE_REMOVED):
-                return
-
-            path = event.event_data.path
-            request_id = path.rsplit('/', 1)[1]
-
-            if event.event_type in (
-                    TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED):
-                # Requests with no data are invalid
-                if not event.event_data.data:
-                    return
-
-                # Perform an in-place update of the already cached request
-                d = json.loads(event.event_data.data.decode('utf8'))
-                old_request = self._cached_hold_requests.get(request_id)
-                if old_request:
-                    if event.event_data.stat.version <= old_request.stat\
-                            .version:
-                        # Don't update to older data
-                        return
-                    old_request.updateFromDict(d)
-                    old_request.stat = event.event_data.stat
-                else:
-                    request = HoldRequest.fromDict(d)
-                    request.id = request_id
-                    request.stat = event.event_data.stat
-                    self._cached_hold_requests[request_id] = request
-
-            elif event.event_type == TreeEvent.NODE_REMOVED:
-                try:
-                    del self._cached_hold_requests[request_id]
-                except KeyError:
-                    pass
-        except Exception:
-            self.log.exception(
-                "Exception in hold request cache update for event: %s", event)
 
     def submitNodeRequest(self, node_request, priority, watcher):
         """
