@@ -1262,9 +1262,11 @@ class GithubConnection(CachedBranchConnection):
         return self._github_client_manager.getGithubClient(
             project_name=project_name, zuul_event_id=zuul_event_id)
 
+    def cleanupCache(self):
+        self._change_cache.cleanup()
+
     def maintainCache(self, relevant, max_age):
         self._change_cache.prune(relevant, max_age)
-        self._change_cache.cleanup()
 
     def updateChangeAttributes(self, change, **attrs):
         def _update_attrs(c):

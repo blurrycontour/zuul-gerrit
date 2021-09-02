@@ -103,9 +103,11 @@ class GitConnection(BaseConnection):
                 refs[ref] = sha
         return refs
 
+    def cleanupCache(self):
+        self._change_cache.cleanup()
+
     def maintainCache(self, relevant, max_age):
         self._change_cache.prune(relevant, max_age)
-        self._change_cache.cleanup()
 
     def getChange(self, event, refresh=False):
         key = str((event.project_name, event.ref, event.newrev))
