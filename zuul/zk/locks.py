@@ -16,11 +16,49 @@ import logging
 from contextlib import contextmanager
 from urllib.parse import quote_plus
 
+from kazoo.protocol.states import KazooState
+
 from zuul.zk.exceptions import LockException
-from zuul.zk.vendor.lock import ReadLock, WriteLock
+from zuul.zk.vendor.lock import Lock, ReadLock, WriteLock
 
 LOCK_ROOT = "/zuul/locks"
 TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"
+
+
+class SessionAwareLock(Lock):
+    def __init__(self, client, path, identifier=None, extra_lock_patterns=()):
+        self._zuul_ephemeral = None
+        self._zuul_session_expired = False
+        self._zuul_watching_session = False
+        super().__init__(client, path, identifier=None, extra_lock_patterns=())
+
+    def acquire(self, blocking=True, timeout=None, ephemeral=True):
+        ret = super().acquire(blocking, timeout, ephemeral)
+        self._zuul_session_expired = False
+        if ret and ephemeral:
+            self._zuul_ephemeral = ephemeral
+            self.client.add_listener(self._zuul_session_watcher)
+            self._zuul_watching_session = True
+        return ret
+
+    def release(self):
+        if self._zuul_watching_session:
+            self.client.remove_listener(self._zuul_session_watcher)
+            self._zuul_watching_session = False
+        return super().release()
+
+    def _zuul_session_watcher(self, state):
+        if state == KazooState.LOST:
+            self._zuul_session_expired = True
+            self.wake_event.set()
+
+            # Return true to de-register
+            return True
+
+    def is_still_valid(self):
+        if not self._zuul_ephemeral:
+            return True
+        return not self._zuul_session_expired
 
 
 @contextmanager
