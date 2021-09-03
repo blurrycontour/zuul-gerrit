@@ -26,8 +26,8 @@ class NodepoolWithCallback(zuul.nodepool.Nodepool):
         super().__init__(*args, **kwargs)
         self.provisioned_requests = []
 
-    def _handleNodeRequestEvent(self, request, event, request_id=None):
-        super()._handleNodeRequestEvent(request, event, request_id)
+    def _handleNodeRequestEvent(self, request, event):
+        super()._handleNodeRequestEvent(request, event)
         self.provisioned_requests.append(request)
 
 

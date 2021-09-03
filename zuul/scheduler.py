@@ -452,29 +452,7 @@ class Scheduler(threading.Thread):
                 self.statsd.gauge(f"{base}.management_events",
                                   len(management_event_queues[pipeline.name]))
 
-        # export current_requests stats per tenant
-        tenant_requests = defaultdict(int)
-
-        # need to initialize tenants here explicitly to report a zero for
-        # all tenants for which no requests are in-flight
-        for tenant_name in self.abide.tenants.keys():
-            tenant_requests[tenant_name] = 0
-
-        total_requests = 0
-        for req in self.nodepool.getNodeRequests():
-            # might be None, we ignore them for this metric
-            total_requests += 1
-            if not req.tenant_name:
-                continue
-            tenant_requests[req.tenant_name] += 1
-
-        self.statsd.gauge('zuul.nodepool.current_requests',
-                          total_requests)
-        for tenant, request_count in tenant_requests.items():
-            self.statsd.gauge(
-                "zuul.nodepool.tenant.{tenant}.current_requests",
-                request_count,
-                tenant=tenant)
+        self.nodepool.emitStatsTotals(self.abide)
 
     def startCleanup(self):
         # Run the first cleanup immediately after the first

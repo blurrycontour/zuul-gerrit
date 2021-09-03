@@ -1944,6 +1944,17 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(0, request.current_count)
         self.assertEqual([], request.nodes)
 
+        # Some convenience variables for checking the stats.
+        tenant_ram_stat = 'zuul.nodepool.resources.tenant.tenant-one.ram'
+        project_ram_stat = ('zuul.nodepool.resources.project.'
+                            'review_example_com/org/project.ram')
+        # Test that we zeroed the gauges
+        self.scheds.first.sched._runStats()
+        self.assertUnReportedStat(tenant_ram_stat, value='1024', kind='g')
+        self.assertUnReportedStat(project_ram_stat, value='1024', kind='g')
+        self.assertReportedStat(tenant_ram_stat, value='0', kind='g')
+        self.assertReportedStat(project_ram_stat, value='0', kind='g')
+
         # First check that successful jobs do not autohold
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -1975,10 +1986,6 @@ class TestScheduler(ZuulTestCase):
             'ram': 1024,
             'instances': 1,
         }
-        # Some convenience variables for checking these stats.
-        tenant_ram_stat = 'zuul.nodepool.resources.tenant.tenant-one.ram'
-        project_ram_stat = ('zuul.nodepool.resources.project.'
-                            'review_example_com/org/project.ram')
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         self.executor_server.failJob('project-test2', B)
@@ -1990,6 +1997,10 @@ class TestScheduler(ZuulTestCase):
         build = list(self.scheds.first.sched.executor.builds.values())[0]
 
         # We should report using the held node's resources
+        self.waitUntilNodeCacheSync(
+            self.scheds.first.sched.nodepool.zk_nodepool)
+        self.statsd.clear()
+        self.scheds.first.sched._runStats()
         self.assertReportedStat(tenant_ram_stat, value='1024', kind='g')
         self.assertReportedStat(project_ram_stat, value='1024', kind='g')
         self.assertUnReportedStat(tenant_ram_stat, value='0', kind='g')
@@ -2029,11 +2040,15 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(1, len(request2.nodes))
         self.assertEqual(1, len(request2.nodes[0]["nodes"]))
 
-        # We should now report that we no longer use the nodes resources
+        # We should still report we use the resources
+        self.waitUntilNodeCacheSync(
+            self.scheds.first.sched.nodepool.zk_nodepool)
+        self.statsd.clear()
+        self.scheds.first.sched._runStats()
         self.assertReportedStat(tenant_ram_stat, value='1024', kind='g')
         self.assertReportedStat(project_ram_stat, value='1024', kind='g')
-        self.assertReportedStat(tenant_ram_stat, value='0', kind='g')
-        self.assertReportedStat(project_ram_stat, value='0', kind='g')
+        self.assertUnReportedStat(tenant_ram_stat, value='0', kind='g')
+        self.assertUnReportedStat(project_ram_stat, value='0', kind='g')
 
         # Another failed change should not hold any more nodes
         self.fake_nodepool.resources = {}
@@ -2062,6 +2077,20 @@ class TestScheduler(ZuulTestCase):
         node_states = [n['state'] for n in self.fake_nodepool.getNodes()]
         self.assertEqual(3, len(node_states))
         self.assertEqual([zuul.model.STATE_USED] * 3, node_states)
+
+        # Nodepool deletes the nodes
+        for n in self.fake_nodepool.getNodes():
+            self.fake_nodepool.removeNode(n)
+
+        # We should now report that we no longer use the nodes resources
+        self.waitUntilNodeCacheSync(
+            self.scheds.first.sched.nodepool.zk_nodepool)
+        self.statsd.clear()
+        self.scheds.first.sched._runStats()
+        self.assertUnReportedStat(tenant_ram_stat, value='1024', kind='g')
+        self.assertUnReportedStat(project_ram_stat, value='1024', kind='g')
+        self.assertReportedStat(tenant_ram_stat, value='0', kind='g')
+        self.assertReportedStat(project_ram_stat, value='0', kind='g')
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_info(self):
@@ -6130,29 +6159,33 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.executor_server.release('project-merge')
         self.waitUntilSettled()
+        self.waitUntilNodeCacheSync(
+            self.scheds.first.sched.nodepool.zk_nodepool)
+        self.scheds.first.sched._runStats()
 
         # Check that resource usage gauges are reported
         self.assertHistory([
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
         ])
+        # All 3 nodes are in use
         self.assertReportedStat(
             'zuul.nodepool.resources.tenant.tenant-one.cores',
-            value='2', kind='g')
+            value='6', kind='g')
         self.assertReportedStat(
             'zuul.nodepool.resources.tenant.tenant-one.ram',
-            value='1024', kind='g')
+            value='3072', kind='g')
         self.assertReportedStat(
             'zuul.nodepool.resources.tenant.tenant-one.instances',
-            value='1', kind='g')
+            value='3', kind='g')
         self.assertReportedStat(
             'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'cores', value='2', kind='g')
+            'cores', value='6', kind='g')
         self.assertReportedStat(
             'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'ram', value='1024', kind='g')
+            'ram', value='3072', kind='g')
         self.assertReportedStat(
             'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'instances', value='1', kind='g')
+            'instances', value='3', kind='g')
 
         # Check that resource usage counters are reported
         self.assertReportedStat(
