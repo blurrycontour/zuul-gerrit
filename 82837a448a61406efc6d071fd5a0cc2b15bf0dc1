@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ee0b02c_debe217a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-03T16:52:09Z",
+      "side": 1,
+      "message": "Can you include information in the commit message describing the change and the reasoning?",
+      "revId": "82837a448a61406efc6d071fd5a0cc2b15bf0dc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
