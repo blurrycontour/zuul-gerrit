@@ -2883,8 +2883,8 @@ class FakeBuild(object):
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
         self.node = None
-        if len(self.parameters.get('nodes')) == 1:
-            self.node = self.parameters['nodes'][0]['label']
+        if len(self.parameters['nodeset']['nodes']) == 1:
+            self.node = self.parameters['nodeset']['nodes'][0]['label']
         self.unique = self.parameters['zuul']['build']
         self.pipeline = self.parameters['zuul']['pipeline']
         self.project = self.parameters['zuul']['project']['name']

@@ -3336,8 +3336,8 @@ class TestScheduler(ZuulTestCase):
 
         p = self.history[0].parameters
         self.assertEqual(p['timeout'], 40)
-        self.assertEqual(len(p['nodes']), 1)
-        self.assertEqual(p['nodes'][0]['label'], 'new')
+        self.assertEqual(len(p['nodeset']['nodes']), 1)
+        self.assertEqual(p['nodeset']['nodes'][0]['label'], 'new')
         self.assertEqual([x['path'] for x in p['pre_playbooks']],
                          ['base-pre', 'py27-pre'])
         self.assertEqual([x['path'] for x in p['post_playbooks']],
@@ -3347,8 +3347,8 @@ class TestScheduler(ZuulTestCase):
 
         p = self.history[1].parameters
         self.assertEqual(p['timeout'], 50)
-        self.assertEqual(len(p['nodes']), 1)
-        self.assertEqual(p['nodes'][0]['label'], 'old')
+        self.assertEqual(len(p['nodeset']['nodes']), 1)
+        self.assertEqual(p['nodeset']['nodes'][0]['label'], 'old')
         self.assertEqual([x['path'] for x in p['pre_playbooks']],
                          ['base-pre', 'py27-pre', 'py27-diablo-pre'])
         self.assertEqual([x['path'] for x in p['post_playbooks']],
@@ -3359,8 +3359,8 @@ class TestScheduler(ZuulTestCase):
 
         p = self.history[2].parameters
         self.assertEqual(p['timeout'], 40)
-        self.assertEqual(len(p['nodes']), 1)
-        self.assertEqual(p['nodes'][0]['label'], 'new')
+        self.assertEqual(len(p['nodeset']['nodes']), 1)
+        self.assertEqual(p['nodeset']['nodes'][0]['label'], 'new')
         self.assertEqual([x['path'] for x in p['pre_playbooks']],
                          ['base-pre', 'py27-pre', 'py27-essex-pre'])
         self.assertEqual([x['path'] for x in p['post_playbooks']],
