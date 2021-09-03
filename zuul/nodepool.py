@@ -25,18 +25,11 @@ from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import NodeRequestEvent, ZooKeeperNodepool
 
 
-def add_resources(target, source):
-    for key, value in source.items():
-        target[key] += value
-
-
-def subtract_resources(target, source):
-    for key, value in source.items():
-        target[key] -= value
-
-
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
+    # The kind of resources we report stats on.  We need a complete
+    # list in order to report 0 level gauges.
+    resource_types = ('ram', 'cores', 'instances')
 
     def __init__(self, zk_client, system_id, statsd, scheduler=False):
         self._stopped = False
@@ -50,7 +43,8 @@ class Nodepool(object):
             self.zk_nodepool = ZooKeeperNodepool(
                 zk_client,
                 enable_node_request_cache=True,
-                node_request_event_callback=self._handleNodeRequestEvent)
+                node_request_event_callback=self._handleNodeRequestEvent,
+                enable_node_cache=True)
             self.election = NodepoolEventElection(zk_client)
             self.event_thread = threading.Thread(target=self.runEventElection)
             self.event_thread.daemon = True
@@ -65,9 +59,10 @@ class Nodepool(object):
             zk_client
         )
 
-        # TODO: remove internal caches for SOS
-        self.current_resources_by_tenant = {}
-        self.current_resources_by_project = {}
+    def addResources(self, target, source):
+        for key, value in source.items():
+            if key in self.resource_types:
+                target[key] += value
 
     def runEventElection(self):
         while not self._stopped:
@@ -113,9 +108,7 @@ class Nodepool(object):
             self.stop_watcher_event.clear()
             self.election_won = False
 
-    def _handleNodeRequestEvent(self, request, event, request_id=None):
-        # TODO (felix): This callback should be wrapped by leader election, so
-        # that only one scheduler puts NodesProvisionedEvents in the queue.
+    def _handleNodeRequestEvent(self, request, event):
         log = get_annotated_logger(self.log, event=request.event_id)
 
         if request.requestor != self.system_id:
@@ -169,22 +162,6 @@ class Nodepool(object):
         if dt:
             pipe.timing(key + '.size.%s' % len(request.labels), dt)
         pipe.send()
-
-    def emitStatsResources(self):
-        if not self.statsd:
-            return
-
-        for tenant, resources in self.current_resources_by_tenant.items():
-            for resource, value in resources.items():
-                key = 'zuul.nodepool.resources.tenant.' \
-                      '{tenant}.{resource}'
-                self.statsd.gauge(key, value, tenant=tenant, resource=resource)
-        for project, resources in self.current_resources_by_project.items():
-            for resource, value in resources.items():
-                key = 'zuul.nodepool.resources.project.' \
-                      '{project}.{resource}'
-                self.statsd.gauge(
-                    key, value, project=project, resource=resource)
 
     def emitStatsResourceCounters(self, tenant, project, resources, duration):
         if not self.statsd:
@@ -297,7 +274,7 @@ class Nodepool(object):
             if node.lock is None:
                 raise Exception("Node %s is not locked" % (node,))
             if node.resources:
-                add_resources(resources, node.resources)
+                self.addResources(resources, node.resources)
             node.state = model.STATE_HOLD
             node.hold_job = " ".join([request.tenant,
                                       request.project,
@@ -337,48 +314,30 @@ class Nodepool(object):
             # _doBuildCompletedEvent, we always want to try to unlock it.
             self.zk_nodepool.unlockHoldRequest(request)
 
-        # When holding a nodeset we need to update the gauges to avoid
-        # leaking resources
-        if tenant and project and resources:
-            subtract_resources(
-                self.current_resources_by_tenant[tenant], resources)
-            subtract_resources(
-                self.current_resources_by_project[project], resources)
-            self.emitStatsResources()
-
-            if duration:
-                self.emitStatsResourceCounters(
-                    tenant, project, resources, duration)
+        if tenant and project and resources and duration:
+            self.emitStatsResourceCounters(
+                tenant, project, resources, duration)
 
     # TODO (felix): Switch back to use a build object here rather than the
     # ansible_job once it's available via ZK.
     def useNodeSet(self, nodeset, ansible_job=None):
         self.log.info("Setting nodeset %s in use", nodeset)
-        resources = defaultdict(int)
+        user_data = None
+        if ansible_job:
+            args = ansible_job.arguments
+            tenant_name = args["zuul"]["tenant"]
+            project_name = args["zuul"]["project"]["canonical_name"]
+            user_data = dict(
+                zuul_system=self.system_id,
+                tenant_name=tenant_name,
+                project_name=project_name,
+            )
         for node in nodeset.getNodes():
             if node.lock is None:
                 raise Exception("Node %s is not locked", node)
             node.state = model.STATE_IN_USE
+            node.user_data = user_data
             self.zk_nodepool.storeNode(node)
-            if node.resources:
-                add_resources(resources, node.resources)
-        if ansible_job and resources:
-            args = ansible_job.arguments
-            # we have a buildset and thus also tenant and project so we
-            # can emit project specific resource usage stats
-            tenant_name = args["zuul"]["tenant"]
-            project_name = args["zuul"]["project"]["canonical_name"]
-
-            self.current_resources_by_tenant.setdefault(
-                tenant_name, defaultdict(int))
-            self.current_resources_by_project.setdefault(
-                project_name, defaultdict(int))
-
-            add_resources(self.current_resources_by_tenant[tenant_name],
-                          resources)
-            add_resources(self.current_resources_by_project[project_name],
-                          resources)
-            self.emitStatsResources()
 
     # TODO (felix): Switch back to use a build object here rather than the
     # ansible_job once it's available via ZK.
@@ -394,7 +353,7 @@ class Nodepool(object):
                 try:
                     if node.state == model.STATE_IN_USE:
                         if node.resources:
-                            add_resources(resources, node.resources)
+                            self.addResources(resources, node.resources)
                         node.state = model.STATE_USED
                         self.zk_nodepool.storeNode(node)
                 except Exception:
@@ -415,20 +374,9 @@ class Nodepool(object):
                  "for %s seconds for build %s for project %s",
                  nodeset, len(nodeset.nodes), duration, ansible_job, project)
 
-        # When returning a nodeset we need to update the gauges if we have a
-        # build. Further we calculate resource*duration and increment their
-        # tenant or project specific counters. With that we have both the
-        # current value and also counters to be able to perform accounting.
-        if resources:
-            subtract_resources(
-                self.current_resources_by_tenant[tenant], resources)
-            subtract_resources(
-                self.current_resources_by_project[project], resources)
-            self.emitStatsResources()
-
-            if duration:
-                self.emitStatsResourceCounters(
-                    tenant, project, resources, duration)
+        if resources and duration:
+            self.emitStatsResourceCounters(
+                tenant, project, resources, duration)
 
     def unlockNodeSet(self, nodeset):
         self._unlockNodes(nodeset.getNodes())
@@ -536,3 +484,80 @@ class Nodepool(object):
             req = self.zk_nodepool.getNodeRequest(req_id)
             if req.requestor == self.system_id:
                 yield req
+
+    def getNodes(self):
+        """Get all nodes in use or held by Zuul
+
+        Note this relies entirely on the internal cache.
+
+        :returns: An iterator of Node objects in use (or held) by this Zuul
+            system.
+        """
+        for node_id in self.zk_nodepool.getNodes(cached=True):
+            node = self.zk_nodepool.getNode(node_id)
+            if (node.user_data and
+                isinstance(node.user_data, dict) and
+                node.user_data.get('zuul_system') == self.system_id):
+                yield node
+
+    def emitStatsTotals(self, abide):
+        if not self.statsd:
+            return
+
+        total_requests = 0
+        tenant_requests = defaultdict(int)
+        resources_by_tenant = defaultdict(int)
+        resources_by_project = defaultdict(int)
+        empty_resource_dict = dict([(k, 0) for k in self.resource_types])
+
+        # Initialize zero values for gauges
+        for tenant in abide.tenants.values():
+            tenant_requests[tenant.name] = 0
+            resources_by_tenant[tenant.name] = empty_resource_dict.copy()
+            for project in tenant.all_projects:
+                resources_by_project[project.canonical_name] =\
+                    empty_resource_dict.copy()
+
+        # Count node requests
+        for req in self.getNodeRequests():
+            total_requests += 1
+            if not req.tenant_name:
+                continue
+            tenant_requests[req.tenant_name] += 1
+
+        self.statsd.gauge('zuul.nodepool.current_requests',
+                          total_requests)
+        for tenant, request_count in tenant_requests.items():
+            self.statsd.gauge(
+                "zuul.nodepool.tenant.{tenant}.current_requests",
+                request_count,
+                tenant=tenant)
+
+        # Count nodes
+        for node in self.getNodes():
+            if not node.resources:
+                continue
+            project_name = node.user_data.get('project_name')
+            tenant_name = node.user_data.get('tenant_name')
+            if not (project_name and tenant_name):
+                continue
+            if node.state not in {model.STATE_IN_USE,
+                                  model.STATE_USED,
+                                  model.STATE_HOLD}:
+                continue
+            self.addResources(resources_by_tenant[tenant_name],
+                              node.resources)
+            self.addResources(resources_by_project[project_name],
+                              node.resources)
+
+        for tenant, resources in resources_by_tenant.items():
+            for resource, value in resources.items():
+                key = 'zuul.nodepool.resources.tenant.' \
+                      '{tenant}.{resource}'
+                self.statsd.gauge(key, value, tenant=tenant, resource=resource)
+        for project, resources in resources_by_project.items():
+            for resource, value in resources.items():
+                key = 'zuul.nodepool.resources.project.' \
+                      '{project}.{resource}'
+                self.statsd.gauge(
+                    key, value, project=project, resource=resource)
