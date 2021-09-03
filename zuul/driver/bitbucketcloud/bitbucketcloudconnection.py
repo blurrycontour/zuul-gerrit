@@ -223,7 +223,12 @@ class BitbucketCloudConnection(BaseConnection):
         )
         changed_files = self._getBitbucketCloudClient().get(
             pr['links']['diffstat']['href'])
-        pr['files'] = [f['new']['path'] for f in changed_files['values']]
+        pr['files'] = []
+        for f in changed_files['values']:
+            if f['new']:
+                pr['files'].append(f['new']['path'])
+            elif f['old']:
+                pr['files'].append(f['old']['path'])
         return pr
 
     def getPRs(self, project_name):
@@ -583,7 +588,7 @@ class BitbucketCloudEventConnector(threading.Thread):
         new = push.get('new', None)
         old = push.get('old', None)
 
-        event.url = push['links']['html']['href']
+        event.url = push['old']['links']['html']['href']
         if new is None:
             event.newrev = '0' * 40
             event.branch_deleted = True
