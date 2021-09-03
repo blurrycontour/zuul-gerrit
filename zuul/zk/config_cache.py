@@ -205,7 +205,7 @@ class SystemConfigCache(ZooKeeperSimpleBase):
 
     @property
     def is_valid(self):
-        return self.ltime > 0
+        return self.ltime > -1
 
     def get(self):
         """Get the system configuration from Zookeeper.

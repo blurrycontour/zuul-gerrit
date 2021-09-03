@@ -5277,6 +5277,12 @@ class ZuulTestCase(BaseTestCase):
                         return False
         return True
 
+    def __areAllSchedulersPrimed(self, matcher=None):
+        for app in self.scheds.filter(matcher):
+            if app.sched.last_reconfigured is None:
+                return False
+        return True
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -5285,6 +5291,8 @@ class ZuulTestCase(BaseTestCase):
             i = i + 1
             if time.time() - start > self.wait_timeout:
                 self.log.error("Timeout waiting for Zuul to settle")
+                self.log.debug("All schedulers primed: %s",
+                               self.__areAllSchedulersPrimed(matcher))
                 self._logQueueStatus(
                     self.log.error, matcher,
                     self.__areZooKeeperEventQueuesEmpty(matcher),
@@ -5306,7 +5314,8 @@ class ZuulTestCase(BaseTestCase):
                 self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
-                if (self.__areAllMergeJobsWaiting(matcher) and
+                if (self.__areAllSchedulersPrimed(matcher) and
+                    self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
                     self.__areAllNodeRequestsComplete(matcher) and
