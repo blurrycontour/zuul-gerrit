@@ -583,7 +583,7 @@ class BitbucketCloudEventConnector(threading.Thread):
         new = push.get('new', None)
         old = push.get('old', None)
 
-        event.url = push['links']['html']['href']
+        event.url = push['old']['links']['html']['href']
         if new is None:
             event.newrev = '0' * 40
             event.branch_deleted = True
