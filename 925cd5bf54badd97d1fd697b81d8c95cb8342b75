@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "906349f8_03b1d817",
+        "filename": "tests/unit/test_nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-03T07:12:59Z",
+      "side": 1,
+      "message": "nit: I think the TODO can be removed here or changed to a simple comment.",
+      "revId": "925cd5bf54badd97d1fd697b81d8c95cb8342b75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
