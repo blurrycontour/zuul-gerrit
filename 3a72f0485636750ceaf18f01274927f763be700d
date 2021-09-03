@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7404d46f_d7a22c53",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 33571
+      },
+      "writtenOn": "2021-09-03T22:44:33Z",
+      "side": 1,
+      "message": "If a file was deleted in a PR `new` will be `null` here in the json body and only the `old` will have any information. \n\nHere\u0027s what `f` looks like:\n\n```\n{\n  \"status\": \"removed\",\n  \"old\": {\n    \"path\": \"file/path\",\n    \"escaped_path\": \"file/path\",\n    \"type\": \"commit_file\",\n    \"links\": {\n      \"self\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/org_name/repo/src/hash/file/path\"\n      }\n    }\n  },\n  \"lines_removed\": 1,\n  \"lines_added\": 0,\n  \"new\": null,\n  \"type\": \"diffstat\"\n}\n```",
+      "range": {
+        "startLine": 218,
+        "startChar": 23,
+        "endLine": 218,
+        "endChar": 31
+      },
+      "revId": "3a72f0485636750ceaf18f01274927f763be700d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8e5c3bed_cbe6d4df",
         "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
         "patchSetId": 13
@@ -13,6 +36,24 @@
       "writtenOn": "2021-06-02T23:19:12Z",
       "side": 1,
       "message": "Closing a branch (deleting it, having the PR automatically close the branch, etc) does not include `push.links`. All you get is a structure like the below:\n\n {\n  \"push\": {\n    \"changes\": [\n      {\n        \"forced\": false,\n        \"old\": {},\n        \"created\": false,\n        \"truncated\": false,\n        \"closed\": true,\n        \"new\": null\n      }\n    ]\n  },\n  \"actor\": {},\n  \"repository\": {}\n }\n\nI don\u0027t see that documented though: https://support.atlassian.com/bitbucket-cloud/docs/event-payloads/\n\nI suspect in these cases you\u0027d want to use the `old.links.html.href` which is the reference to the closed branch.",
+      "revId": "3a72f0485636750ceaf18f01274927f763be700d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff45922a_71aab381",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 33571
+      },
+      "writtenOn": "2021-09-03T22:44:33Z",
+      "side": 1,
+      "message": "Had another look at this. \n\nDeletion of a branch triggers a single `repo:push` webhook like the above (note that `old` is a full object not just `{}`).\n\nMerging a PR triggers two `repo:push` webhooks at the same moment. One, exactly like the above with the `old` referring to the branch in PR and a `null` `new`. The second referring to the branch receiving the merged PR as the `old` and the `new`.",
+      "parentUuid": "8e5c3bed_cbe6d4df",
       "revId": "3a72f0485636750ceaf18f01274927f763be700d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
