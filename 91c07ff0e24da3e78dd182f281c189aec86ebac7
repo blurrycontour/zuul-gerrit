@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "825c4249_b345a789",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-03T16:54:00Z",
+      "side": 1,
+      "message": "Can you drop the internal references in the commit message?  The Zuul project doesn\u0027t know what a CDEC is.\n\nIt looks like you may have attempted to fix the errors in this patch with followup patches.  You\u0027ll need to amend this change instead.",
+      "revId": "91c07ff0e24da3e78dd182f281c189aec86ebac7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "239fcbd7_3c348946",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-03T16:54:00Z",
+      "side": 1,
+      "message": "You have 2 change ids here, you only need one.",
+      "revId": "91c07ff0e24da3e78dd182f281c189aec86ebac7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
