@@ -33,39 +33,44 @@ class TestScaleOutScheduler(ZuulTestCase):
             self.validate_tenants)
 
     def test_config_priming(self):
-        for _ in iterate_timeout(10, "Wait until priming is complete"):
-            layout_state = self.scheds.first.sched.tenant_layout_state.get(
-                "tenant-one")
-            if layout_state is not None:
-                break
+        # Wait until scheduler is primed
+        self.waitUntilSettled()
+        first_app = self.scheds.first
+        initial_max_hold_exp = first_app.sched.globals.max_hold_expiration
+        layout_state = first_app.sched.tenant_layout_state.get("tenant-one")
+        self.assertIsNotNone(layout_state)
 
         # Second scheduler instance
-        app = self.create_scheduler()
+        second_app = self.create_scheduler()
         # Change a system attribute in order to check that the system config
         # from Zookeeper was used.
-        app.sched.globals.max_hold_expiration += 1234
-        app.config.set("scheduler", "max_hold_expiration",
-                       str(app.sched.globals.max_hold_expiration))
-        app.start()
+        second_app.sched.globals.max_hold_expiration += 1234
+        second_app.config.set("scheduler", "max_hold_expiration", str(
+            second_app.sched.globals.max_hold_expiration))
+
+        second_app.start()
+        self.waitUntilSettled()
+
+        self.assertEqual(first_app.sched.local_layout_state.get("tenant-one"),
+                         second_app.sched.local_layout_state.get("tenant-one"))
+
+        # Make sure only the first schedulers issued cat jobs
+        self.assertIsNotNone(first_app.sched.merger.history.get("cat"))
+        self.assertIsNone(second_app.sched.merger.history.get("cat"))
 
         for _ in iterate_timeout(
-                10, "Wait for all schedulers to have the same layout state"):
-            layout_states = [s.sched.local_layout_state.get("tenant-one")
-                             for s in self.scheds.instances]
-            if all(l == layout_state for l in layout_states):
+                10, "Wait for all schedulers to have the same system config"):
+            if (first_app.sched.unparsed_abide.ltime
+                    == second_app.sched.unparsed_abide.ltime):
                 break
 
-        for app in self.scheds.instances:
-            if app is self.scheds.first:
-                self.assertIsNotNone(
-                    app.sched.merger.history.get("cat"))
-            else:
-                # Make sure the other schedulers did not issue any cat jobs
-                self.assertIsNone(app.sched.merger.history.get("cat"))
-
-        self.waitUntilSettled()
-        self.assertEqual(self.scheds.first.sched.globals.max_hold_expiration,
-                         app.sched.globals.max_hold_expiration)
+        # TODO (swestphahl): change this to assertEqual() when we remove
+        # the smart reconfiguration during config priming.
+        # Currently the smart reconfiguration during priming of the second
+        # scheduler will update the system config in Zookeeper and the first
+        # scheduler updates it's config in return.
+        self.assertNotEqual(second_app.sched.globals.max_hold_expiration,
+                            initial_max_hold_exp)
 
     def test_reconfigure(self):
         # Create a second scheduler instance
