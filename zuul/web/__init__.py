@@ -38,6 +38,7 @@ import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import WebComponent
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.system import ZuulSystem
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 
@@ -243,7 +244,9 @@ class ZuulWebAPI(object):
     def __init__(self, zuulweb):
         self.rpc = zuulweb.rpc
         self.zk_client = zuulweb.zk_client
-        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
+        self.system = ZuulSystem(self.zk_client)
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client,
+                                             enable_node_cache=True)
         self.zuulweb = zuulweb
         self.cache = {}
         self.cache_time = {}
@@ -883,11 +886,18 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def nodes(self, tenant):
         ret = []
-        for node in self.zk_nodepool.nodeIterator():
+        for node_id in self.zk_nodepool.getNodes(cached=True):
+            node = self.zk_nodepool.getNode(node_id)
+            if not (node.user_data and
+                    isinstance(node.user_data, dict) and
+                    node.user_data.get('zuul_system') ==
+                    self.system.system_id and
+                    node.user_data.get('tenant_name') == tenant):
+                continue
             node_data = {}
             for key in ("id", "type", "connection_type", "external_id",
                         "provider", "state", "state_time", "comment"):
-                node_data[key] = node.get(key)
+                node_data[key] = getattr(node, key, None)
             ret.append(node_data)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'

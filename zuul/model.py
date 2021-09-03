@@ -600,6 +600,7 @@ class Node(ConfigObject):
         self.lock = None
         self.hold_job = None
         self.comment = None
+        self.user_data = None
         # Attributes from Nodepool
         self._state = 'unknown'
         self.state_time = time.time()
@@ -651,6 +652,7 @@ class Node(ConfigObject):
         d['state'] = self.state
         d['hold_job'] = self.hold_job
         d['comment'] = self.comment
+        d['user_data'] = self.user_data
         for k in self._keys:
             d[k] = getattr(self, k)
         if internal_attributes:

@@ -3182,7 +3182,8 @@ class ExecutorServer(BaseMergeServer):
         self.component_info.process_merge_jobs = self.process_merge_jobs
 
         self.system = ZuulSystem(self.zk_client)
-        self.nodepool = Nodepool(self.zk_client, self.system.system_id, self.statsd)
+        self.nodepool = Nodepool(self.zk_client, self.system.system_id,
+                                 self.statsd)
 
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client)
