@@ -22,13 +22,18 @@ from kazoo.recipe.lock import Lock
 
 import zuul.model
 from zuul.lib.jsonutil import json_dumps
-from zuul.model import HoldRequest, NodeRequest
+from zuul.model import HoldRequest, NodeRequest, Node
 from zuul.zk import ZooKeeperBase
 from zuul.zk.exceptions import LockException
 
 
 class NodeRequestEvent(Enum):
     COMPLETED = 0  # FULFILLED | FAILED
+    DELETED = 2
+
+
+class NodeEvent(Enum):
+    CHANGED = 0
     DELETED = 2
 
 
@@ -44,11 +49,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     log = logging.getLogger("zuul.zk.nodepool.ZooKeeperNodepool")
 
-    def __init__(self, client, enable_node_request_cache=True,
-                 node_request_event_callback=None):
+    def __init__(self, client,
+                 enable_node_request_cache=False,
+                 node_request_event_callback=None,
+                 enable_node_cache=False):
         super().__init__(client)
         self.enable_node_request_cache = enable_node_request_cache
         self.node_request_event_callback = node_request_event_callback
+        self.enable_node_cache = enable_node_cache
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for
@@ -57,6 +65,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         # the data into objects more than once.
         self._node_request_tree = None
         self._node_request_cache = {}
+        self._node_tree = None
+        self._node_cache = {}
 
         if self.client.connected:
             self._onConnect()
@@ -68,11 +78,20 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self._node_request_tree.listen_fault(self._cacheFaultListener)
             self._node_request_tree.listen(self.requestCacheListener)
             self._node_request_tree.start()
+        if self.enable_node_cache:
+            self._node_tree = TreeCache(self.kazoo_client,
+                                        self.NODES_ROOT)
+            self._node_tree.listen_fault(self._cacheFaultListener)
+            self._node_tree.listen(self.nodeCacheListener)
+            self._node_tree.start()
 
     def _onDisconnect(self):
         if self._node_request_tree is not None:
             self._node_request_tree.close()
             self._node_request_tree = None
+        if self._node_tree is not None:
+            self._node_tree.close()
+            self._node_tree = None
 
     def _launcherPath(self, launcher):
         return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
@@ -110,18 +129,23 @@ class ZooKeeperNodepool(ZooKeeperBase):
             objs.append(Launcher.fromDict(json.loads(data.decode('utf8'))))
         return objs
 
-    def getNodes(self):
+    def getNodes(self, cached=False):
         """
-        Get the current list of all nodes.
+        Get the current list of all node ids.
 
-        :returns: A list of nodes.
+        :param bool cached: Whether to use the internal cache to get the list
+            of ids.
+        :returns: A list of node ids.
         """
-        try:
-            return self.kazoo_client.get_children(self.NODES_ROOT)
-        except NoNodeError:
-            return []
+        if cached and self.enable_node_cache:
+            return list(self._node_cache.keys())
+        else:
+            try:
+                return self.kazoo_client.get_children(self.NODES_ROOT)
+            except NoNodeError:
+                return []
 
-    def _getNode(self, node):
+    def _getNodeData(self, node):
         """
         Get the data for a specific node.
 
@@ -141,12 +165,38 @@ class ZooKeeperNodepool(ZooKeeperBase):
         d['id'] = node
         return d
 
+    def getNode(self, node_id):
+        """
+        Get a Node object for a specific node.
+
+        :param str node_id: The node ID.
+
+        :returns: The Node, or None if the node was not found.
+        """
+        node = self._node_cache.get(node_id)
+        if node:
+            return node
+
+        path = self._nodePath(node_id)
+        try:
+            data, stat = self.kazoo_client.get(path)
+        except NoNodeError:
+            return None
+        if not data:
+            return None
+
+        node = Node(None, None)
+        node.updateFromDict(data)
+        node.id = node_id
+        node.stat = stat
+        return node
+
     def nodeIterator(self):
         """
         Utility generator method for iterating through all nodes.
         """
         for node_id in self.getNodes():
-            node = self._getNode(node_id)
+            node = self.getNode(node_id)
             if node:
                 yield node
 
@@ -231,7 +281,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         failure = False
         for node_id in getHeldNodeIDs(request):
-            node = self._getNode(node_id)
+            node = self._getNodeData(node_id)
             if not node or node['state'] == zuul.model.STATE_USED:
                 continue
 
@@ -383,13 +433,13 @@ class ZooKeeperNodepool(ZooKeeperBase):
                 and request.state != old_state
                 and self.node_request_event_callback):
                 self.node_request_event_callback(
-                    request, NodeRequestEvent.COMPLETED, request_id=request_id)
+                    request, NodeRequestEvent.COMPLETED)
 
         elif event.event_type == TreeEvent.NODE_REMOVED:
             request = self._node_request_cache.pop(request_id)
             if self.node_request_event_callback:
                 self.node_request_event_callback(
-                    request, NodeRequestEvent.DELETED, request_id=request_id)
+                    request, NodeRequestEvent.DELETED)
 
     def submitNodeRequest(self, node_request, priority):
         """
@@ -506,6 +556,58 @@ class ZooKeeperNodepool(ZooKeeperBase):
             data, stat = self.kazoo_client.get(path)
         data = json.loads(data.decode('utf8'))
         node_request.updateFromDict(data)
+
+    def nodeCacheListener(self, event):
+        try:
+            self._nodeCacheListener(event)
+        except Exception:
+            self.log.exception(
+                "Exception in node cache update for event: %s",
+                event)
+
+    def _nodeCacheListener(self, event):
+        if hasattr(event.event_data, 'path'):
+            # Ignore root node
+            path = event.event_data.path
+            if path == self.NODES_ROOT:
+                return
+
+            # Ignore lock nodes
+            if '/lock' in path:
+                return
+
+        # Ignore any non-node related events such as connection events here
+        if event.event_type not in (TreeEvent.NODE_ADDED,
+                                    TreeEvent.NODE_UPDATED,
+                                    TreeEvent.NODE_REMOVED):
+            return
+
+        path = event.event_data.path
+        node_id = path.rsplit('/', 1)[1]
+
+        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED):
+            # Nodes with empty data are invalid so skip add or update these.
+            if not event.event_data.data:
+                return
+
+            # Perform an in-place update of the cached node if possible
+            d = self._bytesToDict(event.event_data.data)
+            node = self._node_cache.get(node_id)
+            if node:
+                if event.event_data.stat.version <= node.stat.version:
+                    # Don't update to older data
+                    return
+                node.updateFromDict(d)
+                node.stat = event.event_data.stat
+            else:
+                node = Node(None, None)
+                node.updateFromDict(d)
+                node.id = node_id
+                node.stat = event.event_data.stat
+                self._node_cache[node_id] = node
+
+        elif event.event_type == TreeEvent.NODE_REMOVED:
+            node = self._node_cache.pop(node_id)
 
     def storeNode(self, node):
         """

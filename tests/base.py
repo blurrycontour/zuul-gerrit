@@ -2846,6 +2846,9 @@ class FakeStatsd(threading.Thread):
         self.wake_read, self.wake_write = os.pipe()
         self.stats = []
 
+    def clear(self):
+        self.stats = []
+
     def run(self):
         while True:
             poll = select.poll()
@@ -5166,6 +5169,19 @@ class ZuulTestCase(BaseTestCase):
     def merge_job_history(self):
         for app in self.scheds:
             app.sched.merger.merger_api.history.clear()
+
+    def waitUntilNodeCacheSync(self, zk_nodepool):
+        """Wait until the node cache on the zk_nodepool object is in sync"""
+        for _ in iterate_timeout(60, 'wait for node cache sync'):
+            cache_state = {}
+            zk_state = {}
+            for n in self.fake_nodepool.getNodes():
+                zk_state[n['_oid']] = n['state']
+            for nid in zk_nodepool.getNodes(cached=True):
+                n = zk_nodepool.getNode(nid)
+                cache_state[n.id] = n.state
+            if cache_state == zk_state:
+                return
 
     def __haveAllBuildsReported(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
