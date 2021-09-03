@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "318e66e7_d58313a7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3900,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-03T21:26:08Z",
+      "side": 1,
+      "message": "We should accept NoNodeError on the put -- that can happen if the tenant (and all pipelines) are deleted between these calls.",
+      "revId": "48324b0470618594b7fffaf69b4a9dfcb1f6c19b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
