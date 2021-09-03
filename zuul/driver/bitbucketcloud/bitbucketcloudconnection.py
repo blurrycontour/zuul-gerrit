@@ -26,10 +26,13 @@ import logging
 import requests
 from requests.auth import HTTPBasicAuth
 from urllib.parse import urlparse
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 import threading
 import time
 import json
 import uuid
+import requests
 import cherrypy
 
 
@@ -54,8 +57,13 @@ class BitbucketCloudClient():
         else:
             url = '{}{}'.format(self.baseurl, path)
 
-        r = requests.get(url, auth=HTTPBasicAuth(self.user, self.pw),
-                         timeout=5, retries=3, backoff_factor=1)
+        session = requests.session()
+        retry = Retry(connect=3, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        r = session.get(url, auth=HTTPBasicAuth(self.user, self.pw),
+                         timeout=5)
 
         if r.status_code != 200:
             raise BitbucketCloudConnectionError(
