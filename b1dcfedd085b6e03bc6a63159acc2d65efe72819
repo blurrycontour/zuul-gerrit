@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f29f6836_b2df36f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-03T16:51:17Z",
+      "side": 1,
+      "message": "Can you:\n\n1) Indicate what is wrong since you say you\u0027re \"correcting\" something, and also indicate why what you wrote is right?\n2) Match the parameters used in the gitlab driver?",
+      "revId": "b1dcfedd085b6e03bc6a63159acc2d65efe72819",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
