@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "007d0105_9b74f1dd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-05T14:31:01Z",
+      "side": 1,
+      "message": "This introduces a network round trip for all node requests in the pipeline in all pipeline runs (which can be a lot). I think this may have a noticeable impact on scheduling performance in our system.\n\nI think we usually only have to revise the priorities if some item we processed before changed in a way that requires this (I think that\u0027s only dequeued items and failed items in dependent pipelines). We could change processOneItem to return a flag if it did such a change and forward that to the next processOneItem call so we can skip this loop entirely if we don\u0027t need to revise node requests.",
+      "revId": "2da3425ff73a9dbb1dd611ea71bec9e951f78e8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
