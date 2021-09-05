@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e423557_bcf08727",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2089,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-05T14:07:23Z",
+      "side": 1,
+      "message": "I think this can only happen if multiple schedulers somehow already have handled the node request. Doing nothing here is likely the correct thing here. However I think we should emit a warning here in case we need to do debugging in this topic.",
+      "revId": "119439e641a657d4c622d8b4a580fad130e5c85b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
