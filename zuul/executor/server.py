@@ -69,6 +69,7 @@ from zuul.zk.components import ExecutorComponent
 from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
+from zuul.zk.system import ZuulSystem
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -3180,7 +3181,9 @@ class ExecutorServer(BaseMergeServer):
                                               'merge_jobs', True)
         self.component_info.process_merge_jobs = self.process_merge_jobs
 
-        self.nodepool = Nodepool(self.zk_client, self.hostname, self.statsd)
+        self.system = ZuulSystem(self.zk_client)
+        self.nodepool = Nodepool(self.zk_client, self.system.system_id,
+                                 self.statsd)
 
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client)
