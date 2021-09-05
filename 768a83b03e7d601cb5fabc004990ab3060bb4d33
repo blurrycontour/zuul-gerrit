@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff29c333_deb346d2",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3916,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-05T15:10:59Z",
+      "side": 1,
+      "message": "This looks like it will correctly handle the CONNECTED -\u003e SUSPENDED -\u003e CONNECTED transition. However I think this endless loop will deadlock the executor in case we really loose the session (in which case we will loose the lock on the build request and the scheduler should re-try the entire build). I think we need to check here as well if we lost the zk session and stop if we lost it.\n\nWe could add a connection lost listener to the executor which triggers an abort of this loop. I think is useful anyway since if we lost the session we can abort all currently running builds as well.",
+      "revId": "768a83b03e7d601cb5fabc004990ab3060bb4d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
