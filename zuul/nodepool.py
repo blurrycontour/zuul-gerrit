@@ -121,8 +121,11 @@ class Nodepool(object):
             # completed event is added to the zk queue.
             try:
                 if self.election_won:
-                    self.emitStats(request)
-                    self._sendNodesProvisionedEvent(request)
+                    if self.election.is_still_valid():
+                        self.emitStats(request)
+                        self._sendNodesProvisionedEvent(request)
+                    else:
+                        self.stop_watcher_event.set()
             except Exception:
                 # If there are any errors moving the event, re-run the
                 # election.
