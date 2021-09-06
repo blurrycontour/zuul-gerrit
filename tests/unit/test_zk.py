@@ -591,6 +591,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         d = executor_api.get(path_d)
         e = executor_api.get(path_e)
 
+        # Make sure we the get() method used the correct zone keys
+        self.assertEqual(set(executor_api.zone_queues.keys()), {"zone", None})
+
         b.state = BuildRequest.RUNNING
         executor_api.update(b)
 
