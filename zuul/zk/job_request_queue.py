@@ -370,6 +370,9 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
             return False
 
+        # Update the request to ensure that we operate on the newest data.
+        request = self.get(request.path)
+
         request.lock = lock
 
         # Create the children watch to listen for cancel/resume actions on this

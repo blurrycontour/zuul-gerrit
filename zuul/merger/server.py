@@ -205,7 +205,16 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.log, merge_request.event_id
         )
 
+        # Lock and update the merge request
         if not self.merger_api.lock(merge_request, blocking=False):
+            return
+
+        # Ensure that the request is still in state requested. This method is
+        # called based on cached data and there might be a mismatch between the
+        # cached state and the real state of the request. The lock might
+        # have been successful because the request is already completed and
+        # thus unlocked.
+        if not merge_request.state == MergeRequest.REQUESTED:
             return
 
         result = None
