@@ -292,6 +292,25 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
         return request
 
+    def refresh(self, request):
+        """Refreshs a request object with the current data from ZooKeeper. """
+        try:
+            data, zstat = self.kazoo_client.get(request.path)
+        except NoNodeError:
+            self.log.warning(
+                "Could not refresh %s, ZooKeeper node is missing", request)
+            return
+
+        if not data:
+            self.log.warning(
+                "Could not refresh %s, ZooKeeper node is empty", request)
+            return
+
+        content = self._bytesToDict(data)
+
+        request.updateFromDict(content)
+        request._zstat = zstat
+
     def remove(self, request):
         self.log.debug("Removing request %s", request)
         try:
@@ -369,6 +388,9 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                 pass
 
             return False
+
+        # Update the request to ensure that we operate on the newest data.
+        self.refresh(request)
 
         request.lock = lock
 
