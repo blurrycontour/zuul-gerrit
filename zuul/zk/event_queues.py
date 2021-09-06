@@ -25,11 +25,11 @@ from contextlib import suppress
 
 from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import EventType
-from kazoo.recipe.election import Election
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
 from zuul.zk import ZooKeeperSimpleBase, sharding
+from zuul.zk.election import SessionAwareElection
 
 RESULT_EVENT_TYPE_MAP = {
     "BuildCompletedEvent": model.BuildCompletedEvent,
@@ -808,7 +808,8 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
             (CONNECTION_ROOT, connection_name, "election")
         )
         self.kazoo_client.ensure_path(self.election_root)
-        self.election = self.kazoo_client.Election(self.election_root)
+        self.election = SessionAwareElection(
+            self.kazoo_client, self.election_root)
 
     def _eventWatch(self, callback, event_list):
         if event_list:
@@ -837,7 +838,7 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
             yield event
 
 
-class EventReceiverElection(Election):
+class EventReceiverElection(SessionAwareElection):
     """Election for a singleton event receiver."""
 
     def __init__(self, client, connection_name, receiver_name):
@@ -847,7 +848,7 @@ class EventReceiverElection(Election):
         super().__init__(client.client, self.election_root)
 
 
-class NodepoolEventElection(Election):
+class NodepoolEventElection(SessionAwareElection):
     """Election for the nodepool completion event processor."""
 
     def __init__(self, client):
