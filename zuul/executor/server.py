@@ -3544,7 +3544,17 @@ class ExecutorServer(BaseMergeServer):
         log = get_annotated_logger(
             self.log, event=None, build=build_request.uuid
         )
+
+        # Lock and update the build request
         if not self.executor_api.lock(build_request, blocking=False):
+            return
+
+        # Ensure that the request is still in state requested. This method is
+        # called based on cached data and there might be a mismatch between the
+        # cached state and the real state of the request. The lock might
+        # have been successful because the request is already completed and
+        # thus unlocked.
+        if not build_request.state == BuildRequest.REQUESTED:
             return
 
         try:
