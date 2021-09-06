@@ -74,12 +74,14 @@ class TestNodepoolIntegration(BaseTestCase):
             self.assertEqual(node.state, model.STATE_READY)
 
         # Mark the nodes in use
-        self.nodepool.useNodeSet(nodeset)
+        self.nodepool.useNodeSet(nodeset, tenant_name=None, project_name=None)
         for node in nodeset.getNodes():
             self.assertEqual(node.state, model.STATE_IN_USE)
 
         # Return the nodes
-        self.nodepool.returnNodeSet(nodeset)
+        self.nodepool.returnNodeSet(
+            nodeset, build=None, tenant_name=None, project_name=None,
+            duration=0)
         for node in nodeset.getNodes():
             self.assertIsNone(node.lock)
             self.assertEqual(node.state, model.STATE_USED)
