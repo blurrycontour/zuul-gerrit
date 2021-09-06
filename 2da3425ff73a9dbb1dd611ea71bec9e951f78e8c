@@ -16,6 +16,24 @@
       "revId": "2da3425ff73a9dbb1dd611ea71bec9e951f78e8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e201570b_0b8de00e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-06T05:22:36Z",
+      "side": 1,
+      "message": "AFAIK zk_nodepool.getNodeRequest() uses the local tree cache dictionary, so there shouldn\u0027t be any network roundtrips. This line is the reason we decided to add a tree cache in the first place. But I\u0027m definitely in favour if we could find a way to avoid this loop (and don\u0027t introduce anything too complex somewhere else).",
+      "parentUuid": "007d0105_9b74f1dd",
+      "revId": "2da3425ff73a9dbb1dd611ea71bec9e951f78e8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
