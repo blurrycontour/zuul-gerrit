@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "283b4af3_d3183e85",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-06T08:19:47Z",
+      "side": 1,
+      "message": "This will not work as you never return the updated request. The executor/merger will still use the object with the possibly stale data.",
+      "revId": "e415553cb0abf3e93beb824a2632b6e52c5163e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
