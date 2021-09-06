@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9bdd3102_fef5bb0e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3567,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-06T20:20:14Z",
+      "side": 1,
+      "message": "I agree with moving the state change before the update (I\u0027m doing the same in https://review.opendev.org/807221 -- but I think that anything after the lock must be in a try/except which unlocks the build, and probably needs to be in a retry loop like in 807221.",
+      "revId": "6723f683dbb8199b22e203d1cbf69386d6d47cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
