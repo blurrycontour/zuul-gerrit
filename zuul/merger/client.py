@@ -163,7 +163,7 @@ class MergeClient(object):
                     try:
                         self.merger_api.remove(request)
                     finally:
-                        self.executor_api.unlock(request)
+                        self.merger_api.unlock(request)
         finally:
             # Regardless of that, remove the waiter node
             job.cancel()
