@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8f6d987_03927144",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-06T22:42:28Z",
+      "side": 1,
+      "message": "Copy pasta.",
+      "revId": "9a7279adcd45c9dd615bbfa15ffe5c4a1873cbb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
