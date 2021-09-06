@@ -3557,13 +3557,17 @@ class ExecutorServer(BaseMergeServer):
         if not build_request.state == BuildRequest.REQUESTED:
             return
 
+        # Ensure that the build is in state RUNNING before doing anything else.
+        # In case this operation fails, we don't want to complete the build
+        # with a failure result as another executor might still be able to run
+        # the build.
+        build_request.state = BuildRequest.RUNNING
+        # Directly update the build in ZooKeeper, so we don't loop over
+        # and try to lock it again and again.
+        self.executor_api.update(build_request)
         try:
-            build_request.state = BuildRequest.RUNNING
             params = self.executor_api.getParams(build_request)
             self.executor_api.clearParams(build_request)
-            # Directly update the build in ZooKeeper, so we don't
-            # loop over and try to lock it again and again.
-            self.executor_api.update(build_request)
             log.debug("Next executed job: %s", build_request)
             self.executeJob(build_request, params)
         except Exception:

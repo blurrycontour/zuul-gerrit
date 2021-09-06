@@ -218,13 +218,17 @@ class BaseMergeServer(metaclass=ABCMeta):
             return
 
         result = None
+        # Ensure that the merge job is in state RUNNING before doing anything
+        # else. In case this operation fails, we don't want to complete the job
+        # with a failure result as another merger might still be able to
+        # run the job.
+        merge_request.state = MergeRequest.RUNNING
+        # Directly update the merge request in ZooKeeper, so we don't
+        # loop over and try to lock it again and again.
+        self.merger_api.update(merge_request)
         try:
-            merge_request.state = MergeRequest.RUNNING
             params = self.merger_api.getParams(merge_request)
             self.merger_api.clearParams(merge_request)
-            # Directly update the merge request in ZooKeeper, so we
-            # don't loop over and try to lock it again and again.
-            self.merger_api.update(merge_request)
             self.log.debug("Next executed merge job: %s", merge_request)
             try:
                 result = self.executeMergeJob(merge_request, params)
