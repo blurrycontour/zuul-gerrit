@@ -4293,9 +4293,8 @@ class SchedulerTestApp:
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
 
-        # TODO (felix, swestphahl): Can be removed when the nodes
-        # provisioned events are switched to ZooKeeper and after we no
-        # longer use global management events.
+        # TODO (swestphahl): Can be removed when we no longer use global
+        # management events.
         self.event_queues = [
             self.sched.reconfigure_event_queue,
         ]
@@ -4663,8 +4662,8 @@ class ZuulTestCase(BaseTestCase):
             self.fake_sql, self.addCleanup, self.validate_tenants)
 
     def __event_queues(self, matcher) -> List[Queue]:
-        # TODO (felix): Can be removed when the nodes provisioned events are
-        # switched to ZooKeeper.
+        # TODO (swestphahl): Can be removed when we no longer use global
+        # management events.
         sched_queues = map(lambda app: app.event_queues,
                            self.scheds.filter(matcher))
         return [item for sublist in sched_queues for item in sublist] + \

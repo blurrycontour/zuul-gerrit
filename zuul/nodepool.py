@@ -246,33 +246,27 @@ class Nodepool(object):
             except Exception:
                 log.exception("Unable to unlock node request %s", request)
 
-    # TODO (felix): Switch back to use a build object here rather than the
-    # ansible_job once it's available via ZK.
-    def holdNodeSet(self, nodeset, request, ansible_job):
+    def holdNodeSet(self, nodeset, request, build, duration,
+                    zuul_event_id=None):
         '''
         Perform a hold on the given set of nodes.
 
         :param NodeSet nodeset: The object containing the set of nodes to hold.
         :param HoldRequest request: Hold request associated with the NodeSet
         '''
-        self.log.info("Holding nodeset %s" % (nodeset,))
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.info("Holding nodeset %s", nodeset)
         resources = defaultdict(int)
         nodes = nodeset.getNodes()
 
-        args = ansible_job.arguments
-        project = args["zuul"]["project"]["canonical_name"]
-        tenant = args["zuul"]["tenant"]
-        duration = 0
-        if ansible_job.end_time and ansible_job.time_starting_build:
-            duration = ansible_job.end_time - ansible_job.time_starting_build
-        self.log.info(
+        log.info(
             "Nodeset %s with %s nodes was in use for %s seconds for build %s "
             "for project %s",
-            nodeset, len(nodeset.nodes), duration, ansible_job, project)
+            nodeset, len(nodeset.nodes), duration, build, request.project)
 
         for node in nodes:
             if node.lock is None:
-                raise Exception("Node %s is not locked" % (node,))
+                raise Exception(f"Node {node} is not locked")
             if node.resources:
                 self.addResources(resources, node.resources)
             node.state = model.STATE_HOLD
@@ -286,7 +280,7 @@ class Nodepool(object):
             self.zk_nodepool.storeNode(node)
 
         request.nodes.append(dict(
-            build=ansible_job.build_request.uuid,
+            build=build.uuid,
             nodes=[node.id for node in nodes],
         ))
         request.current_count += 1
@@ -308,30 +302,25 @@ class Nodepool(object):
             # just get used more than the original count specified.
             # It's possible to leak some held nodes, though, which would
             # require manual node deletes.
-            self.log.exception("Unable to update hold request %s:", request)
+            log.exception("Unable to update hold request %s:", request)
         finally:
             # Although any exceptions thrown here are handled higher up in
             # _doBuildCompletedEvent, we always want to try to unlock it.
             self.zk_nodepool.unlockHoldRequest(request)
 
-        if tenant and project and resources and duration:
+        if resources and duration:
             self.emitStatsResourceCounters(
-                tenant, project, resources, duration)
+                request.tenant, request.project, resources, duration)
 
-    # TODO (felix): Switch back to use a build object here rather than the
-    # ansible_job once it's available via ZK.
-    def useNodeSet(self, nodeset, ansible_job=None):
-        self.log.info("Setting nodeset %s in use", nodeset)
-        user_data = None
-        if ansible_job:
-            args = ansible_job.arguments
-            tenant_name = args["zuul"]["tenant"]
-            project_name = args["zuul"]["project"]["canonical_name"]
-            user_data = dict(
-                zuul_system=self.system_id,
-                tenant_name=tenant_name,
-                project_name=project_name,
-            )
+    def useNodeSet(self, nodeset, tenant_name, project_name,
+                   zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.info("Setting nodeset %s in use", nodeset)
+        user_data = dict(
+            zuul_system=self.system_id,
+            tenant_name=tenant_name,
+            project_name=project_name,
+        )
         for node in nodeset.getNodes():
             if node.lock is None:
                 raise Exception("Node %s is not locked", node)
@@ -339,9 +328,8 @@ class Nodepool(object):
             node.user_data = user_data
             self.zk_nodepool.storeNode(node)
 
-    # TODO (felix): Switch back to use a build object here rather than the
-    # ansible_job once it's available via ZK.
-    def returnNodeSet(self, nodeset, ansible_job=None, zuul_event_id=None):
+    def returnNodeSet(self, nodeset, build, tenant_name, project_name,
+                      duration, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info("Returning nodeset %s", nodeset)
         resources = defaultdict(int)
@@ -361,22 +349,13 @@ class Nodepool(object):
                                   "while unlocking:", node)
         self.unlockNodeSet(nodeset)
 
-        if not ansible_job:
-            return
-
-        args = ansible_job.arguments
-        project = args["zuul"]["project"]["canonical_name"]
-        tenant = args["zuul"]["tenant"]
-        duration = 0
-        if ansible_job.end_time and ansible_job.time_starting_build:
-            duration = ansible_job.end_time - ansible_job.time_starting_build
         log.info("Nodeset %s with %s nodes was in use "
                  "for %s seconds for build %s for project %s",
-                 nodeset, len(nodeset.nodes), duration, ansible_job, project)
+                 nodeset, len(nodeset.nodes), duration, build, project_name)
 
         if resources and duration:
             self.emitStatsResourceCounters(
-                tenant, project, resources, duration)
+                tenant_name, project_name, resources, duration)
 
     def unlockNodeSet(self, nodeset):
         self._unlockNodes(nodeset.getNodes())
