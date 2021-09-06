@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "387ebdc9_13b7cf62",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3558,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-06T20:13:15Z",
+      "side": 1,
+      "message": "We should unlock the build request in this case.  We may need to do so in a retry loop like we\u0027re working on in https://review.opendev.org/807221",
+      "revId": "ef1197c71af6e210a50fa3ca8e62832a38373170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be5bccaa_83dcd60e",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-06T20:13:15Z",
+      "side": 1,
+      "message": "We should unlock this too.",
+      "revId": "ef1197c71af6e210a50fa3ca8e62832a38373170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f6648539_86bcce0f",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-06T20:13:15Z",
+      "side": 1,
+      "message": "This isn\u0027t an f-string (it\u0027s missing the \"f\").",
+      "revId": "ef1197c71af6e210a50fa3ca8e62832a38373170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aedd7969_2f1121eb",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-06T20:13:15Z",
+      "side": 1,
+      "message": "This isn\u0027t an f-string (it\u0027s missing the \"f\").",
+      "revId": "ef1197c71af6e210a50fa3ca8e62832a38373170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
