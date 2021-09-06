@@ -1132,10 +1132,16 @@ class AnsibleJob(object):
 
     def unlockNodes(self):
         if self.node_request:
+            tenant_name = self.arguments["zuul"]["tenant"]
+            project_name = self.arguments["zuul"]["project"]["canonical_name"]
+            duration = self.end_time - self.time_starting_build
             try:
                 self.executor_server.nodepool.returnNodeSet(
                     self.nodeset,
-                    self,
+                    self.build_request,
+                    tenant_name,
+                    project_name,
+                    duration,
                     zuul_event_id=self.zuul_event_id,
                 )
             except Exception:
@@ -1348,7 +1354,10 @@ class AnsibleJob(object):
         # start to run tasks on nodes (prepareVars in particular uses
         # Ansible to freeze hostvars).
         if self.node_request:
-            self.executor_server.nodepool.useNodeSet(self.nodeset, self)
+            tenant_name = self.arguments["zuul"]["tenant"]
+            project_name = self.arguments["zuul"]["project"]["canonical_name"]
+            self.executor_server.nodepool.useNodeSet(
+                self.nodeset, tenant_name, project_name, self.zuul_event_id)
 
         # This prepares each playbook and the roles needed for each.
         self.preparePlaybooks(args)
@@ -3703,8 +3712,7 @@ class ExecutorServer(BaseMergeServer):
 
         return True
 
-    def _getAutoholdRequest(self, ansible_job):
-        args = ansible_job.arguments
+    def _getAutoholdRequest(self, args):
         autohold_key_base = (
             args["zuul"]["tenant"],
             args["zuul"]["project"]["canonical_name"],
@@ -3776,26 +3784,23 @@ class ExecutorServer(BaseMergeServer):
 
         return autohold
 
-    def _processAutohold(self, ansible_job, result):
+    def _processAutohold(self, ansible_job, duration, result):
         # We explicitly only want to hold nodes for jobs if they have
         # failed / retry_limit / post_failure and have an autohold request.
         hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
         if result not in hold_list:
             return False
 
-        request = self._getAutoholdRequest(ansible_job)
+        request = self._getAutoholdRequest(ansible_job.arguments)
         if request is not None:
             self.log.debug("Got autohold %s", request)
             self.nodepool.holdNodeSet(
-                ansible_job.nodeset, request, ansible_job
-            )
+                ansible_job.nodeset, request, ansible_job.build_request,
+                duration, ansible_job.zuul_event_id)
             return True
         return False
 
     def startBuild(self, build_request, data):
-        # TODO (felix): Once the builds are stored in ZooKeeper, we can store
-        # the start_time directly on the build. But for now we have to use the
-        # data dict for that.
         data["start_time"] = time.time()
 
         event = BuildStartedEvent(build_request.uuid, data)
@@ -3828,15 +3833,13 @@ class ExecutorServer(BaseMergeServer):
             return
 
     def completeBuild(self, build_request, result):
-        # TODO (felix): Once the builds are stored in ZooKeeper, we can store
-        # the end_time directly on the build. But for now we have to use the
-        # result dict for that.
         result["end_time"] = time.time()
 
         # NOTE (felix): We store the end_time on the ansible job to calculate
         # the in-use duration of locked nodes when the nodeset is returned.
         ansible_job = self.job_workers[build_request.uuid]
         ansible_job.end_time = time.monotonic()
+        duration = ansible_job.end_time - ansible_job.time_starting_build
 
         params = ansible_job.arguments
         # If the result is None, check if the build has reached its max
@@ -3857,11 +3860,12 @@ class ExecutorServer(BaseMergeServer):
         # Provide the hold information back to the scheduler via the build
         # result.
         try:
-            held = self._processAutohold(ansible_job, result.get("result"))
+            held = self._processAutohold(
+                ansible_job, duration, result.get("result"))
             result["held"] = held
             log.info("Held status set to %s", held)
         except Exception:
-            log.exception("Unable to process autohold for %s", ansible_job)
+            log.exception("Unable to process autohold for %s", build_request)
 
         build_request.state = BuildRequest.COMPLETED
         try:

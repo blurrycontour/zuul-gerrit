@@ -91,12 +91,15 @@ class TestNodepool(TestNodepoolBase):
             self.assertEqual(node.state, 'ready')
 
         # Mark the nodes in use
-        self.nodepool.useNodeSet(executor_nodeset)
+        self.nodepool.useNodeSet(
+            executor_nodeset, tenant_name=None, project_name=None)
         for node in executor_nodeset.getNodes():
             self.assertEqual(node.state, 'in-use')
 
         # Return the nodes
-        self.nodepool.returnNodeSet(executor_nodeset)
+        self.nodepool.returnNodeSet(
+            executor_nodeset, build=None, tenant_name=None, project_name=None,
+            duration=0)
         for node in executor_nodeset.getNodes():
             self.assertIsNone(node.lock)
             self.assertEqual(node.state, 'used')
