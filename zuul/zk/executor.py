@@ -131,7 +131,9 @@ class ExecutorApi:
 
     def get(self, path):
         if path.startswith(self.zones_root):
-            zone = path[len(self.zones_root):]
+            # Remove zone root so we end up with: <zone>/requests/<uuid>
+            rel_path = path[len(f"{self.zones_root}/"):]
+            zone = rel_path.split("/")[0]
         else:
             zone = None
         return self.zone_queues[zone].get(path)
