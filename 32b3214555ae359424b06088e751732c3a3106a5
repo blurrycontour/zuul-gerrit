@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "81c6f9d9_b8446177",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T23:26:53Z",
+      "side": 1,
+      "message": "This is why we still have it.",
+      "revId": "32b3214555ae359424b06088e751732c3a3106a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d20abd4_bc0bfc8f",
         "filename": "zuul/nodepool.py",
         "patchSetId": 10
