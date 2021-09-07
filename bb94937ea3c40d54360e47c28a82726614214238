@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08792f63_c9da8dc2",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-07T23:02:18Z",
+      "side": 1,
+      "message": "In my head I keep thinking of the system_id as a scheduler id but really it is intended to identify an entire zuul system. This would potentially be problematic if it was scheduler specific as we could starve requests but is fine as an entire system identifier.",
+      "revId": "bb94937ea3c40d54360e47c28a82726614214238",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9f90677_60a451d2",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-07T23:02:18Z",
+      "side": 1,
+      "message": "Do we always need to set this otherwise after the first time through a won election we\u0027ll wait() indefinitely and not process further requests?",
+      "revId": "bb94937ea3c40d54360e47c28a82726614214238",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
