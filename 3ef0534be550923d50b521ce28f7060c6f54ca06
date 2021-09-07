@@ -16,6 +16,24 @@
       "revId": "3ef0534be550923d50b521ce28f7060c6f54ca06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aec7d233_796b8a2c",
+        "filename": "doc/source/reference/config.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-07T14:20:12Z",
+      "side": 1,
+      "message": "Though the rest of the documentation seems to use `Zuul` instead of `We`.",
+      "parentUuid": "c884aa9b_490a9c3b",
+      "revId": "3ef0534be550923d50b521ce28f7060c6f54ca06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
