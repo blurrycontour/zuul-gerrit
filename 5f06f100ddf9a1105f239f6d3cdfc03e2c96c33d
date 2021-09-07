@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bace6118_c241d60b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T16:29:58Z",
+      "side": 1,
+      "message": "The same is true for the current implementation as well, but these managers know that their queues are always dynamic.  Why will this change with ZK?",
+      "revId": "5f06f100ddf9a1105f239f6d3cdfc03e2c96c33d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1514adde_d3f5fc94",
+        "filename": "zuul/manager/independent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T16:29:58Z",
+      "side": 1,
+      "message": "This pipeline always removes empty queues because the queue is always dynamic (compare this to the dependenent manager which actually checks the value of dynamic).",
+      "revId": "5f06f100ddf9a1105f239f6d3cdfc03e2c96c33d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
