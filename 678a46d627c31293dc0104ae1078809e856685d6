@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9668247a_7b6ce061",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1305,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-07T23:46:33Z",
+      "side": 1,
+      "message": "If we\u0027ve got a node request registered in a build set under which conditions would it not exist in the request cache? Would that be a race between recording the ID and waiting for the cache to update?\n\nThe model.py updates hint that this might happen if request_id is None as well? However, that is response to a .get(foo) on the dict and not an iteration of the internal values.",
+      "revId": "678a46d627c31293dc0104ae1078809e856685d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
