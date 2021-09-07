@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d6e11bde_cbc78924",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-07T22:52:34Z",
+      "side": 1,
+      "message": "We are using the comparison between old state in the local cache and current state in zookeeper to determine if the callback should be called as we don\u0027t want to call the callback multiple times. Does this work if for some reason our cache is stale or multiple schedulers are getting these events?\n\nWould it make sense to make the callback idempotent if it isn\u0027t already?",
+      "revId": "4e2985638c0120d2606aebd72580373f64cf6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
