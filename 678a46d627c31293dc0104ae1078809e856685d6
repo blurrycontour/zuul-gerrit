@@ -16,6 +16,23 @@
       "revId": "678a46d627c31293dc0104ae1078809e856685d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b94569a_0dc40336",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1305,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T23:50:40Z",
+      "side": 1,
+      "message": "Yes, I think that\u0027s the case where it could happen (since we don\u0027t force a cache update, we wait for ZK to notify us of the new request; that may seem silly now, but may be more reasonable when we have multiple schedulers).",
+      "revId": "678a46d627c31293dc0104ae1078809e856685d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
