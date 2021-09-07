@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "f3364051_dc3f3d05",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T23:24:58Z",
+      "side": 1,
+      "message": "Yep that\u0027s what it is.",
+      "revId": "bb94937ea3c40d54360e47c28a82726614214238",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b9f90677_60a451d2",
         "filename": "zuul/nodepool.py",
         "patchSetId": 12
@@ -33,6 +50,23 @@
       "revId": "bb94937ea3c40d54360e47c28a82726614214238",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e22e8b3e_599f146e",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T23:24:58Z",
+      "side": 1,
+      "message": "That\u0027s actually the intended behavior.  This is really a thread-shifting situation, because we get this callback from kazoo, but we only want one scheduler to emit these events.  We don\u0027t want to run an election for every event (that\u0027s a lot of zk traffic) so we can\u0027t run the election in this method; instead we want one scheduler to semi-persistently be in charge of emitting the events.  So we just check that we\u0027ve won the election here.\n\nBut we want something to continuously try to win the election, so we have a thread dedicated to doing that.  Once it\u0027s won the election though, there\u0027s nothing for it to do, so it just waits for this code to tell it there was an error and it should try again (or for shutdown).\n\nThere is another alternative -- we could make an internal queue of events and push them onto the queue here and pop them from the queue in the electionWon method.  But if we did that we would have one extra queue (I heard you liked queues so here\u0027s a queue for your queue); this seemed simpler to me at the time.",
+      "revId": "bb94937ea3c40d54360e47c28a82726614214238",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
