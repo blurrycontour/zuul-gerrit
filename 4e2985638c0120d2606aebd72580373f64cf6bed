@@ -16,6 +16,23 @@
       "revId": "4e2985638c0120d2606aebd72580373f64cf6bed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b350dd1c_f4a15f0a",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T23:09:31Z",
+      "side": 1,
+      "message": "The callback called here emits a NodeRequestComplete event into the ZK queue.\n\nIn a subsequent change, we use an election to avoid having multiple schedulers emit that event (because it\u0027s silly and wasteful for all of them to emit the same event).  However, there\u0027s a race condition if the election winner changes, so we can emit duplicate events in some cases, and the schedulers accept that.  Ultimately the event handler in the main loop is idemptotent for this.\n\nBut this particular condition is about preventing this single scheduler from emitting that event more often than necessary.  This method is called every time the node object in ZK changes (which could be something innocuous like the request priority changed).  So we only call the callback that emits the event if the state changed (for the same reason, it\u0027s silly to emit a node request completed event every time the request itself changes).\n\nThis will always get called when our internal tree cache changes.  Even if our cache is stale because of a disconnection, the tree cache will refresh everything on reconnection.  Whether the refresh at that point or some point in the future has the request set to completed, we should see it.  The one case we can\u0027t handle this way is:\n\n1) Sched A has a watch, ZK sends the notification.\n2) Before it arrives/is processed, sched A crashes.\n3) Sched B comes online.\n\nIn that case, no one has received the notification of the update.  That\u0027s why we emit events when a scheduler starts up.\n\n4) Sched B iterates over all completed node requests and emits (possibly duplicate) node completed events.\n\nI think that\u0027s all in the next change (and that should be okay because none of it is necessary until there are 2 schedulers; this code is fine with only one).",
+      "revId": "4e2985638c0120d2606aebd72580373f64cf6bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
