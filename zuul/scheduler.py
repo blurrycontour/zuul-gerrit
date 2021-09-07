@@ -533,7 +533,7 @@ class Scheduler(threading.Thread):
                     except Exception:
                         self.log.exception("Error in node request cleanup:")
                 finally:
-                    self.semaphore_cleanup_lock.release()
+                    self.node_request_cleanup_lock.release()
 
     def _cleanupNodeRequests(self):
         # Get all the requests in ZK that belong to us
