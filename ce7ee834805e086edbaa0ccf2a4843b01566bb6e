@@ -68,6 +68,23 @@
       "revId": "ce7ee834805e086edbaa0ccf2a4843b01566bb6e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d81dced3_f5cbb5ac",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T16:35:44Z",
+      "side": 1,
+      "message": "To clarify, it\u0027s not needed here because the existing lock implementation already sets its own session watcher to set the event where necessary.",
+      "revId": "ce7ee834805e086edbaa0ccf2a4843b01566bb6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
