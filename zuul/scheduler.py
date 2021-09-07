@@ -561,9 +561,12 @@ class Scheduler(threading.Thread):
 
     def _runGeneralCleanup(self):
         if self.general_cleanup_lock.acquire(blocking=False):
-            self._runConfigCacheCleanup()
-            self._runExecutorApiCleanup()
-            self._runMergerApiCleanup()
+            try:
+                self._runConfigCacheCleanup()
+                self._runExecutorApiCleanup()
+                self._runMergerApiCleanup()
+            finally:
+                self.general_cleanup_lock.release()
         # This has its own locking
         self._runNodeRequestCleanup()
 
