@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d20abd4_bc0bfc8f",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-07T23:04:11Z",
+      "side": 1,
+      "message": "If we don\u0027t need the condition do we need to set the value? We remove one location we checked it below on line 503.",
+      "revId": "32b3214555ae359424b06088e751732c3a3106a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
