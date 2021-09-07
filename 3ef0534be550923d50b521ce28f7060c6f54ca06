@@ -34,6 +34,24 @@
       "revId": "3ef0534be550923d50b521ce28f7060c6f54ca06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44821a0c_1e3ff9b3",
+        "filename": "doc/source/reference/config.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2021-09-07T20:03:17Z",
+      "side": 1,
+      "message": "Removed sentence about bindings and security.\n\nI\u0027d like to stress that it\u0027s \u0027restricted syntax\u0027, not just \u0027slightly different\u0027: it took quite a while to analyze scheduler/executor log errors -\u003e zuul .py module -\u003e import fb-re -\u003e etc to get down why look ahead regexp is not working.",
+      "parentUuid": "aec7d233_796b8a2c",
+      "revId": "3ef0534be550923d50b521ce28f7060c6f54ca06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
