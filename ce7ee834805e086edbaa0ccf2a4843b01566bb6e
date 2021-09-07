@@ -51,6 +51,23 @@
       "revId": "ce7ee834805e086edbaa0ccf2a4843b01566bb6e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f41b0eb1_e92ffe00",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-07T16:34:54Z",
+      "side": 1,
+      "message": "Yes, and it\u0027s not needed here, i\u0027ll remove it.",
+      "revId": "ce7ee834805e086edbaa0ccf2a4843b01566bb6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
