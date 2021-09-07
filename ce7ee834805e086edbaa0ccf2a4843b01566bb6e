@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "00f6392e_735040ad",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-07T15:44:40Z",
+      "side": 1,
+      "message": "I think I got the logic wrong there. Should be fine like this.",
+      "parentUuid": "157a4426_67fd14e4",
+      "revId": "ce7ee834805e086edbaa0ccf2a4843b01566bb6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "68cb1636_1a3ca867",
         "filename": "zuul/zk/locks.py",
         "patchSetId": 7
