@@ -568,7 +568,8 @@ Here is an example of two job definitions:
       following are considered: First the ref specified by
       :attr:`job.required-projects.override-checkout`, or
       :attr:`job.override-checkout`.  Then if the role repo is the
-      playbook repo, that branch is used; otherwise the project's
+      playbook repo or has a branch name that matches the branch of
+      the playbook repo, that branch is used; otherwise the project's
       default branch is selected.
 
       .. warning::
