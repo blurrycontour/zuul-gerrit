@@ -154,9 +154,11 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def _get(self, key, data_uuid, zstat):
         change = self._change_cache.get(key)
-        if change and change.cache_stat.uuid == data_uuid:
+        # FIXME (swestphahl): DNM, this is just for testing correct
+        # (de-)serialization of all change attributes.
+        # if change and change.cache_stat.uuid == data_uuid:
             # Change in our local cache is up-to-date
-            return change
+            # return change
 
         try:
             data = self._getData(data_uuid)
