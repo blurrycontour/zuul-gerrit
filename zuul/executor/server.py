@@ -3513,6 +3513,10 @@ class ExecutorServer(BaseMergeServer):
         # not we could avoid this ZK update. The cancel request can anyway
         # only be fulfilled by the executor that executes the job. So, if
         # that executor died, no other can pick up the request.
+        log = get_annotated_logger(
+            self.log, build_request.event_id, build=build_request.uuid)
+        log.debug(
+            "Received %s event for build %s", build_event.name, build_request)
         if build_event == JobRequestEvent.CANCELED:
             self.executor_api.fulfillCancel(build_request)
             self.stopJob(build_request)
@@ -3624,14 +3628,16 @@ class ExecutorServer(BaseMergeServer):
         self.stopJobByUnique(unique, reason=AnsibleJob.RESULT_DISK_FULL)
 
     def resumeJob(self, build_request):
-        log = get_annotated_logger(self.log, build_request.event_id)
+        log = get_annotated_logger(
+            self.log, build_request.event_id, build=build_request.uuid)
         log.debug("Resume job")
         self.resumeJobByUnique(
             build_request.uuid, build_request.event_id
         )
 
     def stopJob(self, build_request):
-        log = get_annotated_logger(self.log, build_request.event_id)
+        log = get_annotated_logger(
+            self.log, build_request.event_id, build=build_request.uuid)
         log.debug("Stop job")
         self.stopJobByUnique(build_request.uuid, build_request.event_id)
 

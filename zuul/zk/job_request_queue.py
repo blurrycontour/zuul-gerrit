@@ -293,7 +293,8 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         return request
 
     def remove(self, request):
-        self.log.debug("Removing request %s", request)
+        log = get_annotated_logger(self.log, request.event_id)
+        log.debug("Removing request %s", request)
         try:
             self.kazoo_client.delete(request.path, recursive=True)
         except NoNodeError:
