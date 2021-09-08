@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "aeea0c87_421ce207",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3593,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-08T16:56:21Z",
+      "side": 1,
+      "message": "Re comment from Felix; it\u0027s called here.",
+      "revId": "6fcde31c9e22230e8a04d12861b0137420d13796",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0872ffd9_430d85b2",
         "filename": "zuul/executor/server.py",
         "patchSetId": 8
@@ -16,6 +33,23 @@
       "revId": "6fcde31c9e22230e8a04d12861b0137420d13796",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "546efc27_2e6fbffa",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3865,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-08T16:56:21Z",
+      "side": 1,
+      "message": "I\u0027m not sure if that was a later change or not, but I\u0027ve annotated where it\u0027s called without having created the build worker.  The main issue is that in order to complete the process, we have to submit a result event, so it\u0027s a lot of work and best to have one function.",
+      "revId": "6fcde31c9e22230e8a04d12861b0137420d13796",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
