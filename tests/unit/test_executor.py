@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2014 Wikimedia Foundation Inc.
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -18,6 +19,7 @@ import logging
 import configparser
 import multiprocessing
 import os
+import re
 import time
 from unittest import mock
 
@@ -1060,3 +1062,18 @@ class TestVarSquash(BaseTestCase):
                 'extra': 'extravar_extra'},
         }
         self.assertEqual(out, expected)
+
+
+class TestExecutorFailure(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    @mock.patch('zuul.executor.server.ExecutorServer.executeJob')
+    def test_executor_job_start_failure(self, execute_job_mock):
+        execute_job_mock.side_effect = Exception('Failed to start')
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertTrue(re.search(
+            '- project-merge .* ERROR',
+            A.messages[-1]))

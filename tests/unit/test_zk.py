@@ -1042,8 +1042,8 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         b.state = MergeRequest.RUNNING
         merger_api.update(b)
 
-        c.state = MergeRequest.RUNNING
         merger_api.lock(c)
+        c.state = MergeRequest.RUNNING
         merger_api.update(c)
 
         d.state = MergeRequest.COMPLETED
