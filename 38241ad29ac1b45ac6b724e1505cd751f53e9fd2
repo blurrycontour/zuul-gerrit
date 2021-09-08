@@ -16,6 +16,24 @@
       "revId": "38241ad29ac1b45ac6b724e1505cd751f53e9fd2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b72468d_4c7762a1",
+        "filename": "web/src/containers/build/BuildTable.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-08T16:07:54Z",
+      "side": 1,
+      "message": "no, with the change in the web api, builds is {builds: [...], total: XXX, offset: YYY} - similar thing for buildsets",
+      "parentUuid": "4eafd95f_5e0c04bf",
+      "revId": "38241ad29ac1b45ac6b724e1505cd751f53e9fd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
