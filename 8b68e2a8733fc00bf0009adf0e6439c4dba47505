@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "57bb3199_1b93aed7",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4356,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-08T13:04:13Z",
+      "side": 1,
+      "message": "w/o the proposed change this would be \"master-role\"",
+      "revId": "8b68e2a8733fc00bf0009adf0e6439c4dba47505",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
