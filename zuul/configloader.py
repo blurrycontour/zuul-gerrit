@@ -1821,7 +1821,7 @@ class TenantParser(object):
         try:
             self._processCatJobs(abide, tenant, loading_errors, jobs)
         except Exception:
-            self.log.debug("Error processing cat jobs, canceling")
+            self.log.exception("Error processing cat jobs, canceling")
             for job in jobs:
                 try:
                     self.log.debug("Canceling cat job %s", job)
