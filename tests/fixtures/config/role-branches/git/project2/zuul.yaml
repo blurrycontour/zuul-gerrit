@@ -21,3 +21,8 @@
         - child-job
         - child-job-override
         - child-job-project-override
+    tag:
+      jobs:
+        - child-job
+        - child-job-override
+        - child-job-project-override

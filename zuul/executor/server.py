@@ -2276,7 +2276,7 @@ class AnsibleJob(object):
             branch, selected_desc = self.resolveBranch(
                 project.canonical_name,
                 None,
-                args['branch'],
+                args['branch'] or jobdir_playbook.branch,
                 self.job.override_branch,
                 self.job.override_checkout,
                 args_project.get('override_branch'),
