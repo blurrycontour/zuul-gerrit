@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e5ec3964_b2ba4ffa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-08T05:16:25Z",
+      "side": 1,
+      "message": "Having dynamic queues marked as dynamic could simplify cleanup logic of empty queues. This way we don\u0027t have to add some additional pipeline specific logic into the ZK implementation but can just look at the flag.\n\nSince this is currently only a hypothetical advantage I\u0027m fine with keeping this change open until we know if it\u0027s useful or not. It just looked like an oversight to me not having the \u0027dynamic\u0027 flag set to True.",
+      "parentUuid": "bace6118_c241d60b",
+      "revId": "5f06f100ddf9a1105f239f6d3cdfc03e2c96c33d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1514adde_d3f5fc94",
         "filename": "zuul/manager/independent.py",
         "patchSetId": 1
