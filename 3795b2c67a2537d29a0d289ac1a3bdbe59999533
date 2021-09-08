@@ -16,6 +16,24 @@
       "revId": "3795b2c67a2537d29a0d289ac1a3bdbe59999533",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95e66da4_c3b4a284",
+        "filename": "web/src/containers/filters/Select.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-08T10:05:24Z",
+      "side": 1,
+      "message": "This makes more sense in the followup change (793159), where I add the Job selector. If this was set to false, you could only search for jobs that are known to zuul\u0027s config. With zuul however you can add new jobs in a project\u0027s zuul.yaml file and run them before the actual change adding them is merged. By allowing user input you can then search for builds of jobs that haven\u0027t been \"officially\" added yet.\n\nI could make this optional if you think it\u0027d better that way.",
+      "parentUuid": "bf600ad3_ad195c25",
+      "revId": "3795b2c67a2537d29a0d289ac1a3bdbe59999533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
