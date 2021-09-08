@@ -4304,6 +4304,80 @@ class TestRoleBranches(RoleTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+    def test_playbook_role_branches_tag(self):
+        # This tests that the correct branch of a repo which contains
+        # a playbook or a role is checked out.  Most of the action
+        # happens on project1, which holds a parent job, so that we
+        # can test the behavior of a project which is not in the
+        # dependency chain.
+        # First we create stable and release branches on project1 and
+        # then the release branch on project2 that will be tagged.
+        self.create_branch('project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'project1', 'stable'))
+        self.create_branch('project1', 'release')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'project1', 'release'))
+        self.create_branch('project2', 'release')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'project2', 'release'))
+        self.waitUntilSettled()
+
+        # A pre-playbook with unique release branch content.
+        p = self._addPlaybook('project1', 'release',
+                              'parent-job-pre', 'parent-release-role')
+        # A role that only exists on the release branch.
+        self._addRole('project1', 'release', 'release-role', parent=p)
+
+        # The same for the master and stable branch.
+        p = self._addPlaybook('project1', 'master',
+                              'parent-job-pre', 'parent-master-role')
+        self._addRole('project1', 'master', 'master-role', parent=p)
+        p = self._addPlaybook('project1', 'stable',
+                              'parent-job-pre', 'parent-stable-role')
+        self._addRole('project1', 'stable', 'stable-role', parent=p)
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.executor_server.hold_jobs_in_build = True
+
+        # Create a tag on the release branch
+        event = self.fake_gerrit.addFakeTag('project2', 'release', 'foo')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 3)
+
+        # This job should use the release branch since that's the
+        # branch used for this playbook.
+        build = self.getBuildByName('child-job')
+        self._assertInRolePath(build, 'playbook_0', ['release-role'])
+        self._assertInFile(build.jobdir.pre_playbooks[1].path,
+                           'parent-release-role')
+
+        # The main playbook is on the master branch of project2, but
+        # there is a job-level branch override, so the project1 role
+        # should be from the stable branch.  The job-level override
+        # will cause Zuul to select the project1 pre-playbook from the
+        # stable branch as well, so we should see it using the stable
+        # role.
+        build = self.getBuildByName('child-job-override')
+        self._assertInRolePath(build, 'playbook_0', ['stable-role'])
+        self._assertInFile(build.jobdir.pre_playbooks[1].path,
+                           'parent-stable-role')
+
+        # The same, but using a required-projects override.
+        build = self.getBuildByName('child-job-project-override')
+        self._assertInRolePath(build, 'playbook_0', ['stable-role'])
+        self._assertInFile(build.jobdir.pre_playbooks[1].path,
+                           'parent-stable-role')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
 
 class TestRoles(RoleTestCase):
     tenant_config_file = 'config/roles/main.yaml'
