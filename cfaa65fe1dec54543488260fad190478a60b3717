@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4c056bc9_5a5aef00",
+        "filename": "web/src/containers/filters/Checkbox.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-09T17:13:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "922cb134_b610343f",
+      "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f2f5b732_cbfc912b",
         "filename": "web/src/containers/filters/TernarySelect.jsx",
         "patchSetId": 25
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "93e1cdbe_b855ebe3",
+        "filename": "web/src/containers/filters/TernarySelect.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-09T17:13:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2f5b732_cbfc912b",
+      "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "749b4f72_d8a87b58",
         "filename": "web/src/containers/filters/TernarySelect.jsx",
         "patchSetId": 25
@@ -50,6 +86,24 @@
       "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b789f342_d7bdecf7",
+        "filename": "web/src/containers/filters/TernarySelect.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-09T17:13:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "749b4f72_d8a87b58",
+      "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
