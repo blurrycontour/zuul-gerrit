@@ -550,7 +550,8 @@ class TestResultEventQueue(EventQueueBaseTestCase):
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
 
-        event = model.BuildStartedEvent("build", {})
+        event = model.BuildStartedEvent(
+            "build", "buildset", "job", "build_request_path", {})
         queue.put(event)
 
         self.assertEqual(len(queue), 1)
@@ -631,7 +632,8 @@ class TestEventWatchers(EventQueueBaseTestCase):
         self._wait_for_event(event)
         event.clear()
 
-        result_event = model.BuildStartedEvent("build", {})
+        result_event = model.BuildStartedEvent(
+            "build", "buildset", "job", "build_request_path", {})
         result_queues["other-tenant"]["post"].put(result_event)
         self._wait_for_event(event)
 

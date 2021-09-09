@@ -3834,12 +3834,18 @@ class ExecutorServer(BaseMergeServer):
     def startBuild(self, build_request, data):
         data["start_time"] = time.time()
 
-        event = BuildStartedEvent(build_request.uuid, data)
+        event = BuildStartedEvent(
+            build_request.uuid, build_request.build_set_uuid,
+            build_request.job_name, build_request.path, data,
+            build_request.event_id)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
 
     def updateBuildStatus(self, build_request, data):
-        event = BuildStatusEvent(build_request.uuid, data)
+        event = BuildStatusEvent(
+            build_request.uuid, build_request.build_set_uuid,
+            build_request.job_name, build_request.path, data,
+            build_request.event_id)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
 
@@ -3851,7 +3857,10 @@ class ExecutorServer(BaseMergeServer):
             self.log.warning("Could not pause build: %s", str(e))
             return
 
-        event = BuildPausedEvent(build_request.uuid, data)
+        event = BuildPausedEvent(
+            build_request.uuid, build_request.build_set_uuid,
+            build_request.job_name, build_request.path, data,
+            build_request.event_id)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
 
@@ -3958,6 +3967,9 @@ class ExecutorServer(BaseMergeServer):
         # unable to use transactions because the result event is
         # sharded.  We should be able to redesign the result reporting
         # mechanism to eliminate the race and be more convergent.
-        event = BuildCompletedEvent(build_request.uuid, result)
+        event = BuildCompletedEvent(
+            build_request.uuid, build_request.build_set_uuid,
+            build_request.job_name, build_request.path, result,
+            build_request.event_id)
         self._retry(None, log, put_complete_event, log,
                     build_request, event)
