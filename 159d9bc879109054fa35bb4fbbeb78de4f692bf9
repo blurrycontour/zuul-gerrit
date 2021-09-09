@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c88a30e4_9ec1f137",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1642,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T17:12:36Z",
+      "side": 1,
+      "message": "It might be worth a note regarding the reason for the max_age/last_modified time: it\u0027s because it may take a while for an event processed by a connection (which will update/populate the cache) to eventually end up in a pipeline.  Realistically, that should only be a few minutes at most.\n\nWhich suggests an idea actually -- we could probably make this more accurate and reduce the necessary window by iterating over the pending events to collect cache keys as well.  That should narrow it down to only a few seconds.  That might be worth doing as a followup, but probably not necessary now?",
+      "revId": "159d9bc879109054fa35bb4fbbeb78de4f692bf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
