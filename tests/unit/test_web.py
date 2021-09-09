@@ -1386,7 +1386,7 @@ class TestBuildInfo(BaseTestWeb):
                                if x["job_name"] == "project-merge"][0]
         self.assertEqual('SUCCESS', project_merge_build['result'])
 
-    @simple_layout('layouts/sql-build-error.yaml')
+    @simple_layout('layouts/empty-check.yaml')
     def test_build_error(self):
         conf = textwrap.dedent(
             """

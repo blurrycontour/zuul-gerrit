@@ -67,9 +67,10 @@ class GerritChangeData(object):
     SSH = 1
     HTTP = 2
 
-    def __init__(self, fmt, data, related=None):
+    def __init__(self, fmt, data, related=None, files=None):
         self.format = fmt
         self.data = data
+        self.files = files
 
         if fmt == self.SSH:
             self.parseSSH(data)
@@ -1238,16 +1239,18 @@ class GerritConnection(BaseConnection):
                         'o=DETAILED_LABELS' % (number,))
         related = self.get('changes/%s/revisions/%s/related' % (
             number, data['current_revision']))
-        return data, related
+        files = self.get('changes/%s/revisions/%s/files?parent=1' % (
+            number, data['current_revision']))
+        return data, related, files
 
     def queryChange(self, number, event=None):
         for attempt in range(3):
             try:
                 if self.session:
-                    data, related = self.queryChangeHTTP(number, event=event)
+                    data, related, files = self.queryChangeHTTP(
+                        number, event=event)
                     return GerritChangeData(GerritChangeData.HTTP,
-                                            data,
-                                            related)
+                                            data, related, files)
                 else:
                     data = self.queryChangeSSH(number, event=event)
                     return GerritChangeData(GerritChangeData.SSH, data)
