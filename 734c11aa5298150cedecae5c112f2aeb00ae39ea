@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "97a3e65b_45d48274",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-09T19:36:47Z",
+      "side": 1,
+      "message": "Do we know here if the change is a merge commit? If yes we could set self.files to None such that the files get determined later via the mergers. That way there would be feature parity in that regard between ssh and http.",
+      "revId": "734c11aa5298150cedecae5c112f2aeb00ae39ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
