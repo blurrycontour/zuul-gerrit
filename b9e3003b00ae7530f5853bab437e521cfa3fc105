@@ -16,6 +16,24 @@
       "revId": "b9e3003b00ae7530f5853bab437e521cfa3fc105",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4e38bfc6_a739eb1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-09T14:19:01Z",
+      "side": 1,
+      "message": "no reason in particular, I\u0027ll set it to web UI if it is clearer. We should be mindful with \"web\" only as it may refer to the zuul-web service.",
+      "parentUuid": "fdd8c456_7b6d3247",
+      "revId": "b9e3003b00ae7530f5853bab437e521cfa3fc105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
