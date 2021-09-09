@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "922cb134_b610343f",
+        "filename": "web/src/containers/filters/Checkbox.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-09T13:55:30Z",
+      "side": 1,
+      "message": "nit: why not pulling this prop on L24 instead?",
+      "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2f5b732_cbfc912b",
+        "filename": "web/src/containers/filters/TernarySelect.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-09T13:55:30Z",
+      "side": 1,
+      "message": "nit: instead of doing assignment + break, it might be more idiomatic to create a function instead, e.g.\n\n  const getSelected (val) \u003d\u003e switch (val) {\n    case 1: case \u00271\u0027: return category.options[1]\n    case 0: case \u00270\u0027: return category.options[2]\n    default: return null\n  }\n  const _selected \u003d getSelected([...filters[category.key].pop())",
+      "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "749b4f72_d8a87b58",
+        "filename": "web/src/containers/filters/TernarySelect.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-09T13:55:30Z",
+      "side": 1,
+      "message": "ditto:\n\n  const _selection \u003d (selection \u003d\u003d\u003d selected) ? null : selection",
+      "revId": "cfaa65fe1dec54543488260fad190478a60b3717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
