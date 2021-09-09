@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8c7b2e1_d8c3bcc6",
+        "filename": "web/src/api.js",
+        "patchSetId": 9
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-09T14:03:18Z",
+      "side": 1,
+      "message": "nit: this seems to be the only non-whitespace change.",
+      "revId": "b9c88467da27f2d0015209e137ead1e49c1bf2f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8f88f56b_053614ab",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-09T14:03:18Z",
+      "side": 1,
+      "message": "nit: shouldn\u0027t this be moved in the promise then block?",
+      "revId": "b9c88467da27f2d0015209e137ead1e49c1bf2f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
