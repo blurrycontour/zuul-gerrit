@@ -78,6 +78,7 @@ class ExecutorClient(object):
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
         item.addBuild(build)
+        # TODO (felix): Remove
         self.builds[uuid] = build
 
         if job.name == 'noop':
@@ -135,6 +136,8 @@ class ExecutorClient(object):
 
         request = BuildRequest(
             uuid=uuid,
+            build_set_uuid=build.build_set.uuid,
+            job_name=job.name,
             tenant_name=build.build_set.item.pipeline.tenant.name,
             pipeline_name=build.build_set.item.pipeline.name,
             zone=executor_zone,

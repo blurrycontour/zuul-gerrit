@@ -2212,11 +2212,20 @@ class BuildRequest(JobRequest):
 
     ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)
 
-    def __init__(self, uuid, zone,
+    def __init__(self, uuid, zone, build_set_uuid, job_name,
                  tenant_name, pipeline_name, event_id,
                  precedence=None, state=None, result_path=None):
         super().__init__(uuid, precedence, state, result_path)
+        # TODO (felix): Add build_set_uuid and job_name to provide those
+        # information to the build result event, so the scheduler can look up
+        # the correct buildset from the pipeline and the correct build from the
+        # buildset via the job_name.
+        # We could also provide those parameters to the build result event
+        # based on the job parameters in the AnsibleJob but that feels a little
+        # hacky / out of place.
         self.zone = zone
+        self.build_set_uuid = build_set_uuid
+        self.job_name = job_name
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.event_id = event_id
@@ -2225,6 +2234,8 @@ class BuildRequest(JobRequest):
         d = super().toDict()
         d.update({
             "zone": self.zone,
+            "build_set_uuid": self.build_set_uuid,
+            "job_name": self.job_name,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "event_id": self.event_id,
@@ -2236,6 +2247,8 @@ class BuildRequest(JobRequest):
         return cls(
             data["uuid"],
             data["zone"],
+            data["build_set_uuid"],
+            data["job_name"],
             data["tenant_name"],
             data["pipeline_name"],
             data["event_id"],
@@ -4014,22 +4027,31 @@ class BuildResultEvent(ResultEvent):
 
     :arg str build_uuid: The UUID of the build for which this event is
                          emitted.
+    :arg str build_set_uuid: The UUID of the buildset of which the build
+                             is part of.
+    :arg str job_name: The name of the job the build is executed for.
     :arg dict data: The event data.
     """
 
-    def __init__(self, build_uuid, data):
+    def __init__(self, build_uuid, build_set_uuid, job_name, data):
         self.build_uuid = build_uuid
+        self.build_set_uuid = build_set_uuid
+        self.job_name = job_name
         self.data = data
 
     def toDict(self):
         return {
             "build_uuid": self.build_uuid,
+            "build_set_uuid": self.build_set_uuid,
+            "job_name": self.job_name,
             "data": self.data,
         }
 
     @classmethod
     def fromDict(cls, data):
-        return cls(data.get("build_uuid"), data.get("data"))
+        return cls(
+            data.get("build_uuid"), data.get("build_set_uuid"),
+            data.get("job_name"), data.get("data"))
 
 
 class BuildStartedEvent(BuildResultEvent):

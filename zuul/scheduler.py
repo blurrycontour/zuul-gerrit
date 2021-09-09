@@ -1883,13 +1883,13 @@ class Scheduler(threading.Thread):
 
     def _process_result_event(self, event, pipeline):
         if isinstance(event, BuildStartedEvent):
-            self._doBuildStartedEvent(event)
+            self._doBuildStartedEvent(event, pipeline)
         elif isinstance(event, BuildStatusEvent):
-            self._doBuildStatusEvent(event)
+            self._doBuildStatusEvent(event, pipeline)
         elif isinstance(event, BuildPausedEvent):
-            self._doBuildPausedEvent(event)
+            self._doBuildPausedEvent(event, pipeline)
         elif isinstance(event, BuildCompletedEvent):
-            self._doBuildCompletedEvent(event)
+            self._doBuildCompletedEvent(event, pipeline)
         elif isinstance(event, MergeCompletedEvent):
             self._doMergeCompletedEvent(event, pipeline)
         elif isinstance(event, FilesChangesCompletedEvent):
@@ -1899,8 +1899,41 @@ class Scheduler(threading.Thread):
         else:
             self.log.error("Unable to handle event %s", event)
 
-    def _doBuildStartedEvent(self, event):
-        build = self.executor.builds.get(event.build_uuid)
+    def _getBuildSetFromPipeline(self, event, pipeline):
+        if not pipeline:
+            self.log.warning(
+                "Build set %s is not associated with a pipeline",
+                event.build_set_uuid,
+            )
+            return
+
+        for item in pipeline.getAllItems():
+            # If the provided buildset UUID doesn't match any current one,
+            # we assume that it's not current anymore.
+            if item.current_build_set.uuid == event.build_set_uuid:
+                return item.current_build_set
+
+        self.log.warning("Build set %s is not current", event.build_set_uuid)
+
+    def _getBuildFromPipeline(self, event, pipeline):
+        build_set = self._getBuildSetFromPipeline(event, pipeline)
+        if not build_set:
+            return
+
+        build = build_set.getBuild(event.job_name)
+        # Verify that the build uuid matches the one of the result
+        if not build:
+            self.log.debug("FE: Build could not be found in buildset")
+            return
+
+        if not build.uuid == event.build_uuid:
+            self.log.debug("FE: Build ids don't match")
+            return
+
+        return build
+
+    def _doBuildStartedEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             return
 
@@ -1911,13 +1944,6 @@ class Scheduler(threading.Thread):
             build.worker.updateFromData(event.data)
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
-        if build.build_set is not build.build_set.item.current_build_set:
-            log.warning("Build %s is not in the current build set", build)
-            return
-        pipeline = build.build_set.item.pipeline
-        if not pipeline:
-            log.warning("Build %s is not associated with a pipeline", build)
-            return
         try:
             build.estimated_time = float(self.time_database.getEstimatedTime(
                 build))
@@ -1925,16 +1951,16 @@ class Scheduler(threading.Thread):
             log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(build)
 
-    def _doBuildStatusEvent(self, event):
-        build = self.executor.builds.get(event.build_uuid)
+    def _doBuildStatusEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             return
 
         # Allow URL to be updated
         build.url = event.data.get('url', build.url)
 
-    def _doBuildPausedEvent(self, event):
-        build = self.executor.builds.get(event.build_uuid)
+    def _doBuildPausedEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             return
 
@@ -1945,6 +1971,9 @@ class Scheduler(threading.Thread):
         build.secret_result_data = event.data.get("secret_data", {})
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
+        # TODO (felix): How to do the cancel if we can't get the build because
+        # _getBuildSetFromPipeline() can't get the buildset that holds the
+        # build?
         if build.build_set is not build.build_set.item.current_build_set:
             log.warning("Build %s is not in the current build set", build)
             try:
@@ -1955,6 +1984,7 @@ class Scheduler(threading.Thread):
             return
         pipeline = build.build_set.item.pipeline
         if not pipeline:
+            # TODO (felix): Same here.
             log.warning("Build %s is not associated with a pipeline", build)
             try:
                 self.executor.cancel(build)
@@ -1964,9 +1994,8 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(build)
 
-    def _doBuildCompletedEvent(self, event):
-        # Get the local build object from the executor client
-        build = self.executor.builds.get(event.build_uuid)
+    def _doBuildCompletedEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             self.log.error("Unable to find build %s", event.build_uuid)
             return
@@ -2040,6 +2069,9 @@ class Scheduler(threading.Thread):
         self.executor.removeBuild(build)
 
         try:
+            # TODO (felix): How to do the SQL report if the build could not be
+            # found, e.g. because the buildset is not current (see next if
+            # statement).
             self.sql.reportBuildEnd(build, final=(not build.retry))
         except Exception:
             log.exception("Error reporting build completion to DB:")
@@ -2059,22 +2091,6 @@ class Scheduler(threading.Thread):
                 log.exception("Exception recording build time:")
 
         pipeline.manager.onBuildCompleted(build)
-
-    def _getBuildSetFromPipeline(self, event, pipeline):
-        if not pipeline:
-            self.log.warning(
-                "Build set %s is not associated with a pipeline",
-                event.build_set_uuid,
-            )
-            return
-
-        for item in pipeline.getAllItems():
-            # If the provided buildset UUID doesn't match any current one,
-            # we assume that it's not current anymore.
-            if item.current_build_set.uuid == event.build_set_uuid:
-                return item.current_build_set
-
-        self.log.warning("Build set %s is not current", event.build_set_uuid)
 
     def _doMergeCompletedEvent(self, event, pipeline):
         build_set = self._getBuildSetFromPipeline(event, pipeline)
