@@ -50,6 +50,24 @@
       "revId": "6fcde31c9e22230e8a04d12861b0137420d13796",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb62fedf_f234bff0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3865,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-09T05:28:34Z",
+      "side": 1,
+      "message": "Thanks for the clarification. Then it\u0027s a good idea to do it like that.",
+      "parentUuid": "546efc27_2e6fbffa",
+      "revId": "6fcde31c9e22230e8a04d12861b0137420d13796",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
