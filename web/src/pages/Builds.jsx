@@ -173,17 +173,10 @@ class BuildsPage extends React.Component {
     // fetching shows infinitely or can we catch this and show an erro state in
     // the table instead?
     fetchBuilds(this.props.tenant.apiPrefix, queryString).then((response) => {
-      let _builds = Array.isArray(response.data) ?
-        {
-          builds: response.data,
-          offset: 0,
-          total: response.data.length
-        } :
-        response.data
       this.setState({
-        builds: _builds,
+        builds: response.data,
         fetching: false,
-        currentPage: Math.floor(_builds.offset / this.state.resultsPerPage) + 1,
+        currentPage: Math.floor(response.data.offset / this.state.resultsPerPage) + 1,
       })
     })
   }
