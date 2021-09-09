@@ -33,6 +33,24 @@
       "revId": "734c11aa5298150cedecae5c112f2aeb00ae39ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb6652b8_a0a3cd6e",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-09T19:51:57Z",
+      "side": 1,
+      "message": "Looks like [1] is doing this so that could be rebased on top of this change: https://review.opendev.org/c/zuul/zuul/+/762886",
+      "parentUuid": "6057d1a6_7eba62b1",
+      "revId": "734c11aa5298150cedecae5c112f2aeb00ae39ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
