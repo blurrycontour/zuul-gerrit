@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e3607f2d_0d08dc94",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 5175,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-09T18:52:20Z",
+      "side": 1,
+      "message": "Minor nit. It is a bit confusing that the zk_nodepool object has the cache_state and the fake_nodepool has the zk_state. From what I can see this is correct, but maybe we can make this more clear with improved naming?",
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "083c8845_2f54cd9f",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 3
@@ -33,6 +50,46 @@
       "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fbea1eda_6838a6f0",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-09T18:52:20Z",
+      "side": 1,
+      "message": "Reading the code below could we skip the construction of the new Node object by calling getNode() instead? Or do we want to force a cache bypass for this scenario?",
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c8ad7cff_10df6e53",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-09T18:52:20Z",
+      "side": 1,
+      "message": "Could also just use Node here now that the import has changed.",
+      "range": {
+        "startLine": 297,
+        "startChar": 23,
+        "endLine": 297,
+        "endChar": 34
+      },
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
