@@ -147,13 +147,13 @@ function BuildTable({
             .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
-            title: (
-              <BuildResult
-                result={build.result}
-                link={`${tenant.linkPrefix}/build/${build.uuid}`}
-                colored={build.voting}
-              />
-            ),
+          title: (
+            <BuildResult
+              result={build.result}
+              link={`${tenant.linkPrefix}/build/${build.uuid}`}
+              colored={build.voting}
+            />
+          ),
         },
       ],
     }
@@ -191,7 +191,7 @@ function BuildTable({
     // fetcihng row.
     columns[0].dataLabel = ''
   } else {
-    rows = builds.map((build) => createBuildRow(build))
+    rows = builds.builds.map((build) => createBuildRow(build))
     // This list of actions will be applied to each row in the table. For
     // row-specific actions we must evaluate the individual row data provided to
     // the onClick handler.
@@ -242,7 +242,7 @@ function BuildTable({
 }
 
 BuildTable.propTypes = {
-  builds: PropTypes.array.isRequired,
+  builds: PropTypes.object.isRequired,
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   tenant: PropTypes.object.isRequired,

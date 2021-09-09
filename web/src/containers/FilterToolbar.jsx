@@ -273,7 +273,7 @@ function getChipsFromFilters(filters, category) {
 
 function getFiltersFromUrl(location, filterCategories) {
   const urlParams = new URLSearchParams(location.search)
-  const filters = filterCategories.reduce((filterDict, item) => {
+  const _filters = filterCategories.reduce((filterDict, item) => {
     // Initialize each filter category with an empty list
     filterDict[item.key] = []
 
@@ -296,6 +296,11 @@ function getFiltersFromUrl(location, filterCategories) {
     })
     return filterDict
   }, {})
+  const pagination_options = {
+    skip: urlParams.getAll('skip') ? urlParams.getAll('skip') : [0,],
+    limit: urlParams.getAll('limit') ? urlParams.getAll('limit') : [50,],
+  }
+  const filters = { ..._filters, ...pagination_options }
   return filters
 }
 
