@@ -33,6 +33,24 @@
       "revId": "04678e25e666c5e97b76e68838a0ce1cf0761144",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19b7d165_3064d148",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-09T22:12:21Z",
+      "side": 0,
+      "message": "Ah right they are split at this point. Then ya this should be fine as is, but we want to handle the merge case in the ssh method as tobiash points out. Thanks!",
+      "parentUuid": "113ee3db_aa2f75ae",
+      "revId": "04678e25e666c5e97b76e68838a0ce1cf0761144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
