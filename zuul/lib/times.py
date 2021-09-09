@@ -47,7 +47,7 @@ class Times:
             result='SUCCESS',
             limit=10,
             sort_by_buildset=True)
-        times = [x.duration for x in previous_builds if x.duration]
+        times = [x.duration for x in previous_builds['builds'] if x.duration]
         if times:
             estimate = float(sum(times)) / len(times)
             self.cache.setdefault(key, estimate)

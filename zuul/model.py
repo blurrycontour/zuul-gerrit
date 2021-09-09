@@ -4329,7 +4329,7 @@ class QueueItem(zkobject.ZKObject):
         if requirements_tuple not in self._cached_sql_results:
             conn = self.pipeline.manager.sched.connections.getSqlConnection()
             if conn:
-                builds = conn.getBuilds(
+                _builds = conn.getBuilds(
                     tenant=self.pipeline.tenant.name,
                     project=self.change.project.name,
                     pipeline=self.pipeline.name,
@@ -4337,6 +4337,7 @@ class QueueItem(zkobject.ZKObject):
                     branch=self.change.branch,
                     patchset=self.change.patchset,
                     provides=requirements_tuple)
+                builds = _builds['builds']
             else:
                 builds = []
             # Just look at the most recent buildset.
