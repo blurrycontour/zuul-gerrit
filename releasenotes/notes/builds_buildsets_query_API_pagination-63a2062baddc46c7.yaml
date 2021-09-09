@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    REST API calls to the builds and buildsets endpoints now return pagination
+    information (total results and offset). This is an API-breaking change.
+    Implement results pagination in the web UI (buildsets and builds pages).

@@ -103,8 +103,9 @@ class TestMysqlDatabase(BaseTestCase):
             db.createBuildSet(**buildset_args)
 
         # Verify that worked using the driver-external interface
-        self.assertEqual(len(self.connection.getBuildsets()), 1)
-        self.assertEqual(self.connection.getBuildsets()[0].uuid, buildset_uuid)
+        results = self.connection.getBuildsets()
+        self.assertEqual(results['total'], 1)
+        self.assertEqual(results['buildsets'][0].uuid, buildset_uuid)
 
         # Update the buildset using the internal interface
         with self.connection.getSession() as db:

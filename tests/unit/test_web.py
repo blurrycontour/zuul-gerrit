@@ -1314,11 +1314,12 @@ class TestBuildInfo(BaseTestWeb):
         self.waitUntilSettled()
 
         builds = self.get_url("api/tenant/tenant-one/builds").json()
-        self.assertEqual(len(builds), 6)
+        self.assertEqual(builds['total'], 6)
+        self.assertEqual(len(builds['builds']), 6)
 
-        uuid = builds[0]['uuid']
+        uuid = builds['builds'][0]['uuid']
         build = self.get_url("api/tenant/tenant-one/build/%s" % uuid).json()
-        self.assertEqual(build['job_name'], builds[0]['job_name'])
+        self.assertEqual(build['job_name'], builds['builds'][0]['job_name'])
 
         resp = self.get_url("api/tenant/tenant-one/build/1234")
         self.assertEqual(404, resp.status_code)
@@ -1326,8 +1327,9 @@ class TestBuildInfo(BaseTestWeb):
         builds_query = self.get_url("api/tenant/tenant-one/builds?"
                                     "project=org/project&"
                                     "project=org/project1").json()
-        self.assertEqual(len(builds_query), 6)
-        self.assertEqual(builds_query[0]['nodeset'], 'test-nodeset')
+        self.assertEqual(builds_query['total'], 6)
+        self.assertEqual(len(builds_query['builds']), 6)
+        self.assertEqual(builds_query['builds'][0]['nodeset'], 'test-nodeset')
 
         resp = self.get_url("api/tenant/non-tenant/builds")
         self.assertEqual(404, resp.status_code)
@@ -1373,8 +1375,10 @@ class TestBuildInfo(BaseTestWeb):
         self.waitUntilSettled()
 
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
-        self.assertEqual(2, len(buildsets))
-        project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+        self.assertEqual(2, buildsets['total'])
+        self.assertEqual(2, len(buildsets['buildsets']))
+        project_bs = [x for x in buildsets['buildsets']
+                      if x["project"] == "org/project"][0]
 
         buildset = self.get_url(
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
@@ -1413,8 +1417,9 @@ class TestBuildInfo(BaseTestWeb):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         builds = self.get_url("api/tenant/tenant-one/builds").json()
+        self.assertTrue(builds['total'] >= 1)
         self.assertIn('Unable to find playbook',
-                      builds[0]['error_detail'])
+                      builds['builds'][0]['error_detail'])
 
 
 class TestArtifacts(BaseTestWeb, AnsibleZuulTestCase):
@@ -1431,11 +1436,12 @@ class TestArtifacts(BaseTestWeb, AnsibleZuulTestCase):
         build_query = self.get_url("api/tenant/tenant-one/builds?"
                                    "project=org/project&"
                                    "job_name=project-test1").json()
-        self.assertEqual(len(build_query), 1)
-        self.assertEqual(len(build_query[0]['artifacts']), 3)
-        arts = build_query[0]['artifacts']
+        self.assertEqual(build_query['total'], 1)
+        self.assertEqual(len(build_query['builds']), 1)
+        self.assertEqual(len(build_query['builds'][0]['artifacts']), 3)
+        arts = build_query['builds'][0]['artifacts']
         arts.sort(key=lambda x: x['name'])
-        self.assertEqual(build_query[0]['artifacts'], [
+        self.assertEqual(build_query['builds'][0]['artifacts'], [
             {'url': 'http://example.com/docs',
              'name': 'docs'},
             {'url': 'http://logs.example.com/build/relative/docs',
@@ -1452,7 +1458,8 @@ class TestArtifacts(BaseTestWeb, AnsibleZuulTestCase):
         self.waitUntilSettled()
 
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
-        project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+        project_bs = [x for x in buildsets['buildsets']
+                      if x["project"] == "org/project"][0]
         buildset = self.get_url(
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
         self.assertEqual(3, len(buildset["builds"]))
@@ -2451,8 +2458,9 @@ class TestHeldAttributeInBuildInfo(BaseTestWeb):
                          held_builds_resp.text)
         all_builds = all_builds_resp.json()
         held_builds = held_builds_resp.json()
-        self.assertEqual(len(held_builds), 1, all_builds)
-        held_build = held_builds[0]
+        self.assertEqual(held_builds['total'], 1, all_builds)
+        self.assertEqual(len(held_builds['builds']), 1, all_builds)
+        held_build = held_builds['builds'][0]
         self.assertEqual('project-test2', held_build['job_name'], held_build)
         self.assertEqual(True, held_build['held'], held_build)
 
