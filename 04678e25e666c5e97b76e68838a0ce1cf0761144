@@ -16,6 +16,23 @@
       "revId": "04678e25e666c5e97b76e68838a0ce1cf0761144",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "113ee3db_aa2f75ae",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T21:12:33Z",
+      "side": 0,
+      "message": "This method is only called for http responses (this won\u0027t be called for an ssh response; only the method above).",
+      "revId": "04678e25e666c5e97b76e68838a0ce1cf0761144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
