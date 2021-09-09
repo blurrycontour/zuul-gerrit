@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e65641b2_04e13feb",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-09T21:06:56Z",
+      "side": 0,
+      "message": "Should you continue to do this if files is None to check the ssh case? I think we\u0027ll always return an empty list for the ssh case as is and that might put more load on gerrit than necessary?",
+      "revId": "04678e25e666c5e97b76e68838a0ce1cf0761144",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
