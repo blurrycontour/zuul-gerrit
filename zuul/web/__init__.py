@@ -1035,7 +1035,12 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return [self.buildToDict(b, b.buildset) for b in builds]
+        return {
+            'total': builds['total'],
+            'offset': builds['offset'],
+            'builds': [self.buildToDict(b, b.buildset)
+                       for b in builds['builds']]
+        }
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1044,9 +1049,11 @@ class ZuulWebAPI(object):
         connection = self._get_connection()
 
         data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
-        if not data:
+        if data['total'] == 0:
             raise cherrypy.HTTPError(404, "Build not found")
-        data = self.buildToDict(data[0], data[0].buildset)
+        build = data['builds'][0]
+        data = self.buildToDict(build,
+                                build.buildset)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return data
@@ -1080,10 +1087,10 @@ class ZuulWebAPI(object):
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline,
             branch=branch, complete=True, limit=1)
-        if not buildsets:
+        if buildsets['total'] == 0:
             raise cherrypy.HTTPError(404, 'No buildset found')
 
-        if buildsets[0].result == 'SUCCESS':
+        if buildsets['buildsets'][0].result == 'SUCCESS':
             file = 'passing.svg'
         else:
             file = 'failing.svg'
@@ -1114,7 +1121,12 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return [self.buildsetToDict(b) for b in buildsets]
+        return {
+            'total': buildsets['total'],
+            'offset': buildsets['offset'],
+            'buildsets': [self.buildsetToDict(b)
+                          for b in buildsets['buildsets']]
+        }
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
