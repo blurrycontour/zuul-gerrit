@@ -104,14 +104,12 @@ class SQLReporter(BaseReporter):
             )
         return db_build
 
-    def reportBuildEnd(self, build, final):
+    def reportBuildEnd(self, build, tenant, final):
         end_time = build.end_time or time.time()
         end = datetime.datetime.fromtimestamp(end_time,
                                               tz=datetime.timezone.utc)
         with self.connection.getSession() as db:
-            db_build = db.getBuild(
-                tenant=build.build_set.item.pipeline.tenant.name,
-                uuid=build.uuid)
+            db_build = db.getBuild(tenant=tenant, uuid=build.uuid)
             if not db_build:
                 return None
 
