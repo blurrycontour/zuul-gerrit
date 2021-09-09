@@ -60,6 +60,7 @@ from zuul.model import (
     EnqueueEvent,
     FilesChangesCompletedEvent,
     HoldRequest,
+    Job,
     MergeCompletedEvent,
     NodesProvisionedEvent,
     PromoteEvent,
@@ -1857,13 +1858,13 @@ class Scheduler(threading.Thread):
 
     def _process_result_event(self, event, pipeline):
         if isinstance(event, BuildStartedEvent):
-            self._doBuildStartedEvent(event)
+            self._doBuildStartedEvent(event, pipeline)
         elif isinstance(event, BuildStatusEvent):
-            self._doBuildStatusEvent(event)
+            self._doBuildStatusEvent(event, pipeline)
         elif isinstance(event, BuildPausedEvent):
-            self._doBuildPausedEvent(event)
+            self._doBuildPausedEvent(event, pipeline)
         elif isinstance(event, BuildCompletedEvent):
-            self._doBuildCompletedEvent(event)
+            self._doBuildCompletedEvent(event, pipeline)
         elif isinstance(event, MergeCompletedEvent):
             self._doMergeCompletedEvent(event, pipeline)
         elif isinstance(event, FilesChangesCompletedEvent):
@@ -1873,8 +1874,50 @@ class Scheduler(threading.Thread):
         else:
             self.log.error("Unable to handle event %s", event)
 
-    def _doBuildStartedEvent(self, event):
-        build = self.executor.builds.get(event.build_uuid)
+    def _getBuildSetFromPipeline(self, event, pipeline):
+        if not pipeline:
+            self.log.warning(
+                "Build set %s is not associated with a pipeline",
+                event.build_set_uuid,
+            )
+            return
+
+        for item in pipeline.getAllItems():
+            # If the provided buildset UUID doesn't match any current one,
+            # we assume that it's not current anymore.
+            if item.current_build_set.uuid == event.build_set_uuid:
+                return item.current_build_set
+
+        self.log.warning("Build set %s is not current", event.build_set_uuid)
+
+    def _getBuildFromPipeline(self, event, pipeline):
+        build_set = self._getBuildSetFromPipeline(event, pipeline)
+        if not build_set:
+            return
+
+        build = build_set.getBuild(event.job_name)
+        # Verify that the build uuid matches the one of the result
+        if not build:
+            self.log.debug(
+                "Build %s could not be found in the current buildset",
+                event.build_uuid)
+            return
+
+        # Verify that the build UUIDs match since we looked up the build by
+        # its job name. In case of a retried build, we might already have a new
+        # build in the buildset.
+        # TODO (felix): Not sure if that reasoning is correct, but I think it
+        # shouldn't harm to have such an additional safeguard.
+        if not build.uuid == event.build_uuid:
+            self.log.debug(
+                "Build UUID %s doesn't match the current build's UUID %s",
+                event.build_uuid, build.uuid)
+            return
+
+        return build
+
+    def _doBuildStartedEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             return
 
@@ -1885,13 +1928,6 @@ class Scheduler(threading.Thread):
             build.worker.updateFromData(event.data)
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
-        if build.build_set is not build.build_set.item.current_build_set:
-            log.warning("Build %s is not in the current build set", build)
-            return
-        pipeline = build.build_set.item.pipeline
-        if not pipeline:
-            log.warning("Build %s is not associated with a pipeline", build)
-            return
         try:
             build.estimated_time = float(self.time_database.getEstimatedTime(
                 build))
@@ -1899,16 +1935,16 @@ class Scheduler(threading.Thread):
             log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(build)
 
-    def _doBuildStatusEvent(self, event):
-        build = self.executor.builds.get(event.build_uuid)
+    def _doBuildStatusEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             return
 
         # Allow URL to be updated
         build.url = event.data.get('url', build.url)
 
-    def _doBuildPausedEvent(self, event):
-        build = self.executor.builds.get(event.build_uuid)
+    def _doBuildPausedEvent(self, event, pipeline):
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             return
 
@@ -1922,6 +1958,13 @@ class Scheduler(threading.Thread):
         if build.build_set is not build.build_set.item.current_build_set:
             log.warning("Build %s is not in the current build set", build)
             try:
+                # TODO (felix): In case the buildset is not current
+                # anymore, we can't look up the build object. Thus, to
+                # still be able to cancel the build in this case we
+                # could change the cancel procedure to use the build
+                # UUID rather than the whole build object.
+                # This might need some adaptions in the cancel methods
+                # also release the node request / nodes.
                 self.executor.cancel(build)
             except Exception:
                 log.exception(
@@ -1931,6 +1974,7 @@ class Scheduler(threading.Thread):
         if not pipeline:
             log.warning("Build %s is not associated with a pipeline", build)
             try:
+                # TODO (felix): Same as above.
                 self.executor.cancel(build)
             except Exception:
                 log.exception(
@@ -1938,19 +1982,53 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(build)
 
-    def _doBuildCompletedEvent(self, event):
-        # Get the local build object from the executor client
-        build = self.executor.builds.get(event.build_uuid)
+    def _doBuildCompletedEvent(self, event, pipeline):
+        log = get_annotated_logger(
+            self.log, event.zuul_event_id, build=event.build_uuid)
+        build = self._getBuildFromPipeline(event, pipeline)
         if not build:
             self.log.error("Unable to find build %s", event.build_uuid)
+            # Create a fake build with a minimal set of attributes that allows
+            # reporting the build via SQL and cleaning up build resources.
+            build = Build(
+                Job(event.job_name),
+                None,
+                event.build_uuid,
+                zuul_event_id=event.zuul_event_id,
+            )
+
+            # Set the build_request_ref on the fake build to make the cleanup
+            # work.
+            build.build_request_ref = event.build_request_ref
+
+            # TODO (felix): Do we have to fully evaluate the build result (see
+            # the if/else block with different results further down) or is it
+            # sufficient to just use the result as-is from the executor since
+            # the build is anyways outdated. In case the build result is None
+            # it won't be changed to RETRY.
+            build.result = event.data.get("result")
+
+            self._cleanupCompletedBuild(build)
+            try:
+                self.sql.reportBuildEnd(
+                    build, tenant=pipeline.tenant.name,
+                    final=(not build.retry))
+            except Exception:
+                log.exception("Error reporting build completion to DB:")
+
+            # Make sure we don't forward this outdated build result with an
+            # incomplete (fake) build object to the pipeline manager.
             return
 
-        log = get_annotated_logger(
-            self.log, event=build.zuul_event_id, build=build.uuid
-        )
         event_result = event.data
 
         result = event_result.get("result")
+        result_data = event_result.get("data", {})
+        secret_result_data = event_result.get("secret_data", {})
+        warnings = event_result.get("warnings", [])
+
+        log.info("Build complete, result %s, warnings %s", result, warnings)
+
         build.error_detail = event_result.get("error_detail")
 
         if result is None:
@@ -1974,12 +2052,6 @@ class Scheduler(threading.Thread):
             ):
                 build.retry = True
 
-        result_data = event_result.get("data", {})
-        secret_result_data = event_result.get("secret_data", {})
-        warnings = event_result.get("warnings", [])
-
-        log.info("Build complete, result %s, warnings %s", result, warnings)
-
         if build.retry:
             result = "RETRY"
 
@@ -1998,34 +2070,13 @@ class Scheduler(threading.Thread):
         build.result = result
         self._reportBuildStats(build)
 
-        # In case the build didn't show up on any executor, the node request
-        # does still exist, so we have to make sure it is removed from ZK.
-        request_id = build.build_set.getJobNodeRequestID(build.job.name)
-        if request_id:
-            self.nodepool.deleteNodeRequest(
-                request_id, event_id=build.zuul_event_id)
-
-        # The build is completed and the nodes were already returned by the
-        # executor. For consistency, also remove the node request from the
-        # build set.
-        build.build_set.removeJobNodeRequestID(build.job.name)
-
-        # The test suite expects the build to be removed from the
-        # internal dict after it's added to the report queue.
-        self.executor.removeBuild(build)
-
+        self._cleanupCompletedBuild(build)
         try:
-            self.sql.reportBuildEnd(build, final=(not build.retry))
+            self.sql.reportBuildEnd(
+                build, tenant=pipeline.tenant.name, final=(not build.retry))
         except Exception:
             log.exception("Error reporting build completion to DB:")
 
-        if build.build_set is not build.build_set.item.current_build_set:
-            log.debug("Build %s is not in the current build set", build)
-            return
-        pipeline = build.build_set.item.pipeline
-        if not pipeline:
-            log.warning("Build %s is not associated with a pipeline", build)
-            return
         if build.end_time and build.start_time and build.result:
             duration = build.end_time - build.start_time
             try:
@@ -2035,21 +2086,27 @@ class Scheduler(threading.Thread):
 
         pipeline.manager.onBuildCompleted(build)
 
-    def _getBuildSetFromPipeline(self, event, pipeline):
-        if not pipeline:
-            self.log.warning(
-                "Build set %s is not associated with a pipeline",
-                event.build_set_uuid,
-            )
-            return
+    def _cleanupCompletedBuild(self, build):
+        # TODO (felix): Returning the nodes doesn't work in case the buildset
+        # is not current anymore. Does it harm to not do anything in here in
+        # this case?
+        if build.build_set:
+            # In case the build didn't show up on any executor, the node
+            # request does still exist, so we have to make sure it is
+            # removed from ZK.
+            request_id = build.build_set.getJobNodeRequestID(build.job.name)
+            if request_id:
+                self.nodepool.deleteNodeRequest(
+                    request_id, event_id=build.zuul_event_id)
 
-        for item in pipeline.getAllItems():
-            # If the provided buildset UUID doesn't match any current one,
-            # we assume that it's not current anymore.
-            if item.current_build_set.uuid == event.build_set_uuid:
-                return item.current_build_set
+            # The build is completed and the nodes were already returned
+            # by the executor. For consistency, also remove the node
+            # request from the build set.
+            build.build_set.removeJobNodeRequestID(build.job.name)
 
-        self.log.warning("Build set %s is not current", event.build_set_uuid)
+        # The test suite expects the build to be removed from the
+        # internal dict after it's added to the report queue.
+        self.executor.removeBuild(build)
 
     def _doMergeCompletedEvent(self, event, pipeline):
         build_set = self._getBuildSetFromPipeline(event, pipeline)
@@ -2230,12 +2287,11 @@ class Scheduler(threading.Thread):
                     # CANCELED event in the result event queue since
                     # the result event queue won't be processed
                     # anymore once the pipeline is removed.
+                    self.executor.removeBuild(build)
                     try:
-                        del self.executor.builds[build.uuid]
-                    except KeyError:
-                        pass
-                    try:
-                        self.sql.reportBuildEnd(build, final=False)
+                        self.sql.reportBuildEnd(
+                            build, build.build_set.item.pipeline.tenant.name,
+                            final=False)
                     except Exception:
                         self.log.exception(
                             "Error reporting build completion to DB:")
