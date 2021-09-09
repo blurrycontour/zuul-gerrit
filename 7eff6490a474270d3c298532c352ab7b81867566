@@ -16,6 +16,24 @@
       "revId": "7eff6490a474270d3c298532c352ab7b81867566",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51644e59_e159a81c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 26
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-09T20:04:03Z",
+      "side": 1,
+      "message": "It\u0027d be good to have a single source of truth for default results so that the list in the web UI can be sync\u0027ed more easily. Should I resurrect https://review.opendev.org/c/zuul/zuul/+/738632 ?",
+      "parentUuid": "586e1acc_13c415ff",
+      "revId": "7eff6490a474270d3c298532c352ab7b81867566",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
