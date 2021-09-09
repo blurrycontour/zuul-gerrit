@@ -364,7 +364,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        request = BuildRequest(
+            "A", None, None, "job", "tenant", "pipeline", '1')
         client.submit(request, {'job': 'test'})
         request_queue.get(timeout=30)
 
@@ -459,7 +460,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        request = BuildRequest(
+            "A", None, None, "job", "tenant", "pipeline", '1')
         client.submit(request, {})
         request_queue.get(timeout=30)
 
@@ -512,7 +514,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        request = BuildRequest(
+            "A", None, None, "job", "tenant", "pipeline", '1')
         client.submit(request, {})
         request_queue.get(timeout=30)
 
@@ -549,7 +552,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         client = ExecutorApi(self.zk_client)
 
         # Scheduler submits request
-        request = BuildRequest("A", None, "tenant", "pipeline", '1')
+        request = BuildRequest(
+            "A", None, None, "job", "tenant", "pipeline", '1')
         client.submit(request, {})
         sched_a = client.get(request.path)
 
@@ -569,22 +573,27 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # requests
         executor_api = ExecutorApi(self.zk_client)
 
-        br = BuildRequest("A", "zone", "tenant", "pipeline", '1')
+        br = BuildRequest(
+            "A", "zone", None, "job", "tenant", "pipeline", '1')
         executor_api.submit(br, {})
 
-        br = BuildRequest("B", None, "tenant", "pipeline", '1')
+        br = BuildRequest(
+            "B", None, None, "job", "tenant", "pipeline", '1')
         executor_api.submit(br, {})
         path_b = br.path
 
-        br = BuildRequest("C", "zone", "tenant", "pipeline", '1')
+        br = BuildRequest(
+            "C", "zone", None, "job", "tenant", "pipeline", '1')
         executor_api.submit(br, {})
         path_c = br.path
 
-        br = BuildRequest("D", "zone", "tenant", "pipeline", '1')
+        br = BuildRequest(
+            "D", "zone", None, "job", "tenant", "pipeline", '1')
         executor_api.submit(br, {})
         path_d = br.path
 
-        br = BuildRequest("E", "zone", "tenant", "pipeline", '1')
+        br = BuildRequest(
+            "E", "zone", None, "job", "tenant", "pipeline", '1')
         executor_api.submit(br, {})
         path_e = br.path
 
@@ -633,7 +642,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Test cleaning up orphaned request parameters
         executor_api = ExecutorApi(self.zk_client)
 
-        br = BuildRequest("A", "zone", "tenant", "pipeline", '1')
+        br = BuildRequest(
+            "A", "zone", None, "job", "tenant", "pipeline", '1')
         executor_api.submit(br, {})
 
         params_root = executor_api.zone_queues['zone'].PARAM_ROOT
@@ -671,7 +681,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Simulate the client side
         client = ExecutorApi(self.zk_client)
         client.submit(
-            BuildRequest("A", None, "tenant", "pipeline", '1'), {})
+            BuildRequest(
+                "A", None, None, "job", "tenant", "pipeline", '1'), {})
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,

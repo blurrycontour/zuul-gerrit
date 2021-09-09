@@ -77,17 +77,22 @@ class ExecutorClient(object):
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
         item.addBuild(build)
+        # TODO (felix): Remove once we are not relying on this list anymore
         self.builds[uuid] = build
 
         if job.name == 'noop':
             data = {"start_time": time.time()}
-            started_event = BuildStartedEvent(build.uuid, data)
+            started_event = BuildStartedEvent(
+                build.uuid, build.build_set.uuid, job.name, None, data,
+                zuul_event_id=build.zuul_event_id)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 started_event
             )
 
             result = {"result": "SUCCESS", "end_time": time.time()}
-            completed_event = BuildCompletedEvent(build.uuid, result)
+            completed_event = BuildCompletedEvent(
+                build.uuid, build.build_set.uuid, job.name, None, result,
+                zuul_event_id=build.zuul_event_id)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 completed_event
             )
@@ -125,6 +130,8 @@ class ExecutorClient(object):
 
         request = BuildRequest(
             uuid=uuid,
+            build_set_uuid=build.build_set.uuid,
+            job_name=job.name,
             tenant_name=build.build_set.item.pipeline.tenant.name,
             pipeline_name=build.build_set.item.pipeline.name,
             zone=executor_zone,
@@ -170,7 +177,9 @@ class ExecutorClient(object):
                     result = {"result": "CANCELED", "end_time": time.time()}
                     tenant_name = build.build_set.item.pipeline.tenant.name
                     pipeline_name = build.build_set.item.pipeline.name
-                    event = BuildCompletedEvent(build_request.uuid, result)
+                    event = BuildCompletedEvent(
+                        build_request.uuid, build_request.build_set_uuid,
+                        build_request.job_name, build_request.path, result)
                     self.result_events[tenant_name][pipeline_name].put(event)
                 finally:
                     self.executor_api.unlock(build_request)
@@ -216,6 +225,10 @@ class ExecutorClient(object):
 
         build_request = self.executor_api.get(build.build_request_ref)
         if build_request:
+            # TODO (felix): We could directly remove the build request via
+            # its path in ZK to spare a read operation. Usually there should
+            # be no need to look up the build request object from ZooKeeper
+            # just to immediately remove it.
             self.executor_api.remove(build_request)
 
     def cleanupLostBuildRequests(self):
@@ -253,6 +266,8 @@ class ExecutorClient(object):
 
         # No need to unlock the build, as it is by definition unlocked
 
-        event = BuildCompletedEvent(build_request.uuid, result)
+        event = BuildCompletedEvent(
+            build_request.uuid, build_request.build_set_uuid,
+            build_request.job_name, build_request.path, result)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
