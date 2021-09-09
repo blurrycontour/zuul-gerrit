@@ -16,6 +16,23 @@
       "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5c423ca_dde77345",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 892,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T15:46:08Z",
+      "side": 1,
+      "message": "Correct.  The other system could be Nodepool itself.",
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
