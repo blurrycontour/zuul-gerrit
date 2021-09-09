@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "12b6bcad_f5ab4649",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 5175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T20:36:57Z",
+      "side": 1,
+      "message": "I agree on it being confusing; I did try to name it in a helpful way.  Here\u0027s my thinking:\n\n* cache_state: the values in the cache that we\u0027re examining; we\u0027re waiting until this thing is in sync with zk\n* zk_state: the values as they are in zk\n\nWhen cache_state \u003d\u003d zk_state then the cache is in sync.  I\u0027m open to alternatives :)",
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "083c8845_2f54cd9f",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 3
@@ -67,6 +84,23 @@
       "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38d08801_d98e03f8",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T20:36:57Z",
+      "side": 1,
+      "message": "I think since we\u0027re doing a synchronous write, this is a good time to do this.  We could use a cached value, but we\u0027d need to do a stat check to make sure we didn\u0027t have a concurrent mod.",
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
