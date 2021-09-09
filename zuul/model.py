@@ -4006,92 +4006,54 @@ class ResultEvent(AbstractEvent):
         pass
 
 
-class BuildStartedEvent(ResultEvent):
-    """A build has started.
+class BuildResultEvent(ResultEvent):
+    """Base class for all build result events.
 
-    :arg Build build: The build which has started.
+    This class provides the common data structure for all build result
+    events.
+
+    :arg str build_uuid: The UUID of the build for which this event is
+                         emitted.
+    :arg dict data: The event data.
     """
 
-    def __init__(self, build, data):
-        self.build = build
+    def __init__(self, build_uuid, data):
+        self.build_uuid = build_uuid
         self.data = data
 
     def toDict(self):
         return {
-            "build": self.build,
+            "build_uuid": self.build_uuid,
             "data": self.data,
         }
 
     @classmethod
     def fromDict(cls, data):
-        return cls(
-            data.get("build"),
-            data.get("data"),
-        )
+        return cls(data.get("build_uuid"), data.get("data"))
 
 
-class BuildStatusEvent(ResultEvent):
-    def __init__(self, build, data):
-        self.build = build
-        self.data = data
+class BuildStartedEvent(BuildResultEvent):
+    """A build has started."""
 
-    def toDict(self):
-        return {
-            "build": self.build,
-            "data": self.data,
-        }
-
-    @classmethod
-    def fromDict(cls, data):
-        return cls(data.get("build"), data.get("data"))
+    pass
 
 
-class BuildPausedEvent(ResultEvent):
-    """A build has been paused.
+class BuildStatusEvent(BuildResultEvent):
+    """Worker info and log URL for a build are available."""
 
-    :arg Build build: The build which has been paused.
-    """
-
-    def __init__(self, build, data):
-        self.build = build
-        self.data = data
-
-    def toDict(self):
-        return {
-            "build": self.build,
-            "data": self.data,
-        }
-
-    @classmethod
-    def fromDict(cls, data):
-        return cls(
-            data.get("build"),
-            data.get("data"),
-        )
+    pass
 
 
-class BuildCompletedEvent(ResultEvent):
-    """A build has completed
+class BuildPausedEvent(BuildResultEvent):
+    """A build has been paused."""
 
-    :arg Build build: The build which has completed.
-    """
+    pass
 
-    def __init__(self, build, result):
-        self.build = build
-        self.result = result
 
-    def toDict(self):
-        return {
-            "build": self.build,
-            "result": self.result,
-        }
+class BuildCompletedEvent(BuildResultEvent):
+    """A build has completed."""
 
-    @classmethod
-    def fromDict(cls, data):
-        return cls(
-            data.get("build"),
-            data.get("result"),
-        )
+    pass
 
 
 class MergeCompletedEvent(ResultEvent):

@@ -1900,7 +1900,7 @@ class Scheduler(threading.Thread):
             self.log.error("Unable to handle event %s", event)
 
     def _doBuildStartedEvent(self, event):
-        build = self.executor.builds.get(event.build)
+        build = self.executor.builds.get(event.build_uuid)
         if not build:
             return
 
@@ -1926,7 +1926,7 @@ class Scheduler(threading.Thread):
         pipeline.manager.onBuildStarted(build)
 
     def _doBuildStatusEvent(self, event):
-        build = self.executor.builds.get(event.build)
+        build = self.executor.builds.get(event.build_uuid)
         if not build:
             return
 
@@ -1934,7 +1934,7 @@ class Scheduler(threading.Thread):
         build.url = event.data.get('url', build.url)
 
     def _doBuildPausedEvent(self, event):
-        build = self.executor.builds.get(event.build)
+        build = self.executor.builds.get(event.build_uuid)
         if not build:
             return
 
@@ -1966,15 +1966,15 @@ class Scheduler(threading.Thread):
 
     def _doBuildCompletedEvent(self, event):
         # Get the local build object from the executor client
-        build = self.executor.builds.get(event.build)
+        build = self.executor.builds.get(event.build_uuid)
         if not build:
-            self.log.error("Unable to find build %s", event.build)
+            self.log.error("Unable to find build %s", event.build_uuid)
             return
 
         log = get_annotated_logger(
             self.log, event=build.zuul_event_id, build=build.uuid
         )
-        event_result = event.result
+        event_result = event.data
 
         result = event_result.get("result")
         build.error_detail = event_result.get("error_detail")
