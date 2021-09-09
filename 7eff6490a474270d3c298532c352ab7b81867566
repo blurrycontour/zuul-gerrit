@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "586e1acc_13c415ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 26
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T17:52:32Z",
+      "side": 1,
+      "message": "I like that users can enter a value for the result selection; that\u0027s important as long as we have https://zuul-ci.org/docs/zuul/reference/job_def.html#attr-job.success-message",
+      "revId": "7eff6490a474270d3c298532c352ab7b81867566",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
