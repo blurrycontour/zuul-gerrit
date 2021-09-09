@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "083c8845_2f54cd9f",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 892,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-09T06:00:37Z",
+      "side": 1,
+      "message": "Just for clarification: We need those additional safe guards (like the type check) as the node could haven been requested by a different system and thus the user_data field might be missing completely or might have a different format, right? Maybe we could add a short comment about that.",
+      "revId": "f8d762de08f6d7102d0233fa9573c46d20aaf5d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
