@@ -127,17 +127,10 @@ class BuildsetsPage extends React.Component {
     this.setState({ fetching: true })
     fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(
       (response) => {
-        let _buildsets = Array.isArray(response.data) ?
-          {
-            buildsets: response.data,
-            offset: 0,
-            total: response.data.length
-          } :
-          response.data
         this.setState({
-          buildsets: _buildsets,
+          buildsets: response.data,
           fetching: false,
-          currentPage: Math.floor(_buildsets.offset / this.state.resultsPerPage) + 1,
+          currentPage: Math.floor(response.data.offset / this.state.resultsPerPage) + 1,
         })
       }
     )
