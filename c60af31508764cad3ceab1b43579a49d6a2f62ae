@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a7ec4d2_27959d13",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1058,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T15:04:30Z",
+      "side": 1,
+      "message": "Should we think about refactoring this retry proceduce into the change cache itself?",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
