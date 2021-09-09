@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "a399a2f1_d6861772",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-09T16:11:59Z",
+      "side": 1,
+      "message": "Okay that makes sense.  I think this is fine to go ahead and do; I just wanted to ensure I wasn\u0027t missing something.",
+      "revId": "5f06f100ddf9a1105f239f6d3cdfc03e2c96c33d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1514adde_d3f5fc94",
         "filename": "zuul/manager/independent.py",
         "patchSetId": 1
