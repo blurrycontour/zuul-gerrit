@@ -2215,11 +2215,13 @@ class BuildRequest(JobRequest):
 
     ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)
 
-    def __init__(self, uuid, zone,
-                 tenant_name, pipeline_name, event_id,
-                 precedence=None, state=None, result_path=None):
+    def __init__(self, uuid, zone, build_set_uuid, job_name, tenant_name,
+                 pipeline_name, event_id, precedence=None, state=None,
+                 result_path=None):
         super().__init__(uuid, precedence, state, result_path)
         self.zone = zone
+        self.build_set_uuid = build_set_uuid
+        self.job_name = job_name
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.event_id = event_id
@@ -2228,6 +2230,8 @@ class BuildRequest(JobRequest):
         d = super().toDict()
         d.update({
             "zone": self.zone,
+            "build_set_uuid": self.build_set_uuid,
+            "job_name": self.job_name,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "event_id": self.event_id,
@@ -2239,6 +2243,8 @@ class BuildRequest(JobRequest):
         return cls(
             data["uuid"],
             data["zone"],
+            data["build_set_uuid"],
+            data["job_name"],
             data["tenant_name"],
             data["pipeline_name"],
             data["event_id"],
@@ -4141,22 +4147,39 @@ class BuildResultEvent(ResultEvent):
 
     :arg str build_uuid: The UUID of the build for which this event is
                          emitted.
+    :arg str build_set_uuid: The UUID of the buildset of which the build
+                             is part of.
+    :arg str job_name: The name of the job the build is executed for.
+    :arg str build_request_ref: The path to the build request that is
+                                stored in ZooKeeper.
     :arg dict data: The event data.
     """
 
-    def __init__(self, build_uuid, data):
+    def __init__(self, build_uuid, build_set_uuid, job_name, build_request_ref,
+                 data, zuul_event_id=None):
         self.build_uuid = build_uuid
+        self.build_set_uuid = build_set_uuid
+        self.job_name = job_name
+        self.build_request_ref = build_request_ref
         self.data = data
+        self.zuul_event_id = zuul_event_id
 
     def toDict(self):
         return {
             "build_uuid": self.build_uuid,
+            "build_set_uuid": self.build_set_uuid,
+            "job_name": self.job_name,
+            "build_request_ref": self.build_request_ref,
             "data": self.data,
+            "zuul_event_id": self.zuul_event_id,
         }
 
     @classmethod
     def fromDict(cls, data):
-        return cls(data.get("build_uuid"), data.get("data"))
+        return cls(
+            data.get("build_uuid"), data.get("build_set_uuid"),
+            data.get("job_name"), data.get("build_request_ref"),
+            data.get("data"), data.get("zuul_event_id"))
 
 
 class BuildStartedEvent(BuildResultEvent):
