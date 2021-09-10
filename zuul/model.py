@@ -4463,6 +4463,7 @@ class ProjectConfig(ConfigObject):
 
     def toDict(self):
         d = {}
+        d['source_context'] = self.source_context.toDict()
         d['default_branch'] = self.default_branch
         if self.merge_mode:
             d['merge_mode'] = list(filter(lambda x: x[1] == self.merge_mode,

@@ -720,6 +720,9 @@ class TestWeb(BaseTestWeb):
                 'connection_name': 'gerrit',
                 'name': 'org/project1',
                 'configs': [{
+                    'source_context': {'branch': 'master',
+                                       'path': 'zuul.yaml',
+                                       'project': 'common-config'},
                     'templates': [],
                     'default_branch': 'master',
                     'queue_name': 'integrated',
