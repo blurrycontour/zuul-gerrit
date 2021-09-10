@@ -5127,6 +5127,10 @@ class ZuulTestCase(BaseTestCase):
         job.release()
 
     @property
+    def sched_zk_nodepool(self):
+        return self.scheds.first.sched.nodepool.zk_nodepool
+
+    @property
     def hold_jobs_in_queue(self):
         return self.executor_api.hold_in_queue
 

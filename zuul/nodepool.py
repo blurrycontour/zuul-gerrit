@@ -102,7 +102,7 @@ class Nodepool(object):
         self.election_won = True
         try:
             for rid in self.zk_nodepool.getNodeRequests():
-                request = self.zk_nodepool.getNodeRequest(rid)
+                request = self.zk_nodepool.getNodeRequest(rid, cached=True)
                 if request.requestor != self.system_id:
                     continue
                 if (request.state in {model.STATE_FULFILLED,

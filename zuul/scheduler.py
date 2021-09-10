@@ -100,7 +100,6 @@ from zuul.zk.locks import (
     management_queue_lock,
     trigger_queue_lock,
 )
-from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -175,7 +174,6 @@ class Scheduler(threading.Thread):
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
         self.system = ZuulSystem(self.zk_client)
-        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.component_info = SchedulerComponent(self.zk_client, self.hostname)
         self.component_info.register()
         self.component_registry = ComponentRegistry(self.zk_client)
@@ -541,7 +539,7 @@ class Scheduler(threading.Thread):
         # Get all the requests in ZK that belong to us
         zk_requests = set()
         for req_id in self.nodepool.zk_nodepool.getNodeRequests():
-            req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
+            req = self.nodepool.zk_nodepool.getNodeRequest(req_id, cached=True)
             if req.requestor == self.system.system_id:
                 zk_requests.add(req_id)
         # Get all the current node requests in the queues
@@ -555,7 +553,8 @@ class Scheduler(threading.Thread):
         for req_id in leaked_requests:
             try:
                 self.log.warning("Deleting leaked node request: %s", req_id)
-                req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
+                req = self.nodepool.zk_nodepool.getNodeRequest(req_id,
+                                                               cached=True)
                 self.nodepool.zk_nodepool.deleteNodeRequest(req)
             except Exception:
                 self.log.exception("Error deleting leaked node request: %s",
@@ -817,15 +816,15 @@ class Scheduler(threading.Thread):
         request.node_expiration = node_hold_expiration
 
         # No need to lock it since we are creating a new one.
-        self.zk_nodepool.storeHoldRequest(request)
+        self.nodepool.zk_nodepool.storeHoldRequest(request)
 
     def autohold_list(self):
         '''
         Return current hold requests as a list of dicts.
         '''
         data = []
-        for request_id in self.zk_nodepool.getHoldRequests():
-            request = self.zk_nodepool.getHoldRequest(request_id)
+        for request_id in self.nodepool.zk_nodepool.getHoldRequests():
+            request = self.nodepool.zk_nodepool.getHoldRequest(request_id)
             if not request:
                 continue
             data.append(request.toDict())
@@ -838,7 +837,8 @@ class Scheduler(threading.Thread):
         :param str hold_request_id: The unique ID of the request to delete.
         '''
         try:
-            hold_request = self.zk_nodepool.getHoldRequest(hold_request_id)
+            hold_request = self.nodepool.zk_nodepool.getHoldRequest(
+                hold_request_id)
         except Exception:
             self.log.exception(
                 "Error retrieving autohold ID %s:", hold_request_id)
@@ -856,7 +856,8 @@ class Scheduler(threading.Thread):
         '''
         hold_request = None
         try:
-            hold_request = self.zk_nodepool.getHoldRequest(hold_request_id)
+            hold_request = self.nodepool.zk_nodepool.getHoldRequest(
+                hold_request_id)
         except Exception:
             self.log.exception(
                 "Error retrieving autohold ID %s:", hold_request_id)
@@ -868,7 +869,7 @@ class Scheduler(threading.Thread):
 
         self.log.debug("Removing autohold %s", hold_request)
         try:
-            self.zk_nodepool.deleteHoldRequest(hold_request)
+            self.nodepool.zk_nodepool.deleteHoldRequest(hold_request)
         except Exception:
             self.log.exception(
                 "Error removing autohold request %s:", hold_request)
@@ -2085,7 +2086,7 @@ class Scheduler(threading.Thread):
         pipeline.manager.onFilesChangesCompleted(event, build_set)
 
     def _doNodesProvisionedEvent(self, event, pipeline):
-        request = self.zk_nodepool.getNodeRequest(event.request_id)
+        request = self.nodepool.zk_nodepool.getNodeRequest(event.request_id)
 
         if not request:
             self.log.warning("Unable to find request %s while processing"
