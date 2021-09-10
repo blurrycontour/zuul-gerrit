@@ -420,15 +420,17 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         return sorted(requests)
 
-    def getNodeRequest(self, node_request_id):
+    def getNodeRequest(self, node_request_id, cached=False):
         """
         Retrieve a NodeRequest from a given path in ZooKeeper.
 
         :param str node_request_id: The ID of the node request to retrieve.
+        :param bool cached: Whether to use the cache.
         """
-        req = self._node_request_cache.get(node_request_id)
-        if req:
-            return req
+        if cached:
+            req = self._node_request_cache.get(node_request_id)
+            if req:
+                return req
 
         path = f"{self.REQUEST_ROOT}/{node_request_id}"
         try:
