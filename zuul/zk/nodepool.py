@@ -15,6 +15,7 @@ import logging
 import time
 from enum import Enum
 from typing import Optional, List
+import threading
 
 from kazoo.exceptions import NoNodeError, LockTimeout
 from kazoo.recipe.cache import TreeCache, TreeEvent
@@ -67,6 +68,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         self._node_request_cache = {}
         self._node_tree = None
         self._node_cache = {}
+        self._callback_lock = threading.Lock()
 
         if self.client.connected:
             self._onConnect()
@@ -380,7 +382,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     def requestCacheListener(self, event):
         try:
-            self._requestCacheListener(event)
+            # This lock is only needed for tests.  It wraps updating
+            # our internal cache and performing the callback which
+            # will generate node provisioned events in a critical
+            # section.  This way the tests know if a request is
+            # outstanding because either our cache is out of date or
+            # there is an event on the queue.
+            with self._callback_lock:
+                self._requestCacheListener(event)
         except Exception:
             self.log.exception(
                 "Exception in request cache update for event: %s",
