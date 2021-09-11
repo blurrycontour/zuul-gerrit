@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "172c35a6_e0ad484f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-11T23:16:11Z",
+      "side": 1,
+      "message": "Does this need to be data.get(\u0027requestor_data\u0027) to properly check for a missing entry in the dict?",
+      "revId": "3df528d5b65d1c6ec2ec2100f634044d84e8fa49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
