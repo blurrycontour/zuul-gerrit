@@ -906,12 +906,14 @@ class NodeRequest(object):
         # The requestor_data contains zuul-specific information which is opaque
         # to nodepool and returned as-is when the NodeRequest is fulfilled.
         requestor_data = data["requestor_data"]
+        if requestor_data is None:
+            requestor_data = {}
         request = cls(
             requestor=data["requestor"],
-            build_set_uuid=requestor_data["build_set_uuid"],
-            tenant_name=requestor_data["tenant_name"],
-            pipeline_name=requestor_data["pipeline_name"],
-            job_name=requestor_data["job_name"],
+            build_set_uuid=requestor_data.get("build_set_uuid"]),
+            tenant_name=requestor_data.get("tenant_name"),
+            pipeline_name=requestor_data.get("pipeline_name"),
+            job_name=requestor_data.get("job_name"),
             labels=data["node_types"],
             provider=data["provider"],
             relative_priority=data.get("relative_priority", 0),
