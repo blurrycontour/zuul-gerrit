@@ -16,6 +16,23 @@
       "revId": "3df528d5b65d1c6ec2ec2100f634044d84e8fa49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ade99df5_47a4bc07",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-12T13:47:30Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be necessary because zuul and nodepool will both now always include this field, even if it\u0027s null.  We won\u0027t be dealing with any node requests from before zuul started including it because they were ephemeral.",
+      "revId": "3df528d5b65d1c6ec2ec2100f634044d84e8fa49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
