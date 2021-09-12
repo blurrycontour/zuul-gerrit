@@ -116,9 +116,6 @@ class Nodepool(object):
 
         log.debug("Node request %s %s", request, request.state)
         if event == NodeRequestEvent.COMPLETED:
-            # This sequence is required for tests -- we can only
-            # remove the request from our internal cache after the
-            # completed event is added to the zk queue.
             try:
                 if self.election_won:
                     if self.election.is_still_valid():

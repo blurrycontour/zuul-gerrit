@@ -5250,17 +5250,25 @@ class ZuulTestCase(BaseTestCase):
             return True
         # Check ZK and the scheduler cache and make sure they are
         # in sync.
-        for req in self.fake_nodepool.getNodeRequests():
-            if req['state'] != model.STATE_FULFILLED:
-                return False
-            for app in self.scheds.filter(matcher):
-                nodepool = app.sched.nodepool
-                r2 = nodepool.zk_nodepool.getNodeRequest(req['_oid'],
-                                                         cached=True)
-                if r2 and r2.state != req['state']:
-                    return False
-                if req and not r2:
-                    return False
+        for app in self.scheds.filter(matcher):
+            sched = app.sched
+            nodepool = app.sched.nodepool
+            with nodepool.zk_nodepool._callback_lock:
+                for req in self.fake_nodepool.getNodeRequests():
+                    if req['state'] != model.STATE_FULFILLED:
+                        return False
+                    r2 = nodepool.zk_nodepool.getNodeRequest(req['_oid'],
+                                                             cached=True)
+                    if r2 and r2.state != req['state']:
+                        return False
+                    if req and not r2:
+                        return False
+                    tenant_name = r2.tenant_name
+                    pipeline_name = r2.pipeline_name
+                    if sched.pipeline_result_events[tenant_name][
+                            pipeline_name
+                    ].hasEvents():
+                        return False
         return True
 
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
