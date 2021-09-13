@@ -3189,7 +3189,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                          ref=build.parameters['zuul']['ref'],
                          newrev=build.parameters['zuul'].get('newrev'),
                          parameters=build.parameters, jobdir=build.jobdir,
-                         pipeline=build.parameters['zuul']['pipeline'])
+                         pipeline=build.parameters['zuul']['pipeline'],
+                         build_request_ref=build.build_request.path)
         )
         self.executor_server.running_builds.remove(build)
         del self.executor_server.job_builds[self.build_request.uuid]
@@ -5270,67 +5271,57 @@ class ZuulTestCase(BaseTestCase):
             if cache_state == zk_state:
                 return
 
-    def __haveAllBuildsReported(self, matcher) -> bool:
-        for app in self.scheds.filter(matcher):
-            executor_client = app.sched.executor
-            # Find out if every build that the worker has completed has been
-            # reported back to Zuul.  If it hasn't then that means a Gearman
-            # event is still in transit and the system is not stable.
-            for build in self.history:
-                zbuild = executor_client.builds.get(build.uuid)
-                if not zbuild:
-                    # It has already been reported
-                    continue
-                # It hasn't been reported yet.
-                return False
+    def __haveAllBuildsReported(self):
+        # The build requests will be deleted from ZooKeeper once the
+        # scheduler processed their result event. Thus, as long as
+        # there are build requests left in ZooKeeper, the system is
+        # not stable.
+        for build in self.history:
+            zbuild = self.executor_api.get(build.build_request_ref)
+            if not zbuild:
+                # It has already been reported
+                continue
+            # It hasn't been reported yet.
+            return False
         return True
 
-    def __areAllBuildsWaiting(self, matcher) -> bool:
-        # TODO (felix): With all build requests stored in ZK would it be
-        # sufficient to query ZK for all known builds and make assertions based
-        # on their state?
-        for app in self.scheds.filter(matcher):
-            executor_client = app.sched.executor
-            builds = executor_client.builds.values()
-            seen_builds = set()
-            for build in builds:
-                seen_builds.add(build.uuid)
-
-                if not build.build_request_ref:
-                    self.log.debug("%s has not been submitted", build)
-                    return False
-                build_request = self.executor_api.get(build.build_request_ref)
-                if not build_request:
-                    self.log.debug("%s is not known in Zookeeper", build)
-                    return False
-
-                if build_request.state == BuildRequest.HOLD:
+    def __areAllBuildsWaiting(self):
+        # Look up the queued build requests directly from ZooKeeper
+        queued_build_requests = list(self.executor_api.all())
+        seen_builds = set()
+        # Always ignore builds which are on hold
+        for build_request in queued_build_requests:
+            seen_builds.add(build_request.uuid)
+            if build_request.state in (BuildRequest.HOLD):
+                continue
+            # Check if the build is currently processed by the
+            # RecordingExecutorServer.
+            worker_build = self.executor_server.job_builds.get(
+                build_request.uuid)
+            if worker_build:
+                if worker_build.paused:
                     continue
-
-                if build.url is None:
-                    self.log.debug("%s has not reported start", build)
-                    return False
-                # Check if the build is currently processed by the
-                # RecordingExecutorServer.
-                worker_build = self.executor_server.job_builds.get(build.uuid)
-                if worker_build:
-                    if build.paused:
-                        continue
-                    if worker_build.isWaiting():
-                        continue
-                    self.log.debug("%s is running", worker_build)
-                    return False
-                else:
-                    self.log.debug("%s is unassigned", build)
-                    return False
-            for (build_uuid, job_worker) in \
-                self.executor_server.job_workers.items():
-                if build_uuid not in seen_builds:
-                    log = get_annotated_logger(
-                        self.log, event=None, build=build_uuid
-                    )
-                    log.debug("Build is not finalized")
-                    return False
+                if worker_build.isWaiting():
+                    continue
+                self.log.debug("%s is running", worker_build)
+                return False
+            else:
+                self.log.debug("%s is unassigned", build_request)
+                return False
+        # Wait until all running builds have finished on the executor
+        # and that all job workers are cleaned up. Otherwise there
+        # could be a short window in which the build is finished
+        # (and reported), but the job cleanup is not yet finished on
+        # the executor. During this time the test could settle, but
+        # assertFinalState() will fail because there are still
+        # job_workers present on the executor.
+        for build_uuid in self.executor_server.job_workers.keys():
+            if build_uuid not in seen_builds:
+                log = get_annotated_logger(
+                    self.log, event=None, build=build_uuid
+                )
+                log.debug("Build is not finalized")
+                return False
         return True
 
     def __areAllNodeRequestsComplete(self, matcher) -> bool:
@@ -5424,8 +5415,8 @@ class ZuulTestCase(BaseTestCase):
                     self.log.error, matcher,
                     self.__areZooKeeperEventQueuesEmpty(matcher),
                     self.__areAllMergeJobsWaiting(matcher),
-                    self.__haveAllBuildsReported(matcher),
-                    self.__areAllBuildsWaiting(matcher),
+                    self.__haveAllBuildsReported(),
+                    self.__areAllBuildsWaiting(),
                     self.__areAllNodeRequestsComplete(matcher),
                     all(self.__eventQueuesEmpty(matcher))
                 )
@@ -5435,7 +5426,7 @@ class ZuulTestCase(BaseTestCase):
             self.executor_server.lock.acquire()
 
             # have all build states propogated to zuul?
-            if self.__haveAllBuildsReported(matcher):
+            if self.__haveAllBuildsReported():
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
                 self.__eventQueuesJoin(matcher)
@@ -5443,8 +5434,8 @@ class ZuulTestCase(BaseTestCase):
                     lambda app: app.sched.run_handler_lock.acquire())
                 if (self.__areAllSchedulersPrimed(matcher) and
                     self.__areAllMergeJobsWaiting(matcher) and
-                    self.__haveAllBuildsReported(matcher) and
-                    self.__areAllBuildsWaiting(matcher) and
+                    self.__haveAllBuildsReported() and
+                    self.__areAllBuildsWaiting() and
                     self.__areAllNodeRequestsComplete(matcher) and
                     self.__areZooKeeperEventQueuesEmpty(matcher) and
                     all(self.__eventQueuesEmpty(matcher))):
