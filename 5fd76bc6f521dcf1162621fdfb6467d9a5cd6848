@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba7bad4c_d4bed06a",
+        "filename": "zuul/model.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 3579,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T18:46:54Z",
+      "side": 1,
+      "message": "Why is project missing from here when we have it in the serialize method?",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23486db8_237a27b7",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T18:46:54Z",
+      "side": 1,
+      "message": "Might be a bit more clear to use https://docs.python.org/3/library/os.path.html#os.path.basename ?",
+      "range": {
+        "startLine": 34,
+        "startChar": 24,
+        "endLine": 34,
+        "endChar": 48
+      },
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a6632ec_488d1a05",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T18:46:54Z",
+      "side": 1,
+      "message": "Thinking out loud here:\n\nWe sometimes have caches in memory of the zuul processes and we sometimes cache data in zookeeper. Might be a good idea to try and come up with some sort of convention for identifying which cache we are talking about when naming them?",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0875a8ca_1a1b8408",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T18:46:54Z",
+      "side": 1,
+      "message": "I didn\u0027t realize you can do function calls in f strings. Neat.",
+      "range": {
+        "startLine": 91,
+        "startChar": 36,
+        "endLine": 91,
+        "endChar": 51
+      },
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46c7b393_b5fbbf82",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T18:46:54Z",
+      "side": 1,
+      "message": "cache_keys is a set of unquoted keys due to line 94. I think that we put unquoted keys in self._change_cache because _cacheItemWatcher gets the key from _keyFromPath which calls unquote.\n\nHowever here we call the keys we iterate over quoted_key. Is this actually a quoted key? If so I think we have a data type mismatch somewhere? Though I\u0027m having a hard time finding exactly where and maybe this var should just be called key or unquoted_key to reduce confusion.",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
