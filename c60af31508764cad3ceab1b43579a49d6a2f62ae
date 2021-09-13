@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "af743547_2b2ca248",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 772,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-13T22:46:49Z",
+      "side": 1,
+      "message": "I believe the intention of this method is that it\u0027s called with semi-immutable values.  We\u0027re calling it with attributes like the change dependencies or the files list.  The git dependencies and files are set by the drivers; if more than one of them tried to perform an update, they should end up with the same data (a different set of git depends or files is a different change in git).\nThe commit dependencies (ie depends-on) may be set by pipeline managers, but similarly, they should come to the same conclusion.\n\nTwo cache set events could be setting different attributes though.  By the time we get through this loop, we should have read in the new attributes from the other actor, and added our own (if they are different, and if they are the same or overlap, we should have harmlessly overwritten them).",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a06e162f_0b02a0c8",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 18
