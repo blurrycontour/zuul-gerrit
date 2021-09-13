@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "db16494c_29562700",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 772,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T22:24:39Z",
+      "side": 1,
+      "message": "How does this reconcile the ordering of concurrent updates? It seems like we send in a fixed set of attributes to set which may be stale by the time they are set due to the retries above? Put another way could the updates that caused a ConcurrentUpdateError here be newer and more accurate in which case we should just stop?",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a06e162f_0b02a0c8",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 832,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T22:24:39Z",
+      "side": 1,
+      "message": "Here we assume the ConcurrentUpdateError means we should simply reread from the cache as it will be up to date. This is different than above where we try to set attributes in a retry loop and defers to the other update.",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "32483706_9b49187c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T22:24:39Z",
+      "side": 1,
+      "message": "See above question about updated change attributes. I think this has potentially similar concerns?",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6a7ec4d2_27959d13",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 18
@@ -51,6 +102,23 @@
       "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1cbdcb5_0783a57d",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T22:24:39Z",
+      "side": 1,
+      "message": "Note this will do a zookeeper child listing then pull those children out of the cache. That means we\u0027ll do a bit more zookeepering here than before.",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
