@@ -2491,6 +2491,58 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='3,1'),
         ], ordered=True)
 
+    @simple_layout('layouts/empty-check.yaml')
+    def test_merge_commit(self):
+        # Test a .zuul.yaml content change in a merge commit
+
+        self.create_branch('org/project', 'stable/queens')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable/queens'))
+        self.waitUntilSettled()
+
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - test-job
+            """)
+
+        file_dict = {'.zuul.yaml': conf}
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable/queens', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        upstream_path = os.path.join(self.upstream_root, 'org/project')
+        upstream_repo = git.Repo(upstream_path)
+        master_sha = upstream_repo.heads.master.commit.hexsha
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C',
+                                           merge_parents=[
+                                               master_sha,
+                                               A.patchsets[-1]['revision'],
+                                           ],
+                                           merge_files=['.zuul.yaml'])
+
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='3,1'),
+        ], ordered=True)
+
 
 class TestInRepoConfigDir(ZuulTestCase):
     # Like TestInRepoConfig, but the fixture test files are in zuul.d

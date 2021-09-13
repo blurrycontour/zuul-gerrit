@@ -389,7 +389,7 @@ class FakeGerritChange(object):
 
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
-                 parent=None):
+                 parent=None, merge_parents=None, merge_files=None):
         self.gerrit = gerrit
         self.source = gerrit
         self.reported = 0
@@ -428,7 +428,15 @@ class FakeGerritChange(object):
             'url': '%s/%s' % (self.gerrit.baseurl.rstrip('/'), number)}
 
         self.upstream_root = upstream_root
-        self.addPatchset(files=files, parent=parent)
+        if merge_parents:
+            self.addMergePatchset(parents=merge_parents,
+                                  merge_files=merge_files)
+        else:
+            self.addPatchset(files=files, parent=parent)
+        if merge_parents:
+            self.data['parents'] = merge_parents
+        elif parent:
+            self.data['parents'] = [parent]
         self.data['submitRecords'] = self.getSubmitRecords()
         self.open = status == 'NEW'
 
@@ -476,6 +484,27 @@ class FakeGerritChange(object):
         repo.heads['master'].checkout()
         return r
 
+    def addFakeMergeCommitChangeToRepo(self, msg, parents):
+        path = os.path.join(self.upstream_root, self.project)
+        repo = git.Repo(path)
+        ref = GerritChangeReference.create(
+            repo, '%s/%s/%s' % (str(self.number).zfill(2)[-2:],
+                                self.number,
+                                self.latest_patchset),
+            parents[0])
+        repo.head.reference = ref
+        repo.head.reset(working_tree=True)
+        repo.git.clean('-x', '-f', '-d')
+
+        repo.index.merge_tree(parents[1])
+        r = repo.index.commit(msg)
+
+        repo.head.reference = 'master'
+        repo.head.reset(working_tree=True)
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
+        return r
+
     def addPatchset(self, files=None, large=False, parent=None):
         self.latest_patchset += 1
         if not files:
@@ -490,6 +519,33 @@ class FakeGerritChange(object):
                     {'file': 'README',
                      'type': 'MODIFIED'}]
         for f in files:
+            ps_files.append({'file': f, 'type': 'ADDED'})
+        d = {'approvals': [],
+             'createdOn': time.time(),
+             'files': ps_files,
+             'number': str(self.latest_patchset),
+             'ref': 'refs/changes/%s/%s/%s' % (str(self.number).zfill(2)[-2:],
+                                               self.number,
+                                               self.latest_patchset),
+             'revision': c.hexsha,
+             'uploader': {'email': 'user@example.com',
+                          'name': 'User name',
+                          'username': 'user'}}
+        self.data['currentPatchSet'] = d
+        self.patchsets.append(d)
+        self.data['submitRecords'] = self.getSubmitRecords()
+
+    def addMergePatchset(self, parents, merge_files=None):
+        self.latest_patchset += 1
+        if not merge_files:
+            merge_files = []
+        msg = self.subject + '-' + str(self.latest_patchset)
+        c = self.addFakeMergeCommitChangeToRepo(msg, parents)
+        ps_files = [{'file': '/COMMIT_MSG',
+                     'type': 'ADDED'},
+                    {'file': '/MERGE_LIST',
+                     'type': 'ADDED'}]
+        for f in merge_files:
             ps_files.append({'file': f, 'type': 'ADDED'})
         d = {'approvals': [],
              'createdOn': time.time(),
@@ -831,6 +887,8 @@ class FakeGerritChange(object):
             "requirements": [],
             "work_in_progresss": self.data.get('wip', False)
         }
+        if 'parents' in self.data:
+            data['parents'] = self.data['parents']
         return json.loads(json.dumps(data))
 
     def queryRevisionHTTP(self, revision):
@@ -859,6 +917,18 @@ class FakeGerritChange(object):
                 "_revision_number": needed_by_patchset,
             })
         return {"changes": changes}
+
+    def queryFilesHTTP(self, revision):
+        for rev in self.patchsets:
+            if rev['revision'] == revision:
+                break
+        else:
+            return None
+
+        files = {}
+        for f in rev['files']:
+            files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
+        return files
 
     def setMerged(self):
         if (self.depends_on_change and
@@ -922,6 +992,8 @@ class GerritWebServer(object):
             list_checkers_re = re.compile('/a/plugins/checks/checkers/')
             change_re = re.compile(r'/a/changes/(.*)\?o=.*')
             related_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/related')
+            files_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/files'
+                                  r'\?parent=1')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
 
@@ -956,6 +1028,9 @@ class GerritWebServer(object):
                 m = self.related_re.match(path)
                 if m:
                     return self.get_related(m.group(1), m.group(2))
+                m = self.files_re.match(path)
+                if m:
+                    return self.get_files(m.group(1), m.group(2))
                 m = self.change_search_re.match(path)
                 if m:
                     return self.get_changes(m.group(1))
@@ -1063,6 +1138,16 @@ class GerritWebServer(object):
                 if not change:
                     return self._404()
                 data = change.queryRevisionHTTP(revision)
+                if data is None:
+                    return self._404()
+                self.send_data(data)
+                self.end_headers()
+
+            def get_files(self, number, revision):
+                change = fake_gerrit.changes.get(int(number))
+                if not change:
+                    return self._404()
+                data = change.queryFilesHTTP(revision)
                 if data is None:
                     return self._404()
                 self.send_data(data)
@@ -1203,12 +1288,15 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.fake_checkers.append(kw)
 
     def addFakeChange(self, project, branch, subject, status='NEW',
-                      files=None, parent=None):
+                      files=None, parent=None, merge_parents=None,
+                      merge_files=None):
         """Add a change to the fake Gerrit."""
         self.change_number += 1
         c = FakeGerritChange(self, self.change_number, project, branch,
                              subject, upstream_root=self.upstream_root,
-                             status=status, files=files, parent=parent)
+                             status=status, files=files, parent=parent,
+                             merge_parents=merge_parents,
+                             merge_files=merge_files)
         self.changes[self.change_number] = c
         return c
 

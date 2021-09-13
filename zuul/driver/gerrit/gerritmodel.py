@@ -38,7 +38,7 @@ class GerritChange(Change):
         if data.format == data.SSH:
             self.updateFromSSH(data.data, connection)
         else:
-            self.updateFromHTTP(data.data, connection)
+            self.updateFromHTTP(data.data, data.files, connection)
 
     def updateFromSSH(self, data, connection):
         if self.patchset is None:
@@ -92,7 +92,7 @@ class GerritChange(Change):
                     elif label['status'] in ['NEED', 'REJECT']:
                         self.missing_labels.add(label['label'])
 
-    def updateFromHTTP(self, data, connection):
+    def updateFromHTTP(self, data, files, connection):
         urlparse = urllib.parse.urlparse(connection.baseurl)
         baseurl = "%s://%s%s" % (urlparse.scheme, urlparse.netloc,
                                  urlparse.path)
@@ -111,15 +111,13 @@ class GerritChange(Change):
             '%s/c/%s/+/%s' % (baseurl, self.project.name, self.number),
         ]
 
-        files = []
         if str(current_revision['_number']) == self.patchset:
             self.ref = current_revision['ref']
             self.commit = data['current_revision']
-            files = list(current_revision.get('files', []).keys())
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False
-        self.files = files
+        self.files = files or []
 
         self.is_merged = data['status'] == 'MERGED'
         self.approvals = []
