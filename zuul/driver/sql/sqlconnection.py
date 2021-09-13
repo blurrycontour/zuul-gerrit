@@ -14,6 +14,7 @@
 
 import logging
 import time
+import datetime
 
 import alembic
 import alembic.command
@@ -29,6 +30,7 @@ BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
 ARTIFACT_TABLE = 'zuul_artifact'
 PROVIDES_TABLE = 'zuul_provides'
+TIME_TABLE = 'zuul_time'
 
 
 class DatabaseSession(object):
@@ -207,6 +209,29 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise Exception("Multiple buildset found with uuid %s", uuid)
 
+    def getTime(self, tenant, project, branch, job_name):
+        """Get one time record"""
+
+        time_table = self.connection.zuul_time_table
+
+        q = self.session().query(self.connection.timeModel)
+        q = q.filter(time_table.c.tenant == tenant,
+                     time_table.c.project == project,
+                     time_table.c.branch == branch,
+                     time_table.c.job_name == job_name)
+        try:
+            return q.one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return None
+        except sqlalchemy.orm.exc.MultipleResultsFound:
+            raise Exception("Multiple times found")
+
+    def createTime(self, *args, **kw):
+        bs = self.connection.timeModel(*args, **kw)
+        self.session().add(bs)
+        self.session().flush()
+        return bs
+
 
 class SQLConnection(BaseConnection):
     driver_name = 'sql'
@@ -355,6 +380,15 @@ class SQLConnection(BaseConnection):
             sa.Index(self.table_prefix + 'uuid_buildset_id_idx',
                      uuid, buildset_id)
 
+            @property
+            def duration(self):
+                if self.start_time and self.end_time:
+                    return max(0.0,
+                               (self.end_time -
+                                self.start_time).total_seconds())
+                else:
+                    return None
+
             def createArtifact(self, *args, **kw):
                 session = orm.session.Session.object_session(self)
                 # SQLAlchemy reserves the 'metadata' attribute on
@@ -399,6 +433,29 @@ class SQLConnection(BaseConnection):
             name = sa.Column(sa.String(255))
             build = orm.relationship(BuildModel, backref="provides")
 
+        class TimeModel(Base):
+            __tablename__ = self.table_prefix + TIME_TABLE
+            id = sa.Column(sa.Integer, primary_key=True)
+            tenant = sa.Column(sa.String(255))
+            project = sa.Column(sa.String(255))
+            branch = sa.Column(sa.String(255))
+            job_name = sa.Column(sa.String(255))
+            last_updated = sa.Column(sa.DateTime)
+            t0 = sa.Column(sa.Integer)
+            t1 = sa.Column(sa.Integer)
+            t2 = sa.Column(sa.Integer)
+            t3 = sa.Column(sa.Integer)
+            t4 = sa.Column(sa.Integer)
+            t5 = sa.Column(sa.Integer)
+            t6 = sa.Column(sa.Integer)
+            t7 = sa.Column(sa.Integer)
+            t8 = sa.Column(sa.Integer)
+            t9 = sa.Column(sa.Integer)
+            __table_args__ = (
+                sa.UniqueConstraint(tenant, project, branch, job_name,
+                                    name=self.table_prefix + 'time_idx'),
+            )
+
         self.providesModel = ProvidesModel
         self.zuul_provides_table = self.providesModel.__table__
 
@@ -410,6 +467,9 @@ class SQLConnection(BaseConnection):
 
         self.buildSetModel = BuildSetModel
         self.zuul_buildset_table = self.buildSetModel.__table__
+
+        self.timeModel = TimeModel
+        self.zuul_time_table = self.timeModel.__table__
 
     def onStop(self):
         self.log.debug("Stopping SQL connection %s" % self.connection_name)
@@ -429,3 +489,33 @@ class SQLConnection(BaseConnection):
         """Return a BuildSet objects"""
         with self.getSession() as db:
             return db.getBuildset(*args, **kw)
+
+    def getEstimatedTime(self, tenant, project, branch, job_name):
+        with self.getSession() as db:
+            t = db.getTime(tenant, project, branch, job_name)
+            if t is None:
+                return None
+            times = [t.t0, t.t1, t.t2, t.t3, t.t4,
+                     t.t5, t.t6, t.t7, t.t8, t.t9]
+            times = [x for x in times if x is not None]
+            if len(times):
+                return int(sum(times) / len(times))
+            return None
+
+    def addTime(self, tenant, project, branch, job_name, elapsed):
+        with self.getSession() as db:
+            t = db.getTime(tenant, project, branch, job_name)
+            if t is None:
+                t = db.createTime(tenant=tenant, project=project,
+                                  branch=branch, job_name=job_name)
+            t.last_updated = datetime.datetime.now()
+            t.t0 = t.t1
+            t.t1 = t.t2
+            t.t2 = t.t3
+            t.t3 = t.t4
+            t.t4 = t.t5
+            t.t5 = t.t6
+            t.t6 = t.t7
+            t.t7 = t.t8
+            t.t8 = t.t9
+            t.t9 = elapsed
