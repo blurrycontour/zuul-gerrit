@@ -16,6 +16,24 @@
       "revId": "159d9bc879109054fa35bb4fbbeb78de4f692bf9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba7e4343_7d0698d8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1642,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-13T08:17:21Z",
+      "side": 1,
+      "message": "Done.\n\nYes, I think there is some potential to optimize this further. Given that we currently don\u0027t anticipate that the size of the change cache will be a problem I think we can postpone this until we have collected some data points re. the size and feel that it is necessary.",
+      "parentUuid": "c88a30e4_9ec1f137",
+      "revId": "159d9bc879109054fa35bb4fbbeb78de4f692bf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
