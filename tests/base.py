@@ -5182,7 +5182,17 @@ class ZuulTestCase(BaseTestCase):
             if cache_state == zk_state:
                 return
 
-    def __haveAllBuildsReported(self, matcher) -> bool:
+    def __haveAllBuildsReported(self, matcher):
+        """
+        # The build requests will be deleted from ZooKeeper once the scheduler
+        # processed their result event. Thus, as long as there are build
+        # requests left in ZooKeeper, the system is not stable.
+        queued_build_requests = list(self.executor_api.all())
+        if queued_build_requests:
+            return False
+        return True
+        """
+
         for app in self.scheds.filter(matcher):
             executor_client = app.sched.executor
             # Find out if every build that the worker has completed has been
@@ -5197,7 +5207,35 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
-    def __areAllBuildsWaiting(self, matcher) -> bool:
+    def __areAllBuildsWaiting(self, matcher):
+        # TODO (felix): Although this check should be enough, this method now
+        # doesn't provide as much information as before (e.g. build has not
+        # reported start, build is running, ...).
+
+        """
+        # Look up the queued build requests directly from ZooKeeper
+        queued_build_requests = list(self.executor_api.all())
+        # Always ignore builds which are on hold
+        for build_request in queued_build_requests:
+            if build_request.state == BuildRequest.HOLD:
+                continue
+            # Check if the build is currently processed by the
+            # RecordingExecutorServer.
+            worker_build = self.executor_server.job_builds.get(
+                build_request.uuid)
+            if worker_build:
+                if worker_build.paused:
+                    continue
+                if worker_build.isWaiting():
+                    continue
+                self.log.debug("%s is running", worker_build)
+                return False
+            else:
+                self.log.debug("%s is unassigned", build_request)
+                return False
+        return True
+        """
+
         # TODO (felix): With all build requests stored in ZK would it be
         # sufficient to query ZK for all known builds and make assertions based
         # on their state?
