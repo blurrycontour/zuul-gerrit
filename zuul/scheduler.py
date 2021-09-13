@@ -17,7 +17,6 @@
 
 import json
 import logging
-import os
 import socket
 import sys
 import threading
@@ -65,7 +64,6 @@ from zuul.model import (
     PromoteEvent,
     ReconfigureEvent,
     TenantReconfigureEvent,
-    TimeDataBase,
     UnparsedAbideConfig,
     SystemAttributes,
     STATE_FAILED,
@@ -219,10 +217,6 @@ class Scheduler(threading.Thread):
         self.tenant_layout_state = LayoutStateStore(self.zk_client,
                                                     self.wake_event.set)
         self.local_layout_state = {}
-
-        if not testonly:
-            time_dir = self._get_time_database_dir()
-            self.time_database = TimeDataBase(time_dir)
 
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
@@ -896,14 +890,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Waiting for enqueue")
         result.wait()
         self.log.debug("Enqueue complete")
-
-    def _get_time_database_dir(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        d = os.path.join(state_dir, 'times')
-        if not os.path.exists(d):
-            os.mkdir(d)
-        return d
 
     def _get_key_store_password(self):
         try:
@@ -1893,8 +1879,22 @@ class Scheduler(threading.Thread):
             log.warning("Build %s is not associated with a pipeline", build)
             return
         try:
-            build.estimated_time = float(self.time_database.getEstimatedTime(
-                build))
+            change = build.build_set.item.change
+            previous_builds = self.sql.getBuilds(
+                tenant=pipeline.tenant.name,
+                project=change.project.name,
+                branch=change.branch,
+                job_name=build.job.name,
+                final=True,
+                result='SUCCESS',
+                limit=10,
+                sort_by_buildset=True)
+            times = [x.duration for x in previous_builds if x.duration]
+            if times:
+                estimate = float(sum(times)) / len(times)
+            else:
+                estimate = 0
+            build.estimated_time = float(estimate)
         except Exception:
             log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(build)
@@ -2026,12 +2026,6 @@ class Scheduler(threading.Thread):
         if not pipeline:
             log.warning("Build %s is not associated with a pipeline", build)
             return
-        if build.end_time and build.start_time and build.result:
-            duration = build.end_time - build.start_time
-            try:
-                self.time_database.update(build, duration, build.result)
-            except Exception:
-                log.exception("Exception recording build time:")
 
         pipeline.manager.onBuildCompleted(build)
 
