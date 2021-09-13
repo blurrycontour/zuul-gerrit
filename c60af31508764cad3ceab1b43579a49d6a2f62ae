@@ -33,6 +33,24 @@
       "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c923377b_c9597f43",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1058,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-13T08:23:28Z",
+      "side": 1,
+      "message": "Done in 808612. The way we update the change is always a little different between drivers. This means we have to pass a function that\u0027s updating the change.\n\nIf we think that 808612 is fine, I can also split this up and move to the ABC and driver changes if preferred.",
+      "parentUuid": "70bd99e7_b4e104a8",
+      "revId": "c60af31508764cad3ceab1b43579a49d6a2f62ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
