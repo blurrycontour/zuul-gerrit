@@ -552,20 +552,11 @@ class PagureConnection(BaseConnection):
         self._change_cache.prune(relevant, max_age)
 
     def updateChangeAttributes(self, change, **attrs):
-        for attempt in range(1, 6):
-            cache_stat = change.cache_stat
+        def updater(c):
             for name, value in attrs.items():
-                setattr(change, name, value)
-            try:
-                self._change_cache.set(cache_stat.key, change)
-                return
-            except ConcurrentUpdateError:
-                self.log.info("Conflicting cache update of %s (attempt: %s/5)",
-                              change, attempt)
-                if attempt == 5:
-                    raise
-            # Get the change for the side-effect of updating the cache
-            self._change_cache.get(cache_stat.key)
+                setattr(c, name, value)
+        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
+                                                 change, updater)
 
     def getWebController(self, zuul_web):
         return PagureWebController(zuul_web, self)
@@ -643,19 +634,12 @@ class PagureConnection(BaseConnection):
                 number, project.name))
             self.log.info("Updating change from pagure %s" % change)
             pull = self.getPull(change.project.name, change.number)
-            for attempt in range(1, 6):
-                try:
-                    self._updateChange(change, event, pull)
-                    self._change_cache.set(key, change)
-                    break
-                except ConcurrentUpdateError:
-                    self.log.info("Conflicting cache update of %s needs to be "
-                                  "retried (%s/5).", change, attempt)
-                    if attempt == 5:
-                        raise
-                # Update the cache and get the change as it might have
-                # changed due to a concurrent create.
-                change = self._change_cache.get(key)
+
+            def updater(c):
+                self._updateChange(c, event, pull)
+
+            change = self._change_cache.updateChangeWithRetry(key, change,
+                                                              updater)
 
             if self.sched:
                 self.sched.onChangeUpdated(change, event)

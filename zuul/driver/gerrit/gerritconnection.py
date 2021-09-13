@@ -752,20 +752,11 @@ class GerritConnection(BaseConnection):
         self._change_cache.prune(relevant, max_age)
 
     def updateChangeAttributes(self, change, **attrs):
-        for attempt in range(1, 6):
-            cache_stat = change.cache_stat
+        def updater(c):
             for name, value in attrs.items():
-                setattr(change, name, value)
-            try:
-                self._change_cache.set(cache_stat.key, change)
-                return
-            except ConcurrentUpdateError:
-                self.log.info("Conflicting cache update of %s (attempt: %s/5)",
-                              change, attempt)
-                if attempt == 5:
-                    raise
-            # Get the change for the side-effect of updating the cache
-            self._change_cache.get(cache_stat.key)
+                setattr(c, name, value)
+        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
+                                                 change, updater)
 
     def getChange(self, event, refresh=False):
         if event.change_number:
@@ -927,19 +918,11 @@ class GerritConnection(BaseConnection):
 
         log.info("Updating %s", change)
         data = self.queryChange(change.number, event=event)
-        for attempt in range(1, 6):
-            try:
-                change.update(data, self)
-                self._change_cache.set(key, change)
-                break
-            except ConcurrentUpdateError:
-                self.log.info("Conflicting cache update of %s (attempt: %s/5)",
-                              change, attempt)
-                if attempt == 5:
-                    raise
-            # Update the cache and get the change as it might have
-            # changed due to a concurrent create.
-            change = self._change_cache.get(key)
+
+        def updater(c):
+            c.update(data, self)
+
+        self._change_cache.updateChangeWithRetry(key, change, updater)
 
         if not change.is_merged:
             self._updateChangeDependencies(log, change, data, event, history)
@@ -1040,18 +1023,11 @@ class GerritConnection(BaseConnection):
 
         data = self.queryChange(change.number)
         key = str((change.number, change.patchset))
-        for attempt in range(1, 6):
-            try:
-                change.update(data, self)
-                self._change_cache.set(key, change)
-                break
-            except ConcurrentUpdateError:
-                self.log.info("Conflicting cache update of %s (attempt: %s/5)",
-                              change, attempt)
-                if attempt == 5:
-                    raise
-            # Get the change for the side-effect of updating the cache
-            self._change_cache.get(key)
+
+        def updater(c):
+            c.update(data, self)
+
+        self._change_cache.updateChangeWithRetry(key, change, updater)
 
         if change.is_merged:
             self.log.debug("Change %s is merged" % (change,))

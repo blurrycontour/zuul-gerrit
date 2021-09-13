@@ -1314,6 +1314,27 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         with testtools.ExpectedException(ConcurrentUpdateError):
             self.cache.set("foo", change)
 
+    def test_change_update_retry(self):
+        change = DummyChange("project", {"foobar": 0})
+        self.cache.set("foobar", change)
+
+        outdated_change = DummyChange("project", {"foobar": -1})
+        outdated_change.cache_stat = change.cache_stat
+
+        # Update the change so we have a new cache stat.
+        change.foobar = 1
+        self.cache.set("foobar", change)
+        self.assertEqual(self.cache.get("foobar").foobar, 1)
+
+        def updater(c):
+            c.foobar += 1
+
+        # Use the outdated change so we will run into a concurrent update
+        # error and need to retry.
+        updated_change = self.cache.updateChangeWithRetry(
+            "foobar", outdated_change, updater)
+        self.assertEqual(updated_change.foobar, 2)
+
     def test_cache_sync(self):
         other_cache = DummyChangeCache(self.zk_client, DummyConnection())
 

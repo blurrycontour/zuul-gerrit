@@ -215,6 +215,23 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             stream.write(payload)
         return data_uuid
 
+    def updateChangeWithRetry(self, key, change, update_func, retry_count=5):
+        for attempt in range(1, retry_count + 1):
+            try:
+                update_func(change)
+                self.set(key, change)
+                break
+            except ConcurrentUpdateError:
+                self.log.info(
+                    "Conflicting cache update of %s (attempt: %s/%s)",
+                    change, attempt, retry_count)
+                if attempt == retry_count:
+                    raise
+            # Update the cache and get the change as it might have
+            # changed due to a concurrent create.
+            change = self._change_cache.get(key)
+        return change
+
     def delete(self, key):
         cache_path = self._cachePath(key)
         # Only delete the cache entry and NOT the data node in order to
