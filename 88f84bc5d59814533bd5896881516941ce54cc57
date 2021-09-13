@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7dfd8a7_40aa4828",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T17:55:55Z",
+      "side": 1,
+      "message": "Do we need to sanity check that change.cache_key \u003d\u003d key here?",
+      "revId": "88f84bc5d59814533bd5896881516941ce54cc57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
