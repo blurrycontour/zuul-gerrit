@@ -134,6 +134,10 @@ class SQLReporter(BaseReporter):
 
         return db_build
 
+    def getBuilds(self, *args, **kw):
+        """Return a list of Build objects"""
+        return self.connection.getBuilds(*args, **kw)
+
     def report(self, item):
         # We're not a real reporter, but we use _formatItemReport, so
         # we inherit from the reporters.

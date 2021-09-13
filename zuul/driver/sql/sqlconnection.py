@@ -355,6 +355,14 @@ class SQLConnection(BaseConnection):
             sa.Index(self.table_prefix + 'uuid_buildset_id_idx',
                      uuid, buildset_id)
 
+            @property
+            def duration(self):
+                if self.start_time and self.end_time:
+                    return (self.end_time -
+                            self.start_time).total_seconds()
+                else:
+                    return None
+
             def createArtifact(self, *args, **kw):
                 session = orm.session.Session.object_session(self)
                 # SQLAlchemy reserves the 'metadata' attribute on
