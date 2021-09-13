@@ -22,7 +22,6 @@ import os
 from functools import total_ordering
 
 import re2
-import struct
 import time
 from uuid import uuid4
 import urllib.parse
@@ -5743,91 +5742,6 @@ class Abide(object):
 
             if len(project_branch_cache) == 0 or branch is None:
                 del self.unparsed_project_branch_cache[canonical_project_name]
-
-
-class JobTimeData(object):
-    format = 'B10H10H10B'
-    version = 0
-
-    def __init__(self, path):
-        self.path = path
-        self.success_times = [0 for x in range(10)]
-        self.failure_times = [0 for x in range(10)]
-        self.results = [0 for x in range(10)]
-
-    def load(self):
-        if not os.path.exists(self.path):
-            return
-        with open(self.path, 'rb') as f:
-            data = struct.unpack(self.format, f.read())
-        version = data[0]
-        if version != self.version:
-            raise Exception("Unkown data version")
-        self.success_times = list(data[1:11])
-        self.failure_times = list(data[11:21])
-        self.results = list(data[21:32])
-
-    def save(self):
-        tmpfile = self.path + '.tmp'
-        data = [self.version]
-        data.extend(self.success_times)
-        data.extend(self.failure_times)
-        data.extend(self.results)
-        data = struct.pack(self.format, *data)
-        with open(tmpfile, 'wb') as f:
-            f.write(data)
-        os.rename(tmpfile, self.path)
-
-    def add(self, elapsed, result):
-        elapsed = int(elapsed)
-        if result == 'SUCCESS':
-            self.success_times.append(elapsed)
-            self.success_times.pop(0)
-            result = 0
-        else:
-            self.failure_times.append(elapsed)
-            self.failure_times.pop(0)
-            result = 1
-        self.results.append(result)
-        self.results.pop(0)
-
-    def getEstimatedTime(self):
-        times = [x for x in self.success_times if x]
-        if times:
-            return float(sum(times)) / len(times)
-        return 0.0
-
-
-class TimeDataBase(object):
-    def __init__(self, root):
-        self.root = root
-
-    def _getTD(self, build):
-        if hasattr(build.build_set.item.change, 'branch'):
-            branch = build.build_set.item.change.branch
-        else:
-            branch = ''
-
-        dir_path = os.path.join(
-            self.root,
-            build.build_set.item.pipeline.tenant.name,
-            build.build_set.item.change.project.canonical_name,
-            branch)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-        path = os.path.join(dir_path, build.job.name)
-
-        td = JobTimeData(path)
-        td.load()
-        return td
-
-    def getEstimatedTime(self, name):
-        return self._getTD(name).getEstimatedTime()
-
-    def update(self, build, elapsed, result):
-        td = self._getTD(build)
-        td.add(elapsed, result)
-        td.save()
 
 
 class Capabilities(object):
