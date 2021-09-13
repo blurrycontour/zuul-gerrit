@@ -25,7 +25,6 @@ password=secret
 tenant_config=/etc/zuul/main.yaml
 log_config=/etc/zuul/logging.conf
 pidfile=/var/run/zuul/zuul.pid
-state_dir=/var/lib/zuul
 prometheus_port=9091
 ;prometheus_addr=0.0.0.0
 

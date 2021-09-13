@@ -353,11 +353,6 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
       Path to PID lock file.
 
-   .. attr:: state_dir
-      :default: /var/lib/zuul
-
-      Path to directory in which Zuul should save its state.
-
    .. attr:: relative_priority
       :default: False
 
