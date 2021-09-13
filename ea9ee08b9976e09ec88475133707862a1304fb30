@@ -16,6 +16,24 @@
       "revId": "ea9ee08b9976e09ec88475133707862a1304fb30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "513ff437_82bb7824",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 28
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2021-09-13T07:29:29Z",
+      "side": 1,
+      "message": "My first thought is that I\u0027d rather not mix up such optional things with the Ansible version, as this is more or less independent from that. Also, I find a boolean flag catchier than encoding this into a version string. But that\u0027s just my five cents, I\u0027m open to other opinions there.\n\nAnyhow, there\u0027s still some problems with the zuul_console log streaming and the daemonizing/forking mechanism which needs to be addressed.",
+      "parentUuid": "e3fe8b5a_3ab655f4",
+      "revId": "ea9ee08b9976e09ec88475133707862a1304fb30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
