@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import calendar
 import datetime
 import json
 import logging
@@ -132,7 +133,35 @@ class SQLReporter(BaseReporter):
                     artifact['metadata'] = json.dumps(artifact['metadata'])
                 db_build.createArtifact(**artifact)
 
+            if db_build.end_time and db_build.start_time:
+                elapsed = int(
+                    calendar.timegm(db_build.end_time.utctimetuple()) -
+                    calendar.timegm(db_build.start_time.utctimetuple())
+                )
+            else:
+                elapsed = None
+
+        if (final and build.result == 'SUCCESS' and elapsed is not None):
+            buildset = build.build_set
+            try:
+                self.connection.addTime(
+                    tenant=buildset.item.pipeline.tenant.name,
+                    project=buildset.item.change.project.name,
+                    branch=getattr(buildset.item.change, 'branch'),
+                    job_name=build.job.name,
+                    elapsed=elapsed)
+            except Exception:
+                self.log.exception("Unable to add time record:")
+
         return db_build
+
+    def getBuilds(self, *args, **kw):
+        """Return a list of Build objects"""
+        return self.connection.getBuilds(*args, **kw)
+
+    def getEstimatedTime(self, tenant, project, branch, job_name):
+        return self.connection.getEstimatedTime(
+            tenant, project, branch, job_name)
 
     def report(self, item):
         # We're not a real reporter, but we use _formatItemReport, so

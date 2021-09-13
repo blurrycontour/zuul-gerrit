@@ -367,6 +367,44 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
         check_results('database', 'resultsdb_failures')
 
+    def test_time_table(self):
+        sql = self.scheds.first.connections.getSqlReporter(None)
+        tenant = 'tenant-one'
+        project = 'openstack/nova'
+        branch = 'master'
+        job_name = 'openstack-tox-pep8'
+        t = sql.getEstimatedTime(tenant, project, branch, job_name)
+        self.assertEqual(t, None)
+        for (add, expected) in [
+                (100, 100),
+                (200, 150),
+                (300, 200),
+                (400, 250),
+                (500, 300),
+                (600, 350),
+                (700, 400),
+                (800, 450),
+                (900, 500),
+                (1000, 550),
+                (1100, 650),
+        ]:
+            sql.connection.addTime(tenant, project, branch, job_name, add)
+            t = sql.getEstimatedTime(tenant, project, branch, job_name)
+            self.assertEqual(t, expected)
+
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+            res = conn.execute(sa.sql.select([sql.connection.zuul_time_table]))
+            self.assertEqual(len(res.fetchall()), 1)
+
+        job_name = 'job2'
+        sql.connection.addTime(tenant, project, branch, job_name, 100)
+
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+            res = conn.execute(sa.sql.select([sql.connection.zuul_time_table]))
+            self.assertEqual(len(res.fetchall()), 2)
+
 
 class TestSQLConnectionPostgres(TestSQLConnectionMysql):
     config_file = 'zuul-sql-driver-postgres.conf'
