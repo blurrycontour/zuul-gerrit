@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cf524f59_4384f2c4",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-13T22:11:40Z",
+      "side": 1,
+      "message": "This is the form of key that the gerrit driver uses:\n\n  key \u003d str((event.change_number, event.patch_number))\n\nMaybe even consider using that type of key here as that has a number of things that need quoting.",
+      "parentUuid": "9b95c5f4_9deea433",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba7bad4c_d4bed06a",
         "filename": "zuul/model.py",
         "patchSetId": 16
