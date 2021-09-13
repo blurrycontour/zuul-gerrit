@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9b95c5f4_9deea433",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-13T20:08:34Z",
+      "side": 1,
+      "message": "As described in the other file, I think this test should actually be as follows:\n\n    def test_cache_sync(self):\n        other_cache \u003d DummyChangeCache(self.zk_client, DummyConnection())\n\n        key \u003d \u0027foo foo\u0027\n        change \u003d DummyChange(\"project\", {key: \"bar\"})\n        self.cache.set(key, change)\n        self.assertIsNotNone(other_cache.get(key))\n\n        change_other \u003d other_cache.get(key)\n        change_other.number \u003d 123\n        other_cache.set(key, change_other)\n\n        import time; time.sleep(0.5)\n        self.assertEqual(change.number, 123)\n\n        other_cache.delete(key)\n        self.assertIsNone(self.cache.get(key))\n\nThe time.sleep is a placeholder; it should probably actually be an iterate_timeout that waits for change.number \u003d\u003d 123.\n\nThis does 2 things (both of which fail in the current code).\n\n1) We use a key which requires quoting.\n2) We test that a other_cache.set() updates our local self.cache object (ie, we set a data watch on the initial self.cache.set()).",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba7bad4c_d4bed06a",
         "filename": "zuul/model.py",
         "patchSetId": 16
@@ -96,6 +113,57 @@
       "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75d45114_7f376e8d",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-13T20:08:34Z",
+      "side": 1,
+      "message": "I\u0027ve verified this is a bug.  I modified test_cache_sync so that the key has a space (\"foo foo\" instead of \"foo\"), and I can see that we\u0027re setting a data watch on a node that will never exist.  Clark is right, these are unquoted keys.\n\nNow, having done that, the test still doesn\u0027t fail, and I think that\u0027s because it\u0027s flawed.  I\u0027m going write more about that as a comment on the test itself.",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a888b3f_88b3e979",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-13T20:08:34Z",
+      "side": 1,
+      "message": "Note there\u0027s a further race with .set() and creating data watches.  More on .set() below.",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1848e3d5_564984ea",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-13T20:08:34Z",
+      "side": 1,
+      "message": "We insert the change into the cache here, but we do so without creating a data watch.  That means that if the children watch fires after this point (that\u0027s likely; it\u0027s what happens in the tests), it will see that we already have a cache entry and will not set a data watch.  So we either need to set a data watch here, or update the children watch to use a different method of deciding when to add data watches.",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
