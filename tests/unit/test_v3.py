@@ -4677,10 +4677,8 @@ class TestDataReturn(AnsibleZuulTestCase):
         for job_worker in self.executor_server.job_workers.values():
             if job_worker.build_request.uuid == paused_job.uuid:
                 job_worker.stop()
-        self.waitUntilSettled("stop job worker")
 
         self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release('print-data-return-vars')
         self.waitUntilSettled("all jobs are done")
         # The "pause" job might be paused during the waitUntilSettled
         # call and appear settled; it should automatically resume
