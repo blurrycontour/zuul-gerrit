@@ -492,6 +492,15 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
          The size of the current connection event queue.
 
+   .. stat:: time_query
+      :type: timer
+
+      Each time the scheduler performs a query against the SQL
+      database in order to determine an estimated time for a job, it
+      emits this timer of the duration of the query.  Note this is a
+      performance metric of how long the SQL query takes; it is not
+      the estimated time value itself.
+
 .. stat:: zuul.geard
 
    Gearman job distribution statistics.  Gearman jobs encompass the

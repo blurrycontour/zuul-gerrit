@@ -17,7 +17,6 @@
 
 import json
 import logging
-import os
 import socket
 import sys
 import threading
@@ -41,6 +40,7 @@ from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.queue import NamedQueue
+from zuul.lib.times import Times
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
 import zuul.lib.queue
 import zuul.lib.repl
@@ -66,7 +66,6 @@ from zuul.model import (
     PromoteEvent,
     ReconfigureEvent,
     TenantReconfigureEvent,
-    TimeDataBase,
     UnparsedAbideConfig,
     SystemAttributes,
     STATE_FAILED,
@@ -158,6 +157,7 @@ class Scheduler(threading.Thread):
         self.connections = connections
         self.sql = self.connections.getSqlReporter(None)
         self.statsd = get_statsd(config)
+        self.times = Times(self.sql, self.statsd)
         self.rpc = rpclistener.RPCListener(config, self)
         self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
         self.repl = None
@@ -224,10 +224,6 @@ class Scheduler(threading.Thread):
                                                     self.wake_event.set)
         self.local_layout_state = {}
 
-        if not testonly:
-            time_dir = self._get_time_database_dir()
-            self.time_database = TimeDataBase(time_dir)
-
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
             '/var/lib/zuul/scheduler.socket')
@@ -269,6 +265,7 @@ class Scheduler(threading.Thread):
         self.rpc_slow.start()
         self.stats_thread.start()
         self.apsched.start()
+        self.times.start()
         # Start an anonymous thread to perform initial cleanup, then
         # schedule later cleanup tasks.
         t = threading.Thread(target=self.startCleanup, name='cleanup start')
@@ -279,6 +276,7 @@ class Scheduler(threading.Thread):
     def stop(self):
         self._stopped = True
         self.component_info.state = self.component_info.STOPPED
+        self.times.stop()
         self.nodepool.stop()
         self.stop_event.set()
         self.stopConnections()
@@ -293,6 +291,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+        self.times.join()
         self.join()
         self.zk_client.disconnect()
 
@@ -916,14 +915,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Waiting for enqueue")
         result.wait()
         self.log.debug("Enqueue complete")
-
-    def _get_time_database_dir(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        d = os.path.join(state_dir, 'times')
-        if not os.path.exists(d):
-            os.mkdir(d)
-        return d
 
     def _get_key_store_password(self):
         try:
@@ -1957,8 +1948,15 @@ class Scheduler(threading.Thread):
         log = get_annotated_logger(
             self.log, build.zuul_event_id, build=build.uuid)
         try:
-            build.estimated_time = float(self.time_database.getEstimatedTime(
-                build))
+            change = build.build_set.item.change
+            estimate = self.times.getEstimatedTime(
+                pipeline.tenant.name,
+                change.project.name,
+                getattr(change, 'branch', None),
+                build.job.name)
+            if not estimate:
+                estimate = 0.0
+            build.estimated_time = estimate
         except Exception:
             log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(build)
@@ -2083,13 +2081,6 @@ class Scheduler(threading.Thread):
                 build, tenant=pipeline.tenant.name, final=(not build.retry))
         except Exception:
             log.exception("Error reporting build completion to DB:")
-
-        if build.end_time and build.start_time and build.result:
-            duration = build.end_time - build.start_time
-            try:
-                self.time_database.update(build, duration, build.result)
-            except Exception:
-                log.exception("Exception recording build time:")
 
         pipeline.manager.onBuildCompleted(build)
 
