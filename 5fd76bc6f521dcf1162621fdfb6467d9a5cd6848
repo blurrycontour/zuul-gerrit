@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "de07e1c3_ce678a8c",
+        "filename": "zuul/model.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 3579,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-14T11:54:29Z",
+      "side": 1,
+      "message": "The project of a change is supplied via the init and is immutable. However, if we create a new change object from serialized data we need the project name in order to create it with the correct project instance.\n\nA better name for the serialize/deserialize methods would be toDict/updateFromDict, but that is already used for the executor specific serialization.",
+      "parentUuid": "ba7bad4c_d4bed06a",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "23486db8_237a27b7",
         "filename": "zuul/zk/change_cache.py",
         "patchSetId": 16
@@ -74,6 +92,30 @@
       "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a3f8e1c_98c829fc",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-14T11:54:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23486db8_237a27b7",
+      "range": {
+        "startLine": 34,
+        "startChar": 24,
+        "endLine": 34,
+        "endChar": 48
+      },
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -151,6 +193,24 @@
     },
     {
       "key": {
+        "uuid": "3f10403e_a34dde7f",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-14T11:54:29Z",
+      "side": 1,
+      "message": "Thanks for catching that! In the process of fixing that I found other places that had race conditions so I think this needs a little more work.",
+      "parentUuid": "75d45114_7f376e8d",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a888b3f_88b3e979",
         "filename": "zuul/zk/change_cache.py",
         "patchSetId": 16
@@ -179,6 +239,24 @@
       "writtenOn": "2021-09-13T20:08:34Z",
       "side": 1,
       "message": "We insert the change into the cache here, but we do so without creating a data watch.  That means that if the children watch fires after this point (that\u0027s likely; it\u0027s what happens in the tests), it will see that we already have a cache entry and will not set a data watch.  So we either need to set a data watch here, or update the children watch to use a different method of deciding when to add data watches.",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d08fc1b_022a5681",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-14T11:54:29Z",
+      "side": 1,
+      "message": "Ack, the same is true for get() when the event for a new entry is not yet processed.",
+      "parentUuid": "1848e3d5_564984ea",
       "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
