@@ -4673,13 +4673,13 @@ class TestDataReturn(AnsibleZuulTestCase):
         j = json.loads(_get_file(paused_job.jobdir.result_data_file))
         self.assertEqual(j["data"]["build_id"], paused_job.uuid)
 
+        self.executor_server.hold_jobs_in_build = False
         # Stop the job worker to simulate an executor restart
         for job_worker in self.executor_server.job_workers.values():
             if job_worker.build_request.uuid == paused_job.uuid:
                 job_worker.stop()
         self.waitUntilSettled("stop job worker")
 
-        self.executor_server.hold_jobs_in_build = False
         self.executor_server.release('print-data-return-vars')
         self.waitUntilSettled("all jobs are done")
         # The "pause" job might be paused during the waitUntilSettled
