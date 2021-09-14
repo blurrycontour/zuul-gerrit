@@ -73,6 +73,13 @@ class GerritChange(Change):
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False
+        if len(data.get('parents', [])) > 1:
+            # This is a merge commit, and the SSH query only reports
+            # files in this commit's content (not files changed by the
+            # underlying merged changes).  Set files to None to
+            # instruct Zuul to ask the mergers to get the full file
+            # list.
+            self.files = None
         self.files = files
         self.id = data['id']
         self.is_merged = data.get('status', '') == 'MERGED'
