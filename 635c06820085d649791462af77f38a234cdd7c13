@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aeed4dbc_5acd0e8c",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-14T22:00:38Z",
+      "side": 1,
+      "message": "Should you return a min value of 0 here just in case the clocks get skewed away from each other?",
+      "revId": "635c06820085d649791462af77f38a234cdd7c13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
