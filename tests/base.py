@@ -5257,8 +5257,8 @@ class ZuulTestCase(BaseTestCase):
                 for req in self.fake_nodepool.getNodeRequests():
                     if req['state'] != model.STATE_FULFILLED:
                         return False
-                    r2 = nodepool.zk_nodepool.getNodeRequest(req['_oid'],
-                                                             cached=True)
+                    r2 = nodepool.zk_nodepool._node_request_cache.get(
+                        req['_oid'])
                     if r2 and r2.state != req['state']:
                         return False
                     if req and not r2:
