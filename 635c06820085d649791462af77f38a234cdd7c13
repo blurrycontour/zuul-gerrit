@@ -16,6 +16,23 @@
       "revId": "635c06820085d649791462af77f38a234cdd7c13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c78a0234_b79ec8ca",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-14T22:09:55Z",
+      "side": 1,
+      "message": "Good point, this was copy-pasta from code that didn\u0027t anticipate multiple actors.",
+      "revId": "635c06820085d649791462af77f38a234cdd7c13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
