@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "12683858_660251fc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1967,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-14T23:40:05Z",
+      "side": 1,
+      "message": "It\u0027s worth thinking about whether we still need this, or if we can rely on the scheduler having already actually canceled the build.  This was added in I14a3ad24feffcee5e999bef30d7c774e4be4fb92 but with the queue in ZK now, we may not need it any more.",
+      "revId": "abbc64da6d09a44e9b4840f0ff3be4c12a841ce6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c00ce01_60f52307",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2002,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-14T23:40:05Z",
+      "side": 1,
+      "message": "It looks like this is the only place where build_request_ref is used.  The path is predictable, so maybe instead of passing it through ZK on the result object, we can just re-generate it here?",
+      "revId": "abbc64da6d09a44e9b4840f0ff3be4c12a841ce6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
