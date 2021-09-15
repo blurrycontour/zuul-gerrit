@@ -434,18 +434,26 @@ class TestExecutorRepos(ZuulTestCase):
 class TestAnsibleJob(ZuulTestCase):
     tenant_config_file = 'config/ansible/main.yaml'
 
+    # TODO: turn this into a real test and have fake nodepool supply
+    # expected info
     def setUp(self):
         super(TestAnsibleJob, self).setUp()
         ansible_version = AnsibleManager().default_version
-        params = {
+        job = {
+            "name": "test",
             "ansible_version": ansible_version,
-            "zuul_event_id": 0,
+            "dependencies": [],
             "nodeset": {
                 "name": "dummy-node",
                 "node_request_id": 0,
                 "nodes": [],
                 "groups": [],
             },
+        }
+        self.zk_client.client.create('/test_job_def', json.dumps(job).encode('utf8'))
+        params = {
+            "job_ref": "/test_job_def",
+            "zuul_event_id": 0,
         }
         build_request = BuildRequest(
             "test",

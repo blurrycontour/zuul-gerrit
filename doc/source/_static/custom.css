@@ -4,3 +4,6 @@
 div.sphinxsidebarwrapper p.logo {
     text-align: left;
 }
+dl.zuul.path {
+    margin-bottom: 1em;
+}
