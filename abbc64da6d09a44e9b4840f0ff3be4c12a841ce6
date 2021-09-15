@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f56d24e7_b4fd3428",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1967,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-15T05:22:08Z",
+      "side": 1,
+      "message": "Thanks for the hint, I will try that out.",
+      "parentUuid": "12683858_660251fc",
+      "revId": "abbc64da6d09a44e9b4840f0ff3be4c12a841ce6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c00ce01_60f52307",
         "filename": "zuul/scheduler.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2021-09-14T23:40:05Z",
       "side": 1,
       "message": "It looks like this is the only place where build_request_ref is used.  The path is predictable, so maybe instead of passing it through ZK on the result object, we can just re-generate it here?",
+      "revId": "abbc64da6d09a44e9b4840f0ff3be4c12a841ce6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "977ca228_86c9fc31",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2002,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-15T05:22:08Z",
+      "side": 1,
+      "message": "That would work, but we would need to store the zone on the result event instead to generate the correct path. I thought I had a comment about that somewhere in this change, but it looks like I\u0027ve removed that already.",
+      "parentUuid": "1c00ce01_60f52307",
       "revId": "abbc64da6d09a44e9b4840f0ff3be4c12a841ce6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
