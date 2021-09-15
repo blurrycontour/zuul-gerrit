@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff2b1257_bb7a1ea4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-15T16:07:48Z",
+      "side": 1,
+      "message": "This both reports and updates the sql db.  Maybe we should put the reported_start check inside reportDequeue so that we still close out the sql entry?",
+      "revId": "e5b05529a45dbc9ae24f824ddc397c4262b7122e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
