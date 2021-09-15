@@ -25,7 +25,7 @@ LOCK_ROOT = "/zuul/locks"
 TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"
 
 
-class SessionAwareLock(Lock):
+class SessionAwareMixin:
     def __init__(self, client, path, identifier=None, extra_lock_patterns=()):
         self._zuul_ephemeral = None
         self._zuul_session_expired = False
@@ -60,6 +60,18 @@ class SessionAwareLock(Lock):
         return not self._zuul_session_expired
 
 
+class SessionAwareLock(SessionAwareMixin, Lock):
+    pass
+
+
+class SessionAwareWriteLock(SessionAwareMixin, WriteLock):
+    pass
+
+
+class SessionAwareReadLock(SessionAwareMixin, ReadLock):
+    pass
+
+
 @contextmanager
 def locked(lock, blocking=True, timeout=None):
     if not lock.acquire(blocking=blocking, timeout=timeout):
@@ -78,7 +90,9 @@ def locked(lock, blocking=True, timeout=None):
 def tenant_read_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     with locked(
-        ReadLock(client.client, f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
+        SessionAwareReadLock(
+            client.client,
+            f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
         blocking=blocking
     ) as lock:
         yield lock
@@ -88,7 +102,9 @@ def tenant_read_lock(client, tenant_name, blocking=True):
 def tenant_write_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     with locked(
-        WriteLock(client.client, f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
+        SessionAwareWriteLock(
+            client.client,
+            f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
         blocking=blocking
     ) as lock:
         yield lock
@@ -99,7 +115,8 @@ def pipeline_lock(client, tenant_name, pipeline_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     safe_pipeline = quote_plus(pipeline_name)
     with locked(
-        client.client.Lock(
+        SessionAwareLock(
+            client.client,
             f"/zuul/locks/pipeline/{safe_tenant}/{safe_pipeline}"),
         blocking=blocking
     ) as lock:
@@ -110,7 +127,9 @@ def pipeline_lock(client, tenant_name, pipeline_name, blocking=True):
 def management_queue_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     with locked(
-        client.client.Lock(f"/zuul/locks/events/management/{safe_tenant}"),
+        SessionAwareLock(
+            client.client,
+            f"/zuul/locks/events/management/{safe_tenant}"),
         blocking=blocking
     ) as lock:
         yield lock
@@ -120,7 +139,9 @@ def management_queue_lock(client, tenant_name, blocking=True):
 def trigger_queue_lock(client, tenant_name, blocking=True):
     safe_tenant = quote_plus(tenant_name)
     with locked(
-        client.client.Lock(f"/zuul/locks/events/trigger/{safe_tenant}"),
+        SessionAwareLock(
+            client.client,
+            f"/zuul/locks/events/trigger/{safe_tenant}"),
         blocking=blocking
     ) as lock:
         yield lock
