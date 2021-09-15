@@ -34,6 +34,23 @@
       "revId": "e5b05529a45dbc9ae24f824ddc397c4262b7122e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a5140a4e_ceb8dec4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-15T16:42:50Z",
+      "side": 1,
+      "message": "I think it\u0027s possible to report a start to sql without reporting a start to the code review system if there are no \"start\" reporters in the pipeline (so \"reported_start\" means \"there are jobs and a start reporter\").  So if we leave this as is, we may not report end to sql in the case there are jobs but no start reporter.\n\nI think that checking reported_start in reportDequeue is still an okay solution and handles that case.\n\nI\u0027m not sure we can or want to make the conditions the same though, since one of them depends on whether there\u0027s a start reporter.\n\nWe could move sql.reportBuildsetStart to _processOneItem; that might make things a little more clear, but I don\u0027t think it really changes anything.  We\u0027d still have to do 3/4 checks before doing that, and then one more check for whether there are start reporters before reporting to code review.",
+      "revId": "e5b05529a45dbc9ae24f824ddc397c4262b7122e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
