@@ -286,8 +286,6 @@ class GithubReporter(BaseReporter):
 
     def _formatMergeMessage(self, change):
         message = []
-        if change.title:
-            message.append(change.title)
         if change.body_text:
             message.append(change.body_text)
         merge_message = "\n\n".join(message)
