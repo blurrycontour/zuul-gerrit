@@ -14,7 +14,6 @@
 
 import logging
 import time
-from contextlib import suppress
 from uuid import uuid4
 
 import zuul.executor.common
@@ -39,8 +38,6 @@ class ExecutorClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
-        self.builds = {}
-        self.meta_jobs = {}  # A list of meta-jobs like stop or describe
 
         self.executor_api = self._executor_api_class(self.sched.zk_client)
         self.result_events = PipelineResultEventQueue.createRegistry(
@@ -77,8 +74,6 @@ class ExecutorClient(object):
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
         item.addBuild(build)
-        # TODO (felix): Remove once we are not relying on this list anymore
-        self.builds[uuid] = build
 
         if job.name == 'noop':
             data = {"start_time": time.time()}
@@ -195,7 +190,7 @@ class ExecutorClient(object):
 
         return False
 
-    def resumeBuild(self, build: Build) -> bool:
+    def resumeBuild(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id)
 
         if not build.build_request_ref:
@@ -209,12 +204,9 @@ class ExecutorClient(object):
             return True
         return False
 
-    def removeBuild(self, build: Build) -> None:
+    def removeBuild(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         log.debug("Removing build %s", build.uuid)
-
-        with suppress(KeyError):
-            del self.builds[build.uuid]
 
         if not build.build_request_ref:
             log.debug("Build %s has not been submitted to ZooKeeper",
