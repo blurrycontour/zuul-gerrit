@@ -136,6 +136,24 @@
     },
     {
       "key": {
+        "uuid": "41e91d32_3cf52579",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-15T09:00:16Z",
+      "side": 1,
+      "message": "You mean something like ZookeeperAbstractChangeCache and GerritZookeeperChangeCache?",
+      "parentUuid": "1a6632ec_488d1a05",
+      "revId": "5fd76bc6f521dcf1162621fdfb6467d9a5cd6848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0875a8ca_1a1b8408",
         "filename": "zuul/zk/change_cache.py",
         "patchSetId": 16
