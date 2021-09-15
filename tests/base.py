@@ -5217,6 +5217,13 @@ class ZuulTestCase(BaseTestCase):
 
         return sorted(self.builds, key=lambda x: x.name)
 
+    def getCurrentBuilds(self):
+        for tenant in self.scheds.first.sched.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for item in pipeline.getAllItems():
+                    for build in item.current_build_set.builds.values():
+                        yield build
+
     def release(self, job):
         job.release()
 
