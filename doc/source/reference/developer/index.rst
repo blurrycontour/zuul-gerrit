@@ -18,4 +18,5 @@ Zuul, though advanced users may find it interesting.
    ansible
    javascript
    specs/index
+   zookeeper
    releasenotes
