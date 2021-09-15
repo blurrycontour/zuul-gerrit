@@ -14,6 +14,7 @@
 
 import json
 import queue
+import threading
 import uuid
 
 import testtools
@@ -47,6 +48,10 @@ from tests.base import (
     BaseTestCase, HoldableExecutorApi, HoldableMergerApi,
     iterate_timeout
 )
+from zuul.zk.zkobject import ZKObject, ZKContext
+from zuul.zk.locks import tenant_write_lock
+
+from kazoo.exceptions import ZookeeperError
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -1427,3 +1432,94 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         for _ in iterate_timeout(10, "watch to be removed"):
             if change.cache_stat.key._hash not in self.cache._watched_keys:
                 break
+
+
+class DummyZKObject(ZKObject):
+    _retry_interval = 0.1
+
+    def getPath(self):
+        return f'/zuul/pipeline/{self.name}'
+
+    def serialize(self):
+        d = {'name': self.name,
+             'foo': self.foo}
+        return json.dumps(d).encode('utf-8')
+
+
+class TestZKObject(ZooKeeperBaseTestCase):
+    def test_zk_object(self):
+        stop_event = threading.Event()
+        self.zk_client.client.create('/zuul/pipeline', makepath=True)
+        # Create a new object
+        tenant_name = 'fake_tenant'
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline1 = DummyZKObject.new(context,
+                                          name=tenant_name,
+                                          foo='bar')
+            self.assertEqual(pipeline1.foo, 'bar')
+
+        # Load an object from ZK (that we don't already have)
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline2 = DummyZKObject.fromZK(context,
+                                             '/zuul/pipeline/fake_tenant')
+            self.assertEqual(pipeline2.foo, 'bar')
+
+        # Update an object
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline1.updateAttributes(context, foo='baz')
+            self.assertEqual(pipeline1.foo, 'baz')
+
+        # Refresh an existing object
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline2.refresh(context)
+            self.assertEqual(pipeline2.foo, 'baz')
+
+        # Delete an object
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline2.delete(context)
+
+    def test_zk_object_exception(self):
+        # Exercise the exception handling in the _save method
+        stop_event = threading.Event()
+        self.zk_client.client.create('/zuul/pipeline', makepath=True)
+        # Create a new object
+        tenant_name = 'fake_tenant'
+
+        class ZKFailsOnUpdate:
+            def set(self, *args, **kw):
+                raise ZookeeperError()
+
+        class FailsOnce:
+            def __init__(self, real_client):
+                self.count = 0
+                self._real_client = real_client
+
+            def set(self, *args, **kw):
+                self.count += 1
+                if self.count < 2:
+                    raise Exception()
+                return self._real_client.set(*args, **kw)
+
+        # Fail an update
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline1 = DummyZKObject.new(context,
+                                          name=tenant_name,
+                                          foo='bar')
+            self.assertEqual(pipeline1.foo, 'bar')
+
+            context.client = ZKFailsOnUpdate()
+            with testtools.ExpectedException(ZookeeperError):
+                pipeline1.updateAttributes(context, foo='baz')
+
+            # We should still have the old attribute
+            self.assertEqual(pipeline1.foo, 'bar')
+
+            context.client = FailsOnce(self.zk_client.client)
+            pipeline1.updateAttributes(context, foo='baz')
+            self.assertEqual(pipeline1.foo, 'baz')
