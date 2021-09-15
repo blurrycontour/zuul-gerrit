@@ -144,6 +144,9 @@ class MergeClient(object):
             self.merger_api.remove(merge_request)
         except JobRequestNotFound as e:
             self.log.warning("Could not complete merge: %s", str(e))
+            # In case we re-created the lock directory, still remove
+            # the request for the side effect of removing the lock.
+            self.merger_api.remove(merge_request)
             return
         except BadVersionError:
             # There could be a race condition:

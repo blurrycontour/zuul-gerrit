@@ -238,6 +238,9 @@ class ExecutorClient(object):
             self.executor_api.update(build_request)
         except JobRequestNotFound as e:
             self.log.warning("Could not complete build: %s", str(e))
+            # In case we re-created the lock directory, still remove
+            # the request for the side effect of removing the lock.
+            self.executor_api.remove(build_request)
             return
         except BadVersionError:
             # There could be a race condition:

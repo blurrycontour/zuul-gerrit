@@ -317,7 +317,10 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         except NoNodeError:
             # Nothing to do if the node is already deleted
             pass
-        self.clearParams(request)
+        try:
+            self.clearParams(request)
+        except NoNodeError:
+            pass
         try:
             # Delete the lock parent node as well
             path = "/".join([self.LOCK_ROOT, request.uuid])
@@ -421,6 +424,8 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
     def isLocked(self, request):
         path = "/".join([self.LOCK_ROOT, request.uuid])
+        if not self.kazoo_client.exists(path):
+            return False
         lock = SessionAwareLock(self.kazoo_client, path)
         is_locked = len(lock.contenders()) > 0
         return is_locked
