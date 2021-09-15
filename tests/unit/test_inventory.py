@@ -72,11 +72,9 @@ class TestInventoryBase(ZuulTestCase):
         self.waitUntilSettled()
 
     def cancelExecutorJobs(self):
-        for app in self.scheds:
-            executor_client = app.sched.executor
-            builds = [b for b in executor_client.builds.values()]
-            for build in builds:
-                executor_client.cancel(build)
+        executor_client = self.scheds.first.sched.executor
+        for build in self.getCurrentBuilds():
+            executor_client.cancel(build)
 
 
 class TestInventoryGithub(TestInventoryBase):
