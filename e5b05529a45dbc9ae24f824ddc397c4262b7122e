@@ -16,6 +16,24 @@
       "revId": "e5b05529a45dbc9ae24f824ddc397c4262b7122e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6ff8b886_aaf0d3a4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-15T16:23:45Z",
+      "side": 1,
+      "message": "I just checked and we sql.reportBuildsetStart only if item.job_graph.jobs \u003e 0. Maybe we should change the condition to that so those are the same? Reading the code I think we currently may even close out non-existent sql entries since we open them conditionally and close them unconditionally.",
+      "parentUuid": "ff2b1257_bb7a1ea4",
+      "revId": "e5b05529a45dbc9ae24f824ddc397c4262b7122e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
