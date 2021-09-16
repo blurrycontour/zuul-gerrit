@@ -33,6 +33,24 @@
       "revId": "b9c88467da27f2d0015209e137ead1e49c1bf2f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d959d8ad_b54a6281",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-16T14:49:14Z",
+      "side": 1,
+      "message": "removed in latest patchset",
+      "parentUuid": "8f88f56b_053614ab",
+      "revId": "b9c88467da27f2d0015209e137ead1e49c1bf2f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
