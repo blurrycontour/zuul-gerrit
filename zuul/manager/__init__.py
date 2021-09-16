@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import collections
+import contextlib
 import logging
 import textwrap
 import time
@@ -61,9 +62,19 @@ class PipelineManager(metaclass=ABCMeta):
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
         self.sql = self.sched.sql
+        # Current ZK context when the pipeline is locked
+        self.current_context = None
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
+
+    @contextlib.contextmanager
+    def currentContext(self, ctx):
+        try:
+            self.current_context = ctx
+            yield
+        finally:
+            self.current_context = None
 
     def _postConfig(self, layout):
         # All pipelines support shared queues for setting
@@ -309,7 +320,8 @@ class PipelineManager(metaclass=ABCMeta):
                 if item.live:
                     # Only reset the layout for live items as we don't need to
                     # re-create the layout in independent pipelines.
-                    item.layout_uuid = None
+                    item.updateAttributes(self.current_context,
+                                          layout_uuid=None)
 
                 # If the item is no longer active, but has a job graph we
                 # will make sure to update it.
@@ -431,13 +443,15 @@ class PipelineManager(metaclass=ABCMeta):
             self.updateBundle(item, change_queue, cycle)
 
             if enqueue_time:
-                item.enqueue_time = enqueue_time
-            item.live = live
+                item.updateAttributes(self.current_context,
+                                      enqueue_time=enqueue_time)
+            item.updateAttributes(self.current_context, live=live)
             self.reportStats(item, added=True)
-            item.quiet = quiet
+            item.updateAttributes(self.current_context, quiet=quiet)
             if item.live and not item.reported_enqueue:
                 self.reportEnqueue(item)
-                item.reported_enqueue = True
+                item.updateAttributes(self.current_context,
+                                      reported_enqueue=True)
 
             # Items in a dependency cycle are expected to be enqueued after
             # each other. To prevent non-cycle items from being enqueued
@@ -517,7 +531,7 @@ class PipelineManager(metaclass=ABCMeta):
             return
 
         log = get_annotated_logger(self.log, item.event)
-        item.bundle = model.Bundle()
+        item.updateAttributes(self.current_context, bundle=model.Bundle())
 
         # Try to find already enqueued items of this cycle, so we use
         # the same bundle
@@ -526,7 +540,8 @@ class PipelineManager(metaclass=ABCMeta):
             if not needed_item:
                 continue
             # Use a common bundle for the cycle
-            item.bundle = needed_item.bundle
+            item.updateAttributes(self.current_context,
+                                  bundle=needed_item.bundle)
             break
 
         log.info("Adding cycle item %s to bundle %s", item, item.bundle)
@@ -899,7 +914,8 @@ class PipelineManager(metaclass=ABCMeta):
 
         layout = self._getLayout(item)
         if layout:
-            item.layout_uuid = layout.uuid
+            item.updateAttributes(self.current_context,
+                                  layout_uuid=layout.uuid)
             self._layout_cache[item.layout_uuid] = layout
         return layout
 
@@ -1202,7 +1218,7 @@ class PipelineManager(metaclass=ABCMeta):
             return (True, nnfi)
 
         actionable = change_queue.isActionable(item)
-        item.active = actionable
+        item.updateAttributes(self.current_context, active=actionable)
 
         dep_items = self.getFailingDependentItems(item)
         if dep_items:
@@ -1233,7 +1249,8 @@ class PipelineManager(metaclass=ABCMeta):
                         and not item.reported_start \
                         and not item.quiet:
                     self.reportStart(item)
-                    item.reported_start = True
+                    item.updateAttributes(self.current_context,
+                                          reported_start=True)
                 if item.current_build_set.unable_to_merge:
                     failing_reasons.append("it has a merge conflict")
                 if item.current_build_set.config_errors:
@@ -1538,7 +1555,8 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, item.event)
         if not item.reported:
             # _reportItem() returns True if it failed to report.
-            item.reported = not self._reportItem(item)
+            item.updateAttributes(self.current_context,
+                                  reported=not self._reportItem(item))
         if self.changes_merge:
             succeeded = item.didAllJobsSucceed() and not item.isBundleFailing()
             merged = item.reported
