@@ -16,7 +16,6 @@
 import json
 import logging
 import time
-import random
 from abc import ABCMeta
 from typing import List
 
@@ -151,7 +150,6 @@ class RPCListener(RPCListenerBase):
         'allowed_labels_get',
         'get_admin_tenants',
         'get_running_jobs',
-        'get_job_log_stream_address',
         'tenant_list',
         'status_get',
         'job_get',
@@ -260,66 +258,6 @@ class RPCListener(RPCListenerBase):
                         running_items.append(item.formatJSON())
 
         job.sendWorkComplete(json.dumps(running_items))
-
-    def _get_fingergw_in_zone(self, zone):
-        gws = [gw for gw in self.sched.component_registry.all('fingergw')
-               if gw.zone == zone]
-        if gws:
-            return random.choice(gws)
-        return None
-
-    def handle_get_job_log_stream_address(self, job):
-        # TODO: map log files to ports. Currently there is only one
-        #       log stream for a given job. But many jobs produce many
-        #       log files, so this is forwards compatible with a future
-        #       where there are more logs to potentially request than
-        #       "console.log"
-        def find_build(uuid):
-            for tenant in self.sched.abide.tenants.values():
-                for pipeline_name, pipeline in tenant.layout.pipelines.items():
-                    for queue in pipeline.queues:
-                        for item in queue.queue:
-                            for bld in item.current_build_set.getBuilds():
-                                if bld.uuid == uuid:
-                                    return bld
-            return None
-
-        args = json.loads(job.arguments)
-        self.log.debug('Handle get_job_log_stream_address with arguments %s',
-                       job.arguments)
-        uuid = args['uuid']
-        # TODO: logfile = args['logfile']
-        job_log_stream_address = {}
-        build = find_build(uuid)
-        if build:
-            # If zone and worker zone are both given check if we need to route
-            # via a finger gateway in that zone.
-            source_zone = args.get('source_zone')
-            if (build.worker.zone and source_zone != build.worker.zone):
-                info = self._get_fingergw_in_zone(build.worker.zone)
-                if info:
-                    job_log_stream_address['server'] = info.hostname
-                    job_log_stream_address['port'] = info.public_port
-                    job_log_stream_address['use_ssl'] = info.use_ssl
-                    self.log.debug('Source (%s) and worker (%s) zone '
-                                   'are different, routing via %s:%s',
-                                   source_zone, build.worker.zone,
-                                   info.hostname, info.public_port)
-                else:
-                    self.log.warning('Source (%s) and worker (%s) zone '
-                                     'are different but no fingergw in '
-                                     'target zone found. '
-                                     'Falling back to direct connection.',
-                                     source_zone, build.worker.zone)
-            else:
-                self.log.debug('Source (%s) or worker zone (%s) undefined '
-                               'or equal, no routing is needed.',
-                               source_zone, build.worker.zone)
-
-            if 'server' not in job_log_stream_address:
-                job_log_stream_address['server'] = build.worker.hostname
-                job_log_stream_address['port'] = build.worker.log_port
-        job.sendWorkComplete(json.dumps(job_log_stream_address))
 
     def _is_authorized(self, tenant, claims):
         authorized = False
