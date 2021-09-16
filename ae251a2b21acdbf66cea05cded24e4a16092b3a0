@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "96854f9e_4ed68202",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-16T23:56:23Z",
+      "side": 1,
+      "message": "nit: Seems like we\u0027re using a lot of _ methods... maybe we should add a new one?",
+      "revId": "ae251a2b21acdbf66cea05cded24e4a16092b3a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
