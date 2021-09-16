@@ -41,6 +41,7 @@ from zuul.lib.config import get_default
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
+from zuul.zk import zkobject
 from zuul.zk.change_cache import ChangeKey
 
 MERGER_MERGE = 1          # "git merge"
@@ -305,6 +306,15 @@ class Pipeline(object):
         self.window_decrease_factor = None
         self.state = self.STATE_NORMAL
 
+    def getPath(self):
+        safe_tenant = urllib.parse.quote_plus(self.tenant.name)
+        safe_pipeline = urllib.parse.quote_plus(self.name)
+        return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
+
+    def refresh(self, context):
+        for queue in self.queues:
+            queue.refresh(context)
+
     @property
     def actions(self):
         return (
@@ -446,6 +456,31 @@ class ChangeQueue(object):
         self.window_decrease_factor = window_decrease_factor
         self.dynamic = dynamic
 
+    def getPath(self):
+        queue_id = (self.uuid if self.dynamic
+                    else urllib.parse.quote_plus(self.name))
+        return f"{self.pipeline.getPath()}/queue/{queue_id}"
+
+    def refresh(self, context):
+        # FIXME: we currently don't have the queue data in ZK, so we just
+        # construct a similar list of item uuids.
+        existing_items = {i.uuid: i for i in self.queue}
+        items_in_queue = existing_items.keys()
+        for item_uuid in items_in_queue:
+            item = existing_items.get(item_uuid)
+            if item:
+                item.refresh(context)
+            else:
+                # FIXME: this code path is currently unused as we have all
+                # items in the queue.
+                item = QueueItem.fromZK(
+                    context,
+                    QueueItem.itemPath(self.pipeline.getPath(), item_uuid))
+
+    @property
+    def zk_context(self):
+        return self.pipeline.manager.current_context
+
     def __repr__(self):
         return '<ChangeQueue %s: %s>' % (self.pipeline.name, self.name)
 
@@ -471,16 +506,20 @@ class ChangeQueue(object):
         return (project, branch) in self.project_branches
 
     def enqueueChange(self, change, event):
-        item = QueueItem(self, change, event)
+        item = QueueItem.new(self.zk_context,
+                             queue=self,
+                             pipeline=self.pipeline,
+                             change=change,
+                             event=event,
+                             enqueue_time=time.time())
         self.enqueueItem(item)
-        item.enqueue_time = time.time()
         return item
 
     def enqueueItem(self, item):
-        item.pipeline = self.pipeline
-        item.queue = self
+        # FIXME: the pipeline should not change
+        item._set(pipeline=self.pipeline, queue=self)
         if self.queue:
-            item.item_ahead = self.queue[-1]
+            item.updateAttributes(self.zk_context, item_ahead=self.queue[-1])
             item.item_ahead.items_behind.append(item)
         self.queue.append(item)
 
@@ -492,10 +531,24 @@ class ChangeQueue(object):
         for item_behind in item.items_behind:
             if item.item_ahead:
                 item.item_ahead.items_behind.append(item_behind)
-            item_behind.item_ahead = item.item_ahead
-        item.item_ahead = None
-        item.items_behind = []
-        item.dequeue_time = time.time()
+            item_behind.updateAttributes(self.zk_context,
+                                         item_ahead=item.item_ahead)
+
+        if item.bundle:
+            if any([i in self.queue for i in item.bundle.items]):
+                item.updateAttributes(
+                    self.zk_context, item_ahead=None, items_behind=[],
+                    dequeue_time=time.time())
+            else:
+                # We no longer need the bundle items
+                for bundle_item in item.bundle.items:
+                    bundle_item.delete(self.zk_context)
+                item._set(dequeue_time=time.time())
+        else:
+            item.delete(self.zk_context)
+            # We use the dequeue time for stats reporting, but the queue
+            # item will no longer be in Zookeeper at this point.
+            item._set(dequeue_time=time.time())
 
     def moveItem(self, item, item_ahead):
         if item.item_ahead == item_ahead:
@@ -506,10 +559,14 @@ class ChangeQueue(object):
         for item_behind in item.items_behind:
             if item.item_ahead:
                 item.item_ahead.items_behind.append(item_behind)
-            item_behind.item_ahead = item.item_ahead
+                item_behind.updateAttributes(
+                    self.zk_context,
+                    item_ahead=item.item_ahead)
         # Add to new location
-        item.item_ahead = item_ahead
-        item.items_behind = []
+        item.updateAttributes(
+            self.zk_context,
+            item_ahead=item_ahead,
+            items_behind=[])
         if item.item_ahead:
             item.item_ahead.items_behind.append(item)
         return True
@@ -2589,7 +2646,7 @@ class BuildSet(object):
         return Attributes(uuid=self.uuid)
 
 
-class QueueItem(object):
+class QueueItem(zkobject.ZKObject):
 
     """Represents the position of a Change in a ChangeQueue.
 
@@ -2598,41 +2655,135 @@ class QueueItem(object):
     produced for this `QueueItem`.
     """
 
-    def __init__(self, queue, change, event):
-        log = logging.getLogger("zuul.QueueItem")
-        self.log = get_annotated_logger(log, event)
-        self.uuid = uuid4().hex
-        self.pipeline = queue.pipeline
-        self.queue = queue
-        self.change = change  # a ref
-        self.dequeued_needing_change = False
-        self.current_build_set = BuildSet(self)
-        self.item_ahead = None
-        self.items_behind = []
-        self.enqueue_time = None
-        self.report_time = None
-        self.dequeue_time = None
-        self.reported = False
-        self.reported_enqueue = False
-        self.reported_start = False
-        self.quiet = False
-        self.active = False  # Whether an item is within an active window
-        self.live = True  # Whether an item is intended to be processed at all
-        self.layout_uuid = None
-        self.project_pipeline_config = None
-        self.job_graph = None
-        self._old_job_graph = None  # Cached job graph of previous layout
-        self._cached_sql_results = {}
-        self.event = event  # The trigger event that lead to this queue item
+    log = logging.getLogger("zuul.QueueItem")
 
-        # Additional container for connection specifig information to be used
-        # by reporters throughout the lifecycle
-        self.dynamic_state = defaultdict(dict)
+    def __init__(self):
+        super().__init__()
+        self._set(
+            uuid=uuid4().hex,
+            pipeline=None,
+            queue=None,
+            change=None,  # a ref
+            dequeued_needing_change=False,
+            current_build_set=None,
+            item_ahead=None,
+            items_behind=[],
+            enqueue_time=None,
+            report_time=None,
+            dequeue_time=None,
+            reported=False,
+            reported_enqueue=False,
+            reported_start=False,
+            quiet=False,
+            active=False,  # Whether an item is within an active window
+            live=True,  # Whether an item is intended to be processed at all
+            layout_uuid=None,
+            project_pipeline_config=None,
+            job_graph=None,
+            _old_job_graph=None,  # Cached job graph of previous layout
+            _cached_sql_results={},
+            event=None,  # The trigger event that lead to this queue item
 
-        # A bundle holds other queue items that have to be successful
-        # for the current queue item to succeed
-        self.bundle = None
-        self.dequeued_bundle_failing = False
+            # Additional container for connection specifig information to be
+            # used by reporters throughout the lifecycle
+            dynamic_state=defaultdict(dict),
+
+            # A bundle holds other queue items that have to be successful
+            # for the current queue item to succeed
+            bundle=None,
+            dequeued_bundle_failing=False
+        )
+
+    @classmethod
+    def new(klass, context, **kw):
+        obj = klass()
+        obj._set(**kw)
+        obj._set(current_build_set=BuildSet(obj))
+        obj._save(context, create=True)
+        return obj
+
+    def getPath(self):
+        return self.itemPath(self.pipeline.getPath(), self.uuid)
+
+    @classmethod
+    def itemPath(cls, pipeline_path, item_uuid):
+        return f"{pipeline_path}/item/{item_uuid}"
+
+    def serialize(self):
+        if isinstance(self.event, TriggerEvent):
+            event_type = "TriggerEvent"
+        else:
+            event_type = self.event.__class__.__name__
+
+        data = {
+            "uuid": self.uuid,
+            # TODO: we need to also store some info about the change in
+            # Zookeeper in order to show the change info on the status page.
+            # This needs change cache and the API to resolve change by key.
+            "change": self.change.cache_key,
+            "dequeued_needing_change": self.dequeued_needing_change,
+            # "current_build_set": self.current_build_set.uuid,
+            "enqueue_time": self.enqueue_time,
+            "report_time": self.report_time,
+            "dequeue_time": self.dequeue_time,
+            "reported": self.reported,
+            "reported_enqueue": self.reported_enqueue,
+            "reported_start": self.reported_start,
+            "quiet": self.quiet,
+            "active": self.active,
+            "live": self.live,
+            "layout_uuid": self.layout_uuid,
+            # "project_pipeline_config": self.project_pipeline_config,
+            # "job_graph": self.job_graph,
+            # "_old_job_graph": self._old_job_graph,
+            "event": {
+                "type": event_type,
+                "data": self.event.toDict(),
+            },
+            "dynamic_state": self.dynamic_state,
+            # "bundle": self.bundle and self.bundle.serialize(),
+            "dequeued_bundle_failing": self.dequeued_bundle_failing,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def deserialize(self, raw):
+        data = super().deserialize(raw)
+        # Set our UUID so that getPath() returns the correct path for
+        # child objects.
+        self._set(uuid=data["uuid"])
+
+        # FIXME: Move queue item class after events so we can define
+        # this as a class attribute.
+        EVENT_TYPE_MAP = {
+            "EnqueueEvent": EnqueueEvent,
+            "DequeueEvent": DequeueEvent,
+            "PromoteEvent": PromoteEvent,
+        }
+
+        event_type = data["event"]["type"]
+        if event_type == "TriggerEvent":
+            event_class = (
+                self.pipeline.manager.sched.connections.getTriggerEventClass(
+                    data["event"]["data"]["driver_name"])
+            )
+        else:
+            event_class = EVENT_TYPE_MAP.get(event_type)
+
+        if event_class is None:
+            raise NotImplementedError(
+                f"Event type {event_type} not deserializable")
+
+        event = event_class.fromDict(data["event"]["data"])
+        change = self.pipeline.manager.resolveChangeKeys(
+            [data["change"]])[0]
+
+        data.update({
+            "event": event,
+            "change": change,
+            "log": get_annotated_logger(self.log, event),
+            "dynamic_state": defaultdict(dict, data["dynamic_state"])
+        })
+        return data
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
@@ -2647,11 +2798,13 @@ class QueueItem(object):
             self.uuid, self.change, pipeline)
 
     def resetAllBuilds(self):
-        self.current_build_set = BuildSet(self)
-        self.layout_uuid = None
-        self.project_pipeline_config = None
-        self.job_graph = None
-        self._old_job_graph = None
+        self.updateAttributes(
+            self.pipeline.manager.current_context,
+            current_build_set=BuildSet(self),
+            layout_uuid=None,
+            project_pipeline_config=None,
+            job_graph=None,
+            _old_job_graph=None)
 
     def addBuild(self, build):
         self.current_build_set.addBuild(build)
@@ -2663,7 +2816,8 @@ class QueueItem(object):
         self.current_build_set.removeBuild(build)
 
     def setReportedResult(self, result):
-        self.report_time = time.time()
+        self.updateAttributes(self.pipeline.manager.current_context,
+                              report_time=time.time())
         self.current_build_set.result = result
 
     def debug(self, msg, indent=0):
@@ -2685,10 +2839,11 @@ class QueueItem(object):
         store the resulting job tree."""
 
         ppc = layout.getProjectPipelineConfig(self)
+        ctx = self.pipeline.manager.current_context
         try:
             # Conditionally set self.ppc so that the debug method can
             # consult it as we resolve the jobs.
-            self.project_pipeline_config = ppc
+            self.updateAttributes(ctx, project_pipeline_config=ppc)
             if ppc:
                 for msg in ppc.debug_messages:
                     self.debug(msg)
@@ -2706,11 +2861,10 @@ class QueueItem(object):
             # created the layout.
             job_graph.project_metadata = layout.project_metadata
 
-            self.job_graph = job_graph
+            self.updateAttributes(ctx, job_graph=job_graph)
         except Exception:
-            self.project_pipeline_config = None
-            self.job_graph = None
-            self._old_job_graph = None
+            self.updateAttributes(ctx, project_pipeline_config=None,
+                                  job_graph=None, _old_job_graph=None)
             raise
 
     def hasJobGraph(self):
@@ -3243,11 +3397,15 @@ class QueueItem(object):
         self.setResult(fakebuild)
 
     def setDequeuedNeedingChange(self):
-        self.dequeued_needing_change = True
+        self.updateAttributes(
+            self.pipeline.manager.current_context,
+            dequeued_needing_change=True)
         self._setAllJobsSkipped()
 
     def setDequeuedBundleFailing(self):
-        self.dequeued_bundle_failing = True
+        self.updateAttributes(
+            self.pipeline.manager.current_context,
+            dequeued_bundle_failing=True)
         self._setMissingJobsSkipped()
 
     def setUnableToMerge(self):
@@ -3544,8 +3702,10 @@ class QueueItem(object):
                 try:
                     ppc = layout_ahead.getProjectPipelineConfig(self)
                     log.debug("Creating job graph for config change detection")
-                    self._old_job_graph = layout_ahead.createJobGraph(
-                        self, ppc, skip_file_matcher=True)
+                    self.updateAttributes(
+                        self.pipeline.manager.current_context,
+                        _old_job_graph=layout_ahead.createJobGraph(
+                            self, ppc, skip_file_matcher=True))
                     log.debug("Done creating job graph for "
                               "config change detection")
                 except Exception:
@@ -4407,6 +4567,7 @@ class TriggerEvent(AbstractEvent):
             "arrived_at_scheduler_timestamp": (
                 self.arrived_at_scheduler_timestamp
             ),
+            "driver_name": self.driver_name,
         }
 
     def updateFromDict(self, d):
@@ -4437,6 +4598,7 @@ class TriggerEvent(AbstractEvent):
         self.arrived_at_scheduler_timestamp = (
             d["arrived_at_scheduler_timestamp"]
         )
+        self.driver_name = d["driver_name"]
 
     @property
     def canonical_project_name(self):
