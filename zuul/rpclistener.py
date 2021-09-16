@@ -28,6 +28,13 @@ from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
 
 
+class LocalQueueItem(model.QueueItem):
+    """Local non-persistent queue item for job freezing."""
+
+    def _save(self, ctx, create=False):
+        pass
+
+
 class RPCListenerBase(metaclass=ABCMeta):
     log = logging.getLogger("zuul.RPCListenerBase")
     thread_name = 'zuul-rpc-gearman-worker'
@@ -441,7 +448,8 @@ class RPCListener(RPCListenerBase):
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
-        item = model.QueueItem(queue, change, None)
+        item = LocalQueueItem.new(None, queue=queue, change=change,
+                                  pipeline=queue.pipeline)
         item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
 
         output = []
@@ -471,7 +479,8 @@ class RPCListener(RPCListenerBase):
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
-        item = model.QueueItem(queue, change, None)
+        item = LocalQueueItem.new(None, queue=queue, change=change,
+                                  pipeline=queue.pipeline)
         item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
 
         job = item.job_graph.jobs.get(args.get("job"))
