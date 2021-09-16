@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af4b3237_7410b9f0",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5280,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-16T23:32:50Z",
+      "side": 1,
+      "message": "This appears to be causing some problems because it creates executor queues if they don\u0027t already exist: https://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_f03/808792/5/check/zuul-tox-py38/f033fb4/testr_results.html  And that creates watchers, etc...\n\nThe build_request_ref is a full path right?  Can we just zk_client.get() that directly?",
+      "revId": "c11d849cc86395992eee90f1650efdae9691f190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a91c6b99_6b8bd7cc",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5419,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-16T23:32:50Z",
+      "side": 1,
+      "message": "It sort of seems like we may not actually need the matcher argument?  What are your thoughts on that?",
+      "revId": "c11d849cc86395992eee90f1650efdae9691f190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
