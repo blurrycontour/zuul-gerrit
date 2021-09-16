@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import cherrypy
+import random
 import socket
 
 from cachetools.func import ttl_cache
@@ -36,7 +37,8 @@ from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
 import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import WebComponent
+from zuul.zk.components import ComponentRegistry, WebComponent
+from zuul.zk.executor import ExecutorApi
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
 from zuul.lib.auth import AuthenticatorRegistry
@@ -166,15 +168,81 @@ class LogStreamHandler(WebSocket):
                     "'{key}' missing from request payload".format(
                         key=key))
 
-        port_location = self.zuulweb.rpc.get_job_log_stream_address(
+        port_location = self._getLogStreamAddress(
             request['uuid'], source_zone=self.zuulweb.zone)
         if not port_location:
-            return self.logClose(4011, "Error with Gearman")
+            return self.logClose(4011, "Error with log streaming")
 
         self.streamer = LogStreamer(
             self.zuulweb, self,
             port_location['server'], port_location['port'],
             request['uuid'], port_location.get('use_ssl'))
+
+    def _getLogStreamAddress(self, uuid, source_zone):
+        """
+        Looks up the log stream address for the given build UUID.
+
+        Try to find the build request for the given UUID in ZooKeeper
+        by searching through all available zones. If a build request
+        was found we use the worker information to build the log stream
+        address.
+        """
+        build_request = None
+        worker_zone = None
+        # Search for the build request in ZooKeeper. This iterates over all
+        # available zones (inlcuding unzoned) and stops when the UUID is found.
+        executor_api = self.zuulweb.executor_api
+        for zone in executor_api._getAllZones():
+            zone_root = executor_api._getZoneRoot(zone)
+            build_request_path = f"{zone_root}/requests/{uuid}"
+            build_request = executor_api.get(build_request_path)
+            if build_request is not None:
+                # Use the zone from the ZooKeeper path, so there is no need to
+                # store that information on the build request.
+                worker_zone = zone
+                break
+
+        if build_request is None:
+            return self.logClose(4011, "Build not found")
+
+        worker_info = build_request.worker_info
+        if not worker_info:
+            return self.logClose(4011, "Build did not start yet")
+
+        job_log_stream_address = {}
+        if worker_zone and source_zone != worker_zone:
+            info = self._getFingerGatewayInZone(worker_zone)
+            if info:
+                job_log_stream_address['server'] = info.hostname
+                job_log_stream_address['port'] = info.public_port
+                job_log_stream_address['use_ssl'] = info.use_ssl
+                self.log.debug('Source (%s) and worker (%s) zone '
+                               'are different, routing via %s:%s',
+                               source_zone, worker_zone,
+                               info.hostname, info.public_port)
+            else:
+                self.log.warning('Source (%s) and worker (%s) zone '
+                                 'are different but no fingergw in '
+                                 'target zone found. '
+                                 'Falling back to direct connection.',
+                                 source_zone, worker_zone)
+        else:
+            self.log.debug('Source (%s) or worker zone (%s) undefined '
+                           'or equal, no routing is needed.',
+                           source_zone, worker_zone)
+
+        if 'server' not in job_log_stream_address:
+            job_log_stream_address['server'] = worker_info["hostname"]
+            job_log_stream_address['port'] = worker_info["log_port"]
+
+        return job_log_stream_address
+
+    def _getFingerGatewayInZone(self, zone):
+        gws = [gw for gw in self.zuulweb.component_registry.all('fingergw')
+               if gw.zone == zone]
+        if gws:
+            return random.choice(gws)
+        return None
 
 
 class LogStreamer(object):
@@ -1293,8 +1361,13 @@ class ZuulWeb(object):
                                             client_id='Zuul Web Server')
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
+
+        self.executor_api = ExecutorApi(self.zk_client)
+
         self.component_info = WebComponent(self.zk_client, self.hostname)
         self.component_info.register()
+
+        self.component_registry = ComponentRegistry(self.zk_client)
 
         self.connections = connections
         self.authenticators = authenticators
