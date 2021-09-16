@@ -334,7 +334,6 @@ class TestJob(BaseTestCase):
         # Test master
         change.branch = 'master'
         item = self.queue.enqueueChange(change, None)
-        item.layout = self.layout
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
