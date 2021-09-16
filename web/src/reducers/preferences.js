@@ -12,8 +12,6 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import update from 'immutability-helper'
-
 import {
   PREFERENCE_SET,
 } from '../actions/preferences'
@@ -35,7 +33,7 @@ export default (state = {
   let newstate
   switch (action.type) {
     case PREFERENCE_SET:
-      newstate = update(state, {$merge: {[action.key]: action.value}})
+      newstate = { ...state, [action.key]: action.value }
       localStorage.setItem('preferences', JSON.stringify(newstate))
       return newstate
     default:

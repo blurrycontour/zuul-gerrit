@@ -12,8 +12,6 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import update from 'immutability-helper'
-
 import {
   ADD_ERROR,
   CLEAR_ERROR,
@@ -27,18 +25,21 @@ export default (state = [], action) => {
   if (action.error && action.type.match(/.*_FETCH_FAIL$/)) {
     action = addApiError(action.error)
   }
+  let newError
   switch (action.type) {
     case ADD_ERROR:
       if (state.filter(error => (
         error.url === action.error.url &&
-            error.status === action.error.status)).length > 0)
+        error.status === action.error.status)).length > 0)
         return state
-      action.error.id = action.id
-      action.error.date = Date.now()
-      return update(state, {$push: [action.error]})
+      newError = {
+        ...action.error,
+        id: action.id,
+        date: Date.now()
+      }
+      return [...state, newError]
     case CLEAR_ERROR:
-      return update(state, {$splice: [[state.indexOf(
-        state.filter(item => (item.id === action.id))[0]), 1]]})
+      return state.filter(item => (item.id !== action.id))
     case CLEAR_ERRORS:
       return []
     default:
