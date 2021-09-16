@@ -17,6 +17,7 @@ import collections
 import os
 import random
 import types
+from unittest import mock
 
 import fixtures
 import testtools
@@ -63,6 +64,7 @@ class TestJob(BaseTestCase):
         self.tenant.addUntrustedProject(self.tpc)
         self.pipeline = model.Pipeline('gate', self.tenant)
         self.pipeline.source_context = self.context
+        self.pipeline.manager = mock.Mock()
         self.layout.addPipeline(self.pipeline)
         self.queue = model.ChangeQueue(self.pipeline)
         self.pcontext = configloader.ParseContext(
@@ -161,7 +163,8 @@ class TestJob(BaseTestCase):
                 "Unable to modify final job"):
             job.applyVariant(bad_final, self.layout)
 
-    def test_job_inheritance_job_tree(self):
+    @mock.patch("zuul.model.zkobject.ZKObject._save")
+    def test_job_inheritance_job_tree(self, save_mock):
         queue = model.ChangeQueue(self.pipeline)
 
         base = self.pcontext.job_parser.fromYaml({
@@ -231,7 +234,8 @@ class TestJob(BaseTestCase):
         self.assertEqual(job.name, 'python27')
         self.assertEqual(job.timeout, 70)
 
-    def test_inheritance_keeps_matchers(self):
+    @mock.patch("zuul.model.zkobject.ZKObject._save")
+    def test_inheritance_keeps_matchers(self, save_mock):
         queue = model.ChangeQueue(self.pipeline)
 
         base = self.pcontext.job_parser.fromYaml({
@@ -272,6 +276,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(base.changeMatchesFiles(change))
         self.assertFalse(python27.changeMatchesFiles(change))
 
+        self.pipeline.manager.getFallbackLayout = mock.Mock(return_value=None)
         item.freezeJobGraph(self.layout)
         self.assertEqual([], item.getJobs())
 
@@ -308,7 +313,8 @@ class TestJob(BaseTestCase):
                 "to shadow job base in base_project"):
             self.layout.addJob(base2)
 
-    def test_job_pipeline_allow_untrusted_secrets(self):
+    @mock.patch("zuul.model.zkobject.ZKObject._save")
+    def test_job_pipeline_allow_untrusted_secrets(self, save_mock):
         self.pipeline.post_review = False
         job = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -338,7 +344,6 @@ class TestJob(BaseTestCase):
         # Test master
         change.branch = 'master'
         item = self.queue.enqueueChange(change, None)
-        item.layout = self.layout
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
