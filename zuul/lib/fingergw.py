@@ -21,11 +21,13 @@ from configparser import ConfigParser
 from typing import Optional
 
 import zuul.rpcclient
+from zuul.exceptions import StreamingError
 from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import FingerGatewayComponent
+from zuul.zk.components import ComponentRegistry, FingerGatewayComponent
+from zuul.zk.executor import ExecutorApi
 
 COMMANDS = ['stop']
 
@@ -81,7 +83,8 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         port = None
         try:
             build_uuid = self.getCommand()
-            port_location = self.fingergw.rpc.get_job_log_stream_address(
+            port_location = streamer_utils.getJobLogStreamAddress(
+                self.fingergw.executor_api, self.fingergw.component_registry,
                 build_uuid, source_zone=self.fingergw.zone)
 
             if not port_location:
@@ -93,6 +96,8 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
             port = port_location['port']
             use_ssl = port_location.get('use_ssl', False)
             self._fingerClient(server, port, build_uuid, use_ssl)
+        except StreamingError as e:
+            self.request.sendall(str(e).encode("utf-8"))
         except BrokenPipeError:   # Client disconnect
             return
         except Exception:
@@ -199,6 +204,10 @@ class FingerGateway(object):
         if self.tls_listen:
             self.component_info.use_ssl = True
         self.component_info.register()
+
+        self.component_registry = ComponentRegistry(self.zk_client)
+
+        self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
 
     def _runCommand(self):
         while self.command_running:

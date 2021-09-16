@@ -27,11 +27,13 @@ class ExecutorQueue(JobRequestQueue):
 
     def __init__(self, client, root,
                  initial_state_getter,
+                 use_cache=True,
                  request_callback=None,
                  event_callback=None):
         self.log.debug("Creating executor queue at root %s", root)
         self._initial_state_getter = initial_state_getter
-        super().__init__(client, root, request_callback, event_callback)
+        super().__init__(
+            client, root, use_cache, request_callback, event_callback)
 
     @property
     def initial_state(self):
@@ -51,10 +53,11 @@ class ExecutorQueue(JobRequestQueue):
 class ExecutorApi:
     log = logging.getLogger("zuul.ExecutorApi")
 
-    def __init__(self, client, zone_filter=None,
+    def __init__(self, client, zone_filter=None, use_cache=True,
                  build_request_callback=None,
                  build_event_callback=None):
         self.client = client
+        self.use_cache = use_cache
         self.request_callback = build_request_callback
         self.event_callback = build_event_callback
         self.zone_filter = zone_filter
@@ -68,6 +71,7 @@ class ExecutorApi:
                 self.client,
                 self._getZoneRoot(zone),
                 self._getInitialState,
+                self.use_cache,
                 self.request_callback,
                 self.event_callback))
 
