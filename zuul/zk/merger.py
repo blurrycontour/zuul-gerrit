@@ -22,6 +22,6 @@ class MergerApi(JobRequestQueue):
     log = logging.getLogger("zuul.MergerApi")
     request_class = MergeRequest
 
-    def __init__(self, client, merge_request_callback=None):
+    def __init__(self, client, use_cache=True, merge_request_callback=None):
         root = '/zuul/merger'
-        super().__init__(client, root, merge_request_callback)
+        super().__init__(client, root, use_cache, merge_request_callback)

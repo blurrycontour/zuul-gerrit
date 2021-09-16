@@ -27,11 +27,13 @@ class ExecutorQueue(JobRequestQueue):
 
     def __init__(self, client, root,
                  initial_state_getter,
+                 use_cache=True,
                  request_callback=None,
                  event_callback=None):
         self.log.debug("Creating executor queue at root %s", root)
         self._initial_state_getter = initial_state_getter
-        super().__init__(client, root, request_callback, event_callback)
+        super().__init__(
+            client, root, use_cache, request_callback, event_callback)
 
     @property
     def initial_state(self):
@@ -51,10 +53,11 @@ class ExecutorQueue(JobRequestQueue):
 class ExecutorApi:
     log = logging.getLogger("zuul.ExecutorApi")
 
-    def __init__(self, client, zone_filter=None,
+    def __init__(self, client, zone_filter=None, use_cache=True,
                  build_request_callback=None,
                  build_event_callback=None):
         self.client = client
+        self.use_cache = use_cache
         self.request_callback = build_request_callback
         self.event_callback = build_event_callback
         self.zone_filter = zone_filter
@@ -68,6 +71,7 @@ class ExecutorApi:
                 self.client,
                 self._getZoneRoot(zone),
                 self._getInitialState,
+                self.use_cache,
                 self.request_callback,
                 self.event_callback))
 
@@ -137,6 +141,17 @@ class ExecutorApi:
         else:
             zone = None
         return self.zone_queues[zone].get(path)
+
+    def getByUuid(self, uuid):
+        """Find a build request by its UUID.
+
+        This method will search for the UUID in all available zones.
+        """
+        for zone in self._getAllZones():
+            request = self.zone_queues[zone].getByUuid(uuid)
+            if request:
+                return request, zone
+        return None, None
 
     def remove(self, request):
         return self.zone_queues[request.zone].remove(request)

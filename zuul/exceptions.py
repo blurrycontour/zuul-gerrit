@@ -39,6 +39,10 @@ class ConfigurationError(Exception):
     pass
 
 
+class StreamingError(Exception):
+    pass
+
+
 # Authentication Exceptions
 
 class AuthTokenException(Exception):

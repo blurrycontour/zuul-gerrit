@@ -44,9 +44,11 @@ class JobRequestQueue(ZooKeeperSimpleBase):
     log = logging.getLogger("zuul.JobRequestQueue")
     request_class = JobRequest
 
-    def __init__(self, client, root,
+    def __init__(self, client, root, use_cache=True,
                  request_callback=None, event_callback=None):
         super().__init__(client)
+
+        self.use_cache = use_cache
 
         self.REQUEST_ROOT = f"{root}/requests"
         self.LOCK_ROOT = f"{root}/locks"
@@ -76,12 +78,13 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         return self.request_class.REQUESTED
 
     def register(self):
-        # Register a child watch that listens for new requests
-        self.kazoo_client.ChildrenWatch(
-            self.REQUEST_ROOT,
-            self._makeRequestWatcher(self.REQUEST_ROOT),
-            send_event=True,
-        )
+        if self.use_cache:
+            # Register a child watch that listens for new requests
+            self.kazoo_client.ChildrenWatch(
+                self.REQUEST_ROOT,
+                self._makeRequestWatcher(self.REQUEST_ROOT),
+                send_event=True,
+            )
 
     def _makeRequestWatcher(self, path):
         def watch(requests, event=None):
@@ -291,6 +294,11 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         request._zstat = zstat
 
         return request
+
+    def getByUuid(self, uuid):
+        """Get a request by its UUID without using the cache."""
+        path = f"{self.REQUEST_ROOT}/{uuid}"
+        return self.get(path)
 
     def refresh(self, request):
         """Refreshs a request object with the current data from ZooKeeper. """

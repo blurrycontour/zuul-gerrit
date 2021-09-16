@@ -32,11 +32,13 @@ import threading
 from zuul import exceptions
 import zuul.lib.repl
 from zuul.lib import commandsocket
+from zuul.lib import streamer_utils
 from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
 import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import WebComponent
+from zuul.zk.components import ComponentRegistry, WebComponent
+from zuul.zk.executor import ExecutorApi
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
 from zuul.lib.auth import AuthenticatorRegistry
@@ -166,10 +168,15 @@ class LogStreamHandler(WebSocket):
                     "'{key}' missing from request payload".format(
                         key=key))
 
-        port_location = self.zuulweb.rpc.get_job_log_stream_address(
-            request['uuid'], source_zone=self.zuulweb.zone)
+        try:
+            port_location = streamer_utils.getJobLogStreamAddress(
+                self.zuulweb.executor_api, self.zuulweb.component_registry,
+                request['uuid'], source_zone=self.zuulweb.zone)
+        except exceptions.StreamingError as e:
+            return self.logClose(4011, str(e))
+
         if not port_location:
-            return self.logClose(4011, "Error with Gearman")
+            return self.logClose(4011, "Error with log streaming")
 
         self.streamer = LogStreamer(
             self.zuulweb, self,
@@ -1293,8 +1300,13 @@ class ZuulWeb(object):
                                             client_id='Zuul Web Server')
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
+
+        self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
+
         self.component_info = WebComponent(self.zk_client, self.hostname)
         self.component_info.register()
+
+        self.component_registry = ComponentRegistry(self.zk_client)
 
         self.connections = connections
         self.authenticators = authenticators
