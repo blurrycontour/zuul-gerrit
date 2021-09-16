@@ -102,6 +102,7 @@ from zuul.zk.locks import (
     trigger_queue_lock,
 )
 from zuul.zk.system import ZuulSystem
+from zuul.zk.zkobject import ZKContext
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
 
@@ -747,7 +748,8 @@ class Scheduler(threading.Thread):
                     layout_state = self.tenant_layout_state.get(tenant_name)
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
-                        self._reconfigureTenant(tenant)
+                        ctx = self.createZKContext(tlock, self.log)
+                        self._reconfigureTenant(ctx, tenant)
                     else:
                         self.local_layout_state[tenant_name] = layout_state
                     self.connections.reconfigureDrivers(tenant)
@@ -1069,16 +1071,17 @@ class Scheduler(threading.Thread):
                     # Consider caches valid if the cache ltime >= event ltime
                     min_ltimes = defaultdict(
                         lambda: defaultdict(lambda: event.zuul_event_ltime))
-                with tenant_write_lock(self.zk_client, tenant_name):
+                with tenant_write_lock(self.zk_client, tenant_name) as lock:
                     tenant = loader.loadTenant(self.abide, tenant_name,
                                                self.ansible_manager,
                                                self.unparsed_abide,
                                                min_ltimes=min_ltimes)
                     reconfigured_tenants.append(tenant_name)
+                    ctx = self.createZKContext(lock, self.log)
                     if tenant is not None:
-                        self._reconfigureTenant(tenant, old_tenant)
+                        self._reconfigureTenant(ctx, tenant, old_tenant)
                     else:
-                        self._reconfigureDeleteTenant(old_tenant)
+                        self._reconfigureDeleteTenant(ctx, old_tenant)
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Reconfiguration complete (smart: %s, "
@@ -1115,12 +1118,13 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide,
                             [event.tenant_name])
 
-            with tenant_write_lock(self.zk_client, event.tenant_name):
+            with tenant_write_lock(self.zk_client, event.tenant_name) as lock:
                 loader.loadTenant(self.abide, event.tenant_name,
                                   self.ansible_manager, self.unparsed_abide,
                                   min_ltimes=min_ltimes)
                 tenant = self.abide.tenants[event.tenant_name]
-                self._reconfigureTenant(tenant, old_tenant)
+                ctx = self.createZKContext(lock, self.log)
+                self._reconfigureTenant(ctx, tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
         self.log.info("Tenant reconfiguration complete for %s (duration: %s "
                       "seconds)", event.tenant_name, duration)
@@ -1165,53 +1169,67 @@ class Scheduler(threading.Thread):
 
         return None
 
-    def _reenqueueTenant(self, old_tenant, tenant):
+    def _reenqueueTenant(self, context, old_tenant, tenant):
         for name, new_pipeline in tenant.layout.pipelines.items():
             old_pipeline = old_tenant.layout.pipelines.get(name)
             if not old_pipeline:
                 self.log.warning("No old pipeline matching %s found "
                                  "when reconfiguring" % name)
                 continue
-            self.log.debug("Re-enqueueing changes for pipeline %s" % name)
-            # TODO(jeblair): This supports an undocument and
-            # unanticipated hack to create a static window.  If we
-            # really want to support this, maybe we should have a
-            # 'static' type?  But it may be in use in the wild, so we
-            # should allow this at least until there's an upgrade
-            # path.
-            if (new_pipeline.window and
-                new_pipeline.window_increase_type == 'exponential' and
-                new_pipeline.window_decrease_type == 'exponential' and
-                new_pipeline.window_increase_factor == 1 and
-                new_pipeline.window_decrease_factor == 1):
-                static_window = True
-            else:
-                static_window = False
-            if old_pipeline.window and (not static_window):
-                new_pipeline.window = max(old_pipeline.window,
-                                          new_pipeline.window_floor)
-            items_to_remove = []
-            builds_to_cancel = []
-            requests_to_cancel = []
-            for shared_queue in old_pipeline.queues:
-                last_head = None
-                # Attempt to keep window sizes from shrinking where possible
-                project, branch = shared_queue.project_branches[0]
-                new_queue = new_pipeline.getQueue(project, branch)
-                if new_queue and shared_queue.window and (not static_window):
-                    new_queue.window = max(shared_queue.window,
-                                           new_queue.window_floor)
-                for item in shared_queue.queue:
-                    # If the old item ahead made it in, re-enqueue
-                    # this one behind it.
-                    new_project = self._reenqueueGetProject(
-                        tenant, item)
-                    if item.item_ahead in items_to_remove:
-                        old_item_ahead = None
-                        item_ahead_valid = False
-                    else:
-                        old_item_ahead = item.item_ahead
-                        item_ahead_valid = True
+
+            with new_pipeline.manager.currentContext(context):
+                self._reenqueuePipeline(
+                    tenant, new_pipeline, old_pipeline, context)
+
+        for name, old_pipeline in old_tenant.layout.pipelines.items():
+            new_pipeline = tenant.layout.pipelines.get(name)
+            if not new_pipeline:
+                with old_pipeline.manager.currentContext(context):
+                    self._reconfigureDeletePipeline(old_pipeline)
+
+    def _reenqueuePipeline(self, tenant, new_pipeline, old_pipeline, context):
+        self.log.debug("Re-enqueueing changes for pipeline %s",
+                       new_pipeline.name)
+        # TODO(jeblair): This supports an undocument and
+        # unanticipated hack to create a static window.  If we
+        # really want to support this, maybe we should have a
+        # 'static' type?  But it may be in use in the wild, so we
+        # should allow this at least until there's an upgrade
+        # path.
+        if (new_pipeline.window and
+            new_pipeline.window_increase_type == 'exponential' and
+            new_pipeline.window_decrease_type == 'exponential' and
+            new_pipeline.window_increase_factor == 1 and
+            new_pipeline.window_decrease_factor == 1):
+            static_window = True
+        else:
+            static_window = False
+        if old_pipeline.window and (not static_window):
+            new_pipeline.window = max(old_pipeline.window,
+                                      new_pipeline.window_floor)
+        items_to_remove = []
+        builds_to_cancel = []
+        requests_to_cancel = []
+        for shared_queue in old_pipeline.queues:
+            last_head = None
+            # Attempt to keep window sizes from shrinking where possible
+            project, branch = shared_queue.project_branches[0]
+            new_queue = new_pipeline.getQueue(project, branch)
+            if new_queue and shared_queue.window and (not static_window):
+                new_queue.window = max(shared_queue.window,
+                                       new_queue.window_floor)
+            for item in shared_queue.queue:
+                # If the old item ahead made it in, re-enqueue
+                # this one behind it.
+                new_project = self._reenqueueGetProject(
+                    tenant, item)
+                if item.item_ahead in items_to_remove:
+                    old_item_ahead = None
+                    item_ahead_valid = False
+                else:
+                    old_item_ahead = item.item_ahead
+                    item_ahead_valid = True
+                with item.activeContext(context):
                     item.item_ahead = None
                     item.items_behind = []
                     reenqueued = False
@@ -1229,63 +1247,59 @@ class Scheduler(threading.Thread):
                             self.log.exception(
                                 "Exception while re-enqueing item %s",
                                 item)
-                    if reenqueued:
-                        for build in item.current_build_set.getBuilds():
-                            new_job = item.getJob(build.job.name)
-                            if new_job:
-                                build.job = new_job
-                            else:
-                                item.removeBuild(build)
-                                builds_to_cancel.append(build)
-                        for request_job, request in \
-                            item.current_build_set.node_requests.items():
-                            new_job = item.getJob(request_job)
-                            if not new_job:
-                                requests_to_cancel.append(
-                                    (item.current_build_set, request))
-                    else:
-                        items_to_remove.append(item)
-            for item in items_to_remove:
-                self.log.info(
-                    "Removing item %s during reconfiguration" % (item,))
-                for build in item.current_build_set.getBuilds():
-                    builds_to_cancel.append(build)
-                for request_job, request in \
-                    item.current_build_set.node_requests.items():
-                    requests_to_cancel.append(
-                        (
-                            item.current_build_set,
-                            request,
-                            item.getJob(request_job),
-                        )
+                if reenqueued:
+                    for build in item.current_build_set.getBuilds():
+                        new_job = item.getJob(build.job.name)
+                        if new_job:
+                            build.job = new_job
+                        else:
+                            item.removeBuild(build)
+                            builds_to_cancel.append(build)
+                    for request_job, request in \
+                        item.current_build_set.node_requests.items():
+                        new_job = item.getJob(request_job)
+                        if not new_job:
+                            requests_to_cancel.append(
+                                (item.current_build_set, request))
+                else:
+                    items_to_remove.append(item)
+        for item in items_to_remove:
+            self.log.info(
+                "Removing item %s during reconfiguration" % (item,))
+            for build in item.current_build_set.getBuilds():
+                builds_to_cancel.append(build)
+            for request_job, request in \
+                item.current_build_set.node_requests.items():
+                requests_to_cancel.append(
+                    (
+                        item.current_build_set,
+                        request,
+                        item.getJob(request_job),
                     )
-                try:
-                    self.sql.reportBuildsetEnd(
-                        item.current_build_set, 'dequeue',
-                        final=False, result='DEQUEUED')
-                except Exception:
-                    self.log.exception(
-                        "Error reporting buildset completion to DB:")
+                )
+            try:
+                self.sql.reportBuildsetEnd(
+                    item.current_build_set, 'dequeue',
+                    final=False, result='DEQUEUED')
+            except Exception:
+                self.log.exception(
+                    "Error reporting buildset completion to DB:")
 
-            for build in builds_to_cancel:
-                self.log.info(
-                    "Canceling build %s during reconfiguration" % (build,))
-                self.cancelJob(build.build_set, build.job, build=build)
-            for build_set, request, request_job in requests_to_cancel:
-                self.log.info(
-                    "Canceling node request %s during reconfiguration",
-                    request)
-                self.cancelJob(build_set, request_job)
-        for name, old_pipeline in old_tenant.layout.pipelines.items():
-            new_pipeline = tenant.layout.pipelines.get(name)
-            if not new_pipeline:
-                self._reconfigureDeletePipeline(old_pipeline)
+        for build in builds_to_cancel:
+            self.log.info(
+                "Canceling build %s during reconfiguration" % (build,))
+            self.cancelJob(build.build_set, build.job, build=build)
+        for build_set, request, request_job in requests_to_cancel:
+            self.log.info(
+                "Canceling node request %s during reconfiguration",
+                request)
+            self.cancelJob(build_set, request_job)
 
-    def _reconfigureTenant(self, tenant, old_tenant=None):
+    def _reconfigureTenant(self, context, tenant, old_tenant=None):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
         if old_tenant:
-            self._reenqueueTenant(old_tenant, tenant)
+            self._reenqueueTenant(context, old_tenant, tenant)
 
         self.connections.reconfigureDrivers(tenant)
 
@@ -1319,12 +1333,13 @@ class Scheduler(threading.Thread):
                 self.log.exception("Exception reporting initial "
                                    "pipeline stats:")
 
-    def _reconfigureDeleteTenant(self, tenant):
+    def _reconfigureDeleteTenant(self, context, tenant):
         # Called when a tenant is deleted during reconfiguration
         self.log.info("Removing tenant %s during reconfiguration" %
                       (tenant,))
         for pipeline in tenant.layout.pipelines.values():
-            self._reconfigureDeletePipeline(pipeline)
+            with pipeline.manager.currentContext(context):
+                self._reconfigureDeletePipeline(pipeline)
 
         # Delete the tenant root path for this tenant in ZooKeeper to remove
         # all tenant specific event queues
@@ -1344,8 +1359,9 @@ class Scheduler(threading.Thread):
             builds_to_cancel = []
             requests_to_cancel = []
             for item in shared_queue.queue:
-                item.item_ahead = None
-                item.items_behind = []
+                with item.activeContext(pipeline.manager.current_context):
+                    item.item_ahead = None
+                    item.items_behind = []
                 self.log.info(
                     "Removing item %s during reconfiguration" % (item,))
                 for build in item.current_build_set.getBuilds():
@@ -1592,8 +1608,11 @@ class Scheduler(threading.Thread):
             try:
                 with pipeline_lock(
                     self.zk_client, tenant.name, pipeline.name, blocking=False
-                ):
-                    self._process_pipeline(tenant, pipeline)
+                ) as lock:
+                    ctx = self.createZKContext(lock, self.log)
+                    with pipeline.manager.currentContext(ctx):
+                        pipeline.refresh(ctx)
+                        self._process_pipeline(tenant, pipeline)
 
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
@@ -2289,3 +2308,6 @@ class Scheduler(threading.Thread):
             # Release the semaphore in any case
             tenant = buildset.item.pipeline.tenant
             tenant.semaphore_handler.release(item, job)
+
+    def createZKContext(self, lock, log):
+        return ZKContext(self.zk_client, lock, self.stop_event, log)
