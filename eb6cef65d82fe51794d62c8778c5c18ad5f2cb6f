@@ -22,6 +22,30 @@
       "revId": "eb6cef65d82fe51794d62c8778c5c18ad5f2cb6f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6072d22d_dac2c1e1",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-16T16:24:14Z",
+      "side": 1,
+      "message": "Learned this from https://review.opendev.org/c/zuul/zuul/+/809293/2/zuul/zk/zkobject.py#155\n\nThe docs seems to be outdated.",
+      "parentUuid": "e027a58d_886f89f1",
+      "range": {
+        "startLine": 209,
+        "startChar": 24,
+        "endLine": 209,
+        "endChar": 41
+      },
+      "revId": "eb6cef65d82fe51794d62c8778c5c18ad5f2cb6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
