@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1542cfab_5b05e54b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4676,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-16T23:22:46Z",
+      "side": 1,
+      "message": "Fundamentally, if moving this line fixes a race condition, then we weren\u0027t actually settled on line 4667.  That\u0027s the thing we need to fix.\n\nDo you have logs for this failure?",
+      "revId": "6f393b0cfa0eaf22ee271231130d0bfa69d2ab70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
