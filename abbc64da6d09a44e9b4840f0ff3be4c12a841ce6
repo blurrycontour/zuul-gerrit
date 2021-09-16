@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "924b6c64_d6e5ad2c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1967,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-16T07:04:40Z",
+      "side": 1,
+      "message": "Are we talking about an active canceling here? So the scheduler explicitly cancels the builds, but that wasn\u0027t working for paused builds correctly until https://review.opendev.org/c/zuul/zuul/+/667072?\n\nIf so, I think this should work fine with the builds in ZooKeeper, as the scheduler is either canceling (and deleting) those builds directly in case they are not locked or schedules a cancel event which should be picked up by the executor independently of the job being paused or not. This snipped here might also be relevant for this (resuming a paused job before it is aborted): https://opendev.org/zuul/zuul/src/branch/master/zuul/executor/server.py#L977",
+      "parentUuid": "f56d24e7_b4fd3428",
+      "revId": "abbc64da6d09a44e9b4840f0ff3be4c12a841ce6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c00ce01_60f52307",
         "filename": "zuul/scheduler.py",
         "patchSetId": 4
