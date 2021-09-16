@@ -18,8 +18,6 @@ import {
   NODES_FETCH_SUCCESS
 } from '../actions/nodes'
 
-import update from 'immutability-helper'
-
 export default (state = {
   receivedAt: 0,
   isFetching: false,
@@ -27,15 +25,22 @@ export default (state = {
 }, action) => {
   switch (action.type) {
     case NODES_FETCH_REQUEST:
-      return update(state, {$merge: {isFetching: true}})
+      return {
+        ...state,
+        isFetching: true,
+      }
     case NODES_FETCH_SUCCESS:
-      return update(state, {$merge: {
+      return {
+        ...state,
         isFetching: false,
         nodes: action.nodes,
-        receivedAt: action.receivedAt
-      }})
+        receivedAt: action.receivedAt,
+      }
     case NODES_FETCH_FAIL:
-      return update(state, {$merge: {isFetching: false}})
+      return {
+        ...state,
+        isFetching: false
+      }
     default:
       return state
   }

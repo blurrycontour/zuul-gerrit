@@ -18,8 +18,6 @@ import {
   PROJECTS_FETCH_SUCCESS
 } from '../actions/projects'
 
-import update from 'immutability-helper'
-
 export default (state = {
   isFetching: false,
   projects: {},
@@ -33,8 +31,7 @@ export default (state = {
     case PROJECTS_FETCH_SUCCESS:
       return {
         isFetching: false,
-        projects: update(
-          state.projects, {$merge: {[action.tenant]: action.projects}}),
+        projects: { ...state.projects, [action.tenant]: action.projects },
       }
     case PROJECTS_FETCH_FAIL:
       return {
