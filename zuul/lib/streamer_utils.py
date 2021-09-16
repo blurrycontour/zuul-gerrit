@@ -18,14 +18,21 @@ The log streamer process within each executor, the finger gateway service,
 and the web interface will all make use of this module.
 '''
 
+import logging
 import os
 import pwd
+import random
 import select
 import socket
 import socketserver
 import ssl
 import threading
 import time
+
+from zuul.exceptions import StreamingError
+
+
+log = logging.getLogger("zuul.lib.streamer_utils")
 
 
 class BaseFingerRequestHandler(socketserver.BaseRequestHandler):
@@ -166,3 +173,60 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
             context.verify_mode = ssl.CERT_REQUIRED
             sock = context.wrap_socket(sock, server_side=True)
         return sock, addr
+
+
+def getJobLogStreamAddress(executor_api, component_registry, uuid,
+                           source_zone):
+    """
+    Looks up the log stream address for the given build UUID.
+
+    Try to find the build request for the given UUID in ZooKeeper
+    by searching through all available zones. If a build request
+    was found we use the worker information to build the log stream
+    address.
+    """
+    # Search for the build request in ZooKeeper. This iterates over all
+    # available zones (inlcuding unzoned) and stops when the UUID is
+    # found.
+    build_request, worker_zone = executor_api.getByUuid(uuid)
+
+    if build_request is None:
+        raise StreamingError("Build not found")
+
+    worker_info = build_request.worker_info
+    if not worker_info:
+        raise StreamingError("Build did not start yet")
+
+    job_log_stream_address = {}
+    if worker_zone and source_zone != worker_zone:
+        info = _getFingerGatewayInZone(component_registry, worker_zone)
+        if info:
+            job_log_stream_address['server'] = info.hostname
+            job_log_stream_address['port'] = info.public_port
+            job_log_stream_address['use_ssl'] = info.use_ssl
+            log.debug('Source (%s) and worker (%s) zone '
+                      'are different, routing via %s:%s',
+                      source_zone, worker_zone,
+                      info.hostname, info.public_port)
+        else:
+            log.warning('Source (%s) and worker (%s) zone are different'
+                        'but no fingergw in target zone found. '
+                        'Falling back to direct connection.',
+                        source_zone, worker_zone)
+    else:
+        log.debug('Source (%s) or worker zone (%s) undefined '
+                  'or equal, no routing is needed.',
+                  source_zone, worker_zone)
+
+    if 'server' not in job_log_stream_address:
+        job_log_stream_address['server'] = worker_info["hostname"]
+        job_log_stream_address['port'] = worker_info["log_port"]
+
+    return job_log_stream_address
+
+
+def _getFingerGatewayInZone(component_registry, zone):
+    gws = [gw for gw in component_registry.all('fingergw') if gw.zone == zone]
+    if gws:
+        return random.choice(gws)
+    return None
