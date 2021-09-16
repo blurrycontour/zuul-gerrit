@@ -102,6 +102,7 @@ from zuul.zk.locks import (
     trigger_queue_lock,
 )
 from zuul.zk.system import ZuulSystem
+from zuul.zk.zkobject import ZKContext
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
 
@@ -1596,8 +1597,11 @@ class Scheduler(threading.Thread):
             try:
                 with pipeline_lock(
                     self.zk_client, tenant.name, pipeline.name, blocking=False
-                ):
-                    self._process_pipeline(tenant, pipeline)
+                ) as lock:
+                    ctx = self.createZKContext(lock, self.log)
+                    with pipeline.manager.currentContext(ctx):
+                        pipeline.refresh(ctx)
+                        self._process_pipeline(tenant, pipeline)
 
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
@@ -2272,3 +2276,6 @@ class Scheduler(threading.Thread):
             # Release the semaphore in any case
             tenant = buildset.item.pipeline.tenant
             tenant.semaphore_handler.release(item, job)
+
+    def createZKContext(self, lock, log):
+        return ZKContext(self.zk_client, lock, self.stop_event, log)
