@@ -423,7 +423,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                     self.merger_api.unlock, merge_request)
         # TODO (felix): If we want to optimize ZK requests, we could only call
         # the remove() here.
-        self.merger_api.remove(merge_request)
+        self.merger_api.remove(merge_request.path)
 
     def _retry(self, lock, log, fn, *args, **kw):
         """Retry a method to deal with ZK connection issues

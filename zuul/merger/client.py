@@ -141,7 +141,7 @@ class MergeClient(object):
             # No need to unlock the build, as it is by definition unlocked.
             # TODO (felix): If we want to optimize ZK requests, we could only
             # call the remove() here.
-            self.merger_api.remove(merge_request)
+            self.merger_api.remove(merge_request.path)
         except JobRequestNotFound as e:
             self.log.warning("Could not complete merge: %s", str(e))
             return
@@ -161,7 +161,7 @@ class MergeClient(object):
             if request:
                 if self.merger_api.lock(request, blocking=False):
                     try:
-                        self.merger_api.remove(request)
+                        self.merger_api.remove(request.path)
                     finally:
                         self.merger_api.unlock(request)
         finally:

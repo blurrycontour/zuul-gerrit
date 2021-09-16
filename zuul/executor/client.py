@@ -213,13 +213,7 @@ class ExecutorClient(object):
                       build.uuid)
             return
 
-        build_request = self.executor_api.get(build.build_request_ref)
-        if build_request:
-            # TODO (felix): We could directly remove the build request via
-            # its path in ZK to spare a read operation. Usually there should
-            # be no need to look up the build request object from ZooKeeper
-            # just to immediately remove it.
-            self.executor_api.remove(build_request)
+        self.executor_api.remove(build.build_request_ref, build.zuul_event_id)
 
     def cleanupLostBuildRequests(self):
         for build_request in self.executor_api.lostRequests():

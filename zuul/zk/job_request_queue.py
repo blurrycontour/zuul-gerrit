@@ -309,18 +309,21 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         request.updateFromDict(content)
         request._zstat = zstat
 
-    def remove(self, request):
-        log = get_annotated_logger(self.log, request.event_id)
-        log.debug("Removing request %s", request)
+    def remove(self, path, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("Removing request %s", path)
+
+        # Extract the UUID from the path
+        uuid = path.rsplit("/", 1)[1]
         try:
-            self.kazoo_client.delete(request.path, recursive=True)
+            self.kazoo_client.delete(path, recursive=True)
         except NoNodeError:
             # Nothing to do if the node is already deleted
             pass
-        self.clearParams(request)
+        self.clearParams(uuid)
         try:
             # Delete the lock parent node as well
-            path = "/".join([self.LOCK_ROOT, request.uuid])
+            path = "/".join([self.LOCK_ROOT, uuid])
             self.kazoo_client.delete(path, recursive=True)
         except NoNodeError:
             pass
