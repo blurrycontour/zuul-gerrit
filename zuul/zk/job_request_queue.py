@@ -127,7 +127,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         return watch
 
     def _watchState(self, path, data, stat, event=None):
-        if not event or (event.type == EventType.CHANGED and data is not None):
+        if (not event or event.type == EventType.CHANGED) and data is not None:
             # As we already get the data and the stat value, we can directly
             # use it without asking ZooKeeper for the data again.
             content = self._bytesToDict(data)
