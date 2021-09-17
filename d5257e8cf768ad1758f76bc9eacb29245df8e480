@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffe54f2d_d7642061",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-17T00:20:19Z",
+      "side": 1,
+      "message": "How bad is it if we have job as the default?  I ask because that\u0027s the most likely thing for users to filter by, so it seems a little unfortunate to make them click to change this all in the name of making it easier by supporting auto-fill.\n\nLike, if auto-fill works but is just a little delayed (because the user types faster than the browser can process the network request!) that seems okay to me.  Obviously if it doesn\u0027t work at all, that\u0027s bad, but if that\u0027s true, then we may have issues recovering from minor network delays, so we may need to address it anyway.",
+      "revId": "d5257e8cf768ad1758f76bc9eacb29245df8e480",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
