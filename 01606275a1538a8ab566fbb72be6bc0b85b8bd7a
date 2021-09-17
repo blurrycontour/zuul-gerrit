@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "831aec68_4211c814",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T11:12:18Z",
+      "side": 1,
+      "message": "Done as a follow-up in https://review.opendev.org/c/zuul/zuul/+/809633",
+      "parentUuid": "f01970d3_98284149",
+      "revId": "01606275a1538a8ab566fbb72be6bc0b85b8bd7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a75c62f3_789e1eb4",
         "filename": "zuul/driver/pagure/pagureconnection.py",
         "patchSetId": 15
@@ -30,6 +48,24 @@
       "writtenOn": "2021-09-16T23:38:19Z",
       "side": 1,
       "message": "Related to the above comment can we move this method into BaseConnection?",
+      "revId": "01606275a1538a8ab566fbb72be6bc0b85b8bd7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a39e29a8_561970f1",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T11:12:18Z",
+      "side": 1,
+      "message": "I moved the cache related common methods to a mixin-class as not all connections need a change cache. Done in https://review.opendev.org/c/zuul/zuul/+/809632/",
+      "parentUuid": "a75c62f3_789e1eb4",
       "revId": "01606275a1538a8ab566fbb72be6bc0b85b8bd7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5eb99b5d_d2cffa66",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T11:12:18Z",
+      "side": 1,
+      "message": "see above",
+      "parentUuid": "63186ef7_7eb8225b",
+      "revId": "01606275a1538a8ab566fbb72be6bc0b85b8bd7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "692140fa_dbee92c1",
         "filename": "zuul/driver/pagure/paguresource.py",
         "patchSetId": 15
@@ -64,6 +118,24 @@
       "writtenOn": "2021-09-16T23:38:19Z",
       "side": 1,
       "message": "Is this type change safe? Iterator vs list.\n\nThe gerrit update does yield from too but github does a list return. The difference jumped out to me in this change so commenting here.",
+      "revId": "01606275a1538a8ab566fbb72be6bc0b85b8bd7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b5a819b8_d8eeb79c",
+        "filename": "zuul/driver/pagure/paguresource.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T11:12:18Z",
+      "side": 1,
+      "message": "The caller seem to be fine with any iterable. As you mentioned it was already the case for the GerritSource.",
+      "parentUuid": "692140fa_dbee92c1",
       "revId": "01606275a1538a8ab566fbb72be6bc0b85b8bd7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
