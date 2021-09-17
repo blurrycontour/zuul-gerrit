@@ -51,12 +51,6 @@ class GitlabChangeCache(AbstractChangeCache):
         "MergeRequest": MergeRequest,
     }
 
-    def _getChangeClass(self, change_type):
-        return self.CHANGE_TYPE_MAP[change_type]
-
-    def _getChangeType(self, change):
-        return type(change).__name__
-
 
 class GitlabEventConnector(threading.Thread):
     """Move events from Gitlab into the scheduler"""
