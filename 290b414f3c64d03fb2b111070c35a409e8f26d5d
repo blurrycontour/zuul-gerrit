@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d37982ad_9953124c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-17T00:08:57Z",
+      "side": 1,
+      "message": "Looking at reportStats, I don\u0027t think quiet is important, so we should be able to combine live and quiet into one update.\n\nWe could probably also combine it with enqueue_time if we used a dictionary.  Not sure it\u0027s worth it.",
+      "revId": "290b414f3c64d03fb2b111070c35a409e8f26d5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "22e64c82_768dd5cb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-17T00:08:57Z",
+      "side": 1,
+      "message": "This line is fine; I\u0027m just leaving this note to share my thoughts:\n\nWhatever we do above, I don\u0027t think we should combine this update with it.  The reportEnqueue call could fail, and regardless of whether it does, we want to have set enqueue_time, etc).",
+      "revId": "290b414f3c64d03fb2b111070c35a409e8f26d5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
