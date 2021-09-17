@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1912367d_42064ef2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 629,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-17T21:47:39Z",
+      "side": 1,
+      "message": "This line is under indented. We\u0027ll cleanup only the last connection after the for loop completes.",
+      "revId": "9587566ad5182397fd313e44e2a4999e6df0cbb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
