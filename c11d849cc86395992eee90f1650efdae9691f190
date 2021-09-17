@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "e09be557_837ef7c8",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5280,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-17T05:32:04Z",
+      "side": 1,
+      "message": "Since we are only evaluating, if the znode exists, I think that\u0027s fine. But I don\u0027t fully understand why we could create a new executor queue here since the build is already completed and thus should have been picked up by an executor in that zone.\n\nIs this called after the test started its cleanup?",
+      "revId": "c11d849cc86395992eee90f1650efdae9691f190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a91c6b99_6b8bd7cc",
         "filename": "tests/base.py",
         "patchSetId": 5
