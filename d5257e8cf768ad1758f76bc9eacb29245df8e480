@@ -16,6 +16,47 @@
       "revId": "d5257e8cf768ad1758f76bc9eacb29245df8e480",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e489cec9_810980da",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-17T11:02:45Z",
+      "side": 1,
+      "message": "The select\u0027s options weren\u0027t updated at all unless the user switched back and forth in the toolbar. This is fixed in the latest PS, so this trick isn\u0027t needed anymore.",
+      "parentUuid": "ffe54f2d_d7642061",
+      "revId": "d5257e8cf768ad1758f76bc9eacb29245df8e480",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98082766_0c0e9706",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-17T11:02:45Z",
+      "side": 1,
+      "message": "If we want to absolutely make sure the selects are loaded before the results are displayed, we can change this to\n\n  fetching || !pipelines.pipelines.hasOwnProperty(tenant.name) || ...\n\nbut from observation, this is transparent to the user.",
+      "range": {
+        "startLine": 239,
+        "startChar": 10,
+        "endLine": 239,
+        "endChar": 29
+      },
+      "revId": "d5257e8cf768ad1758f76bc9eacb29245df8e480",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
