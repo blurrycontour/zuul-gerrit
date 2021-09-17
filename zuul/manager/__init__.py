@@ -442,12 +442,13 @@ class PipelineManager(metaclass=ABCMeta):
             item = change_queue.enqueueChange(change, event)
             self.updateBundle(item, change_queue, cycle)
 
-            if enqueue_time:
-                item.updateAttributes(self.current_context,
-                                      enqueue_time=enqueue_time)
-            item.updateAttributes(self.current_context, live=live)
-            self.reportStats(item, added=True)
-            item.updateAttributes(self.current_context, quiet=quiet)
+            with item.activeContext(self.current_context):
+                if enqueue_time:
+                    item.enqueue_time = enqueue_time
+                item.live = live
+                self.reportStats(item, added=True)
+                item.quiet = quiet
+
             if item.live and not item.reported_enqueue:
                 self.reportEnqueue(item)
                 item.updateAttributes(self.current_context,

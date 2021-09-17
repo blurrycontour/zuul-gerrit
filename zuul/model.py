@@ -2618,6 +2618,7 @@ class QueueItem(zkobject.ZKObject):
     log = logging.getLogger("zuul.QueueItem")
 
     def __init__(self):
+        super().__init__()
         self._set(
             uuid=uuid4().hex,
             pipeline=None,

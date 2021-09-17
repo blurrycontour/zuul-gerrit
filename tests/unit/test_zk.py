@@ -1254,6 +1254,18 @@ class TestZKObject(ZooKeeperBaseTestCase):
             pipeline1.updateAttributes(context, foo='baz')
             self.assertEqual(pipeline1.foo, 'baz')
 
+        # Update an object using an active context
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            with pipeline1.activeContext(context):
+                pipeline1.foo = 'baz'
+        self.assertEqual(pipeline1.foo, 'baz')
+
+        # Update of object w/o active context should not work
+        with testtools.ExpectedException(Exception):
+            pipeline1.foo = 'nope'
+        self.assertEqual(pipeline1.foo, 'baz')
+
         # Refresh an existing object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
