@@ -291,3 +291,25 @@ class CachedBranchConnection(BaseConnection):
             # the push event, so we don't touch the cache here
             # again.
             event.branch_protected = True
+
+
+class ZKChangeCacheMixin:
+    # Expected to be defined by the connection and to be an instance
+    # that implements the AbstractChangeCache API.
+    _change_cache = None
+
+    def cleanupCache(self):
+        self._change_cache.cleanup()
+
+    def maintainCache(self, relevant, max_age):
+        self._change_cache.prune(relevant, max_age)
+
+    def updateChangeAttributes(self, change, **attrs):
+        def _update_attrs(c):
+            for name, value in attrs.items():
+                setattr(c, name, value)
+        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
+                                                 change, _update_attrs)
+
+    def getChangeByKey(self, key):
+        return self._change_cache.get(key)

@@ -40,7 +40,7 @@ import github3.exceptions
 import github3.pulls
 from github3.session import AppInstallationTokenAuth
 
-from zuul.connection import CachedBranchConnection
+from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
@@ -1175,7 +1175,7 @@ class GithubClientManager:
         return github
 
 
-class GithubConnection(CachedBranchConnection):
+class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
     driver_name = 'github'
     log = logging.getLogger("zuul.GithubConnection")
     payload_path = 'payload'
@@ -1261,19 +1261,6 @@ class GithubConnection(CachedBranchConnection):
                         zuul_event_id=None):
         return self._github_client_manager.getGithubClient(
             project_name=project_name, zuul_event_id=zuul_event_id)
-
-    def cleanupCache(self):
-        self._change_cache.cleanup()
-
-    def maintainCache(self, relevant, max_age):
-        self._change_cache.prune(relevant, max_age)
-
-    def updateChangeAttributes(self, change, **attrs):
-        def _update_attrs(c):
-            for name, value in attrs.items():
-                setattr(c, name, value)
-        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
-                                                 change, _update_attrs)
 
     def getChange(self, event, refresh=False):
         """Get the change representing an event."""
@@ -1406,9 +1393,6 @@ class GithubConnection(CachedBranchConnection):
         except ConcurrentUpdateError:
             change = self._change_cache.get(key)
         return change
-
-    def getChangeByKey(self, key):
-        return self._change_cache.get(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         changes = []
