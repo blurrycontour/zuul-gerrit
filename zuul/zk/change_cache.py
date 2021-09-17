@@ -286,12 +286,18 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
     def _updateChange(self, change, data):
         change.deserialize(data["change_data"])
 
-    @abc.abstractmethod
     def _getChangeClass(self, change_type):
         """Return the change class for the given type."""
-        pass
+        return self.CHANGE_TYPE_MAP[change_type]
 
-    @abc.abstractmethod
     def _getChangeType(self, change):
         """Return the change type as a string for the given type."""
+        return type(change).__name__
+
+    @abc.abstractproperty
+    def CHANGE_TYPE_MAP(self):
+        """Return a mapping of change type as string to change class.
+
+        This property cann also be defined as a class attribute.
+        """
         pass
