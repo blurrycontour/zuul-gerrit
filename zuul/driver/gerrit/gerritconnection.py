@@ -63,12 +63,6 @@ class GerritChangeCache(AbstractChangeCache):
         "GerritChange": GerritChange,
     }
 
-    def _getChangeClass(self, change_type):
-        return self.CHANGE_TYPE_MAP[change_type]
-
-    def _getChangeType(self, change):
-        return type(change).__name__
-
 
 class GerritChangeData(object):
     """Compatability layer for SSH/HTTP
