@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a9e474c5_6a4b8968",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T07:39:27Z",
+      "side": 1,
+      "message": "maybe we should call that `transaction()` but not sure if that might be confusing as there are also ZK transactions.",
+      "revId": "565ce94a678ea8bcc43de6dd37175fd38cd91e32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
