@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "063e606d_7ea0a1bc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1642,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-17T21:44:23Z",
+      "side": 1,
+      "message": "Nit it appears we\u0027ll only remove changes older than max_age that are not in the relevant set. I was going to suggest that the 2 hour timeout was too short until I saw that.",
+      "revId": "0d635181f8d693c57b59d5144b997c0c8fe715ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
