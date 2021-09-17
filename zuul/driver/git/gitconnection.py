@@ -19,7 +19,7 @@ import time
 import logging
 import urllib
 
-from zuul.connection import BaseConnection
+from zuul.connection import BaseConnection, ZKChangeCacheMixin
 from zuul.driver.git.gitmodel import GitTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.model import Ref, Branch
@@ -41,7 +41,7 @@ class GitChangeCache(AbstractChangeCache):
         return type(change).__name__
 
 
-class GitConnection(BaseConnection):
+class GitConnection(BaseConnection, ZKChangeCacheMixin):
     driver_name = 'git'
     log = logging.getLogger("zuul.connection.git")
 
@@ -103,12 +103,6 @@ class GitConnection(BaseConnection):
                 refs[ref] = sha
         return refs
 
-    def cleanupCache(self):
-        self._change_cache.cleanup()
-
-    def maintainCache(self, relevant, max_age):
-        self._change_cache.prune(relevant, max_age)
-
     def getChange(self, event, refresh=False):
         key = str((event.project_name, event.ref, event.newrev))
         change = self._change_cache.get(key)
@@ -149,9 +143,6 @@ class GitConnection(BaseConnection):
         branches = [ref[len('refs/heads/'):] for ref in
                     refs if ref.startswith('refs/heads/')]
         return branches
-
-    def getChangeByKey(self, key):
-        return self._change_cache.get(key)
 
     def getGitUrl(self, project):
         return os.path.join(self.baseurl, project.name)

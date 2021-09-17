@@ -28,7 +28,7 @@ import dateutil.parser
 from urllib.parse import quote_plus
 from typing import List, Optional
 
-from zuul.connection import CachedBranchConnection
+from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.exceptions import MergeFailure
@@ -409,7 +409,7 @@ class GitlabAPIClient():
         return resp[0]
 
 
-class GitlabConnection(CachedBranchConnection):
+class GitlabConnection(CachedBranchConnection, ZKChangeCacheMixin):
     driver_name = 'gitlab'
     log = logging.getLogger("zuul.GitlabConnection")
     payload_path = 'payload'
@@ -458,19 +458,6 @@ class GitlabConnection(CachedBranchConnection):
     def onStop(self):
         if hasattr(self, 'gitlab_event_connector'):
             self._stop_event_connector()
-
-    def cleanupCache(self):
-        self._change_cache.cleanup()
-
-    def maintainCache(self, relevant, max_age):
-        self._change_cache.prune(relevant, max_age)
-
-    def updateChangeAttributes(self, change, **attrs):
-        def _update_attrs(c):
-            for name, value in attrs.items():
-                setattr(c, name, value)
-        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
-                                                 change, _update_attrs)
 
     def getWebController(self, zuul_web):
         return GitlabWebController(zuul_web, self)
@@ -657,9 +644,6 @@ class GitlabConnection(CachedBranchConnection):
             log.info(
                 "Set approval: %s on MR %s#%s (%s)", approve,
                 project_name, number, patchset)
-
-    def getChangeByKey(self, key):
-        return self._change_cache.get(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of MR depending on this one
