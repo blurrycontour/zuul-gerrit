@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1b82ab_bd4b7cbe",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T07:33:12Z",
+      "side": 1,
+      "message": "This will not work as it is referencing the same dict instance that you are modifying. If we want to have a rollback mechanism we need to (deep?) copy the dict here.",
+      "revId": "62a5c464ad0629969e13aa781905d32b3c0698de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "addffb10_511fcd0e",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-17T07:33:12Z",
+      "side": 1,
+      "message": "Didn\u0027t know that you can pass `include_data\u003dTrue` to get the zstat. Seems the kazoo docs are outdated https://kazoo.readthedocs.io/en/latest/api/client.html#kazoo.client.KazooClient.create",
+      "revId": "62a5c464ad0629969e13aa781905d32b3c0698de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
