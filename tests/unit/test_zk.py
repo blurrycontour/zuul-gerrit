@@ -1243,12 +1243,6 @@ class DummyChangeCache(AbstractChangeCache):
         "DummyChange": DummyChange,
     }
 
-    def _getChangeClass(self, change_type):
-        return self.CHANGE_TYPE_MAP[change_type]
-
-    def _getChangeType(self, change):
-        return type(change).__name__
-
 
 class DummySource:
 
