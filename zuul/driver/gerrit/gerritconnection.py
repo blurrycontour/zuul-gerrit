@@ -35,7 +35,7 @@ from typing import Dict, List
 from uuid import uuid4
 
 from zuul import version as zuul_version
-from zuul.connection import BaseConnection
+from zuul.connection import BaseConnection, ZKChangeCacheMixin
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
@@ -540,7 +540,7 @@ class GerritPoller(threading.Thread):
         self.poller_election.cancel()
 
 
-class GerritConnection(BaseConnection):
+class GerritConnection(ZKChangeCacheMixin, BaseConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
     iolog = logging.getLogger("zuul.GerritConnection.io")
@@ -737,19 +737,6 @@ class GerritConnection(BaseConnection):
             del self._project_branch_cache[project.name]
         except KeyError:
             pass
-
-    def cleanupCache(self):
-        self._change_cache.cleanup()
-
-    def maintainCache(self, relevant, max_age):
-        self._change_cache.prune(relevant, max_age)
-
-    def updateChangeAttributes(self, change, **attrs):
-        def _update_attrs(c):
-            for name, value in attrs.items():
-                setattr(c, name, value)
-        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
-                                                 change, _update_attrs)
 
     def getChange(self, event, refresh=False):
         if event.change_number:
@@ -1003,9 +990,6 @@ class GerritConnection(BaseConnection):
             compat_needs_changes=compat_needs_changes,
             git_needed_by_changes=git_needed_by_changes,
             compat_needed_by_changes=compat_needed_by_changes)
-
-    def getChangeByKey(self, key):
-        return self._change_cache.get(key)
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)

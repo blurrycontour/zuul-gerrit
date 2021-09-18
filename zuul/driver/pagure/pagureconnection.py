@@ -23,7 +23,7 @@ import requests
 import cherrypy
 import voluptuous as v
 
-from zuul.connection import BaseConnection
+from zuul.connection import BaseConnection, ZKChangeCacheMixin
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
@@ -466,7 +466,7 @@ class PagureAPIClient():
         return resp[0]['webhook']['token']
 
 
-class PagureConnection(BaseConnection):
+class PagureConnection(ZKChangeCacheMixin, BaseConnection):
     driver_name = 'pagure'
     log = logging.getLogger("zuul.PagureConnection")
 
@@ -544,19 +544,6 @@ class PagureConnection(BaseConnection):
             self.log.debug(
                 "Fetching project %s webhook token from API" % project)
             return token
-
-    def cleanupCache(self):
-        self._change_cache.cleanup()
-
-    def maintainCache(self, relevant, max_age):
-        self._change_cache.prune(relevant, max_age)
-
-    def updateChangeAttributes(self, change, **attrs):
-        def _update_attrs(c):
-            for name, value in attrs.items():
-                setattr(c, name, value)
-        self._change_cache.updateChangeWithRetry(change.cache_stat.key,
-                                                 change, _update_attrs)
 
     def getWebController(self, zuul_web):
         return PagureWebController(zuul_web, self)
@@ -796,9 +783,6 @@ class PagureConnection(BaseConnection):
             "Got pull-request CI status for PR %s on %s status: %s" % (
                 number, project, flag.get('status')))
         return flag.get('status')
-
-    def getChangeByKey(self, key):
-        return self._change_cache.get(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of PR depending on this one
