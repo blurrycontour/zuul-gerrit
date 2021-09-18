@@ -33,12 +33,30 @@ class GerritChange(Change):
         self.status = None
         self.wip = None
         self.approvals = []
+        self.missing_labels = set()
 
     def update(self, data, connection):
         if data.format == data.SSH:
             self.updateFromSSH(data.data, connection)
         else:
             self.updateFromHTTP(data.data, data.files, connection)
+
+    def serialize(self):
+        d = super().serialize()
+        d.update({
+            "status": self.status,
+            "wip": self.wip,
+            "approvals": self.approvals,
+            "missing_labels": list(self.missing_labels),
+        })
+        return d
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.status = data["status"]
+        self.wip = data["wip"]
+        self.approvals = data["approvals"]
+        self.missing_labels = set(data["missing_labels"])
 
     def updateFromSSH(self, data, connection):
         if self.patchset is None:
