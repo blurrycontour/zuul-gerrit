@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a95e0112_b128f5c6",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-18T06:05:36Z",
+      "side": 1,
+      "message": "typo: SUCCESS",
+      "revId": "2ad60a00ae2300ed2e134db9e805d4d42044be21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
