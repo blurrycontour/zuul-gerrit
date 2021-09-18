@@ -44,7 +44,7 @@ from zuul.connection import CachedBranchConnection
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Branch, Tag, Project
+from zuul.model import Ref, Branch, Tag, Project, CacheStat
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 from zuul.model import DequeueEvent
@@ -1307,6 +1307,7 @@ class GithubConnection(CachedBranchConnection):
             if lock.acquire(blocking=False):
                 try:
                     self._updateChange(change, event)
+                    change.cache_stat = CacheStat(key, None, None)
                     self._change_cache[key] = change
 
                     if self.sched:
@@ -1330,6 +1331,9 @@ class GithubConnection(CachedBranchConnection):
                 del self._change_cache[key]
             raise
         return change
+
+    def getChangeByKey(self, key):
+        return self._change_cache.get(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         changes = []

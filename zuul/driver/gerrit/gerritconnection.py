@@ -41,7 +41,7 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Tag, Branch, Project
+from zuul.model import Ref, Tag, Branch, Project, CacheStat
 from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 
 # HTTP timeout in seconds
@@ -791,6 +791,8 @@ class GerritConnection(BaseConnection):
             change = GerritChange(None)
             change.number = number
             change.patchset = patchset
+        change.cache_stat = CacheStat((change.number, change.patchset),
+                                      None, None)
         self._change_cache.setdefault(change.number, {})
         self._change_cache[change.number][change.patchset] = change
         try:
@@ -895,8 +897,8 @@ class GerritConnection(BaseConnection):
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
             if (not dep.is_merged) and dep not in needs_changes:
-                git_needs_changes.append(dep)
-                needs_changes.add(dep)
+                git_needs_changes.append(dep.cache_key)
+                needs_changes.add(dep.cache_key)
         change.git_needs_changes = git_needs_changes
 
         compat_needs_changes = []
@@ -907,8 +909,8 @@ class GerritConnection(BaseConnection):
             dep = self._getChange(dep_num, dep_ps, history=history,
                                   event=event)
             if dep.open and dep not in needs_changes:
-                compat_needs_changes.append(dep)
-                needs_changes.add(dep)
+                compat_needs_changes.append(dep.cache_key)
+                needs_changes.add(dep.cache_key)
         change.compat_needs_changes = compat_needs_changes
 
         needed_by_changes = set()
@@ -921,8 +923,8 @@ class GerritConnection(BaseConnection):
                                       event=event)
                 if (dep.open and dep.is_current_patchset and
                     dep not in needed_by_changes):
-                    git_needed_by_changes.append(dep)
-                    needed_by_changes.add(dep)
+                    git_needed_by_changes.append(dep.cache_key)
+                    needed_by_changes.add(dep.cache_key)
             except Exception:
                 log.exception("Failed to get git-needed change %s,%s",
                               dep_num, dep_ps)
@@ -945,12 +947,19 @@ class GerritConnection(BaseConnection):
                     event=event)
                 if (dep.open and dep.is_current_patchset
                     and dep not in needed_by_changes):
-                    compat_needed_by_changes.append(dep)
-                    needed_by_changes.add(dep)
+                    compat_needed_by_changes.append(dep.cache_key)
+                    needed_by_changes.add(dep.cache_key)
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
         change.compat_needed_by_changes = compat_needed_by_changes
+
+    def getChangeByKey(self, key):
+        try:
+            number, patchset = key
+            return self._change_cache[number][patchset]
+        except (KeyError, ValueError):
+            return None
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)

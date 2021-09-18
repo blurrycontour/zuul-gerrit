@@ -14,7 +14,7 @@
 # under the License.
 
 import abc
-from collections import OrderedDict, defaultdict, UserDict
+from collections import OrderedDict, defaultdict, namedtuple, UserDict
 import copy
 import json
 import logging
@@ -3569,6 +3569,10 @@ class Bundle:
         return any(i.change.updatesConfig(tenant) for i in self.items)
 
 
+# Cache info of a ref
+CacheStat = namedtuple("CacheStat", ["key", "uuid", "version"])
+
+
 class Ref(object):
     """An existing state of a Project."""
 
@@ -3578,6 +3582,13 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        # Cache info about this ref:
+        # CacheStat(cache key, uuid, version)
+        self.cache_stat = None
+
+    @property
+    def cache_key(self):
+        return (self.project.connection_name, self.cache_stat.key)
 
     def _id(self):
         return self.newrev

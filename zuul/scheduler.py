@@ -2170,7 +2170,9 @@ class Scheduler(threading.Thread):
             for other_change in source.getCachedChanges():
                 if other_change.commit_needs_changes is None:
                     continue
-                for dep in other_change.commit_needs_changes:
+                for connection_name, key in other_change.commit_needs_changes:
+                    dep_source = self.connections.getSource(connection_name)
+                    dep = dep_source.getChangeByKey(key)
                     if change.isUpdateOf(dep):
                         source.setChangeAttributes(
                             other_change, refresh_deps=True)
