@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4272fcb_a5454ac2",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T18:54:47Z",
+      "side": 1,
+      "message": "This code doesn\u0027t appear to be used anymore?",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4387306_b2ca0685",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T18:54:47Z",
+      "side": 1,
+      "message": "This could be replaced with https://docs.python.org/3/library/functions.html#filter but is equivalent. Not sure if filter might have a quicker internal implementation thoughl",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8abeb16c_959a1e57",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T18:54:47Z",
+      "side": 1,
+      "message": "We convert this back to a float when we use it. Would it be better to return a float here and not bother with the translation in the scheduler?",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d29f60ad_35c08886",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T18:54:47Z",
+      "side": 1,
+      "message": "As mentioned on a previous patchset do we need to guard against negative elapsed times? We know it is at least 0?",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12d50926_1d8beaf8",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T18:54:47Z",
+      "side": 1,
+      "message": "I don\u0027t think this method is used.",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
