@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da707e23_02333112",
+        "filename": "web/src/reducers/errors.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-20T12:43:24Z",
+      "side": 1,
+      "message": "I think you could simply add the dict to the new list, so there is no need to define a variable for that. I\u0027m also not sure if the action.error must be copied as this doesn\u0027t come from the old state, or?\n\nreturn [\n  ...state,\n  { action.error, id: action.id, date: Date.now() }\n]",
+      "revId": "5a6ec28d1a1e41095f21c968087c0fbe527c6f31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
