@@ -531,8 +531,9 @@ class Scheduler(threading.Thread):
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for item in pipeline.getAllItems():
-                    for req in item.current_build_set.node_requests.values():
-                        outstanding_requests.add(req.id)
+                    for req_id in (
+                            item.current_build_set.node_requests.values()):
+                        outstanding_requests.add(req_id)
         leaked_requests = zk_requests - outstanding_requests
         for req_id in leaked_requests:
             try:
