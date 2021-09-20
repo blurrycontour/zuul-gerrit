@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "d175aa85_a4c7cde0",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-20T19:06:54Z",
+      "side": 1,
+      "message": "Correct.  We could get rid of it.",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f4387306_b2ca0685",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 8
@@ -33,6 +50,23 @@
       "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f8835f7_b7060dcf",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-20T19:06:54Z",
+      "side": 1,
+      "message": "filter/map have been available in Python since 1.5.2, at least.  I remember when list comprehensions were touted as far superior for readability.  Here\u0027s a blast from the past: \n\n  https://www.oreilly.com/library/view/python-cookbook/0596001673/ch01s11.html\n\nAnyway, it probably suffices to say I\u0027m aware of filter and this was a deliberate choice.  We can all handle reading both forms, and we probably don\u0027t need to nitpick it?",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "774d71f4_0074ea06",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-20T19:06:54Z",
+      "side": 1,
+      "message": "My thought was to have this object deal consistently with integers rather than have an outlier here.",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d29f60ad_35c08886",
         "filename": "zuul/driver/sql/sqlreporter.py",
         "patchSetId": 8
@@ -70,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "f7f9f4cf_3716ad0c",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-20T19:06:54Z",
+      "side": 1,
+      "message": "It would be good to add that here, yes.",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "12d50926_1d8beaf8",
         "filename": "zuul/driver/sql/sqlreporter.py",
         "patchSetId": 8
@@ -84,6 +152,23 @@
       "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a1b29d1_5d599a35",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-20T19:06:54Z",
+      "side": 1,
+      "message": "Probably not, I can remove it.",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
