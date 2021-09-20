@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d6fc0c6_d34552dd",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-20T19:54:53Z",
+      "side": 1,
+      "message": "We could duplicate the Pagination element at the bottom of the list, so that users don\u0027t have to scroll back up when trying to change pages. WDYT?",
+      "revId": "91f55639cf4a2450ff8cdda4f23688f1b00f496a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
