@@ -70,6 +70,24 @@
     },
     {
       "key": {
+        "uuid": "c6bdfc48_ef66ca83",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T19:11:11Z",
+      "side": 1,
+      "message": "Huh I vastly prefer the functional methods because they have well defined behaviors. But I can understand if others prefer comprehensions because they are more explicitly written out.\n\nI only mentioned it here because I wasn\u0027t sure of the performance equivalence (they are functionally equivalent). Didn\u0027t meant to nitpick but noticed since sum was used below.",
+      "parentUuid": "2f8835f7_b7060dcf",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8abeb16c_959a1e57",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 8
