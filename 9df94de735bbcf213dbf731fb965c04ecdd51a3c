@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "34b081ba_bd005c37",
+        "filename": "zuul/lib/streamer_utils.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-20T12:11:11Z",
+      "side": 1,
+      "message": "Maybe there is a better way than to provide the executor_api and the component_registry as parameters to this function. But as this is a shared library function which is used by zuul-web and fingergw that was the simplest solution.",
+      "revId": "9df94de735bbcf213dbf731fb965c04ecdd51a3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}

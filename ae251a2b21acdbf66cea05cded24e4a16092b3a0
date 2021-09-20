@@ -16,6 +16,24 @@
       "revId": "ae251a2b21acdbf66cea05cded24e4a16092b3a0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ee20cd7_e0507241",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-20T12:11:11Z",
+      "side": 1,
+      "message": "Done. I\u0027ve implemented the logic directly in the executor api, so this method doesn\u0027t have to deal with iterating over the available zones.",
+      "parentUuid": "96854f9e_4ed68202",
+      "revId": "ae251a2b21acdbf66cea05cded24e4a16092b3a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
