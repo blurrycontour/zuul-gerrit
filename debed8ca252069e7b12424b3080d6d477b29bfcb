@@ -88,6 +88,23 @@
     },
     {
       "key": {
+        "uuid": "2c6efcc4_c4696ade",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-20T20:28:10Z",
+      "side": 1,
+      "message": "For posterity:\n* list comprehension is a little faster than filter(lambda) (probably not enough to worry about in most cases)\n* filter(None) is *much faster* than list comprehension, but filters out 0 which would be wrong here.  Worth using in other cases where it would be correct.",
+      "revId": "debed8ca252069e7b12424b3080d6d477b29bfcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8abeb16c_959a1e57",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 8
