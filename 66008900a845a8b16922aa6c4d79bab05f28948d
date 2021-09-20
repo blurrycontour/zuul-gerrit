@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f385005_f2267d06",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-20T17:52:50Z",
+      "side": 1,
+      "message": "Is this sufficient to indicate that it failed? Below we set merged and updated to False which indicates a failure iirc.",
+      "revId": "66008900a845a8b16922aa6c4d79bab05f28948d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
