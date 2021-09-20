@@ -34,6 +34,24 @@
       "revId": "5a6ec28d1a1e41095f21c968087c0fbe527c6f31",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "88d21849_2c35d6e6",
+        "filename": "web/src/reducers/errors.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-20T13:29:31Z",
+      "side": 1,
+      "message": "Right, I was on the wrong track here. We must copy the action.error as we are overwriting its values.",
+      "parentUuid": "db25619a_d91cc0c8",
+      "revId": "5a6ec28d1a1e41095f21c968087c0fbe527c6f31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
