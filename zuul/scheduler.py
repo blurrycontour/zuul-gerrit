@@ -587,6 +587,7 @@ class Scheduler(threading.Thread):
                 self.log.debug("Starting build request cleanup")
                 self.executor.cleanupLostBuildRequests()
             finally:
+                self.log.debug("Finished build request cleanup")
                 self.build_request_cleanup_lock.release()
 
     def _runMergeRequestCleanup(self):
@@ -596,6 +597,7 @@ class Scheduler(threading.Thread):
                 self.log.debug("Starting merge request cleanup")
                 self.merger.cleanupLostMergeRequests()
             finally:
+                self.log.debug("Finished merge request cleanup")
                 self.merge_request_cleanup_lock.release()
 
     def _runConnectionCleanup(self):
