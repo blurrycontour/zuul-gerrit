@@ -1472,6 +1472,18 @@ class TestZKObject(ZooKeeperBaseTestCase):
             pipeline1.updateAttributes(context, foo='baz')
             self.assertEqual(pipeline1.foo, 'baz')
 
+        # Update an object using an active context
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            with pipeline1.activeContext(context):
+                pipeline1.foo = 'baz'
+        self.assertEqual(pipeline1.foo, 'baz')
+
+        # Update of object w/o active context should not work
+        with testtools.ExpectedException(Exception):
+            pipeline1.foo = 'nope'
+        self.assertEqual(pipeline1.foo, 'baz')
+
         # Refresh an existing object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
@@ -1510,16 +1522,32 @@ class TestZKObject(ZooKeeperBaseTestCase):
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
             pipeline1 = DummyZKObject.new(context,
                                           name=tenant_name,
-                                          foo='bar')
-            self.assertEqual(pipeline1.foo, 'bar')
+                                          foo='one')
+            self.assertEqual(pipeline1.foo, 'one')
 
+            # Simulate a fatal ZK exception
             context.client = ZKFailsOnUpdate()
             with testtools.ExpectedException(ZookeeperError):
-                pipeline1.updateAttributes(context, foo='baz')
+                pipeline1.updateAttributes(context, foo='two')
 
             # We should still have the old attribute
-            self.assertEqual(pipeline1.foo, 'bar')
+            self.assertEqual(pipeline1.foo, 'one')
+
+            # Any other error is retryable
+            context.client = FailsOnce(self.zk_client.client)
+            pipeline1.updateAttributes(context, foo='three')
+
+            # This time it should be updated
+            self.assertEqual(pipeline1.foo, 'three')
+
+            # Repeat test using an active context
+            context.client = ZKFailsOnUpdate()
+            with testtools.ExpectedException(ZookeeperError):
+                with pipeline1.activeContext(context):
+                    pipeline1.foo = 'four'
+            self.assertEqual(pipeline1.foo, 'three')
 
             context.client = FailsOnce(self.zk_client.client)
-            pipeline1.updateAttributes(context, foo='baz')
-            self.assertEqual(pipeline1.foo, 'baz')
+            with pipeline1.activeContext(context):
+                pipeline1.foo = 'five'
+            self.assertEqual(pipeline1.foo, 'five')
