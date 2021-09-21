@@ -861,6 +861,7 @@ class Client(zuul.cmd.ZuulApp):
         with open(os.open(self.args.path,
                           os.O_CREAT | os.O_WRONLY, 0o600), 'w') as f:
             json.dump(export, f)
+        sys.exit(0)
 
     def import_keys(self):
         logging.basicConfig(level=logging.INFO)
@@ -875,6 +876,7 @@ class Client(zuul.cmd.ZuulApp):
         with open(self.args.path, 'r') as f:
             import_data = json.load(f)
         keystore.importKeys(import_data, self.args.force)
+        sys.exit(0)
 
     def copy_keys(self):
         logging.basicConfig(level=logging.INFO)
@@ -900,6 +902,7 @@ class Client(zuul.cmd.ZuulApp):
         self.log.info("Copied keys from %s %s to %s %s",
                       args.src_connection, args.src_project,
                       args.dest_connection, args.dest_project)
+        sys.exit(0)
 
     def delete_keys(self):
         logging.basicConfig(level=logging.INFO)
@@ -916,6 +919,7 @@ class Client(zuul.cmd.ZuulApp):
         keystore.deleteProjectsSecretsKeys(args.connection, args.project)
         self.log.info("Delete keys from %s %s",
                       args.connection, args.project)
+        sys.exit(0)
 
     def delete_state(self):
         logging.basicConfig(level=logging.INFO)
@@ -926,6 +930,7 @@ class Client(zuul.cmd.ZuulApp):
                         "all ephemeral data from ZooKeeper? (yes/no) ")
         if confirm.strip().lower() == 'yes':
             zk_client.client.delete('/zuul', recursive=True)
+        sys.exit(0)
 
 
 def main():
