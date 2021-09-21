@@ -433,10 +433,14 @@ class JobRequestQueue(ZooKeeperSimpleBase):
     def lostRequests(self):
         # Get a list of requests which are running but not locked by
         # any client.
-        yield from filter(
-            lambda b: not self.isLocked(b),
-            self.inState(self.request_class.RUNNING),
-        )
+        for req in self.inState(self.request_class.RUNNING):
+            if self.isLocked(req):
+                continue
+            # Double check that our cache isn't out of date: it should
+            # still exist and be running.
+            req = self.get(req.path)
+            if req is not None and req.state == self.request_class.RUNNING:
+                yield req
 
     def _getAllRequestIds(self):
         # Get a list of all request ids without using the cache.
