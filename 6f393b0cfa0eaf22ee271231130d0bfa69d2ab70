@@ -16,6 +16,24 @@
       "revId": "6f393b0cfa0eaf22ee271231130d0bfa69d2ab70",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce7d4c01_204839c1",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4676,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-21T06:44:02Z",
+      "side": 1,
+      "message": "I\u0027ve put this change on top of https://review.opendev.org/c/zuul/zuul/+/808792/7 to see if it\u0027s still necessary. Without this \"fix\" the test case is failing for the change above, e.g. https://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_4da/809175/5/check/zuul-tox-py38/4daf1f6/testr_results.html\n\nHowever, thinking about that now, it might also be related to the change above which adapts the waitUntilSettled() method. I will have a look at it.",
+      "parentUuid": "1542cfab_5b05e54b",
+      "revId": "6f393b0cfa0eaf22ee271231130d0bfa69d2ab70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
