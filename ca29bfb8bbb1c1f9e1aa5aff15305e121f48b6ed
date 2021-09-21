@@ -16,6 +16,23 @@
       "revId": "ca29bfb8bbb1c1f9e1aa5aff15305e121f48b6ed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "009abd2a_532f17b7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1304,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T22:31:23Z",
+      "side": 1,
+      "message": "Or allow the cache to be used in both cases.  Either way, I agree, web and fingergw are essentially equivalent here and we should treat them the same.",
+      "revId": "ca29bfb8bbb1c1f9e1aa5aff15305e121f48b6ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
