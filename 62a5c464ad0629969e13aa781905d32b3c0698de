@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "65d0c63c_763083a3",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T14:44:26Z",
+      "side": 1,
+      "message": "Oh yep.  I think we only need a shallow copy.",
+      "revId": "62a5c464ad0629969e13aa781905d32b3c0698de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "addffb10_511fcd0e",
         "filename": "zuul/zk/zkobject.py",
         "patchSetId": 2
