@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "ab6eaf4f_2d7e318e",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5280,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T17:23:44Z",
+      "side": 1,
+      "message": "Because in zuul/zk/executor.py the .get() method accesses a DefaultKeyDict of executor queues, so it will make a new one.  To be clear, I\u0027m not saying the problem is that the zones in ZK are created, you are right, they should already exist.  But rather the problem is that the test framework is now using all of the magic in the executor API to establish its own cache and watchers, etc, and that\u0027s a lot of extra work we don\u0027t need the tests doing.",
+      "revId": "c11d849cc86395992eee90f1650efdae9691f190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a91c6b99_6b8bd7cc",
         "filename": "tests/base.py",
         "patchSetId": 5
