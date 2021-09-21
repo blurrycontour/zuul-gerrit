@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0242caaa_7bc89009",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 4187,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T17:15:26Z",
+      "side": 1,
+      "message": "Are we sure we want to log data here?  It could be quite large if the job returns a lot of data.  It could also be sensitive.",
+      "revId": "c43145a284d7a5758f976c4914ea93c87d33e1a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
