@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08b6e765_7a40df89",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-21T19:32:44Z",
+      "side": 1,
+      "message": "nit: left-over console.log debug.",
+      "revId": "039fc8b7f96545f4e1949e598774efe776928ba8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
