@@ -4272,19 +4272,13 @@ class NodesProvisionedEvent(ResultEvent):
     :arg str build_set_uuid: UUID of the buildset this node request belongs to
     """
 
-    def __init__(self, request_id, job_name, build_set_uuid):
+    def __init__(self, request_id, build_set_uuid):
         self.request_id = request_id
-        # We have to use the job_name to look up empty node requests from the
-        # buildset (as empty node requests don't have an id).
-        # TODO (felix): Is the job_name still needed? We are now also storing
-        # empty node requests in ZK, so they have an ID.
-        self.job_name = job_name
         self.build_set_uuid = build_set_uuid
 
     def toDict(self):
         return {
             "request_id": self.request_id,
-            "job_name": self.job_name,
             "build_set_uuid": self.build_set_uuid,
         }
 
@@ -4292,7 +4286,6 @@ class NodesProvisionedEvent(ResultEvent):
     def fromDict(cls, data):
         return cls(
             data.get("request_id"),
-            data.get("job_name"),
             data.get("build_set_uuid"),
         )
 
