@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8d52a11_e66a5a5c",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T15:02:20Z",
+      "side": 1,
+      "message": "This should be a Right icon.",
+      "revId": "1cc6411e738089abd7c89cfd70168fd2aa801725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
