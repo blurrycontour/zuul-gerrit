@@ -14,6 +14,7 @@
 
 import json
 import time
+import contextlib
 
 from kazoo.exceptions import ZookeeperError
 
@@ -86,6 +87,24 @@ class ZKObject:
             self._set(**old)
             raise
 
+    @contextlib.contextmanager
+    def activeContext(self, context):
+        if self._active_context:
+            raise RuntimeError(
+                f"Another context is already active {self._active_context}")
+        try:
+            old = self.__dict__.copy()
+            self._set(_active_context=context)
+            yield
+            try:
+                self._save(context)
+            except Exception:
+                # Roll back our old values if we aren't able to update ZK.
+                self._set(**old)
+                raise
+        finally:
+            self._set(_active_context=None)
+
     @classmethod
     def new(klass, context, **kw):
         """Create a new instance and save it in ZooKeeper"""
@@ -128,6 +147,7 @@ class ZKObject:
         # Don't support any arguments in constructor to force us to go
         # through a save or restore path.
         super().__init__()
+        self._set(_active_context=None)
 
     def _load(self, context, path=None):
         if path is None:
@@ -174,8 +194,11 @@ class ZKObject:
         raise Exception("ZooKeeper session or lock not valid")
 
     def __setattr__(self, name, value):
-        raise Exception("Unable to modify ZKObject %s" %
-                        (repr(self),))
+        if self._active_context:
+            super().__setattr__(name, value)
+        else:
+            raise Exception("Unable to modify ZKObject %s" %
+                            (repr(self),))
 
     def _set(self, **kw):
         for name, value in kw.items():
