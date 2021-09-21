@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8f07d8bf_2e30ffe4",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 495,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T15:58:55Z",
+      "side": 1,
+      "message": "It looks like the intent was for functions to return True in order to exit 0.  Most of them do (though a few call sys.exit directly.  Might be nice to be more consistent.",
+      "revId": "6e96fcfc674a55fa3f497ac6e64fd63737269b40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
