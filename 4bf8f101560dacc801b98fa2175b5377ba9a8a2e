@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc8b37dc_6dad6bdb",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2724,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-21T22:19:16Z",
+      "side": 1,
+      "message": "This approach of getting the change from the event won\u0027t work, because this might be a dependent change, or a cycle change, so not directly tied to the event.  (In other words, an approval event for change A causes change B to be enqueued, and this is the item for change B, but the triggering event is the one for change A).\n\nI think we need to go ahead and rely on the change cache as noted above in order to continue.",
+      "revId": "4bf8f101560dacc801b98fa2175b5377ba9a8a2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
