@@ -18,11 +18,14 @@ import socket
 from collections import defaultdict
 from contextlib import suppress
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from opentelemetry import trace
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
 import copy
+import ctypes
 from datetime import datetime
 import json
 import logging
@@ -2609,6 +2612,15 @@ class ZuulWeb(object):
         app = cherrypy.tree.mount(api, '/', config=conf)
         app.log = ZuulCherrypyLogManager(appid=app.log.appid)
 
+        self._malloc_trim_interval = IntervalTrigger(minutes=30, jitter=60)
+        self.apsched = BackgroundScheduler()
+        self.apsched.add_job(self._runMallocTrim,
+                             trigger=self._malloc_trim_interval)
+
+    def _runMallocTrim(self):
+        self.log.debug("Executing malloc_trim")
+        ctypes.CDLL(None).malloc_trim(0)
+
     @property
     def port(self):
         return cherrypy.server.bound_addr[1]
@@ -2667,10 +2679,12 @@ class ZuulWeb(object):
         self._system_config_running = True
         self.system_config_thread.daemon = True
         self.system_config_thread.start()
+        self.apsched.start()
 
     def stop(self):
         self.log.info("ZuulWeb stopping")
         self._running = False
+        self.apsched.shutdown()
         self.component_info.state = self.component_info.STOPPED
         cherrypy.engine.exit()
         # Not strictly necessary, but without this, if the server is
