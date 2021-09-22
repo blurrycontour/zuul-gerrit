@@ -168,6 +168,7 @@ class GerritEventConnector(threading.Thread):
                 time.sleep(1)
 
     def _run(self):
+        self.log.info("Gerrit event processor election won.")
         while not self._stopped and self.event_queue.election.is_still_valid():
             for event in self.event_queue:
                 try:
@@ -201,7 +202,11 @@ class GerritEventConnector(threading.Thread):
         log = get_annotated_logger(self.log, event)
 
         event.type = data.get('type')
+        # Is this uuid expected to be in the event data? Based on what we
+        # currently log is going into zk I'm not sure this exists?
         event.uuid = data.get('uuid')
+        log.debug("Processing gerrit event %s", event.type)
+        log.debug("Gerrit event data: %s", str(data))
 
         # NOTE(mnaser): Certain plugins fire events which end up causing
         #               an unrecognized event log *and* a traceback if they
