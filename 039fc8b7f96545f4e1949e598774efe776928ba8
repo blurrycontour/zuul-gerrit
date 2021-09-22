@@ -16,6 +16,24 @@
       "revId": "039fc8b7f96545f4e1949e598774efe776928ba8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d0f51bd_c90ab64b",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-22T06:47:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08b6e765_7a40df89",
+      "revId": "039fc8b7f96545f4e1949e598774efe776928ba8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
