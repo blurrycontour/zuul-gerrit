@@ -249,7 +249,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
         try:
             data = self._getData(data_uuid)
-        except NoNodeError:
+        except (NoNodeError, json.JSONDecodeError):
             cache_path = self._cachePath(key._hash)
             self.log.error("Removing cache entry %s without any data",
                            cache_path)
