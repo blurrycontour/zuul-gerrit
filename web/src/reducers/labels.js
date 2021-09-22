@@ -18,8 +18,6 @@ import {
   LABELS_FETCH_SUCCESS
 } from '../actions/labels'
 
-import update from 'immutability-helper'
-
 export default (state = {
   isFetching: false,
   labels: {},
@@ -33,8 +31,10 @@ export default (state = {
     case LABELS_FETCH_SUCCESS:
       return {
         isFetching: false,
-        labels: update(
-          state.labels, {$merge: {[action.tenant]: action.labels}}),
+        labels: {
+          ...state.labels,
+          [action.tenant]: action.labels,
+        }
       }
     case LABELS_FETCH_FAIL:
       return {
