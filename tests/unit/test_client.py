@@ -193,6 +193,7 @@ class TestKeyOperations(ZuulTestCase):
             stdout=subprocess.PIPE)
         out, _ = p.communicate()
         self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
 
         # Delete keys from ZK
         self.zk_client.client.delete('/keystorage', recursive=True)
@@ -209,6 +210,7 @@ class TestKeyOperations(ZuulTestCase):
             stdout=subprocess.PIPE)
         out, _ = p.communicate()
         self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
 
         # Make sure the new data matches the original
         new_data = self.getZKTree('/keystorage')
@@ -229,6 +231,7 @@ class TestKeyOperations(ZuulTestCase):
             stdout=subprocess.PIPE)
         out, _ = p.communicate()
         self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
 
         data = self.getZKTree('/keystorage')
         self.assertEqual(
@@ -247,6 +250,7 @@ class TestKeyOperations(ZuulTestCase):
             stdout=subprocess.PIPE)
         out, _ = p.communicate()
         self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
 
         data = self.getZKTree('/keystorage')
         self.assertIsNone(
