@@ -16,6 +16,24 @@
       "revId": "c43145a284d7a5758f976c4914ea93c87d33e1a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "74abc400_1c5fb1c5",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 4187,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-22T05:16:19Z",
+      "side": 1,
+      "message": "Right, maybe data is a little too much here. I thought it only contains a small dict, but in case of a successful build, it might be a lot larger. I\u0027ll remove it.",
+      "parentUuid": "0242caaa_7bc89009",
+      "revId": "c43145a284d7a5758f976c4914ea93c87d33e1a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
