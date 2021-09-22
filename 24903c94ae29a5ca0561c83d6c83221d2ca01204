@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ee6798e2_c00b67eb",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-22T07:41:11Z",
+      "side": 1,
+      "message": "Could we add a cursor:pointer style to those icons, so it\u0027s clear that you can click on them? I think that it\u0027s also clear without, but I always find it confusing if something that is clearly clickable (like a button or a link) doesn\u0027t change the mouse cursor to a pointer.",
+      "revId": "24903c94ae29a5ca0561c83d6c83221d2ca01204",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "903f8152_a7428ead",
         "filename": "web/src/containers/build/BuildList.jsx",
         "patchSetId": 8
