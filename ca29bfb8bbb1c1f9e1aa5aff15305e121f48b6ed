@@ -33,6 +33,24 @@
       "revId": "ca29bfb8bbb1c1f9e1aa5aff15305e121f48b6ed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5868df2b_1ab98c22",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1304,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-22T05:26:54Z",
+      "side": 1,
+      "message": "I\u0027ve added the use_cache\u003dFalse here.",
+      "parentUuid": "009abd2a_532f17b7",
+      "revId": "ca29bfb8bbb1c1f9e1aa5aff15305e121f48b6ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
