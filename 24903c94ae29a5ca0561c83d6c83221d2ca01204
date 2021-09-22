@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "903f8152_a7428ead",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-22T07:34:32Z",
+      "side": 1,
+      "message": "nit: Should we rename this to \"Show retried builds\", since the title of the list also says \"Builds\" and not \"Jobs\"?",
+      "revId": "24903c94ae29a5ca0561c83d6c83221d2ca01204",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4abf3df_d3749b17",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-22T07:34:32Z",
+      "side": 1,
+      "message": "Maybe it\u0027s worth to put the sorting/filtering into a function so we can keep it out of the render part and just use the map() on the result?",
+      "revId": "24903c94ae29a5ca0561c83d6c83221d2ca01204",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
