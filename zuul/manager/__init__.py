@@ -422,6 +422,16 @@ class PipelineManager(metaclass=ABCMeta):
                       change)
             return False
 
+        # Presumably, if our change object was previously in a
+        # pipeline and a depends-on commit was updated, it should have
+        # been dequeued since the dependent change didn't match any
+        # more.  We know this change isn't in this pipeline, but it
+        # may be in others.  If it is, then presumably its
+        # commit_needs are up to date and this is a noop; otherwise,
+        # we need to refresh them anyway.
+        if isinstance(change, model.Change):
+            self.updateCommitDependencies(change, None, event)
+
         with self.getChangeQueue(change, event, change_queue) as change_queue:
             if not change_queue:
                 log.debug("Unable to find change queue for "
@@ -663,10 +673,11 @@ class PipelineManager(metaclass=ABCMeta):
                 dependencies.append(dep)
         source = self.sched.connections.getSource(
             change.project.connection_name)
-        source.setChangeAttributes(
-            change,
-            commit_needs_changes=[d.cache_key for d in dependencies],
-            refresh_deps=False)
+        new_commit_needs_changes = [d.cache_key for d in dependencies]
+        if change.commit_needs_changes != new_commit_needs_changes:
+            source.setChangeAttributes(
+                change,
+                commit_needs_changes=[d.cache_key for d in dependencies])
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
