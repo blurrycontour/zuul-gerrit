@@ -199,12 +199,35 @@ class PipelineManager(metaclass=ABCMeta):
                 return True
         return False
 
+    def isAnyVersionOfChangeInPipeline(self, change):
+        # Checks any items in the pipeline
+        for item in self.pipeline.getAllItems():
+            if change.stable_id == item.change.stable_id:
+                return True
+        return False
+
     def isChangeAlreadyInQueue(self, change, change_queue):
         # Checks any item in the specified change queue
         for item in change_queue.queue:
             if change.equals(item.change):
                 return True
         return False
+
+    def refreshDeps(self, change, event):
+        if not isinstance(change, model.Change):
+            return
+
+        for item in self.pipeline.getAllItems():
+            # TODO: with structured-data keys (so we can compare the
+            # stable_id), we might be able to do more of this without
+            # going to ZK.
+            for connection_name, key in item.change.commit_needs_changes:
+                source = self.sched.connections.getSource(connection_name)
+                dep = source.getChangeByKey(key)
+                if (dep.stable_id == change.stable_id):
+                    self.updateCommitDependencies(item.change, None, event)
+
+        self.updateCommitDependencies(change, None, event)
 
     def reportEnqueue(self, item):
         if not self.pipeline._disabled:
@@ -421,6 +444,13 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("Change %s is not ready to be enqueued, ignoring" %
                       change)
             return False
+
+        # We know this change isn't in this pipeline, but it may be in
+        # others.  If it is, then presumably its commit_needs are up
+        # to date and this is a noop; otherwise, we need to refresh
+        # them anyway.
+        if isinstance(change, model.Change):
+            self.updateCommitDependencies(change, None, event)
 
         with self.getChangeQueue(change, event, change_queue) as change_queue:
             if not change_queue:
@@ -663,10 +693,11 @@ class PipelineManager(metaclass=ABCMeta):
                 dependencies.append(dep)
         source = self.sched.connections.getSource(
             change.project.connection_name)
-        source.setChangeAttributes(
-            change,
-            commit_needs_changes=[d.cache_key for d in dependencies],
-            refresh_deps=False)
+        new_commit_needs_changes = [d.cache_key for d in dependencies]
+        if change.commit_needs_changes != new_commit_needs_changes:
+            source.setChangeAttributes(
+                change,
+                commit_needs_changes=[d.cache_key for d in dependencies])
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
