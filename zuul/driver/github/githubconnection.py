@@ -1061,7 +1061,18 @@ class GithubClientManager:
                     page += 1
                     response = requests.get(url, headers=headers)
                     response.raise_for_status()
-                    installations.extend(response.json())
+                    for i in response.json():
+                        # admins can hit "suspend app" which populates
+                        # this in the app response.  A suspended app
+                        # will just get back 400 "This installation
+                        # has been suspended" responses.
+                        if i.get('suspended_at'):
+                            self.log.info("Skipping GitHub installation %s due"
+                                          " to admin suspension (by %s @ %s)" %
+                                          (i['id'], i['suspended_by']['login'],
+                                           i['suspended_at']))
+                        else:
+                            installations.append(i)
 
                     # check if we need to do further paged calls
                     url = response.links.get(
