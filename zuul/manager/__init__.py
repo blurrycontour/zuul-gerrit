@@ -22,8 +22,9 @@ from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
-from zuul.model import Change, DequeueEvent, QueueItem
+from zuul.model import Change, DequeueEvent, PipelineState, QueueItem
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.locks import pipeline_lock
 
 
 class DynamicChangeQueueContextManager(object):
@@ -84,7 +85,14 @@ class PipelineManager(metaclass=ABCMeta):
         # All pipelines support shared queues for setting
         # relative_priority; only the dependent pipeline uses them for
         # pipeline queing.
-        self.buildChangeQueues(layout)
+        with pipeline_lock(
+            self.sched.zk_client, self.pipeline.tenant.name, self.pipeline.name
+        ) as lock:
+            ctx = self.sched.createZKContext(lock, self.log)
+            with self.currentContext(ctx):
+                self.pipeline.state = PipelineState.resetOrCreate(
+                    self.pipeline)
+                self.buildChangeQueues(layout)
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")
@@ -241,7 +249,7 @@ class PipelineManager(metaclass=ABCMeta):
             self.updateCommitDependencies(change, None, event)
 
     def reportEnqueue(self, item):
-        if not self.pipeline._disabled:
+        if not self.pipeline.state.disabled:
             self.log.info("Reporting enqueue, action %s item %s" %
                           (self.pipeline.enqueue_actions, item))
             ret = self.sendReport(self.pipeline.enqueue_actions, item)
@@ -250,7 +258,7 @@ class PipelineManager(metaclass=ABCMeta):
                                (item, ret))
 
     def reportStart(self, item):
-        if not self.pipeline._disabled:
+        if not self.pipeline.state.disabled:
             self.log.info("Reporting start, action %s item %s" %
                           (self.pipeline.start_actions, item))
             ret = self.sendReport(self.pipeline.start_actions, item)
@@ -259,7 +267,7 @@ class PipelineManager(metaclass=ABCMeta):
                                (item, ret))
 
     def reportDequeue(self, item):
-        if not self.pipeline._disabled:
+        if not self.pipeline.state.disabled:
             self.log.info(
                 "Reporting dequeue, action %s item%s",
                 self.pipeline.dequeue_actions,
@@ -1751,26 +1759,31 @@ class PipelineManager(metaclass=ABCMeta):
             actions = self.pipeline.failure_actions
             item.setReportedResult("FAILURE")
             if not item.didAllJobsSucceed():
-                self.pipeline._consecutive_failures += 1
+                with self.pipeline.state.activeContext(self.current_context):
+                    self.pipeline.state.consecutive_failures += 1
         elif item.didAllJobsSucceed() and not item.isBundleFailing():
             log.debug("success %s", self.pipeline.success_actions)
             action = 'success'
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
-            self.pipeline._consecutive_failures = 0
+            with self.pipeline.state.activeContext(self.current_context):
+                self.pipeline.state.consecutive_failures = 0
         else:
             action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
-            self.pipeline._consecutive_failures += 1
-        if project_in_pipeline and self.pipeline._disabled:
+            with self.pipeline.state.activeContext(self.current_context):
+                self.pipeline.state.consecutive_failures += 1
+        if project_in_pipeline and self.pipeline.state.disabled:
             actions = self.pipeline.disabled_actions
         # Check here if we should disable so that we only use the disabled
         # reporters /after/ the last disable_at failure is still reported as
         # normal.
-        if (self.pipeline.disable_at and not self.pipeline._disabled and
-            self.pipeline._consecutive_failures >= self.pipeline.disable_at):
-            self.pipeline._disabled = True
+        if (self.pipeline.disable_at and not self.pipeline.state.disabled and
+            self.pipeline.state.consecutive_failures
+                >= self.pipeline.disable_at):
+            self.pipeline.state.updateAttributes(
+                self.current_context, disabled=True)
         if actions:
             log.info("Reporting item %s, actions: %s", item, actions)
             ret = self.sendReport(actions, item)
