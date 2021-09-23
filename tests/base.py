@@ -67,6 +67,7 @@ import yaml
 import paramiko
 import prometheus_client.exposition
 import sqlalchemy
+import requests_mock
 
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul import model
@@ -2742,6 +2743,8 @@ class FakeGithubClientManager(GithubClientManager):
     github_class = tests.fakegithub.FakeGithubClient
     github_enterprise_class = tests.fakegithub.FakeGithubEnterpriseClient
 
+    log = logging.getLogger("zuul.test.FakeGithubClientManager")
+
     def __init__(self, connection_config):
         super().__init__(connection_config)
         self.record_clients = False
@@ -2769,19 +2772,95 @@ class FakeGithubClientManager(GithubClientManager):
         return client
 
     def _prime_installation_map(self):
+        # Only valid if installed as a github app
         if not self.app_id:
             return
 
-        # simulate one installation per org
-        orgs = {}
-        latest_inst_id = 0
-        for repo in self.github_data.repos:
-            inst_id = orgs.get(repo[0])
-            if not inst_id:
-                latest_inst_id += 1
-                inst_id = latest_inst_id
-                orgs[repo[0]] = inst_id
-            self.installation_map['/'.join(repo)] = inst_id
+        # github_data.repos is a hash like
+        # { ('org', 'project1'): <dataobj>
+        #   ('org', 'project2'): <dataobj>,
+        #   ('org2', 'project1'): <dataobj>, ... }
+        #
+        # we don't care about the value. index by org, e.g.
+        #
+        #  {
+        #    'org': ('project1', 'project2')
+        #    'org2': ('project1', 'project2')
+        #  }
+        orgs = defaultdict(list)
+        project_id = 1
+        for org, project in self.github_data.repos:
+            # Each entry is in the format for "repositories" response
+            # of GET /installation/repositories
+            orgs[org].append({
+                'id': project_id,
+                'name': project,
+                'full_name': '%s/%s' % (org, project)
+                # note, lots of other stuff that's not relevant
+            })
+            project_id += 1
+
+        self.log.debug("GitHub installation mapped to: %s" % orgs)
+
+        # Mock response to GET /app/installations
+        app_json = []
+        app_projects = []
+        app_id = 1
+        for org, projects in orgs.items():
+            # We respond as if each org is a different app instance
+            #
+            # Below we will be sent the app_id in a token to query
+            # what projects this app exports.  Keep the projects in a
+            # sequential list so we can just look up "projects for app
+            # X" == app_projects[X]
+            app_projects.append(projects)
+            app_json.append(
+                {
+                    'id': app_id,
+                    # Acutally none of this matters, and there's lots
+                    # more in a real response.  Padded out just for
+                    # example sake.
+                    'account': {
+                        'login': org,
+                        'id': 1234,
+                        'type': 'User',
+                    },
+                    'permissions': {
+                        'checks': 'write',
+                        'metadata': 'read',
+                        'contents': 'read'
+                    },
+                    'events': ['push',
+                               'pull_request'
+                               ],
+                    'suspended_at': None,
+                    'suspended_by': None,
+                }
+            )
+            app_id += 1
+
+        # TODO(ianw) : we could exercise the pagination paths ...
+        with requests_mock.Mocker() as m:
+            m.get('https://api.github.com/app/installations', json=app_json)
+
+            def repositories_callback(request, context):
+                # FakeGithubSession gives us an auth token "token
+                # token-X" where "X" corresponds to the app id we want
+                # the projects for.  apps start at id "1", so the projects
+                # to return for this call are app_projects[token-1]
+                token = int(request.headers['Authorization'][12:])
+                projects = app_projects[token - 1]
+                return {
+                    'total_count': len(projects),
+                    'repositories': projects
+                }
+            m.get(
+                ('https://api.github.com/'
+                 'installation/repositories?per_page=100'),
+                json=repositories_callback)
+
+            # everything mocked now, call real implementation
+            super()._prime_installation_map()
 
 
 class FakeGithubConnection(githubconnection.GithubConnection):
