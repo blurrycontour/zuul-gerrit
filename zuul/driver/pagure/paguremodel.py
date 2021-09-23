@@ -87,6 +87,7 @@ class PagureTriggerEvent(TriggerEvent):
         self.trigger_name = 'pagure'
         self.title = None
         self.action = None
+        self.initial_comment_changed = None
         self.status = None
         self.tags = []
         self.tag = None
@@ -96,6 +97,7 @@ class PagureTriggerEvent(TriggerEvent):
         d["trigger_name"] = self.trigger_name
         d["title"] = self.title
         d["action"] = self.action
+        d["initial_comment_changed"] = self.initial_comment_changed
         d["status"] = self.status
         d["tags"] = list(self.tags)
         d["tag"] = self.tag
@@ -106,6 +108,7 @@ class PagureTriggerEvent(TriggerEvent):
         self.trigger_name = d.get("trigger_name", "pagure")
         self.title = d.get("title")
         self.action = d.get("action")
+        self.initial_comment_changed = d.get("initial_comment_changed")
         self.status = d.get("status")
         self.tags = d.get("tags", [])
         self.tag = d.get("tag")
@@ -127,6 +130,9 @@ class PagureTriggerEvent(TriggerEvent):
         if self.type == 'pg_pull_request':
             return self.action in ['opened', 'changed']
         return False
+
+    def isMessageChanged(self):
+        return bool(self.initial_comment_changed)
 
 
 class PagureEventFilter(EventFilter):

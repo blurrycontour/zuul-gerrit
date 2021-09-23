@@ -4422,6 +4422,9 @@ class TriggerEvent(AbstractEvent):
     def isPatchsetCreated(self):
         return False
 
+    def isMessageChanged(self):
+        return False
+
     def isChangeAbandoned(self):
         return False
 
