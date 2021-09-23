@@ -107,6 +107,7 @@ class GithubTriggerEvent(TriggerEvent):
         self.check_run = None
         self.status = None
         self.commits = []
+        self.body_edited = None
 
     def toDict(self):
         d = super().toDict()
@@ -135,6 +136,9 @@ class GithubTriggerEvent(TriggerEvent):
         if self.type == 'pull_request':
             return self.action in ['opened', 'changed']
         return False
+
+    def isMessageChanged(self):
+        return bool(self.body_edited)
 
     def isChangeAbandoned(self):
         if self.type == 'pull_request':

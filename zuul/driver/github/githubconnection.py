@@ -463,6 +463,8 @@ class GithubEventProcessor(object):
             event.label = self.body['label']['name']
         elif action == 'edited':
             event.action = 'edited'
+            if self.body.get('changes', {}).get('body'):
+                event.body_edited = True
         else:
             return None
 
