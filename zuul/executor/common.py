@@ -99,6 +99,8 @@ def construct_build_params(uuid, sched, job, item, pipeline,
     params['workspace_scheme'] = job.workspace_scheme
 
     def make_playbook(playbook):
+        # TODO (felix): We could store the playbook directly as dict on the
+        # FrozenJob class, so this toDict() call would be obsolete.
         d = playbook.toDict(redact_secrets=redact_secrets_and_keys)
         for role in d['roles']:
             if role['type'] != 'zuul':
