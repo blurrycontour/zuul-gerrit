@@ -33,6 +33,7 @@ from kazoo.exceptions import NoNodeError
 from cachetools.func import lru_cache
 
 from zuul.lib import yamlutil as yaml
+from zuul.lib.jsonutil import ZuulJSONEncoder
 from zuul.lib.varnames import check_varnames
 
 import jsonpath_rw
@@ -1543,6 +1544,14 @@ class Job(ConfigObject):
         # in the context of a project-pipeline.  They can not affect
         # the execution of the job, but only whether the job is run
         # and how it is reported.
+
+        # TODO (felix): With the FrozenJob as it's own class, we might
+        # be able to remove some of the attributes from the original
+        # Job class, e.g. queued or waiting_status.
+        # In general: Everything that is not set in the configloader
+        # directly (before the job freezing) could be removed from
+        # the Job class.
+
         self.context_attributes = dict(
             voting=True,
             hold_following_changes=False,
@@ -1568,6 +1577,8 @@ class Job(ConfigObject):
         # declared "final", these may not be overridden in a
         # project-pipeline.
         self.execution_attributes = dict(
+            # TODO (felix): Reference parent by job_name (should be unique
+            # within the jobgraph)
             parent=None,
             timeout=None,
             post_timeout=None,
@@ -1621,14 +1632,6 @@ class Job(ConfigObject):
         self.attributes.update(self.other_attributes)
 
         self.name = name
-
-    @property
-    def combined_variables(self):
-        """
-        Combines the data that has been returned by parent jobs with the
-        job variables where job variables have priority over parent data.
-        """
-        return Job._deepUpdate(self.parent_data or {}, self.variables)
 
     def toDict(self, tenant):
         '''
@@ -1731,9 +1734,6 @@ class Job(ConfigObject):
 
     def _get(self, name):
         return self.__dict__.get(name)
-
-    def getSafeAttributes(self):
-        return Attributes(name=self.name)
 
     def isBase(self):
         return self.parent is self.BASE_JOB_MARKER
@@ -1851,56 +1851,6 @@ class Job(ConfigObject):
             self.group_variables = Job._deepUpdate(
                 self.group_variables, other_group_vars)
 
-    def updateParentData(self, other_build):
-        # Update variables, but give the new values priority. If more than one
-        # parent job returns the same variable, the value from the later job
-        # in the job graph will take precedence.
-        other_vars = other_build.result_data
-        v = self.parent_data or {}
-        v = Job._deepUpdate(v, other_vars)
-        # To avoid running afoul of checks that jobs don't set zuul
-        # variables, remove them from parent data here.
-        v.pop('zuul', None)
-        # For safety, also drop nodepool and unsafe_vars
-        v.pop('nodepool', None)
-        v.pop('unsafe_vars', None)
-        self.parent_data = v
-
-        secret_other_vars = other_build.secret_result_data
-        v = self.secret_parent_data or {}
-        v = Job._deepUpdate(secret_other_vars, v)
-        if 'zuul' in v:
-            del v['zuul']
-        self.secret_parent_data = v
-
-        artifact_data = self.artifact_data or []
-        artifacts = get_artifacts_from_result_data(other_vars)
-        for a in artifacts:
-            # Change here may be any ref type (tag, change, etc)
-            ref = other_build.build_set.item.change
-            a.update({'project': ref.project.name,
-                      'job': other_build.job.name})
-            # Change is a Branch
-            if hasattr(ref, 'branch'):
-                a.update({'branch': ref.branch})
-                if hasattr(ref, 'number') and hasattr(ref, 'patchset'):
-                    a.update({'change': str(ref.number),
-                              'patchset': ref.patchset})
-            # Otherwise we are ref type
-            else:
-                a.update({'ref': ref.ref,
-                          'oldrev': ref.oldrev,
-                          'newrev': ref.newrev})
-                if hasattr(ref, 'tag'):
-                    a.update({'tag': ref.tag})
-            if a not in artifact_data:
-                artifact_data.append(a)
-        if artifact_data:
-            self.updateArtifactData(artifact_data)
-
-    def updateArtifactData(self, artifact_data):
-        self.artifact_data = artifact_data
-
     def updateProjectVariables(self, project_vars):
         # Merge project/template variables directly into the job
         # variables.  Job variables override project variables.
@@ -1912,6 +1862,7 @@ class Job(ConfigObject):
         self.required_projects = required_projects
 
     @staticmethod
+    # TODO (felix): Move to one of the utility modules (lib/collections.py)
     def _deepUpdate(a, b):
         # Merge nested dictionaries if possible, otherwise, overwrite
         # the value in 'a' with the value in 'b'.
@@ -2127,32 +2078,6 @@ class Job(ConfigObject):
 
         return True
 
-    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
-        for playbook in playbooks:
-            # noop job does not have source_context
-            if playbook.source_context:
-                yield playbook.source_context.project_canonical_name
-            for role in playbook.roles:
-                if role.implicit and not with_implicit:
-                    continue
-                yield role.project_canonical_name
-
-    def getAffectedProjects(self, tenant):
-        """
-        Gets all projects that are required to run this job. This includes
-        required_projects, referenced playbooks, roles and dependent changes.
-        """
-        project_canonical_names = set()
-        project_canonical_names.update(self.required_projects.keys())
-        project_canonical_names.update(self._projectsFromPlaybooks(
-            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
-                            self.cleanup_run), with_implicit=True))
-
-        projects = list()
-        for project_canonical_name in project_canonical_names:
-            projects.append(tenant.getProject(project_canonical_name)[1])
-        return projects
-
 
 class JobProject(ConfigObject):
     """ A reference to a project from a job. """
@@ -2220,23 +2145,304 @@ class JobDependency(ConfigObject):
                 'soft': self.soft}
 
 
-class JobGraph(object):
+class FrozenJob(object):
+    """This represents a Job after the job freezing."""
+
+    # TODO (felix): There was some exception that this class is not hashable,
+    # so I took this line over from the Job class.
+    __hash__ = object.__hash__
+
+    def __init__(self, name):
+        self.name = name
+
+    @property
+    def combined_variables(self):
+        """
+        Combines the data that has been returned by parent jobs with the
+        job variables where job variables have priority over parent data.
+        """
+        return Job._deepUpdate(self.parent_data or {}, self.variables)
+
+    def getSafeAttributes(self):
+        return Attributes(name=self.name)
+
+    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
+        for playbook in playbooks:
+            # noop job does not have source_context
+            if playbook.source_context:
+                yield playbook.source_context.project.canonical_name
+            for role in playbook.roles:
+                if role.implicit and not with_implicit:
+                    continue
+                yield role.project_canonical_name
+
+    def getAffectedProjects(self, tenant):
+        """
+        Gets all projects that are required to run this job. This
+        includes required_projects, referenced playbooks, roles and
+        dependent changes.
+        """
+        project_canonical_names = set()
+        project_canonical_names.update(self.required_projects.keys())
+        project_canonical_names.update(self._projectsFromPlaybooks(
+            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
+                            self.cleanup_run), with_implicit=True))
+
+        projects = list()
+        for project_canonical_name in project_canonical_names:
+            projects.append(tenant.getProject(project_canonical_name)[1])
+        return projects
+
+    def updateArtifactData(self, artifact_data):
+        self.artifact_data = artifact_data
+
+    def updateParentData(self, other_build):
+        # Update variables, but give the new values priority. If more than one
+        # parent job returns the same variable, the value from the later job
+        # in the job graph will take precedence.
+        other_vars = other_build.result_data
+        v = self.parent_data or {}
+        v = Job._deepUpdate(v, other_vars)
+        # To avoid running afoul of checks that jobs don't set zuul
+        # variables, remove them from parent data here.
+        v.pop('zuul', None)
+        # For safety, also drop nodepool and unsafe_vars
+        v.pop('nodepool', None)
+        v.pop('unsafe_vars', None)
+        self.parent_data = v
+
+        secret_other_vars = other_build.secret_result_data
+        v = self.secret_parent_data or {}
+        v = Job._deepUpdate(secret_other_vars, v)
+        if 'zuul' in v:
+            del v['zuul']
+        self.secret_parent_data = v
+
+        artifact_data = self.artifact_data or []
+        artifacts = get_artifacts_from_result_data(other_vars)
+        for a in artifacts:
+            # Change here may be any ref type (tag, change, etc)
+            ref = other_build.build_set.item.change
+            a.update({'project': ref.project.name,
+                      'job': other_build.job.name})
+            # Change is a Branch
+            if hasattr(ref, 'branch'):
+                a.update({'branch': ref.branch})
+                if hasattr(ref, 'number') and hasattr(ref, 'patchset'):
+                    a.update({'change': str(ref.number),
+                              'patchset': ref.patchset})
+            # Otherwise we are ref type
+            else:
+                a.update({'ref': ref.ref,
+                          'oldrev': ref.oldrev,
+                          'newrev': ref.newrev})
+                if hasattr(ref, 'tag'):
+                    a.update({'tag': ref.tag})
+            if a not in artifact_data:
+                artifact_data.append(a)
+        if artifact_data:
+            self.updateArtifactData(artifact_data)
+
+    @classmethod
+    def fromJob(cls, job):
+        frozen_job = cls(job.name)
+        # TODO (felix): Check which attributes are really needed.
+        for attr in (
+            # context attributes
+            "voting",
+            "hold_following_changes",
+            "failure_message",
+            "success_message",
+            #"branch_matcher",
+            #"_branches",
+            #"file_matcher",
+            #"_files",
+            #"irrelevant_file_matcher",
+            #"_irrelevant_files",
+            #"match_on_config_updates",
+            "tags",
+            "provides",
+            "requires",
+            # TODO (felix): Store this as list of names
+            "dependencies",
+            #"ignore_allowed_projects",
+
+            # execution attributes
+            #"parent",
+            "timeout",
+            "post_timeout",
+            "variables",
+            "extra_variables",
+            "host_variables",
+            "group_variables",
+            "nodeset",
+            #"workspace",
+            "pre_run",
+            "post_run",
+            "cleanup_run",
+            "run",
+            "ansible_version",
+            "semaphores",
+            "attempts",
+            #"final",
+            #"abstract",
+            #"intermediate",
+            #"protected",
+            #"roles",
+            "required_projects",
+            #"allowed_projects",
+            "override_branch",
+            "override_checkout",
+            #"post_review",
+            "workspace_scheme",
+
+            # other attributes
+            #"source_context",
+            #"start_mark",
+            "inheritance_path",
+            "parent_data",
+            "secret_parent_data",
+            "artifact_data",
+            #"description",
+            #"variant_description",
+            #"protected_origin",
+            #"secrets",
+            "queued",
+            "waiting_status",
+        ):
+            setattr(frozen_job, attr, getattr(job, attr))
+
+        # TODO (felix): For debugging
+        frozen_job._job = job
+
+        return frozen_job
+
+    # TODO (felix): This is just a temporary solution to not copy the whole
+    # toDict() method until we know what we actually need or if the whole thing
+    # is working at all like this.
+    #def toDict(self, tenant_name):
+    #    return self._job.toDict(tenant_name)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        # TODO (felix): Ignore file matchers
+        # see: QueueItem.updatesJobConfig()
+        self_dict = copy.deepcopy(self.__dict__)
+        other_dict = copy.deepcopy(other.__dict__)
+
+        # Ignore changes to file matchers since they don't affect the
+        # content of the job.
+        for attr in [
+            "files", "irrelevant_files", "source_context", "description"
+        ]:
+            self_dict.pop(attr, None)
+            other_dict.pop(attr, None)
+
+        logging.debug("FE: self %s", self_dict)
+        logging.debug("FE: other %s", other_dict)
+
+        return self_dict == other_dict
+
+        #return self.__dict__ == other.__dict__
+
+    def toDict(self):
+        data = self.__dict__.copy()
+        logging.debug("FE: data %s", data)
+
+        # TODO (felix): For debugging
+        data.pop("_job")
+
+        """
+        # "Correct" parent reference in data dictionary
+        if self.isBase():
+            data["parent"] = None
+        elif self.parent:
+            data["parent"] = self.parent
+        else:
+            # TODO (felix): Get the tenant's default base job
+            pass
+        """
+
+        data["nodeset"] = self.nodeset.toDict()
+
+        # NOTE (felix): The executor client uses redact_secrets=False
+        # when serializing the playbooks. So we are doing the same
+        # here.
+        data.pop("run")
+        data.pop("pre_run")
+        data.pop("post_run")
+        data.pop("cleanup_run")
+        if self.name != "noop":
+            data["run"] = [
+                playbook.toDict(redact_secrets=False)
+                for playbook in self.run]
+            data["pre_run"] = [
+                playbook.toDict(redact_secrets=False)
+                for playbook in self.pre_run]
+            data["post_run"] = [
+                playbook.toDict(redact_secrets=False)
+                for playbook in self.post_run]
+            data["cleanup_run"] = [
+                playbook.toDict(redact_secrets=False)
+                for playbook in self.cleanup_run]
+
+
+        # TODO (felix): Could we serialize those directly when setting them on
+        # the FrozenJob (like we do with the playbooks)?
+        data["tags"] = list(self.tags)
+        data["provides"] = list(self.provides)
+        data["requires"] = list(self.requires)
+        data["dependencies"] = list(map(lambda x: x.toDict(), self.dependencies))
+        data["semaphores"] = [s.toDict() for s in self.semaphores]
+        data["required_projects"] = {
+            name: p.toDict() for name, p in self.required_projects.items()}
+
+        return data
+
+
+class JobGraph(zkobject.ZKObject):
     """ A JobGraph represents the dependency graph between Job."""
 
     def __init__(self):
-        self.jobs = OrderedDict()  # job_name -> Job
-        # dependent_job_name -> dict(parent_job_name -> soft)
-        self._dependencies = {}
-        self.project_metadata = {}
+        super().__init__()
+        self._set(
+            uuid=uuid4().hex,
+            jobs=OrderedDict(),  # job_name -> Job
+            # dependent_job_name -> dict(parent_job_name -> soft)
+            _dependencies={},
+            project_metadata={},
+        )
+
+    def getPath(self):
+        # TODO (felix): Where to put the jobgraph?
+        return f"/zuul/jobgraphs/{self.uuid}"
+
+    def serialize(self):
+        data = {
+            "uuid": self.uuid,
+            "jobs": {job_name: job.toDict() for job_name, job in self.jobs.items()},
+            "_dependencies": self._dependencies,
+            "project_metadata": {
+                name: pmd.toDict()
+                for name, pmd in self.project_metadata.items()
+            },
+        }
+        # TODO (felix): The ZuulJSONEncoder is used to serialize
+        # MappingProxyType attributes. Do we have to take care of that during
+        # the deserialization from ZooKeeper?
+        return json.dumps(data, cls=ZuulJSONEncoder).encode("utf-8")
 
     def __repr__(self):
         return '<JobGraph %s>' % (self.jobs)
 
-    def addJob(self, job):
+    def addJob(self, frozen_job):
+        job = FrozenJob.fromJob(frozen_job)
         # A graph must be created after the job list is frozen,
         # therefore we should only get one job with the same name.
         if job.name in self.jobs:
-            raise Exception("Job %s already added" % (job.name,))
+            raise Exception("Job %s already added", job.name)
         self.jobs[job.name] = job
         # Append the dependency information
         self._dependencies.setdefault(job.name, {})
@@ -3157,6 +3363,14 @@ class QueueItem(zkobject.ZKObject):
             "bundle": bundle,
             "current_build_set": build_set,
         })
+
+        # TODO (felix): Disable the if block in the tests to see if the
+        # (de)serialization works.
+        #if self.job_graph is not None:
+        #    self.job_graph.refresh(...)
+        #else:
+        self.job_graph = JobGraph.fromZK(...)
+
         return data
 
     def annotateLogger(self, logger):
@@ -3234,7 +3448,8 @@ class QueueItem(zkobject.ZKObject):
             # The layout might be no longer available at this point, as the
             # scheduler submitting the job can be different from the one that
             # created the layout.
-            job_graph.project_metadata = layout.project_metadata
+            job_graph.updateAttributes(
+                ctx, project_metadata=layout.project_metadata)
 
             self.updateAttributes(context, job_graph=job_graph)
         except Exception:
@@ -3674,6 +3889,10 @@ class QueueItem(zkobject.ZKObject):
             if job not in jobs_not_requested:
                 continue
             if not self.jobRequirementsReady(job):
+                # TODO (felix): Create a dummy build object on the buildset and
+                # store the waiting_status there. This is now possible as we
+                # have the build and the build request decoupled.
+                # This would also solve the queued state
                 job.waiting_status = 'requirements: {}'.format(
                     ', '.join(job.requires))
                 continue
@@ -4098,7 +4317,16 @@ class QueueItem(zkobject.ZKObject):
             if old_job is None:
                 log.debug("Found a newly created job")
                 return True  # A newly created job
-            old_job_dict = old_job.toDict(self.pipeline.tenant)
+
+            # TODO (felix): old_job is a FrozenJob, but job is a Job
+            # (configobject). So we are comparing apples and oranges
+            # here.
+            # TODO (felix): If we want to switch this to use a FrozenJob
+            # instead, we have to find out which attributes are relevant
+            # for this comparison. If only some are relevant, we could
+            # reduce the number of attributes that must be stored in a
+            # FrozenJob.
+            old_job_dict = old_job._job.toDict(self.pipeline.tenant)
             new_job_dict = job.toDict(self.pipeline.tenant)
             # Ignore changes to file matchers since they don't affect
             # the content of the job.
@@ -5233,6 +5461,14 @@ class ProjectMetadata(object):
         self.queue_name = None
 
 
+    def toDict(self):
+        return {
+            "merge_mode": self.merge_mode,
+            "default_branch": self.default_branch,
+            "queue_name": self.queue_name,
+        }
+
+
 class SystemAttributes:
     """Global system attributes from the Zuul config.
 
@@ -6031,6 +6267,8 @@ class Layout(object):
                 else:
                     frozen_job.applyVariant(variant, self)
                     frozen_job.name = variant.name
+            # TODO (felix): From here on we should deal with a FrozenJob
+            # frozen_job = job.freeze()
             frozen_job.name = jobname
 
             # Now merge variables set from this parent ppc
@@ -6071,6 +6309,7 @@ class Layout(object):
                not frozen_job.changeMatchesFiles(change):
                 matched_files = False
                 if frozen_job.match_on_config_updates:
+                    log.debug("FE: job %s matches on config updates", frozen_job)
                     updates_job_config = item.updatesJobConfig(
                         frozen_job, self)
             else:
@@ -6112,7 +6351,8 @@ class Layout(object):
     def createJobGraph(self, item, ppc, skip_file_matcher=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
-        ret = JobGraph()
+        # TODO (felix): How to get the ZK context here?
+        ret = JobGraph.new(item.pipeline.manager.current_context)
         if ppc:
             self._createJobGraph(item, ppc, ret, skip_file_matcher)
         return ret
