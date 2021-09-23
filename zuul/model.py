@@ -29,6 +29,7 @@ import textwrap
 import types
 import itertools
 
+from kazoo.exceptions import NoNodeError
 from cachetools.func import lru_cache
 
 from zuul.lib import yamlutil as yaml
@@ -282,8 +283,6 @@ class Pipeline(object):
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
         self.manager = None
-        self.queues = []
-        self.relative_priority_queues = {}
         self.precedence = PRECEDENCE_NORMAL
         self.supercedes = []
         self.triggers = []
@@ -296,24 +295,21 @@ class Pipeline(object):
         self.disabled_actions = []
         self.dequeue_actions = []
         self.disable_at = None
-        self._consecutive_failures = 0
-        self._disabled = False
         self.window = None
         self.window_floor = None
         self.window_increase_type = None
         self.window_increase_factor = None
         self.window_decrease_type = None
         self.window_decrease_factor = None
-        self.state = self.STATE_NORMAL
+        self.state = None
 
-    def getPath(self):
-        safe_tenant = urllib.parse.quote_plus(self.tenant.name)
-        safe_pipeline = urllib.parse.quote_plus(self.name)
-        return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
+    @property
+    def queues(self):
+        return self.state.queues
 
-    def refresh(self, context):
-        for queue in self.queues:
-            queue.refresh(context)
+    @property
+    def relative_priority_queues(self):
+        return self.state.relative_priority_queues
 
     @property
     def actions(self):
@@ -384,7 +380,7 @@ class Pipeline(object):
     def formatStatusJSON(self, websocket_url=None):
         j_pipeline = dict(name=self.name,
                           description=self.description,
-                          state=self.state)
+                          state=self.state.state)
         j_queues = []
         j_pipeline['change_queues'] = j_queues
         for queue in self.queues:
@@ -414,6 +410,57 @@ class Pipeline(object):
             if j_changes:
                 j_queue['heads'].append(j_changes)
         return j_pipeline
+
+
+class PipelineState(zkobject.ZKObject):
+
+    def __init__(self):
+        super().__init__()
+        self._set(**self.defaultState())
+
+    @classmethod
+    def defaultState(cls):
+        return dict(
+            state=Pipeline.STATE_NORMAL,
+            queues=[],
+            relative_priority_queues={},
+            consecutive_failures=0,
+            disabled=False,
+            pipeline=None,
+        )
+
+    @classmethod
+    def resetOrCreate(cls, pipeline):
+        ctx = pipeline.manager.current_context
+        try:
+            state = cls.fromZK(ctx, cls.pipelinePath(pipeline))
+            reset_state = {**state.defaultState(), "pipeline": pipeline}
+            state.updateAttributes(ctx, **reset_state)
+            return state
+        except NoNodeError:
+            return cls.new(ctx, pipeline=pipeline)
+
+    def getPath(self):
+        return self.pipelinePath(self.pipeline)
+
+    @classmethod
+    def pipelinePath(cls, pipeline):
+        safe_tenant = urllib.parse.quote_plus(pipeline.tenant.name)
+        safe_pipeline = urllib.parse.quote_plus(pipeline.name)
+        return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
+
+    def serialize(self):
+        data = {
+            "state": self.state,
+            "consecutive_failures": self.consecutive_failures,
+            "disabled": self.disabled,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def refresh(self, context):
+        super().refresh(context)
+        for queue in self.queues:
+            queue.refresh(context)
 
 
 class ChangeQueue(object):
@@ -2703,7 +2750,7 @@ class QueueItem(zkobject.ZKObject):
         return obj
 
     def getPath(self):
-        return self.itemPath(self.pipeline.getPath(), self.uuid)
+        return self.itemPath(self.pipeline.state.getPath(), self.uuid)
 
     @classmethod
     def itemPath(cls, pipeline_path, item_uuid):
