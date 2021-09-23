@@ -78,6 +78,7 @@ class GitlabTriggerEvent(TriggerEvent):
         self.action = None
         self.labels = []
         self.change_number = None
+        self.merge_request_description_changed = None
         self.tag = None
 
     def toDict(self):
@@ -114,6 +115,9 @@ class GitlabTriggerEvent(TriggerEvent):
         if self.type == 'gl_merge_request':
             return self.action in ['opened', 'changed']
         return False
+
+    def isMessageChanged(self):
+        return bool(self.merge_request_description_changed)
 
 
 class GitlabEventFilter(EventFilter):
