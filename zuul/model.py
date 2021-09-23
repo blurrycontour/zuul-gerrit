@@ -3755,7 +3755,6 @@ class Change(Branch):
         # Changes that the pipeline manager determined are needed due
         # to Depends-On headers (all drivers):
         self.commit_needs_changes = None
-        self.refresh_deps = False
 
         self.is_current_patchset = True
         self.can_merge = False
@@ -3790,7 +3789,6 @@ class Change(Branch):
             None if data.get("commit_needs_changes") is None
             else [tuple(k) for k in data.get("commit_needs_changes", [])]
         )
-        self.refresh_deps = data.get("refresh_deps", False)
         self.is_current_patchset = data.get("is_current_patchset", True)
         self.can_merge = data.get("can_merge", False)
         self.is_merged = data.get("is_merged", False)
@@ -3812,7 +3810,6 @@ class Change(Branch):
             "compat_needs_changes": self.compat_needs_changes,
             "compat_needed_by_changes": self.git_needed_by_changes,
             "commit_needs_changes": self.commit_needs_changes,
-            "refresh_deps": self.refresh_deps,
             "is_current_patchset": self.is_current_patchset,
             "can_merge": self.can_merge,
             "is_merged": self.is_merged,

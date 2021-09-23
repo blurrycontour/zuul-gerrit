@@ -1751,6 +1751,10 @@ class Scheduler(threading.Thread):
                       e.change, project.source)
             return
 
+        # TODO: maybe here we check to see if this is an update of any
+        # commit_needs change in the pipeline and refresh its deps
+        # here.  Basically what onChangeUpdated used to do, but over a
+        # much smaller in-memory search area.
         if event.isPatchsetCreated():
             pipeline.manager.removeOldVersionsOfChange(
                 change, event)
@@ -2181,24 +2185,8 @@ class Scheduler(threading.Thread):
         them to be refreshed the next time the queue processor
         examines them.
         """
-        log = get_annotated_logger(self.log, event)
-        log.debug("Change %s has been updated, clearing dependent "
-                  "change caches", change)
-        for source in self.connections.getSources():
-            for other_change in source.getCachedChanges():
-                if not isinstance(other_change, Change):
-                    continue
-                if other_change.commit_needs_changes is None:
-                    continue
-                for connection_name, key in other_change.commit_needs_changes:
-                    dep_source = self.connections.getSource(connection_name)
-                    dep = dep_source.getChangeByKey(key)
-                    if change.isUpdateOf(dep):
-                        source.setChangeAttributes(
-                            other_change, refresh_deps=True)
-
-        source = self.connections.getSource(change.project.connection_name)
-        source.setChangeAttributes(change, refresh_deps=True)
+        # TODO remove method?
+        pass
 
     def cancelJob(self, buildset, job, build=None, final=False,
                   force=False):
