@@ -641,8 +641,9 @@ class FakeGithubSession(object):
         if re.match(r'.*/app/installations/.*/access_tokens', url):
             expiry = (datetime.datetime.now(utc) + datetime.timedelta(
                 minutes=60)).replace(microsecond=0).isoformat()
+            install_id = url.split('/')[-2]
             data = {
-                'token': 'fake',
+                'token': 'token-%s' % install_id,
                 'expires_at': expiry,
             }
             return FakeResponse(data, 201)
@@ -767,6 +768,11 @@ class FakeGithubData(object):
         self.reports = []
         self.fail_check_run_creation = False
 
+    def __repr__(self):
+        return ("pull_requests:%s repos:%s reports:%s "
+                "fail_check_run_creation:%s" % (
+                    self.pull_requests, self.repos, self.reports,
+                    self.fail_check_run_creation))
 
 class FakeGithubClient(object):
 
