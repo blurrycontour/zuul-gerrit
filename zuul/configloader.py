@@ -661,6 +661,7 @@ class JobParser(object):
             if conf['parent'] is not None:
                 # Parent job is explicitly specified, so inherit from it.
                 job.parent = conf['parent']
+                self.log.debug("FE: job.parent %s", job.parent)
             else:
                 # Parent is explicitly set as None, so user intends
                 # this to be a base job.  That's only okay if we're in
