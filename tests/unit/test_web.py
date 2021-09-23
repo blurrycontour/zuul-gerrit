@@ -155,6 +155,8 @@ class TestWeb(BaseTestWeb):
             self.assertEqual(p["trigger_events"], 0)
             self.assertEqual(p["result_events"], 0)
             self.assertEqual(p["management_events"], 0)
+            self.assertIn('manager', p, p)
+            self.assertTrue(len(p.get('triggers', [])) > 0, p)
             for q in p['change_queues']:
                 if p['name'] in ['gate', 'conflict']:
                     self.assertEqual(q['window'], 20)
