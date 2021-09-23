@@ -169,3 +169,48 @@ class TestGithubCrossRepoDeps(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
+
+    @simple_layout('layouts/github-message-update.yaml', driver='github')
+    def test_crd_message_update(self):
+        "Test a change is dequeued when the PR in its depends-on is updated"
+
+        # Create a change in project1 that a project2 change will depend on
+        A = self.fake_github.openFakePullRequest('org/project1', 'master', 'A')
+
+        # Create a commit in B that sets the dependency on A
+        msg = "Depends-On: https://github.com/org/project1/pull/%s" % A.number
+        B = self.fake_github.openFakePullRequest('org/project2', 'master', 'B',
+                                                 body=msg)
+
+        # Create a commit in C that sets the dependency on B
+        msg = "Depends-On: https://github.com/org/project2/pull/%s" % B.number
+        C = self.fake_github.openFakePullRequest('org/project3', 'master', 'C',
+                                                 body=msg)
+
+        # A change we'll use later to replace A
+        A1 = self.fake_github.openFakePullRequest('org/project1', 'master', 'A1')
+
+        self.executor_server.hold_jobs_in_build = True
+
+        # Enqueue A,B,C
+        self.fake_github.emitEvent(C.getReviewAddedEvent('approve'))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['check'].getAllItems()
+        self.assertEqual(len(items), 3)
+
+        # Update B to point at A1 instead of A
+        msg = "Depends-On: https://github.com/org/project1/pull/%s" % A1.number
+        B.editBody(msg)
+        self.fake_github.emitEvent(B.getPullRequestEditedEvent())
+        self.waitUntilSettled()
+
+        # Release
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The job should be aborted since B was updated while enqueued.
+        self.assertHistory([dict(name='project3-test', result='ABORTED')])
