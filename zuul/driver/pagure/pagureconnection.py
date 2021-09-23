@@ -621,9 +621,6 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
 
             change = self._change_cache.updateChangeWithRetry(key, change,
                                                               _update_change)
-
-            if self.sched:
-                self.sched.onChangeUpdated(change, event)
         except Exception:
             self.log.warning("Deleting cache key %s due to exception", key)
             self._change_cache.delete(key)
