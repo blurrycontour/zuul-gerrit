@@ -19,6 +19,7 @@ class SupercedentPipelineManager(PipelineManager):
     """PipelineManager with one queue per project and a window of 1"""
 
     changes_merge = False
+    type = 'supercedent'
 
     def getChangeQueue(self, change, event, existing=None):
         log = get_annotated_logger(self.log, event)
