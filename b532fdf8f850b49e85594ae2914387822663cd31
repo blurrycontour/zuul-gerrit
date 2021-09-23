@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a31823f2_daa98b88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-23T09:39:25Z",
+      "side": 1,
+      "message": "Do we have tests for those cases? I\u0027m asking because with the small  fix to only update dependencies for changes the tests seem to pass.",
+      "revId": "b532fdf8f850b49e85594ae2914387822663cd31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
