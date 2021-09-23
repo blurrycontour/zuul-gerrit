@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a875ee0_64bd0d19",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 591,
+      "author": {
+        "id": 33571
+      },
+      "writtenOn": "2021-09-23T18:07:15Z",
+      "side": 1,
+      "message": "Best to use `old`: \n old[\u0027links\u0027]...",
+      "revId": "6a5465f0bbfe9bde3c2b43a2e5e2baa3fc8214b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
