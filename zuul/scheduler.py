@@ -1611,7 +1611,7 @@ class Scheduler(threading.Thread):
                 ) as lock:
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
-                        pipeline.refresh(ctx)
+                        pipeline.state.refresh(ctx)
                         self._process_pipeline(tenant, pipeline)
 
             except LockException:
@@ -1629,10 +1629,14 @@ class Scheduler(threading.Thread):
                 pass
         except Exception:
             self.log.exception("Exception in pipeline processing:")
-            pipeline.state = pipeline.STATE_ERROR
+            pipeline.state.updateAttributes(
+                pipeline.manager.current_context,
+                state=pipeline.STATE_ERROR)
             # Continue processing other pipelines+tenants
         else:
-            pipeline.state = pipeline.STATE_NORMAL
+            pipeline.state.updateAttributes(
+                pipeline.manager.current_context,
+                state=pipeline.STATE_NORMAL)
 
     def _gatherConnectionCacheKeys(self):
         relevant = set()
