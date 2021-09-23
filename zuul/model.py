@@ -459,7 +459,11 @@ class Pipeline(object):
     def formatStatusJSON(self, websocket_url=None):
         j_pipeline = dict(name=self.name,
                           description=self.description,
-                          state=self.state.state)
+                          state=self.state.state,
+                          manager=self.manager.type)
+        j_pipeline['triggers'] = [
+            {'driver': t.driver.name} for t in self.triggers
+        ]
         j_queues = []
         j_pipeline['change_queues'] = j_queues
         for queue in self.queues:
