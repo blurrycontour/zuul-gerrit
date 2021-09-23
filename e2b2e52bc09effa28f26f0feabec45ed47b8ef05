@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "810f8f8f_fc900bef",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-23T08:09:55Z",
+      "side": 1,
+      "message": "I think updating the dependencies needs to be conditional for changes only and not for other ref types.",
+      "revId": "e2b2e52bc09effa28f26f0feabec45ed47b8ef05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
