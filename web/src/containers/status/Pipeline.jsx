@@ -19,6 +19,50 @@ import { Tooltip } from '@patternfly/react-core'
 
 import ChangeQueue from './ChangeQueue'
 
+import {
+  CodeBranchIcon,
+  OutlinedCalendarAltIcon,
+  FlaskIcon,
+  SortAmountDownIcon,
+  BundleIcon,
+  StreamIcon,
+  OutlinedQuestionCircleIcon,
+} from '@patternfly/react-icons'
+
+const PIPELINE_ICONS = {
+  periodic: {
+    icon: OutlinedCalendarAltIcon,
+    help: 'A periodic pipeline runs jobs on a regular basis.',
+    doc_url: 'https://zuul-ci.org/docs/zuul/reference/drivers/timer.html',
+  },
+  dependent: {
+    icon: CodeBranchIcon,
+    help: 'A dependent pipeline ensures that every change is tested exactly in the order it is going to be merged into the repository.',
+    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.dependent',
+  },
+  independent: {
+    icon: FlaskIcon,
+    help: 'An independent pipeline treats every change as independent of other changes in it.',
+    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.independent',
+  },
+  serial: {
+    icon: SortAmountDownIcon,
+    help: 'A serial pipeline supports shared queues, but only one item in each shared queue is processed at a time.',
+    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.serial',
+  },
+  supercedent: {
+    icon: BundleIcon,
+    help: 'A supercedent pipeline groups items by project and ref, and processes only one item per grouping at a time. Only two items (currently processing and latest) can be queued per grouping.',
+    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.supercedent',
+  },
+  unknown: {
+    icon: StreamIcon,
+    help: 'Unknown pipeline type',
+    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html'
+  },
+}
+
+const DEFAULT_PIPELINE_ICON = PIPELINE_ICONS['unknown']
 
 class Pipeline extends React.Component {
   static propTypes = {
@@ -27,7 +71,7 @@ class Pipeline extends React.Component {
     filter: PropTypes.string
   }
 
-  createTree (pipeline) {
+  createTree(pipeline) {
     let count = 0
     let pipelineMaxTreeColumns = 1
     pipeline.change_queues.forEach(changeQueue => {
@@ -97,7 +141,7 @@ class Pipeline extends React.Component {
         filters.forEach(changeFilter => {
           if (changeFilter && (
             (change.project && change.project.indexOf(changeFilter) !== -1) ||
-              (change.id && change.id.indexOf(changeFilter) !== -1))) {
+            (change.id && change.id.indexOf(changeFilter) !== -1))) {
             found = true
             return
           }
@@ -113,14 +157,41 @@ class Pipeline extends React.Component {
     return found
   }
 
-  render () {
+  renderPipelineName() {
+    const { pipeline } = this.props
+    let pipeline_type = pipeline.manager || 'unknown'
+    // override if periodic
+    if (pipeline.triggers) {
+      pipeline.triggers.forEach(trigger => {
+        if (trigger.driver === 'timer') {
+          pipeline_type = 'periodic'
+        }
+      })
+    }
+    const pl_config = PIPELINE_ICONS[pipeline_type] || DEFAULT_PIPELINE_ICON
+    const Icon = pl_config.icon
+    return (
+      <>
+        <Icon title={pipeline_type} />
+        &nbsp; {pipeline.name}
+        &nbsp;
+        <sup>
+          <a href={pl_config.doc_url} style={{ text_decoration: 'none', color: 'inherit' }} target='_blank' rel='noopener noreferrer'>
+            <OutlinedQuestionCircleIcon title={pl_config.help} style={{ color: 'var(--pf-global--disabled-color--200)' }} />
+          </a>
+        </sup>
+      </>
+    )
+  }
+
+  render() {
     const { pipeline, filter, expanded } = this.props
     const count = this.createTree(pipeline)
     return (
       <div className="pf-c-content zuul-pipeline col-sm-6 col-md-4">
         <div className="zuul-pipeline-header">
           <h3>
-            {pipeline.name} <Badge>{count}</Badge>
+            {this.renderPipelineName()} <Badge>{count}</Badge>
           </h3>
           {pipeline.description ? (
             <small>
@@ -141,7 +212,7 @@ class Pipeline extends React.Component {
         {pipeline.change_queues.filter(item => item.heads.length > 0)
           .filter(item => (!filter || (
             filter.indexOf(pipeline.name) !== -1 ||
-             this.filterQueue(item, filter)
+            this.filterQueue(item, filter)
           )))
           .map(changeQueue => (
             <ChangeQueue
