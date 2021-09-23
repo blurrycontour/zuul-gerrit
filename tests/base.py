@@ -2412,8 +2412,8 @@ class FakeGithubPullRequest(object):
     def getPullRequestClosedEvent(self):
         return self._getPullRequestEvent('closed')
 
-    def getPullRequestEditedEvent(self):
-        return self._getPullRequestEvent('edited')
+    def getPullRequestEditedEvent(self, old_body=None):
+        return self._getPullRequestEvent('edited', old_body)
 
     def addComment(self, message):
         self.comments.append(message)
@@ -2546,8 +2546,10 @@ class FakeGithubPullRequest(object):
         return (name, data)
 
     def editBody(self, body):
+        old_body = self.body
         self.body = body
         self._updateTimeStamp()
+        return self.getPullRequestEditedEvent(old_body=old_body)
 
     def _getRepo(self):
         repo_path = os.path.join(self.upstream_root, self.project)
@@ -2636,7 +2638,7 @@ class FakeGithubPullRequest(object):
     def getPRReference(self):
         return '%s/head' % self.number
 
-    def _getPullRequestEvent(self, action):
+    def _getPullRequestEvent(self, action, old_body=None):
         name = 'pull_request'
         data = {
             'action': action,
@@ -2668,8 +2670,11 @@ class FakeGithubPullRequest(object):
             'installation': {
                 'id': 123,
             },
+            'changes': {},
             'labels': [{'name': l} for l in self.labels]
         }
+        if old_body:
+            data['changes']['body'] = {'from': old_body}
         return (name, data)
 
     def getCommitStatusEvent(self, context, state='success', user='zuul'):

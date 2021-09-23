@@ -472,8 +472,8 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.assertEqual(B.reported, 1)
 
         # Update A to add A->B (a cycle).
-        A.editBody('Depends-On: %s\n' % (B.data['url']))
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(
+            A.editBody('Depends-On: %s\n' % (B.data['url'])))
         self.waitUntilSettled()
 
         # Dependency cycle injected so zuul should have reported again on A
@@ -701,9 +701,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
             'gerrit/project1', 'master', 'B')
 
         # A Depends-On: B
-        A.editBody('Depends-On: %s\n' % (B.data['url'],))
-
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(
+            A.editBody('Depends-On: %s\n' % (B.data['url'],)))
         self.waitUntilSettled()
 
         self.hold_jobs_in_queue = False
@@ -741,12 +740,12 @@ class TestGithubToGerritCRD(ZuulTestCase):
             'gerrit/project1', 'master', 'B')
 
         # A Depends-On: B
-        A.editBody('Depends-On: %s\n' % (B.data['url'],))
+        event = A.editBody('Depends-On: %s\n' % (B.data['url'],))
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         check_pipeline = tenant.layout.pipelines['check']
 
         # Add two dependent changes...
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(event)
         self.waitUntilSettled()
         self.assertEqual(len(check_pipeline.getAllItems()), 2)
 
@@ -794,9 +793,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
             'gerrit/project1', 'master', 'B')
 
         # A Depends-On: B
-        A.editBody('Depends-On: %s\n' % (B.data['url'],))
-
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(
+            A.editBody('Depends-On: %s\n' % (B.data['url'],)))
         self.waitUntilSettled()
 
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
@@ -856,9 +854,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
             B.subject, C.url)
 
         # A Depends-On: B
-        A.editBody('Depends-On: %s\n' % (B.data['url'],))
-
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(
+            A.editBody('Depends-On: %s\n' % (B.data['url'],)))
         self.waitUntilSettled()
         self.assertEqual(self.history[-1].changes, '2,%s 1,1 1,%s' %
                          (C.head_sha, A.head_sha))
@@ -900,14 +897,14 @@ class TestGithubToGerritCRD(ZuulTestCase):
             'gerrit/unknown', 'master', 'B')
 
         # A Depends-On: B
-        A.editBody('Depends-On: %s\n' % (B.data['url'],))
+        event = A.editBody('Depends-On: %s\n' % (B.data['url'],))
 
         # Make sure zuul has seen an event on B.
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         # Note we wait until settled here as the event processing for
         # the next event may not have the updated db yet otherwise.
         self.waitUntilSettled()
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(event)
         self.waitUntilSettled()
 
         self.assertFalse(A.is_merged)
@@ -927,8 +924,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # Create B->A
         B = self.fake_github.openFakePullRequest('github/project2', 'master',
                                                  'B')
-        B.editBody('Depends-On: %s\n' % (A.data['url'],))
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(
+            B.editBody('Depends-On: %s\n' % (A.data['url'],)))
         self.waitUntilSettled()
 
         # Dep is there so zuul should have reported on B

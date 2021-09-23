@@ -1750,11 +1750,8 @@ class Scheduler(threading.Thread):
 
         # Let the pipeline update any dependencies that may need
         # refreshing if this change has updated.
-
-        # TODO: We only really need to run this if we have a new
-        # patchest (isPatchsetCreated()) or the depends-on list in the
-        # PR body has changed (but we don't have a way to test that yet).
-        pipeline.manager.refreshDeps(change, event)
+        if event.isPatchsetCreated() or event.isMessageChanged():
+            pipeline.manager.refreshDeps(change, event)
 
         if event.isPatchsetCreated():
             pipeline.manager.removeOldVersionsOfChange(change, event)

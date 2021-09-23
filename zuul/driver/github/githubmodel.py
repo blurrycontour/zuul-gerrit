@@ -107,6 +107,7 @@ class GithubTriggerEvent(TriggerEvent):
         self.check_run = None
         self.status = None
         self.commits = []
+        self.body_edited = None
 
     def toDict(self):
         d = super().toDict()
@@ -118,6 +119,7 @@ class GithubTriggerEvent(TriggerEvent):
         d["check_run"] = self.check_run
         d["status"] = self.status
         d["commits"] = self.commits
+        d["body_edited"] = self.body_edited
         return d
 
     def updateFromDict(self, d):
@@ -130,11 +132,15 @@ class GithubTriggerEvent(TriggerEvent):
         self.check_run = d["check_run"]
         self.status = d["status"]
         self.commits = d["commits"]
+        self.body_edited = d["body_edited"]
 
     def isPatchsetCreated(self):
         if self.type == 'pull_request':
             return self.action in ['opened', 'changed']
         return False
+
+    def isMessageChanged(self):
+        return bool(self.body_edited)
 
     def isChangeAbandoned(self):
         if self.type == 'pull_request':

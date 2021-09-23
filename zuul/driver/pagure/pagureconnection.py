@@ -242,6 +242,7 @@ class PagureEventConnector(threading.Thread):
         """ Handles pull request initial comment change """
         event, _ = self._event_base(body)
         event.action = 'changed'
+        event.initial_comment_changed = True
         return event
 
     def _event_pull_request_tags_changed(self, body):
