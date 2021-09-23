@@ -173,9 +173,6 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
         log.debug("Checking for changes needed by %s:" % change)
-        if (hasattr(change, 'commit_needs_changes') and
-            (change.refresh_deps or change.commit_needs_changes is None)):
-            self.updateCommitDependencies(change, change_queue, event)
         if not hasattr(change, 'needs_changes'):
             log.debug("  %s does not support dependencies", type(change))
             return True
