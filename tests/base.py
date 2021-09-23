@@ -2806,6 +2806,21 @@ class FakeGithubClientManager(GithubClientManager):
         app_json = []
         app_projects = []
         app_id = 1
+
+        # Ensure that we ignore suspended apps
+        app_json.append(
+            {
+                'id': app_id,
+                'suspended_at': '2021-09-23T01:43:44Z',
+                'suspended_by': {
+                    'login': 'ianw',
+                    'type': 'User',
+                    'id': 12345
+                }
+            })
+        app_projects.append([])
+        app_id += 1
+
         for org, projects in orgs.items():
             # We respond as if each org is a different app instance
             #
