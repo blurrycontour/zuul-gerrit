@@ -8879,7 +8879,7 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
         # event queue after waitUntilSettled.
         start = time.time()
         while True:
-            if time.time() - start > 15:
+            if time.time() - start > 30:
                 raise Exception("Timeout waiting for smart reconfiguration")
             new_two = self.scheds.first.sched.tenant_layout_state.get(
                 'tenant-two', EMPTY_LAYOUT_STATE)
