@@ -21,7 +21,11 @@ import testtools
 from zuul import model
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
-from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+from zuul.zk.change_cache import (
+    AbstractChangeCache,
+    ChangeKey,
+    ConcurrentUpdateError,
+)
 from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi
@@ -1231,7 +1235,9 @@ class DummyChange:
         return -1 if self.cache_stat is None else self.cache_stat.version
 
     def serialize(self):
-        return self.__dict__
+        d = self.__dict__.copy()
+        d.pop('cache_stat')
+        return d
 
     def deserialize(self, data):
         self.__dict__.update(data)
@@ -1266,49 +1272,56 @@ class TestChangeCache(ZooKeeperBaseTestCase):
     def test_insert(self):
         change_foo = DummyChange("project", {"foo": "bar"})
         change_bar = DummyChange("project", {"bar": "foo"})
-        self.cache.set("foo", change_foo)
-        self.cache.set("bar", change_bar)
+        key_foo = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        key_bar = ChangeKey('conn', 'project', 'change', 'bar', '1')
+        self.cache.set(key_foo, change_foo)
+        self.cache.set(key_bar, change_bar)
 
-        self.assertEqual(self.cache.get("foo"), change_foo)
-        self.assertEqual(self.cache.get("bar"), change_bar)
+        self.assertEqual(self.cache.get(key_foo), change_foo)
+        self.assertEqual(self.cache.get(key_bar), change_bar)
 
     def test_update(self):
         change = DummyChange("project", {"foo": "bar"})
-        self.cache.set("foo", change)
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
 
         change.number = 123
-        self.cache.set("foo", change, change.cache_version)
+        self.cache.set(key, change, change.cache_version)
 
         # The change instance must stay the same
-        updated_change = self.cache.get("foo")
+        updated_change = self.cache.get(key)
         self.assertIs(change, updated_change)
         self.assertEqual(change.number, 123)
 
     def test_delete(self):
         change = DummyChange("project", {"foo": "bar"})
-        self.cache.set("foo", change)
-        self.cache.delete("foo")
-        self.assertIsNone(self.cache.get("foo"))
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
+        self.cache.delete(key)
+        self.assertIsNone(self.cache.get(key))
 
         # Deleting an non-existent key should not raise an exception
-        self.cache.delete("invalid")
+        invalid_key = ChangeKey('conn', 'project', 'change', 'invalid', '1')
+        self.cache.delete(invalid_key)
 
     def test_concurrent_update(self):
         change = DummyChange("project", {"foo": "bar"})
-        self.cache.set("foo", change)
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
 
         # Attempt to update with the old change stat
         with testtools.ExpectedException(ConcurrentUpdateError):
-            self.cache.set("foo", change, change.cache_version - 1)
+            self.cache.set(key, change, change.cache_version - 1)
 
     def test_change_update_retry(self):
         change = DummyChange("project", {"foobar": 0})
-        self.cache.set("foobar", change)
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
 
         # Update the change so we have a new cache stat.
         change.foobar = 1
-        self.cache.set("foobar", change, change.cache_version)
-        self.assertEqual(self.cache.get("foobar").foobar, 1)
+        self.cache.set(key, change, change.cache_version)
+        self.assertEqual(self.cache.get(key).foobar, 1)
 
         def updater(c):
             c.foobar += 1
@@ -1320,13 +1333,12 @@ class TestChangeCache(ZooKeeperBaseTestCase):
                                             change.cache_version - 1,
                                             0)
         updated_change = self.cache.updateChangeWithRetry(
-            "foobar", change, updater)
+            key, change, updater)
         self.assertEqual(updated_change.foobar, 2)
 
     def test_cache_sync(self):
         other_cache = DummyChangeCache(self.zk_client, DummyConnection())
-
-        key = "foo foo"  # Use a key that needs escaping
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
         change = DummyChange("project", {"foo": "bar"})
         self.cache.set(key, change)
         self.assertIsNotNone(other_cache.get(key))
@@ -1344,7 +1356,8 @@ class TestChangeCache(ZooKeeperBaseTestCase):
 
     def test_cleanup(self):
         change = DummyChange("project", {"foo": "bar"})
-        self.cache.set("foo", change)
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
 
         self.cache.cleanup()
         self.assertEqual(len(self.cache._data_cleanup_candidates), 0)
@@ -1352,7 +1365,7 @@ class TestChangeCache(ZooKeeperBaseTestCase):
             len(self.zk_client.client.get_children(self.cache.data_root)), 1)
 
         change.number = 123
-        self.cache.set("foo", change, change.cache_version)
+        self.cache.set(key, change, change.cache_version)
 
         self.cache.cleanup()
         self.assertEqual(len(self.cache._data_cleanup_candidates), 1)
@@ -1366,15 +1379,16 @@ class TestChangeCache(ZooKeeperBaseTestCase):
 
     def test_watch_cleanup(self):
         change = DummyChange("project", {"foo": "bar"})
-        self.cache.set("foo", change)
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
 
         for _ in iterate_timeout(10, "watch to be registered"):
-            if change.cache_stat.key in self.cache._watched_keys:
+            if change.cache_stat.key._hash in self.cache._watched_keys:
                 break
 
-        self.cache.delete("foo")
-        self.assertIsNone(self.cache.get("foo"))
+        self.cache.delete(key)
+        self.assertIsNone(self.cache.get(key))
 
         for _ in iterate_timeout(10, "watch to be removed"):
-            if change.cache_stat.key not in self.cache._watched_keys:
+            if change.cache_stat.key._hash not in self.cache._watched_keys:
                 break

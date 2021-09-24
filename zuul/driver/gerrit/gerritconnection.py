@@ -42,7 +42,11 @@ from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
-from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+from zuul.zk.change_cache import (
+    AbstractChangeCache,
+    ChangeKey,
+    ConcurrentUpdateError,
+)
 from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 
 # HTTP timeout in seconds
@@ -311,7 +315,9 @@ class GerritEventConnector(threading.Thread):
         # cache as it may be a dependency
         if event.change_number:
             refresh = True
-            key = str((event.change_number, event.patch_number))
+            key = ChangeKey(self.connection.connection_name, None,
+                            'GerritChange', str(event.change_number),
+                            str(event.patch_number))
             if self.connection._change_cache.get(key) is None:
                 refresh = False
                 for tenant in self.connection.sched.abide.tenants.values():
@@ -760,7 +766,8 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         # Ensure number and patchset are str
         number = str(number)
         patchset = str(patchset)
-        key = str((number, patchset))
+        key = ChangeKey(self.connection_name, None,
+                        'GerritChange', number, patchset)
         change = self._change_cache.get(key)
         if change and not refresh:
             return change
@@ -776,7 +783,8 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
 
     def _getTag(self, event):
         tag = event.ref[len('refs/tags/'):]
-        key = str((event.project_name, tag, event.newrev))
+        key = ChangeKey(self.connection_name, None,
+                        'Tag', tag, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
@@ -794,7 +802,8 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         return change
 
     def _getBranch(self, event, branch, ref):
-        key = str((event.project_name, branch, event.newrev))
+        key = ChangeKey(self.connection_name, None,
+                        'Branch', branch, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
@@ -812,7 +821,8 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         return change
 
     def _getRef(self, event):
-        key = str((event.project_name, event.ref, event.newrev))
+        key = ChangeKey(self.connection_name, None,
+                        'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
@@ -856,6 +866,7 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
                     result.message):
                 if match != change_id:
                     continue
+                # Note: This is not a ChangeCache ChangeKey
                 key = (result.number, result.current_patchset)
                 if key in seen:
                     continue
@@ -992,7 +1003,9 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
             return True
 
         data = self.queryChange(change.number)
-        key = str((change.number, change.patchset))
+        key = ChangeKey(self.connection_name, None,
+                        'GerritChange', str(change.number),
+                        str(change.patchset))
 
         def _update_change(c):
             c.update(data, self)

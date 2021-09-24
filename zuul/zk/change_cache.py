@@ -16,13 +16,12 @@ import abc
 import contextlib
 import json
 import logging
-import os
 import threading
 import time
 import uuid
+import hashlib
 from collections import defaultdict
 from collections.abc import Iterable
-from urllib.parse import quote_plus, unquote_plus
 
 from kazoo.exceptions import BadVersionError, NodeExistsError, NoNodeError
 
@@ -34,15 +33,69 @@ from zuul.zk.vendor.watchers import ExistingDataWatch
 CHANGE_CACHE_ROOT = "/zuul/cache/connection"
 
 
-def _keyFromPath(path):
-    return unquote_plus(os.path.basename(path))
-
-
 class ConcurrentUpdateError(ZuulZooKeeperException):
     pass
 
 
+class ChangeKey:
+    """Represents a change key
+
+    This is used to look up a change in the change cache.
+
+    It also contains enough basic information about a change in order
+    to determine if two entries in the change cache are related or
+    identical.
+
+    There are two ways to refer to a Change in ZK.  If one ZK object
+    refers to a change, it should use ChangeKey.reference.  This is a
+    dictionary with structured information about the change.  The
+    contents can be used to construct a ChangeKey, and that can be
+    used to pull the Change from the cache.
+
+    The cache itself uses a sha256 digest of the reference as the
+    actual cache key in ZK.  This reduces and stabilizes the length of
+    the cache keys themselves.  Methods outside of the change_cache
+    should not use this directly.
+
+    """
+
+    def __init__(self, connection_name, project_name,
+                 change_type, stable_id, revision):
+        self.connection_name = connection_name
+        self.project_name = project_name
+        self.change_type = change_type
+        self.stable_id = stable_id
+        self.revision = revision
+
+        reference = dict(
+            connection_name=connection_name,
+            project_name=project_name,
+            change_type=change_type,
+            stable_id=stable_id,
+            revision=revision,
+        )
+
+        self.reference = json.dumps(reference)
+        msg = self.reference.encode('utf8')
+        self._hash = hashlib.sha256(msg).hexdigest()
+
+    @classmethod
+    def fromReference(cls, data):
+        data = json.loads(data)
+        return cls(data['connection_name'], data['project_name'],
+                   data['change_type'], data['stable_id'], data['revision'])
+
+    def isSameChange(self, other):
+        return all([
+            self.connection_name == other.connection_name,
+            self.project_name == other.project_name,
+            self.change_type == other.change_type,
+            self.stable_id == other.stable_id,
+        ])
+
+
 class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
+
     """Abstract class for caching change items in Zookeeper.
 
     In order to make updates atomic the change data is stored separate
@@ -95,11 +148,12 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
     def _dataPath(self, data_uuid):
         return f"{self.data_root}/{data_uuid}"
 
-    def _cachePath(self, key):
-        return f"{self.cache_root}/{quote_plus(key)}"
+    def _cachePath(self, key_hash):
+        return f"{self.cache_root}/{key_hash}"
 
     def _cacheWatcher(self, cache_keys):
-        cache_keys = {unquote_plus(k) for k in cache_keys}
+        # This method deals with key hashes exclusively
+        cache_keys = set(cache_keys)
         existing_keys = set(self._change_cache.keys())
         deleted_keys = existing_keys - cache_keys
         for key in deleted_keys:
@@ -116,7 +170,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         new_keys = cache_keys - self._watched_keys
         for key in new_keys:
             ExistingDataWatch(self.kazoo_client,
-                              f"{self.cache_root}/{quote_plus(key)}",
+                              f"{self.cache_root}/{key}",
                               self._cacheItemWatcher)
             self._watched_keys.add(key)
 
@@ -124,9 +178,13 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         if not all((data, zstat, event)):
             return
 
-        key = _keyFromPath(event.path)
-        data_uuid = data.decode("utf8")
+        key, data_uuid = self._loadKey(data)
         self._get(key, data_uuid, zstat)
+
+    def _loadKey(self, data):
+        data = json.loads(data.decode("utf8"))
+        key = ChangeKey.fromReference(data['key_reference'])
+        return key, data['data_uuid']
 
     def prune(self, relevant, max_age=3600):  # 1h
         cutoff_time = time.time() - max_age
@@ -152,23 +210,33 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         except NoNodeError:
             return
 
-        for key in sorted(unquote_plus(c) for c in children):
-            change = self.get(key)
+        for key_hash in children:
+            change = self._get_from_key_hash(key_hash)
             if change is not None:
                 yield change
 
     def get(self, key):
-        cache_path = self._cachePath(key)
+        cache_path = self._cachePath(key._hash)
         try:
             value, zstat = self.kazoo_client.get(cache_path)
         except NoNodeError:
             return None
 
-        data_uuid = value.decode("utf8")
+        _, data_uuid = self._loadKey(value)
+        return self._get(key, data_uuid, zstat)
+
+    def _get_from_key_hash(self, key_hash):
+        cache_path = self._cachePath(key_hash)
+        try:
+            value, zstat = self.kazoo_client.get(cache_path)
+        except NoNodeError:
+            return None
+
+        key, data_uuid = self._loadKey(value)
         return self._get(key, data_uuid, zstat)
 
     def _get(self, key, data_uuid, zstat):
-        change = self._change_cache.get(key)
+        change = self._change_cache.get(key._hash)
         if change and change.cache_stat.uuid == data_uuid:
             # Change in our local cache is up-to-date
             return change
@@ -176,14 +244,14 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         try:
             data = self._getData(data_uuid)
         except NoNodeError:
-            cache_path = self._cachePath(key)
+            cache_path = self._cachePath(key._hash)
             self.log.error("Removing cache entry %s without any data",
                            cache_path)
             # TODO: handle no node + version mismatch
             self.kazoo_client.delete(cache_path, zstat.version)
             return None
 
-        with self._change_locks[key]:
+        with self._change_locks[key._hash]:
             if change:
                 # While holding the lock check if we still need to update
                 # the change and skip the update if we have the latest version.
@@ -198,7 +266,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             # Use setdefault here so we only have a single instance of a change
             # around. In case of a concurrent get this might return a different
             # change instance than the one we just created.
-            return self._change_cache.setdefault(key, change)
+            return self._change_cache.setdefault(key._hash, change)
 
     def _getData(self, data_uuid):
         with sharding.BufferedShardReader(
@@ -208,30 +276,37 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def set(self, key, change, version=-1):
         data_uuid = self._setData(self._dataFromChange(change))
-        cache_path = self._cachePath(key)
-        with self._change_locks[key]:
+        # Add the change_key info here mostly for debugging since the
+        # hash is non-reversible.
+        cache_data = json.dumps(dict(
+            data_uuid=data_uuid,
+            key_reference=key.reference,
+        ))
+        cache_path = self._cachePath(key._hash)
+        with self._change_locks[key._hash]:
             try:
                 if version == -1:
                     _, zstat = self.kazoo_client.create(
                         cache_path,
-                        data_uuid.encode("utf8"),
+                        cache_data.encode("utf8"),
                         include_data=True)
                 else:
                     # Sanity check that we only have a single change instance
                     # for a key.
-                    if self._change_cache[key] is not change:
+                    if self._change_cache[key._hash] is not change:
                         raise RuntimeError(
                             "Conflicting change objects (existing "
-                            f"{self._change_cache[key]} vs. new {change} "
-                            f"for key '{key}'")
+                            f"{self._change_cache[key._hash]} vs. "
+                            f"new {change} "
+                            f"for key '{key.reference}'")
                     zstat = self.kazoo_client.set(
-                        cache_path, data_uuid.encode("utf8"), version)
+                        cache_path, cache_data.encode("utf8"), version)
             except (BadVersionError, NodeExistsError, NoNodeError) as exc:
                 raise ConcurrentUpdateError from exc
 
             change.cache_stat = model.CacheStat(
                 key, data_uuid, zstat.version, zstat.last_modified)
-            self._change_cache[key] = change
+            self._change_cache[key._hash] = change
 
     def _setData(self, data):
         data_uuid = uuid.uuid4().hex
@@ -260,14 +335,14 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         return change
 
     def delete(self, key):
-        cache_path = self._cachePath(key)
+        cache_path = self._cachePath(key._hash)
         # Only delete the cache entry and NOT the data node in order to
         # prevent race conditions with other consumers. The stale data
         # nodes will be removed by the periodic cleanup.
         self.kazoo_client.delete(cache_path, recursive=True)
 
         with contextlib.suppress(KeyError):
-            del self._change_cache[key]
+            del self._change_cache[key._hash]
 
     def _changeFromData(self, data):
         change_type, change_data = data["change_type"], data["change_data"]

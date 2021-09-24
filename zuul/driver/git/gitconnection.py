@@ -23,7 +23,11 @@ from zuul.connection import BaseConnection, ZKChangeCacheMixin
 from zuul.driver.git.gitmodel import GitTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.model import Ref, Branch
-from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+from zuul.zk.change_cache import (
+    AbstractChangeCache,
+    ChangeKey,
+    ConcurrentUpdateError,
+)
 
 
 class GitChangeCache(AbstractChangeCache):
@@ -98,7 +102,8 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         return refs
 
     def getChange(self, event, refresh=False):
-        key = str((event.project_name, event.ref, event.newrev))
+        key = ChangeKey(self.connection_name, event.project_name,
+                        'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
