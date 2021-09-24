@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "f4afa244_7128d5a1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1932,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T23:21:28Z",
+      "side": 1,
+      "message": "It\u0027s indexed by job name, so computationally this is technically a little faster, but not enough to matter.  I\u0027m ambivalent about it.",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "95c47073_dd964577",
         "filename": "zuul/scheduler.py",
         "patchSetId": 10
@@ -33,6 +50,23 @@
       "revId": "646548e38468cc62027624e973555194b8a5c2d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40787ef7_377b65db",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1985,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T23:21:28Z",
+      "side": 1,
+      "message": "I think not; we should remove builds from the pipelines when we abort them, and we don\u0027t keep old buildsets around.  And when we put them in ZK, I\u0027m also expecting to delete them at that point.\n\nWe should probably just adjust the sql report methods so they don\u0027t take build objects but instead just take all these parameters, then just make sure they\u0027re all included in the completed event.  Then I think this method could be streamlined a bit.  That will also make things easier for the pipeline state in zk series.",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -56,6 +90,23 @@
       "revId": "646548e38468cc62027624e973555194b8a5c2d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43ccdea6_07dd3f3f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2017,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T23:21:28Z",
+      "side": 1,
+      "message": "Agree: not wrong but not necessary.",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
