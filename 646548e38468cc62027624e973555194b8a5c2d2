@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7907b276_54644044",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 4683,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T23:25:06Z",
+      "side": 0,
+      "message": "I have an alternative fix for this which retains the release; it\u0027s important to release after setting hold to false, otherwise we could get stuck builds.   https://review.opendev.org/c/zuul/zuul/+/810961",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
