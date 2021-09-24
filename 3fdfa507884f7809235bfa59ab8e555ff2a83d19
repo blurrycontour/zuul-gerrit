@@ -16,6 +16,23 @@
       "revId": "3fdfa507884f7809235bfa59ab8e555ff2a83d19",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f18bc29d_ad6eb8d2",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T16:16:16Z",
+      "side": 1,
+      "message": "I generally agree.  When I started this I wasn\u0027t sure if we might have a use for a tri-state value (yes/no/unknown).  It didn\u0027t seem worth going back and changing.",
+      "revId": "3fdfa507884f7809235bfa59ab8e555ff2a83d19",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
