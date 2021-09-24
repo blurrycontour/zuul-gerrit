@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9962dafb_295f1db6",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T20:43:21Z",
+      "side": 1,
+      "message": "Should we enforce that every one of these attributes here is a string so that the json.dumps() below produces a consistent reference? Otherwise we could potentially hash differently for the same change if arguments are passed with different types.\n\nWe end up doing these conversions in all of the individual drivers, but we could move them here and make the API a bit safer for new drivers or changes to existing drivers.",
+      "revId": "bb6f1c03ca86345e5c7137642c300d8575052535",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
