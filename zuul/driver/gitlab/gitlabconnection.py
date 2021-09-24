@@ -124,6 +124,8 @@ class GitlabEventConnector(threading.Thread):
         event.patch_number = attrs['last_commit']['id']
         event.change_url = self.connection.getMRUrl(event.project_name,
                                                     event.change_number)
+        if attrs['action'] == 'update' and "description" in body["changes"]:
+            event.merge_request_description_changed = True
         if attrs['action'] == 'open':
             event.action = 'opened'
         elif attrs['action'] == 'merge':

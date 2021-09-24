@@ -1019,11 +1019,8 @@ class TestGithubToPagureCRD(ZuulTestCase):
             'pagure/project2', 'master', 'B')
 
         # A Depends-On: B
-        A.editBody('Depends-On: %s\n' % B.url)
-
         self.executor_server.hold_jobs_in_build = True
-
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(A.editBody('Depends-On: %s\n' % B.url))
         self.waitUntilSettled()
 
         self.assertTrue(self.builds[0].hasChanges(A, B))

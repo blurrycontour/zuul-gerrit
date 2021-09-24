@@ -204,8 +204,7 @@ class TestGithubCrossRepoDeps(ZuulTestCase):
 
         # Update B to point at A1 instead of A
         msg = "Depends-On: https://github.com/org/project1/pull/%s" % A1.number
-        B.editBody(msg)
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent())
+        self.fake_github.emitEvent(B.editBody(msg))
         self.waitUntilSettled()
 
         # Release
