@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e963b700_e6e24ffa",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T22:08:30Z",
+      "side": 1,
+      "message": "I suspect this was a debugging print and it shouldn\u0027t remain?",
+      "range": {
+        "startLine": 94,
+        "startChar": 16,
+        "endLine": 94,
+        "endChar": 32
+      },
+      "revId": "a20199b0679147720af6f258492df2e05938d520",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
