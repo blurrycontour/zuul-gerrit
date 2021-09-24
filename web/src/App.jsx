@@ -29,6 +29,7 @@ import {
   Brand,
   Button,
   ButtonVariant,
+  Divider,
   Dropdown,
   DropdownItem,
   KebabToggle,
@@ -48,6 +49,8 @@ import {
   PageHeaderTools,
   PageHeaderToolsGroup,
   PageHeaderToolsItem,
+  Select,
+  SelectOption,
 } from '@patternfly/react-core'
 
 import {
@@ -64,6 +67,7 @@ import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
+import { fetchTenantsIfNeeded } from './actions/tenants'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 
@@ -73,6 +77,7 @@ class App extends React.Component {
     configErrors: PropTypes.array,
     info: PropTypes.object,
     tenant: PropTypes.object,
+    tenants: PropTypes.object,
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
@@ -82,6 +87,7 @@ class App extends React.Component {
 
   state = {
     showErrors: false,
+    isTenantSelectOpen: false,
   }
 
   renderMenu() {
@@ -105,7 +111,7 @@ class App extends React.Component {
       )
     } else {
       // Return an empty navigation bar in case we don't have an active tenant
-      return <Nav aria-label="Nav" variant="horizontal"/>
+      return <Nav aria-label="Nav" variant="horizontal" />
     }
   }
 
@@ -162,9 +168,10 @@ class App extends React.Component {
       } else if (!info.tenant) {
         // Multi tenant, look for tenant name in url
         whiteLabel = false
+        this.props.dispatch(fetchTenantsIfNeeded())
 
         const match = matchPath(
-          this.props.location.pathname, {path: '/t/:tenant'})
+          this.props.location.pathname, { path: '/t/:tenant' })
 
         if (match) {
           tenantName = match.params.tenant
@@ -225,7 +232,7 @@ class App extends React.Component {
           <TimedToastNotification
             key={error.id}
             type='error'
-            onDismiss={() => {this.props.dispatch(clearError(error.id))}}
+            onDismiss={() => { this.props.dispatch(clearError(error.id)) }}
           >
             <span title={moment.utc(error.date).tz(this.props.timezone).format()}>
               <strong>{error.text}</strong> ({error.status})&nbsp;
@@ -257,14 +264,14 @@ class App extends React.Component {
           variant="danger"
           onClick={() => {
             history.push(this.props.tenant.linkPrefix + '/config-errors')
-            this.setState({showErrors: false})
+            this.setState({ showErrors: false })
           }}
         >
           <NotificationDrawerListItemHeader
             title={item.source_context.project + ' | ' + ctxPath}
             variant="danger" />
           <NotificationDrawerListItemBody>
-            <pre style={{whiteSpace: 'pre-wrap'}}>
+            <pre style={{ whiteSpace: 'pre-wrap' }}>
               {error}
             </pre>
           </NotificationDrawerListItemBody>
@@ -299,6 +306,85 @@ class App extends React.Component {
     )
   }
 
+  renderTenantSelect() {
+    const { history, tenant, tenants } = this.props
+    const { isTenantSelectOpen } = this.state
+
+    if (tenant.whiteLabel) {
+      return (
+        <PageHeaderToolsItem>
+          <strong>Tenant</strong> {tenant.name}
+        </PageHeaderToolsItem>
+      )
+    } else {
+      const options = tenants.tenants.map((tenant, idx) => {
+        return (
+          <SelectOption key={idx} value={tenant.name} />
+        )
+      })
+      options.push(
+        <Divider component="li" key={tenants.tenants.length + 1} />,
+        <SelectOption key={tenants.tenants.length + 2} value="Go to tenants page" isPlaceholder />
+      )
+
+      const onTenantSelect = (event, selection, isPlaceholder) => {
+        this.setState({ isTenantSelectOpen: false })
+        if (isPlaceholder) {
+          history.push(tenant.defaultRoute)
+        } else {
+          const currentPath = this.props.location.pathname
+          let suffix
+          switch (currentPath) {
+            case '/t/' + tenant.name + '/projects':
+              suffix = '/projects'
+              break
+            case '/t/' + tenant.name + '/jobs':
+              suffix = '/jobs'
+              break
+            case '/t/' + tenant.name + '/labels':
+              suffix = '/labels'
+              break
+            case '/t/' + tenant.name + '/nodes':
+              suffix = '/nodes'
+              break
+            case '/t/' + tenant.name + '/builds':
+              suffix = '/builds'
+              break
+            case '/t/' + tenant.name + '/buildsets':
+              suffix = '/buildsets'
+              break
+            case '/t/' + tenant.name + '/status':
+            default:
+              // all other paths point to tenant-specific resources that would most likely result in a 404
+              suffix = '/status'
+              break
+          }
+          history.push('/t/' + selection + suffix)
+        }
+      }
+
+      return (tenants.isFetching ?
+        <PageHeaderToolsItem>
+          Loading tenants ...
+        </PageHeaderToolsItem> :
+        <>
+          <PageHeaderToolsItem>
+            <strong>Tenant</strong> &nbsp;
+          </PageHeaderToolsItem>
+          <PageHeaderToolsItem>
+            <Select
+              className="zuul-select-tenant"
+              isOpen={isTenantSelectOpen}
+              selections={tenant.name}
+              onToggle={(isOpen) => { this.setState({ isTenantSelectOpen: isOpen }) }}
+              onSelect={onTenantSelect}
+            >{options}
+            </Select>
+          </PageHeaderToolsItem>
+        </>)
+    }
+  }
+
   render() {
     const { isKebabDropdownOpen } = this.state
     const { errors, configErrors, tenant } = this.props
@@ -323,7 +409,7 @@ class App extends React.Component {
           key="tenant"
           onClick={event => this.handleTenantLink(event)}
         >
-          <UsersIcon /> Tenant
+          <UsersIcon /> Tenants
         </DropdownItem>
       )
     }
@@ -353,15 +439,7 @@ class App extends React.Component {
               </Button>
             </a>
           </PageHeaderToolsItem>
-          {tenant.name && (
-            <PageHeaderToolsItem>
-              <Link to={tenant.defaultRoute}>
-                <Button variant={ButtonVariant.plain}>
-                  <strong>Tenant</strong> {tenant.name}
-                </Button>
-              </Link>
-            </PageHeaderToolsItem>
-          )}
+          {tenant.name && (this.renderTenantSelect())}
         </PageHeaderToolsGroup>
         <PageHeaderToolsGroup>
           {/* this kebab dropdown replaces the icon buttons and is hidden for
@@ -383,14 +461,14 @@ class App extends React.Component {
             aria-label="Notifications"
             onClick={(e) => {
               e.preventDefault()
-              this.setState({showErrors: !this.state.showErrors})
+              this.setState({ showErrors: !this.state.showErrors })
             }}
           >
             <BellIcon />
           </NotificationBadge>
         }
-        <SelectTz/>
-        <ConfigModal/>
+        <SelectTz />
+        <ConfigModal />
       </PageHeaderTools>
     )
 
@@ -399,7 +477,7 @@ class App extends React.Component {
     const pageHeader = (
       <PageHeader
         logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
-        logoProps={{to: logoUrl}}
+        logoProps={{ to: logoUrl }}
         logoComponent={Link}
         headerTools={pageHeaderTools}
         topNav={nav}
@@ -427,6 +505,7 @@ export default withRouter(connect(
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
+    tenants: state.tenants,
     timezone: state.timezone
   })
 )(App))
