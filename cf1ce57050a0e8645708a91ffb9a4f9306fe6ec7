@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d26647c_05597fb9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 695,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T18:07:23Z",
+      "side": 1,
+      "message": "Nit we can move this getSource call into the block below to ensure we call that function only when needed.",
+      "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35ee29e5_9b19df3f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 700,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T18:07:23Z",
+      "side": 1,
+      "message": "This should be new_commit_needs_changes to avoid running the comprehension twice.",
+      "range": {
+        "startLine": 700,
+        "startChar": 37,
+        "endLine": 700,
+        "endChar": 72
+      },
+      "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "077d7074_5dae6b18",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1762,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T18:07:23Z",
+      "side": 1,
+      "message": "Do these removals have to happen after refreshing deps so that we know how many transitive removals to perform?",
+      "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
