@@ -3518,10 +3518,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        gate.manager.getChangeQueue(fake_a, None)
-        gate.manager.getChangeQueue(fake_b, None)
-        q1 = gate.getQueue(project1, None)
-        q2 = gate.getQueue(project2, None)
+        with gate.manager.currentContext(self.createZKContext()):
+            gate.manager.getChangeQueue(fake_a, None)
+            gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1.canonical_name, None)
+        q2 = gate.getQueue(project2.canonical_name, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3539,10 +3540,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        gate.manager.getChangeQueue(fake_a, None)
-        gate.manager.getChangeQueue(fake_b, None)
-        q1 = gate.getQueue(project1, None)
-        q2 = gate.getQueue(project2, None)
+        with gate.manager.currentContext(self.createZKContext()):
+            gate.manager.getChangeQueue(fake_a, None)
+            gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1.canonical_name, None)
+        q2 = gate.getQueue(project2.canonical_name, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3560,10 +3562,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        gate.manager.getChangeQueue(fake_a, None)
-        gate.manager.getChangeQueue(fake_b, None)
-        q1 = gate.getQueue(project1, None)
-        q2 = gate.getQueue(project2, None)
+        with gate.manager.currentContext(self.createZKContext()):
+            gate.manager.getChangeQueue(fake_a, None)
+            gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1.canonical_name, None)
+        q2 = gate.getQueue(project2.canonical_name, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3580,10 +3583,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        gate.manager.getChangeQueue(fake_a, None)
-        gate.manager.getChangeQueue(fake_b, None)
-        q1 = gate.getQueue(project1, None)
-        q2 = gate.getQueue(project2, None)
+        with gate.manager.currentContext(self.createZKContext()):
+            gate.manager.getChangeQueue(fake_a, None)
+            gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1.canonical_name, None)
+        q2 = gate.getQueue(project2.canonical_name, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3600,10 +3604,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        gate.manager.getChangeQueue(fake_a, None)
-        gate.manager.getChangeQueue(fake_b, None)
-        q1 = gate.getQueue(project1, None)
-        q2 = gate.getQueue(project2, None)
+        with gate.manager.currentContext(self.createZKContext()):
+            gate.manager.getChangeQueue(fake_a, None)
+            gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1.canonical_name, None)
+        q2 = gate.getQueue(project2.canonical_name, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -6705,8 +6710,10 @@ class TestChangeQueues(ZuulTestCase):
         ])
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         _, p = tenant.getProject(project)
-        q1 = tenant.layout.pipelines['gate'].getQueue(p, 'master')
-        q2 = tenant.layout.pipelines['gate'].getQueue(p, 'stable')
+        q1 = tenant.layout.pipelines['gate'].getQueue(
+            p.canonical_name, 'master')
+        q2 = tenant.layout.pipelines['gate'].getQueue(
+            p.canonical_name, 'stable')
         self.assertEqual(q1.name, queue_name)
         self.assertEqual(q2.name, queue_name)
 
@@ -6762,9 +6769,12 @@ class TestChangeQueues(ZuulTestCase):
         ])
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         _, p = tenant.getProject(project)
-        q1 = tenant.layout.pipelines['gate'].getQueue(p, 'master')
-        q2 = tenant.layout.pipelines['gate'].getQueue(p, 'stable')
-        q3 = tenant.layout.pipelines['gate'].getQueue(p, None)
+        q1 = tenant.layout.pipelines['gate'].getQueue(
+            p.canonical_name, 'master')
+        q2 = tenant.layout.pipelines['gate'].getQueue(
+            p.canonical_name, 'stable')
+        q3 = tenant.layout.pipelines['gate'].getQueue(
+            p.canonical_name, None)
 
         # There should be no branch specific queues anymore
         self.assertEqual(q1, None)
