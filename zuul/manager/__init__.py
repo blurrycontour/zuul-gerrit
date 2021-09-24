@@ -218,13 +218,17 @@ class PipelineManager(metaclass=ABCMeta):
         if not isinstance(change, model.Change):
             return
 
+        change_in_pipeline = False
         for item in self.pipeline.getAllItems():
             for dep_change_ref in item.change.commit_needs_changes:
+                if item.change.equals(change):
+                    change_in_pipeline = True
                 dep_change_key = ChangeKey.fromReference(dep_change_ref)
                 if dep_change_key.isSameChange(change.cache_stat.key):
                     self.updateCommitDependencies(item.change, None, event)
 
-        self.updateCommitDependencies(change, None, event)
+        if change_in_pipeline:
+            self.updateCommitDependencies(change, None, event)
 
     def reportEnqueue(self, item):
         if not self.pipeline._disabled:

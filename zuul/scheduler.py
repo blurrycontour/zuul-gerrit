@@ -1748,15 +1748,16 @@ class Scheduler(threading.Thread):
                       e.change, project.source)
             return
 
+        if event.isPatchsetCreated():
+            pipeline.manager.removeOldVersionsOfChange(change, event)
+        elif event.isChangeAbandoned():
+            pipeline.manager.removeAbandonedChange(change, event)
+
         # Let the pipeline update any dependencies that may need
         # refreshing if this change has updated.
         if event.isPatchsetCreated() or event.isMessageChanged():
             pipeline.manager.refreshDeps(change, event)
 
-        if event.isPatchsetCreated():
-            pipeline.manager.removeOldVersionsOfChange(change, event)
-        elif event.isChangeAbandoned():
-            pipeline.manager.removeAbandonedChange(change, event)
         if pipeline.manager.eventMatches(event, change):
             pipeline.manager.addChange(change, event)
 
