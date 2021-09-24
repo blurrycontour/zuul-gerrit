@@ -2690,6 +2690,65 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(D.reported, 2)
         self.assertEqual(len(self.history), 9)  # 3 each for A, B, D.
 
+    @simple_layout('layouts/no-dequeue-on-new-patchset.yaml')
+    def test_no_dequeue_on_new_patchset(self):
+        "Test the dequeue-on-new-patchset false value"
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.executor_server.hold_jobs_in_build = True
+        A.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        A.addPatchset()
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project1-test', result='SUCCESS', changes='1,1'),
+            dict(name='project1-test', result='SUCCESS', changes='1,2'),
+        ], ordered=False)
+
+    @simple_layout('layouts/no-dequeue-on-new-patchset.yaml')
+    def test_no_dequeue_on_new_patchset_deps(self):
+        "Test dependencies are updated if dequeue-on-new-patchset is false"
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url'])
+        B.addApproval('Code-Review', 2)
+
+        self.executor_server.hold_jobs_in_build = True
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        A.addPatchset()
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The item should be dequeued because of the dependency change
+        self.assertHistory([
+            dict(name='project1-test', result='ABORTED', changes='1,1 2,1'),
+        ], ordered=False)
+
     def test_new_patchset_check(self):
         "Test a new patchset in check"
 
