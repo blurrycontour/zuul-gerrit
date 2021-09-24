@@ -1393,6 +1393,7 @@ class Scheduler(threading.Thread):
                     "Canceling node request %s during reconfiguration",
                     request)
                 self.cancelJob(build_set, request_job, force=True)
+            shared_queue.delete(pipeline.manager.current_context)
 
     def _doPromoteEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)

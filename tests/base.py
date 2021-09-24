@@ -94,9 +94,10 @@ from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
-from zuul.zk import ZooKeeperClient
+from zuul.zk import zkobject, ZooKeeperClient
 from zuul.zk.event_queues import ConnectionEventQueue
 from zuul.zk.executor import ExecutorApi
+from zuul.zk.locks import SessionAwareLock
 from zuul.zk.merger import MergerApi
 from psutil import Popen
 
@@ -4808,6 +4809,10 @@ class ZuulTestCase(BaseTestCase):
         self.additional_event_queues = []
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
+
+        self._context_lock = SessionAwareLock(
+            self.zk_client.client, f"/test/{uuid.uuid4().hex}")
+
         self.connection_event_queues = DefaultKeyDict(
             lambda cn: ConnectionEventQueue(self.zk_client, cn)
         )
@@ -4858,6 +4863,12 @@ class ZuulTestCase(BaseTestCase):
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth,
             self.fake_sql, self.addCleanup, self.validate_tenants)
+
+    def createZKContext(self):
+        # Just make sure the lock is acquired
+        self._context_lock.acquire(blocking=False)
+        return zkobject.ZKContext(self.zk_client, self._context_lock,
+                                  stop_event=None, log=self.log)
 
     def __event_queues(self, matcher) -> List[Queue]:
         # TODO (swestphahl): Can be removed when we no longer use global
