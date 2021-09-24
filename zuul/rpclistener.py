@@ -35,6 +35,13 @@ class LocalQueueItem(model.QueueItem):
         pass
 
 
+class LocalChangeQueue(model.ChangeQueue):
+    """Local non-persistent change queue."""
+
+    def _save(self, ctx, create=False):
+        pass
+
+
 class RPCListenerBase(metaclass=ABCMeta):
     log = logging.getLogger("zuul.RPCListenerBase")
     thread_name = 'zuul-rpc-gearman-worker'
@@ -447,7 +454,7 @@ class RPCListener(RPCListenerBase):
 
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
-        queue = model.ChangeQueue(pipeline)
+        queue = LocalChangeQueue.new(None, pipeline=pipeline)
         item = LocalQueueItem.new(None, queue=queue, change=change,
                                   pipeline=queue.pipeline)
         item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
@@ -478,7 +485,7 @@ class RPCListener(RPCListenerBase):
 
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
-        queue = model.ChangeQueue(pipeline)
+        queue = LocalChangeQueue.new(None, pipeline=pipeline)
         item = LocalQueueItem.new(None, queue=queue, change=change,
                                   pipeline=queue.pipeline)
         item.freezeJobGraph(tenant.layout, skip_file_matcher=True)

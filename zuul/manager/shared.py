@@ -36,12 +36,12 @@ class ChangeQueueManager:
 
         if not change_queue:
             p = self.pipeline_manager.pipeline
-            change_queue = self.pipeline_manager.constructChangeQueue(
-                self.name)
+            name = self.name or project.name
+            change_queue = self.pipeline_manager.constructChangeQueue(name)
             p.addQueue(change_queue)
             self.created_for_branches[branch] = change_queue
 
-        if not change_queue.matches(project, branch):
+        if not change_queue.matches(project.canonical_name, branch):
             change_queue.addProject(project, branch)
             self.log.debug("Added project %s to queue: %s" %
                            (project, change_queue))
@@ -119,7 +119,8 @@ class SharedQueuePipelineManager(PipelineManager, metaclass=ABCMeta):
         # Ignore the existing queue, since we can always get the correct queue
         # from the pipeline. This avoids enqueuing changes in a wrong queue
         # e.g. during re-configuration.
-        queue = self.pipeline.getQueue(change.project, change.branch)
+        queue = self.pipeline.getQueue(change.project.canonical_name,
+                                       change.branch)
         if queue:
             return StaticChangeQueueContextManager(queue)
         else:
@@ -140,13 +141,16 @@ class SharedQueuePipelineManager(PipelineManager, metaclass=ABCMeta):
                 )
 
             # No specific per-branch queue matched so look again with no branch
-            queue = self.pipeline.getQueue(change.project, None)
+            queue = self.pipeline.getQueue(change.project.canonical_name, None)
             if queue:
                 return StaticChangeQueueContextManager(queue)
 
             # There is no existing queue for this change. Create a
             # dynamic one for this one change's use
-            change_queue = model.ChangeQueue(self.pipeline, dynamic=True)
+            change_queue = model.ChangeQueue.new(
+                self.pipeline.manager.current_context,
+                pipeline=self.pipeline,
+                dynamic=True)
             change_queue.addProject(change.project, None)
             self.pipeline.addQueue(change_queue)
             log.debug("Dynamically created queue %s", change_queue)

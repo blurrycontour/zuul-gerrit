@@ -348,10 +348,10 @@ class Pipeline(object):
     def addQueue(self, queue):
         self.queues.append(queue)
 
-    def getQueue(self, project, branch):
+    def getQueue(self, project_cname, branch):
         # Queues might be branch specific so match with branch
         for queue in self.queues:
-            if queue.matches(project, branch):
+            if queue.matches(project_cname, branch):
                 return queue
         return None
 
@@ -363,7 +363,9 @@ class Pipeline(object):
 
     def removeQueue(self, queue):
         if queue in self.queues:
-            self.queues.remove(queue)
+            with self.state.activeContext(self.manager.current_context):
+                self.state.queues.remove(queue)
+            queue.delete(self.manager.current_context)
 
     def getChangesInQueue(self):
         changes = []
@@ -463,7 +465,7 @@ class PipelineState(zkobject.ZKObject):
             queue.refresh(context)
 
 
-class ChangeQueue(object):
+class ChangeQueue(zkobject.ZKObject):
     """A ChangeQueue contains Changes to be processed for related projects.
 
     A Pipeline with a DependentPipelineManager has multiple parallel
@@ -483,46 +485,72 @@ class ChangeQueue(object):
     A ChangeQueue may be a dynamically created queue, which may be removed
     from a DependentPipelineManager once empty.
     """
-    def __init__(self, pipeline, window=0, window_floor=1,
-                 window_increase_type='linear', window_increase_factor=1,
-                 window_decrease_type='exponential', window_decrease_factor=2,
-                 name=None, dynamic=False):
-        self.pipeline = pipeline
-        if name:
-            self.name = name
-        else:
-            self.name = ''
-        self.project_branches = []
-        self._jobs = set()
-        self.queue = []
-        self.window = window
-        self.window_floor = window_floor
-        self.window_increase_type = window_increase_type
-        self.window_increase_factor = window_increase_factor
-        self.window_decrease_type = window_decrease_type
-        self.window_decrease_factor = window_decrease_factor
-        self.dynamic = dynamic
+    def __init__(self):
+        super().__init__()
+        self._set(
+            uuid=uuid4().hex,
+            pipeline=None,
+            name="",
+            project_branches=[],
+            _jobs=set(),
+            queue=[],
+            window=0,
+            window_floor=1,
+            window_increase_type="linear",
+            window_increase_factor=1,
+            window_decrease_type="exponential",
+            window_decrease_factor=2,
+            dynamic=False,
+        )
 
-    def getPath(self):
-        queue_id = (self.uuid if self.dynamic
-                    else urllib.parse.quote_plus(self.name))
-        return f"{self.pipeline.getPath()}/queue/{queue_id}"
+    def serialize(self):
+        data = {
+            "uuid": self.uuid,
+            "name": self.name,
+            "project_branches": self.project_branches,
+            "_jobs": list(self._jobs),
+            "queue": [i.getPath() for i in self.queue],
+            "window": self.window,
+            "window_floor": self.window_floor,
+            "window_increase_type": self.window_increase_type,
+            "window_increase_factor": self.window_increase_factor,
+            "window_decrease_type": self.window_decrease_type,
+            "window_decrease_factor": self.window_decrease_factor,
+            "dynamic": self.dynamic,
+        }
+        return json.dumps(data).encode("utf8")
 
-    def refresh(self, context):
-        # FIXME: we currently don't have the queue data in ZK, so we just
-        # construct a similar list of item uuids.
-        existing_items = {i.uuid: i for i in self.queue}
-        items_in_queue = existing_items.keys()
-        for item_uuid in items_in_queue:
-            item = existing_items.get(item_uuid)
+    def deserialize(self, raw):
+        data = super().deserialize(raw)
+
+        existing_items = {}
+        for item in self.queue:
+            existing_items[item.getPath()] = item
+            if item.bundle:
+                existing_items.update({
+                    i.getPath(): i for i in item.bundle.items
+                })
+
+        queue = []
+        context = self.pipeline.manager.current_context
+        for item_path in data["queue"]:
+            item = existing_items.get(item_path)
             if item:
                 item.refresh(context)
             else:
-                # FIXME: this code path is currently unused as we have all
-                # items in the queue.
-                item = QueueItem.fromZK(
-                    context,
-                    QueueItem.itemPath(self.pipeline.getPath(), item_uuid))
+                item = QueueItem.fromZK(context, item_path)
+            queue.append(item)
+
+        data.update({
+            "_jobs": set(data["_jobs"]),
+            "queue": queue,
+            "project_branches": [tuple(pb) for pb in data["project_branches"]],
+        })
+        return data
+
+    def getPath(self):
+        pipeline_path = self.pipeline.state.getPath()
+        return f"{pipeline_path}/queue/{self.uuid}"
 
     @property
     def zk_context(self):
@@ -542,15 +570,13 @@ class ChangeQueue(object):
         care about branches it can supply None (but must supply None as well
         when matching)
         """
-        project_branch = (project, branch)
+        project_branch = (project.canonical_name, branch)
         if project_branch not in self.project_branches:
-            self.project_branches.append(project_branch)
+            with self.activeContext(self.zk_context):
+                self.project_branches.append(project_branch)
 
-            if not self.name:
-                self.name = project.name
-
-    def matches(self, project, branch):
-        return (project, branch) in self.project_branches
+    def matches(self, project_cname, branch):
+        return (project_cname, branch) in self.project_branches
 
     def enqueueChange(self, change, event):
         item = QueueItem.new(self.zk_context,
@@ -567,17 +593,20 @@ class ChangeQueue(object):
         item._set(pipeline=self.pipeline, queue=self)
         if self.queue:
             item.updateAttributes(self.zk_context, item_ahead=self.queue[-1])
-            item.item_ahead.items_behind.append(item)
-        self.queue.append(item)
+            with item.item_ahead.activeContext(self.zk_context):
+                item.item_ahead.items_behind.append(item)
+        with self.activeContext(self.zk_context):
+            self.queue.append(item)
 
     def dequeueItem(self, item):
         if item in self.queue:
-            self.queue.remove(item)
+            with self.activeContext(self.zk_context):
+                self.queue.remove(item)
         if item.item_ahead:
-            item.item_ahead.items_behind.remove(item)
+            with item.item_ahead.activeContext(self.zk_context):
+                item.item_ahead.items_behind.remove(item)
+                item.item_ahead.items_behind.extend(item.items_behind)
         for item_behind in item.items_behind:
-            if item.item_ahead:
-                item.item_ahead.items_behind.append(item_behind)
             item_behind.updateAttributes(self.zk_context,
                                          item_ahead=item.item_ahead)
 
@@ -602,20 +631,21 @@ class ChangeQueue(object):
             return False
         # Remove from current location
         if item.item_ahead:
-            item.item_ahead.items_behind.remove(item)
+            with item.item_ahead.activeContext(self.zk_context):
+                item.item_ahead.items_behind.remove(item)
+                item.item_ahead.items_behind.extend(item.items_behind)
         for item_behind in item.items_behind:
-            if item.item_ahead:
-                item.item_ahead.items_behind.append(item_behind)
-                item_behind.updateAttributes(
-                    self.zk_context,
-                    item_ahead=item.item_ahead)
+            item_behind.updateAttributes(
+                self.zk_context,
+                item_ahead=item.item_ahead)
         # Add to new location
         item.updateAttributes(
             self.zk_context,
             item_ahead=item_ahead,
             items_behind=[])
         if item.item_ahead:
-            item.item_ahead.items_behind.append(item)
+            with item.item_ahead.activeContext(self.zk_context):
+                item.item_ahead.items_behind.append(item)
         return True
 
     def isActionable(self, item):
@@ -630,14 +660,18 @@ class ChangeQueue(object):
         return item in self.queue[:window]
 
     def increaseWindowSize(self):
-        if self.window:
+        if not self.window:
+            return
+        with self.activeContext(self.zk_context):
             if self.window_increase_type == 'linear':
                 self.window += self.window_increase_factor
             elif self.window_increase_type == 'exponential':
                 self.window *= self.window_increase_factor
 
     def decreaseWindowSize(self):
-        if self.window:
+        if not self.window:
+            return
+        with self.activeContext(self.zk_context):
             if self.window_decrease_type == 'linear':
                 self.window = max(
                     self.window_floor,
