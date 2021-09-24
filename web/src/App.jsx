@@ -31,6 +31,8 @@ import {
   ButtonVariant,
   Dropdown,
   DropdownItem,
+  DropdownToggle,
+  DropdownSeparator,
   KebabToggle,
   Modal,
   Nav,
@@ -53,6 +55,7 @@ import {
 import {
   BellIcon,
   BookIcon,
+  ChevronDownIcon,
   CodeIcon,
   ServiceIcon,
   UsersIcon,
@@ -66,6 +69,7 @@ import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearNotification } from './actions/notifications'
 import { fetchConfigErrorsAction } from './actions/configErrors'
+import { fetchTenantsIfNeeded } from './actions/tenants'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 import { configureAuthFromTenant, configureAuthFromInfo } from './actions/auth'
@@ -76,6 +80,7 @@ class App extends React.Component {
     configErrors: PropTypes.array,
     info: PropTypes.object,
     tenant: PropTypes.object,
+    tenants: PropTypes.object,
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
@@ -86,6 +91,7 @@ class App extends React.Component {
 
   state = {
     showErrors: false,
+    isTenantDropdownOpen: false,
   }
 
   renderMenu() {
@@ -166,6 +172,7 @@ class App extends React.Component {
       } else if (!info.tenant) {
         // Multi tenant, look for tenant name in url
         whiteLabel = false
+        this.props.dispatch(fetchTenantsIfNeeded())
 
         const match = matchPath(
           this.props.location.pathname, { path: '/t/:tenant' })
@@ -329,6 +336,91 @@ class App extends React.Component {
     )
   }
 
+  renderTenantDropdown() {
+    const { tenant, tenants } = this.props
+    const { isTenantDropdownOpen } = this.state
+
+    if (tenant.whiteLabel) {
+      return (
+        <PageHeaderToolsItem>
+          <strong>Tenant</strong> {tenant.name}
+        </PageHeaderToolsItem>
+      )
+    } else {
+      const tenantLink = (_tenant) => {
+        const currentPath = this.props.location.pathname
+        let suffix
+        switch (currentPath) {
+          case '/t/' + tenant.name + '/projects':
+            suffix = '/projects'
+            break
+          case '/t/' + tenant.name + '/jobs':
+            suffix = '/jobs'
+            break
+          case '/t/' + tenant.name + '/labels':
+            suffix = '/labels'
+            break
+          case '/t/' + tenant.name + '/nodes':
+            suffix = '/nodes'
+            break
+          case '/t/' + tenant.name + '/autoholds':
+            suffix = '/autoholds'
+            break
+          case '/t/' + tenant.name + '/builds':
+            suffix = '/builds'
+            break
+          case '/t/' + tenant.name + '/buildsets':
+            suffix = '/buildsets'
+            break
+          case '/t/' + tenant.name + '/status':
+          default:
+            // all other paths point to tenant-specific resources that would most likely result in a 404
+            suffix = '/status'
+            break
+        }
+        return <Link to={'/t/' + _tenant.name + suffix}>{_tenant.name}</Link>
+      }
+
+      const options = tenants.tenants.filter(
+        (_tenant) => (_tenant.name !== tenant.name)
+      ).map(
+        (_tenant, idx) => {
+          return (
+            <DropdownItem key={'tenant-dropdown-' + idx} component={tenantLink(_tenant)} />
+          )
+        })
+      options.push(
+        <DropdownSeparator key="tenant-dropdown-separator" />,
+        <DropdownItem
+          key="tenant-dropdown-tenants_page"
+          component={<Link to={tenant.defaultRoute}>Go to tenants page</Link>} />
+      )
+
+      return (tenants.isFetching ?
+        <PageHeaderToolsItem>
+          Loading tenants ...
+        </PageHeaderToolsItem> :
+        <>
+          <PageHeaderToolsItem>
+            <Dropdown
+              isOpen={isTenantDropdownOpen}
+              toggle={
+                <DropdownToggle
+                  className={`zuul-menu-dropdown-toggle${isTenantDropdownOpen ? '-expanded' : ''}`}
+                  id="tenant-dropdown-toggle-id"
+                  onToggle={(isOpen) => { this.setState({ isTenantDropdownOpen: isOpen }) }}
+                  toggleIndicator={ChevronDownIcon}
+                >
+                  <strong>Tenant</strong> {tenant.name}
+                </DropdownToggle>}
+              onSelect={() => { this.setState({ isTenantDropdownOpen: !isTenantDropdownOpen }) }}
+              dropdownItems={options}
+            />
+          </PageHeaderToolsItem>
+        </>)
+    }
+  }
+
   render() {
     const { isKebabDropdownOpen } = this.state
     const { notifications, configErrors, tenant } = this.props
@@ -359,7 +451,7 @@ class App extends React.Component {
           key="tenant"
           onClick={event => this.handleTenantLink(event)}
         >
-          <UsersIcon /> Tenant
+          <UsersIcon /> Tenants
         </DropdownItem>
       )
     }
@@ -396,15 +488,7 @@ class App extends React.Component {
               </Button>
             </a>
           </PageHeaderToolsItem>
-          {tenant.name && (
-            <PageHeaderToolsItem>
-              <Link to={tenant.defaultRoute}>
-                <Button variant={ButtonVariant.plain}>
-                  <strong>Tenant</strong> {tenant.name}
-                </Button>
-              </Link>
-            </PageHeaderToolsItem>
-          )}
+          {tenant.name && (this.renderTenantDropdown())}
         </PageHeaderToolsGroup>
         <PageHeaderToolsGroup>
           {/* this kebab dropdown replaces the icon buttons and is hidden for
@@ -472,6 +556,7 @@ export default withRouter(connect(
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
+    tenants: state.tenants,
     timezone: state.timezone,
     user: state.user
   })
