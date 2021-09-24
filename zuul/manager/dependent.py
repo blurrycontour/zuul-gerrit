@@ -30,8 +30,9 @@ class DependentPipelineManager(SharedQueuePipelineManager):
 
     def constructChangeQueue(self, queue_name):
         p = self.pipeline
-        return model.ChangeQueue(
-            p,
+        return model.ChangeQueue.new(
+            p.manager.current_context,
+            pipeline=p,
             window=p.window,
             window_floor=p.window_floor,
             window_increase_type=p.window_increase_type,
@@ -81,16 +82,14 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             return
 
         # for project in change_queue, project.source get changes, then dedup.
-        sources = set()
-        for project, _ in change_queue.project_branches:
-            sources.add(project.source)
+        projects = [self.pipeline.tenant.getProject(pcn)[1] for pcn, _ in
+                    change_queue.project_branches]
+        sources = {p.source for p in projects}
 
         needed_by_changes = self.resolveChangeKeys(change.needed_by_changes)
         seen = set(needed_by_changes)
         for source in sources:
             log.debug("  Checking source: %s", source)
-            projects = [project_branch[0]
-                        for project_branch in change_queue.project_branches]
             for c in source.getChangesDependingOn(change,
                                                   projects,
                                                   self.pipeline.tenant):
