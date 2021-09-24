@@ -1714,10 +1714,7 @@ class Scheduler(threading.Thread):
         for pipeline in tenant.layout.pipelines.values():
             if (
                 pipeline.manager.eventMatches(event, change)
-                or pipeline.manager.isChangeAlreadyInPipeline(change)
-                or pipeline.manager.findOldVersionOfChangeAlreadyInQueue(
-                    change
-                )
+                or pipeline.manager.isAnyVersionOfChangeInPipeline(change)
             ):
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
@@ -1751,9 +1748,16 @@ class Scheduler(threading.Thread):
                       e.change, project.source)
             return
 
+        # Let the pipeline update any dependencies that may need
+        # refreshing if this change has updated.
+
+        # TODO: We only really need to run this if we have a new
+        # patchest (isPatchsetCreated()) or the depends-on list in the
+        # PR body has changed (but we don't have a way to test that yet).
+        pipeline.manager.refreshDeps(change, event)
+
         if event.isPatchsetCreated():
-            pipeline.manager.removeOldVersionsOfChange(
-                change, event)
+            pipeline.manager.removeOldVersionsOfChange(change, event)
         elif event.isChangeAbandoned():
             pipeline.manager.removeAbandonedChange(change, event)
         if pipeline.manager.eventMatches(event, change):
@@ -2170,35 +2174,6 @@ class Scheduler(threading.Thread):
                 management_event_queues[pipeline.name])
             pipelines.append(status)
         return json.dumps(data)
-
-    def onChangeUpdated(self, change, event):
-        """Remove stale dependency references on change update.
-
-        When a change is updated with a new patchset, other changes in
-        the system may still have a reference to the old patchset in
-        their dependencies.  Search for those (across all sources) and
-        mark that their dependencies are out of date.  This will cause
-        them to be refreshed the next time the queue processor
-        examines them.
-        """
-        log = get_annotated_logger(self.log, event)
-        log.debug("Change %s has been updated, clearing dependent "
-                  "change caches", change)
-        for source in self.connections.getSources():
-            for other_change in source.getCachedChanges():
-                if not isinstance(other_change, Change):
-                    continue
-                if other_change.commit_needs_changes is None:
-                    continue
-                for connection_name, key in other_change.commit_needs_changes:
-                    dep_source = self.connections.getSource(connection_name)
-                    dep = dep_source.getChangeByKey(key)
-                    if change.isUpdateOf(dep):
-                        source.setChangeAttributes(
-                            other_change, refresh_deps=True)
-
-        source = self.connections.getSource(change.project.connection_name)
-        source.setChangeAttributes(change, refresh_deps=True)
 
     def cancelJob(self, buildset, job, build=None, final=False,
                   force=False):

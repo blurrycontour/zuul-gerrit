@@ -902,8 +902,6 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         if not change.is_merged:
             self._updateChangeDependencies(log, change, data, event, history)
 
-        self.sched.onChangeUpdated(change, event)
-
         return change
 
     def _updateChangeDependencies(self, log, change, data, event, history):

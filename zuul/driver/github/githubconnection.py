@@ -1306,9 +1306,6 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
 
                     change = self._change_cache.updateChangeWithRetry(
                         key, change, _update_change)
-
-                    if self.sched:
-                        self.sched.onChangeUpdated(change, event)
                 finally:
                     # We need to remove the lock here again so we don't leak
                     # them.
