@@ -36,8 +36,8 @@ class ChangeQueueManager:
 
         if not change_queue:
             p = self.pipeline_manager.pipeline
-            change_queue = self.pipeline_manager.constructChangeQueue(
-                self.name)
+            name = self.name or project.name
+            change_queue = self.pipeline_manager.constructChangeQueue(name)
             p.addQueue(change_queue)
             self.created_for_branches[branch] = change_queue
 
@@ -146,7 +146,10 @@ class SharedQueuePipelineManager(PipelineManager, metaclass=ABCMeta):
 
             # There is no existing queue for this change. Create a
             # dynamic one for this one change's use
-            change_queue = model.ChangeQueue(self.pipeline, dynamic=True)
+            change_queue = model.ChangeQueue.new(
+                self.pipeline.manager.curent_context,
+                pipeline=self.pipeline,
+                dynamic=True)
             change_queue.addProject(change.project, None)
             self.pipeline.addQueue(change_queue)
             log.debug("Dynamically created queue %s", change_queue)

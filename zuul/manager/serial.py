@@ -20,8 +20,9 @@ class SerialPipelineManager(SharedQueuePipelineManager):
     changes_merge = False
 
     def constructChangeQueue(self, queue_name):
-        return model.ChangeQueue(
-            self.pipeline,
+        return model.ChangeQueue.new(
+            self.pipeline.manager.current_context,
+            pipeline=self.pipeline,
             window=1,
             window_floor=1,
             window_increase_type='none',
