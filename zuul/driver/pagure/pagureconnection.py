@@ -28,7 +28,11 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
 from zuul.lib import dependson
-from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+from zuul.zk.change_cache import (
+    AbstractChangeCache,
+    ChangeKey,
+    ConcurrentUpdateError,
+)
 from zuul.zk.event_queues import ConnectionEventQueue
 
 from zuul.driver.pagure.paguremodel import PagureTriggerEvent, PullRequest
@@ -596,7 +600,9 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
 
     def _getChange(self, project, number, patchset=None,
                    refresh=False, url=None, event=None):
-        key = str((project.name, number, patchset))
+        key = ChangeKey(self.connection_name, project.name,
+                        'PullRequest', str(number),
+                        str(patchset))
         change = self._change_cache.get(key)
         if change and not refresh:
             self.log.debug("Getting change from cache %s" % str(key))
@@ -629,7 +635,8 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
         return change
 
     def _getNonPRRef(self, project, event):
-        key = str((project.name, event.ref, event.newrev))
+        key = ChangeKey(self.connection_name, project.name,
+                        'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
