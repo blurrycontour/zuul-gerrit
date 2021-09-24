@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "fe231d6e_cfff5102",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 695,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T18:46:45Z",
+      "side": 1,
+      "message": "True, it\u0027s basically a dict lookup.",
+      "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "35ee29e5_9b19df3f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 6
@@ -42,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "1b045bef_256c4dc1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 700,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T18:46:45Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "077d7074_5dae6b18",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -56,6 +90,23 @@
       "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4e18a9ca_c00c8c20",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1762,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-24T18:46:45Z",
+      "side": 1,
+      "message": "They could probably happen before which may save us some cycles, but to avoid opening more of a can of worms I wanted to keep the sequence as close as possible to what happens now (which is the refresh deps happens before all of this and out of band).  I\u0027ll make a followup that moves this so we can evaluate that on its own.",
+      "revId": "cf1ce57050a0e8645708a91ffb9a4f9306fe6ec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
