@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "80a0162b_59afdabf",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1932,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T22:35:50Z",
+      "side": 1,
+      "message": "Might even simplify this by looking up the build by uuid and not job name?",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95c47073_dd964577",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1985,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T22:35:50Z",
+      "side": 1,
+      "message": "This get method only looks at current builds in a pipeline. Below we hint that we could hit this block because the build is outdated. Are we able to lookup outdated builds and handle them without a fake Build object? If so that might be a bit cleaner?",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb6b9903_5307783c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2017,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-24T22:35:50Z",
+      "side": 1,
+      "message": "I think this will always be True because we don\u0027t set build.retry to True above.",
+      "range": {
+        "startLine": 2017,
+        "startChar": 20,
+        "endLine": 2017,
+        "endChar": 43
+      },
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
