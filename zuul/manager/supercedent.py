@@ -38,8 +38,9 @@ class SupercedentPipelineManager(PipelineManager):
                 queue.queue[-1].change.ref == change.ref)):
                 log.debug("Found existing queue %s", queue)
                 return DynamicChangeQueueContextManager(queue)
-        change_queue = model.ChangeQueue(
-            self.pipeline,
+        change_queue = model.ChangeQueue.new(
+            self.pipeline.manager.current_context,
+            pipeline=self.pipeline,
             window=1,
             window_floor=1,
             window_increase_type='none',

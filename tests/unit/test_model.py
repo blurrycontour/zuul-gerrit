@@ -38,6 +38,12 @@ class Dummy(object):
             setattr(self, k, v)
 
 
+class DummyChangeQueue(model.ChangeQueue):
+
+    def _save(self, ctx, create=False):
+        pass
+
+
 class TestJob(BaseTestCase):
     def setUp(self):
         self._env_fixture = self.useFixture(
@@ -64,7 +70,7 @@ class TestJob(BaseTestCase):
         self.pipeline.source_context = self.context
         self.pipeline.manager = mock.Mock()
         self.layout.addPipeline(self.pipeline)
-        self.queue = model.ChangeQueue(self.pipeline)
+        self.queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
         self.pcontext = configloader.ParseContext(
             self.connections, None, self.tenant, AnsibleManager())
 
@@ -163,7 +169,7 @@ class TestJob(BaseTestCase):
 
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_job_inheritance_job_tree(self, save_mock):
-        queue = model.ChangeQueue(self.pipeline)
+        queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
 
         base = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -234,7 +240,7 @@ class TestJob(BaseTestCase):
 
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_inheritance_keeps_matchers(self, save_mock):
-        queue = model.ChangeQueue(self.pipeline)
+        queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
 
         base = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
