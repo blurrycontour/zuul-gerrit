@@ -51,6 +51,21 @@ a.refresh {
     font-weight: bold;
 }
 
+.zuul-tenant-dropdown-toggle::before {
+    content: none !important;
+}
+
+.zuul-tenant-dropdown-toggle:hover {
+    border-bottom: 1px solid #fff;
+}
+
+.zuul-tenant-dropdown-toggle-expanded:before {
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 2px solid #fff;
+}
+
 /* Remove ugly outline when a Switch is selected */
 .pf-c-switch {
     --pf-c-switch__input--focus__toggle--OutlineWidth: 0;
