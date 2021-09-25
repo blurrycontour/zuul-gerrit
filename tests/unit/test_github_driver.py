@@ -2095,6 +2095,24 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         self.assertEqual("cancelled", aborted_check_run["conclusion"])
         self.assertEqual(0, len(aborted_check_run["actions"]))
 
+    @simple_layout('layouts/github-check-name.yaml', driver='github')
+    def test_reporting_check_name(self):
+        # Test a custom check-name in the reporter
+        project = 'org/project1'
+        github = self.fake_github.getGithubClient(None)
+
+        A = self.fake_github.openFakePullRequest(project, 'master', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        check_runs = self.fake_github.getCommitChecks(project, A.head_sha)
+        self.assertEqual(1, len(check_runs))
+        check_run = check_runs[0]
+
+        self.assertEqual("custom-check", check_run["name"])
+        self.assertEqual("completed", check_run["status"])
+        self.assertEqual("success", check_run["conclusion"])
+
 
 class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):
     """We need Github app authentication and be able to run Ansible jobs"""

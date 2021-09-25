@@ -311,7 +311,7 @@ the following options.
       format of ``user:context:status``.  For example,
       ``zuul_github_ci_bot:check_pipeline:success``.
 
-   .. attr: check
+   .. attr:: check
 
       This is only used for ``check_run`` events. It works similar to
       the ``status`` attribute and accepts a list of strings each of
@@ -431,6 +431,12 @@ itself. Status name, description, and context is taken from the pipeline.
       List of strings each representing an exact label name which
       should be removed from the pull request by reporter. Only used
       for Pull Request based items.
+
+   .. attr:: check-name
+      :default: {tenant}/{pipeline}
+
+      The name of the GitHub `Check` to report.
+
 
 .. _Github App: https://developer.github.com/apps/
 

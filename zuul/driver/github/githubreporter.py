@@ -53,7 +53,8 @@ class GithubReporter(BaseReporter):
         self._review_body = self.config.get('review-body')
         if not isinstance(self._unlabels, list):
             self._unlabels = [self._unlabels]
-        self.context = "{}/{}".format(pipeline.tenant.name, pipeline.name)
+        self.context = self.config.get(
+            'check-name', "{}/{}".format(pipeline.tenant.name, pipeline.name))
 
     def report(self, item):
         """Report on an event."""
@@ -335,5 +336,6 @@ def getSchema():
         'check': v.Any(
             "in_progress", "success", "failure", "cancelled",
             "skipped", "neutral"),
+        'check-name': str,
     })
     return github_reporter
