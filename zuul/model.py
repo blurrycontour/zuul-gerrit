@@ -3589,22 +3589,11 @@ class Ref(object):
 
     @property
     def cache_key(self):
-        return (self.project.connection_name, self.cache_stat.key)
+        return self.cache_stat.key.reference
 
     @property
     def cache_version(self):
         return -1 if self.cache_stat is None else self.cache_stat.version
-
-    @property
-    def stable_id(self):
-        # The identifier for this ref/change/thing that doesn't change
-        # even if it's updated.  Something like the ref itself, or the
-        # gerrit change id/number, or the github pull request number.
-        # Stable across patchsets and pushes.
-        return {
-            "project": self.project.canonical_name,
-            "ref": self.ref,
-        }
 
     def serialize(self):
         return {
@@ -3808,17 +3797,6 @@ class Change(Branch):
         self.owner = data.get("owner")
         self.message = data.get("message")
         self.commit_id = data.get("commit_id")
-
-    @property
-    def stable_id(self):
-        # The identifier for this ref/change/thing that doesn't change
-        # even if it's updated.  Something like the ref itself, or the
-        # gerrit change id/number, or the github pull request number.
-        # Stable across patchsets and pushes.
-        return {
-            "project": self.project.canonical_name,
-            "number": self.number,
-        }
 
     def serialize(self):
         d = super().serialize()

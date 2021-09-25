@@ -23,6 +23,7 @@ from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
 from zuul.model import QueueItem
+from zuul.zk.change_cache import ChangeKey
 
 
 class DynamicChangeQueueContextManager(object):
@@ -156,12 +157,12 @@ class PipelineManager(metaclass=ABCMeta):
 
     def resolveChangeKeys(self, change_keys):
         resolved_changes = []
-        for key in change_keys:
+        for reference in change_keys:
+            key = ChangeKey.fromReference(reference)
             change = self._change_cache.get(key)
             if change is None:
-                connection_name, connection_key = key
-                source = self.sched.connections.getSource(connection_name)
-                change = source.getChangeByKey(connection_key)
+                source = self.sched.connections.getSource(key.connection_name)
+                change = source.getChangeByKey(key)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
@@ -202,7 +203,7 @@ class PipelineManager(metaclass=ABCMeta):
     def isAnyVersionOfChangeInPipeline(self, change):
         # Checks any items in the pipeline
         for item in self.pipeline.getAllItems():
-            if change.stable_id == item.change.stable_id:
+            if change.cache_stat.key.isSameChange(item.change.cache_stat.key):
                 return True
         return False
 
@@ -218,13 +219,9 @@ class PipelineManager(metaclass=ABCMeta):
             return
 
         for item in self.pipeline.getAllItems():
-            # TODO: with structured-data keys (so we can compare the
-            # stable_id), we might be able to do more of this without
-            # going to ZK.
-            for connection_name, key in item.change.commit_needs_changes:
-                source = self.sched.connections.getSource(connection_name)
-                dep = source.getChangeByKey(key)
-                if (dep.stable_id == change.stable_id):
+            for dep_change_ref in item.change.commit_needs_changes:
+                dep_change_key = ChangeKey.fromReference(dep_change_ref)
+                if dep_change_key.isSameChange(change.cache_stat.key):
                     self.updateCommitDependencies(item.change, None, event)
 
         self.updateCommitDependencies(change, None, event)

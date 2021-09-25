@@ -34,7 +34,11 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.exceptions import MergeFailure
 from zuul.model import Branch, Project, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
-from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+from zuul.zk.change_cache import (
+    AbstractChangeCache,
+    ChangeKey,
+    ConcurrentUpdateError,
+)
 from zuul.zk.event_queues import ConnectionEventQueue
 
 # HTTP timeout in seconds
@@ -520,7 +524,9 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
     def _getChange(self, project, number, patch_number=None,
                    refresh=False, url=None, event=None):
         log = get_annotated_logger(self.log, event)
-        key = str((project.name, number, patch_number))
+        key = ChangeKey(self.connection_name, project.name,
+                        'MergeRequest', str(number),
+                        str(patch_number))
         change = self._change_cache.get(key)
         if change and not refresh:
             log.debug("Getting change from cache %s" % str(key))
@@ -576,7 +582,8 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
         return change
 
     def _getNonMRRef(self, project, event):
-        key = str((project.name, event.ref, event.newrev))
+        key = ChangeKey(self.connection_name, project.name,
+                        'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change

@@ -48,7 +48,11 @@ from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 from zuul.model import DequeueEvent
-from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
+from zuul.zk.change_cache import (
+    AbstractChangeCache,
+    ChangeKey,
+    ConcurrentUpdateError,
+)
 from zuul.zk.event_queues import ConnectionEventQueue
 
 GITHUB_BASE_URL = 'https://api.github.com'
@@ -1292,7 +1296,9 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
         # because it can originate from different sources (github event, manual
         # enqueue event) where some might just parse the string and forward it.
         number = int(number)
-        key = str((project.name, number, patchset))
+        key = ChangeKey(self.connection_name, project.name,
+                        'PullRequest', str(number),
+                        str(patchset))
         change = self._change_cache.get(key)
         if change and not refresh:
             return change
@@ -1341,7 +1347,8 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
 
     def _getTag(self, project, event):
         tag = event.ref[len('refs/tags/'):]
-        key = str((event.project_name, tag, event.newrev))
+        key = ChangeKey(self.connection_name, project.name,
+                        'Tag', tag, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
@@ -1362,7 +1369,8 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
 
     def _getBranch(self, project, event):
         branch = event.ref[len('refs/heads/'):]
-        key = str((event.project_name, branch, event.newrev))
+        key = ChangeKey(self.connection_name, project.name,
+                        'Branch', branch, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
@@ -1381,7 +1389,8 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
         return change
 
     def _getRef(self, project, event):
-        key = str((event.project_name, event.ref, event.newrev))
+        key = ChangeKey(self.connection_name, project.name,
+                        'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
             return change
@@ -1432,6 +1441,7 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
                 org, proj, _, num = pr.get('url').split('/')[-4:]
                 proj = pr.get('base').get('repo').get('full_name')
                 sha = pr.get('head').get('sha')
+                # This is not a ChangeKey
                 key = (proj, num, sha)
 
                 # A single tenant could have multiple projects with the same
