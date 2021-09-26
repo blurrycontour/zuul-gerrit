@@ -452,6 +452,8 @@ class TestAnsibleJob(ZuulTestCase):
             state=None,
             precedence=200,
             zone=None,
+            job_name=None,
+            build_set_uuid=None,
             tenant_name=None,
             pipeline_name=None,
             event_id='1',
