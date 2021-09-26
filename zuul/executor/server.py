@@ -3579,6 +3579,12 @@ class ExecutorServer(BaseMergeServer):
             # clearing the params so if we fail, no one tries to
             # re-run the job.
             build_request.state = BuildRequest.RUNNING
+            # Set the hostname on the build request so it can be used by
+            # zuul-web for the live log streaming.
+            build_request.worker_info = {
+                "hostname": self.hostname,
+                "log_port": self.log_streaming_port,
+            }
             self.executor_api.update(build_request)
         except Exception:
             log.exception("Exception while preparing to start worker")

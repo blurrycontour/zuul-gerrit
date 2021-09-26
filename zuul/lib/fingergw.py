@@ -20,12 +20,13 @@ import threading
 from configparser import ConfigParser
 from typing import Optional
 
-import zuul.rpcclient
+from zuul.exceptions import StreamingError
 from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import FingerGatewayComponent
+from zuul.zk.components import ComponentRegistry, FingerGatewayComponent
+from zuul.zk.executor import ExecutorApi
 
 COMMANDS = ['stop']
 
@@ -81,7 +82,8 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         port = None
         try:
             build_uuid = self.getCommand()
-            port_location = self.fingergw.rpc.get_job_log_stream_address(
+            port_location = streamer_utils.getJobLogStreamAddress(
+                self.fingergw.executor_api, self.fingergw.component_registry,
                 build_uuid, source_zone=self.fingergw.zone)
 
             if not port_location:
@@ -93,6 +95,8 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
             port = port_location['port']
             use_ssl = port_location.get('use_ssl', False)
             self._fingerClient(server, port, build_uuid, use_ssl)
+        except StreamingError as e:
+            self.request.sendall(str(e).encode("utf-8"))
         except BrokenPipeError:   # Client disconnect
             return
         except Exception:
@@ -110,7 +114,7 @@ class FingerGateway(object):
 
     For each incoming finger request, a new thread is started that will
     be responsible for finding which Zuul executor is executing the
-    requested build (by asking Gearman), forwarding the request to that
+    requested build (by asking ZooKeeper), forwarding the request to that
     executor, and streaming the results back to our client.
     '''
 
@@ -127,26 +131,9 @@ class FingerGateway(object):
         Initialize the finger gateway.
 
         :param config: The parsed Zuul configuration.
-        :param tuple gearman: Gearman connection information. This should
-            include the server, port, SSL key, SSL cert, and SSL CA.
-        :param tuple address: The address and port to bind to for our gateway.
-        :param str user: The user to which we should drop privileges after
-            binding to our address.
         :param str command_socket: Path to the daemon command socket.
         :param str pid_file: Path to the daemon PID file.
         '''
-
-        gear_server = get_default(config, 'gearman', 'server')
-        gear_port = get_default(config, 'gearman', 'port', 4730)
-        gear_ssl_key = get_default(config, 'gearman', 'ssl_key')
-        gear_ssl_cert = get_default(config, 'gearman', 'ssl_cert')
-        gear_ssl_ca = get_default(config, 'gearman', 'ssl_ca')
-
-        self.gear_server = gear_server
-        self.gear_port = gear_port
-        self.gear_ssl_key = gear_ssl_key
-        self.gear_ssl_cert = gear_ssl_cert
-        self.gear_ssl_ca = gear_ssl_ca
 
         host = get_default(config, 'fingergw', 'listen_address', '::')
         self.port = int(get_default(config, 'fingergw', 'port', 79))
@@ -158,7 +145,6 @@ class FingerGateway(object):
         self.user = user
         self.pid_file = pid_file
 
-        self.rpc = None
         self.server = None
         self.server_thread = None
 
@@ -200,6 +186,10 @@ class FingerGateway(object):
             self.component_info.use_ssl = True
         self.component_info.register()
 
+        self.component_registry = ComponentRegistry(self.zk_client)
+
+        self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
+
     def _runCommand(self):
         while self.command_running:
             try:
@@ -219,14 +209,6 @@ class FingerGateway(object):
             raise
 
     def start(self):
-        self.rpc = zuul.rpcclient.RPCClient(
-            self.gear_server,
-            self.gear_port,
-            self.gear_ssl_key,
-            self.gear_ssl_cert,
-            self.gear_ssl_ca,
-            client_id='Zuul Finger Gateway')
-
         kwargs = dict(
             user=self.user,
             pid_file=self.pid_file,
@@ -278,13 +260,6 @@ class FingerGateway(object):
                 self.server = None
             except Exception:
                 self.log.exception("Error stopping TCP server:")
-
-        if self.rpc:
-            try:
-                self.rpc.shutdown()
-                self.rpc = None
-            except Exception:
-                self.log.exception("Error stopping RCP client:")
 
         if self.command_socket:
             self.command_running = False

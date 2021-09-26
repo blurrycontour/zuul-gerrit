@@ -2225,6 +2225,10 @@ class BuildRequest(JobRequest):
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.event_id = event_id
+        # The executor sets the worker info when it locks the build
+        # request so that zuul web can use this information to
+        # build the url for the live log stream.
+        self.worker_info = None
 
     def toDict(self):
         d = super().toDict()
@@ -2235,12 +2239,13 @@ class BuildRequest(JobRequest):
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "event_id": self.event_id,
+            "worker_info": self.worker_info,
         })
         return d
 
     @classmethod
     def fromDict(cls, data):
-        return cls(
+        request = cls(
             data["uuid"],
             data["zone"],
             data["build_set_uuid"],
@@ -2252,6 +2257,10 @@ class BuildRequest(JobRequest):
             state=data["state"],
             result_path=data["result_path"]
         )
+
+        request.worker_info = data["worker_info"]
+
+        return request
 
     def __repr__(self):
         return (
