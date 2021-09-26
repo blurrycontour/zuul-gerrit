@@ -85,8 +85,7 @@ class Nodepool(object):
     def _sendNodesProvisionedEvent(self, request):
         tenant_name = request.tenant_name
         pipeline_name = request.pipeline_name
-        event = model.NodesProvisionedEvent(
-            request.id, request.job_name, request.build_set_uuid)
+        event = model.NodesProvisionedEvent(request.id, request.build_set_uuid)
         self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def _electionWon(self):
