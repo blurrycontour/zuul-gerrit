@@ -2023,7 +2023,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         # Get the build request object
-        build = list(self.scheds.first.sched.executor.builds.values())[0]
+        build = list(self.getCurrentBuilds())[0]
 
         # We should report using the held node's resources
         self.waitUntilNodeCacheSync(
@@ -2937,7 +2937,7 @@ class TestScheduler(ZuulTestCase):
 
             # Wait until the BuildStartedEvent was processed by the scheduler
             # as we need the worker info in order to cancel a build.
-            builds = self.scheds.first.sched.executor.builds.values()
+            builds = self.getCurrentBuilds()
             if all(b.worker.name != "Unknown" for b in builds):
                 break
 
@@ -5615,17 +5615,18 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.executor.builds), 1)
+        current_builds = list(self.getCurrentBuilds())
+        self.assertEqual(len(current_builds), 1)
 
         self.log.debug('Current builds:')
-        self.log.debug(self.scheds.first.sched.executor.builds)
+        self.log.debug(current_builds)
 
         start = time.time()
         while True:
             if time.time() - start > 10:
                 raise Exception("Timeout waiting for gearman server to report "
                                 + "back to the client")
-            build = list(self.scheds.first.sched.executor.builds.values())[0]
+            build = list(self.getCurrentBuilds())[0]
             if build.worker.name == self.executor_server.hostname:
                 break
             else:
@@ -5804,13 +5805,18 @@ For CI problems and help debugging, contact ci@example.org"""
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
 
-        # Wait for gearman server to send the initial workData back to zuul
+        # Wait for executor server to send the initial workData back to zuul
         start = time.time()
         while True:
             if time.time() - start > 10:
                 raise Exception("Timeout waiting for gearman server to report "
                                 + "back to the client")
-            build = list(self.scheds.first.sched.executor.builds.values())[0]
+            build = list(self.getCurrentBuilds())[0]
+            # TODO (felix): If we don't want to look up the builds from the
+            # pipelines/queues, we could use a DataWatch to listen for
+            # BuildStatus events (which set the worker info). However, this
+            # solution might not be as straight forward and more error prone
+            # due to the nature of watches.
             if build.worker.name == self.executor_server.hostname:
                 break
             else:
