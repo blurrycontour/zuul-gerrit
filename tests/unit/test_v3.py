@@ -838,6 +838,79 @@ class TestBranchMismatch(ZuulTestCase):
         ], ordered=False)
 
 
+class TestBranchRef(ZuulTestCase):
+    tenant_config_file = 'config/branch-ref/main.yaml'
+
+    def test_ref_match(self):
+        # Test that branch matchers for explicit refs work as expected
+        # First, make a branch with another job so we can examine
+        # different branches.
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                tag:
+                  jobs:
+                    - other-job:
+                        branches: "^refs/tags/tag1-.*$"
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # We're going to tag master, which is still at the branch
+        # point for stable, so the tagged commit will appear in both
+        # branches.  This should cause test-job-1 (from the project
+        # config on master) and other-job (from the project config on
+        # stable).
+        event = self.fake_gerrit.addFakeTag('org/project', 'master', 'tag1-a')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='other-job', result='SUCCESS', ref='refs/tags/tag1-a'),
+            dict(name='test-job-1', result='SUCCESS', ref='refs/tags/tag1-a')],
+            ordered=False)
+
+        # Next, merge a noop change to master so that we can tag a
+        # commit that's unique to master.
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # This tag should only run test-job-1, since it doesn't appear
+        # in stable, it doesn't get that project config applied.
+        event = self.fake_gerrit.addFakeTag('org/project', 'master', 'tag1-b')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='other-job', result='SUCCESS', ref='refs/tags/tag1-a'),
+            dict(name='test-job-1', result='SUCCESS', ref='refs/tags/tag1-a'),
+            dict(name='test-job-1', result='SUCCESS', ref='refs/tags/tag1-b')],
+            ordered=False)
+
+        # Now tag the same commit with the other format; we should get
+        # only test-job-2 added.
+        event = self.fake_gerrit.addFakeTag('org/project', 'master', 'tag2-a')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='other-job', result='SUCCESS', ref='refs/tags/tag1-a'),
+            dict(name='test-job-1', result='SUCCESS', ref='refs/tags/tag1-a'),
+            dict(name='test-job-1', result='SUCCESS', ref='refs/tags/tag1-b'),
+            dict(name='test-job-2', result='SUCCESS', ref='refs/tags/tag2-a')],
+            ordered=False)
+
+
 class TestAllowedProjects(ZuulTestCase):
     tenant_config_file = 'config/allowed-projects/main.yaml'
 

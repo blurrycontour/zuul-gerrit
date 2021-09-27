@@ -815,6 +815,13 @@ Here is an example of two job definitions:
       the commit referenced by the tag.  If any of those branches match a
       branch matcher, the matcher is considered to have matched.
 
+      Additionally in the case of a tag item, if the expression
+      matches the full name of the ref (eg, `refs/tags/foo`) then the
+      job is considered to match.  The preceding section still
+      applies, so the definition must appear in a branch containing
+      the commit referenced by the tag to be considered, and then the
+      expression must also match the tag.
+
       This example illustrates a job called *run-tests* which uses a
       nodeset based on the current release of an operating system to
       perform its tests, except when testing changes to the stable/2.0
