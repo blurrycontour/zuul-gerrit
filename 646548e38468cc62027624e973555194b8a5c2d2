@@ -107,6 +107,24 @@
       "revId": "646548e38468cc62027624e973555194b8a5c2d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "47ddedd4_3d931482",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2017,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-09-27T05:19:30Z",
+      "side": 1,
+      "message": "This is (kind of) related to the TODO block at line 2005. Not sure if that is a problem or not, but I wanted to write it down somewhere. I think it shouldn\u0027t matter too much as the result is outdated anyways, so we might just remove the TODO and the (not build.retry) expression.",
+      "parentUuid": "43ccdea6_07dd3f3f",
+      "revId": "646548e38468cc62027624e973555194b8a5c2d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
