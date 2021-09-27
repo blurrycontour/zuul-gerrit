@@ -19,27 +19,35 @@ import { Link } from 'react-router-dom'
 import {
   DataList,
   DataListCell,
+  DataListContent,
   DataListItem,
   DataListItemRow,
   DataListItemCells,
   Flex,
   FlexItem,
+  List,
+  ListItem,
   Switch,
 } from '@patternfly/react-core'
 import {
   AngleDownIcon,
   AngleRightIcon,
+  FileCodeIcon,
+  FingerprintIcon,
+  OutlinedCalendarAltIcon,
   OutlinedClockIcon
 } from '@patternfly/react-icons'
 import 'moment-duration-format'
 import * as moment from 'moment'
 
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
+import { ExternalLink } from '../../Misc'
 
 class BuildList extends React.Component {
   static propTypes = {
     builds: PropTypes.array,
     tenant: PropTypes.object,
+    timezone: PropTypes.string,
   }
 
   // TODO (felix): Add a property "isCompact" to be used on the buildresult
@@ -59,6 +67,7 @@ class BuildList extends React.Component {
     this.state = {
       visibleNonFinalBuilds: retriedJobs,
       retriedJobs: retriedJobs,
+      detailedBuild: null,
     }
   }
 
@@ -135,6 +144,88 @@ class BuildList extends React.Component {
     )
   }
 
+  renderBuildInfo = (build) => {
+    const { timezone } = this.props
+    const { detailedBuild } = this.state
+    return <DataListContent
+      id={`${build.uuid}-details`}
+      isHidden={detailedBuild !== build.uuid}
+      onMouseOver={() => { this.setState({ detailedBuild: build.uuid }) }}
+    >
+      <Flex className="zuul-build-attributes"
+        style={{
+          color: 'var(--pf-global--Color--200)',
+          borderRadius: '4px',
+          border: '1px solid rgba(0,0,0,.1)',
+        }}
+      >
+        <Flex flex={{ lg: 'flex_1' }}>
+          <FlexItem>
+            <List style={{ listStyle: 'none' }}>
+              <IconProperty
+                WrapElement={ListItem}
+                icon={<FingerprintIcon />}
+                value={
+                  <span>
+                    <strong>UUID </strong> {build.uuid} <br />
+                  </span>
+                }
+              />
+            </List>
+          </FlexItem>
+        </Flex>
+        <Flex flex={{ lg: 'flex_1' }}>
+          <FlexItem>
+            <List style={{ listStyle: 'none' }}>
+              <IconProperty
+                WrapElement={ListItem}
+                icon={<OutlinedCalendarAltIcon />}
+                value={
+                  <span>
+                    <strong>Started at </strong>
+                    {moment
+                      .utc(build.start_time)
+                      .tz(timezone)
+                      .format('YYYY-MM-DD HH:mm:ss')}
+                    <br />
+                    <strong>Completed at </strong>
+                    {moment
+                      .utc(build.end_time)
+                      .tz(timezone)
+                      .format('YYYY-MM-DD HH:mm:ss')}
+                  </span>
+                }
+              />
+            </List>
+          </FlexItem>
+        </Flex>
+        <Flex flex={{ lg: 'flex_1' }}>
+          <FlexItem>
+            <List style={{ listStyle: 'none' }}>
+              <IconProperty
+                WrapElement={ListItem}
+                icon={<FileCodeIcon />}
+                value={
+                  build.log_url ? (
+                    <ExternalLink target={build.log_url}>View log</ExternalLink>
+                  ) : (
+                    <span
+                      style={{
+                        color: 'var(--pf-global--disabled-color--100)',
+                      }}
+                    >
+                      No log available
+                    </span>
+                  )
+                }
+              />
+            </List>
+          </FlexItem>
+        </Flex>
+      </Flex>
+    </DataListContent>
+  }
+
   render() {
     const { tenant } = this.props
     const { visibleNonFinalBuilds, retriedJobs } = this.state
@@ -157,6 +248,7 @@ class BuildList extends React.Component {
         {retrySwitch}
         <FlexItem>
           <DataList
+            onMouseOut={() => { this.setState({ detailedBuild: null }) }}
             className="zuul-build-list"
             isCompact
             style={{ fontSize: 'var(--pf-global--FontSize--md)' }}
@@ -178,6 +270,7 @@ class BuildList extends React.Component {
               return (
                 <DataListItem key={build.uuid || build.job_name} id={build.uuid}>
                   <DataListItemRow
+                    onMouseOver={() => { this.setState({ detailedBuild: build.uuid }) }}
                     style={!build.final ? { backgroundColor: 'var(--pf-global--BackgroundColor--light-200)' } : {}}>
                     <DataListItemCells
                       dataListCells={[
@@ -209,6 +302,7 @@ class BuildList extends React.Component {
                       ]}
                     />
                   </DataListItemRow>
+                  {this.renderBuildInfo(build)}
                 </DataListItem>
               )
             })}
@@ -219,4 +313,4 @@ class BuildList extends React.Component {
   }
 }
 
-export default connect((state) => ({ tenant: state.tenant }))(BuildList)
+export default connect((state) => ({ tenant: state.tenant, timezone: state.timezone }))(BuildList)
