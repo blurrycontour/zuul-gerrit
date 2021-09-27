@@ -4429,6 +4429,96 @@ class TestRoleBranches(RoleTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+    def test_playbook_role_branches_cross_repo(self):
+        # This tests that the correct branch of a repo which contains
+        # a playbook or a role is checked out.  Most of the action
+        # happens on project1, which holds a parent job, so that we
+        # can test the behavior of a project which is not in the
+        # dependency chain.
+        # Both project2 and common-config will have a master and
+        # release branch. The release branch on project2 that will be
+        # tagged. project1 only has a master branch.
+        self.create_branch('project2', 'release')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'project2', 'release'))
+        self.create_branch('common-config', 'release')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'common-config', 'release'))
+        self.waitUntilSettled()
+
+        self._addPlaybook('project1', 'master', 'parent-job-pre', 'base-role')
+        # Add unique roles for the release/master branch
+        self._addRole('common-config', 'release', 'release-role')
+        self._addRole('common-config', 'master', 'master-role')
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.executor_server.hold_jobs_in_build = True
+
+        # Create a change for the release branch
+        A = self.fake_gerrit.addFakeChange('project2', 'release', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 3)
+
+        build = self.getBuildByName('child-job')
+        # We are looking at the pre playbook of project1 that only
+        # has a master branch, but should still use the release-role
+        # from common-config, since it has a release branch.
+        self._assertInRolePath(build, 'pre_playbook_1', ['release-role'])
+        self._assertInFile(build.jobdir.pre_playbooks[1].path, 'base-role')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_playbook_role_branches_cross_repo_tag(self):
+        # This tests that the correct branch of a repo which contains
+        # a playbook or a role is checked out.  Most of the action
+        # happens on project1, which holds a parent job, so that we
+        # can test the behavior of a project which is not in the
+        # dependency chain.
+        # Both project2 and common-config will have a master and
+        # release branch. The release branch on project2 that will be
+        # tagged. project1 only has a master branch.
+        self.create_branch('project2', 'release')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'project2', 'release'))
+        self.create_branch('common-config', 'release')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'common-config', 'release'))
+        self.waitUntilSettled()
+
+        self._addPlaybook('project1', 'master', 'parent-job-pre', 'base-role')
+        # Add unique roles for the release/master branch
+        self._addRole('common-config', 'release', 'release-role')
+        self._addRole('common-config', 'master', 'master-role')
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.executor_server.hold_jobs_in_build = True
+
+        # Create a tag on the release branch
+        event = self.fake_gerrit.addFakeTag('project2', 'release', 'foo')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 3)
+
+        build = self.getBuildByName('child-job')
+        # We are looking at the pre playbook of project1 that only
+        # has a master branch, but should still use the release-role
+        # from common-config, since it has a release branch.
+        self._assertInRolePath(build, 'pre_playbook_1', ['release-role'])
+        self._assertInFile(build.jobdir.pre_playbooks[1].path, 'base-role')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
 
 class TestRoles(RoleTestCase):
     tenant_config_file = 'config/roles/main.yaml'
