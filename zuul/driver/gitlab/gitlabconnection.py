@@ -258,7 +258,7 @@ class GitlabAPIClient():
         self.session = requests.Session()
         retry = urllib3.util.Retry(total=8,
                                    backoff_factor=0.1)
-        adapter = requests.adapters.HTTPAdapter(retry)
+        adapter = requests.adapters.HTTPAdapter(max_retries=retry)
         self.session.mount(baseurl, adapter)
         self.baseurl = '%s/api/v4' % baseurl
         self.api_token = api_token
