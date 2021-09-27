@@ -21,6 +21,7 @@
         executable: /bin/sh
         chdir: "{{ project_tmp.stdout }}"
         cmd: |
+          set -e
           git init .
           git config user.name "Admin"
           git config user.email "admin@example.com"

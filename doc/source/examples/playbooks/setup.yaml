@@ -3,6 +3,7 @@
   tasks:
     - name: Generate ZooKeeper certs
       shell: |
+        set -e
         /var/zuul-tools/zk-ca.sh /var/certs examples_zk_1.examples_default
         chmod -R a+rX /var/certs
     - name: Wait for Gerrit to start
@@ -64,6 +65,7 @@
         dest: "{{ all_projects_repo }}/project.config"
     - name: Update All-Projects config in Gerrit
       shell: |
+        set -e
         git config user.email 'admin@example.com'
         git commit -a -m 'update config'
         git push http://admin:secret@gerrit:8080/All-Projects +HEAD:refs/meta/config
