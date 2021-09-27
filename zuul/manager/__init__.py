@@ -622,7 +622,6 @@ class PipelineManager(metaclass=ABCMeta):
     def dequeueItem(self, item):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Removing change %s from queue", item.change)
-        item.queue.dequeueItem(item)
         # In case a item is dequeued that doesn't have a result yet
         # (success/failed/...) we report it as dequeued.
         # Without this check, all items with a valid result would be reported
@@ -630,6 +629,7 @@ class PipelineManager(metaclass=ABCMeta):
         if not item.current_build_set.result and item.live:
             item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
+        item.queue.dequeueItem(item)
 
     def removeItem(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -1280,7 +1280,6 @@ class PipelineManager(metaclass=ABCMeta):
             log.info("Dequeuing change %s because "
                      "it can no longer merge" % item.change)
             self.cancelJobs(item)
-            self.dequeueItem(item)
             if item.isBundleFailing():
                 item.setDequeuedBundleFailing()
             else:
@@ -1290,6 +1289,7 @@ class PipelineManager(metaclass=ABCMeta):
                     self.reportItem(item)
                 except exceptions.MergeFailure:
                     pass
+            self.dequeueItem(item)
             return (True, nnfi)
 
         actionable = change_queue.isActionable(item)
