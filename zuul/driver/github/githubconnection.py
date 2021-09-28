@@ -1308,41 +1308,37 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
             change.number = number
             change.patchset = patchset
 
-        try:
-            # This can be called multi-threaded during github event
-            # preprocessing. In order to avoid data races perform locking
-            # by cached key. Try to acquire the lock non-blocking at first.
-            # If the lock is already taken we're currently updating the very
-            # same chnange right now and would likely get the same data again.
-            lock = self._change_update_lock.setdefault(key, threading.Lock())
-            if lock.acquire(blocking=False):
-                try:
-                    pull = self.getPull(change.project.name, change.number,
-                                        event=event)
 
-                    def _update_change(c):
-                        self._updateChange(c, event, pull)
+        # This can be called multi-threaded during github event
+        # preprocessing. In order to avoid data races perform locking
+        # by cached key. Try to acquire the lock non-blocking at first.
+        # If the lock is already taken we're currently updating the very
+        # same chnange right now and would likely get the same data again.
+        lock = self._change_update_lock.setdefault(key, threading.Lock())
+        if lock.acquire(blocking=False):
+            try:
+                pull = self.getPull(change.project.name, change.number,
+                                    event=event)
 
-                    change = self._change_cache.updateChangeWithRetry(
-                        key, change, _update_change)
-                finally:
-                    # We need to remove the lock here again so we don't leak
-                    # them.
-                    del self._change_update_lock[key]
-                    lock.release()
-            else:
-                # We didn't get the lock so we don't need to update the same
-                # change again, but to be correct we should at least wait until
-                # the other thread is done updating the change.
-                log = get_annotated_logger(self.log, event)
-                log.debug("Change %s is currently being updated, "
-                          "waiting for it to finish", change)
-                with lock:
-                    log.debug('Finished updating change %s', change)
-        except Exception:
-            self.log.warning("Deleting cache key %s due to exception", key)
-            self._change_cache.delete(key)
-            raise
+                def _update_change(c):
+                    self._updateChange(c, event, pull)
+
+                change = self._change_cache.updateChangeWithRetry(
+                    key, change, _update_change)
+            finally:
+                # We need to remove the lock here again so we don't leak
+                # them.
+                del self._change_update_lock[key]
+                lock.release()
+        else:
+            # We didn't get the lock so we don't need to update the same
+            # change again, but to be correct we should at least wait until
+            # the other thread is done updating the change.
+            log = get_annotated_logger(self.log, event)
+            log.debug("Change %s is currently being updated, "
+                      "waiting for it to finish", change)
+            with lock:
+                log.debug('Finished updating change %s', change)
         return change
 
     def _getTag(self, project, event):

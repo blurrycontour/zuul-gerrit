@@ -617,21 +617,17 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
             change.uris = [
                 '%s/%s/pull/%s' % (self.baseurl, project, number),
             ]
-        try:
-            self.log.debug("Getting change pr#%s from project %s" % (
-                number, project.name))
-            self.log.info("Updating change from pagure %s" % change)
-            pull = self.getPull(change.project.name, change.number)
 
-            def _update_change(c):
-                self._updateChange(c, event, pull)
+        self.log.debug("Getting change pr#%s from project %s" % (
+            number, project.name))
+        self.log.info("Updating change from pagure %s" % change)
+        pull = self.getPull(change.project.name, change.number)
 
-            change = self._change_cache.updateChangeWithRetry(key, change,
-                                                              _update_change)
-        except Exception:
-            self.log.warning("Deleting cache key %s due to exception", key)
-            self._change_cache.delete(key)
-            raise
+        def _update_change(c):
+            self._updateChange(c, event, pull)
+
+        change = self._change_cache.updateChangeWithRetry(key, change,
+                                                          _update_change)
         return change
 
     def _getNonPRRef(self, project, event):

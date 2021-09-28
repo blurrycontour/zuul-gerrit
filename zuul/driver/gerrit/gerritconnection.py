@@ -775,11 +775,7 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
             change = GerritChange(None)
             change.number = number
             change.patchset = patchset
-        try:
-            return self._updateChange(key, change, event, history)
-        except Exception:
-            self._change_cache.delete(key)
-            raise
+        return self._updateChange(key, change, event, history)
 
     def _getTag(self, event):
         tag = event.ref[len('refs/tags/'):]

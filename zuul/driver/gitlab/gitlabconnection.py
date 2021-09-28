@@ -539,21 +539,17 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
             change.patchset = patch_number
             change.url = url or self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
-        try:
-            log.debug("Getting change mr#%s from project %s" % (
-                number, project.name))
-            log.info("Updating change from Gitlab %s" % change)
-            mr = self.getMR(change.project.name, change.number, event=event)
 
-            def _update_change(c):
-                self._updateChange(c, event, mr)
+        log.debug("Getting change mr#%s from project %s" % (
+            number, project.name))
+        log.info("Updating change from Gitlab %s" % change)
+        mr = self.getMR(change.project.name, change.number, event=event)
 
-            change = self._change_cache.updateChangeWithRetry(key, change,
-                                                              _update_change)
-        except Exception:
-            self.log.warning("Deleting cache key %s due to exception", key)
-            self._change_cache.delete(key)
-            raise
+        def _update_change(c):
+            self._updateChange(c, event, mr)
+
+        change = self._change_cache.updateChangeWithRetry(key, change,
+                                                          _update_change)
         return change
 
     def _updateChange(self, change, event, mr):
