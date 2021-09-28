@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d27dcba6_825d0ade",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-28T08:21:13Z",
+      "side": 1,
+      "message": "I am not knowledgeable enough in css to improve this. Input welcome!",
+      "range": {
+        "startLine": 155,
+        "startChar": 0,
+        "endLine": 161,
+        "endChar": 7
+      },
+      "revId": "85d3157f4e6129b3169555b2ae0ac9250dbcdcac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
