@@ -16,6 +16,23 @@
       "revId": "0a29ddcc1693de5c5ecc94d416f2689294f963f8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b4a0c33_c1c3dd14",
+        "filename": "tests/unit/test_timer_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-28T22:36:06Z",
+      "side": 1,
+      "message": "We could, but I think/hope that we have \"pipeline runs the right job\" covered elsewhere.  I tried to give Zuul as much rope as possible here to get it wrong (by ensuring that we don\u0027t do something based on the job before we get to the point where an incorrect change object would cause an error).  If we added other jobs, we\u0027d have to at least run 12 jobs in the test (instead of 4) in order to allow for all error possibilities.",
+      "revId": "0a29ddcc1693de5c5ecc94d416f2689294f963f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
