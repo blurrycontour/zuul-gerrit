@@ -15,6 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
 import {
   CodeIcon,
@@ -23,13 +24,37 @@ import {
   CubeIcon,
   FingerprintIcon,
   StreamIcon,
+  OutlinedCalendarAltIcon,
+  OutlinedClockIcon,
 } from '@patternfly/react-icons'
+import * as moment from 'moment'
+import 'moment-duration-format'
 
 import { buildExternalLink } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 
-function Buildset({ buildset }) {
+function Buildset({ buildset, timezone, tenant }) {
   const buildset_link = buildExternalLink(buildset)
+
+  const firstStartBuild = buildset.builds.reduce(
+    (prev, cur) => (prev.start_time < cur.start_time ? prev : cur)
+  )
+  const lastEndBuild = buildset.builds.reduce(
+    (prev, cur) => (prev.end_time > cur.end_time ? prev : cur)
+  )
+  const totalDuration = (
+    moment.utc(lastEndBuild.end_time).tz(timezone)
+    - moment.utc(firstStartBuild.start_time).tz(timezone)) / 1000
+
+  const buildLink = (build) => (
+    <Link
+      to={`${tenant.linkPrefix}/build/${build.uuid}`}
+    >
+      {build.job_name}
+    </Link>
+  )
+  const firstStartLink = buildLink(firstStartBuild)
+  const lastEndLink = buildLink(lastEndBuild)
 
   return (
     <>
@@ -111,6 +136,43 @@ function Buildset({ buildset }) {
             <List style={{ listStyle: 'none' }}>
               <IconProperty
                 WrapElement={ListItem}
+                icon={<OutlinedCalendarAltIcon />}
+                value={
+                  <span>
+                    <strong>Starting build </strong>
+                    {firstStartLink} <i>(started {moment
+                      .utc(firstStartBuild.start_time)
+                      .tz(timezone)
+                      .format('YYYY-MM-DD HH:mm:ss')})</i>
+                    <br />
+                    <strong>Ending build </strong>
+                    {lastEndLink} <i>(ended {moment
+                      .utc(lastEndBuild.end_time)
+                      .tz(timezone)
+                      .format('YYYY-MM-DD HH:mm:ss')})</i>
+                  </span>
+                }
+              />
+              <IconProperty
+                WrapElement={ListItem}
+                icon={<OutlinedClockIcon />}
+                value={
+                  <>
+                    <strong>Total duration </strong>
+                    {moment
+                      .duration(totalDuration, 'seconds')
+                      .format('h [hr] m [min] s [sec]')}
+                  </>
+                }
+              />
+            </List>
+          </FlexItem>
+        </Flex>
+        <Flex flex={{ default: 'flex_1' }}>
+          <FlexItem>
+            <List style={{ listStyle: 'none' }}>
+              <IconProperty
+                WrapElement={ListItem}
                 icon={<OutlinedCommentDotsIcon />}
                 value={
                   <>
@@ -130,6 +192,10 @@ function Buildset({ buildset }) {
 Buildset.propTypes = {
   buildset: PropTypes.object,
   tenant: PropTypes.object,
+  timezone: PropTypes.string,
 }
 
-export default connect((state) => ({ tenant: state.tenant }))(Buildset)
+export default connect((state) => ({
+  tenant: state.tenant,
+  timezone: state.timezone,
+}))(Buildset)
