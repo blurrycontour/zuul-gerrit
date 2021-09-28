@@ -779,7 +779,7 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
 
     def _getTag(self, event):
         tag = event.ref[len('refs/tags/'):]
-        key = ChangeKey(self.connection_name, None,
+        key = ChangeKey(self.connection_name, event.project_name,
                         'Tag', tag, event.newrev)
         change = self._change_cache.get(key)
         if change:
@@ -798,7 +798,7 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         return change
 
     def _getBranch(self, event, branch, ref):
-        key = ChangeKey(self.connection_name, None,
+        key = ChangeKey(self.connection_name, event.project_name,
                         'Branch', branch, event.newrev)
         change = self._change_cache.get(key)
         if change:
@@ -817,7 +817,7 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         return change
 
     def _getRef(self, event):
-        key = ChangeKey(self.connection_name, None,
+        key = ChangeKey(self.connection_name, event.project_name,
                         'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
