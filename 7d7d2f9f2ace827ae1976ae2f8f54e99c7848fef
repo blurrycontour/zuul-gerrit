@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "163ed67d_fc99ede0",
+        "filename": "zuul/lib/times.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-28T20:39:36Z",
+      "side": 1,
+      "message": "Got it.",
+      "parentUuid": "4937df15_abb35699",
+      "revId": "7d7d2f9f2ace827ae1976ae2f8f54e99c7848fef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1990c644_5e740731",
         "filename": "zuul/lib/times.py",
         "patchSetId": 12
@@ -70,6 +88,24 @@
       "writtenOn": "2021-09-28T20:37:52Z",
       "side": 1,
       "message": "Maybe?  But duration\u003d0 builds probably have something wrong with them anyway.",
+      "revId": "7d7d2f9f2ace827ae1976ae2f8f54e99c7848fef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c687dbe_c73c738a",
+        "filename": "zuul/lib/times.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-28T20:39:36Z",
+      "side": 1,
+      "message": "I brought it up due to our testing of any() and list comprehensions previously. Don\u0027t feel super strongly about it.",
+      "parentUuid": "a440c134_edc2b8ba",
       "revId": "7d7d2f9f2ace827ae1976ae2f8f54e99c7848fef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
