@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "4937df15_abb35699",
+        "filename": "zuul/lib/times.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-28T20:37:52Z",
+      "side": 1,
+      "message": "Well, self.running should be false and it\u0027ll exit.  We\u0027re not taking advantage of it now, but I think of the None queue item as just a signal to get out of the \u0027get\u0027 call.  There\u0027s no other signal but \u0027stop\u0027 now, but there could be.",
+      "revId": "7d7d2f9f2ace827ae1976ae2f8f54e99c7848fef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1990c644_5e740731",
         "filename": "zuul/lib/times.py",
         "patchSetId": 12
@@ -39,6 +56,23 @@
       "revId": "7d7d2f9f2ace827ae1976ae2f8f54e99c7848fef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a440c134_edc2b8ba",
+        "filename": "zuul/lib/times.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-28T20:37:52Z",
+      "side": 1,
+      "message": "Maybe?  But duration\u003d0 builds probably have something wrong with them anyway.",
+      "revId": "7d7d2f9f2ace827ae1976ae2f8f54e99c7848fef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
