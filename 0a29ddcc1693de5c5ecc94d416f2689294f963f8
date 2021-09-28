@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "579c38a4_952b53dc",
+        "filename": "tests/unit/test_timer_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-09-28T22:30:24Z",
+      "side": 1,
+      "message": "Does it make sense to create a test-job1 and test-job2 for the respective tenants and projects then also check that the jobs don\u0027t leak across? I think this is sufficient to prevent regressions like the current bug we are fixing, but wonder if this would be good belts and suspenders against potential other issues.",
+      "revId": "0a29ddcc1693de5c5ecc94d416f2689294f963f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
