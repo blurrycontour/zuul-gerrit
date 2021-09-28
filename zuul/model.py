@@ -2822,7 +2822,7 @@ class QueueItem(zkobject.ZKObject):
                 "data": self.event.toDict(),
             },
             "dynamic_state": self.dynamic_state,
-            # "bundle": self.bundle and self.bundle.serialize(),
+            "bundle": self.bundle and self.bundle.serialize(),
             "dequeued_bundle_failing": self.dequeued_bundle_failing,
         }
         return json.dumps(data).encode("utf8")
@@ -2858,11 +2858,15 @@ class QueueItem(zkobject.ZKObject):
         change = self.pipeline.manager.resolveChangeKeys(
             [data["change"]])[0]
 
+        bundle = data["bundle"] and Bundle.deserialize(
+            self.pipeline.manager.current_context, self.queue, data["bundle"])
+
         data.update({
             "event": event,
             "change": change,
             "log": get_annotated_logger(self.log, event),
-            "dynamic_state": defaultdict(dict, data["dynamic_state"])
+            "dynamic_state": defaultdict(dict, data["dynamic_state"]),
+            "bundle": bundle,
         })
         return data
 
@@ -3833,6 +3837,48 @@ class Bundle:
 
     def updatesConfig(self, tenant):
         return any(i.change.updatesConfig(tenant) for i in self.items)
+
+    def serialize(self):
+        return {
+            "items": [i.getPath() for i in self.items],
+            "started_reporting": self.started_reporting,
+            "failed_reporting": self.failed_reporting,
+            "cannot_merge": self.cannot_merge,
+        }
+
+    @classmethod
+    def deserialize(cls, context, queue, data):
+        # Collect all known items
+        existing_items = {}
+        for item in queue.queue:
+            existing_items[item.getPath()] = item
+            if item.bundle:
+                # We need to consider items that are part of a bundle
+                # as some items might have been dequeued aready.
+                existing_items.update({
+                    i.getPath(): i for i in item.bundle.items
+                })
+
+        relevant_items = {p: i for p, i in existing_items.items()
+                          if p in data["items"]}
+
+        bundle = cls()
+        for bundle_item in relevant_items.values():
+            # Re-use existing bundle instance
+            bundle = bundle_item.bundle
+            if bundle_item not in queue.queue:
+                # We need to refresh items that are part of a bundle
+                # but were already dequeued.
+                bundle_item.refresh(context)
+
+        bundle.items = [
+            relevant_items.get(p) or QueueItem.fromZK(context, p)
+            for p in data["items"]
+        ]
+        bundle.started_reporting = data["started_reporting"]
+        bundle.failed_reporting = data["failed_reporting"]
+        bundle.cannot_merge = data["cannot_merge"]
+        return bundle
 
 
 # Cache info of a ref
