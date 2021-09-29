@@ -102,3 +102,37 @@ class TestScaleOutScheduler(ZuulTestCase):
             if all(l == new for l in layout_states):
                 break
         self.waitUntilSettled()
+
+    def test_change_cache(self):
+        # Test re-using a change from the change cache.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+
+        B.setDependsOn(A, 1)
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # This has populated the change cache with our change.
+
+        app = self.create_scheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            # Enqueue the change again.  The second scheduler will
+            # load the change object from the cache.
+            self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+            self.waitUntilSettled(matcher=[app])
+
+        # Each job should appear twice and contain both changes.
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)
