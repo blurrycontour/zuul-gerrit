@@ -16,6 +16,23 @@
       "revId": "9e1118615c414db4a1b96176e18cebe41437e405",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99397fae_4a5b66fe",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-09-29T22:29:33Z",
+      "side": 1,
+      "message": "Right, this is deep enough in the startup that we\u0027d get exceptions trying to test it if so.",
+      "revId": "9e1118615c414db4a1b96176e18cebe41437e405",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
