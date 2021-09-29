@@ -65,7 +65,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             mark = err.key.mark
             if not (context and mark and err.short_error):
                 continue
-            if context.project != item.change.project:
+            if context.project_canonical_name != \
+                    item.change.project.canonical_name:
                 continue
             if not hasattr(item.change, 'branch'):
                 continue

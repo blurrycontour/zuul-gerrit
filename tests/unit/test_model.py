@@ -53,10 +53,12 @@ class TestJob(BaseTestCase):
         self.layout = model.Layout(self.tenant)
         self.tenant.layout = self.layout
         self.project = model.Project('project', self.source)
-        self.context = model.SourceContext(self.project, 'master',
-                                           'test', True)
-        self.untrusted_context = model.SourceContext(self.project, 'master',
-                                                     'test', False)
+        self.context = model.SourceContext(
+            self.project.canonical_name, self.project.name,
+            self.project.connection_name, 'master', 'test', True)
+        self.untrusted_context = model.SourceContext(
+            self.project.canonical_name, self.project.name,
+            self.project.connection_name, 'master', 'test', False)
         self.tpc = model.TenantProjectConfig(self.project)
         self.tenant.addUntrustedProject(self.tpc)
         self.pipeline = model.Pipeline('gate', self.tenant)
@@ -275,8 +277,9 @@ class TestJob(BaseTestCase):
 
     def test_job_source_project(self):
         base_project = model.Project('base_project', self.source)
-        base_context = model.SourceContext(base_project, 'master',
-                                           'test', True)
+        base_context = model.SourceContext(
+            base_project.canonical_name, base_project.name,
+            base_project.connection_name, 'master', 'test', True)
         tpc = model.TenantProjectConfig(base_project)
         self.tenant.addUntrustedProject(tpc)
 
@@ -289,8 +292,9 @@ class TestJob(BaseTestCase):
         self.layout.addJob(base)
 
         other_project = model.Project('other_project', self.source)
-        other_context = model.SourceContext(other_project, 'master',
-                                            'test', True)
+        other_context = model.SourceContext(
+            other_project.canonical_name, other_project.name,
+            other_project.connection_name, 'master', 'test', True)
         tpc = model.TenantProjectConfig(other_project)
         self.tenant.addUntrustedProject(tpc)
         base2 = self.pcontext.job_parser.fromYaml({
