@@ -834,7 +834,7 @@ class PipelineManager(metaclass=ABCMeta):
         for err in layout.loading_errors.errors:
             econtext = err.key.context
             if ((err.key not in parent_error_keys) or
-                (econtext.project == item.change.project.name and
+                (econtext.project_name == item.change.project.name and
                  econtext.branch == item.change.branch)):
                 relevant_errors.append(err)
         return relevant_errors
@@ -1029,7 +1029,8 @@ class PipelineManager(metaclass=ABCMeta):
 
             # Add all protected branches of all involved projects
             for project in projects:
-                branches.update(tenant.getProjectBranches(project))
+                branches.update(
+                    tenant.getProjectBranches(project.canonical_name))
 
             # Additionally add all target branches of all involved items.
             branches.update(item.change.branch for item in items

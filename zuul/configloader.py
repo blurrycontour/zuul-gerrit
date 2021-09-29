@@ -172,7 +172,7 @@ class YAMLDuplicateKeyError(ConfigurationSyntaxError):
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a syntax error while parsing its configuration in the
         repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project.name,
+            repo=context.project_name,
             branch=context.branch,
         )))
 
@@ -215,7 +215,7 @@ def project_configuration_exceptions(context, accumulator):
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered an error while accessing the repo {repo}.  The error
         was:""".format(
-            repo=context.project.name,
+            repo=context.project_name,
         )))
 
         m = textwrap.dedent("""\
@@ -238,7 +238,7 @@ def early_configuration_exceptions(context):
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a syntax error while parsing its configuration in the
         repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project.name,
+            repo=context.project_name,
             branch=context.branch,
         )))
 
@@ -265,7 +265,7 @@ def configuration_exceptions(stanza, conf, accumulator):
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a syntax error while parsing its configuration in the
         repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project.name,
+            repo=context.project_name,
             branch=context.branch,
         )))
 
@@ -301,7 +301,7 @@ def reference_exceptions(stanza, obj, accumulator):
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a syntax error while parsing its configuration in the
         repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project.name,
+            repo=context.project_name,
             branch=context.branch,
         )))
 
@@ -400,7 +400,7 @@ repo {repo} on branch {branch}.  The error was:
 
   {error}
 """
-        m = m.format(repo=context.project.name,
+        m = m.format(repo=context.project_name,
                      branch=context.branch,
                      error=str(e))
         raise ConfigurationSyntaxError(m)
@@ -722,7 +722,7 @@ class JobParser(object):
         if secrets and not conf['_source_context'].trusted:
             job.post_review = True
             job.allowed_projects = frozenset((
-                conf['_source_context'].project.name,))
+                conf['_source_context'].project_name,))
 
         if (conf.get('timeout') and
             self.pcontext.tenant.max_job_timeout != -1 and
@@ -934,11 +934,11 @@ class JobParser(object):
                               project.canonical_name)
 
     def _makeImplicitRole(self, job):
-        project = job.source_context.project
-        name = project.name.split('/')[-1]
+        project_name = job.source_context.project_name
+        name = project_name.split('/')[-1]
         name = JobParser.ANSIBLE_ROLE_RE.sub('', name) or name
         return model.ZuulRole(name,
-                              project.canonical_name,
+                              job.source_context.project_canonical_name,
                               implicit=True)
 
 
@@ -1072,15 +1072,16 @@ class ProjectParser(object):
         self.schema(conf)
 
         project_name = conf.get('name')
+        source_context = conf['_source_context']
         if not project_name:
             # There is no name defined so implicitly add the name
             # of the project where it is defined.
-            project_name = (conf['_source_context'].project.canonical_name)
+            project_name = (source_context.project_canonical_name)
 
         if project_name.startswith('^'):
             # regex matching is designed to match other projects so disallow
             # in untrusted contexts
-            if not conf['_source_context'].trusted:
+            if not source_context.trusted:
                 raise ProjectNotPermittedError()
 
             # Parse the project as a template since they're mostly the
@@ -1094,8 +1095,9 @@ class ProjectParser(object):
             if project is None:
                 raise ProjectNotFoundError(project_name)
 
-            if not conf['_source_context'].trusted:
-                if project != conf['_source_context'].project:
+            if not source_context.trusted:
+                if project.canonical_name != \
+                        source_context.project_canonical_name:
                     raise ProjectNotPermittedError()
 
             # Parse the project as a template since they're mostly the
@@ -1109,11 +1111,11 @@ class ProjectParser(object):
             # branch matchers for arbitrary branches, but project
             # stanzas should not.  They should either have the current
             # branch or no branch matcher.
-            if conf['_source_context'].trusted:
+            if source_context.trusted:
                 project_config.setImpliedBranchMatchers([])
             else:
                 project_config.setImpliedBranchMatchers(
-                    [conf['_source_context'].branch])
+                    [source_context.branch])
 
         # Add templates
         for name in conf.get('templates', []):
@@ -1460,7 +1462,7 @@ class ParseContext(object):
         # If this project only has one branch, don't create implied
         # branch matchers.  This way central job repos can work.
         branches = self.tenant.getProjectBranches(
-            source_context.project)
+            source_context.project_canonical_name)
         if len(branches) == 1:
             return None
 
@@ -1575,7 +1577,8 @@ class TenantParser(object):
         loading_errors = model.LoadingErrors()
 
         for tpc in config_tpcs + untrusted_tpcs:
-            source_context = model.ProjectContext(tpc.project)
+            source_context = model.ProjectContext(
+                tpc.project.canonical_name, tpc.project.name)
             with project_configuration_exceptions(source_context,
                                                   loading_errors):
                 self._getProjectBranches(tenant, tpc)
@@ -1633,7 +1636,7 @@ class TenantParser(object):
             _, project = tenant.getProject(sp)
             if project is None:
                 raise ProjectNotFoundError(sp)
-            shadow_projects.append(project)
+            shadow_projects.append(project.canonical_name)
         tpc.shadow_projects = frozenset(shadow_projects)
 
     def _getProjectBranches(self, tenant, tpc):
@@ -1770,7 +1773,7 @@ class TenantParser(object):
             # branch.  Remember the branch and then implicitly add a
             # branch selector to each job there.  This makes the
             # in-repo configuration apply only to that branch.
-            branches = tenant.getProjectBranches(project)
+            branches = tenant.getProjectBranches(project.canonical_name)
             for branch in branches:
                 if not tpc.load_classes:
                     # If all config classes are excluded then do not
@@ -1778,7 +1781,8 @@ class TenantParser(object):
                     continue
 
                 source_context = model.SourceContext(
-                    project, branch, '', False)
+                    project.canonical_name, project.name,
+                    project.connection_name, branch, '', False)
                 if min_ltimes is not None:
                     files_cache = self.unparsed_config_cache.getFilesCache(
                         project.canonical_name, branch)
@@ -1848,10 +1852,10 @@ class TenantParser(object):
 
             # Save all config files in Zookeeper (not just for the current tpc)
             files_cache = self.unparsed_config_cache.getFilesCache(
-                job.source_context.project.canonical_name,
+                job.source_context.project_canonical_name,
                 job.source_context.branch)
             with self.unparsed_config_cache.writeLock(
-                    job.source_context.project.canonical_name):
+                    job.source_context.project_canonical_name):
                 # Since the cat job returns all required config files
                 # for ALL tenants the project is a part of, we can
                 # clear the whole cache and then populate it with the
@@ -1868,12 +1872,12 @@ class TenantParser(object):
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
                                    loading_errors, ltime):
         loaded = False
-        tpc = tenant.project_configs[source_context.project.canonical_name]
+        tpc = tenant.project_configs[source_context.project_canonical_name]
         # Make sure we are clearing the local cache before updating it.
-        abide.clearUnparsedBranchCache(source_context.project.canonical_name,
+        abide.clearUnparsedBranchCache(source_context.project_canonical_name,
                                        source_context.branch)
         branch_cache = abide.getUnparsedBranchCache(
-            source_context.project.canonical_name,
+            source_context.project_canonical_name,
             source_context.branch)
         for conf_root in (
                 ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
@@ -1921,7 +1925,7 @@ class TenantParser(object):
                 config_projects_config.extend(unparsed_branch_config)
 
         for project in tenant.untrusted_projects:
-            branches = tenant.getProjectBranches(project)
+            branches = tenant.getProjectBranches(project.canonical_name)
             for branch in branches:
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
@@ -1956,8 +1960,8 @@ class TenantParser(object):
         return data.copy(trusted=False)
 
     def _getLoadClasses(self, tenant, conf_object):
-        project = conf_object.get('_source_context').project
-        tpc = tenant.project_configs[project.canonical_name]
+        project = conf_object.get('_source_context').project_canonical_name
+        tpc = tenant.project_configs[project]
         return tpc.load_classes
 
     def parseConfig(self, tenant, unparsed_config, loading_errors, pcontext):
@@ -2059,7 +2063,7 @@ class TenantParser(object):
     def cacheConfig(self, tenant, parsed_config):
         def _cache(attr, obj):
             tpc = tenant.project_configs[
-                obj.source_context.project.canonical_name]
+                obj.source_context.project_canonical_name]
             branch_cache = tpc.parsed_branch_config.get(
                 obj.source_context.branch)
             if branch_cache is None:
@@ -2398,7 +2402,7 @@ class ConfigLoader(object):
         else:
             # Use the cached branch list; since this is a dynamic
             # reconfiguration there should not be any branch changes.
-            branches = tenant.getProjectBranches(project)
+            branches = tenant.getProjectBranches(project.canonical_name)
 
         for branch in branches:
             fns1 = []
@@ -2437,8 +2441,9 @@ class ConfigLoader(object):
                 data = files.getFile(project.source.connection.connection_name,
                                      project.name, branch, fn)
                 if data:
-                    source_context = model.SourceContext(project, branch,
-                                                         fn, trusted)
+                    source_context = model.SourceContext(
+                        project.canonical_name, project.name,
+                        project.connection_name, branch, fn, trusted)
                     # Prevent mixing configuration source
                     conf_root = fn.split('/')[0]
 

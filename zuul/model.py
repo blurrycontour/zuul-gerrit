@@ -114,7 +114,7 @@ class ConfigurationErrorKey(object):
         elements = []
         if context:
             elements.extend([
-                context.project.canonical_name,
+                context.project_canonical_name,
                 context.branch,
                 context.path,
             ])
@@ -1029,18 +1029,19 @@ class FrozenSecret(ConfigObject):
 
 class ProjectContext(ConfigObject):
 
-    def __init__(self, project):
+    def __init__(self, project_canonical_name, project_name):
         super().__init__()
-        self.project = project
+        self.project_canonical_name = project_canonical_name
+        self.project_name = project_name
         self.branch = None
         self.path = None
 
     def __str__(self):
-        return self.project.name
+        return self.project_name
 
     def toDict(self):
         return dict(
-            project=self.project.name,
+            project=self.project_name,
         )
 
 
@@ -1050,9 +1051,14 @@ class SourceContext(ConfigObject):
     Jobs and playbooks reference this to keep track of where they
     originate."""
 
-    def __init__(self, project, branch, path, trusted):
+    def __init__(self, project_canonical_name, project_name,
+                 project_connection_name, branch, path, trusted):
         super(SourceContext, self).__init__()
-        self.project = project
+        # TODO (felix): Would it be enough to only store the project's
+        # canonical name?
+        self.project_canonical_name = project_canonical_name
+        self.project_name = project_name
+        self.project_connection_name = project_connection_name
         self.branch = branch
         self.path = path
         self.trusted = trusted
@@ -1060,7 +1066,8 @@ class SourceContext(ConfigObject):
         self.implied_branches = None
 
     def __str__(self):
-        return '%s/%s@%s' % (self.project, self.path, self.branch)
+        return '%s/%s@%s' % (
+            self.project_name, self.path, self.branch)
 
     def __repr__(self):
         return '<SourceContext %s trusted:%s>' % (str(self),
@@ -1070,13 +1077,14 @@ class SourceContext(ConfigObject):
         return self.copy()
 
     def copy(self):
-        return self.__class__(self.project, self.branch, self.path,
-                              self.trusted)
+        return self.__class__(
+            self.project_canonical_name, self.project_name,
+            self.project_connection_name, self.branch, self.path, self.trusted)
 
     def isSameProject(self, other):
         if not isinstance(other, SourceContext):
             return False
-        return (self.project == other.project and
+        return (self.project_canonical_name == other.project_canonical_name and
                 self.trusted == other.trusted)
 
     def __ne__(self, other):
@@ -1085,14 +1093,14 @@ class SourceContext(ConfigObject):
     def __eq__(self, other):
         if not isinstance(other, SourceContext):
             return False
-        return (self.project == other.project and
+        return (self.project_canonical_name == other.project_canonical_name and
                 self.branch == other.branch and
                 self.path == other.path and
                 self.trusted == other.trusted)
 
     def toDict(self):
         return dict(
-            project=self.project.name,
+            project=self.project_name,
             branch=self.branch,
             path=self.path,
         )
@@ -1160,8 +1168,10 @@ class PlaybookContext(ConfigObject):
                     "defined in the same project in which they "
                     "are used".format(
                         name=secret_use.name))
+            project = layout.tenant.getProject(
+                self.source_context.project_canonical_name)[1]
             # Decrypt a copy of the secret to verify it can be done
-            secret.decrypt(self.source_context.project.private_secrets_key)
+            secret.decrypt(project.private_secrets_key)
 
     def freezeSecrets(self, layout):
         secrets = []
@@ -1171,10 +1181,10 @@ class PlaybookContext(ConfigObject):
             encrypted_secret_data = secret.serialize()
             # Use *our* project, not the secret's, because we want to decrypt
             # with *our* key.
-            connection_name = self.source_context.project.connection_name
-            project_name = self.source_context.project.name
+            project = layout.tenant.getProject(
+                self.source_context.project_canonical_name)[1]
             secrets.append(FrozenSecret.construct_cached(
-                connection_name, project_name, secret_name,
+                project.connection_name, project.name, secret_name,
                 encrypted_secret_data))
         self.frozen_secrets = tuple(secrets)
 
@@ -1193,8 +1203,8 @@ class PlaybookContext(ConfigObject):
             else:
                 secrets[secret.name] = secret.toDict()
         return dict(
-            connection=self.source_context.project.connection_name,
-            project=self.source_context.project.name,
+            connection=self.source_context.project_connection_name,
+            project=self.source_context.project_name,
             branch=self.source_context.branch,
             trusted=self.source_context.trusted,
             roles=[r.toDict() for r in self.roles],
@@ -1726,7 +1736,7 @@ class Job(ConfigObject):
                 if self.protected_origin:
                     # this is a protected job, check origin of job definition
                     this_origin = self.protected_origin
-                    other_origin = other.source_context.project.canonical_name
+                    other_origin = other.source_context.project_canonical_name
                     if this_origin != other_origin:
                         raise Exception("Job %s which is defined in %s is "
                                         "protected and cannot be inherited "
@@ -1773,7 +1783,7 @@ class Job(ConfigObject):
                                     repr(self), repr(other)))
             if not self.protected_origin:
                 self.protected_origin = \
-                    other.source_context.project.canonical_name
+                    other.source_context.project_canonical_name
 
         # We must update roles before any playbook contexts
         if other._get('roles') is not None:
@@ -1794,8 +1804,8 @@ class Job(ConfigObject):
                 encrypted_secret_data = secret.serialize()
                 # Use the other project, not the secret's, because we
                 # want to decrypt with the other project's key key.
-                connection_name = other.source_context.project.connection_name
-                project_name = other.source_context.project.name
+                connection_name = other.source_context.project_connection_name
+                project_name = other.source_context.project_name
                 frozen_secrets.append(FrozenSecret.construct_cached(
                     connection_name, project_name,
                     secret_name, encrypted_secret_data))
@@ -1886,7 +1896,7 @@ class Job(ConfigObject):
         for playbook in playbooks:
             # noop job does not have source_context
             if playbook.source_context:
-                yield playbook.source_context.project.canonical_name
+                yield playbook.source_context.project_canonical_name
             for role in playbook.roles:
                 if role.implicit and not with_implicit:
                     continue
@@ -4915,7 +4925,9 @@ class UnparsedConfig(object):
             setattr(r, attr, new_objlist)
             for i, new_obj in enumerate(new_objlist):
                 old_obj = old_objlist[i]
-                key = (old_obj['_source_context'].project,
+                key = (old_obj['_source_context'].project_canonical_name,
+                       old_obj['_source_context'].project_name,
+                       old_obj['_source_context'].project_connection_name,
                        old_obj['_source_context'].branch,
                        old_obj['_source_context'].path)
                 new_sc = source_contexts.get(key)
@@ -5070,16 +5082,16 @@ class Layout(object):
         # We can have multiple variants of a job all with the same
         # name, but these variants must all be defined in the same repo.
         prior_jobs = [j for j in self.getJobs(job.name) if
-                      j.source_context.project !=
-                      job.source_context.project]
+                      j.source_context.project_canonical_name !=
+                      job.source_context.project_canonical_name]
         # Unless the repo is permitted to shadow another.  If so, and
         # the job we are adding is from a repo that is permitted to
         # shadow the one with the older jobs, skip adding this job.
-        job_project = job.source_context.project
-        job_tpc = self.tenant.project_configs[job_project.canonical_name]
+        job_project = job.source_context.project_canonical_name
+        job_tpc = self.tenant.project_configs[job_project]
         skip_add = False
         for prior_job in prior_jobs[:]:
-            prior_project = prior_job.source_context.project
+            prior_project = prior_job.source_context.project_canonical_name
             if prior_project in job_tpc.shadow_projects:
                 prior_jobs.remove(prior_job)
                 skip_add = True
@@ -5088,9 +5100,9 @@ class Layout(object):
             raise Exception("Job %s in %s is not permitted to shadow "
                             "job %s in %s" % (
                                 job,
-                                job.source_context.project,
+                                job.source_context.project_name,
                                 prior_jobs[0],
-                                prior_jobs[0].source_context.project))
+                                prior_jobs[0].source_context.project_name))
         if skip_add:
             return False
         if job.name in self.jobs:
@@ -5106,8 +5118,9 @@ class Layout(object):
         other = self.nodesets.get(nodeset.name)
         if other is not None:
             if not nodeset.source_context.isSameProject(other.source_context):
-                raise Exception("Nodeset %s already defined in project %s" %
-                                (nodeset.name, other.source_context.project))
+                raise Exception(
+                    "Nodeset %s already defined in project %s" %
+                    (nodeset.name, other.source_context.project_name))
             if nodeset.source_context.branch == other.source_context.branch:
                 raise Exception("Nodeset %s already defined" % (nodeset.name,))
             if nodeset != other:
@@ -5126,8 +5139,9 @@ class Layout(object):
         other = self.secrets.get(secret.name)
         if other is not None:
             if not secret.source_context.isSameProject(other.source_context):
-                raise Exception("Secret %s already defined in project %s" %
-                                (secret.name, other.source_context.project))
+                raise Exception(
+                    "Secret %s already defined in project %s" %
+                    (secret.name, other.source_context.project_name))
             if secret.source_context.branch == other.source_context.branch:
                 raise Exception("Secret %s already defined" % (secret.name,))
             if not secret.areDataEqual(other):
@@ -5147,8 +5161,9 @@ class Layout(object):
         if other is not None:
             if not semaphore.source_context.isSameProject(
                     other.source_context):
-                raise Exception("Semaphore %s already defined in project %s" %
-                                (semaphore.name, other.source_context.project))
+                raise Exception(
+                    "Semaphore %s already defined in project %s" %
+                    (semaphore.name, other.source_context.project_name))
             if semaphore.source_context.branch == other.source_context.branch:
                 raise Exception("Semaphore %s already defined" %
                                 (semaphore.name,))
@@ -5185,8 +5200,8 @@ class Layout(object):
         template_list = self.project_templates.get(project_template.name)
         if template_list is not None:
             reference = template_list[0]
-            if (reference.source_context.project !=
-                project_template.source_context.project):
+            if (reference.source_context.project_canonical_name !=
+                project_template.source_context.project_canonical_name):
                 raise Exception("Project template %s is already defined" %
                                 (project_template.name,))
         else:
@@ -5313,11 +5328,11 @@ class Layout(object):
         project = None
         for variant in self.getJobs(jobname):
             if project is None and variant.source_context:
-                project = variant.source_context.project
+                project = variant.source_context.project_canonical_name
                 if override_checkouts.get(None) is not None:
                     override_branch = override_checkouts.get(None)
                 override_branch = override_checkouts.get(
-                    project.canonical_name, override_branch)
+                    project, override_branch)
                 branches = self.tenant.getProjectBranches(project)
                 if override_branch not in branches:
                     override_branch = None
@@ -5703,16 +5718,16 @@ class Tenant(object):
                                 (project,))
         return result
 
-    def getProjectBranches(self, project):
+    def getProjectBranches(self, project_canonical_name):
         """Return a project's branches (filtered by this tenant config)
 
-        :arg Project project: The project object.
+        :arg str project_canonical: The project's canonical name.
 
         :returns: A list of branch names.
         :rtype: [str]
 
         """
-        tpc = self.project_configs[project.canonical_name]
+        tpc = self.project_configs[project_canonical_name]
         return tpc.branches
 
     def getExcludeUnprotectedBranches(self, project):
