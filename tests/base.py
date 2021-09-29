@@ -5537,8 +5537,9 @@ class ZuulTestCase(BaseTestCase):
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
                 self.__eventQueuesJoin(matcher)
-                self.scheds.execute(
-                    lambda app: app.sched.run_handler_lock.acquire())
+                for sched in map(lambda app: app.sched,
+                                 self.scheds.filter(matcher)):
+                    sched.run_handler_lock.acquire()
                 if (self.__areAllSchedulersPrimed(matcher) and
                     self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported() and
@@ -5551,17 +5552,21 @@ class ZuulTestCase(BaseTestCase):
                     # when locked the run handler and checked that the
                     # components were stable, we don't erroneously
                     # report that we are settled.
-                    self.scheds.execute(
-                        lambda app: app.sched.run_handler_lock.release())
+                    for sched in map(lambda app: app.sched,
+                                     self.scheds.filter(matcher)):
+                        sched.run_handler_lock.release()
                     self.executor_server.lock.release()
                     self.log.debug("...settled after %.3f ms / %s loops (%s)",
                                    time.time() - start, i, msg)
                     self.logState()
                     return
-                self.scheds.execute(
-                    lambda app: app.sched.run_handler_lock.release())
+                for sched in map(lambda app: app.sched,
+                                 self.scheds.filter(matcher)):
+                    sched.run_handler_lock.release()
             self.executor_server.lock.release()
-            self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
+            for sched in map(lambda app: app.sched,
+                             self.scheds.filter(matcher)):
+                sched.wake_event.wait(0.1)
             # Let other threads work
             time.sleep(0.1)
 
