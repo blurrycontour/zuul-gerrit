@@ -16,6 +16,40 @@
       "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bae970fb_5693a8e8",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-29T21:37:19Z",
+      "side": 1,
+      "message": "Let\u0027s go ahead and remove it.",
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c81f80e1_516bbd7f",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-09-29T21:37:19Z",
+      "side": 1,
+      "message": "I\u0027m not sure if you have control over this, but the mousever obscures what it\u0027s pointing at.  I think it\u0027d be better if it could be shifted above or below the pointer.\n\nAlso, this behaves very strangely once you trigger a mousover, then move away from the bars.  It seems like a random label keeps popping up.\n\nIf it\u0027s not possible to control this, it might be worth just omitting the label, since the data are already available elsewhere.",
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
