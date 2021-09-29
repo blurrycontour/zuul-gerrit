@@ -59,9 +59,11 @@ class DatabaseSession(object):
 
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
-                  newrev=None, event_id=None, uuid=None, job_name=None,
-                  voting=None, nodeset=None, result=None, provides=None,
-                  final=None, held=None, complete=None, limit=50, offset=0):
+                  newrev=None, event_id=None, uuid=None,
+                  job_name=None, voting=None, nodeset=None,
+                  result=None, provides=None, final=None, held=None,
+                  complete=None, sort_by_buildset=False, limit=50,
+                  offset=0):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -111,9 +113,14 @@ class DatabaseSession(object):
         q = self.listFilter(q, provides_table.c.name, provides)
         q = self.listFilter(q, build_table.c.held, held)
 
-        q = q.order_by(build_table.c.id.desc()).\
-            limit(limit).\
-            offset(offset)
+        if sort_by_buildset:
+            # If we don't need the builds to be strictly ordered, this
+            # query can be much faster as it may avoid the use of a
+            # temporary table.
+            q = q.order_by(buildset_table.c.id.desc())
+        else:
+            q = q.order_by(build_table.c.id.desc())
+        q = q.limit(limit).offset(offset)
 
         try:
             return q.all()
@@ -354,6 +361,15 @@ class SQLConnection(BaseConnection):
                      job_name, buildset_id)
             sa.Index(self.table_prefix + 'uuid_buildset_id_idx',
                      uuid, buildset_id)
+
+            @property
+            def duration(self):
+                if self.start_time and self.end_time:
+                    return max(0.0,
+                               (self.end_time -
+                                self.start_time).total_seconds())
+                else:
+                    return None
 
             def createArtifact(self, *args, **kw):
                 session = orm.session.Session.object_session(self)
