@@ -484,8 +484,8 @@ class Nodepool(object):
 
         total_requests = 0
         tenant_requests = defaultdict(int)
-        resources_by_tenant = defaultdict(int)
-        resources_by_project = defaultdict(int)
+        resources_by_tenant = {}
+        resources_by_project = {}
         empty_resource_dict = dict([(k, 0) for k in self.resource_types])
 
         # Initialize zero values for gauges
@@ -523,8 +523,12 @@ class Nodepool(object):
                                   model.STATE_USED,
                                   model.STATE_HOLD}:
                 continue
+            if tenant_name not in resources_by_tenant:
+                continue
             self.addResources(resources_by_tenant[tenant_name],
                               node.resources)
+            if project_name not in resources_by_project:
+                continue
             self.addResources(resources_by_project[project_name],
                               node.resources)
 
