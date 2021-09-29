@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30d357db_75ea0bed",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-09-29T22:28:25Z",
+      "side": 1,
+      "message": "I guess we weren\u0027t actually taking advantage of the in defaults anywhere for these?",
+      "revId": "9e1118615c414db4a1b96176e18cebe41437e405",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
