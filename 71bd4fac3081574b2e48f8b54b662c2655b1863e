@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cac84845_e9e32fc1",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-09-29T19:32:39Z",
+      "side": 1,
+      "message": "That looks like debug leftover.",
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
