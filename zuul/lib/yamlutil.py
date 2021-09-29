@@ -142,6 +142,11 @@ class AnsibleUnsafeDumper(yaml.SafeDumper):
     pass
 
 
+class AnsibleUnsafeDumperWithoutAliases(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        return True
+
+
 class AnsibleUnsafeLoader(yaml.SafeLoader):
     pass
 
@@ -153,7 +158,12 @@ AnsibleUnsafeLoader.add_constructor(AnsibleUnsafeStr.yaml_tag,
 
 
 def ansible_unsafe_dump(data, *args, **kwargs):
-    return yaml.dump(data, *args, Dumper=AnsibleUnsafeDumper, **kwargs)
+    ignore_aliases = kwargs.pop('ignore_aliases', False)
+    if ignore_aliases:
+        return yaml.dump(data, *args, Dumper=AnsibleUnsafeDumperWithoutAliases,
+                         **kwargs)
+    else:
+        return yaml.dump(data, *args, Dumper=AnsibleUnsafeDumper, **kwargs)
 
 
 def ansible_unsafe_load(stream, *args, **kwargs):
