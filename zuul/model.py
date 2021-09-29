@@ -3791,17 +3791,14 @@ class Change(Branch):
         self.url = data.get("url")
         self.uris = data.get("uris", [])
         self.patchset = data.get("patchset")
-        self.git_needs_changes = [
-            tuple(k) for k in data.get("git_needs_changes", [])]
-        self.git_needed_by_changes = [
-            tuple(k) for k in data.get("git_needed_by_changes", [])]
-        self.compat_needs_changes = [
-            tuple(k) for k in data.get("compat_needs_changes", [])]
-        self.compat_needed_by_changes = [
-            tuple(k) for k in data.get("compat_needed_by_changes", [])]
+        self.git_needs_changes = data.get("git_needs_changes", [])
+        self.git_needed_by_changes = data.get("git_needed_by_changes", [])
+        self.compat_needs_changes = data.get("compat_needs_changes", [])
+        self.compat_needed_by_changes = data.get(
+            "compat_needed_by_changes", [])
         self.commit_needs_changes = (
             None if data.get("commit_needs_changes") is None
-            else [tuple(k) for k in data.get("commit_needs_changes", [])]
+            else data.get("commit_needs_changes", [])
         )
         self.is_current_patchset = data.get("is_current_patchset", True)
         self.can_merge = data.get("can_merge", False)
