@@ -829,12 +829,18 @@ class PipelineManager(metaclass=ABCMeta):
             parent_error_keys.extend(
                 e.key for e in item.item_ahead.current_build_set.config_errors)
 
-        # Then find config errors which aren't in the parent.
+        # Then find config errors which aren't in the parent.  But
+        # include errors in this project-branch because the error
+        # detection hash is imperfect and someone attempting to fix an
+        # error may create a near duplicate error and it would go
+        # undetected.  Or if there are two errors and the user only
+        # fixes one, then they may not realize their work is
+        # incomplete.
         relevant_errors = []
         for err in layout.loading_errors.errors:
             econtext = err.key.context
             if ((err.key not in parent_error_keys) or
-                (econtext.project == item.change.project.name and
+                (econtext.project.name == item.change.project.name and
                  econtext.branch == item.change.branch)):
                 relevant_errors.append(err)
         return relevant_errors
