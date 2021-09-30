@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8f57351_89c988cc",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4515,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-09-30T11:49:33Z",
+      "side": 1,
+      "message": "This assertion is currently failing as Zuul uses the master branch for the roles from common-config. Changing this to\n\n  self._assertInRolePath(build, \u0027pre_playbook_1\u0027, [\u0027master-role\u0027])\n\nwill make the test pass.\n\nThat\u0027s the unexpected difference from user\u0027s POV to the change triggered pipeline above that uses the roles from the \"release\" branch.",
+      "revId": "dbde8409b48f94917b2ca2638edc3d252521138e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
