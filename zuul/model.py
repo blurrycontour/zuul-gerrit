@@ -458,10 +458,11 @@ class PipelineState(zkobject.ZKObject):
         }
         return json.dumps(data).encode("utf8")
 
-    def refresh(self, context):
-        super().refresh(context)
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
         for queue in self.queues:
             queue.refresh(context)
+        return data
 
 
 class ChangeQueue(zkobject.ZKObject):
@@ -519,8 +520,8 @@ class ChangeQueue(zkobject.ZKObject):
         }
         return json.dumps(data).encode("utf8")
 
-    def deserialize(self, raw):
-        data = super().deserialize(raw)
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
 
         existing_items = {}
         for item in self.queue:
@@ -531,7 +532,6 @@ class ChangeQueue(zkobject.ZKObject):
                 })
 
         queue = []
-        context = self.pipeline.manager.current_context
         for item_path in data["queue"]:
             item = existing_items.get(item_path)
             if item:
@@ -2826,8 +2826,8 @@ class QueueItem(zkobject.ZKObject):
         }
         return json.dumps(data).encode("utf8")
 
-    def deserialize(self, raw):
-        data = super().deserialize(raw)
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
 
         # FIXME: Move queue item class after events so we can define
         # this as a class attribute.
@@ -2855,7 +2855,7 @@ class QueueItem(zkobject.ZKObject):
             [data["change"]])[0]
 
         bundle = data["bundle"] and Bundle.deserialize(
-            self.pipeline.manager.current_context, self.queue, data["bundle"])
+            context, self.queue, data["bundle"])
 
         data.update({
             "event": event,
