@@ -37,6 +37,9 @@ import {
   TableHeader,
   TableBody,
   TableVariant,
+  truncate,
+  breakWord,
+  cellWidth,
 } from '@patternfly/react-table'
 
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
@@ -53,18 +56,23 @@ function BuildsetTable({
     {
       title: <IconProperty icon={<CubeIcon />} value="Project" />,
       dataLabel: 'Project',
+      cellTransforms: [breakWord],
     },
     {
       title: <IconProperty icon={<CodeBranchIcon />} value="Branch" />,
       dataLabel: 'Branch',
+      cellTransforms: [breakWord],
     },
     {
       title: <IconProperty icon={<StreamIcon />} value="Pipeline" />,
       dataLabel: 'Pipeline',
+      cellTransforms: [breakWord],
     },
     {
       title: <IconProperty icon={<CodeIcon />} value="Change" />,
       dataLabel: 'Change',
+      transforms: [cellWidth(10)],
+      cellTransforms: [truncate],
     },
     {
       title: <IconProperty icon={<PollIcon />} value="Result" />,
