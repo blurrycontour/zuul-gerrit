@@ -254,7 +254,7 @@ class GitlabAPIClientException(Exception):
 class GitlabAPIClient():
     log = logging.getLogger("zuul.GitlabAPIClient")
 
-    def __init__(self, baseurl, api_token):
+    def __init__(self, baseurl, api_token, timeout):
         self.session = requests.Session()
         retry = urllib3.util.Retry(total=8,
                                    backoff_factor=0.1)
@@ -262,6 +262,7 @@ class GitlabAPIClient():
         self.session.mount(baseurl, adapter)
         self.baseurl = '%s/api/v4' % baseurl
         self.api_token = api_token
+        self.timeout = timeout
         self.headers = {'Authorization': 'Bearer %s' % (
             self.api_token)}
 
@@ -278,7 +279,7 @@ class GitlabAPIClient():
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Getting resource %s ..." % url)
         ret = self.session.get(url, headers=self.headers,
-                               timeout=TIMEOUT)
+                               timeout=self.timeout)
         log.debug("GET returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'GET'
@@ -288,7 +289,7 @@ class GitlabAPIClient():
         log.info(
             "Posting on resource %s, params (%s) ..." % (url, params))
         ret = self.session.post(url, data=params, headers=self.headers,
-                                timeout=TIMEOUT)
+                                timeout=self.timeout)
         log.debug("POST returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'POST'
@@ -298,7 +299,7 @@ class GitlabAPIClient():
         log.info(
             "Put on resource %s, params (%s) ..." % (url, params))
         ret = self.session.put(url, data=params, headers=self.headers,
-                               timeout=TIMEOUT)
+                               timeout=self.timeout)
         log.debug("PUT returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'PUT'
@@ -431,7 +432,9 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
             'api_token_name', '')
         self.api_token = self.connection_config.get(
             'api_token', '')
-        self.gl_client = GitlabAPIClient(self.baseurl, self.api_token)
+        self.timeout = int(self.connection_config.get(
+            'timeout', TIMEOUT))
+        self.gl_client = GitlabAPIClient(self.baseurl, self.api_token, self.timeout)
         self.sched = None
         self.source = driver.getSource(self)
 

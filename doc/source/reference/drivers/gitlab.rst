@@ -109,6 +109,10 @@ The supported options in ``zuul.conf`` connections are:
       If **cloneurl** is defined with credentials, it will be used as is,
       without modification from the driver.
 
+  .. attr:: timeout
+     :default: 30
+
+     Timeout for GitLab connection.
 
 Trigger Configuration
 ---------------------
