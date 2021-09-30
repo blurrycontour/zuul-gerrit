@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b0fd4f0_395c7801",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-30T14:40:16Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be `secondary` to look less important? That would remove the blue background.",
+      "revId": "391184e44d64337c91adc23fe083ac4df6fedeb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "658b4199_7f2132e1",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-09-30T14:40:16Z",
+      "side": 1,
+      "message": "nit: using `tickFormat` it seems like we should be able to display text value like (1sec, 5min, ...)",
+      "revId": "391184e44d64337c91adc23fe083ac4df6fedeb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
