@@ -6880,7 +6880,7 @@ class TestJobUpdateBrokenConfig(ZuulTestCase):
         # When the config is broken, we don't override any files
         # matchers since we don't have a valid basis.  Since this
         # does update README.txt, the job should run.
-        file_dict = {'zuul.d/template.yaml': in_repo_conf,
+        file_dict = {'zuul.d/existing.yaml': in_repo_conf,
                      'README.txt': ''}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
