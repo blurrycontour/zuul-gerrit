@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "ebfead04_fa972eec",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-30T11:32:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bae970fb_5693a8e8",
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c81f80e1_516bbd7f",
         "filename": "web/src/containers/charts/GanttChart.jsx",
         "patchSetId": 1
@@ -50,6 +68,70 @@
       "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "838eaa5b_b38682d2",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-30T11:32:48Z",
+      "side": 1,
+      "message": "I\u0027ve switched to using the native ChartTooltip component, compacted the label a bit with carriage returns, and added some padding to the right of the chart, giving some space for the label to pop up without overlapping the bar (although not always possible).\n\nI don\u0027t want to increase right padding too much, as it can otherwise make the graph area quite crammed (see for example buildset c0f357960cf147d98f5cc07302481649 in the zuul tenant). If you think it still does not look good enough, I can just remove the label in the next PS as you suggested.",
+      "parentUuid": "c81f80e1_516bbd7f",
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "00bef91e_7e723456",
+        "filename": "web/src/containers/charts/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-30T11:32:48Z",
+      "side": 1,
+      "message": "Should we standardize these colors, ie use them for badges in the build pages and for the color of result links in the builds search page ?",
+      "range": {
+        "startLine": 17,
+        "startChar": 6,
+        "endLine": 17,
+        "endChar": 27
+      },
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8f6756e9_57e8b716",
+        "filename": "web/src/containers/charts/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-09-30T11:32:48Z",
+      "side": 1,
+      "message": "note that if a result value isn\u0027t defined in buildResultLegendData, it\u0027ll appear as a black bar on the graph. Any values I should add? Shall I change the default color to something else?",
+      "range": {
+        "startLine": 78,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 1
+      },
+      "revId": "71bd4fac3081574b2e48f8b54b662c2655b1863e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
