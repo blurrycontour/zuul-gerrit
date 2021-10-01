@@ -1052,24 +1052,56 @@ class ZuulWebAPI(object):
         return data
 
     def buildsetToDict(self, buildset, builds=[]):
+        try:
+            b, start_time, end_time = buildset
+        except (TypeError, ValueError):
+            b, start_time, end_time = (buildset, None, None)
         ret = {
-            'uuid': buildset.uuid,
-            'result': buildset.result,
-            'message': buildset.message,
-            'project': buildset.project,
-            'branch': buildset.branch,
-            'pipeline': buildset.pipeline,
-            'change': buildset.change,
-            'patchset': buildset.patchset,
-            'ref': buildset.ref,
-            'newrev': buildset.newrev,
-            'ref_url': buildset.ref_url,
-            'event_id': buildset.event_id,
+            'uuid': b.uuid,
+            'result': b.result,
+            'message': b.message,
+            'project': b.project,
+            'branch': b.branch,
+            'pipeline': b.pipeline,
+            'change': b.change,
+            'patchset': b.patchset,
+            'ref': b.ref,
+            'newrev': b.newrev,
+            'ref_url': b.ref_url,
+            'event_id': b.event_id,
+            'start_time': start_time,
+            'end_time': end_time,
         }
         if builds:
             ret['builds'] = []
         for build in builds:
             ret['builds'].append(self.buildToDict(build))
+            # we have the builds, we can compute the start and end times if
+            # they weren't fetched from the connection query.
+            if start_time is None:
+                if ret['start_time'] is None:
+                    ret['start_time'] = build.start_time
+                elif (build.start_time != None
+                      and ret['start_time'] > build.start_time):
+                    ret['start_time'] = build.start_time
+                else:
+                    pass
+            if end_time is None:
+                if ret['end_time'] is None:
+                    ret['end_time'] = build.end_time
+                elif (build.end_time != None
+                      and ret['end_time'] < build.end_time):
+                    ret['end_time'] = build.end_time
+                else:
+                    pass                    
+        if ret['start_time']:
+            ret['start_time'] = ret['start_time'].strftime(
+                '%Y-%m-%dT%H:%M:%S'
+            )
+        if ret['end_time']:
+            ret['end_time'] = ret['end_time'].strftime(
+                '%Y-%m-%dT%H:%M:%S'
+            )
         return ret
 
     @cherrypy.expose
@@ -1083,7 +1115,8 @@ class ZuulWebAPI(object):
         if not buildsets:
             raise cherrypy.HTTPError(404, 'No buildset found')
 
-        if buildsets[0].result == 'SUCCESS':
+        buildset, _, _ = buildsets[0]
+        if buildset.result == 'SUCCESS':
             file = 'passing.svg'
         else:
             file = 'failing.svg'
