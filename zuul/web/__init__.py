@@ -1052,22 +1052,42 @@ class ZuulWebAPI(object):
         return data
 
     def buildsetToDict(self, buildset, builds=[]):
+        try:
+            b, _start_time, _end_time = buildset
+        except (TypeError, ValueError):
+            b, _start_time, _end_time = (buildset, None, None)
+        start_time = (
+            _start_time and _start_time.strftime('%Y-%m-%dT%H:%M:%S') or None
+        )
+        end_time = (
+            _end_time and _end_time.strftime('%Y-%m-%dT%H:%M:%S') or None
+        )
         ret = {
-            'uuid': buildset.uuid,
-            'result': buildset.result,
-            'message': buildset.message,
-            'project': buildset.project,
-            'branch': buildset.branch,
-            'pipeline': buildset.pipeline,
-            'change': buildset.change,
-            'patchset': buildset.patchset,
-            'ref': buildset.ref,
-            'newrev': buildset.newrev,
-            'ref_url': buildset.ref_url,
-            'event_id': buildset.event_id,
+            'uuid': b.uuid,
+            'result': b.result,
+            'message': b.message,
+            'project': b.project,
+            'branch': b.branch,
+            'pipeline': b.pipeline,
+            'change': b.change,
+            'patchset': b.patchset,
+            'ref': b.ref,
+            'newrev': b.newrev,
+            'ref_url': b.ref_url,
+            'event_id': b.event_id,
+            'start_time': start_time,
+            'end_time': end_time,
         }
         if builds:
             ret['builds'] = []
+            if ret['start_time'] is None:
+                ret['start_time'] = min(
+                    b.start_time for b in builds
+                ).strftime('%Y-%m-%dT%H:%M:%S')
+            if ret['end_time'] is None:
+                ret['end_time'] = max(
+                    b.end_time for b in builds
+                ).strftime('%Y-%m-%dT%H:%M:%S')
         for build in builds:
             ret['builds'].append(self.buildToDict(build))
         return ret

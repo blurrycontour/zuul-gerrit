@@ -21,6 +21,7 @@ import alembic.config
 import alembic.migration
 import sqlalchemy as sa
 from sqlalchemy import orm
+from sqlalchemy.sql import functions
 import sqlalchemy.pool
 
 from zuul.connection import BaseConnection
@@ -165,7 +166,19 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
 
         # See note above about the hint.
-        q = self.session().query(self.connection.buildSetModel)
+        q = self.session().query(
+            self.connection.buildSetModel,
+            functions.min(
+                self.connection.buildModel.start_time
+            ).label('start_time'),
+            functions.max(
+                self.connection.buildModel.end_time
+            ).label('end_time')
+        ).join(
+            self.connection.buildModel
+        ).group_by(
+            self.connection.buildModel.buildset_id
+        )
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
 
