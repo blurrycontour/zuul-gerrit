@@ -83,6 +83,8 @@ class GerritChange(Change):
             if str(ps['number']) == self.patchset:
                 self.ref = ps['ref']
                 self.commit = ps['revision']
+                # SSH queries gives us a list of dicts for the files. We
+                # convert that to a list of filenames.
                 for f in ps.get('files', []):
                     files.append(f['file'])
             if int(ps['number']) > int(max_ps):
@@ -142,7 +144,13 @@ class GerritChange(Change):
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False
-        self.files = files or []
+
+        # HTTP queries give us a dict of files in the form of
+        # {filename: { attrs }}. We only want a list of filenames here.
+        if files:
+            self.files = list(files.keys())
+        else:
+            self.files = []
 
         self.is_merged = data['status'] == 'MERGED'
         self.approvals = []
