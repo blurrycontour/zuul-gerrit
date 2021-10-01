@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "099fea06_f2b8d06b",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-01T17:26:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b0fd4f0_395c7801",
+      "revId": "391184e44d64337c91adc23fe083ac4df6fedeb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "658b4199_7f2132e1",
         "filename": "web/src/containers/charts/GanttChart.jsx",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "391184e44d64337c91adc23fe083ac4df6fedeb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f30b7d62_c69b9022",
+        "filename": "web/src/containers/charts/GanttChart.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-01T17:26:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "658b4199_7f2132e1",
+      "revId": "391184e44d64337c91adc23fe083ac4df6fedeb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
