@@ -39,6 +39,9 @@ import {
   TableHeader,
   TableBody,
   TableVariant,
+  truncate,
+  breakWord,
+  cellWidth,
 } from '@patternfly/react-table'
 import 'moment-duration-format'
 import * as moment from 'moment'
@@ -58,14 +61,17 @@ function BuildTable({
     {
       title: <IconProperty icon={<BuildIcon />} value="Job" />,
       dataLabel: 'Job',
+      cellTransforms: [breakWord],
     },
     {
       title: <IconProperty icon={<CubeIcon />} value="Project" />,
       dataLabel: 'Project',
+      cellTransforms: [breakWord],
     },
     {
       title: <IconProperty icon={<CodeBranchIcon />} value="Branch" />,
       dataLabel: 'Branch',
+      cellTransforms: [breakWord],
     },
     {
       title: <IconProperty icon={<StreamIcon />} value="Pipeline" />,
@@ -74,6 +80,8 @@ function BuildTable({
     {
       title: <IconProperty icon={<CodeIcon />} value="Change" />,
       dataLabel: 'Change',
+      transforms: [cellWidth(10)],
+      cellTransforms: [truncate],
     },
     {
       title: <IconProperty icon={<OutlinedClockIcon />} value="Duration" />,
