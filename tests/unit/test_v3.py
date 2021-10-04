@@ -29,6 +29,7 @@ import git
 import paramiko
 
 import zuul.configloader
+from zuul.lib import yamlutil as yaml
 from zuul.model import MergeRequest
 
 from tests.base import (
@@ -4425,9 +4426,75 @@ class TestRoleBranches(RoleTestCase):
         self._assertInFile(build.jobdir.pre_playbooks[1].path,
                            'parent-stable-role')
 
+        inventory = self.getBuildInventory('child-job-override')
+        zuul = inventory['all']['vars']['zuul']
+
+        expected = {
+            'playbook_projects': {
+                'trusted/project_0/review.example.com/common-config': {
+                    'canonical_name': 'review.example.com/common-config',
+                    'checkout': 'master',
+                    'commit': self.getCheckout(
+                        build,
+                        'trusted/project_0/review.example.com/common-config')},
+                'untrusted/project_0/review.example.com/project1': {
+                    'canonical_name': 'review.example.com/project1',
+                    'checkout': 'stable',
+                    'commit': self.getCheckout(
+                        build,
+                        'untrusted/project_0/review.example.com/project1')},
+                'untrusted/project_1/review.example.com/common-config': {
+                    'canonical_name': 'review.example.com/common-config',
+                    'checkout': 'master',
+                    'commit': self.getCheckout(
+                        build,
+                        'untrusted/project_1/review.example.com/common-config'
+                    )},
+                'untrusted/project_2/review.example.com/project2': {
+                    'canonical_name': 'review.example.com/project2',
+                    'checkout': 'master',
+                    'commit': self.getCheckout(
+                        build,
+                        'untrusted/project_2/review.example.com/project2')}},
+            'playbooks': [
+                {'path': 'untrusted/project_2/review.example.com/'
+                 'project2/playbooks/child-job.yaml',
+                 'roles': [
+                     {'checkout': 'stable',
+                      'checkout_description': 'job override ref',
+                      'link_name': 'ansible/playbook_0/role_1/project1',
+                      'link_target': 'untrusted/project_0/'
+                      'review.example.com/project1',
+                      'role_path': 'ansible/playbook_0/role_1/project1/roles'
+                      },
+                     {'checkout': 'master',
+                      'checkout_description': 'zuul branch',
+                      'link_name': 'ansible/playbook_0/role_2/common-config',
+                      'link_target': 'untrusted/project_1/'
+                      'review.example.com/common-config',
+                      'role_path': 'ansible/playbook_0/role_2/'
+                      'common-config/roles'
+                      }
+                 ]}
+            ]
+        }
+
+        self.assertEqual(expected, zuul['playbook_context'])
+
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
+
+    def getBuildInventory(self, name):
+        build = self.getBuildByName(name)
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        inventory = yaml.safe_load(open(inv_path, 'r'))
+        return inventory
+
+    def getCheckout(self, build, path):
+        root = os.path.join(build.jobdir.root, path)
+        repo = git.Repo(root)
+        return repo.head.commit.hexsha
 
 
 class TestRoles(RoleTestCase):

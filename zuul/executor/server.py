@@ -417,6 +417,30 @@ class KubeFwd(object):
             pass
 
 
+class JobDirPlaybookRole(object):
+    def __init__(self, root):
+        self.root = root
+        self.link_src = None
+        self.link_target = None
+        self.role_path = None
+        self.checkout_description = None
+        self.checkout = None
+
+    def toDict(self, jobdir_root=None):
+        # This is serialized to the zuul.playbook_context variable
+        if jobdir_root:
+            strip = len(jobdir_root) + 1
+        else:
+            strip = 0
+        return dict(
+            link_name=self.link_name[strip:],
+            link_target=self.link_target[strip:],
+            role_path=self.role_path[strip:],
+            checkout_description=self.checkout_description,
+            checkout=self.checkout,
+        )
+
+
 class JobDirPlaybook(object):
     def __init__(self, root):
         self.root = root
@@ -440,8 +464,25 @@ class JobDirPlaybook(object):
         count = len(self.roles)
         root = os.path.join(self.root, 'role_%i' % (count,))
         os.makedirs(root)
-        self.roles.append(root)
-        return root
+        role_info = JobDirPlaybookRole(root)
+        self.roles.append(role_info)
+        return role_info
+
+
+class JobDirProject(object):
+    def __init__(self, root):
+        self.root = root
+        self.canonical_name = None
+        self.checkout = None
+        self.commit = None
+
+    def toDict(self):
+        # This is serialized to the zuul.playbook_context variable
+        return dict(
+            canonical_name=self.canonical_name,
+            checkout=self.checkout,
+            commit=self.commit,
+        )
 
 
 class JobDir(object):
@@ -589,10 +630,8 @@ class JobDir(object):
             job_output.write("{now} | Job console starting...\n".format(
                 now=datetime.datetime.now()
             ))
-        self.trusted_projects = []
-        self.trusted_project_index = {}
-        self.untrusted_projects = []
-        self.untrusted_project_index = {}
+        self.trusted_projects = {}
+        self.untrusted_projects = {}
 
         # Create a JobDirPlaybook for the Ansible setup run.  This
         # doesn't use an actual playbook, but it lets us use the same
@@ -618,12 +657,14 @@ class JobDir(object):
         count = len(self.trusted_projects)
         root = os.path.join(self.trusted_root, 'project_%i' % (count,))
         os.makedirs(root)
-        self.trusted_projects.append(root)
-        self.trusted_project_index[(canonical_name, branch)] = root
-        return root
+        project_info = JobDirProject(root)
+        project_info.canonical_name = canonical_name
+        project_info.checkout = branch
+        self.trusted_projects[(canonical_name, branch)] = project_info
+        return project_info
 
     def getTrustedProject(self, canonical_name, branch):
-        return self.trusted_project_index.get((canonical_name, branch))
+        return self.trusted_projects.get((canonical_name, branch))
 
     def addUntrustedProject(self, canonical_name, branch):
         # Similar to trusted projects, but these hold checkouts of
@@ -635,12 +676,14 @@ class JobDir(object):
         count = len(self.untrusted_projects)
         root = os.path.join(self.untrusted_root, 'project_%i' % (count,))
         os.makedirs(root)
-        self.untrusted_projects.append(root)
-        self.untrusted_project_index[(canonical_name, branch)] = root
-        return root
+        project_info = JobDirProject(root)
+        project_info.canonical_name = canonical_name
+        project_info.checkout = branch
+        self.untrusted_projects[(canonical_name, branch)] = project_info
+        return project_info
 
     def getUntrustedProject(self, canonical_name, branch):
-        return self.untrusted_project_index.get((canonical_name, branch))
+        return self.untrusted_projects.get((canonical_name, branch))
 
     def addPrePlaybook(self):
         count = len(self.pre_playbooks)
@@ -1331,12 +1374,14 @@ class AnsibleJob(object):
             self.log.info("Checking out %s %s %s",
                           project['canonical_name'], selected_desc,
                           selected_ref)
-            repo.checkout(selected_ref)
+            commit = repo.checkout(selected_ref)
 
             # Update the inventory variables to indicate the ref we
             # checked out
             p = args['zuul']['projects'][project['canonical_name']]
             p['checkout'] = selected_ref
+            p['checkout_description'] = selected_desc
+            p['commit'] = commit.hexsha
 
         # Set the URL of the origin remote for each repo to a bogus
         # value. Keeping the remote allows tools to use it to determine
@@ -2024,43 +2069,44 @@ class AnsibleJob(object):
         return ret
 
     def checkoutTrustedProject(self, project, branch, args):
-        root = self.jobdir.getTrustedProject(project.canonical_name,
-                                             branch)
-        if not root:
-            root = self.jobdir.addTrustedProject(project.canonical_name,
-                                                 branch)
+        pi = self.jobdir.getTrustedProject(project.canonical_name,
+                                           branch)
+        if not pi:
+            pi = self.jobdir.addTrustedProject(project.canonical_name,
+                                               branch)
             self.log.debug("Cloning %s@%s into new trusted space %s",
-                           project, branch, root)
+                           project, branch, pi.root)
             # We always use the golang scheme for playbook checkouts
             # (so that the path indicates the canonical repo name for
             # easy debugging; there are no concerns with collisions
             # since we only have one repo in the working dir).
             merger = self.executor_server._getMerger(
-                root,
+                pi.root,
                 self.executor_server.merge_root,
                 logger=self.log,
                 scheme=zuul.model.SCHEME_GOLANG)
-            merger.checkoutBranch(
+            commit = merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch,
                 repo_state=args['repo_state'],
                 process_worker=self.executor_server.process_worker,
                 zuul_event_id=self.zuul_event_id)
+            pi.commit = commit.hexsha
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
-                           project, branch, root)
+                           project, branch, pi.root)
 
-        path = os.path.join(root,
+        path = os.path.join(pi.root,
                             project.canonical_hostname,
                             project.name)
         return path
 
     def checkoutUntrustedProject(self, project, branch, args):
-        root = self.jobdir.getUntrustedProject(project.canonical_name,
-                                               branch)
-        if not root:
-            root = self.jobdir.addUntrustedProject(project.canonical_name,
-                                                   branch)
+        pi = self.jobdir.getUntrustedProject(project.canonical_name,
+                                             branch)
+        if not pi:
+            pi = self.jobdir.addUntrustedProject(project.canonical_name,
+                                                 branch)
             # If the project is in the dependency chain, clone from
             # there so we pick up any speculative changes, otherwise,
             # clone from the cache.
@@ -2076,7 +2122,7 @@ class AnsibleJob(object):
                     # We already have this repo prepared
                     self.log.debug("Found workdir repo for untrusted project")
                     merger = self.executor_server._getMerger(
-                        root,
+                        pi.root,
                         self.jobdir.src_root,
                         logger=self.log,
                         scheme=zuul.model.SCHEME_GOLANG,
@@ -2086,7 +2132,7 @@ class AnsibleJob(object):
             repo_state = None
             if merger is None:
                 merger = self.executor_server._getMerger(
-                    root,
+                    pi.root,
                     self.executor_server.merge_root,
                     logger=self.log,
                     scheme=zuul.model.SCHEME_GOLANG)
@@ -2097,17 +2143,18 @@ class AnsibleJob(object):
                 repo_state = args['repo_state']
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
-                           project, branch, root)
-            merger.checkoutBranch(
+                           project, branch, pi.root)
+            commit = merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch, repo_state=repo_state,
                 process_worker=self.executor_server.process_worker,
                 zuul_event_id=self.zuul_event_id)
+            pi.commit = commit.hexsha
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
-                           project, branch, root)
+                           project, branch, pi.root)
 
-        path = os.path.join(root,
+        path = os.path.join(pi.root,
                             project.canonical_hostname,
                             project.name)
         return path
@@ -2149,8 +2196,8 @@ class AnsibleJob(object):
 
     def prepareRole(self, jobdir_playbook, role, args):
         if role['type'] == 'zuul':
-            root = jobdir_playbook.addRole()
-            self.prepareZuulRole(jobdir_playbook, role, args, root)
+            role_info = jobdir_playbook.addRole()
+            self.prepareZuulRole(jobdir_playbook, role, args, role_info)
 
     def findRole(self, path, trusted=False):
         d = os.path.join(path, 'tasks')
@@ -2173,7 +2220,7 @@ class AnsibleJob(object):
         # It is neither a bare role, nor a collection of roles
         raise RoleNotFoundError("Unable to find role in %s" % (path,))
 
-    def prepareZuulRole(self, jobdir_playbook, role, args, root):
+    def prepareZuulRole(self, jobdir_playbook, role, args, role_info):
         self.log.debug("Prepare zuul role for %s" % (role,))
         # Check out the role repo if needed
         source = self.executor_server.connections.getSource(
@@ -2190,6 +2237,8 @@ class AnsibleJob(object):
             branch = jobdir_playbook.branch
             self.log.debug("Role project is playbook project, "
                            "using playbook branch %s", branch)
+            role_info.checkout_description = 'playbook branch'
+            role_info.checkout = branch
         else:
             # Find if the project is one of the job-specified projects.
             # If it is, we can honor the project checkout-override options.
@@ -2209,6 +2258,8 @@ class AnsibleJob(object):
                 args_project.get('override_checkout'),
                 role['project_default_branch'])
             self.log.debug("Role using %s %s", selected_desc, branch)
+            role_info.checkout_description = selected_desc
+            role_info.checkout = branch
 
         if not jobdir_playbook.trusted:
             path = self.checkoutUntrustedProject(project, branch, args)
@@ -2218,12 +2269,14 @@ class AnsibleJob(object):
         # The name of the symlink is the requested name of the role
         # (which may be the repo name or may be something else; this
         # can come into play if this is a bare role).
-        link = os.path.join(root, name)
+        link = os.path.join(role_info.root, name)
         link = os.path.realpath(link)
-        if not link.startswith(os.path.realpath(root)):
+        if not link.startswith(os.path.realpath(role_info.root)):
             raise ExecutorError("Invalid role name %s" % name)
         os.symlink(path, link)
 
+        role_info.link_name = link
+        role_info.link_target = path
         try:
             role_path = self.findRole(link, trusted=jobdir_playbook.trusted)
         except RoleNotFoundError:
@@ -2239,7 +2292,8 @@ class AnsibleJob(object):
             raise
         if role_path is None:
             # In the case of a bare role, add the containing directory
-            role_path = root
+            role_path = role_info.root
+        role_info.role_path = role_path
         self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
 
@@ -2386,6 +2440,27 @@ class AnsibleJob(object):
             work_root=self.jobdir.work_root,
             result_data_file=self.jobdir.result_data_file,
             inventory_file=self.jobdir.inventory)
+
+        # Add playbook_context info
+        zuul_vars['playbook_context'] = dict(
+            playbook_projects={},
+            playbooks=[],
+        )
+        strip = len(self.jobdir.root) + 1
+        for pi in self.jobdir.trusted_projects.values():
+            root = os.path.join(pi.root[strip:], pi.canonical_name)
+            zuul_vars['playbook_context']['playbook_projects'][
+                root] = pi.toDict()
+        for pi in self.jobdir.untrusted_projects.values():
+            root = os.path.join(pi.root[strip:], pi.canonical_name)
+            zuul_vars['playbook_context']['playbook_projects'][
+                root] = pi.toDict()
+        for pb in self.jobdir.playbooks:
+            zuul_vars['playbook_context']['playbooks'].append(dict(
+                path=pb.path[strip:],
+                roles=[ri.toDict(self.jobdir.root) for ri in pb.roles
+                       if ri.role_path is not None],
+            ))
 
         with open(self.jobdir.zuul_vars, 'w') as zuul_vars_yaml:
             zuul_vars_yaml.write(
