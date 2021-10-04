@@ -12,11 +12,11 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import * as React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
+import { Button, Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
 import {
   CodeIcon,
   CodeBranchIcon,
@@ -32,9 +32,12 @@ import 'moment-duration-format'
 
 import { buildExternalLink } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
+import { ChartModal } from '../charts/ChartModal'
+import BuildsetGanttChart from '../charts/GanttChart'
 
 function Buildset({ buildset, timezone, tenant }) {
   const buildset_link = buildExternalLink(buildset)
+  const [isGanttChartModalOpen, setIsGanttChartModalOpen] = useState(false)
 
   const firstStartBuild = buildset.builds.reduce(
     (prev, cur) => (prev.start_time < cur.start_time ? prev : cur)
@@ -140,13 +143,15 @@ function Buildset({ buildset, timezone, tenant }) {
                 value={
                   <span>
                     <strong>Starting build </strong>
-                    {firstStartLink} <i>(started {moment
+                    {firstStartLink} <br />
+                    <i>(started {moment
                       .utc(firstStartBuild.start_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')})</i>
                     <br />
                     <strong>Ending build </strong>
-                    {lastEndLink} <i>(ended {moment
+                    {lastEndLink} <br />
+                    <i>(ended {moment
                       .utc(lastEndBuild.end_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')})</i>
@@ -161,7 +166,12 @@ function Buildset({ buildset, timezone, tenant }) {
                     <strong>Total duration </strong>
                     {moment
                       .duration(totalDuration, 'seconds')
-                      .format('h [hr] m [min] s [sec]')}
+                      .format('h [hr] m [min] s [sec]')} &nbsp;
+                    <Button
+                      key='GanttChartToggle'
+                      variant='secondary'
+                      onClick={() => { setIsGanttChartModalOpen(true) }}>Show timeline
+                    </Button>
                   </>
                 }
               />
@@ -185,6 +195,12 @@ function Buildset({ buildset, timezone, tenant }) {
           </FlexItem>
         </Flex>
       </Flex>
+      <ChartModal
+        chart={<BuildsetGanttChart builds={buildset.builds} />}
+        isOpen={isGanttChartModalOpen}
+        title='Builds Timeline'
+        onClose={() => { setIsGanttChartModalOpen(false) }}
+      />
     </>
   )
 }
