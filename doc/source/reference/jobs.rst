@@ -405,6 +405,20 @@ of item.
          This may be influenced by the branch or tag associated with
          the item as well as the job configuration.
 
+      .. var:: checkout_description
+
+         A human-readable description of why Zuul chose this
+         particular branch or tag to be checked out.  This is intended
+         as a debugging aid in the case of complex jobs.  The specific
+         text is not defined and is subject to change.
+
+      .. var:: commit
+
+         The hex SHA of the commit checked out.  This commit may
+         appear in the upstream repository, or if it the result of a
+         speculative merge, it may only exist during the run of this
+         job.
+
       For example, to access the source directory of a single known
       project, you might use::
 
@@ -417,6 +431,93 @@ of item.
           debug:
             msg: "Project {{ item.name }} is at {{ item.src_dir }}
           with_items: {{ zuul.projects.values() | list }}
+
+   .. var:: playbook_context
+      :type: dict
+
+      This dictionary contains information about the execution of each
+      playbook in the job.  This may be useful for understanding
+      exactly what playbooks and roles Zuul executed.
+
+      All paths herein are located under the root of the build
+      directory (note that is one level higher than the workspace
+      directory accessible to jobs on the executor).
+
+      .. var:: playbook_projects
+         :type: dict
+
+         A dictionary of projects that have been checked out for
+         playbook execution.  When used in the trusted execution
+         context, these will contain only merged commits in upstream
+         repositories.  In the case of the untrusted context, they may
+         contain speculatively merged code.
+
+         The key is the path and the value is as follows:
+
+         .. var:: canonical_name
+
+            The canonical name of the repository.
+
+         .. var:: checkout
+
+            The branch or tag checked out.
+
+         .. var:: commit
+
+            The hex SHA of the commit checked out.  As above, this
+            commit may or may not exist in the upstream repository
+            depending on whether it was the result of a speculative
+            merge.
+
+      .. var:: playbooks
+         :type: list
+
+         An ordered list of playbooks executed for the job.  Each item
+         is a dictionary with the following keys:
+
+         .. var:: path
+
+            The path to the playbook.
+
+         .. var:: roles
+            :type: list
+
+            Information about the roles available to the playbook.
+            The actual `role path` supplied to Ansible is the
+            concatenation of the ``role_path`` entry in each of the
+            following dictionaries.  The rest of the information
+            describes what is in the role path.
+
+            In order to deal with the many possible role layouts and
+            aliases, each element in the role path gets its own
+            directory.  Depending on the contents and alias
+            configuration for that role repo, a symlink is added to
+            one of the repo checkouts in
+            :var:`zuul.playbook_context.playbook_projects`.
+
+            .. var:: checkout
+
+               The branch or tag checked out.
+
+            .. var:: checkout_description
+
+               A human-readable description of why Zuul chose this
+               particular branch or tag to be checked out.  This is
+               intended as a debugging aid in the case of complex
+               jobs.  The specific text is not defined and is subject
+               to change.
+
+            .. var:: link_name
+
+               The name of the symbolic link.
+
+            .. var:: link_target
+
+               The target of the symbolic_link.
+
+            .. var:: role_path
+
+               The role path passed to Ansible.
 
    .. var:: tenant
 
