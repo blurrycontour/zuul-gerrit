@@ -82,7 +82,7 @@ class TestJob(BaseTestCase):
             self.project.private_secrets_key = priv
             self.project.public_secrets_key = pub
         m = yaml.Mark('name', 0, 0, 0, '', 0)
-        self.start_mark = configloader.ZuulMark(m, m, '')
+        self.start_mark = model.ZuulMark(m, m, '')
 
     @property
     def job(self):
