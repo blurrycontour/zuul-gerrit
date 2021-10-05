@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcc2b28d_12692e6c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-05T09:17:54Z",
+      "side": 0,
+      "message": "As I needed this change as well I\u0027ve done it in https://review.opendev.org/c/zuul/zuul/+/812450/",
+      "revId": "9cfa1bfcda453f73ade7b7736a3ce49b367e8291",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
