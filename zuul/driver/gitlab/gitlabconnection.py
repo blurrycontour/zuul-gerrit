@@ -398,9 +398,13 @@ class GitlabAPIClient():
 
     # https://docs.gitlab.com/ee/api/merge_requests.html#accept-mr
     def merge_mr(self, project_name, number,
+                 method,
                  zuul_event_id=None):
         path = "/projects/%s/merge_requests/%s/merge" % (
             quote_plus(project_name), number)
+        params = {}
+        if method == "squash":
+            params['squash'] = True
         resp = self.put(self.baseurl + path, zuul_event_id=zuul_event_id)
         try:
             self._manage_error(*resp, zuul_event_id=zuul_event_id)
@@ -653,9 +657,10 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
         # Will be done in a folloup commit
         return []
 
-    def mergeMR(self, project_name, number, event=None):
+    def mergeMR(self, project_name, number, method='merge', event=None):
         log = get_annotated_logger(self.log, event)
-        self.gl_client.merge_mr(project_name, number, zuul_event_id=event)
+        self.gl_client.merge_mr(
+            project_name, number, method, zuul_event_id=event)
         log.info("Merged MR %s#%s", project_name, number)
 
 
