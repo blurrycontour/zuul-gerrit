@@ -16,7 +16,7 @@ import json
 import time
 import contextlib
 
-from kazoo.exceptions import ZookeeperError
+from kazoo.exceptions import KazooException, ZookeeperError
 
 
 class ZKContext:
@@ -137,7 +137,7 @@ class ZKObject:
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
                 raise
-            except Exception:
+            except KazooException:
                 context.log.exception(
                     "Exception deleting ZKObject %s, will retry", self)
                 time.sleep(self._retry_interval)
@@ -165,7 +165,7 @@ class ZKObject:
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
                 raise
-            except Exception:
+            except KazooException:
                 context.log.exception(
                     "Exception loading ZKObject %s, will retry", self)
                 time.sleep(5)
@@ -189,7 +189,7 @@ class ZKObject:
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
                 raise
-            except Exception:
+            except KazooException:
                 context.log.exception(
                     "Exception saving ZKObject %s, will retry", self)
                 time.sleep(self._retry_interval)
