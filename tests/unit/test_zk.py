@@ -51,7 +51,7 @@ from tests.base import (
 from zuul.zk.zkobject import ZKObject, ZKContext
 from zuul.zk.locks import tenant_write_lock
 
-from kazoo.exceptions import ZookeeperError
+from kazoo.exceptions import KazooException, ZookeeperError
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -1514,7 +1514,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
             def set(self, *args, **kw):
                 self.count += 1
                 if self.count < 2:
-                    raise Exception()
+                    raise KazooException()
                 return self._real_client.set(*args, **kw)
 
         # Fail an update
