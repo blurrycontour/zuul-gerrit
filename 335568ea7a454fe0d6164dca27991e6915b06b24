@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2195d8df_c1beece0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-05T23:12:35Z",
+      "side": 1,
+      "message": "Should we just do this at the end of pipeline processing?",
+      "revId": "335568ea7a454fe0d6164dca27991e6915b06b24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
