@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0024513c_90d05b07",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-05T23:23:06Z",
+      "side": 1,
+      "message": "I\u0027m looking at this as something we should try to remove once we\u0027re done.  I don\u0027t have any suggestions now, but it looks like this could be a source of maintenance issues.",
+      "revId": "00c58a1185bd7eee97dca3b2f5d183059e0c6a4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
