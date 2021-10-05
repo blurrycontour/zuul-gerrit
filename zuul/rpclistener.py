@@ -28,8 +28,25 @@ from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
 
 
+class LocalBuildSet(model.BuildSet):
+    """Local non-persistent build set."""
+
+    def _save(self, ctx, create=False):
+        pass
+
+
 class LocalQueueItem(model.QueueItem):
     """Local non-persistent queue item for job freezing."""
+
+    @classmethod
+    def new(klass, context, **kw):
+        obj = klass()
+        obj._set(**kw)
+        files_state = (model.BuildSet.COMPLETE if obj.change.files is not None
+                       else model.BuildSet.NEW)
+        obj.updateAttributes(context, current_build_set=LocalBuildSet.new(
+            context, item=obj, files_state=files_state, uuid=None))
+        return obj
 
     def _save(self, ctx, create=False):
         pass
