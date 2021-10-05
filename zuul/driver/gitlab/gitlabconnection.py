@@ -30,6 +30,7 @@ from typing import List, Optional
 
 from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
 from zuul.web.handler import BaseWebController
+from zuul.lib.http import ZuulHTTPAdapter
 from zuul.lib.logutil import get_annotated_logger
 from zuul.exceptions import MergeFailure
 from zuul.model import Branch, Project, Ref, Tag
@@ -254,11 +255,12 @@ class GitlabAPIClientException(Exception):
 class GitlabAPIClient():
     log = logging.getLogger("zuul.GitlabAPIClient")
 
-    def __init__(self, baseurl, api_token):
+    def __init__(self, baseurl, api_token, keepalive):
         self.session = requests.Session()
         retry = urllib3.util.Retry(total=8,
                                    backoff_factor=0.1)
-        adapter = requests.adapters.HTTPAdapter(max_retries=retry)
+        adapter = ZuulHTTPAdapter(keepalive=keepalive,
+                                  max_retries=retry)
         self.session.mount(baseurl, adapter)
         self.baseurl = '%s/api/v4' % baseurl
         self.api_token = api_token
@@ -435,7 +437,10 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
             'api_token_name', '')
         self.api_token = self.connection_config.get(
             'api_token', '')
-        self.gl_client = GitlabAPIClient(self.baseurl, self.api_token)
+        self.keepalive = self.connection_config.get('keepalive', 60)
+
+        self.gl_client = GitlabAPIClient(self.baseurl, self.api_token,
+                                         self.keepalive)
         self.sched = None
         self.source = driver.getSource(self)
 
