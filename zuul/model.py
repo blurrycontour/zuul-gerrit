@@ -104,6 +104,32 @@ SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'  # Internal use only
 
 
+class ZuulMark:
+    # The yaml mark class differs between the C and python versions.
+    # The C version does not provide a snippet, and also appears to
+    # lose data under some circumstances.
+    def __init__(self, start_mark, end_mark, stream):
+        self.name = start_mark.name
+        self.index = start_mark.index
+        self.line = start_mark.line
+        self.end_line = end_mark.line
+        self.end_index = end_mark.index
+        self.column = start_mark.column
+        self.end_column = end_mark.column
+        self.snippet = stream[start_mark.index:end_mark.index]
+
+    def __str__(self):
+        return '  in "{name}", line {line}, column {column}'.format(
+            name=self.name,
+            line=self.line + 1,
+            column=self.column + 1,
+        )
+
+    def __eq__(self, other):
+        return (self.line == other.line and
+                self.snippet == other.snippet)
+
+
 class ConfigurationErrorKey(object):
     """A class which attempts to uniquely identify configuration errors
     based on their file location.  It's not perfect, but it's usually

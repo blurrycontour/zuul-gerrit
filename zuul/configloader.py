@@ -325,32 +325,6 @@ def reference_exceptions(stanza, obj, accumulator):
         accumulator.addError(context, start_mark, m, str(e))
 
 
-class ZuulMark(object):
-    # The yaml mark class differs between the C and python versions.
-    # The C version does not provide a snippet, and also appears to
-    # lose data under some circumstances.
-    def __init__(self, start_mark, end_mark, stream):
-        self.name = start_mark.name
-        self.index = start_mark.index
-        self.line = start_mark.line
-        self.end_line = end_mark.line
-        self.end_index = end_mark.index
-        self.column = start_mark.column
-        self.end_column = end_mark.column
-        self.snippet = stream[start_mark.index:end_mark.index]
-
-    def __str__(self):
-        return '  in "{name}", line {line}, column {column}'.format(
-            name=self.name,
-            line=self.line + 1,
-            column=self.column + 1,
-        )
-
-    def __eq__(self, other):
-        return (self.line == other.line and
-                self.snippet == other.snippet)
-
-
 class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
@@ -373,8 +347,8 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
                 continue
 
             if k.value in keys:
-                mark = ZuulMark(node.start_mark, node.end_mark,
-                                self.zuul_stream)
+                mark = model.ZuulMark(node.start_mark, node.end_mark,
+                                      self.zuul_stream)
                 raise YAMLDuplicateKeyError(k.value, node, self.zuul_context,
                                             mark)
             keys.add(k.value)
@@ -383,8 +357,9 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
         if len(keys) == 1 and keys.intersection(self.zuul_node_types):
             d = list(r.values())[0]
             if isinstance(d, dict):
-                d['_start_mark'] = ZuulMark(node.start_mark, node.end_mark,
-                                            self.zuul_stream)
+                d['_start_mark'] = model.ZuulMark(node.start_mark,
+                                                  node.end_mark,
+                                                  self.zuul_stream)
                 d['_source_context'] = self.zuul_context
         return r
 
@@ -425,7 +400,7 @@ class PragmaParser(object):
         'implied-branch-matchers': bool,
         'implied-branches': to_list(str),
         '_source_context': model.SourceContext,
-        '_start_mark': ZuulMark,
+        '_start_mark': model.ZuulMark,
     }
 
     schema = vs.Schema(pragma)
@@ -467,7 +442,7 @@ class NodeSetParser(object):
         nodeset = {vs.Required('nodes'): to_list(node),
                    'groups': to_list(group),
                    '_source_context': model.SourceContext,
-                   '_start_mark': ZuulMark,
+                   '_start_mark': model.ZuulMark,
                    }
 
         if not anonymous:
@@ -533,7 +508,7 @@ class SecretParser(object):
         secret = {vs.Required('name'): str,
                   vs.Required('data'): dict,
                   '_source_context': model.SourceContext,
-                  '_start_mark': ZuulMark,
+                  '_start_mark': model.ZuulMark,
                   }
 
         return vs.Schema(secret)
@@ -607,7 +582,7 @@ class JobParser(object):
                       'cleanup-run': to_list(str),
                       'ansible-version': vs.Any(str, float),
                       '_source_context': model.SourceContext,
-                      '_start_mark': ZuulMark,
+                      '_start_mark': model.ZuulMark,
                       'roles': to_list(role),
                       'required-projects': to_list(vs.Any(job_project, str)),
                       'vars': ansible_vars_dict,
@@ -970,7 +945,7 @@ class ProjectTemplateParser(object):
             'vars': ansible_vars_dict,
             str: pipeline_contents,
             '_source_context': model.SourceContext,
-            '_start_mark': ZuulMark,
+            '_start_mark': model.ZuulMark,
         }
 
         return vs.Schema(project)
@@ -1063,7 +1038,7 @@ class ProjectParser(object):
             'queue': str,
             str: pipeline_contents,
             '_source_context': model.SourceContext,
-            '_start_mark': ZuulMark,
+            '_start_mark': model.ZuulMark,
         }
 
         return vs.Schema(project)
@@ -1215,7 +1190,7 @@ class PipelineParser(object):
                     'window-decrease-type': window_type,
                     'window-decrease-factor': window_factor,
                     '_source_context': model.SourceContext,
-                    '_start_mark': ZuulMark,
+                    '_start_mark': model.ZuulMark,
                     }
         pipeline['require'] = self.getDriverSchema('require')
         pipeline['reject'] = self.getDriverSchema('reject')
@@ -1350,7 +1325,7 @@ class SemaphoreParser(object):
         semaphore = {vs.Required('name'): str,
                      'max': int,
                      '_source_context': model.SourceContext,
-                     '_start_mark': ZuulMark,
+                     '_start_mark': model.ZuulMark,
                      }
 
         return vs.Schema(semaphore)
@@ -1375,7 +1350,7 @@ class QueueParser:
                  'per-branch': bool,
                  'allow-circular-dependencies': bool,
                  '_source_context': model.SourceContext,
-                 '_start_mark': ZuulMark,
+                 '_start_mark': model.ZuulMark,
                  }
         return vs.Schema(queue)
 
