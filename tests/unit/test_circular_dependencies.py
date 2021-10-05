@@ -923,7 +923,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # We only want to have a merge failure for the first item in the queue
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         items = tenant.layout.pipelines['gate'].getAllItems()
-        items[0].current_build_set.unable_to_merge = True
+        context = self.createZKContext()
+        items[0].current_build_set.updateAttributes(context,
+                                                    unable_to_merge=True)
 
         self.waitUntilSettled()
 

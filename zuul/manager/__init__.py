@@ -1103,7 +1103,8 @@ class PipelineManager(metaclass=ABCMeta):
         log.debug("Scheduling merge for item %s (files: %s, dirs: %s)" %
                   (item, files, dirs))
         build_set = item.current_build_set
-        build_set.merge_state = build_set.PENDING
+        build_set.updateAttributes(self.current_context,
+                                   merge_state=build_set.PENDING)
 
         # If the involved projects exclude unprotected branches we should also
         # exclude them from the merge and repo state except the branch of the
@@ -1137,7 +1138,8 @@ class PipelineManager(metaclass=ABCMeta):
         log = item.annotateLogger(self.log)
         log.debug("Scheduling fileschanged for item %s", item)
         build_set = item.current_build_set
-        build_set.files_state = build_set.PENDING
+        build_set.updateAttributes(self.current_context,
+                                   files_state=build_set.PENDING)
 
         to_sha = getattr(item.change, "branch", None)
         self.sched.merger.getFilesChanges(
@@ -1173,8 +1175,9 @@ class PipelineManager(metaclass=ABCMeta):
         projects -= projects_to_remove
 
         if not projects:
-            item.current_build_set.repo_state_state =\
-                item.current_build_set.COMPLETE
+            item.current_build_set.updateAttributes(
+                self.current_context,
+                repo_state_state=item.current_build_set.COMPLETE)
             return True
 
         branches = self._branchesForRepoState(
@@ -1201,7 +1204,7 @@ class PipelineManager(metaclass=ABCMeta):
         # isn't already set.
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
         if not build_set.ref:
-            build_set.setConfiguration()
+            build_set.setConfiguration(self.current_context)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
@@ -1292,7 +1295,8 @@ class PipelineManager(metaclass=ABCMeta):
         # At this point we know all frozen jobs and their repos so update the
         # repo state with all missing repos.
         if build_set.repo_state_state == build_set.NEW:
-            build_set.repo_state_state = build_set.PENDING
+            build_set.updateAttributes(self.current_context,
+                                       repo_state_state=build_set.PENDING)
             self.scheduleGlobalRepoState(item)
         if build_set.repo_state_state == build_set.PENDING:
             return False
@@ -1425,7 +1429,9 @@ class PipelineManager(metaclass=ABCMeta):
             changed = dequeued = True
         elif not failing_reasons and item.live:
             nnfi = item
-        item.current_build_set.failing_reasons = failing_reasons
+        if not dequeued:
+            item.current_build_set.updateAttributes(
+                self.current_context, failing_reasons=failing_reasons)
         if failing_reasons:
             log.debug("%s is a failing item because %s" %
                       (item, failing_reasons))
@@ -1588,7 +1594,8 @@ class PipelineManager(metaclass=ABCMeta):
         source = self.sched.connections.getSource(
             item.change.project.connection_name)
         source.setChangeAttributes(item.change, files=event.files)
-        build_set.files_state = build_set.COMPLETE
+        build_set.updateAttributes(self.current_context,
+                                   files_state=build_set.COMPLETE)
 
     def onMergeCompleted(self, event, build_set):
         if build_set.merge_state == build_set.COMPLETE:
@@ -1603,18 +1610,19 @@ class PipelineManager(metaclass=ABCMeta):
         if isinstance(item.change, model.Tag):
             source.setChangeAttributes(
                 item.change, containing_branches=event.item_in_branches)
-        build_set.merge_state = build_set.COMPLETE
-        build_set.repo_state = event.repo_state
-        if event.merged:
-            build_set.commit = event.commit
-            items_ahead = item.getNonLiveItemsAhead()
-            for index, item in enumerate(items_ahead):
-                files = item.current_build_set.files
-                files.setFiles(event.files[:index + 1])
-            build_set.files.setFiles(event.files)
-        elif event.updated:
-            build_set.commit = (item.change.newrev or
-                                '0000000000000000000000000000000000000000')
+        with build_set.activeContext(self.current_context):
+            build_set.merge_state = build_set.COMPLETE
+            build_set.repo_state = event.repo_state
+            if event.merged:
+                build_set.commit = event.commit
+                items_ahead = item.getNonLiveItemsAhead()
+                for index, item in enumerate(items_ahead):
+                    files = item.current_build_set.files
+                    files.setFiles(event.files[:index + 1])
+                build_set.files.setFiles(event.files)
+            elif event.updated:
+                build_set.commit = (item.change.newrev or
+                                    '0000000000000000000000000000000000000000')
         if not build_set.commit:
             self.log.info("Unable to merge change %s" % item.change)
             item.setUnableToMerge()
@@ -1632,7 +1640,8 @@ class PipelineManager(metaclass=ABCMeta):
                     repo_state[connection].update(event.repo_state[connection])
                 else:
                     repo_state[connection] = event.repo_state[connection]
-            build_set.repo_state_state = build_set.COMPLETE
+            build_set.updateAttributes(self.current_context,
+                                       repo_state_state=build_set.COMPLETE)
 
     def onNodesProvisioned(self, request, nodeset, build_set):
         # TODOv3(jeblair): handle provisioning failure here
