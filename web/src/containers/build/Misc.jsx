@@ -16,15 +16,13 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import {
-    Label,
+  Label,
 } from '@patternfly/react-core'
 import {
-  CheckIcon,
   ExclamationIcon,
   QuestionIcon,
-  TimesIcon,
 } from '@patternfly/react-icons'
-import { ConditionalWrapper } from '../../Misc'
+import { ConditionalWrapper, BUILDS_CONSTS } from '../../Misc'
 
 const RESULT_ICON_CONFIGS = {
   // In progress
@@ -33,56 +31,7 @@ const RESULT_ICON_CONFIGS = {
     color: 'var(--pf-global--info-color--100)',
     badgeColor: 'blue',
   },
-  SUCCESS: {
-    icon: CheckIcon,
-    color: 'var(--pf-global--success-color--100)',
-    badgeColor: 'green',
-  },
-  FAILURE: {
-    icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
-    badgeColor: 'red',
-  },
-  RETRY_LIMIT: {
-    icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
-    badgeColor: 'red',
-  },
-  SKIPPED: {
-    icon: QuestionIcon,
-    color: 'var(--pf-global--info-color--100)',
-    badgeColor: 'blue',
-  },
-  ABORTED: {
-    icon: QuestionIcon,
-    color: 'var(--pf-global--info-color--100)',
-    badgeColor: 'yellow',
-  },
-  MERGER_FAILURE: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  NODE_FAILURE: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  TIMED_OUT: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  POST_FAILURE: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  CONFIG_ERROR: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
+  ...BUILDS_CONSTS,
 }
 
 const DEFAULT_RESULT_ICON_CONFIG = {

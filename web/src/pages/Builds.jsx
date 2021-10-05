@@ -26,6 +26,7 @@ import {
   writeFiltersToUrl,
 } from '../containers/FilterToolbar'
 import BuildTable from '../containers/build/BuildTable'
+import { BUILDS_CONSTS } from '../Misc'
 
 class BuildsPage extends React.Component {
   static propTypes = {
@@ -73,27 +74,7 @@ class BuildsPage extends React.Component {
         title: 'Result',
         placeholder: 'Any result',
         type: 'select',
-        // TODO there should be a single source of truth for this
-        options: [
-          'SUCCESS',
-          'FAILURE',
-          'RETRY_LIMIT',
-          'POST_FAILURE',
-          'SKIPPED',
-          'NODE_FAILURE',
-          'MERGER_FAILURE',
-          'CONFIG_ERROR',
-          'TIMED_OUT',
-          'CANCELED',
-          'ERROR',
-          'RETRY',
-          'DISK_FULL',
-          'NO_JOBS',
-          'DISCONNECT',
-          'ABORTED',
-          'LOST',
-          'EXCEPTION',
-          'NO_HANDLE'],
+        options: Object.keys(BUILDS_CONSTS),
       },
       {
         key: 'uuid',
