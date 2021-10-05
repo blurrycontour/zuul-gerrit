@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5086e2c3_f23ced2c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-05T23:27:14Z",
+      "side": 1,
+      "message": "Two ideas:\n\nOption 1:\n\nThe object itself could have a complete flag.\n\nSo the shards are:\n\n/path/to/object/001\n/path/to/object/002\n\nBut the object itself:\n\n/path/to/object\n\nCould have data of \"complete: True\".\n\nOption 2:\n\nWe delete the shards before writing them.  Then any incomplete write would produce invaled json data (I\u0027m assuming all our data will be json), and then we can detect that on load with a json parse error.",
+      "revId": "8fd91b8b92b4be17312b3dd00482d55a1a6d4451",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
