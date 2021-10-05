@@ -16,7 +16,11 @@ import json
 import time
 import contextlib
 
-from kazoo.exceptions import KazooException, ZookeeperError
+from kazoo.exceptions import (
+    KazooException, NodeExistsError, NoNodeError, ZookeeperError)
+
+from zuul.zk import sharding
+from zuul.zk.exceptions import InvalidObjectError
 
 
 class ZKContext:
@@ -204,3 +208,54 @@ class ZKObject:
     def _set(self, **kw):
         for name, value in kw.items():
             super().__setattr__(name, value)
+
+
+class ShardedZKObject(ZKObject):
+    def _load(self, context, path=None):
+        if path is None:
+            path = self.getPath()
+        while context.sessionIsValid():
+            try:
+                with sharding.BufferedShardReader(
+                        context.client, path) as stream:
+                    data = stream.read()
+                if not data and context.client.exists(path) is None:
+                    raise NoNodeError
+                self._set(**self.deserialize(data, context))
+                return
+            except ZookeeperError:
+                # These errors come from the server and are not
+                # retryable.  Connection errors are KazooExceptions so
+                # they aren't caught here and we will retry.
+                raise
+            except KazooException:
+                context.log.exception(
+                    "Exception loading ZKObject %s, will retry", self)
+                time.sleep(5)
+            except Exception as exc:
+                self.delete(context)
+                raise InvalidObjectError from exc
+        raise Exception("ZooKeeper session or lock not valid")
+
+    def _save(self, context, create=False):
+        data = self.serialize()
+        path = self.getPath()
+        while context.sessionIsValid():
+            try:
+                if create and context.client.exists(path) is not None:
+                    raise NodeExistsError
+                with sharding.BufferedShardWriter(
+                        context.client, path) as stream:
+                    stream.truncate(0)
+                    stream.write(data)
+                return
+            except ZookeeperError:
+                # These errors come from the server and are not
+                # retryable.  Connection errors are KazooExceptions so
+                # they aren't caught here and we will retry.
+                raise
+            except KazooException:
+                context.log.exception(
+                    "Exception saving ZKObject %s, will retry", self)
+                time.sleep(self._retry_interval)
+        raise Exception("ZooKeeper session or lock not valid")
