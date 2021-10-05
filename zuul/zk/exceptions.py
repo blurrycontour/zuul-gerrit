@@ -29,3 +29,7 @@ class NoClientException(ZuulZooKeeperException):
 
 class JobRequestNotFound(ZuulZooKeeperException):
     pass
+
+
+class InvalidObjectError(ZuulZooKeeperException):
+    pass
