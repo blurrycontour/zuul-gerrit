@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "36371cf0_e893717a",
+        "filename": "releasenotes/notes/playbooks-trigger-files-0b9ce5b71882c7a9.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-05T22:55:53Z",
+      "side": 1,
+      "message": "I guess the idea for using an upgrade note here is \"you can delete those lines from your files matchers now?\"\n\nI\u0027d prefer if we reserved \u0027upgrade\u0027 for \"You must or really should do this thing otherwise you will be unhappy\".  If people don\u0027t delete extra lines from file matchers, it\u0027s no big deal.  This way when we do use upgrade, it means we really want them to pay attention.  How about we use \u0027features\u0027 for this?",
+      "revId": "3f4d83dd7b722377d8f0792680fe6334aaaebc8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
