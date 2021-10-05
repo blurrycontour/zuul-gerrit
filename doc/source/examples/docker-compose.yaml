@@ -34,7 +34,7 @@ services:
       - "certs:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
     # introduced for 3.7.0: zookeeper shall wait for certificates to be available
-    # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
+    # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
     command: |
       /bin/sh -c '\
         while [ ! -f /var/certs/keystores/examples_zk_1.examples_default.pem ] ; do \
@@ -99,6 +99,14 @@ services:
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
       - "certs:/var/certs:z"
+    # introduced for 3.7.0: zookeeper shall wait for certificates to be available
+    # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
+    command: |
+      /bin/sh -c '\
+        while [ ! -f /var/certs/keystores/examples_zk_1.examples_default.pem ] ; do \
+          sleep 1; \
+        done; \
+      /usr/local/bin/zuul-executor -f'
   node:
     build:
       dockerfile: node-Dockerfile
