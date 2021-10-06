@@ -26,37 +26,7 @@ from zuul.connection import BaseConnection
 from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
-
-
-class LocalBuildSet(model.BuildSet):
-    """Local non-persistent build set."""
-
-    def _save(self, ctx, create=False):
-        pass
-
-
-class LocalQueueItem(model.QueueItem):
-    """Local non-persistent queue item for job freezing."""
-
-    @classmethod
-    def new(klass, context, **kw):
-        obj = klass()
-        obj._set(**kw)
-        files_state = (model.BuildSet.COMPLETE if obj.change.files is not None
-                       else model.BuildSet.NEW)
-        obj.updateAttributes(context, current_build_set=LocalBuildSet.new(
-            context, item=obj, files_state=files_state, uuid=None))
-        return obj
-
-    def _save(self, ctx, create=False):
-        pass
-
-
-class LocalChangeQueue(model.ChangeQueue):
-    """Local non-persistent change queue."""
-
-    def _save(self, ctx, create=False):
-        pass
+from zuul.zk.zkobject import LocalZKContext
 
 
 class RPCListenerBase(metaclass=ABCMeta):
@@ -471,10 +441,11 @@ class RPCListener(RPCListenerBase):
 
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
-        queue = LocalChangeQueue.new(None, pipeline=pipeline)
-        item = LocalQueueItem.new(None, queue=queue, change=change,
-                                  pipeline=queue.pipeline)
-        item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
+        context = LocalZKContext(self.log)
+        queue = model.ChangeQueue.new(context, pipeline=pipeline)
+        item = model.QueueItem.new(context, queue=queue, change=change,
+                                   pipeline=queue.pipeline)
+        item.freezeJobGraph(tenant.layout, context, skip_file_matcher=True)
 
         output = []
 
@@ -502,10 +473,11 @@ class RPCListener(RPCListenerBase):
 
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
-        queue = LocalChangeQueue.new(None, pipeline=pipeline)
-        item = LocalQueueItem.new(None, queue=queue, change=change,
-                                  pipeline=queue.pipeline)
-        item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
+        context = LocalZKContext(self.log)
+        queue = model.ChangeQueue.new(context, pipeline=pipeline)
+        item = model.QueueItem.new(context, queue=queue, change=change,
+                                   pipeline=queue.pipeline)
+        item.freezeJobGraph(tenant.layout, context, skip_file_matcher=True)
 
         job = item.job_graph.jobs.get(args.get("job"))
         if not job:
@@ -515,6 +487,7 @@ class RPCListener(RPCListenerBase):
         uuid = '0' * 32
         params = zuul.executor.common.construct_build_params(
             uuid, self.sched, job, item, pipeline)
+        params['zuul']['buildset'] = None
         gear_job.sendWorkComplete(json.dumps(params, cls=ZuulJSONEncoder))
 
     def handle_allowed_labels_get(self, job):

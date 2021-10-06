@@ -30,6 +30,7 @@ import zuul.lib.connections
 
 from tests.base import BaseTestCase, FIXTURE_DIR
 from zuul.lib.ansible import AnsibleManager
+from zuul.zk.zkobject import LocalZKContext
 
 
 class Dummy(object):
@@ -71,6 +72,7 @@ class TestJob(BaseTestCase):
         self.pipeline = model.Pipeline('gate', self.tenant)
         self.pipeline.source_context = self.context
         self.pipeline.manager = mock.Mock()
+        self.zk_context = LocalZKContext(self.log)
         self.layout.addPipeline(self.pipeline)
         self.queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
         self.pcontext = configloader.ParseContext(
@@ -221,7 +223,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27.changeMatchesBranch(change))
         self.assertFalse(python27diablo.changeMatchesBranch(change))
 
-        item.freezeJobGraph(self.layout)
+        item.freezeJobGraph(self.layout, self.zk_context)
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -234,7 +236,7 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27.changeMatchesBranch(change))
         self.assertTrue(python27diablo.changeMatchesBranch(change))
 
-        item.freezeJobGraph(self.layout)
+        item.freezeJobGraph(self.layout, self.zk_context)
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -283,7 +285,7 @@ class TestJob(BaseTestCase):
         self.assertFalse(python27.changeMatchesFiles(change))
 
         self.pipeline.manager.getFallbackLayout = mock.Mock(return_value=None)
-        item.freezeJobGraph(self.layout)
+        item.freezeJobGraph(self.layout, self.zk_context)
         self.assertEqual([], item.getJobs())
 
     def test_job_source_project(self):
@@ -353,7 +355,7 @@ class TestJob(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
-            item.freezeJobGraph(self.layout)
+            item.freezeJobGraph(self.layout, self.zk_context)
 
 
 class TestGraph(BaseTestCase):
