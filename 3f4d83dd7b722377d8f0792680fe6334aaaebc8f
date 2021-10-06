@@ -16,6 +16,24 @@
       "revId": "3f4d83dd7b722377d8f0792680fe6334aaaebc8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb2073ae_b03970b5",
+        "filename": "releasenotes/notes/playbooks-trigger-files-0b9ce5b71882c7a9.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-10-06T02:04:48Z",
+      "side": 1,
+      "message": "\u003e How about we use \u0027features\u0027 for this?\n\ndone",
+      "parentUuid": "36371cf0_e893717a",
+      "revId": "3f4d83dd7b722377d8f0792680fe6334aaaebc8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
