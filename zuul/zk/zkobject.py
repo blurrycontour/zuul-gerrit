@@ -35,6 +35,19 @@ class ZKContext:
                 not self.stop_event or not self.stop_event.is_set())
 
 
+class LocalZKContext:
+    """A Local ZKContext that means don't actually write anything to ZK"""
+
+    def __init__(self, log):
+        self.client = None
+        self.lock = None
+        self.stop_event = None
+        self.log = log
+
+    def sessionIsValid(self):
+        return True
+
+
 class ZKObject:
     _retry_interval = 5
 
@@ -175,6 +188,8 @@ class ZKObject:
         raise Exception("ZooKeeper session or lock not valid")
 
     def _save(self, context, create=False):
+        if isinstance(context, LocalZKContext):
+            return
         data = self.serialize()
         path = self.getPath()
         while context.sessionIsValid():
@@ -238,6 +253,8 @@ class ShardedZKObject(ZKObject):
         raise Exception("ZooKeeper session or lock not valid")
 
     def _save(self, context, create=False):
+        if isinstance(context, LocalZKContext):
+            return
         data = self.serialize()
         path = self.getPath()
         while context.sessionIsValid():
