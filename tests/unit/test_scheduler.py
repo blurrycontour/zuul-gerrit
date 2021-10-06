@@ -1390,10 +1390,6 @@ class TestScheduler(ZuulTestCase):
 
     def test_connection_cache_cleanup(self):
         "Test that cached changes are correctly cleaned up"
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1))
-        self.waitUntilSettled()
-
         sched = self.scheds.first.sched
 
         def _getCachedChanges():
@@ -1402,15 +1398,30 @@ class TestScheduler(ZuulTestCase):
                 cached.update(source.getCachedChanges())
             return cached
 
-        self.assertEqual(len(_getCachedChanges()), 1)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        self.hold_jobs_in_queue = True
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(_getCachedChanges()), 2)
         sched.maintainConnectionCache()
-        self.assertEqual(len(_getCachedChanges()), 1)
+        self.assertEqual(len(_getCachedChanges()), 2)
+
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(_getCachedChanges()), 2)
+        sched.maintainConnectionCache()
+        self.assertEqual(len(_getCachedChanges()), 2)
 
         # Test that outdated but still relevant changes are not cleaned up
         for connection in sched.connections.connections.values():
             connection.maintainCache(
                 [c.cache_stat.key for c in _getCachedChanges()], max_age=0)
-        self.assertEqual(len(_getCachedChanges()), 1)
+        self.assertEqual(len(_getCachedChanges()), 2)
 
         for connection in sched.connections.connections.values():
             connection.maintainCache([], max_age=0)

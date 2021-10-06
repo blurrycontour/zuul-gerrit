@@ -544,16 +544,20 @@ class Scheduler(threading.Thread):
                                    req_id)
 
     def _runGeneralCleanup(self):
+        self.log.debug("Starting general cleanup")
         if self.general_cleanup_lock.acquire(blocking=False):
             try:
                 self._runConfigCacheCleanup()
                 self._runExecutorApiCleanup()
                 self._runMergerApiCleanup()
                 self.maintainConnectionCache()
+            except Exception:
+                self.log.execption("Error in general cleanup:")
             finally:
                 self.general_cleanup_lock.release()
         # This has its own locking
         self._runNodeRequestCleanup()
+        self.log.debug("Finished general cleanup")
 
     def _runConfigCacheCleanup(self):
         with self.layout_lock:
@@ -566,6 +570,7 @@ class Scheduler(threading.Thread):
                 unused_projects = cached_projects - active_projects
                 for project_cname in unused_projects:
                     self.unparsed_config_cache.clearCache(project_cname)
+                self.log.debug("Finished config cache cleanup")
             except Exception:
                 self.log.exception("Error in config cache cleanup:")
 
@@ -1614,21 +1619,25 @@ class Scheduler(threading.Thread):
 
     def maintainConnectionCache(self):
         relevant = set()
+        self.log.debug("Starting connection cache maintenance")
         with self.layout_lock:
             for tenant in self.abide.tenants.values():
                 for pipeline in tenant.layout.pipelines.values():
-                    self.log.debug("Gather relevant cache items for: %s",
-                                   pipeline)
+                    self.log.debug("Gather relevant cache items for: %s %s",
+                                   tenant.name, pipeline.name)
                     for item in pipeline.getAllItems():
                         relevant.add(item.change.cache_stat.key)
-                        relevant.update(item.change.getRelatedChanges())
+                        relevant.update(
+                            item.change.getRelatedChanges(self))
 
         # We'll only remove changes older than `max_age` from the cache, as
         # it may take a while for an event that was processed by a connection
         # (which updated/populated the cache) to end up in a pipeline.
         for connection in self.connections.connections.values():
             connection.maintainCache(relevant, max_age=7200)  # 2h
-            self.log.debug("End maintain connection cache for: %s", connection)
+            self.log.debug("Finished connection cache maintenance for: %s",
+                           connection)
+        self.log.debug("Finished connection cache maintenance")
 
     def process_tenant_trigger_queue(self, tenant):
         try:

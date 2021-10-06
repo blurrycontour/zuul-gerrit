@@ -41,6 +41,7 @@ from zuul.lib.config import get_default
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
+from zuul.zk.change_cache import ChangeKey
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -3667,7 +3668,7 @@ class Ref(object):
     def isUpdateOf(self, other):
         return False
 
-    def getRelatedChanges(self):
+    def getRelatedChanges(self, sched):
         return set()
 
     def updatesConfig(self, tenant):
@@ -3878,13 +3879,16 @@ class Change(Branch):
             return True
         return False
 
-    def getRelatedChanges(self):
+    def getRelatedChanges(self, sched):
         related = set()
-        for c in self.needs_changes:
-            related.add(c)
-        for c in self.needed_by_changes:
-            related.add(c)
-            related.update(c.getRelatedChanges())
+        for reference in self.needs_changes:
+            related.add(reference)
+        for reference in self.needed_by_changes:
+            related.add(reference)
+            key = ChangeKey.fromReference(reference)
+            source = sched.connections.getSource(key.connection_name)
+            change = source.getChangeByKey(key)
+            related.update(change.getRelatedChanges(sched))
         return related
 
     def getSafeAttributes(self):
