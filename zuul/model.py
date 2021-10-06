@@ -2589,7 +2589,7 @@ class Worker(object):
         return '<Worker %s>' % self.name
 
 
-class RepoFiles(object):
+class RepoFiles(zkobject.ShardedZKObject):
     """RepoFiles holds config-file content for per-project job config.
 
     When Zuul asks a merger to prepare a future multiple-repo state
@@ -2603,23 +2603,38 @@ class RepoFiles(object):
     """
 
     def __init__(self):
-        self.connections = {}
+        super().__init__()
+        self._set(connections={})
 
     def __repr__(self):
         return '<RepoFiles %s>' % self.connections
 
-    def setFiles(self, items):
-        self.hostnames = {}
+    def setFiles(self, items, context):
         for item in items:
             connection = self.connections.setdefault(
                 item['connection'], {})
             project = connection.setdefault(item['project'], {})
             branch = project.setdefault(item['branch'], {})
             branch.update(item['files'])
+        self._save(context)
 
     def getFile(self, connection_name, project_name, branch, fn):
         host = self.connections.get(connection_name, {})
         return host.get(project_name, {}).get(branch, {}).get(fn)
+
+    def getPath(self):
+        return self.repoFilesPath(self._buildset_path)
+
+    @classmethod
+    def repoFilesPath(cls, buildset_path):
+        return f"{buildset_path}/files"
+
+    def serialize(self):
+        data = {
+            "connections": self.connections,
+            "_buildset_path": self._buildset_path,
+        }
+        return json.dumps(data).encode("utf8")
 
 
 class BuildSet(zkobject.ZKObject):
@@ -2638,6 +2653,8 @@ class BuildSet(zkobject.ZKObject):
     builders check out.
 
     """
+    log = logging.getLogger("zuul.BuilSet")
+
     # Merge states:
     NEW = 1
     PENDING = 2
@@ -2668,8 +2685,7 @@ class BuildSet(zkobject.ZKObject):
             merge_state=self.NEW,
             nodeset_info={},  # job -> dict of nodeset info
             node_requests={},  # job -> request id
-            # FIXME: init to None and make this a separate ZK node
-            files=RepoFiles(),
+            files=None,
             # FIXME: make this a separate object
             repo_state={},
             tries={},
@@ -2677,6 +2693,14 @@ class BuildSet(zkobject.ZKObject):
             repo_state_state=self.NEW,
             configured=False
         )
+
+    @classmethod
+    def new(klass, context, **kw):
+        obj = klass()
+        obj._set(**kw)
+        obj._save(context, create=True)
+        obj._set(files=RepoFiles.new(context, _buildset_path=obj.getPath()))
+        return obj
 
     def getPath(self):
         return f"{self.item.getPath()}/buildset/{self.uuid}"
@@ -2700,7 +2724,7 @@ class BuildSet(zkobject.ZKObject):
             "merge_state": self.merge_state,
             "nodeset_info": self.nodeset_info,
             "node_requests": self.node_requests,
-            # "files": RepoFiles(),
+            "files": RepoFiles.repoFilesPath(self.getPath()),
             # "repo_state": self.repo_state,
             "tries": self.tries,
             "files_state": self.files_state,
@@ -2710,9 +2734,15 @@ class BuildSet(zkobject.ZKObject):
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+        try:
+            files = RepoFiles.fromZK(context, data["files"])
+        except Exception:
+            self.log.exception("Failed to restore repo files; recreating")
+            files = RepoFiles.new(context, _buildset_path=self.getPath())
         data.update({
+            "files": files,
             "config_errors": [ConfigurationError.deserialize(d)
-                              for d in data["config_errors"]]
+                              for d in data["config_errors"]],
         })
         return data
 

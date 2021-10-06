@@ -1618,8 +1618,9 @@ class PipelineManager(metaclass=ABCMeta):
                 items_ahead = item.getNonLiveItemsAhead()
                 for index, item in enumerate(items_ahead):
                     files = item.current_build_set.files
-                    files.setFiles(event.files[:index + 1])
-                build_set.files.setFiles(event.files)
+                    files.setFiles(event.files[:index + 1],
+                                   self.current_context)
+                build_set.files.setFiles(event.files, self.current_context)
             elif event.updated:
                 build_set.commit = (item.change.newrev or
                                     '0000000000000000000000000000000000000000')
