@@ -1927,7 +1927,7 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
                                                    connection_config)
         self.merge_requests = changes_db
         self.gl_client = FakeGitlabAPIClient(
-            self.baseurl, self.api_token, merge_requests_db=changes_db)
+            self.baseurl, self.api_token, 60, merge_requests_db=changes_db)
         self.rpcclient = rpcclient
         self.upstream_root = upstream_root
         self.mr_number = 0
@@ -2024,8 +2024,10 @@ FakeBranch = namedtuple('Branch', ('name', 'protected'))
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
 
-    def __init__(self, baseurl, api_token, merge_requests_db={}):
-        super(FakeGitlabAPIClient, self).__init__(baseurl, api_token)
+    def __init__(self, baseurl, api_token, keepalive,
+                 merge_requests_db={}):
+        super(FakeGitlabAPIClient, self).__init__(
+            baseurl, api_token, keepalive)
         self.merge_requests = merge_requests_db
         self.fake_repos = defaultdict(lambda: IterableList('name'))
         self.community_edition = False

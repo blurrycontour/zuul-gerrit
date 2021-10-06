@@ -101,13 +101,19 @@ The supported options in ``zuul.conf`` connections are:
 
    .. attr:: cloneurl
       :default: {baseurl}
-      
+
       Omit to clone using http(s) or set to ``ssh://git@{server}``.
       If **api_token_name** is set and **cloneurl** is either omitted or is
       set without credentials, **cloneurl** will be modified to use credentials
       as this: ``http(s)://<api_token_name>:<api_token>@<server>``.
       If **cloneurl** is defined with credentials, it will be used as is,
       without modification from the driver.
+
+   .. attr:: keepalive
+      :default: 60
+
+      TCP connection keepalive timeout; ``0`` disables.
+
 
 
 Trigger Configuration
