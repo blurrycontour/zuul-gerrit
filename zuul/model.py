@@ -2589,7 +2589,7 @@ class Worker(object):
         return '<Worker %s>' % self.name
 
 
-class RepoFiles(object):
+class RepoFiles(zkobject.ShardedZKObject):
     """RepoFiles holds config-file content for per-project job config.
 
     When Zuul asks a merger to prepare a future multiple-repo state
@@ -2602,24 +2602,30 @@ class RepoFiles(object):
     configuration files can change with each new BuildSet.
     """
 
+    # If the node exists already, it is probably a half-written state
+    # from a crash; truncate it and continue.
+    truncate_on_create = True
+
     def __init__(self):
-        self.connections = {}
+        super().__init__()
+        self._set(connections={})
 
     def __repr__(self):
         return '<RepoFiles %s>' % self.connections
 
-    def setFiles(self, items):
-        self.hostnames = {}
-        for item in items:
-            connection = self.connections.setdefault(
-                item['connection'], {})
-            project = connection.setdefault(item['project'], {})
-            branch = project.setdefault(item['branch'], {})
-            branch.update(item['files'])
-
     def getFile(self, connection_name, project_name, branch, fn):
         host = self.connections.get(connection_name, {})
         return host.get(project_name, {}).get(branch, {}).get(fn)
+
+    def getPath(self):
+        return f"{self._buildset_path}/files"
+
+    def serialize(self):
+        data = {
+            "connections": self.connections,
+            "_buildset_path": self._buildset_path,
+        }
+        return json.dumps(data).encode("utf8")
 
 
 class BaseRepoState(zkobject.ShardedZKObject):
@@ -2684,6 +2690,7 @@ class BuildSet(zkobject.ZKObject):
     builders check out.
 
     """
+
     # Merge states:
     NEW = 1
     PENDING = 2
@@ -2714,8 +2721,7 @@ class BuildSet(zkobject.ZKObject):
             merge_state=self.NEW,
             nodeset_info={},  # job -> dict of nodeset info
             node_requests={},  # job -> request id
-            # FIXME: init to None and make this a separate ZK node
-            files=RepoFiles(),
+            files=None,
             merge_repo_state=None,  # The repo_state of the original merge
             extra_repo_state=None,  # Repo state for any additional projects
             tries={},
@@ -2723,6 +2729,22 @@ class BuildSet(zkobject.ZKObject):
             repo_state_state=self.NEW,
             configured=False
         )
+
+    def setFiles(self, items):
+        if self.files is not None:
+            raise Exception("Repo files can not be updated")
+        if not self._active_context:
+            raise Exception("setFiles must be used with a context manager")
+        connections = {}
+        for item in items:
+            connection = connections.setdefault(item['connection'], {})
+            project = connection.setdefault(item['project'], {})
+            branch = project.setdefault(item['branch'], {})
+            branch.update(item['files'])
+        repo_files = RepoFiles.new(self._active_context,
+                                   connections=connections,
+                                   _buildset_path=self.getPath())
+        self.files = repo_files
 
     @property
     def repo_state(self):
@@ -2780,7 +2802,7 @@ class BuildSet(zkobject.ZKObject):
             "merge_state": self.merge_state,
             "nodeset_info": self.nodeset_info,
             "node_requests": self.node_requests,
-            # "files": RepoFiles(),
+            "files": self.files and self.files.getPath(),
             "merge_repo_state": (self.merge_repo_state.getPath()
                                  if self.merge_repo_state else None),
             "extra_repo_state": (self.extra_repo_state.getPath()
@@ -2793,6 +2815,18 @@ class BuildSet(zkobject.ZKObject):
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+
+        # If we already have a repo files, we don't need to
+        # deserialize since it's immutable.
+        if self.files is not None:
+            data["files"] = self.files
+        else:
+            try:
+                if data["files"]:
+                    data["files"] = RepoFiles.fromZK(context, data["files"])
+            except Exception:
+                self.log.exception("Failed to restore repo files")
+                data["files"] = None
 
         # If we already have a repo state, we don't need to
         # deserialize since it's immutable.
@@ -2820,7 +2854,7 @@ class BuildSet(zkobject.ZKObject):
 
         data.update({
             "config_errors": [ConfigurationError.deserialize(d)
-                              for d in data["config_errors"]]
+                              for d in data["config_errors"]],
         })
         return data
 
