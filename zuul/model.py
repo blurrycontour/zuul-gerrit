@@ -2622,6 +2622,52 @@ class RepoFiles(object):
         return host.get(project_name, {}).get(branch, {}).get(fn)
 
 
+class BaseRepoState(zkobject.ShardedZKObject):
+    """RepoState holds the repo state for a buildset
+
+    When Zuul performs a speculative merge before enqueing an item,
+    the starting state of the repo (and the repos in any items ahead)
+    before that merge is encoded in a RepoState so the process can be
+    repeated by the executor.
+
+    If jobs add required-projects, a second merge operation is
+    performed for any repos not in the original.  A second RepoState
+    object holds the additional information.  A second object is used
+    instead of updating the first since these objects are sharded --
+    this simplifies error detection and recovery if a scheduler
+    crashes while writing them.  They are effectively immutable once
+    written.
+
+    It is attached to a BuildSet since the content of Zuul
+    configuration files can change with each new BuildSet.
+    """
+
+    # If the node exists already, it is probably a half-written state
+    # from a crash; truncate it and continue.
+    truncate_on_create = True
+
+    def __init__(self):
+        super().__init__()
+        self._set(state={})
+
+    def serialize(self):
+        data = {
+            "state": self.state,
+            "_buildset_path": self._buildset_path,
+        }
+        return json.dumps(data).encode("utf8")
+
+
+class MergeRepoState(BaseRepoState):
+    def getPath(self):
+        return f"{self._buildset_path}/merge_repo_state"
+
+
+class ExtraRepoState(BaseRepoState):
+    def getPath(self):
+        return f"{self._buildset_path}/extra_repo_state"
+
+
 class BuildSet(zkobject.ZKObject):
     """A collection of Builds for one specific potential future repository
     state.
@@ -2670,13 +2716,47 @@ class BuildSet(zkobject.ZKObject):
             node_requests={},  # job -> request id
             # FIXME: init to None and make this a separate ZK node
             files=RepoFiles(),
-            # FIXME: make this a separate object
-            repo_state={},
+            merge_repo_state=None,  # The repo_state of the original merge
+            extra_repo_state=None,  # Repo state for any additional projects
             tries={},
             files_state=self.NEW,
             repo_state_state=self.NEW,
             configured=False
         )
+
+    @property
+    def repo_state(self):
+        d = {}
+        for rs in (self.merge_repo_state, self.extra_repo_state):
+            if not rs:
+                continue
+            for connection in rs.state.keys():
+                if connection not in d:
+                    d[connection] = {}
+                d[connection].update(rs.state.get(connection, {}))
+        return d
+
+    def setMergeRepoState(self, repo_state):
+        if self.merge_repo_state is not None:
+            raise Exception("Merge repo state can not be updated")
+        if not self._active_context:
+            raise Exception("setMergeRepoState must be used "
+                            "with a context manager")
+        rs = MergeRepoState.new(self._active_context,
+                                state=repo_state,
+                                _buildset_path=self.getPath())
+        self.merge_repo_state = rs
+
+    def setExtraRepoState(self, repo_state):
+        if self.extra_repo_state is not None:
+            raise Exception("Extra repo state can not be updated")
+        if not self._active_context:
+            raise Exception("setExtraRepoState must be used "
+                            "with a context manager")
+        rs = ExtraRepoState.new(self._active_context,
+                                state=repo_state,
+                                _buildset_path=self.getPath())
+        self.extra_repo_state = rs
 
     def getPath(self):
         return f"{self.item.getPath()}/buildset/{self.uuid}"
@@ -2701,7 +2781,10 @@ class BuildSet(zkobject.ZKObject):
             "nodeset_info": self.nodeset_info,
             "node_requests": self.node_requests,
             # "files": RepoFiles(),
-            # "repo_state": self.repo_state,
+            "merge_repo_state": (self.merge_repo_state.getPath()
+                                 if self.merge_repo_state else None),
+            "extra_repo_state": (self.extra_repo_state.getPath()
+                                 if self.extra_repo_state else None),
             "tries": self.tries,
             "files_state": self.files_state,
             "repo_state_state": self.repo_state_state,
@@ -2711,6 +2794,31 @@ class BuildSet(zkobject.ZKObject):
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+
+        # If we already have a repo state, we don't need to
+        # deserialize since it's immutable.
+        if self.merge_repo_state is not None:
+            data['merge_repo_state'] = self.merge_repo_state
+        else:
+            try:
+                if data['merge_repo_state']:
+                    data['merge_repo_state'] = MergeRepoState.fromZK(
+                        context, data["merge_repo_state"])
+            except Exception:
+                self.log.exception("Failed to restore merge repo state")
+                data['merge_repo_state'] = None
+
+        if self.extra_repo_state is not None:
+            data['extra_repo_state'] = self.extra_repo_state
+        else:
+            try:
+                if data['extra_repo_state']:
+                    data['extra_repo_state'] = ExtraRepoState.fromZK(
+                        context, data["extra_repo_state"])
+            except Exception:
+                self.log.exception("Failed to restore extra repo state")
+                data['extra_repo_state'] = None
+
         data.update({
             "config_errors": [ConfigurationError.deserialize(d)
                               for d in data["config_errors"]]
