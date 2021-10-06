@@ -2384,7 +2384,7 @@ class ConfigLoader(object):
             fns2 = []
             fns3 = []
             fns4 = []
-            files_entry = files.connections.get(
+            files_entry = files and files.connections.get(
                 project.source.connection.connection_name, {}).get(
                     project.name, {}).get(branch)
             # If there is no files entry at all for this
