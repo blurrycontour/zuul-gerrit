@@ -3072,16 +3072,15 @@ class QueueItem(zkobject.ZKObject):
         self.current_build_set.warning_messages.append(msg)
         self.log.info(msg)
 
-    def freezeJobGraph(self, layout, skip_file_matcher=False):
+    def freezeJobGraph(self, layout, context, skip_file_matcher=False):
         """Find or create actual matching jobs for this item's change and
         store the resulting job tree."""
 
         ppc = layout.getProjectPipelineConfig(self)
-        ctx = self.pipeline.manager.current_context
         try:
             # Conditionally set self.ppc so that the debug method can
             # consult it as we resolve the jobs.
-            self.updateAttributes(ctx, project_pipeline_config=ppc)
+            self.updateAttributes(context, project_pipeline_config=ppc)
             if ppc:
                 for msg in ppc.debug_messages:
                     self.debug(msg)
@@ -3099,9 +3098,9 @@ class QueueItem(zkobject.ZKObject):
             # created the layout.
             job_graph.project_metadata = layout.project_metadata
 
-            self.updateAttributes(ctx, job_graph=job_graph)
+            self.updateAttributes(context, job_graph=job_graph)
         except Exception:
-            self.updateAttributes(ctx, project_pipeline_config=None,
+            self.updateAttributes(context, project_pipeline_config=None,
                                   job_graph=None, _old_job_graph=None)
             raise
 

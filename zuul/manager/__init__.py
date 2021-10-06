@@ -1282,7 +1282,7 @@ class PipelineManager(metaclass=ABCMeta):
         if not item.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
-                item.freezeJobGraph(self.getLayout(item))
+                item.freezeJobGraph(self.getLayout(item), self.current_context)
             except Exception as e:
                 # TODOv3(jeblair): nicify this exception as it will be reported
                 log.exception("Error freezing job graph for %s" % (item,))
