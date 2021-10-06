@@ -39,12 +39,6 @@ class Dummy(object):
             setattr(self, k, v)
 
 
-class DummyChangeQueue(model.ChangeQueue):
-
-    def _save(self, ctx, create=False):
-        pass
-
-
 class TestJob(BaseTestCase):
     def setUp(self):
         self._env_fixture = self.useFixture(
@@ -72,9 +66,14 @@ class TestJob(BaseTestCase):
         self.pipeline = model.Pipeline('gate', self.tenant)
         self.pipeline.source_context = self.context
         self.pipeline.manager = mock.Mock()
+        self.pipeline.tenant = self.tenant
         self.zk_context = LocalZKContext(self.log)
+        self.pipeline.manager.current_context = self.zk_context
+        self.pipeline.state = model.PipelineState()
+        self.pipeline.state._set(pipeline=self.pipeline)
         self.layout.addPipeline(self.pipeline)
-        self.queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
+        self.queue = model.ChangeQueue.new(
+            self.zk_context, pipeline=self.pipeline)
         self.pcontext = configloader.ParseContext(
             self.connections, None, self.tenant, AnsibleManager())
 
@@ -173,8 +172,6 @@ class TestJob(BaseTestCase):
 
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_job_inheritance_job_tree(self, save_mock):
-        queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
-
         base = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
             '_start_mark': self.start_mark,
@@ -217,7 +214,7 @@ class TestJob(BaseTestCase):
 
         change = model.Change(self.project)
         change.branch = 'master'
-        item = queue.enqueueChange(change, None)
+        item = self.queue.enqueueChange(change, None)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -230,7 +227,7 @@ class TestJob(BaseTestCase):
         self.assertEqual(job.timeout, 70)
 
         change.branch = 'stable/diablo'
-        item = queue.enqueueChange(change, None)
+        item = self.queue.enqueueChange(change, None)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -244,8 +241,6 @@ class TestJob(BaseTestCase):
 
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_inheritance_keeps_matchers(self, save_mock):
-        queue = DummyChangeQueue.new(None, pipeline=self.pipeline)
-
         base = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
             '_start_mark': self.start_mark,
@@ -279,7 +274,7 @@ class TestJob(BaseTestCase):
         change = model.Change(self.project)
         change.branch = 'master'
         change.files = ['/COMMIT_MSG', 'ignored-file']
-        item = queue.enqueueChange(change, None)
+        item = self.queue.enqueueChange(change, None)
 
         self.assertTrue(base.changeMatchesFiles(change))
         self.assertFalse(python27.changeMatchesFiles(change))
