@@ -401,23 +401,25 @@ class PipelineManager(metaclass=ABCMeta):
                 if item.active or has_job_graph:
                     self.prepareItem(item)
 
-                # Re-set build results in case any new jobs have been
-                # added to the tree.
-                for build in item.current_build_set.getBuilds():
-                    if build.result:
-                        item.setResult(build)
-                # Similarly, reset the item state.
-                if item.current_build_set.unable_to_merge:
-                    item.setUnableToMerge()
-                if item.current_build_set.config_errors:
-                    item.setConfigErrors(item.current_build_set.config_errors)
-                if item.dequeued_needing_change:
-                    item.setDequeuedNeedingChange()
+                if item.current_build_set:
+                    # Re-set build results in case any new jobs have been
+                    # added to the tree.
+                    for build in item.current_build_set.getBuilds():
+                        if build.result:
+                            item.setResult(build)
+                    # Similarly, reset the item state.
+                    if item.current_build_set.unable_to_merge:
+                        item.setUnableToMerge()
+                    if item.current_build_set.config_errors:
+                        item.setConfigErrors(
+                            item.current_build_set.config_errors)
+                    if item.dequeued_needing_change:
+                        item.setDequeuedNeedingChange()
 
-                # It can happen that all in-flight builds have been removed
-                # which would lead to paused parent jobs not being resumed.
-                # To prevent that resume parent jobs if necessary.
-                self._resumeBuilds(item.current_build_set)
+                    # It can happen that all in-flight builds have been removed
+                    # which would lead to paused parent jobs not being resumed.
+                    # To prevent that resume parent jobs if necessary.
+                    self._resumeBuilds(item.current_build_set)
 
                 self.reportStats(item)
                 return True
@@ -502,6 +504,9 @@ class PipelineManager(metaclass=ABCMeta):
                              "does not allow circular dependencies", change)
                     actions = self.pipeline.failure_actions
                     ci = change_queue.enqueueChange(cycle[-1], event)
+                    ci.updateAttributes(self.current_context,
+                                        current_build_set=model.BuildSet.new(
+                                            self.current_context, ci))
                     ci.warning("Dependency cycle detected")
                     ci.setReportedResult('FAILURE')
 
@@ -649,7 +654,8 @@ class PipelineManager(metaclass=ABCMeta):
         # (success/failed/...) we report it as dequeued.
         # Without this check, all items with a valid result would be reported
         # twice.
-        if not item.current_build_set.result and item.live:
+        if (item.live and item.current_build_set
+                and not item.current_build_set.result):
             item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
         item.queue.dequeueItem(item)
@@ -838,13 +844,12 @@ class PipelineManager(metaclass=ABCMeta):
         # Don't reset builds for a failing bundle when it has already started
         # reporting, to keep available build results. Those items will be
         # reported immediately afterwards during queue processing.
-        if (prime and item.current_build_set.ref and not
+        if (prime and old_build_set and old_build_set.ref and not
                 item.didBundleStartReporting()):
             # Force a dequeued result here because we haven't actually
             # reported the item, but we are done with this buildset.
-            self.sql.reportBuildsetEnd(
-                item.current_build_set, 'dequeue', final=False,
-                result='DEQUEUED')
+            self.sql.reportBuildsetEnd(old_build_set, 'dequeue', final=False,
+                                       result='DEQUEUED')
             item.resetAllBuilds()
 
         for job in jobs_to_cancel:
@@ -1083,7 +1088,8 @@ class PipelineManager(metaclass=ABCMeta):
 
             # Make sure override-checkout targets are part of the repo state
             for item in items:
-                if not item.current_build_set.job_graph:
+                if not (item.current_build_set
+                        and item.current_build_set.job_graph):
                     continue
 
                 for job in item.current_build_set.job_graph.getJobs():
@@ -1203,8 +1209,10 @@ class PipelineManager(metaclass=ABCMeta):
         # We always need to set the configuration of the item if it
         # isn't already set.
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
-        if not build_set.ref:
-            build_set.setConfiguration(self.current_context)
+        if build_set is None:
+            build_set = model.BuildSet.new(self.current_context, item)
+            item.updateAttributes(self.current_context,
+                                  current_build_set=build_set)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
@@ -1669,6 +1677,11 @@ class PipelineManager(metaclass=ABCMeta):
 
     def reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
+        if not item.current_build_set:
+            # Create a build set for reporting in case we don't have one yet
+            item.updateAttributes(self.current_context,
+                                  current_build_set=model.BuildSet.new(
+                                      self.current_context, item))
         if not item.reported:
             # _reportItem() returns True if it failed to report.
             item.updateAttributes(self.current_context,

@@ -43,7 +43,7 @@ class SQLReporter(BaseReporter):
 
     def reportBuildsetStart(self, buildset):
         """Create the initial buildset entry in the db"""
-        if not buildset.uuid:
+        if not buildset:
             return
         event_id = None
         item = buildset.item
@@ -69,7 +69,7 @@ class SQLReporter(BaseReporter):
             return db_buildset
 
     def reportBuildsetEnd(self, buildset, action, final, result=None):
-        if not buildset.uuid:
+        if not buildset:
             return
         if final:
             message = self._formatItemReport(
