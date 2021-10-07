@@ -86,6 +86,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def _getFileComments(self, item):
         """Get the file comments from the zuul_return value"""
         ret = {}
+        if not item.current_build_set:
+            return ret
         for build in item.current_build_set.getBuilds():
             fc = build.result_data.get("zuul", {}).get("file_comments")
             if not fc:
