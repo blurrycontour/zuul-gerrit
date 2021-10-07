@@ -445,6 +445,8 @@ class RPCListener(RPCListenerBase):
         queue = model.ChangeQueue.new(context, pipeline=pipeline)
         item = model.QueueItem.new(context, queue=queue, change=change,
                                    pipeline=queue.pipeline)
+        build_set = model.BuildSet.new(context, item)
+        item.updateAttributes(context, current_build_set=build_set)
         item.freezeJobGraph(tenant.layout, context,
                             skip_file_matcher=True,
                             redact_secrets_and_keys=True)
@@ -478,6 +480,8 @@ class RPCListener(RPCListenerBase):
         queue = model.ChangeQueue.new(context, pipeline=pipeline)
         item = model.QueueItem.new(context, queue=queue, change=change,
                                    pipeline=queue.pipeline)
+        build_set = model.BuildSet.new(context, item)
+        item.updateAttributes(context, current_build_set=build_set)
         item.freezeJobGraph(tenant.layout, context,
                             skip_file_matcher=True,
                             redact_secrets_and_keys=True)

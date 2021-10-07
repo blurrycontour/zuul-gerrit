@@ -234,7 +234,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             needed_item = self.getItemForChange(needed_change)
             if not needed_item:
                 continue
-            if needed_item.current_build_set.failing_reasons:
+            if (needed_item.current_build_set and
+                    needed_item.current_build_set.failing_reasons):
                 failing_items.add(needed_item)
         if item.isBundleFailing():
             failing_items.update(item.bundle.items)

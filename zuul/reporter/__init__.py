@@ -86,6 +86,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def _getFileComments(self, item):
         """Get the file comments from the zuul_return value"""
         ret = {}
+        if not item.current_build_set:
+            return ret
         for build in item.current_build_set.getBuilds():
             fc = build.result_data.get("zuul", {}).get("file_comments")
             if not fc:
@@ -135,13 +137,14 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         action = action or self._action
         ret = self._getFormatter(action)(item, with_jobs)
 
-        if item.current_build_set.warning_messages:
-            warning = '\n  '.join(item.current_build_set.warning_messages)
-            ret += '\nWarning:\n  ' + warning + '\n'
+        if item.current_build_set:
+            if item.current_build_set.warning_messages:
+                warning = '\n  '.join(item.current_build_set.warning_messages)
+                ret += '\nWarning:\n  ' + warning + '\n'
 
-        if item.current_build_set.debug_messages:
-            debug = '\n  '.join(item.current_build_set.debug_messages)
-            ret += '\nDebug information:\n  ' + debug + '\n'
+            if item.current_build_set.debug_messages:
+                debug = '\n  '.join(item.current_build_set.debug_messages)
+                ret += '\nDebug information:\n  ' + debug + '\n'
 
         if item.pipeline.footer_message:
             ret += '\n' + item.pipeline.footer_message
@@ -248,7 +251,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             else:
                 report_times = True
 
-            if report_times and build.end_time and build.start_time:
+            if report_times and build and build.end_time and build.start_time:
                 dt = int(build.end_time - build.start_time)
                 m, s = divmod(dt, 60)
                 h, m = divmod(m, 60)
@@ -260,7 +263,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                     elapsed = ' in %ds' % (s)
             else:
                 elapsed = ''
-            if build.error_detail:
+            if build and build.error_detail:
                 error = ' ' + build.error_detail
             else:
                 error = ''

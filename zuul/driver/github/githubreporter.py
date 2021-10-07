@@ -181,7 +181,7 @@ class GithubReporter(BaseReporter):
 
     def mergePull(self, item):
         log = get_annotated_logger(self.log, item.event)
-        merge_mode = item.current_build_set.getMergeMode()
+        merge_mode = item.getMergeMode()
 
         if merge_mode not in self.merge_modes:
             mode = [x[0] for x in MERGER_MAP.items() if x[1] == merge_mode][0]

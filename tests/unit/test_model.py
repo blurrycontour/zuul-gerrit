@@ -215,6 +215,8 @@ class TestJob(BaseTestCase):
         change = model.Change(self.project)
         change.branch = 'master'
         item = self.queue.enqueueChange(change, None)
+        build_set = model.BuildSet.new(self.zk_context, item)
+        item.updateAttributes(self.zk_context, current_build_set=build_set)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -230,6 +232,8 @@ class TestJob(BaseTestCase):
 
         change.branch = 'stable/diablo'
         item = self.queue.enqueueChange(change, None)
+        build_set = model.BuildSet.new(self.zk_context, item)
+        item.updateAttributes(self.zk_context, current_build_set=build_set)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -279,6 +283,8 @@ class TestJob(BaseTestCase):
         change.branch = 'master'
         change.files = ['/COMMIT_MSG', 'ignored-file']
         item = self.queue.enqueueChange(change, None)
+        build_set = model.BuildSet.new(self.zk_context, item)
+        item.updateAttributes(self.zk_context, current_build_set=build_set)
 
         self.assertTrue(base.changeMatchesFiles(change))
         self.assertFalse(python27.changeMatchesFiles(change))
@@ -353,6 +359,8 @@ class TestJob(BaseTestCase):
         # Test master
         change.branch = 'master'
         item = self.queue.enqueueChange(change, None)
+        build_set = model.BuildSet.new(self.zk_context, item)
+        item.updateAttributes(self.zk_context, current_build_set=build_set)
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
