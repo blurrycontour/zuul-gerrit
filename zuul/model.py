@@ -2728,8 +2728,38 @@ class BuildSet(zkobject.ZKObject):
             tries={},
             files_state=self.NEW,
             repo_state_state=self.NEW,
-            configured=False
         )
+
+    @classmethod
+    def new(klass, context, item, **kw):
+        obj = klass()
+        # The item needs to have a current build set in order to
+        # create the merge items below.
+        item._set(current_build_set=obj)
+
+        # The change isn't enqueued until after it's created
+        # so we don't know what the other changes ahead will be
+        # until jobs start.
+        items = []
+        if item.bundle:
+            items.extend(reversed(item.bundle.items))
+        else:
+            items.append(item)
+        items.extend(i for i in item.items_ahead if i not in items)
+        items.reverse()
+
+        dependent_changes = [i.change.toDict() for i in items]
+        merger_items = [i.makeMergerItem() for i in items]
+        files_state = (BuildSet.COMPLETE if item.change.files is not None
+                       else BuildSet.NEW)
+
+        obj._set(item=item,
+                dependent_changes=dependent_changes,
+                merger_items=merger_items,
+                files_state=files_state,
+                **kw)
+        obj._save(context, create=True)
+        return obj
 
     def setFiles(self, items):
         if self.files is not None:
@@ -2862,35 +2892,14 @@ class BuildSet(zkobject.ZKObject):
     @property
     def ref(self):
         # NOTE(jamielennox): The concept of buildset ref is to be removed and a
-        # buildset UUID identifier available instead. Currently the ref is
-        # checked to see if the BuildSet has been configured.
-        return 'Z' + self.uuid if self.configured else None
+        # buildset UUID identifier available instead.
+        return f"Z{self.uuid}"
 
     def __repr__(self):
         return '<BuildSet item: %s #builds: %s merge state: %s>' % (
             self.item,
             len(self.builds),
             self.getStateName(self.merge_state))
-
-    def setConfiguration(self, context):
-        with self.activeContext(context):
-            # The change isn't enqueued until after it's created
-            # so we don't know what the other changes ahead will be
-            # until jobs start.
-            if self.dependent_changes is None:
-                items = []
-                if self.item.bundle:
-                    items.extend(reversed(self.item.bundle.items))
-                else:
-                    items.append(self.item)
-
-                items.extend(i for i in self.item.items_ahead
-                             if i not in items)
-                items.reverse()
-
-                self.dependent_changes = [i.change.toDict() for i in items]
-                self.merger_items = [i.makeMergerItem() for i in items]
-            self.configured = True
 
     def getStateName(self, state_num):
         return self.states_map.get(
@@ -2974,35 +2983,6 @@ class BuildSet(zkobject.ZKObject):
     def getTries(self, job_name):
         return self.tries.get(job_name, 0)
 
-    def getMergeMode(self):
-        # We may be called before this build set has a shadow layout
-        # (ie, we are called to perform the merge to create that
-        # layout).  It's possible that the change we are merging will
-        # update the merge-mode for the project, but there's not much
-        # we can do about that here.  Instead, do the best we can by
-        # using the nearest shadow layout to determine the merge mode,
-        # or if that fails, the current live layout, or if that fails,
-        # use the default: merge-resolve.
-        item = self.item
-        project = self.item.change.project
-        project_metadata = None
-        while item:
-            if item.job_graph:
-                project_metadata = item.job_graph.getProjectMetadata(
-                    project.canonical_name)
-                if project_metadata:
-                    break
-            item = item.item_ahead
-        if not project_metadata:
-            layout = self.item.pipeline.tenant.layout
-            if layout:
-                project_metadata = layout.getProjectMetadata(
-                    project.canonical_name
-                )
-        if project_metadata:
-            return project_metadata.merge_mode
-        return MERGER_MERGE_RESOLVE
-
     def getSafeAttributes(self):
         return Attributes(uuid=self.uuid)
 
@@ -3055,16 +3035,6 @@ class QueueItem(zkobject.ZKObject):
             dequeued_bundle_failing=False
         )
 
-    @classmethod
-    def new(klass, context, **kw):
-        obj = klass()
-        obj._set(**kw)
-        obj._save(context, create=True)
-        files_state = (BuildSet.COMPLETE if obj.change.files is not None
-                       else BuildSet.NEW)
-        obj.updateAttributes(context, current_build_set=BuildSet.new(
-            context, item=obj, files_state=files_state))
-        return obj
 
     def getPath(self):
         return self.itemPath(self.pipeline.state.getPath(), self.uuid)
@@ -3085,8 +3055,8 @@ class QueueItem(zkobject.ZKObject):
             # This needs change cache and the API to resolve change by key.
             "change": self.change.cache_key,
             "dequeued_needing_change": self.dequeued_needing_change,
-            "current_build_set": (self.current_build_set and
-                                  self.current_build_set.getPath()),
+            # "current_build_set": (self.current_build_set and
+                                  # self.current_build_set.getPath()),
             "enqueue_time": self.enqueue_time,
             "report_time": self.report_time,
             "dequeue_time": self.dequeue_time,
@@ -3141,13 +3111,13 @@ class QueueItem(zkobject.ZKObject):
         bundle = data["bundle"] and Bundle.deserialize(
             context, self.queue, data["bundle"])
 
-        build_set = self.current_build_set
-        if build_set and build_set.getPath() == data["current_build_set"]:
-            build_set.refresh(context)
-        else:
-            build_set = (data["current_build_set"] and
-                         BuildSet.fromZK(context, data["current_build_set"]))
-            build_set._set(item=self)
+        # build_set = self.current_build_set
+        # if build_set and build_set.getPath() == data["current_build_set"]:
+        #     build_set.refresh(context)
+        # else:
+        #     build_set = (data["current_build_set"] and
+        #                  BuildSet.fromZK(context, data["current_build_set"]))
+        #     build_set._set(item=self)
 
         data.update({
             "event": event,
@@ -3155,7 +3125,7 @@ class QueueItem(zkobject.ZKObject):
             "log": get_annotated_logger(self.log, event),
             "dynamic_state": defaultdict(dict, data["dynamic_state"]),
             "bundle": bundle,
-            "current_build_set": build_set,
+            # "current_build_set": build_set,
         })
         return data
 
@@ -3175,7 +3145,7 @@ class QueueItem(zkobject.ZKObject):
         context = self.pipeline.manager.current_context
         self.updateAttributes(
             context,
-            current_build_set=BuildSet.new(context, item=self),
+            current_build_set=None,
             layout_uuid=None,
             project_pipeline_config=None,
             job_graph=None,
@@ -4058,7 +4028,7 @@ class QueueItem(zkobject.ZKObject):
 
         return dict(project=project.name,
                     connection=connection_name,
-                    merge_mode=self.current_build_set.getMergeMode(),
+                    merge_mode=self.getMergeMode(),
                     ref=self.change.ref,
                     branch=branch,
                     buildset_uuid=self.current_build_set.uuid,
@@ -4067,6 +4037,35 @@ class QueueItem(zkobject.ZKObject):
                     oldrev=oldrev,
                     newrev=newrev,
                     )
+
+    def getMergeMode(self):
+        # We may be called before this build set has a shadow layout
+        # (ie, we are called to perform the merge to create that
+        # layout).  It's possible that the change we are merging will
+        # update the merge-mode for the project, but there's not much
+        # we can do about that here.  Instead, do the best we can by
+        # using the nearest shadow layout to determine the merge mode,
+        # or if that fails, the current live layout, or if that fails,
+        # use the default: merge-resolve.
+        item = self
+        project = self.change.project
+        project_metadata = None
+        while item:
+            if item.job_graph:
+                project_metadata = item.job_graph.getProjectMetadata(
+                    project.canonical_name)
+                if project_metadata:
+                    break
+            item = item.item_ahead
+        if not project_metadata:
+            layout = self.pipeline.tenant.layout
+            if layout:
+                project_metadata = layout.getProjectMetadata(
+                    project.canonical_name
+                )
+        if project_metadata:
+            return project_metadata.merge_mode
+        return MERGER_MERGE_RESOLVE
 
     def updatesJobConfig(self, job, layout):
         log = self.annotateLogger(self.log)

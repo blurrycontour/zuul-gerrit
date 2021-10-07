@@ -838,13 +838,12 @@ class PipelineManager(metaclass=ABCMeta):
         # Don't reset builds for a failing bundle when it has already started
         # reporting, to keep available build results. Those items will be
         # reported immediately afterwards during queue processing.
-        if (prime and item.current_build_set.ref and not
+        if (prime and old_build_set and old_build_set.ref and not
                 item.didBundleStartReporting()):
             # Force a dequeued result here because we haven't actually
             # reported the item, but we are done with this buildset.
-            self.sql.reportBuildsetEnd(
-                item.current_build_set, 'dequeue', final=False,
-                result='DEQUEUED')
+            self.sql.reportBuildsetEnd(old_build_set, 'dequeue', final=False,
+                                       result='DEQUEUED')
             item.resetAllBuilds()
 
         for job in jobs_to_cancel:
@@ -1203,8 +1202,8 @@ class PipelineManager(metaclass=ABCMeta):
         # We always need to set the configuration of the item if it
         # isn't already set.
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
-        if not build_set.ref:
-            build_set.setConfiguration(self.current_context)
+        if build_set is None:
+            build_set = model.BuildSet.new(self.current_context, item)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
@@ -1353,9 +1352,9 @@ class PipelineManager(metaclass=ABCMeta):
                 log.info("Resetting builds for change %s because the "
                          "item ahead, %s, is not the nearest non-failing "
                          "item, %s" % (item.change, item_ahead, nnfi))
+                self.cancelJobs(item)
                 change_queue.moveItem(item, nnfi)
                 changed = True
-                self.cancelJobs(item)
             if actionable:
                 ready = self.prepareItem(item)
                 # Starting jobs reporting should only be done once if there are
