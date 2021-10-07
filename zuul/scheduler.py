@@ -552,7 +552,7 @@ class Scheduler(threading.Thread):
                 self._runMergerApiCleanup()
                 self.maintainConnectionCache()
             except Exception:
-                self.log.execption("Error in general cleanup:")
+                self.log.exception("Error in general cleanup:")
             finally:
                 self.general_cleanup_lock.release()
         # This has its own locking
