@@ -3608,6 +3608,8 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        # The url for browsing the ref/tag/branch/change
+        self.url = None
         # Cache info about this ref:
         # CacheStat(cache key, uuid, version, last_modified)
         self.cache_stat = None
@@ -3627,6 +3629,7 @@ class Ref(object):
             "oldrev": self.oldrev,
             "newrev": self.newrev,
             "files": self.files,
+            "url": self.url,
         }
 
     def deserialize(self, data):
@@ -3634,6 +3637,7 @@ class Ref(object):
         self.oldrev = data.get("oldrev")
         self.newrev = data.get("newrev")
         self.files = data.get("files", [])
+        self.url = data.get("url")
 
     def _id(self):
         return self.newrev
@@ -3760,8 +3764,6 @@ class Change(Branch):
     def __init__(self, project):
         super(Change, self).__init__(project)
         self.number = None
-        # The gitweb url for browsing the change
-        self.url = None
         # URIs for this change which may appear in depends-on headers.
         # Note this omits the scheme; i.e., is hostname/path.
         self.uris = []
@@ -3799,7 +3801,6 @@ class Change(Branch):
     def deserialize(self, data):
         super().deserialize(data)
         self.number = data.get("number")
-        self.url = data.get("url")
         self.uris = data.get("uris", [])
         self.patchset = data.get("patchset")
         self.git_needs_changes = data.get("git_needs_changes", [])
@@ -3824,7 +3825,6 @@ class Change(Branch):
         d = super().serialize()
         d.update({
             "number": self.number,
-            "url": self.url,
             "uris": self.uris,
             "patchset": self.patchset,
             "git_needs_changes": self.git_needs_changes,
