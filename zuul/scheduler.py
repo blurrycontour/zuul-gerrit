@@ -532,6 +532,8 @@ class Scheduler(threading.Thread):
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for item in pipeline.getAllItems():
+                    if not item.current_build_set:
+                        continue
                     for req_id in (
                             item.current_build_set.node_requests.values()):
                         outstanding_requests.add(req_id)
@@ -1249,7 +1251,7 @@ class Scheduler(threading.Thread):
                             self.log.exception(
                                 "Exception while re-enqueing item %s",
                                 item)
-                if reenqueued:
+                if reenqueued and item.current_build_set:
                     for build in item.current_build_set.getBuilds():
                         new_job = item.getJob(build.job.name)
                         if new_job:
@@ -1268,6 +1270,8 @@ class Scheduler(threading.Thread):
         for item in items_to_remove:
             self.log.info(
                 "Removing item %s during reconfiguration" % (item,))
+            if not item.current_build_set:
+                continue
             for build in item.current_build_set.getBuilds():
                 builds_to_cancel.append(build)
             for request_job, request in \
@@ -1366,6 +1370,8 @@ class Scheduler(threading.Thread):
                     item.items_behind = []
                 self.log.info(
                     "Removing item %s during reconfiguration" % (item,))
+                if not item.current_build_set:
+                    continue
                 for build in item.current_build_set.getBuilds():
                     builds_to_cancel.append(build)
                 for request_job, request in \
@@ -1499,6 +1505,8 @@ class Scheduler(threading.Thread):
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for item in pipeline.getAllItems():
+                    if not item.current_build_set:
+                        continue
                     for build in item.current_build_set.getBuilds():
                         if build.result is None:
                             self.log.debug("%s waiting on %s" %
@@ -1934,7 +1942,8 @@ class Scheduler(threading.Thread):
         for item in pipeline.getAllItems():
             # If the provided buildset UUID doesn't match any current one,
             # we assume that it's not current anymore.
-            if item.current_build_set.uuid == event.build_set_uuid:
+            if (item.current_build_set and
+                    item.current_build_set.uuid == event.build_set_uuid):
                 return item.current_build_set
 
         log.warning("Build set %s is not current", event.build_set_uuid)
