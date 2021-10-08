@@ -28,3 +28,10 @@ def get_default(config, section, option, default=None, expand_user=False):
     if expand_user and value:
         return os.path.expanduser(value)
     return value
+
+
+def any_to_bool(val):
+    val = str(val)
+    if val.lower() in ('1', 'on', 'yes', 'true'):
+        return True
+    return False
