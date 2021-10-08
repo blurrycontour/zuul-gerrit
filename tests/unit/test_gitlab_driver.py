@@ -629,6 +629,28 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(set(A.labels), {'addme1', 'addme2'})
 
     @simple_layout('layouts/merging-gitlab.yaml', driver='gitlab')
+    def test_merge_blocking_discussions(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project2', 'master', 'A')
+
+        A.blocking_discussions_resolved = False
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        # canMerge is not validated
+        self.assertEqual(0, len(self.history))
+
+        A.blocking_discussions_resolved = True
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        # canMerge is validated
+        self.assertEqual(1, len(self.history))
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test').result)
+        self.assertEqual('merged', A.state)
+
+    @simple_layout('layouts/merging-gitlab.yaml', driver='gitlab')
     def test_merge_action_in_independent(self):
 
         A = self.fake_gitlab.openFakeMergeRequest(

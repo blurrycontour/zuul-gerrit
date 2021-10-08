@@ -2109,6 +2109,7 @@ class FakeGitlabMergeRequest(object):
             self.gitlab.server, self.project, self.number)
         self.base_sha = base_sha
         self.approved = False
+        self.blocking_discussions_resolved = True
         self.mr_ref = self._createMRRef(base_sha=base_sha)
         self._addCommitInMR(files=files)
 
@@ -2208,7 +2209,9 @@ class FakeGitlabMergeRequest(object):
                 'iid': self.number,
                 'target_branch': self.branch,
                 'last_commit': {'id': self.sha},
-                'action': action
+                'action': action,
+                'blocking_discussions_resolved':
+                    self.blocking_discussions_resolved
             },
         }
         data['labels'] = [{'title': label} for label in self.labels]
@@ -2219,6 +2222,7 @@ class FakeGitlabMergeRequest(object):
                 'previous': [{'title': label} for label in previous_labels],
                 'current': data['labels']
             }
+
         return (name, data)
 
     def getMergeRequestOpenedEvent(self):
