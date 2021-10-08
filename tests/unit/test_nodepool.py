@@ -115,12 +115,20 @@ class TestNodepool(TestNodepoolBase):
         self.fake_nodepool.pause()
         request = self.nodepool.requestNodes(
             "test-uuid", job, "tenant", "pipeline", "provider", 0, 0)
+        for x in iterate_timeout(30, 'request created'):
+            if len(self.nodepool.zk_nodepool._node_request_cache):
+                break
+
+        self.assertEqual(len(self.nodepool.provisioned_requests), 0)
         self.nodepool.cancelRequest(request)
 
         for x in iterate_timeout(30, 'request deleted'):
-            if not len(self.fake_nodepool.getNodeRequests()):
+            if len(self.nodepool.provisioned_requests):
                 break
-        self.assertEqual(len(self.nodepool.provisioned_requests), 0)
+
+        self.assertEqual(len(self.nodepool.provisioned_requests), 1)
+        self.assertEqual(self.nodepool.provisioned_requests[0].state,
+                         'requested')
 
     def test_node_request_priority(self):
         # Test that requests are satisfied in priority order
