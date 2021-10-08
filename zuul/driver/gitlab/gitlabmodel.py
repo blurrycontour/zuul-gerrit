@@ -26,6 +26,7 @@ class MergeRequest(Change):
         self.approved = None
         self.labels = None
         self.merge_status = None
+        self.blocking_discussions_resolved = None
         self.mr = None
         self.title = None
 
@@ -56,6 +57,8 @@ class MergeRequest(Change):
             "approved": self.approved,
             "labels": self.labels,
             "merge_status": self.merge_status,
+            "blocking_discussions_resolved":
+                self.blocking_discussions_resolved,
             "mr": self.mr,
             "title": self.title,
         })
@@ -67,6 +70,8 @@ class MergeRequest(Change):
         self.approved = data.get("approved")
         self.labels = data.get("labels")
         self.merge_status = data.get("merge_status")
+        self.blocking_discussions_resolved = data.get(
+            "blocking_discussions_resolved")
         self.mr = data.get("mr")
         self.title = data.get("title")
 
