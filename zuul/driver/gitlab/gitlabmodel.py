@@ -231,6 +231,10 @@ class GitlabEventFilter(EventFilter):
             if not set(event.unlabels).intersection(set(self.unlabels)):
                 return False
 
+        if hasattr(event, 'blocking_discussions_resolved'):
+            if not event.blocking_discussions_resolved:
+                return False
+
         return True
 
 

@@ -672,6 +672,13 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.is_merged = change.mr['state'] == 'merged'
         # Can be "can_be_merged"
         change.merge_status = change.mr['merge_status']
+        # Blocking discussions - not properly documented parameter
+        # It is set to False when project settings enforce "all discussions
+        # must be resolved" and there are unresolved discussions.
+        # Gently try to get it for the case it is not present in some
+        # installations.
+        change.blocking_discussions_resolved = \
+            change.mr.get('blocking_discussions_resolved', True)
         change.approved = change.mr['approved']
         change.message = change.mr.get('description', "")
         change.labels = change.mr['labels']
@@ -699,7 +706,13 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def canMerge(self, change, allow_needs, event=None):
         log = get_annotated_logger(self.log, event)
-        can_merge = True if change.merge_status == "can_be_merged" else False
+        can_merge = False
+        if (
+            change.merge_status == "can_be_merged" and
+            change.blocking_discussions_resolved
+        ):
+            can_merge = True
+
         log.info('Check MR %s#%s mergeability can_merge: %s',
                  change.project.name, change.number, can_merge)
         return can_merge
