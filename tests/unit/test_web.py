@@ -1097,6 +1097,7 @@ class TestWeb(BaseTestWeb):
                 'branch': 'master',
                 'projects': {},
                 'items': [],
+                'change_url': None,
                 'child_jobs': [],
                 'event_id': None,
             },
