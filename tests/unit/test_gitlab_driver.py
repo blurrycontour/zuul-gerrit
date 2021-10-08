@@ -158,6 +158,18 @@ class TestGitlabDriver(ZuulTestCase):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
 
+        A.blocking_discussions_resolved = False
+        self.fake_gitlab.emitEvent(A.getMergeRequestApprovedEvent(
+            discussions_resolved=False
+        ))
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.blocking_discussions_resolved = True
+        self.fake_gitlab.emitEvent(A.getMergeRequestApprovedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
         self.fake_gitlab.emitEvent(A.getMergeRequestApprovedEvent())
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
