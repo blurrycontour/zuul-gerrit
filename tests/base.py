@@ -2071,6 +2071,7 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                     'start_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00'
                 },
                 'merge_status': mr.merge_status,
+                'blocking_discussions_resolved': True,
             }, 200, "", "GET"
 
         match = re.match('.+/projects/(.+)/'
