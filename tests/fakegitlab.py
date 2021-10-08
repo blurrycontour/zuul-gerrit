@@ -167,6 +167,8 @@ class GitlabWebServer(object):
                         'head_sha': mr.sha,
                         'start_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00'
                     },
+                    'blocking_discussions_resolved':
+                        mr.blocking_discussions_resolved,
                     'merge_status': mr.merge_status,
                 }
                 self.send_data(data)

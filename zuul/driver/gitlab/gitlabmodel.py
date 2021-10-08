@@ -93,6 +93,7 @@ class GitlabTriggerEvent(TriggerEvent):
         self.tag = None
         self.commits = []
         self.total_commits_count = 0
+        self.blocking_discussions_resolved = True
 
     def toDict(self):
         d = super().toDict()
@@ -107,6 +108,7 @@ class GitlabTriggerEvent(TriggerEvent):
         d["tag"] = self.tag
         d["commits"] = self.commits
         d["total_commits_count"] = self.total_commits_count
+        d["blocking_discussions_resolved"] = self.blocking_discussions_resolved
         return d
 
     def updateFromDict(self, d):
@@ -123,6 +125,8 @@ class GitlabTriggerEvent(TriggerEvent):
         self.commits = d.get("commits", [])
         self.total_commits_count = d.get("total_commits_count",
                                          len(self.commits))
+        self.blocking_discussions_resolved = \
+            d.get("blocking_discussions_resolved", True)
 
     def _repr(self):
         r = [super(GitlabTriggerEvent, self)._repr()]
@@ -135,6 +139,8 @@ class GitlabTriggerEvent(TriggerEvent):
             r.append("labels:%s" % ', '.join(self.labels))
         if self.unlabels:
             r.append("unlabels:%s" % ', '.join(self.unlabels))
+        if not self.blocking_discussions_resolved:
+            r.append("blocking_discussions_resolved: False")
         return ' '.join(r)
 
     def isPatchsetCreated(self):
@@ -229,6 +235,10 @@ class GitlabEventFilter(EventFilter):
 
         if self.unlabels:
             if not set(event.unlabels).intersection(set(self.unlabels)):
+                return False
+
+        if hasattr(event, 'blocking_discussions_resolved'):
+            if not event.blocking_discussions_resolved:
                 return False
 
         return True
