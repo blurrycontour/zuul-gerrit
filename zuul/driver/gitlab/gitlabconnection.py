@@ -32,6 +32,7 @@ from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
 from zuul.web.handler import BaseWebController
 from zuul.lib.http import ZuulHTTPAdapter
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.config import any_to_bool
 from zuul.exceptions import MergeFailure
 from zuul.model import Branch, Project, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
@@ -255,17 +256,33 @@ class GitlabAPIClientException(Exception):
 class GitlabAPIClient():
     log = logging.getLogger("zuul.GitlabAPIClient")
 
-    def __init__(self, baseurl, api_token, keepalive):
-        self.session = requests.Session()
-        retry = urllib3.util.Retry(total=8,
-                                   backoff_factor=0.1)
-        adapter = ZuulHTTPAdapter(keepalive=keepalive,
-                                  max_retries=retry)
-        self.session.mount(baseurl, adapter)
+    def __init__(self, baseurl, api_token, keepalive, disable_pool):
+        self._session = None
+        self._orig_baseurl = baseurl
         self.baseurl = '%s/api/v4' % baseurl
         self.api_token = api_token
+        self.keepalive = keepalive
+        self.disable_pool = disable_pool
         self.headers = {'Authorization': 'Bearer %s' % (
             self.api_token)}
+
+        if not self.disable_pool:
+            self._session = self._makeSession()
+
+    def _makeSession(self):
+        session = requests.Session()
+        retry = urllib3.util.Retry(total=8,
+                                   backoff_factor=0.1)
+        adapter = ZuulHTTPAdapter(keepalive=self.keepalive,
+                                  max_retries=retry)
+        session.mount(self._orig_baseurl, adapter)
+        return session
+
+    @property
+    def session(self):
+        if self.disable_pool:
+            return self._makeSession()
+        return self._session
 
     def _manage_error(self, data, code, url, verb, zuul_event_id=None):
         if code < 400:
@@ -442,9 +459,11 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
         self.api_token = self.connection_config.get(
             'api_token', '')
         self.keepalive = self.connection_config.get('keepalive', 60)
+        self.disable_pool = any_to_bool(self.connection_config.get(
+            'disable_connection_pool', False))
 
         self.gl_client = GitlabAPIClient(self.baseurl, self.api_token,
-                                         self.keepalive)
+                                         self.keepalive, self.disable_pool)
         self.sched = None
         self.source = driver.getSource(self)
 

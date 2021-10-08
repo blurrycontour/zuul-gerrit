@@ -1089,3 +1089,44 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
                                           old_sha=new_sha,
                                           new_sha='0' * 40,
                                           removed_files=['zuul.yaml'])
+
+
+class TestGitlabDriverNoPool(ZuulTestCase):
+    config_file = 'zuul-gitlab-driver-no-pool.conf'
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_opened(self):
+
+        description = "This is the\nMR description."
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project', 'master', 'A', description=description)
+        self.fake_gitlab.emitEvent(
+            A.getMergeRequestOpenedEvent(), project='org/project')
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+
+        job = self.getJobFromHistory('project-test2')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual(str(A.number), zuulvars['change'])
+        self.assertEqual(str(A.sha), zuulvars['patchset'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEquals(f'{self.fake_gitlab._test_baseurl}/'
+                          'org/project/merge_requests/1',
+                          zuulvars['items'][0]['change_url'])
+        self.assertEqual(zuulvars["message"], strings.b64encode(description))
+        self.assertEqual(2, len(self.history))
+        self.assertEqual(2, len(A.notes))
+        self.assertEqual(
+            A.notes[0]['body'], "Starting check jobs.")
+        self.assertThat(
+            A.notes[1]['body'],
+            MatchesRegex(r'.*project-test1.*SUCCESS.*', re.DOTALL))
+        self.assertThat(
+            A.notes[1]['body'],
+            MatchesRegex(r'.*project-test2.*SUCCESS.*', re.DOTALL))
+        self.assertTrue(A.approved)
