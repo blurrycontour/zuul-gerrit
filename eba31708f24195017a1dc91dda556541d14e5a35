@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af333d65_01864036",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-11T21:55:47Z",
+      "side": 1,
+      "message": "Why do we need to do this?  Why can\u0027t we continue using the current random buildset UUID?  We already re-set it at the appropriate times.\n\nI think there may be a fundamental problem with this: nothing in NNFI assumes that we can\u0027t recreate a queue sequence a second time.  That used to happen quite frequently in Zuul.  Fixing the job graph at global buildset creation time has greatly reduced the opportunity for that, but I don\u0027t want to assume that doing something like running a promote on the item at the top of the queue won\u0027t still be able to do it.  Or we might even write a \"restart builds\" command.\n\nTo elaborate/clarify: imagine we have A\u003c-B in the queue.  We create buildests #1 and #2 respectively.  A fails, so we have A as a severed head, and B as the next head.  B gets buildset #3 created for it.  Then something happens and A\u003c-B are sequenced again.  We should get buildset #4 for B; we should not re-use buildset #2.",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10cd8f54_1e569c9e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-11T21:55:47Z",
+      "side": 1,
+      "message": "Yes, there is as little logic as possible in the re-enqueue method.  The idea behind the NNFI method is that it converges on the correct state.  If any conditions are different compared to the current state, then the method corrects the state to match the current conditions, and this includes creating new buildsets if needed.  The re-enqueue method should definitely not re-implement the NNFI algorithm.  It should just get the item into the queue and then the scheduler should always process the pipeline after that is complete in order to perform corrective action.",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
