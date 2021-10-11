@@ -24,7 +24,7 @@ from functools import total_ordering
 import re2
 import struct
 import time
-from uuid import uuid4
+from uuid import uuid4, uuid5, UUID
 import urllib.parse
 import textwrap
 import types
@@ -2450,7 +2450,7 @@ class BuildSet(object):
         # so we don't know what the other changes ahead will be
         # until jobs start.
         if not self.uuid:
-            self.uuid = uuid4().hex
+            self.uuid = self.item.calculateBuildSetUUID()
         if self.dependent_changes is None:
             items = []
             if self.item.bundle:
@@ -2727,6 +2727,29 @@ class QueueItem(object):
     def getNonLiveItemsAhead(self):
         items = [item for item in self.items_ahead if not item.live]
         return reversed(items)
+
+    def calculateBuildSetUUID(self):
+        """Calculate a deterministic build set UUID.
+
+        The calculated build set UUID takes into account the current
+        position of the item in the queue. This means that when the
+        position changes the build set UUID will also change.
+
+        This is accomplished by using the build set UUID of the item
+        ahead if there is one.
+
+        With that deterministic UUID we can determine if a build set
+        is valid. for the current queue position.
+        """
+        if self.item_ahead:
+            uuid_ahead = (self.item_ahead.current_build_set.uuid
+                          or self.item_ahead.calculateBuildSetUUID())
+            return uuid5(UUID(self.uuid), uuid_ahead).hex
+        # If there is no item ahead and already have a build set UUID
+        # we will use it. Otherwise generate a new UUID based on our own
+        # item UUID.
+        return (self.current_build_set.uuid
+                or uuid5(UUID(self.uuid), self.uuid).hex)
 
     def haveAllJobsStarted(self):
         if not self.hasJobGraph():

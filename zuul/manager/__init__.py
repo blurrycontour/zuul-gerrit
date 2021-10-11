@@ -377,6 +377,17 @@ class PipelineManager(metaclass=ABCMeta):
                     # re-create the layout in independent pipelines.
                     item.layout_uuid = None
 
+                # If the position of the item in the queue change, we should
+                # reset the build_set.
+                if item.current_build_set.uuid:
+                    new_build_set_uuid = item.calculateBuildSetUUID()
+                    # This assertion is not correct as we are simply
+                    # enqueuing items sequentially withoug checking
+                    # if the item ahead is also the nnfi.
+                    # The problem seems to be corrected by the pipeline
+                    # manager later on.
+                    assert item.current_build_set.uuid == new_build_set_uuid
+
                 # If the item is no longer active, but has a job graph we
                 # will make sure to update it.
                 if item.active or has_job_graph:
@@ -1417,6 +1428,11 @@ class PipelineManager(metaclass=ABCMeta):
             for item in queue.queue[:]:
                 item_changed, nnfi = self._processOneItem(
                     item, nnfi)
+
+                if item.current_build_set.uuid:
+                    new_build_set_uuid = item.calculateBuildSetUUID()
+                    assert item.current_build_set.uuid == new_build_set_uuid
+
                 if item_changed:
                     queue_changed = True
                 self.reportStats(item)

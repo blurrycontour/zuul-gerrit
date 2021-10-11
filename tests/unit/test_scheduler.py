@@ -3894,6 +3894,24 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(C.data['status'], 'MERGED')
 
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 3,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='3,1'),
+        ], ordered=False)
+
     def test_double_live_reconfiguration_shared_queue(self):
         # This was a real-world regression.  A change is added to
         # gate; a reconfigure happens, a second change which depends
