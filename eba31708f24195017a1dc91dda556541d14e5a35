@@ -56,6 +56,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "8df9ac66_2e61b385",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-12T16:28:23Z",
+      "side": 1,
+      "message": "I don\u0027t know what would lead A and B to being sequenced again, but I know that the algorithm allows for it and the software as written now would support it.  I think it could have happened in the past before global repo state was implemented.  And I don\u0027t want to prevent it from happening again in the future.  In short, I have no concrete current case for it, but I think it\u0027s important for us to allow it.\n\nI don\u0027t think we can re-use the same buildset.  The first time through, the jobs may have run to completion.  The second time through they may also run to completion.  We would have database entries with a single buildset with duplicate \"final\" jobs, which is not something we intend to support.  It makes much more sense for those to be different buildsets.",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "10cd8f54_1e569c9e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -85,6 +102,23 @@
       "side": 1,
       "message": "I\u0027d be totally fine with the re-enqueue doing only what\u0027s necessary, but I think there are currently cases where the buildset of an item is still used and NOT reset by the pipeline manager later on. E.g. see the failing test case test_live_reconfiguration_shared_queue_removed.\n\nI\u0027m fine with arguing that the items ahead/behind pointers will eventually converge to the correct state and that they might be wrong after a re-enqueue. However, in the mentioned test the old buildset was still used and not reset even though the items ahead moved to a different queue.\n\nMaybe there is a different way to fix this, but I think some information about the previous order of the items is lost during re-enqueue and the deterministic buildset UUID allows us to detect such ordering changes.",
       "parentUuid": "10cd8f54_1e569c9e",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe0a5390_c40f06cd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-12T16:28:23Z",
+      "side": 1,
+      "message": "I\u0027ll look into that test so I understand more of what\u0027s going on.  But maybe if we need something like this we could explicitly list the items in the buildset, so we can invalidate it that way.  So the item ahead sequence would be one reason to invalidate a buildset (but perhaps not the only one, and we wouldn\u0027t assume that every item ahead sequence maps 1:1 to a buildset).",
       "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
