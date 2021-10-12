@@ -57,6 +57,10 @@ class HTTPConflictException(Exception):
     message = "Received response 409"
 
 
+class HTTPBadRequestException(Exception):
+    pass
+
+
 class GerritChangeCache(AbstractChangeCache):
     log = logging.getLogger("zuul.driver.GerritChangeCache")
 
@@ -713,6 +717,8 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         self.iolog.debug('Received: %s %s' % (r.status_code, r.text,))
         if r.status_code == 409:
             raise HTTPConflictException()
+        if r.status_code == 400:
+            raise HTTPBadRequestException('Received response 400: %s' % r.text)
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
@@ -1188,6 +1194,10 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
                 except HTTPConflictException:
                     log.exception("Conflict submitting check data to gerrit.")
                     break
+                except HTTPBadRequestException:
+                    log.exception(
+                        "Bad request submitting check data to gerrit.")
+                    break
                 except Exception:
                     log.exception("Error submitting check data to gerrit, "
                                   "attempt %s", x)
@@ -1235,6 +1245,10 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
                 except HTTPConflictException:
                     log.exception("Conflict submitting data to gerrit.")
                     break
+                except HTTPBadRequestException:
+                    log.exception(
+                        "Bad request submitting check data to gerrit.")
+                    break
                 except Exception:
                     log.exception(
                         "Error submitting data to gerrit, attempt %s", x)
@@ -1246,6 +1260,10 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
                     break
                 except HTTPConflictException:
                     log.exception("Conflict submitting data to gerrit.")
+                    break
+                except HTTPBadRequestException:
+                    log.exception(
+                        "Bad request submitting check data to gerrit.")
                     break
                 except Exception:
                     log.exception(
