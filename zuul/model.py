@@ -2538,14 +2538,13 @@ class Build(object):
         self.retry = False
         self.held = False
         self.parameters = {}
-        self.worker = Worker()
         self.zuul_event_id = zuul_event_id
 
         self.build_request_ref = None
 
     def __repr__(self):
-        return ('<Build %s of %s voting:%s on %s>' %
-                (self.uuid, self.job.name, self.job.voting, self.worker))
+        return ('<Build %s of %s voting:%s>' %
+                (self.uuid, self.job.name, self.job.voting))
 
     @property
     def failed(self):
@@ -2569,25 +2568,6 @@ class Build(object):
                           result=self.result,
                           error_detail=self.error_detail,
                           result_data=self.result_data)
-
-
-class Worker(object):
-    """Information about the specific worker executing a Build."""
-    def __init__(self):
-        self.name = "Unknown"
-        self.hostname = None
-        self.log_port = None
-        self.zone = None
-
-    def updateFromData(self, data):
-        """Update worker information if contained in the WORK_DATA response."""
-        self.name = data.get('worker_name', self.name)
-        self.hostname = data.get('worker_hostname', self.hostname)
-        self.log_port = data.get('worker_log_port', self.log_port)
-        self.zone = data.get('worker_zone', self.zone)
-
-    def __repr__(self):
-        return '<Worker %s>' % self.name
 
 
 class RepoFiles(zkobject.ShardedZKObject):
@@ -3933,7 +3913,6 @@ class QueueItem(zkobject.ZKObject):
             build_url = None
             finger_url = None
             report_url = None
-            worker = None
             if build:
                 result = build.result
                 finger_url = build.url
@@ -3956,10 +3935,6 @@ class QueueItem(zkobject.ZKObject):
                             remaining = max(
                                 int(build.estimated_time * 1000) - elapsed,
                                 0)
-                worker = {
-                    'name': build.worker.name,
-                    'hostname': build.worker.hostname,
-                }
             if remaining and remaining > max_remaining:
                 max_remaining = remaining
 
@@ -3988,7 +3963,6 @@ class QueueItem(zkobject.ZKObject):
                 'retry': build.retry if build else None,
                 'tries': self.current_build_set.getTries(job.name),
                 'queued': job.queued,
-                'worker': worker,
                 'waiting_status': waiting_status,
             })
 
