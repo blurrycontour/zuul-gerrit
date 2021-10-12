@@ -3864,6 +3864,7 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release('.*-merge')
         self.waitUntilSettled()
 
+        print("XXX reconfigure")
         # Remove the shared queue.
         self.commitConfigUpdate(
             'common-config',
@@ -3872,9 +3873,11 @@ class TestScheduler(ZuulTestCase):
         # Use _doReconfigureEvent() instead of reconfigure() here so that the
         # pipeline manager does not run which would fix the wrong item state
         # after the re-enqueue.
-        event = zuul.model.ReconfigureEvent()
-        event.zuul_event_ltime = self.zk_client.getCurrentLtime()
-        self.scheds.execute(lambda app: app.sched._doReconfigureEvent(event))
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        #event = zuul.model.ReconfigureEvent()
+        #event.zuul_event_ltime = self.zk_client.getCurrentLtime()
+        #self.scheds.execute(lambda app: app.sched._doReconfigureEvent(event))
 
         tenant = self.scheds.first.sched.abide.tenants['tenant-one']
         pipeline = tenant.layout.pipelines["gate"]

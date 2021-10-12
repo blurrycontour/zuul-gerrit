@@ -359,7 +359,7 @@ class PipelineManager(metaclass=ABCMeta):
                 # be true, so we should attempt to move the item back
                 # to where it was in case an item ahead is already
                 # failing.
-                if item_ahead_valid and old_item_ahead in change_queue.queue:
+                if item_ahead_valid: # and old_item_ahead in change_queue.queue:
                     change_queue.moveItem(item, old_item_ahead)
 
                 # Get an updated copy of the layout, but if we have a

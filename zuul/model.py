@@ -2407,6 +2407,7 @@ class BuildSet(object):
     }
 
     def __init__(self, item):
+        print("XXX create buildset for", item)
         self.item = item
         self.builds = {}
         self.retry_builds = {}
@@ -2449,7 +2450,9 @@ class BuildSet(object):
         # The change isn't enqueued until after it's created
         # so we don't know what the other changes ahead will be
         # until jobs start.
+        print("XXX set config for", self.item)
         if not self.uuid:
+            print("XXX create uuid")
             self.uuid = uuid4().hex
         if self.dependent_changes is None:
             items = []
