@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "be9e9d3f_1ab47d82",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-12T07:59:49Z",
+      "side": 1,
+      "message": "What would be the event that leads to A and B being sequenced again? Wouldn\u0027t this only be possible in case there is another item X ahead of A and B that failed? In that case we\u0027d get a different buildset UUID because the buildsets ahead have changed.\n\nRegarding the \"why\", please see my response below.",
+      "parentUuid": "af333d65_01864036",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "10cd8f54_1e569c9e",
@@ -31,6 +49,24 @@
       "writtenOn": "2021-10-11T21:55:47Z",
       "side": 1,
       "message": "Yes, there is as little logic as possible in the re-enqueue method.  The idea behind the NNFI method is that it converges on the correct state.  If any conditions are different compared to the current state, then the method corrects the state to match the current conditions, and this includes creating new buildsets if needed.  The re-enqueue method should definitely not re-implement the NNFI algorithm.  It should just get the item into the queue and then the scheduler should always process the pipeline after that is complete in order to perform corrective action.",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "feaafb87_a0e3020f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-12T07:59:49Z",
+      "side": 1,
+      "message": "I\u0027d be totally fine with the re-enqueue doing only what\u0027s necessary, but I think there are currently cases where the buildset of an item is still used and NOT reset by the pipeline manager later on. E.g. see the failing test case test_live_reconfiguration_shared_queue_removed.\n\nI\u0027m fine with arguing that the items ahead/behind pointers will eventually converge to the correct state and that they might be wrong after a re-enqueue. However, in the mentioned test the old buildset was still used and not reset even though the items ahead moved to a different queue.\n\nMaybe there is a different way to fix this, but I think some information about the previous order of the items is lost during re-enqueue and the deterministic buildset UUID allows us to detect such ordering changes.",
+      "parentUuid": "10cd8f54_1e569c9e",
       "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
