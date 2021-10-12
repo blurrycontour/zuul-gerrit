@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac50df75_0744465a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-12T08:05:37Z",
+      "side": 1,
+      "message": "Sorry, I think I did not fully understand what you mean by \"sequenced again\". In the case of a \"restart builds\" command I think it should be fine to keep the same buildset. We could just restart the builds as the position in the queue did not change and everything else should be still valid.",
+      "parentUuid": "be9e9d3f_1ab47d82",
+      "revId": "eba31708f24195017a1dc91dda556541d14e5a35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "10cd8f54_1e569c9e",
