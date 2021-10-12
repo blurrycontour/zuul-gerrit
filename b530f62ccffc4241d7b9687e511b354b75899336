@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f68a52c_2cc169f3",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3874,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-12T21:00:52Z",
+      "side": 1,
+      "message": "I think this is the crux: the intention is that after reconfiguring, we must run NNFI to fix up the queues.\n\nA key thing to remember is that a Zuul ChangeQueue is simultaneously a queue and a tree.  The queue is the strict linear ordering of changes which is relatively fixed.  The tree is ephemeral and can change every time a job completes.\n\nWhen we re-enqueue, we put all the items into either the same or new queues in that strict linear order, then we let NNFI fix up the tree as necessary.  ChangeQueue.queue is the linear queue, QueueItem.item_ahead is the tree.\n\nI pushed up a followup change for discussion which allows the pipeline processor to run and I think shows that the right thing is happening with the buildsets.",
+      "revId": "b530f62ccffc4241d7b9687e511b354b75899336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
