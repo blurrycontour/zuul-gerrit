@@ -2723,6 +2723,8 @@ class BuildSet(zkobject.ZKObject):
             configured=False,
             debug=False,
             fail_fast=False,
+            job_graph=None,
+            _old_job_graph=None,  # Cached job graph of previous layout
         )
 
     def setFiles(self, items):
@@ -2807,6 +2809,8 @@ class BuildSet(zkobject.ZKObject):
             "repo_state_state": self.repo_state_state,
             "debug": self.debug,
             "fail_fast": self.fail_fast,
+            # "job_graph": self.job_graph,
+            # "_old_job_graph": self._old_job_graph,
         }
         return json.dumps(data).encode("utf8")
 
@@ -2983,9 +2987,10 @@ class BuildSet(zkobject.ZKObject):
         project = self.item.change.project
         project_metadata = None
         while item:
-            if item.job_graph:
-                project_metadata = item.job_graph.getProjectMetadata(
-                    project.canonical_name)
+            if item.current_build_set.job_graph:
+                project_metadata = item.current_build_set.job_graph.\
+                    getProjectMetadata(
+                        project.canonical_name)
                 if project_metadata:
                     break
             item = item.item_ahead
@@ -3035,8 +3040,6 @@ class QueueItem(zkobject.ZKObject):
             active=False,  # Whether an item is within an active window
             live=True,  # Whether an item is intended to be processed at all
             layout_uuid=None,
-            job_graph=None,
-            _old_job_graph=None,  # Cached job graph of previous layout
             _cached_sql_results={},
             event=None,  # The trigger event that lead to this queue item
 
@@ -3095,8 +3098,6 @@ class QueueItem(zkobject.ZKObject):
             "active": self.active,
             "live": self.live,
             "layout_uuid": self.layout_uuid,
-            # "job_graph": self.job_graph,
-            # "_old_job_graph": self._old_job_graph,
             "event": {
                 "type": event_type,
                 "data": self.event.toDict(),
@@ -3168,9 +3169,7 @@ class QueueItem(zkobject.ZKObject):
         self.updateAttributes(
             context,
             current_build_set=BuildSet.new(context, item=self),
-            layout_uuid=None,
-            job_graph=None,
-            _old_job_graph=None)
+            layout_uuid=None)
 
     def addBuild(self, build):
         self.current_build_set.addBuild(build)
@@ -3204,6 +3203,7 @@ class QueueItem(zkobject.ZKObject):
         """Find or create actual matching jobs for this item's change and
         store the resulting job tree."""
 
+        # TODO: move this and related methods to BuildSet
         ppc = layout.getProjectPipelineConfig(self)
         try:
             # Conditionally set self.current_build_set.debug so that
@@ -3227,24 +3227,26 @@ class QueueItem(zkobject.ZKObject):
             # created the layout.
             job_graph.project_metadata = layout.project_metadata
 
-            self.updateAttributes(context, job_graph=job_graph)
+            self.current_build_set.updateAttributes(
+                context, job_graph=job_graph)
         except Exception:
-            self.updateAttributes(context, job_graph=None, _old_job_graph=None)
+            self.current_build_set.updateAttributes(
+                context, job_graph=None, _old_job_graph=None)
             raise
 
     def hasJobGraph(self):
         """Returns True if the item has a job graph."""
-        return self.job_graph is not None
+        return self.current_build_set.job_graph is not None
 
     def getJobs(self):
-        if not self.live or not self.job_graph:
+        if not self.live or not self.current_build_set.job_graph:
             return []
-        return self.job_graph.getJobs()
+        return self.current_build_set.job_graph.getJobs()
 
     def getJob(self, name):
-        if not self.job_graph:
+        if not self.current_build_set.job_graph:
             return None
-        return self.job_graph.jobs.get(name)
+        return self.current_build_set.job_graph.jobs.get(name)
 
     @property
     def items_ahead(self):
@@ -3549,7 +3551,7 @@ class QueueItem(zkobject.ZKObject):
         torun = []
         if not self.live:
             return []
-        if not self.job_graph:
+        if not self.current_build_set.job_graph:
             return []
         if self.item_ahead:
             # Only run jobs if any 'hold' jobs on the change ahead
@@ -3557,11 +3559,12 @@ class QueueItem(zkobject.ZKObject):
             if self.item_ahead.isHoldingFollowingChanges():
                 return []
 
+        job_graph = self.current_build_set.job_graph
         failed_job_names = set()  # Jobs that run and failed
         ignored_job_names = set()  # Jobs that were skipped or canceled
         unexecuted_job_names = set()  # Jobs that were not started yet
         jobs_not_started = set()
-        for job in self.job_graph.getJobs():
+        for job in job_graph.getJobs():
             build = self.current_build_set.getBuild(job.name)
             if build:
                 if build.result == 'SUCCESS' or build.paused:
@@ -3576,14 +3579,14 @@ class QueueItem(zkobject.ZKObject):
 
         # Attempt to run jobs in the order they appear in
         # configuration.
-        for job in self.job_graph.getJobs():
+        for job in job_graph.getJobs():
             if job not in jobs_not_started:
                 continue
             if not self.jobRequirementsReady(job):
                 continue
             all_parent_jobs_successful = True
             parent_builds_with_data = {}
-            for parent_job in self.job_graph.getParentJobsRecursively(
+            for parent_job in job_graph.getParentJobsRecursively(
                     job.name):
                 if parent_job.name in unexecuted_job_names \
                         or parent_job.name in failed_job_names:
@@ -3593,7 +3596,7 @@ class QueueItem(zkobject.ZKObject):
                 if parent_build.result_data:
                     parent_builds_with_data[parent_job.name] = parent_build
 
-            for parent_job in self.job_graph.getParentJobsRecursively(
+            for parent_job in job_graph.getParentJobsRecursively(
                     job.name, skip_soft=True):
                 if parent_job.name in ignored_job_names:
                     all_parent_jobs_successful = False
@@ -3605,7 +3608,7 @@ class QueueItem(zkobject.ZKObject):
                 # already found.
                 if len(parent_builds_with_data) > 0:
                     job.parent_data = {}
-                    for parent_job in self.job_graph.getJobs():
+                    for parent_job in job_graph.getJobs():
                         parent_build = parent_builds_with_data.get(
                             parent_job.name)
                         if parent_build:
@@ -3627,17 +3630,18 @@ class QueueItem(zkobject.ZKObject):
         toreq = []
         if not self.live:
             return []
-        if not self.job_graph:
+        if not self.current_build_set.job_graph:
             return []
         if self.item_ahead:
             if self.item_ahead.isHoldingFollowingChanges():
                 return []
 
+        job_graph = self.current_build_set.job_graph
         failed_job_names = set()       # Jobs that run and failed
         ignored_job_names = set()      # Jobs that were skipped or canceled
         unexecuted_job_names = set()   # Jobs that were not started yet
         jobs_not_requested = set()
-        for job in self.job_graph.getJobs():
+        for job in job_graph.getJobs():
             build = build_set.getBuild(job.name)
             if build and (build.result == 'SUCCESS' or build.paused):
                 pass
@@ -3660,7 +3664,7 @@ class QueueItem(zkobject.ZKObject):
 
         # Attempt to request nodes for jobs in the order jobs appear
         # in configuration.
-        for job in self.job_graph.getJobs():
+        for job in job_graph.getJobs():
             if job not in jobs_not_requested:
                 continue
             if not self.jobRequirementsReady(job):
@@ -3673,10 +3677,10 @@ class QueueItem(zkobject.ZKObject):
             # Every parent job (dependency), whether soft or hard:
             all_dep_job_names = set(
                 [x.name for x in
-                 self.job_graph.getParentJobsRecursively(job.name)])
+                 job_graph.getParentJobsRecursively(job.name)])
             # Only the hard deps:
             hard_dep_job_names = set(
-                [x.name for x in self.job_graph.getParentJobsRecursively(
+                [x.name for x in job_graph.getParentJobsRecursively(
                     job.name, skip_soft=True)])
             # Any dep that hasn't finished (or started) running
             unexecuted_dep_job_names = unexecuted_job_names & all_dep_job_names
@@ -3714,6 +3718,7 @@ class QueueItem(zkobject.ZKObject):
             self.removeBuild(build)
             return
 
+        job_graph = self.current_build_set.job_graph
         skipped = []
         # NOTE(pabelanger): Check successful/paused jobs to see if
         # zuul_return includes zuul.child_jobs.
@@ -3721,13 +3726,13 @@ class QueueItem(zkobject.ZKObject):
         if ((build.result == 'SUCCESS' or build.paused)
                 and 'child_jobs' in build_result):
             zuul_return = build_result.get('child_jobs', [])
-            dependent_jobs = self.job_graph.getDirectDependentJobs(
+            dependent_jobs = job_graph.getDirectDependentJobs(
                 build.job.name)
 
             if not zuul_return:
                 # If zuul.child_jobs exists and is empty, the user
                 # wants to skip all child jobs.
-                to_skip = self.job_graph.getDependentJobsRecursively(
+                to_skip = job_graph.getDependentJobsRecursively(
                     build.job.name, skip_soft=True)
                 skipped += to_skip
             else:
@@ -3735,14 +3740,14 @@ class QueueItem(zkobject.ZKObject):
                 intersect_jobs = dependent_jobs.intersection(zuul_return)
 
                 for skip in (dependent_jobs - intersect_jobs):
-                    s = self.job_graph.jobs.get(skip)
+                    s = job_graph.jobs.get(skip)
                     skipped.append(s)
-                    to_skip = self.job_graph.getDependentJobsRecursively(
+                    to_skip = job_graph.getDependentJobsRecursively(
                         skip, skip_soft=True)
                     skipped += to_skip
 
         elif build.result != 'SUCCESS' and not build.paused:
-            to_skip = self.job_graph.getDependentJobsRecursively(
+            to_skip = job_graph.getDependentJobsRecursively(
                 build.job.name)
             skipped += to_skip
 
@@ -4060,11 +4065,11 @@ class QueueItem(zkobject.ZKObject):
         if layout_ahead and layout and layout is not layout_ahead:
             # This change updates the layout.  Calculate the job as it
             # would be if the layout had not changed.
-            if self._old_job_graph is None:
+            if self.current_build_set._old_job_graph is None:
                 try:
                     ppc = layout_ahead.getProjectPipelineConfig(self)
                     log.debug("Creating job graph for config change detection")
-                    self.updateAttributes(
+                    self.current_build_set.updateAttributes(
                         self.pipeline.manager.current_context,
                         _old_job_graph=layout_ahead.createJobGraph(
                             self, ppc, skip_file_matcher=True))
@@ -4078,7 +4083,7 @@ class QueueItem(zkobject.ZKObject):
                     # which jobs have changed, so rather than run them
                     # all, just rely on the file matchers as-is.
                     return False
-            old_job = self._old_job_graph.jobs.get(job.name)
+            old_job = self.current_build_set._old_job_graph.jobs.get(job.name)
             if old_job is None:
                 log.debug("Found a newly created job")
                 return True  # A newly created job
