@@ -1579,7 +1579,7 @@ class PipelineManager(metaclass=ABCMeta):
 
         self._resumeBuilds(build.build_set)
 
-        if (item.project_pipeline_config.fail_fast and
+        if (item.current_build_set.fail_fast and
             build.failed and build.job.voting and not build.retry):
             # If fail-fast is set and the build is not successful
             # cancel all remaining jobs.
