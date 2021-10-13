@@ -75,6 +75,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abebd84a_b3560b4d",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1149,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-13T21:43:00Z",
+      "side": 1,
+      "message": "Semi-nit: Every log message starts with a capital letter.",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7dd33c9a_d41a2d64",
