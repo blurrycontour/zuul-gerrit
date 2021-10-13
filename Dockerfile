@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM docker.io/library/node:14-buster as js-builder
+FROM docker.io/library/node:14-bullseye as js-builder
 
 COPY web /tmp/src
 # Explicitly run the Javascript build
 RUN cd /tmp/src && yarn install -d && yarn build
 
-FROM docker.io/opendevorg/python-builder:3.8 as builder
+FROM docker.io/opendevorg/python-builder:3.8-bullseye as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Optional location of Zuul API endpoint.
@@ -48,7 +48,7 @@ RUN /output/install-from-bindep \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz --strip-components=1 -C /tmp/openshift-install
 
-FROM docker.io/opendevorg/python-base:3.8 as zuul
+FROM docker.io/opendevorg/python-base:3.8-bullseye as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
@@ -71,7 +71,7 @@ COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 
 # https://podman.io/getting-started/installation.html
 COPY tools/4D64390375060AA4.asc /etc/apt/trusted.gpg.d/kubic.asc
-RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
+RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_11/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
   && apt-get update \
   && apt-get install -y skopeo \
   && apt-get clean \
