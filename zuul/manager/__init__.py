@@ -389,7 +389,7 @@ class PipelineManager(metaclass=ABCMeta):
                 # isn't one; or it will send a new merge job if
                 # necessary, or it will do nothing if we're waiting on
                 # a merge job.
-                has_job_graph = bool(item.job_graph)
+                has_job_graph = bool(item.current_build_set.job_graph)
                 if item.live:
                     # Only reset the layout for live items as we don't need to
                     # re-create the layout in independent pipelines.
@@ -770,7 +770,7 @@ class PipelineManager(metaclass=ABCMeta):
         return True
 
     def _getPausedParent(self, build_set, job):
-        job_graph = build_set.item.job_graph
+        job_graph = build_set.job_graph
         if job_graph:
             for parent in job_graph.getParentJobsRecursively(job.name):
                 build = build_set.getBuild(parent.name)
@@ -820,7 +820,7 @@ class PipelineManager(metaclass=ABCMeta):
     def executeJobs(self, item):
         # TODO(jeblair): This should return a value indicating a job
         # was executed.  Appears to be a longstanding bug.
-        if not item.job_graph:
+        if not item.current_build_set.job_graph:
             return False
 
         jobs = item.findJobsToRun(
@@ -1033,7 +1033,8 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, item.event)
         if item.item_ahead:
             if (
-                (item.item_ahead.live and not item.item_ahead.job_graph) or
+                (item.item_ahead.live and
+                 not item.item_ahead.current_build_set.job_graph) or
                 (not item.item_ahead.live and not item.item_ahead.layout_uuid)
             ):
                 # We're probably waiting on a merge job for the item ahead.
@@ -1082,10 +1083,10 @@ class PipelineManager(metaclass=ABCMeta):
 
             # Make sure override-checkout targets are part of the repo state
             for item in items:
-                if not item.job_graph:
+                if not item.current_build_set.job_graph:
                     continue
 
-                for job in item.job_graph.jobs.values():
+                for job in item.current_build_set.job_graph.jobs.values():
                     if job.override_checkout:
                         branches.add(job.override_checkout)
 
@@ -1153,7 +1154,7 @@ class PipelineManager(metaclass=ABCMeta):
         log.info('Scheduling global repo state for item %s', item)
 
         tenant = item.pipeline.tenant
-        jobs = item.job_graph.getJobs()
+        jobs = item.current_build_set.job_graph.getJobs()
         projects = set()
         for job in jobs:
             log.debug('Processing job %s', job.name)
@@ -1266,7 +1267,7 @@ class PipelineManager(metaclass=ABCMeta):
         # None if there was an error that makes the layout unusable.
         # In the last case, it will have set the config_errors on this
         # item, which may be picked up by the next item.
-        if not (item.layout_uuid or item.job_graph):
+        if not (item.layout_uuid or item.current_build_set.job_graph):
             layout = self.getLayout(item)
             if not layout:
                 return False
@@ -1279,7 +1280,7 @@ class PipelineManager(metaclass=ABCMeta):
         # At this point we have a layout for the item, and it's live,
         # so freeze the job graph.
         log = item.annotateLogger(self.log)
-        if not item.job_graph:
+        if not item.current_build_set.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
                 item.freezeJobGraph(self.getLayout(item), self.current_context)
@@ -1289,7 +1290,8 @@ class PipelineManager(metaclass=ABCMeta):
                 item.setConfigError("Unable to freeze job graph: %s" %
                                     (str(e)))
                 return False
-            if item.job_graph and len(item.job_graph.jobs) > 0:
+            if (item.current_build_set.job_graph and
+                len(item.current_build_set.job_graph.jobs) > 0):
                 self.sql.reportBuildsetStart(build_set)
 
         # At this point we know all frozen jobs and their repos so update the
@@ -1361,7 +1363,7 @@ class PipelineManager(metaclass=ABCMeta):
                 # Starting jobs reporting should only be done once if there are
                 # jobs to run for this item.
                 if ready and len(self.pipeline.start_actions) > 0 \
-                        and len(item.job_graph.jobs) > 0 \
+                        and len(item.current_build_set.job_graph.jobs) > 0 \
                         and not item.reported_start \
                         and not item.quiet:
                     self.reportStart(item)
@@ -1515,13 +1517,13 @@ class PipelineManager(metaclass=ABCMeta):
         """
         Resumes all paused builds of a buildset that may be resumed.
         """
-        jobgraph = build_set.item.job_graph
+        job_graph = build_set.job_graph
         for build in build_set.builds.values():
             if not build.paused:
                 continue
             # check if all child jobs are finished
             child_builds = [build_set.builds.get(x.name) for x in
-                            jobgraph.getDependentJobsRecursively(
+                            job_graph.getDependentJobsRecursively(
                                 build.job.name)]
             all_completed = True
             for child_build in child_builds:
@@ -1534,9 +1536,9 @@ class PipelineManager(metaclass=ABCMeta):
                 build.paused = False
 
     def _resetDependentBuilds(self, build_set, build):
-        jobgraph = build_set.item.job_graph
+        job_graph = build_set.job_graph
 
-        for job in jobgraph.getDependentJobsRecursively(build.job.name):
+        for job in job_graph.getDependentJobsRecursively(build.job.name):
             self.sched.cancelJob(build_set, job)
             build = build_set.getBuild(job.name)
             if build:
@@ -1677,7 +1679,8 @@ class PipelineManager(metaclass=ABCMeta):
                 merged = source.isMerged(item.change, item.change.branch)
             change_queue = item.queue
             if not (succeeded and merged):
-                if not item.job_graph or not item.job_graph.jobs:
+                if (not item.current_build_set.job_graph or
+                    not item.current_build_set.job_graph.jobs):
                     error_reason = "did not have any jobs configured"
                 elif not succeeded:
                     error_reason = "failed tests"
