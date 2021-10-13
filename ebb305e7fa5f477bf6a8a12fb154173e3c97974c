@@ -134,6 +134,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fea2b7a_709455ca",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1149,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-10-13T22:19:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abebd84a_b3560b4d",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7dd33c9a_d41a2d64",

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "170f30db_056d3d1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-10-13T22:19:06Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e If you discovered this as a result of a long syntax error message, have you given any thought to making it shorter?\n\nYes I did, I had a quick look and punted it to my todo list 😊  It will have something to do with updating the snippet extraction in a ZuulMark to not be overly long, I think.  I started thinking about things like overly long base-64 encoded secret lines, etc and it seemed there would be a lot of corner cases.  The other thing was that other drivers might be happy to post this full context for you as well, if their limits are different.\n\nI figure this at least gets something reported, even if it is not ideal.\n\nThis was found via a actual failure -- https://review.opendev.org/c/opendev/system-config/+/807672 has a syntax error that is being unreported currently.",
+      "revId": "2d94944e2260e8466eedbf4229dd64d126c40b7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
