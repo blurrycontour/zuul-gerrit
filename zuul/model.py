@@ -3672,8 +3672,8 @@ class Ref(object):
     def isUpdateOf(self, other):
         return False
 
-    def getRelatedChanges(self, sched):
-        return set()
+    def getRelatedChanges(self, sched, related):
+        pass
 
     def updatesConfig(self, tenant):
         tpc = tenant.project_configs.get(self.project.canonical_name)
@@ -3879,17 +3879,21 @@ class Change(Branch):
             return True
         return False
 
-    def getRelatedChanges(self, sched):
-        related = set()
-        for reference in self.needs_changes:
-            related.add(reference)
-        for reference in self.needed_by_changes:
-            related.add(reference)
+    def getRelatedChanges(self, sched, related):
+        """Recursively update a set of related changes
+
+        :arg Scheduler sched: The scheduler instance
+        :arg set related: The cache keys of changes which have been inspected
+           so far.  Will be updated with additional changes by this method.
+        """
+        related.add(self.cache_stat.key)
+        for reference in itertools.chain(self.needs_changes,
+                                         self.needed_by_changes):
             key = ChangeKey.fromReference(reference)
-            source = sched.connections.getSource(key.connection_name)
-            change = source.getChangeByKey(key)
-            related.update(change.getRelatedChanges(sched))
-        return related
+            if key not in related:
+                source = sched.connections.getSource(key.connection_name)
+                change = source.getChangeByKey(key)
+                change.getRelatedChanges(sched, related)
 
     def getSafeAttributes(self):
         return Attributes(project=self.project,
