@@ -85,6 +85,13 @@ class ChangeKey:
         msg = self.reference.encode('utf8')
         self._hash = hashlib.sha256(msg).hexdigest()
 
+    def __hash__(self):
+        return hash(self.reference)
+
+    def __eq__(self, other):
+        return (isinstance(other, ChangeKey) and
+                self.reference == other.reference)
+
     @classmethod
     def fromReference(cls, data):
         data = json.loads(data)

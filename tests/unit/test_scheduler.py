@@ -48,6 +48,7 @@ from tests.base import (
     TestConnectionRegistry,
     FIXTURE_DIR,
 )
+from zuul.zk.change_cache import ChangeKey
 from zuul.zk.layout import LayoutState
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0)
@@ -1408,6 +1409,15 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(_getCachedChanges()), 2)
         sched.maintainConnectionCache()
         self.assertEqual(len(_getCachedChanges()), 2)
+
+        # Test this method separately to make sure we are getting
+        # cache keys of the correct type, since we don't do run-time
+        # validation.
+        relevant = sched._gatherConnectionCacheKeys()
+        self.assertEqual(len(relevant), 2)
+        for k in relevant:
+            if not isinstance(k, ChangeKey):
+                raise RuntimeError("Cache key %s is not a ChangeKey" % repr(k))
 
         self.hold_jobs_in_queue = False
         self.executor_api.release()

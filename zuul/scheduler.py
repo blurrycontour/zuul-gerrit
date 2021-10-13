@@ -1616,18 +1616,20 @@ class Scheduler(threading.Thread):
         else:
             pipeline.state = pipeline.STATE_NORMAL
 
-    def maintainConnectionCache(self):
+    def _gatherConnectionCacheKeys(self):
         relevant = set()
-        self.log.debug("Starting connection cache maintenance")
         with self.layout_lock:
             for tenant in self.abide.tenants.values():
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",
                                    tenant.name, pipeline.name)
                     for item in pipeline.getAllItems():
-                        relevant.add(item.change.cache_stat.key)
-                        relevant.update(
-                            item.change.getRelatedChanges(self))
+                        item.change.getRelatedChanges(self, relevant)
+        return relevant
+
+    def maintainConnectionCache(self):
+        self.log.debug("Starting connection cache maintenance")
+        relevant = self._gatherConnectionCacheKeys()
 
         # We'll only remove changes older than `max_age` from the cache, as
         # it may take a while for an event that was processed by a connection
