@@ -16,6 +16,80 @@
       "message": "recheck",
       "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe6a2b03_1e2737d1",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1071,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-13T15:47:04Z",
+      "side": 1,
+      "message": "See note about checking the length of python strings in the other file.",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3fb9587_1d428b7b",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-13T15:47:04Z",
+      "side": 1,
+      "message": "Out of curiosity why not write out the value as it is constant?",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc09ef39_7bd4aefd",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1148,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-13T15:47:04Z",
+      "side": 1,
+      "message": "This seems to be the python string length not the byte length. I think you may need to convert this to a utf8 bytestring and check the length of that value.\n\nTo append the truncated string at the end I think you can remove 20 characters from the end of the message which may be 20 or more bytes. Then append your less than 20 byte ascii bit safely at the end.",
+      "range": {
+        "startLine": 1148,
+        "startChar": 15,
+        "endLine": 1148,
+        "endChar": 27
+      },
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dd33c9a_d41a2d64",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1218,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-13T15:47:04Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
