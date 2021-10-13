@@ -3099,14 +3099,6 @@ class QueueItem(zkobject.ZKObject):
         # child objects.
         self._set(uuid=data["uuid"])
 
-        # FIXME: Move queue item class after events so we can define
-        # this as a class attribute.
-        EVENT_TYPE_MAP = {
-            "EnqueueEvent": EnqueueEvent,
-            "DequeueEvent": DequeueEvent,
-            "PromoteEvent": PromoteEvent,
-        }
-
         event_type = data["event"]["type"]
         if event_type == "TriggerEvent":
             event_class = (
@@ -3114,7 +3106,7 @@ class QueueItem(zkobject.ZKObject):
                     data["event"]["data"]["driver_name"])
             )
         else:
-            event_class = EVENT_TYPE_MAP.get(event_type)
+            event_class = globals().get(event_type)
 
         if event_class is None:
             raise NotImplementedError(
