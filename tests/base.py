@@ -1068,6 +1068,10 @@ class GerritWebServer(object):
                     return self._404()
 
                 message = data['message']
+                if len(message) > gerritconnection.GERRIT_HUMAN_MESSAGE_LIMIT:
+                    self.send_response(400, message='Message length exceeded')
+                    self.end_headers()
+                    return
                 labels = data.get('labels', {})
                 comments = data.get('robot_comments', data.get('comments', {}))
                 tag = data.get('tag', None)
