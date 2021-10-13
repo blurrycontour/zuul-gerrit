@@ -79,8 +79,8 @@ def construct_build_params(uuid, sched, job, item, pipeline,
         zuul_params['newrev'] = item.change.newrev
     zuul_params['projects'] = {}  # Set below
     zuul_params['items'] = dependent_changes
-    zuul_params['child_jobs'] = list(item.job_graph.getDirectDependentJobs(
-        job.name))
+    zuul_params['child_jobs'] = list(item.current_build_set.job_graph.
+                                     getDirectDependentJobs(job.name))
 
     params = dict()
     params['job'] = job.name
@@ -103,8 +103,8 @@ def construct_build_params(uuid, sched, job, item, pipeline,
         for role in d['roles']:
             if role['type'] != 'zuul':
                 continue
-            project_metadata = item.job_graph.getProjectMetadata(
-                role['project_canonical_name'])
+            project_metadata = item.current_build_set.job_graph.\
+                getProjectMetadata(role['project_canonical_name'])
             if project_metadata:
                 role['project_default_branch'] = \
                     project_metadata.default_branch
@@ -144,8 +144,8 @@ def construct_build_params(uuid, sched, job, item, pipeline,
 
     def make_project_dict(project, override_branch=None,
                           override_checkout=None):
-        project_metadata = item.job_graph.getProjectMetadata(
-            project.canonical_name)
+        project_metadata = item.current_build_set.job_graph.\
+            getProjectMetadata(project.canonical_name)
         if project_metadata:
             project_default_branch = project_metadata.default_branch
         else:

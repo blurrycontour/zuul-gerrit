@@ -449,7 +449,7 @@ class RPCListener(RPCListenerBase):
 
         output = []
 
-        for job in item.job_graph.getJobs():
+        for job in item.current_build_set.job_graph.getJobs():
             job.setBase(tenant.layout)
             output.append({
                 'name': job.name,
@@ -479,7 +479,7 @@ class RPCListener(RPCListenerBase):
                                    pipeline=queue.pipeline)
         item.freezeJobGraph(tenant.layout, context, skip_file_matcher=True)
 
-        job = item.job_graph.jobs.get(args.get("job"))
+        job = item.current_build_set.job_graph.jobs.get(args.get("job"))
         if not job:
             gear_job.sendWorkComplete(json.dumps(None))
             return
