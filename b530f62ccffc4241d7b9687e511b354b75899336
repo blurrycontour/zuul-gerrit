@@ -34,6 +34,24 @@
       "parentUuid": "7f68a52c_2cc169f3",
       "revId": "b530f62ccffc4241d7b9687e511b354b75899336",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b4e3122_afa48119",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3874,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-13T08:52:36Z",
+      "side": 1,
+      "message": "I\u0027m also thinking if this can be a problem when we have the pipeline state in Zookeeper and an item is removed during re-enqueue but still referenced via another item\u0027s ahead/behind.\n\nMaybe something we then have to account for when restoring the pipeline state.",
+      "parentUuid": "87fe7fd9_e4bbf968",
+      "revId": "b530f62ccffc4241d7b9687e511b354b75899336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
