@@ -609,18 +609,31 @@ class ChangeQueue(zkobject.ZKObject):
                     i.getPath(): i for i in item.bundle.items
                 })
 
-        queue = []
+        items_by_path = OrderedDict()
         for item_path in data["queue"]:
             item = existing_items.get(item_path)
             if item:
                 item.refresh(context)
             else:
                 item = QueueItem.fromZK(context, item_path)
-            queue.append(item)
+            items_by_path[item.getPath()] = item
+
+        # Resolve ahead/behind references between queue items
+        for item in items_by_path.values():
+            # After a re-enqueue we might have references to items
+            # outside the current queue. We will resolve those
+            # references to None for the item ahead or simply exclude
+            # it in the list of items behind.
+            # The pipeline manager will take care of correcting the
+            # references on the next queue iteration.
+            item._set(
+                item_ahead=items_by_path.get(item.item_ahead),
+                items_behind=[items_by_path[p] for p in item.items_behind
+                              if p in items_by_path])
 
         data.update({
             "_jobs": set(data["_jobs"]),
-            "queue": queue,
+            "queue": list(items_by_path.values()),
             "project_branches": [tuple(pb) for pb in data["project_branches"]],
         })
         return data
@@ -3071,6 +3084,8 @@ class QueueItem(zkobject.ZKObject):
             "dequeued_needing_change": self.dequeued_needing_change,
             "current_build_set": (self.current_build_set and
                                   self.current_build_set.getPath()),
+            "item_ahead": self.item_ahead and self.item_ahead.getPath(),
+            "items_behind": [i.getPath() for i in self.items_behind],
             "enqueue_time": self.enqueue_time,
             "report_time": self.report_time,
             "dequeue_time": self.dequeue_time,
