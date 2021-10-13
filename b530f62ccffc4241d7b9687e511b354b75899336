@@ -16,6 +16,24 @@
       "message": "I think this is the crux: the intention is that after reconfiguring, we must run NNFI to fix up the queues.\n\nA key thing to remember is that a Zuul ChangeQueue is simultaneously a queue and a tree.  The queue is the strict linear ordering of changes which is relatively fixed.  The tree is ephemeral and can change every time a job completes.\n\nWhen we re-enqueue, we put all the items into either the same or new queues in that strict linear order, then we let NNFI fix up the tree as necessary.  ChangeQueue.queue is the linear queue, QueueItem.item_ahead is the tree.\n\nI pushed up a followup change for discussion which allows the pipeline processor to run and I think shows that the right thing is happening with the buildsets.",
       "revId": "b530f62ccffc4241d7b9687e511b354b75899336",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87fe7fd9_e4bbf968",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3874,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-13T08:47:39Z",
+      "side": 1,
+      "message": "I\u0027m aware that the pipeline manager corrects the ahead/behind pointers as mentioned in the commit message.\n\nThe thing for me is that the ahead/behind pointers are referencing items OUTSIDE the current queue after the re-enqueue. I mean yes, it is corrected by the pipeline manager but this seems a little too loose to me and the correct behavior feels like a lucky side-effect.\n\nIf that is the intended behavior we might want to add a comment to the reEnqueueItem() method that explains this. Still, I hope that we don\u0027t have any other cases that the pipeline manager can\u0027t detect correctly that are not covered with a test case.\n\nThe deterministic buildset UUID was just an attempt to tie the buildset UUID more to the position of the item in the queue, which would allow us to detect an outdated buildset. But I also agree that it might have some other issues that I did not anticipate.",
+      "parentUuid": "7f68a52c_2cc169f3",
+      "revId": "b530f62ccffc4241d7b9687e511b354b75899336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
