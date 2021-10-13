@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0e1a9fd2_c2187281",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-10-13T21:56:11Z",
+      "side": 1,
+      "message": "TBH I took it from the gerrit source\n\nhttps://gerrit.googlesource.com/gerrit/+/refs/heads/master/java/com/google/gerrit/server/git/validators/CommentSizeValidator.java#33\n\nI guess it looks 😎",
+      "parentUuid": "b3fb9587_1d428b7b",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cc09ef39_7bd4aefd",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 2
@@ -65,6 +83,30 @@
       "writtenOn": "2021-10-13T15:47:04Z",
       "side": 1,
       "message": "This seems to be the python string length not the byte length. I think you may need to convert this to a utf8 bytestring and check the length of that value.\n\nTo append the truncated string at the end I think you can remove 20 characters from the end of the message which may be 20 or more bytes. Then append your less than 20 byte ascii bit safely at the end.",
+      "range": {
+        "startLine": 1148,
+        "startChar": 15,
+        "endLine": 1148,
+        "endChar": 27
+      },
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffe8932d_05670a6a",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1148,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-10-13T21:56:11Z",
+      "side": 1,
+      "message": "the documentation is vague on what it\u0027s actually counting\n\n\"Maximum allowed size in characters of a regular (non-robot) comment. Comments which exceed this size will be rejected. Size computation is approximate and may be off by roughly 1%. Common unit suffixes of \u0027k\u0027, \u0027m\u0027, or \u0027g\u0027 are supported. The value must be positive.\"\n\nI think you\u0027re right, and additionally we should probably leave ourselves some more headroom.  I think java uses 2-byte encoding, so possibly what we send expands on the other side anyway",
+      "parentUuid": "cc09ef39_7bd4aefd",
       "range": {
         "startLine": 1148,
         "startChar": 15,
@@ -105,6 +147,24 @@
       "writtenOn": "2021-10-13T15:47:04Z",
       "side": 1,
       "message": "See above.",
+      "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6104fe9_6c66eefd",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1218,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-10-13T21:56:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7dd33c9a_d41a2d64",
       "revId": "ebb305e7fa5f477bf6a8a12fb154173e3c97974c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
