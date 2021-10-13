@@ -363,9 +363,8 @@ class Scheduler(threading.Thread):
 
         # Get all builds so we can filter by state and zone
         for build_request in self.executor.executor_api.inState():
-            zone = build_request.zone
             zone_stats = zoned_executor_stats.setdefault(
-                executor_component.zone,
+                build_request.zone,
                 executor_stats_default.copy())
             if build_request.state == build_request.REQUESTED:
                 zone_stats['queued'] += 1
