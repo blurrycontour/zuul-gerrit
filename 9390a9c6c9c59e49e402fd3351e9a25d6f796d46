@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecf67faa_ccc59c3d",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-14T20:45:03Z",
+      "side": 1,
+      "message": "Is this meant to be self._gen_error(\"GET\")? I don\u0027t see any reference to gen_error at https://docs.python.org/3/library/http.server.html.",
+      "revId": "9390a9c6c9c59e49e402fd3351e9a25d6f796d46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31aaea8d_d7bb30bb",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-14T20:45:03Z",
+      "side": 1,
+      "message": "Assuming the above is meant to be _gen_error() this method needs to check if it got an error back and send_data appropriately I think.",
+      "revId": "9390a9c6c9c59e49e402fd3351e9a25d6f796d46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
