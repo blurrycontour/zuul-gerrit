@@ -1531,17 +1531,12 @@ class ZuulRole(Role):
         return d
 
 
-class Job(ConfigObject):
+class AbstractJob:
+    """A base class for FrozenJob and Job
 
-    """A Job represents the defintion of actions to perform.
+    This class contains all of the job attribute names and default
+    values which are common to both frozen and configuration jobs.
 
-    A Job is an abstract configuration concept.  It describes what,
-    where, and under what circumstances something should be run
-    (contrast this with Build which is a concrete single execution of
-    a Job).
-
-    NB: Do not modify attributes of this class, set them directly
-    (e.g., "job.run = ..." rather than "job.run.append(...)").
     """
 
     BASE_JOB_MARKER = object()
@@ -1551,7 +1546,6 @@ class Job(ConfigObject):
     empty_nodeset = NodeSet()
 
     def __init__(self, name):
-        super(Job, self).__init__()
         # These attributes may override even the final form of a job
         # in the context of a project-pipeline.  They can not affect
         # the execution of the job, but only whether the job is run
@@ -1635,13 +1629,8 @@ class Job(ConfigObject):
 
         self.name = name
 
-    @property
-    def combined_variables(self):
-        """
-        Combines the data that has been returned by parent jobs with the
-        job variables where job variables have priority over parent data.
-        """
-        return Job._deepUpdate(self.parent_data or {}, self.variables)
+    def isBase(self):
+        return self.parent is self.BASE_JOB_MARKER
 
     def toDict(self, tenant):
         '''
@@ -1705,6 +1694,131 @@ class Job(ConfigObject):
         d['workspace_scheme'] = self.workspace_scheme
         return d
 
+
+class FrozenJob(AbstractJob):
+    """A rendered job definition that will actually be run.
+
+    This is the combination of one or more Job variants to produce a
+    rendered job definition that can be serialized and run by the
+    executor.
+
+    Most variables should not be updated once created, except some
+    variables which deal with the current state of the job in the
+    pipeline.
+    """
+
+    @property
+    def combined_variables(self):
+        """
+        Combines the data that has been returned by parent jobs with the
+        job variables where job variables have priority over parent data.
+        """
+        return Job._deepUpdate(self.parent_data or {}, self.variables)
+
+    def getAffectedProjects(self, tenant):
+        """
+        Gets all projects that are required to run this job. This includes
+        required_projects, referenced playbooks, roles and dependent changes.
+        """
+        project_canonical_names = set()
+        project_canonical_names.update(self.required_projects.keys())
+        project_canonical_names.update(self._projectsFromPlaybooks(
+            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
+                            self.cleanup_run), with_implicit=True))
+
+        projects = list()
+        for project_canonical_name in project_canonical_names:
+            projects.append(tenant.getProject(project_canonical_name)[1])
+        return projects
+
+    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
+        for playbook in playbooks:
+            # noop job does not have source_context
+            if playbook.source_context:
+                yield playbook.source_context.project_canonical_name
+            for role in playbook.roles:
+                if role.implicit and not with_implicit:
+                    continue
+                yield role.project_canonical_name
+
+    def getSafeAttributes(self):
+        return Attributes(name=self.name)
+
+    def updateParentData(self, other_build):
+        # Update variables, but give the new values priority. If more than one
+        # parent job returns the same variable, the value from the later job
+        # in the job graph will take precedence.
+        other_vars = other_build.result_data
+        v = self.parent_data or {}
+        v = Job._deepUpdate(v, other_vars)
+        # To avoid running afoul of checks that jobs don't set zuul
+        # variables, remove them from parent data here.
+        v.pop('zuul', None)
+        # For safety, also drop nodepool and unsafe_vars
+        v.pop('nodepool', None)
+        v.pop('unsafe_vars', None)
+        self.parent_data = v
+
+        secret_other_vars = other_build.secret_result_data
+        v = self.secret_parent_data or {}
+        v = Job._deepUpdate(secret_other_vars, v)
+        if 'zuul' in v:
+            del v['zuul']
+        self.secret_parent_data = v
+
+        artifact_data = self.artifact_data or []
+        artifacts = get_artifacts_from_result_data(other_vars)
+        for a in artifacts:
+            # Change here may be any ref type (tag, change, etc)
+            ref = other_build.build_set.item.change
+            a.update({'project': ref.project.name,
+                      'job': other_build.job.name})
+            # Change is a Branch
+            if hasattr(ref, 'branch'):
+                a.update({'branch': ref.branch})
+                if hasattr(ref, 'number') and hasattr(ref, 'patchset'):
+                    a.update({'change': str(ref.number),
+                              'patchset': ref.patchset})
+            # Otherwise we are ref type
+            else:
+                a.update({'ref': ref.ref,
+                          'oldrev': ref.oldrev,
+                          'newrev': ref.newrev})
+                if hasattr(ref, 'tag'):
+                    a.update({'tag': ref.tag})
+            if a not in artifact_data:
+                artifact_data.append(a)
+        if artifact_data:
+            self.updateArtifactData(artifact_data)
+
+    def updateArtifactData(self, artifact_data):
+        self.artifact_data = artifact_data
+
+
+class Job(AbstractJob, ConfigObject):
+    """A Job represents the defintion of actions to perform.
+
+    A Job is an abstract configuration concept.  It describes what,
+    where, and under what circumstances something should be run
+    (contrast this with Build which is a concrete single execution of
+    a Job).
+
+    NB: Do not modify attributes of this class, set them directly
+    (e.g., "job.run = ..." rather than "job.run.append(...)").
+    """
+
+    def __init__(self, name):
+        ConfigObject.__init__(self)
+        AbstractJob.__init__(self, name)
+
+    def freezeJob(self):
+        job = FrozenJob(self.name)
+        for k in self.attributes:
+            # If this is a config object, it's frozen, so it's
+            # safe to shallow copy.
+            setattr(job, k, getattr(self, k))
+        return job
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -1744,12 +1858,6 @@ class Job(ConfigObject):
 
     def _get(self, name):
         return self.__dict__.get(name)
-
-    def getSafeAttributes(self):
-        return Attributes(name=self.name)
-
-    def isBase(self):
-        return self.parent is self.BASE_JOB_MARKER
 
     def setBase(self, layout):
         self.inheritance_path = self.inheritance_path + (repr(self),)
@@ -1863,56 +1971,6 @@ class Job(ConfigObject):
         if other_group_vars is not None:
             self.group_variables = Job._deepUpdate(
                 self.group_variables, other_group_vars)
-
-    def updateParentData(self, other_build):
-        # Update variables, but give the new values priority. If more than one
-        # parent job returns the same variable, the value from the later job
-        # in the job graph will take precedence.
-        other_vars = other_build.result_data
-        v = self.parent_data or {}
-        v = Job._deepUpdate(v, other_vars)
-        # To avoid running afoul of checks that jobs don't set zuul
-        # variables, remove them from parent data here.
-        v.pop('zuul', None)
-        # For safety, also drop nodepool and unsafe_vars
-        v.pop('nodepool', None)
-        v.pop('unsafe_vars', None)
-        self.parent_data = v
-
-        secret_other_vars = other_build.secret_result_data
-        v = self.secret_parent_data or {}
-        v = Job._deepUpdate(secret_other_vars, v)
-        if 'zuul' in v:
-            del v['zuul']
-        self.secret_parent_data = v
-
-        artifact_data = self.artifact_data or []
-        artifacts = get_artifacts_from_result_data(other_vars)
-        for a in artifacts:
-            # Change here may be any ref type (tag, change, etc)
-            ref = other_build.build_set.item.change
-            a.update({'project': ref.project.name,
-                      'job': other_build.job.name})
-            # Change is a Branch
-            if hasattr(ref, 'branch'):
-                a.update({'branch': ref.branch})
-                if hasattr(ref, 'number') and hasattr(ref, 'patchset'):
-                    a.update({'change': str(ref.number),
-                              'patchset': ref.patchset})
-            # Otherwise we are ref type
-            else:
-                a.update({'ref': ref.ref,
-                          'oldrev': ref.oldrev,
-                          'newrev': ref.newrev})
-                if hasattr(ref, 'tag'):
-                    a.update({'tag': ref.tag})
-            if a not in artifact_data:
-                artifact_data.append(a)
-        if artifact_data:
-            self.updateArtifactData(artifact_data)
-
-    def updateArtifactData(self, artifact_data):
-        self.artifact_data = artifact_data
 
     def updateProjectVariables(self, project_vars):
         # Merge project/template variables directly into the job
@@ -2139,32 +2197,6 @@ class Job(ConfigObject):
             return False
 
         return True
-
-    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
-        for playbook in playbooks:
-            # noop job does not have source_context
-            if playbook.source_context:
-                yield playbook.source_context.project_canonical_name
-            for role in playbook.roles:
-                if role.implicit and not with_implicit:
-                    continue
-                yield role.project_canonical_name
-
-    def getAffectedProjects(self, tenant):
-        """
-        Gets all projects that are required to run this job. This includes
-        required_projects, referenced playbooks, roles and dependent changes.
-        """
-        project_canonical_names = set()
-        project_canonical_names.update(self.required_projects.keys())
-        project_canonical_names.update(self._projectsFromPlaybooks(
-            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
-                            self.cleanup_run), with_implicit=True))
-
-        projects = list()
-        for project_canonical_name in project_canonical_names:
-            projects.append(tenant.getProject(project_canonical_name)[1])
-        return projects
 
 
 class JobProject(ConfigObject):
@@ -6155,7 +6187,7 @@ class Layout(object):
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
 
-            job_graph.addJob(frozen_job)
+            job_graph.addJob(frozen_job.freezeJob())
 
     def createJobGraph(self, item, ppc, skip_file_matcher=False, old=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
