@@ -1123,6 +1123,64 @@ class TestWeb(BaseTestWeb):
 
         self.assertEqual(job_params, resp.json())
 
+    @simple_layout('layouts/noop-job.yaml')
+    def test_freeze_noop_job(self):
+
+        resp = self.get_url(
+            "api/tenant/tenant-one/pipeline/gate"
+            "/project/org/noop-project/branch/master/freeze-job/"
+            "noop")
+
+        job_params = {
+            'ansible_version': '2.9',
+            'branch': 'master',
+            'extra_vars': {},
+            'group_vars': {},
+            'host_vars': {},
+            'items': [],
+            'job': 'noop',
+            'nodeset': {'groups': [], 'name': '', 'nodes': []},
+            'override_branch': None,
+            'override_checkout': None,
+            'post_timeout': None,
+            'projects': [],
+            'repo_state': {},
+            'secret_vars': None,
+            'ssh_keys': [],
+            'timeout': None,
+            'vars': {},
+            'workspace_scheme': 'golang',
+            'zuul': {
+                '_inheritance_path': [
+                    '<Job noop branches: None source: None#0>',
+                    '<Job noop branches: None source: '
+                    'org/common-config/zuul.yaml@master#22>',
+                    '<Job noop branches: None source: None#0>'],
+                'branch': 'master',
+                'build': '00000000000000000000000000000000',
+                'buildset': None,
+                'change_url': None,
+                'child_jobs': [],
+                'event_id': None,
+                'items': [],
+                'job': 'noop',
+                'jobtags': [],
+                'pipeline': 'gate',
+                'post_review': False,
+                'project': {
+                    'canonical_hostname': 'review.example.com',
+                    'canonical_name': 'review.example.com/org/noop-project',
+                    'name': 'org/noop-project',
+                    'short_name': 'noop-project',
+                    'src_dir': 'src/review.example.com/org/noop-project'},
+                'projects': {},
+                'ref': None,
+                'tenant': 'tenant-one',
+                'timeout': None,
+                'voting': True}}
+
+        self.assertEqual(job_params, resp.json())
+
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
     tenant_config_file = 'config/change-queues/main.yaml'
