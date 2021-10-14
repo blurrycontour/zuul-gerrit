@@ -1073,9 +1073,7 @@ class TestWeb(BaseTestWeb):
                     '<Job project-test1 branches: None source: '
                     'common-config/zuul.yaml@master#66>',
                     '<Job project-test1 branches: None source: '
-                    'common-config/zuul.yaml@master#138>',
-                    '<Job project-test1 branches: None source: '
-                    'common-config/zuul.yaml@master#53>'],
+                    'common-config/zuul.yaml@master#138>'],
                 'build': '00000000000000000000000000000000',
                 'buildset': None,
                 'branch': 'master',
