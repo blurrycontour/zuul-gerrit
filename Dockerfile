@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.1.3-experimental
+# syntax=docker/dockerfile:1
 
 # Copyright (c) 2019 Red Hat, Inc.
 #
