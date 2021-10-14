@@ -450,7 +450,6 @@ class RPCListener(RPCListenerBase):
         output = []
 
         for job in item.current_build_set.job_graph.getJobs():
-            job.setBase(tenant.layout)
             output.append({
                 'name': job.name,
                 'dependencies':
@@ -483,7 +482,6 @@ class RPCListener(RPCListenerBase):
         if not job:
             gear_job.sendWorkComplete(json.dumps(None))
             return
-        job.setBase(tenant.layout)
         uuid = '0' * 32
         params = zuul.executor.common.construct_build_params(
             uuid, self.sched, job, item, pipeline)
