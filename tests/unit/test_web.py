@@ -1090,9 +1090,7 @@ class TestWeb(BaseTestWeb):
                     '<Job project-test1 branches: None source: '
                     'common-config/zuul.yaml@master#66>',
                     '<Job project-test1 branches: None source: '
-                    'common-config/zuul.yaml@master#138>',
-                    '<Job project-test1 branches: None source: '
-                    'common-config/zuul.yaml@master#53>'],
+                    'common-config/zuul.yaml@master#138>'],
                 'build': '00000000000000000000000000000000',
                 'buildset': None,
                 'branch': 'master',
@@ -1154,8 +1152,7 @@ class TestWeb(BaseTestWeb):
                 '_inheritance_path': [
                     '<Job noop branches: None source: None#0>',
                     '<Job noop branches: None source: '
-                    'org/common-config/zuul.yaml@master#22>',
-                    '<Job noop branches: None source: None#0>'],
+                    'org/common-config/zuul.yaml@master#22>'],
                 'branch': 'master',
                 'build': '00000000000000000000000000000000',
                 'buildset': None,
