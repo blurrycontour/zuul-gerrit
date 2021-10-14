@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73532e8d_113e571f",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-14T20:50:51Z",
+      "side": 1,
+      "message": "This appears to be a long-standing bug in the original code.  AFAICT this could never be called.  I haven\u0027t investigated what the right response is in this case, so I don\u0027t know how to fix it.  Since this was a refactor/port, I just left it as-is.\n\nIf you don\u0027t want to leave dead code but share my indifference to emulating behavior we don\u0027t test, I could replace this with \"raise NotImplementedError(\u0027figure out what gitlab does here\u0027)\".",
+      "revId": "9390a9c6c9c59e49e402fd3351e9a25d6f796d46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31aaea8d_d7bb30bb",
