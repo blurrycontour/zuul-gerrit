@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "322bcb97_72c75b47",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1137,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-14T23:24:19Z",
+      "side": 1,
+      "message": "Why is this path repeated at the end of the inheritance path?",
+      "revId": "c349bf606a8c0ee1d63b0ab3ecab934aa4a214f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
