@@ -1,6 +1,24 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "897d5556_df3f64d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2021-10-14T12:54:23Z",
+      "side": 1,
+      "message": "\u003e Patch Set 4: Code-Review+1\n\u003e \n\u003e Should the quickstart documentation be updated to mention the new buildkit requirements? e.g. does it needs the DOCKER_BUILDKIT\u003d1 variable to be set?\n\nI checked - and no, we don\u0027t need to update anything. We don\u0027t build images as part of our docker-compose, so no changes needed there.\n\nThat said - should we add a release note?",
+      "revId": "e79e247fcb02414d82575a9903a0953241289d9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "da3ac886_de12f668",
         "filename": "Dockerfile",
@@ -14,8 +32,7 @@
       "side": 1,
       "message": "nite: from my reading, I think you can just do \"dockerfile:1\" and it takes the latest point release, which is sufficient for this feature; so we don\u0027t need the experimental bit?",
       "revId": "e79e247fcb02414d82575a9903a0953241289d9c",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
