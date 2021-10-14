@@ -355,7 +355,7 @@ class TestJob(BaseTestCase):
 
 class TestGraph(BaseTestCase):
     def test_job_graph_disallows_multiple_jobs_with_same_name(self):
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         job1 = model.Job('job')
         job2 = model.Job('job')
         graph.addJob(job1)
@@ -364,7 +364,7 @@ class TestGraph(BaseTestCase):
             graph.addJob(job2)
 
     def test_job_graph_disallows_circular_dependencies(self):
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         jobs = [model.Job('job%d' % i) for i in range(0, 10)]
         prevjob = None
         for j in jobs[:3]:
@@ -418,14 +418,14 @@ class TestGraph(BaseTestCase):
             model.JobDependency(parent.name, True)])
 
         # With the parent
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         graph.addJob(parent)
         graph.addJob(child)
         self.assertEqual(graph.getParentJobsRecursively(child.name),
                          [parent])
 
         # Skip the parent
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         graph.addJob(child)
         self.assertEqual(graph.getParentJobsRecursively(child.name), [])
 
@@ -443,7 +443,7 @@ class TestGraph(BaseTestCase):
             model.JobDependency(parents[4].name),
             model.JobDependency(parents[5].name)])
         # Run them all
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         for j in parents:
             graph.addJob(j)
         graph.addJob(child)
@@ -451,7 +451,7 @@ class TestGraph(BaseTestCase):
                          set(parents))
 
         # Skip first parent, therefore its recursive dependencies don't appear
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         for j in parents:
             if j is not parents[0]:
                 graph.addJob(j)
@@ -461,7 +461,7 @@ class TestGraph(BaseTestCase):
                          set([parents[0], parents[2], parents[3]]))
 
         # Skip a leaf node
-        graph = model.JobGraph()
+        graph = model.JobGraph({})
         for j in parents:
             if j is not parents[3]:
                 graph.addJob(j)
