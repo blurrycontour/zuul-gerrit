@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c5ae0b8_ebd0af7f",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-14T20:52:46Z",
+      "side": 1,
+      "message": "The nice thing about the NotImplementedError is that it makes it clear that the fake server is incomplete, where the current code implies that we\u0027re sort of intentionally trying to return a 503. I\u0027m not sure how important that is given this is a fake for a single driver that we can update easily enough if necessary.\n\nI\u0027ll +2 and let you decide if you want to switch to the raise.",
+      "parentUuid": "73532e8d_113e571f",
+      "revId": "9390a9c6c9c59e49e402fd3351e9a25d6f796d46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31aaea8d_d7bb30bb",
