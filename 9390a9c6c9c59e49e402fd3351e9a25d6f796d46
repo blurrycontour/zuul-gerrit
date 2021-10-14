@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d6a012c_40a17345",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-14T20:52:02Z",
+      "side": 1,
+      "message": "Oh, or I\u0027m happy to add the tail onto it too if that\u0027s what you meant.",
+      "revId": "9390a9c6c9c59e49e402fd3351e9a25d6f796d46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31aaea8d_d7bb30bb",
