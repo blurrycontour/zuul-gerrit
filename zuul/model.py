@@ -2233,10 +2233,20 @@ class JobDependency(ConfigObject):
 
 
 class JobGraph(object):
-    """ A JobGraph represents the dependency graph between Job."""
+    """A JobGraph represents the dependency graph between Jobs.
 
-    def __init__(self):
-        self.jobs = OrderedDict()  # job_name -> Job
+    This class is an attribute of the BuildSet, and should not be
+    modified after its initial creation.
+    """
+
+    def __init__(self, job_map):
+        # The jobs parameter is a reference to an attribute on the
+        # BuildSet (either the real list of jobs, or a cached list of
+        # "old" jobs for comparison).
+        self._job_map = job_map
+        # An ordered list of jobs
+        self.jobs = []
+        # OrderedDict()  # job_name -> Job
         # dependent_job_name -> dict(parent_job_name -> soft)
         self._dependencies = {}
         self.project_metadata = {}
@@ -2244,12 +2254,30 @@ class JobGraph(object):
     def __repr__(self):
         return '<JobGraph %s>' % (self.jobs)
 
+    def toDict(self):
+        data = {
+            "jobs": self.jobs,
+            "dependencies": self._dependencies,
+            # TODO: serialize
+            # "project_metadata": self.project_metadata,
+        }
+        return data
+
+    @classmethod
+    def fromDict(klass, data, job_map):
+        self = klass(job_map)
+        self.jobs = data['jobs']
+        self._dependencies = data['dependencies']
+        # self.project_metadata = data['project_metadata']
+        return self
+
     def addJob(self, job):
         # A graph must be created after the job list is frozen,
         # therefore we should only get one job with the same name.
         if job.name in self.jobs:
             raise Exception("Job %s already added" % (job.name,))
-        self.jobs[job.name] = job
+        self._job_map[job.name] = job
+        self.jobs.append(job.name)
         # Append the dependency information
         self._dependencies.setdefault(job.name, {})
         try:
@@ -2264,12 +2292,14 @@ class JobGraph(object):
                 self._dependencies[job.name][dependency.name] = \
                     dependency.soft
         except Exception:
-            del self.jobs[job.name]
+            del self._job_map[job.name]
+            self.jobs.pop()
             del self._dependencies[job.name]
             raise
 
     def getJobs(self):
-        return list(self.jobs.values())  # Report in the order of layout cfg
+        # Report in the order of layout cfg
+        return list([self._job_map[x] for x in self.jobs])
 
     def getDirectDependentJobs(self, parent_job, skip_soft=False):
         ret = set()
@@ -2290,11 +2320,11 @@ class JobGraph(object):
             new_dependent_jobs = current_dependent_jobs - all_dependent_jobs
             jobs_to_iterate |= new_dependent_jobs
             all_dependent_jobs |= new_dependent_jobs
-        return [self.jobs[name] for name in all_dependent_jobs]
+        return [self._job_map[name] for name in all_dependent_jobs]
 
     def getParentJobsRecursively(self, dependent_job, layout=None,
                                  skip_soft=False):
-        return [self.jobs[name] for name in
+        return [self._job_map[name] for name in
                 self._getParentJobNamesRecursively(dependent_job,
                                                    layout=layout,
                                                    skip_soft=skip_soft)]
@@ -2724,7 +2754,10 @@ class BuildSet(zkobject.ZKObject):
             debug=False,
             fail_fast=False,
             job_graph=None,
-            _old_job_graph=None,  # Cached job graph of previous layout
+            jobs={},
+            # Cached job graph of previous layout; not serialized
+            _old_job_graph=None,
+            _old_jobs={},
         )
 
     def setFiles(self, items):
@@ -2809,8 +2842,9 @@ class BuildSet(zkobject.ZKObject):
             "repo_state_state": self.repo_state_state,
             "debug": self.debug,
             "fail_fast": self.fail_fast,
-            # "job_graph": self.job_graph,
-            # "_old_job_graph": self._old_job_graph,
+            "job_graph": (self.job_graph.toDict()
+                          if self.job_graph else None),
+            # jobs (serialize as separate objects)
         }
         return json.dumps(data).encode("utf8")
 
@@ -2857,6 +2891,18 @@ class BuildSet(zkobject.ZKObject):
             "config_errors": [ConfigurationError.deserialize(d)
                               for d in data["config_errors"]],
         })
+
+        # Job graphs are immutable
+        if self.job_graph is not None:
+            data['job_graph'] = self.job_graph
+        elif data['job_graph']:
+            data['job_graph'] = JobGraph.fromDict(data['job_graph'], self.jobs)
+
+        # jobs (deserialize as separate objects)
+
+        # These are local cache objects only valid for one pipeline run
+        data['_old_job_graph'] = None
+        data['_old_jobs'] = {}
         return data
 
     @property
@@ -3245,9 +3291,7 @@ class QueueItem(zkobject.ZKObject):
         return self.current_build_set.job_graph.getJobs()
 
     def getJob(self, name):
-        if not self.current_build_set.job_graph:
-            return None
-        return self.current_build_set.job_graph.jobs.get(name)
+        return self.current_build_set.jobs.get(name)
 
     @property
     def items_ahead(self):
@@ -3719,6 +3763,7 @@ class QueueItem(zkobject.ZKObject):
             self.removeBuild(build)
             return
 
+        buildset = self.current_build_set
         job_graph = self.current_build_set.job_graph
         skipped = []
         # NOTE(pabelanger): Check successful/paused jobs to see if
@@ -3741,7 +3786,7 @@ class QueueItem(zkobject.ZKObject):
                 intersect_jobs = dependent_jobs.intersection(zuul_return)
 
                 for skip in (dependent_jobs - intersect_jobs):
-                    s = job_graph.jobs.get(skip)
+                    s = buildset.jobs.get(skip)
                     skipped.append(s)
                     to_skip = job_graph.getDependentJobsRecursively(
                         skip, skip_soft=True)
@@ -4070,10 +4115,9 @@ class QueueItem(zkobject.ZKObject):
                 try:
                     ppc = layout_ahead.getProjectPipelineConfig(self)
                     log.debug("Creating job graph for config change detection")
-                    self.current_build_set.updateAttributes(
-                        self.pipeline.manager.current_context,
+                    self.current_build_set._set(
                         _old_job_graph=layout_ahead.createJobGraph(
-                            self, ppc, skip_file_matcher=True))
+                            self, ppc, skip_file_matcher=True, old=True))
                     log.debug("Done creating job graph for "
                               "config change detection")
                 except Exception:
@@ -4084,7 +4128,7 @@ class QueueItem(zkobject.ZKObject):
                     # which jobs have changed, so rather than run them
                     # all, just rely on the file matchers as-is.
                     return False
-            old_job = self.current_build_set._old_job_graph.jobs.get(job.name)
+            old_job = self.current_build_set._old_jobs.get(job.name)
             if old_job is None:
                 log.debug("Found a newly created job")
                 return True  # A newly created job
@@ -6103,10 +6147,14 @@ class Layout(object):
 
             job_graph.addJob(frozen_job)
 
-    def createJobGraph(self, item, ppc, skip_file_matcher=False):
+    def createJobGraph(self, item, ppc, skip_file_matcher=False, old=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
-        ret = JobGraph()
+        if old:
+            job_map = item.current_build_set._old_jobs
+        else:
+            job_map = item.current_build_set.jobs
+        ret = JobGraph(job_map)
         if ppc:
             self._createJobGraph(item, ppc, ret, skip_file_matcher)
         return ret
