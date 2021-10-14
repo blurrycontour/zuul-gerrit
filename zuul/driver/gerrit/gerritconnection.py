@@ -52,6 +52,17 @@ from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 # HTTP timeout in seconds
 TIMEOUT = 30
 
+# commentSizeLimit default set by Gerrit.  Gerrit is a bit
+# vague about what this means, it says
+#
+#  Comments which exceed this size will be rejected ... Size
+#  computation is approximate and may be off by roughly 1% ...
+#  Default is 16k
+#
+# This magic number is int((16 << 10) * 0.98).  Robot comments
+# are accounted for separately.
+GERRIT_HUMAN_MESSAGE_LIMIT = 16056
+
 
 class HTTPConflictException(Exception):
     message = "Received response 409"
@@ -1133,8 +1144,8 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
 
     def review_ssh(self, item, message, submit, labels, checks_api,
                    file_comments, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         if checks_api:
-            log = get_annotated_logger(self.log, zuul_event_id)
             log.error("Zuul is configured to report to the checks API, "
                       "but no HTTP password is present for the connection "
                       "in the configuration file.")
@@ -1142,6 +1153,12 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
         project = change.project.name
         cmd = 'gerrit review --project %s' % project
         if message:
+            b_len = len(message.encode('utf-8'))
+            if b_len >= GERRIT_HUMAN_MESSAGE_LIMIT:
+                log.info("Message truncated %d > %d" %
+                         (b_len, GERRIT_HUMAN_MESSAGE_LIMIT))
+                message = ("%s... (truncated)" %
+                           message[:GERRIT_HUMAN_MESSAGE_LIMIT - 20])
             cmd += ' --message %s' % shlex.quote(message)
         if submit:
             cmd += ' --submit'
@@ -1207,6 +1224,12 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
                     checks_api, file_comments, zuul_event_id=None):
         change = item.change
         log = get_annotated_logger(self.log, zuul_event_id)
+        b_len = len(message.encode('utf-8'))
+        if b_len >= GERRIT_HUMAN_MESSAGE_LIMIT:
+            log.info("Message truncated %d > %d" %
+                     (b_len, GERRIT_HUMAN_MESSAGE_LIMIT))
+            message = ("%s... (truncated)" %
+                       message[:GERRIT_HUMAN_MESSAGE_LIMIT - 20])
         data = dict(message=message,
                     strict_labels=False)
         if change.is_current_patchset:
