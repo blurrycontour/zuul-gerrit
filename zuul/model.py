@@ -1555,7 +1555,7 @@ class ZuulRole(Role):
         return d
 
 
-class FrozenJob:
+class FrozenJob(zkobject.ZKObject):
     """A rendered job definition that will actually be run.
 
     This is the combination of one or more Job variants to produce a
@@ -1566,6 +1566,28 @@ class FrozenJob:
     variables which deal with the current state of the job in the
     pipeline.
     """
+
+    @classmethod
+    def jobPath(cls, job_name, parent_path):
+        safe_job = urllib.parse.quote_plus(job_name)
+        return f"{parent_path}/job/{safe_job}"
+
+    def getPath(self):
+        return self.jobPath(self.name, self.buildset.getPath())
+
+    def serialize(self):
+        # This needs a unique implementation; toDict only represents
+        # the surface level attributes, and the executor api
+        # serialization is not reusable.
+        # TODO:
+        return b'{}'
+
+    def setWaitingStatus(self, status):
+        if self.waiting_status == status:
+            return
+        self.updateAttributes(
+            self.buildset.item.pipeline.manager.current_context,
+            waiting_status=status)
 
     @property
     def combined_variables(self):
@@ -1653,12 +1675,23 @@ class FrozenJob:
         return parent_data, secret_parent_data, artifact_data
 
     def setParentData(self, parent_data, secret_parent_data, artifact_data):
-        self.parent_data = parent_data
-        self.secret_parent_data = secret_parent_data
-        self.artifact_data = artifact_data
+        kw = {}
+        if self.parent_data != parent_data:
+            kw['parent_data'] = parent_data
+        if self.secret_parent_data != secret_parent_data:
+            kw['secret_parent_data'] = secret_parent_data
+        if self.artifact_data != artifact_data:
+            kw['artifact_data'] = artifact_data
+        if kw:
+            self.updateAttributes(
+                self.buildset.item.pipeline.manager.current_context,
+                **kw)
 
     def setArtifactData(self, artifact_data):
-        self.artifact_data = artifact_data
+        if self.artifact_data != artifact_data:
+            self.updateAttributes(
+                self.buildset.item.pipeline.manager.current_context,
+                artifact_data=artifact_data)
 
 
 class Job(ConfigObject):
@@ -1829,14 +1862,15 @@ class Job(ConfigObject):
 
         self.name = name
 
-    def freezeJob(self, tenant):
-        job = FrozenJob()
+    def freezeJob(self, tenant, context, buildset):
+        kw = {}
         for k in self.attributes:
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
-            setattr(job, k, getattr(self, k))
-        job.config_hash = self.getConfigHash(tenant)
-        return job
+            kw[k] = getattr(self, k)
+        kw['buildset'] = buildset
+        kw['config_hash'] = self.getConfigHash(tenant)
+        return FrozenJob.new(context, **kw)
 
     def getConfigHash(self, tenant):
         # Make a hash of the job configuration for determining whether
@@ -2921,6 +2955,9 @@ class BuildSet(zkobject.ZKObject):
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+        # Set our UUID so that getPath() returns the correct path for
+        # child objects.
+        self._set(uuid=data["uuid"])
 
         # If we already have a repo files, we don't need to
         # deserialize since it's immutable.
@@ -2970,6 +3007,15 @@ class BuildSet(zkobject.ZKObject):
             data['job_graph'] = JobGraph.fromDict(data['job_graph'], self.jobs)
 
         # jobs (deserialize as separate objects)
+        if data['job_graph']:
+            for job_name in data['job_graph'].jobs:
+                if job_name in self.jobs:
+                    self.jobs[job_name].refresh(context)
+                else:
+                    job_path = FrozenJob.jobPath(job_name, self.getPath())
+                    job = FrozenJob.fromZK(context, job_path)
+                    job._set(buildset=self)
+                    self.jobs[job_name] = job
 
         # These are local cache objects only valid for one pipeline run
         data['_old_job_graph'] = None
@@ -3330,7 +3376,8 @@ class QueueItem(zkobject.ZKObject):
                     context, debug=ppc.debug, fail_fast=ppc.fail_fast)
                 for msg in ppc.debug_messages:
                     self.debug(msg)
-            job_graph = layout.createJobGraph(self, ppc, skip_file_matcher)
+            job_graph = layout.createJobGraph(
+                context, self, ppc, skip_file_matcher)
             for job in job_graph.getJobs():
                 # Ensure that each jobs's dependencies are fully
                 # accessible.  This will raise an exception if not.
@@ -3791,7 +3838,10 @@ class QueueItem(zkobject.ZKObject):
                         # This may have been reset due to a reconfig;
                         # since we know there is a queued request for
                         # it, set it here.
-                        job.queued = True
+                        if job.queued is not True:
+                            job.updateAttributes(
+                                self.pipeline.manager.current_context,
+                                queued=True)
 
         # Attempt to request nodes for jobs in the order jobs appear
         # in configuration.
@@ -3799,8 +3849,8 @@ class QueueItem(zkobject.ZKObject):
             if job not in jobs_not_requested:
                 continue
             if not self.jobRequirementsReady(job):
-                job.waiting_status = 'requirements: {}'.format(
-                    ', '.join(job.requires))
+                job.setWaitingStatus('requirements: {}'.format(
+                    ', '.join(job.requires)))
                 continue
 
             # Some set operations to figure out what jobs we really need:
@@ -3828,8 +3878,8 @@ class QueueItem(zkobject.ZKObject):
                 failed_dep_job_names |
                 ignored_hard_dep_job_names)
             if required_dep_job_names:
-                job.waiting_status = 'dependencies: {}'.format(
-                    ', '.join(required_dep_job_names))
+                job.setWaitingStatus('dependencies: {}'.format(
+                    ', '.join(required_dep_job_names)))
                 all_dep_jobs_successful = False
 
             if all_dep_jobs_successful:
@@ -3837,10 +3887,13 @@ class QueueItem(zkobject.ZKObject):
                     # If this job needs a semaphore, either acquire it or
                     # make sure that we have it before requesting the nodes.
                     toreq.append(job)
-                    job.queued = True
+                    if job.queued is not True:
+                        job.updateAttributes(
+                            self.pipeline.manager.current_context,
+                            queued=True)
                 else:
                     sem_names = ','.join([s.name for s in job.semaphores])
-                    job.waiting_status = 'semaphores: {}'.format(sem_names)
+                    job.setWaitingStatus('semaphores: {}'.format(sem_names))
         return toreq
 
     def setResult(self, build):
@@ -4203,7 +4256,7 @@ class QueueItem(zkobject.ZKObject):
                     log.debug("Creating job graph for config change detection")
                     self.current_build_set._set(
                         _old_job_graph=layout_ahead.createJobGraph(
-                            self, ppc, skip_file_matcher=True, old=True))
+                            None, self, ppc, skip_file_matcher=True, old=True))
                     log.debug("Done creating job graph for "
                               "config change detection")
                 except Exception:
@@ -6123,7 +6176,8 @@ class Layout(object):
             raise NoMatchingParentError()
         return jobs
 
-    def _createJobGraph(self, item, ppc, job_graph, skip_file_matcher):
+    def _createJobGraph(self, context, item, ppc, job_graph,
+                        skip_file_matcher):
         log = item.annotateLogger(self.log)
         job_list = ppc.job_list
         change = item.change
@@ -6239,18 +6293,22 @@ class Layout(object):
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
 
-            job_graph.addJob(frozen_job.freezeJob(self.tenant))
+            job_graph.addJob(frozen_job.freezeJob(
+                self.tenant, context, item.current_build_set))
 
-    def createJobGraph(self, item, ppc, skip_file_matcher=False, old=False):
+    def createJobGraph(self, context, item, ppc, skip_file_matcher=False,
+                       old=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         if old:
             job_map = item.current_build_set._old_jobs
+            assert(context is None)
+            context = zkobject.LocalZKContext(self.log)
         else:
             job_map = item.current_build_set.jobs
         ret = JobGraph(job_map)
         if ppc:
-            self._createJobGraph(item, ppc, ret, skip_file_matcher)
+            self._createJobGraph(context, item, ppc, ret, skip_file_matcher)
         return ret
 
 
