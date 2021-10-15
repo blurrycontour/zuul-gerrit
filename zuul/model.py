@@ -1655,12 +1655,14 @@ class FrozenJob(AbstractJob):
     def getSafeAttributes(self):
         return Attributes(name=self.name)
 
-    def updateParentData(self, other_build):
+    @staticmethod
+    def updateParentData(parent_data, secret_parent_data, artifact_data,
+                         other_build):
         # Update variables, but give the new values priority. If more than one
         # parent job returns the same variable, the value from the later job
         # in the job graph will take precedence.
         other_vars = other_build.result_data
-        v = self.parent_data or {}
+        v = parent_data
         v = Job._deepUpdate(v, other_vars)
         # To avoid running afoul of checks that jobs don't set zuul
         # variables, remove them from parent data here.
@@ -1668,17 +1670,17 @@ class FrozenJob(AbstractJob):
         # For safety, also drop nodepool and unsafe_vars
         v.pop('nodepool', None)
         v.pop('unsafe_vars', None)
-        self.parent_data = v
+        parent_data = v
 
         secret_other_vars = other_build.secret_result_data
-        v = self.secret_parent_data or {}
+        v = secret_parent_data
         v = Job._deepUpdate(secret_other_vars, v)
         if 'zuul' in v:
             del v['zuul']
-        self.secret_parent_data = v
+        secret_parent_data = v
 
-        artifact_data = self.artifact_data or []
         artifacts = get_artifacts_from_result_data(other_vars)
+        artifact_data = artifact_data[:]
         for a in artifacts:
             # Change here may be any ref type (tag, change, etc)
             ref = other_build.build_set.item.change
@@ -1699,10 +1701,14 @@ class FrozenJob(AbstractJob):
                     a.update({'tag': ref.tag})
             if a not in artifact_data:
                 artifact_data.append(a)
-        if artifact_data:
-            self.updateArtifactData(artifact_data)
+        return parent_data, secret_parent_data, artifact_data
 
-    def updateArtifactData(self, artifact_data):
+    def setParentData(self, parent_data, secret_parent_data, artifact_data):
+        self.parent_data = parent_data
+        self.secret_parent_data = secret_parent_data
+        self.artifact_data = artifact_data
+
+    def setArtifactData(self, artifact_data):
         self.artifact_data = artifact_data
 
 
@@ -3615,7 +3621,7 @@ class QueueItem(zkobject.ZKObject):
             data = []
             ret = self.item_ahead.providesRequirements(job, data)
             data.reverse()
-            job.updateArtifactData(data)
+            job.setArtifactData(data)
         except RequirementsError as e:
             self.warning(str(e))
             fakebuild = Build(job, self.current_build_set, None)
@@ -3685,12 +3691,28 @@ class QueueItem(zkobject.ZKObject):
                 # in sorted config order) and apply parent data of the jobs we
                 # already found.
                 if len(parent_builds_with_data) > 0:
-                    job.parent_data = {}
+                    # We have all of the parent data here, so we can
+                    # start from scratch each time.
+                    new_parent_data = {}
+                    new_secret_parent_data = {}
+                    # We may have artifact data from
+                    # jobRequirementsReady, so we preserve it.
+                    # updateParentData de-duplicates it.
+                    new_artifact_data = job.artifact_data or []
                     for parent_job in job_graph.getJobs():
                         parent_build = parent_builds_with_data.get(
                             parent_job.name)
                         if parent_build:
-                            job.updateParentData(parent_build)
+                            (new_parent_data,
+                             new_secret_parent_data,
+                             new_artifact_data) = FrozenJob.updateParentData(
+                                 new_parent_data,
+                                 new_secret_parent_data,
+                                 new_artifact_data,
+                                 parent_build)
+                    job.setParentData(new_parent_data,
+                                      new_secret_parent_data,
+                                      new_artifact_data)
 
                 nodeset = self.current_build_set.getJobNodeSetInfo(job.name)
                 if nodeset is None:
