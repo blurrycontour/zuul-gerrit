@@ -1155,31 +1155,30 @@ class PipelineManager(metaclass=ABCMeta):
 
         tenant = item.pipeline.tenant
         jobs = item.current_build_set.job_graph.getJobs()
-        projects = set()
+        project_cnames = set()
         for job in jobs:
             log.debug('Processing job %s', job.name)
-            projects.update(job.getAffectedProjects(tenant))
-            log.debug('Needed projects: %s', projects)
+            project_cnames.update(job.affected_projects)
+            log.debug('Needed projects: %s', project_cnames)
 
         # Filter projects for ones that are already in repo state
         repo_state = item.current_build_set.repo_state
         connections = self.sched.connections.connections
-        projects_to_remove = set()
         for connection in repo_state.keys():
             canonical_hostname = connections[connection].canonical_hostname
             for project in repo_state[connection].keys():
                 canonical_project_name = canonical_hostname + '/' + project
-                for affected_project in projects:
-                    if canonical_project_name ==\
-                            affected_project.canonical_name:
-                        projects_to_remove.add(affected_project)
-        projects -= projects_to_remove
+                project_cnames.discard(canonical_project_name)
 
-        if not projects:
+        if not project_cnames:
             item.current_build_set.updateAttributes(
                 self.current_context,
                 repo_state_state=item.current_build_set.COMPLETE)
             return True
+
+        projects = []
+        for project_cname in project_cnames:
+            projects.append(tenant.getProject(project_cname)[1])
 
         branches = self._branchesForRepoState(
             projects=projects, tenant=tenant, items=[item])
@@ -1283,7 +1282,10 @@ class PipelineManager(metaclass=ABCMeta):
         if not item.current_build_set.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
-                item.freezeJobGraph(self.getLayout(item), self.current_context)
+                item.freezeJobGraph(self.getLayout(item),
+                                    self.current_context,
+                                    skip_file_matcher=False,
+                                    redact_secrets_and_keys=False)
             except Exception as e:
                 # TODOv3(jeblair): nicify this exception as it will be reported
                 log.exception("Error freezing job graph for %s" % (item,))
