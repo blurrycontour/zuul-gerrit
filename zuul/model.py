@@ -17,6 +17,7 @@ import abc
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
 import copy
 import json
+import hashlib
 import logging
 import os
 from functools import total_ordering
@@ -42,6 +43,7 @@ from zuul.lib.config import get_default
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
+from zuul.lib.jsonutil import json_dumps
 from zuul.zk import zkobject
 from zuul.zk.change_cache import ChangeKey
 
@@ -309,6 +311,29 @@ class Freezable(object):
         # Ignore return value from freezedict because __dict__ can't
         # be a mappingproxy.
         self._frozen = True
+
+    @staticmethod
+    def thaw(data):
+        """Thaw the supplied dictionary"""
+        def _thawlist(l):
+            l = list(l)
+            for i, v in enumerate(l):
+                if isinstance(v, (types.MappingProxyType, dict)):
+                    l[i] = _thawdict(v)
+                elif isinstance(v, (tuple, list)):
+                    l[i] = _thawlist(v)
+            return l
+
+        def _thawdict(d):
+            d = dict(d)
+            for k, v in list(d.items()):
+                if isinstance(v, (types.MappingProxyType, dict)):
+                    d[k] = _thawdict(v)
+                elif isinstance(v, (tuple, list)):
+                    d[k] = _thawlist(v)
+            return d
+
+        return _thawdict(data)
 
     def __setattr__(self, name, value):
         if self._frozen:
@@ -1530,83 +1555,7 @@ class ZuulRole(Role):
         return d
 
 
-class AbstractJob:
-    """A base class for FrozenJob and Job
-
-    This class contains all of the job attribute names and default
-    values which are common to both frozen and configuration jobs.
-
-    """
-
-    BASE_JOB_MARKER = object()
-
-    def isBase(self):
-        return self.parent is self.BASE_JOB_MARKER
-
-    def toDict(self, tenant):
-        '''
-        Convert a Job object's attributes to a dictionary.
-        '''
-        d = {}
-        d['name'] = self.name
-        d['branches'] = self._branches
-        d['override_checkout'] = self.override_checkout
-        d['files'] = self._files
-        d['irrelevant_files'] = self._irrelevant_files
-        d['variant_description'] = self.variant_description
-        if self.source_context:
-            d['source_context'] = self.source_context.toDict()
-        else:
-            d['source_context'] = None
-        d['description'] = self.description
-        d['required_projects'] = []
-        for project in self.required_projects.values():
-            d['required_projects'].append(project.toDict())
-        d['semaphores'] = [s.toDict() for s in self.semaphores]
-        d['variables'] = self.variables
-        d['extra_variables'] = self.extra_variables
-        d['host_variables'] = self.host_variables
-        d['group_variables'] = self.group_variables
-        d['final'] = self.final
-        d['abstract'] = self.abstract
-        d['intermediate'] = self.intermediate
-        d['protected'] = self.protected
-        d['voting'] = self.voting
-        d['timeout'] = self.timeout
-        d['tags'] = list(self.tags)
-        d['provides'] = list(self.provides)
-        d['requires'] = list(self.requires)
-        d['dependencies'] = list(map(lambda x: x.toDict(), self.dependencies))
-        d['attempts'] = self.attempts
-        d['roles'] = list(map(lambda x: x.toDict(), self.roles))
-        d['run'] = list(map(lambda x: x.toSchemaDict(), self.run))
-        d['pre_run'] = list(map(lambda x: x.toSchemaDict(), self.pre_run))
-        d['post_run'] = list(map(lambda x: x.toSchemaDict(), self.post_run))
-        d['cleanup_run'] = list(map(lambda x: x.toSchemaDict(),
-                                    self.cleanup_run))
-        d['post_review'] = self.post_review
-        d['match_on_config_updates'] = self.match_on_config_updates
-        if self.isBase():
-            d['parent'] = None
-        elif self.parent:
-            d['parent'] = self.parent
-        else:
-            d['parent'] = tenant.default_base_job
-        if isinstance(self.nodeset, str):
-            ns = tenant.layout.nodesets.get(self.nodeset)
-        else:
-            ns = self.nodeset
-        if ns:
-            d['nodeset'] = ns.toDict()
-        if self.ansible_version:
-            d['ansible_version'] = self.ansible_version
-        else:
-            d['ansible_version'] = None
-        d['workspace_scheme'] = self.workspace_scheme
-        return d
-
-
-class FrozenJob(AbstractJob):
+class FrozenJob:
     """A rendered job definition that will actually be run.
 
     This is the combination of one or more Job variants to produce a
@@ -1712,7 +1661,7 @@ class FrozenJob(AbstractJob):
         self.artifact_data = artifact_data
 
 
-class Job(AbstractJob, ConfigObject):
+class Job(ConfigObject):
     """A Job represents the defintion of actions to perform.
 
     A Job is an abstract configuration concept.  It describes what,
@@ -1728,8 +1677,75 @@ class Job(AbstractJob, ConfigObject):
     # with every job variant.
     empty_nodeset = NodeSet()
 
+    BASE_JOB_MARKER = object()
+
+    def isBase(self):
+        return self.parent is self.BASE_JOB_MARKER
+
+    def toDict(self, tenant):
+        '''
+        Convert a Job object's attributes to a dictionary.
+        '''
+        d = {}
+        d['name'] = self.name
+        d['branches'] = self._branches
+        d['override_checkout'] = self.override_checkout
+        d['files'] = self._files
+        d['irrelevant_files'] = self._irrelevant_files
+        d['variant_description'] = self.variant_description
+        if self.source_context:
+            d['source_context'] = self.source_context.toDict()
+        else:
+            d['source_context'] = None
+        d['description'] = self.description
+        d['required_projects'] = []
+        for project in self.required_projects.values():
+            d['required_projects'].append(project.toDict())
+        d['semaphores'] = [s.toDict() for s in self.semaphores]
+        d['variables'] = self.variables
+        d['extra_variables'] = self.extra_variables
+        d['host_variables'] = self.host_variables
+        d['group_variables'] = self.group_variables
+        d['final'] = self.final
+        d['abstract'] = self.abstract
+        d['intermediate'] = self.intermediate
+        d['protected'] = self.protected
+        d['voting'] = self.voting
+        d['timeout'] = self.timeout
+        d['tags'] = list(self.tags)
+        d['provides'] = list(self.provides)
+        d['requires'] = list(self.requires)
+        d['dependencies'] = list(map(lambda x: x.toDict(), self.dependencies))
+        d['attempts'] = self.attempts
+        d['roles'] = list(map(lambda x: x.toDict(), self.roles))
+        d['run'] = list(map(lambda x: x.toSchemaDict(), self.run))
+        d['pre_run'] = list(map(lambda x: x.toSchemaDict(), self.pre_run))
+        d['post_run'] = list(map(lambda x: x.toSchemaDict(), self.post_run))
+        d['cleanup_run'] = list(map(lambda x: x.toSchemaDict(),
+                                    self.cleanup_run))
+        d['post_review'] = self.post_review
+        d['match_on_config_updates'] = self.match_on_config_updates
+        if self.isBase():
+            d['parent'] = None
+        elif self.parent:
+            d['parent'] = self.parent
+        else:
+            d['parent'] = tenant.default_base_job
+        if isinstance(self.nodeset, str):
+            ns = tenant.layout.nodesets.get(self.nodeset)
+        else:
+            ns = self.nodeset
+        if ns:
+            d['nodeset'] = ns.toDict()
+        if self.ansible_version:
+            d['ansible_version'] = self.ansible_version
+        else:
+            d['ansible_version'] = None
+        d['workspace_scheme'] = self.workspace_scheme
+        return d
+
     def __init__(self, name):
-        ConfigObject.__init__(self)
+        super().__init__()
         # These attributes may override even the final form of a job
         # in the context of a project-pipeline.  They can not affect
         # the execution of the job, but only whether the job is run
@@ -1813,13 +1829,28 @@ class Job(AbstractJob, ConfigObject):
 
         self.name = name
 
-    def freezeJob(self):
+    def freezeJob(self, tenant):
         job = FrozenJob()
         for k in self.attributes:
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
             setattr(job, k, getattr(self, k))
+        job.config_hash = self.getConfigHash(tenant)
         return job
+
+    def getConfigHash(self, tenant):
+        # Make a hash of the job configuration for determining whether
+        # it has been updated.
+        hasher = hashlib.sha256()
+        job_dict = Freezable.thaw(self.toDict(tenant))
+        # Ignore changes to file matchers since they don't affect
+        # the content of the job.
+        for attr in ['files', 'irrelevant_files',
+                     'source_context', 'description']:
+            job_dict.pop(attr, None)
+        # Use json_dumps to strip any ZuulMark entries
+        hasher.update(json_dumps(job_dict, sort_keys=True).encode('utf8'))
+        return hasher.hexdigest()
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -4186,15 +4217,8 @@ class QueueItem(zkobject.ZKObject):
             if old_job is None:
                 log.debug("Found a newly created job")
                 return True  # A newly created job
-            old_job_dict = old_job.toDict(self.pipeline.tenant)
-            new_job_dict = job.toDict(self.pipeline.tenant)
-            # Ignore changes to file matchers since they don't affect
-            # the content of the job.
-            for attr in ['files', 'irrelevant_files',
-                         'source_context', 'description']:
-                old_job_dict.pop(attr, None)
-                new_job_dict.pop(attr, None)
-            if (new_job_dict != old_job_dict):
+            if (job.getConfigHash(self.pipeline.tenant) !=
+                old_job.config_hash):
                 log.debug("Found an updated job")
                 return True  # This job's configuration has changed
         return False
@@ -6214,7 +6238,7 @@ class Layout(object):
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
 
-            job_graph.addJob(frozen_job.freezeJob())
+            job_graph.addJob(frozen_job.freezeJob(self.tenant))
 
     def createJobGraph(self, item, ppc, skip_file_matcher=False, old=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
