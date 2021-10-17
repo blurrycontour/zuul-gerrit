@@ -98,31 +98,11 @@ def construct_build_params(uuid, sched, job, item, pipeline,
     params['ansible_version'] = job.ansible_version
     params['workspace_scheme'] = job.workspace_scheme
 
-    def make_playbook(playbook):
-        d = playbook.toDict(redact_secrets=redact_secrets_and_keys)
-        for role in d['roles']:
-            if role['type'] != 'zuul':
-                continue
-            project_metadata = item.current_build_set.job_graph.\
-                getProjectMetadata(role['project_canonical_name'])
-            if project_metadata:
-                role['project_default_branch'] = \
-                    project_metadata.default_branch
-            else:
-                role['project_default_branch'] = 'master'
-            role_trusted, role_project = item.pipeline.tenant.getProject(
-                role['project_canonical_name'])
-            role_connection = role_project.source.connection
-            role['connection'] = role_connection.connection_name
-            role['project'] = role_project.name
-        return d
-
     if job.name != 'noop':
-        params['playbooks'] = [make_playbook(x) for x in job.run]
-        params['pre_playbooks'] = [make_playbook(x) for x in job.pre_run]
-        params['post_playbooks'] = [make_playbook(x) for x in job.post_run]
-        params['cleanup_playbooks'] = [make_playbook(x)
-                                       for x in job.cleanup_run]
+        params['playbooks'] = job.run
+        params['pre_playbooks'] = job.pre_run
+        params['post_playbooks'] = job.post_run
+        params['cleanup_playbooks'] = job.cleanup_run
 
     params["nodeset"] = job.nodeset.toDict()
     params['ssh_keys'] = []

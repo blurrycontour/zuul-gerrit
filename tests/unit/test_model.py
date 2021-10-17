@@ -220,7 +220,9 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27.changeMatchesBranch(change))
         self.assertFalse(python27diablo.changeMatchesBranch(change))
 
-        item.freezeJobGraph(self.layout, self.zk_context)
+        item.freezeJobGraph(self.layout, self.zk_context,
+                            skip_file_matcher=False,
+                            redact_secrets_and_keys=False)
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -233,7 +235,9 @@ class TestJob(BaseTestCase):
         self.assertTrue(python27.changeMatchesBranch(change))
         self.assertTrue(python27diablo.changeMatchesBranch(change))
 
-        item.freezeJobGraph(self.layout, self.zk_context)
+        item.freezeJobGraph(self.layout, self.zk_context,
+                            skip_file_matcher=False,
+                            redact_secrets_and_keys=False)
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -280,7 +284,9 @@ class TestJob(BaseTestCase):
         self.assertFalse(python27.changeMatchesFiles(change))
 
         self.pipeline.manager.getFallbackLayout = mock.Mock(return_value=None)
-        item.freezeJobGraph(self.layout, self.zk_context)
+        item.freezeJobGraph(self.layout, self.zk_context,
+                            skip_file_matcher=False,
+                            redact_secrets_and_keys=False)
         self.assertEqual([], item.getJobs())
 
     def test_job_source_project(self):
@@ -350,7 +356,9 @@ class TestJob(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
-            item.freezeJobGraph(self.layout, self.zk_context)
+            item.freezeJobGraph(self.layout, self.zk_context,
+                                skip_file_matcher=False,
+                                redact_secrets_and_keys=False)
 
 
 class TestGraph(BaseTestCase):
