@@ -1308,8 +1308,6 @@ class SourceContext(ConfigObject):
     def __init__(self, project_canonical_name, project_name,
                  project_connection_name, branch, path, trusted):
         super(SourceContext, self).__init__()
-        # TODO (felix): Would it be enough to only store the project's
-        # canonical name?
         self.project_canonical_name = project_canonical_name
         self.project_name = project_name
         self.project_connection_name = project_connection_name
@@ -1554,6 +1552,13 @@ class ZuulRole(Role):
         d['implicit'] = self.implicit
         return d
 
+    @classmethod
+    def fromDict(cls, data):
+        self = cls(data['target_name'],
+                   data['project_canonical_name'],
+                   data['implicit'])
+        return self
+
 
 class FrozenJob(zkobject.ZKObject):
     """A rendered job definition that will actually be run.
@@ -1567,6 +1572,9 @@ class FrozenJob(zkobject.ZKObject):
     pipeline.
     """
 
+    def isBase(self):
+        return self.parent is None
+
     @classmethod
     def jobPath(cls, job_name, parent_path):
         safe_job = urllib.parse.quote_plus(job_name)
@@ -1579,8 +1587,62 @@ class FrozenJob(zkobject.ZKObject):
         # This needs a unique implementation; toDict only represents
         # the surface level attributes, and the executor api
         # serialization is not reusable.
-        # TODO:
-        return b'{}'
+        data = {}
+        for k in self.attributes:
+            v = getattr(self, k)
+            if k == 'nodeset':
+                v = v.toDict()
+            elif k == 'dependencies':
+                # list of JobDependency
+                v = [dep.toDict() for dep in v]
+            elif k == 'semaphores':
+                # list of JobSemaphores
+                v = [sem.toDict() for sem in v]
+            elif k in ('provides', 'requires'):
+                v = list(v)
+            elif k == 'required_projects':
+                # dict of name->JobProject
+                v = {project_name: job_project.toDict()
+                     for (project_name, job_project) in v.items()}
+            data[k] = v
+
+        # Use json_dumps to strip any ZuulMark entries
+        return json_dumps(data).encode("utf8")
+
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
+
+        if hasattr(self, 'nodeset'):
+            nodeset = self.nodeset
+        else:
+            nodeset = data.get('nodeset')
+            if nodeset:
+                nodeset = NodeSet.fromDict(nodeset)
+        data['nodeset'] = nodeset
+
+        if hasattr(self, 'dependencies'):
+            data['dependencies'] = self.dependencies
+        else:
+            data['dependencies'] = [JobDependency.fromDict(dep)
+                                    for dep in data['dependencies']]
+
+        if hasattr(self, 'semaphores'):
+            data['semaphores'] = self.semaphores
+        else:
+            data['semaphores'] = [JobSemaphore.fromDict(sem)
+                                  for sem in data['semaphores']]
+
+        if hasattr(self, 'required_projects'):
+            data['required_projects'] = self.required_projects
+        else:
+            data['required_projects'] = {
+                project_name: JobProject.fromDict(job_project)
+                for (project_name, job_project)
+                in data['required_projects'].items()}
+
+        data['provides'] = frozenset(data['provides'])
+        data['requires'] = frozenset(data['requires'])
+        return data
 
     def setWaitingStatus(self, status):
         if self.waiting_status == status:
@@ -1596,32 +1658,6 @@ class FrozenJob(zkobject.ZKObject):
         job variables where job variables have priority over parent data.
         """
         return Job._deepUpdate(self.parent_data or {}, self.variables)
-
-    def getAffectedProjects(self, tenant):
-        """
-        Gets all projects that are required to run this job. This includes
-        required_projects, referenced playbooks, roles and dependent changes.
-        """
-        project_canonical_names = set()
-        project_canonical_names.update(self.required_projects.keys())
-        project_canonical_names.update(self._projectsFromPlaybooks(
-            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
-                            self.cleanup_run), with_implicit=True))
-
-        projects = list()
-        for project_canonical_name in project_canonical_names:
-            projects.append(tenant.getProject(project_canonical_name)[1])
-        return projects
-
-    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
-        for playbook in playbooks:
-            # noop job does not have source_context
-            if playbook.source_context:
-                yield playbook.source_context.project_canonical_name
-            for role in playbook.roles:
-                if role.implicit and not with_implicit:
-                    continue
-                yield role.project_canonical_name
 
     def getSafeAttributes(self):
         return Attributes(name=self.name)
@@ -1862,14 +1898,99 @@ class Job(ConfigObject):
 
         self.name = name
 
-    def freezeJob(self, tenant, context, buildset):
+    def _getAffectedProjects(self, tenant):
+        """
+        Gets all projects that are required to run this job. This includes
+        required_projects, referenced playbooks, roles and dependent changes.
+        """
+        project_canonical_names = set()
+        project_canonical_names.update(self.required_projects.keys())
+        project_canonical_names.update(self._projectsFromPlaybooks(
+            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
+                            self.cleanup_run), with_implicit=True))
+        return list(project_canonical_names)
+
+    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
+        for playbook in playbooks:
+            # noop job does not have source_context
+            if playbook.source_context:
+                yield playbook.source_context.project_canonical_name
+            for role in playbook.roles:
+                if role.implicit and not with_implicit:
+                    continue
+                yield role.project_canonical_name
+
+    def _freezePlaybook(self, layout, item, playbook, redact_secrets_and_keys):
+        d = playbook.toDict(redact_secrets=redact_secrets_and_keys)
+        for role in d['roles']:
+            if role['type'] != 'zuul':
+                continue
+            project_metadata = layout.getProjectMetadata(
+                role['project_canonical_name'])
+            if project_metadata:
+                role['project_default_branch'] = \
+                    project_metadata.default_branch
+            else:
+                role['project_default_branch'] = 'master'
+            role_trusted, role_project = item.pipeline.tenant.getProject(
+                role['project_canonical_name'])
+            role_connection = role_project.source.connection
+            role['connection'] = role_connection.connection_name
+            role['project'] = role_project.name
+        return d
+
+    def freezeJob(self, context, tenant, layout, item,
+                  redact_secrets_and_keys):
+        buildset = item.current_build_set
         kw = {}
-        for k in self.attributes:
+        for k in ('ansible_version',
+                  'artifact_data',
+                  'dependencies',
+                  'extra_variables',
+                  'group_variables',
+                  'host_variables',
+                  'inheritance_path',
+                  'name',
+                  'nodeset',
+                  'override_branch',
+                  'override_checkout',
+                  'post_timeout',
+                  'required_projects',
+                  'secret_parent_data',
+                  'semaphores',
+                  'tags',
+                  'timeout',
+                  'voting',
+                  'queued',
+                  'hold_following_changes',
+                  'waiting_status',
+                  'pre_run', 'run', 'post_run', 'cleanup_run',
+                  'parent_data', 'variables', 'attempts',
+                  'success_message', 'failure_message',
+                  'provides', 'requires',
+                  'workspace_scheme'):
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
-            kw[k] = getattr(self, k)
-        kw['buildset'] = buildset
+            v = getattr(self, k)
+            if isinstance(v, frozenset):
+                v = list(v)
+            if isinstance(v, (dict, types.MappingProxyType)):
+                v = Freezable.thaw(v)
+            # On a frozen job, parent=None means a base job
+            if v is self.BASE_JOB_MARKER:
+                v = None
+            # Playbooks have a lot of objects that can be flattened at
+            # this point to simplify serialization.
+            if k in ('pre_run', 'run', 'post_run', 'cleanup_run'):
+                v = [self._freezePlaybook(layout, item, pb,
+                                          redact_secrets_and_keys)
+                     for pb in v if pb.source_context]
+            kw[k] = v
+        kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
+        kw['attributes'] = list(kw.keys())
+        # Don't add buildset to attributes since it's not serialized
+        kw['buildset'] = buildset
         return FrozenJob.new(context, **kw)
 
     def getConfigHash(self, tenant):
@@ -2283,6 +2404,12 @@ class JobProject(ConfigObject):
         d['override_checkout'] = self.override_checkout
         return d
 
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['project_name'],
+                   data['override_branch'],
+                   data['override_checkout'])
+
 
 class JobSemaphore(ConfigObject):
     """ A reference to a semaphore from a job. """
@@ -2297,6 +2424,10 @@ class JobSemaphore(ConfigObject):
         d['name'] = self.name
         d['resources_first'] = self.resources_first
         return d
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['name'], data['resources_first'])
 
 
 class JobList(ConfigObject):
@@ -2330,6 +2461,10 @@ class JobDependency(ConfigObject):
     def toDict(self):
         return {'name': self.name,
                 'soft': self.soft}
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['name'], data['soft'])
 
 
 class JobGraph(object):
@@ -3362,7 +3497,9 @@ class QueueItem(zkobject.ZKObject):
         self.current_build_set.warning_messages.append(msg)
         self.log.info(msg)
 
-    def freezeJobGraph(self, layout, context, skip_file_matcher=False):
+    def freezeJobGraph(self, layout, context,
+                       skip_file_matcher,
+                       redact_secrets_and_keys):
         """Find or create actual matching jobs for this item's change and
         store the resulting job tree."""
 
@@ -3377,7 +3514,7 @@ class QueueItem(zkobject.ZKObject):
                 for msg in ppc.debug_messages:
                     self.debug(msg)
             job_graph = layout.createJobGraph(
-                context, self, ppc, skip_file_matcher)
+                context, self, ppc, skip_file_matcher, redact_secrets_and_keys)
             for job in job_graph.getJobs():
                 # Ensure that each jobs's dependencies are fully
                 # accessible.  This will raise an exception if not.
@@ -4256,7 +4393,10 @@ class QueueItem(zkobject.ZKObject):
                     log.debug("Creating job graph for config change detection")
                     self.current_build_set._set(
                         _old_job_graph=layout_ahead.createJobGraph(
-                            None, self, ppc, skip_file_matcher=True, old=True))
+                            None, self, ppc,
+                            skip_file_matcher=True,
+                            redact_secrets_and_keys=False,
+                            old=True))
                     log.debug("Done creating job graph for "
                               "config change detection")
                 except Exception:
@@ -6177,7 +6317,7 @@ class Layout(object):
         return jobs
 
     def _createJobGraph(self, context, item, ppc, job_graph,
-                        skip_file_matcher):
+                        skip_file_matcher, redact_secrets_and_keys):
         log = item.annotateLogger(self.log)
         job_list = ppc.job_list
         change = item.change
@@ -6294,10 +6434,11 @@ class Layout(object):
                     frozen_job.name,))
 
             job_graph.addJob(frozen_job.freezeJob(
-                self.tenant, context, item.current_build_set))
+                context, self.tenant, self, item,
+                redact_secrets_and_keys))
 
-    def createJobGraph(self, context, item, ppc, skip_file_matcher=False,
-                       old=False):
+    def createJobGraph(self, context, item, ppc, skip_file_matcher,
+                       redact_secrets_and_keys, old=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         if old:
@@ -6306,10 +6447,11 @@ class Layout(object):
             context = zkobject.LocalZKContext(self.log)
         else:
             job_map = item.current_build_set.jobs
-        ret = JobGraph(job_map)
+        job_graph = JobGraph(job_map)
         if ppc:
-            self._createJobGraph(context, item, ppc, ret, skip_file_matcher)
-        return ret
+            self._createJobGraph(context, item, ppc, job_graph,
+                                 skip_file_matcher, redact_secrets_and_keys)
+        return job_graph
 
 
 class Semaphore(ConfigObject):
