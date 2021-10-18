@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6dfed57_58dd8f7f",
+        "filename": "web/src/actions/actionTypes.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-18T08:23:50Z",
+      "side": 1,
+      "message": "NIT - we don\u0027t have semicolons in other files, you should remove them",
+      "revId": "77b2bbec33c6c8d5f775773c43bfff219f4d4afe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
