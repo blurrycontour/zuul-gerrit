@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba367f73_4015f25b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1732,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-18T05:48:33Z",
+      "side": 1,
+      "message": "Should we move the context_attributes, execution_attributes and other_attributes to the AbstractJob as well?",
+      "revId": "be845e16f5e7066231e79860e442100f9eab988e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
