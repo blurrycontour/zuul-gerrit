@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "328bc388_9db0623b",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-10-18T22:31:05Z",
+      "side": 1,
+      "message": "Oh neat, I had no idea the subtraction operator worked with sets! Kurt Gödel would be proud.",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "188a5c67_1bf6fdad",
