@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "509790d3_c2496c4d",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-18T23:49:08Z",
+      "side": 1,
+      "message": "At this point, it might be worth re-doing the secrets and ssh variables to be based on prefix and project path.  I only suggest that because it\u0027s really confusing why project_path has more slots than secrets path (the reason is that one of the secrets_path slots is filled by a {prefix}/{project} string.",
+      "revId": "9931c4f1cd9c18310e69474f37307b5f8f21cad8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "654f038c_bbd55476",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-18T23:49:08Z",
+      "side": 1,
+      "message": "It\u0027s the default; and I don\u0027t think it\u0027s going to change, and everywhere else we don\u0027t explicitly set it to false, so it seems a little unusual to do that here.",
+      "revId": "9931c4f1cd9c18310e69474f37307b5f8f21cad8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
