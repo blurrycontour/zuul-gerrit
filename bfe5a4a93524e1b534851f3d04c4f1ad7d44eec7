@@ -3,6 +3,57 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "630aebec_5fc51e30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-18T22:59:19Z",
+      "side": 1,
+      "message": "Approving now as this seems like an important fix, but I left a few comments that may be worth a follow-up.",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "134fcae0_93680e3d",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-18T22:59:19Z",
+      "side": 1,
+      "message": "I\u0027m not sure to understand, how is assigning a local variable prevent inconsistencies in case of a cache update? Shouldn\u0027t we use a copy.deepcopy?",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eea585f_fc314a06",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-18T22:59:19Z",
+      "side": 1,
+      "message": "perhaps it would be more efficient to check if the key is not in the relevant here?",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "328bc388_9db0623b",
         "filename": "zuul/zk/change_cache.py",
         "patchSetId": 3
@@ -66,6 +117,24 @@
       "side": 1,
       "message": "As mentioned in the Matrix room I was thinking that maybe we should remove the stale entry below. In that case I guess we should always use pass. However, Jim pointed out that a watch should do that for us.",
       "parentUuid": "0d5e6bc7_b79057bf",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0344467_f5766d79",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-18T22:59:19Z",
+      "side": 1,
+      "message": "I agree this is confusing. Perhaps the `BadVersionError` could be handled upstream, for example:\n\n  def delete():\n    try:\n      self.do_delete()\n    except BadVersionError:\n      pass\n\n  def do_delete():\n    try:\n      self.kazoo_client.delete()\n    except NoNodeError:\n      pass\n    del self._change_cache",
+      "parentUuid": "f573972a_695bcf0b",
       "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
