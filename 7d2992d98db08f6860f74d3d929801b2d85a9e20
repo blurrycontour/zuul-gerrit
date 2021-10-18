@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e6fe6fa_8994355e",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1576,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-18T07:54:01Z",
+      "side": 1,
+      "message": "I think we should define all self.* attributes in an __init__ method to keep track on them. At least for something like the buildset which I don\u0027t think comes from the AbstractJob base class, or?",
+      "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
