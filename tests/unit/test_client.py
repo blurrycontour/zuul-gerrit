@@ -257,6 +257,38 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org/org%2Fproject/secrets'))
         self.assertIsNone(
             data.get('/keystorage/gerrit/org/org%2Fproject/ssh'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject'))
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-keys',
+             'gerrit', 'org/project1',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-keys',
+             'gerrit', 'org/project2',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
+
+        data = self.getZKTree('/keystorage')
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject1'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject2'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org'))
 
 
 class TestZKOperations(ZuulTestCase):

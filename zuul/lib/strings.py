@@ -20,11 +20,16 @@ import zuul.model
 
 
 def unique_project_name(project_name):
+    prefix, name = unique_project_name_with_prefix(project_name)
+    return f'{prefix}/{name}'
+
+
+def unique_project_name_with_prefix(project_name):
     parts = project_name.split('/')
     prefix = parts[0]
 
     name = quote_plus(project_name)
-    return f'{prefix}/{name}'
+    return (prefix, name)
 
 
 def workspace_project_path(hostname, project_name, scheme):

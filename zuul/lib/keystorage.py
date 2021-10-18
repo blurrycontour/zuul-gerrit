@@ -32,6 +32,8 @@ class KeyStorage(ZooKeeperBase):
     log = logging.getLogger("zuul.KeyStorage")
     SECRETS_PATH = "/keystorage/{}/{}/secrets"
     SSH_PATH = "/keystorage/{}/{}/ssh"
+    PROJECT_PATH = "keystorage/{}/{}/{}"
+    PREFIX_PATH = "keystorage/{}/{}"
 
     def __init__(self, zookeeper_client, password, backup=None):
         super().__init__(zookeeper_client)
@@ -235,3 +237,31 @@ class KeyStorage(ZooKeeperBase):
             'keys': keys
         }
         self.saveProjectsSecretsKeys(connection_name, project_name, keydata)
+
+    def deleteProjectDir(self, connection_name, project_name):
+        prefix, name = strings.unique_project_name_with_prefix(project_name)
+        project_path = self.PROJECT_PATH.format(connection_name, prefix, name)
+        prefix_path = self.PREFIX_PATH.format(connection_name, prefix)
+        try:
+            # We check for children and explicitly disable recursive deletion
+            # for belts and suspenders.
+            if not self.kazoo_client.get_children(project_path):
+                self.kazoo_client.delete(project_path, recursive=False)
+            else:
+                self.log.warning(f"Not deleting non empty path {project_path}")
+        except kazoo.exceptions.NotEmptyError:
+            self.log.warning(f"Not deleting non empty path {project_path}")
+        except kazoo.exceptions.NoNodeError:
+            # Already deleted
+            pass
+        try:
+            if not self.kazoo_client.get_children(prefix_path):
+                self.kazoo_client.delete(prefix_path, recursive=False)
+            # We don't check the else case here because it is normal for the
+            # org contents to remain for other member projects when renaming
+            # repos.
+        except kazoo.exceptions.NotEmptyError:
+            self.log.warning(f"Not deleting non empty path {prefix_path}")
+        except kazoo.exceptions.NoNodeError:
+            # Already deleted
+            pass
