@@ -16,6 +16,23 @@
       "message": "Nit we pass here but return above. if you need to make another patchset maybe switch one or the other to match?",
       "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d5e6bc7_b79057bf",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-18T22:13:20Z",
+      "side": 1,
+      "message": "We pass here so that we still delete from the local dict.  But we return above so that we don\u0027t delete from ZK.  In both cases, we should leave this function with either an entry in both, or no entries in either.",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
