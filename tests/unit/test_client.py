@@ -226,7 +226,7 @@ class TestKeyOperations(ZuulTestCase):
              '-c', config_file,
              'copy-keys',
              'gerrit', 'org/project',
-             'gerrit', 'org/newproject',
+             'gerrit', 'neworg/newproject',
              ],
             stdout=subprocess.PIPE)
         out, _ = p.communicate()
@@ -236,10 +236,10 @@ class TestKeyOperations(ZuulTestCase):
         data = self.getZKTree('/keystorage')
         self.assertEqual(
             data['/keystorage/gerrit/org/org%2Fproject/secrets'],
-            data['/keystorage/gerrit/org/org%2Fnewproject/secrets'])
+            data['/keystorage/gerrit/neworg/neworg%2Fnewproject/secrets'])
         self.assertEqual(
             data['/keystorage/gerrit/org/org%2Fproject/ssh'],
-            data['/keystorage/gerrit/org/org%2Fnewproject/ssh'])
+            data['/keystorage/gerrit/neworg/neworg%2Fnewproject/ssh'])
 
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
@@ -257,6 +257,38 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org/org%2Fproject/secrets'))
         self.assertIsNone(
             data.get('/keystorage/gerrit/org/org%2Fproject/ssh'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject'))
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-keys',
+             'gerrit', 'org/project1',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-keys',
+             'gerrit', 'org/project2',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
+
+        data = self.getZKTree('/keystorage')
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject1'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject2'))
+        self.assertIsNone(
+            data.get('/keystorage/gerrit/org'))
 
 
 class TestZKOperations(ZuulTestCase):
