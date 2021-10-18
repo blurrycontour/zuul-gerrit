@@ -201,11 +201,23 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def prune(self, relevant, max_age=3600):  # 1h
         cutoff_time = time.time() - max_age
-        outdated = {c.cache_stat.key for c in list(self._change_cache.values())
-                    if c.cache_stat.last_modified < cutoff_time}
-        to_prune = outdated - set(relevant)
+        outdated_keys = set()
+        change_versions = dict()
+        for c in list(self._change_cache.values()):
+            # Assign to a local variable so all 3 values we use are
+            # consistent in case the cache_stat is updated during this
+            # loop.
+            cache_stat = c.cache_stat
+            if cache_stat.last_modified >= cutoff_time:
+                # This entry isn't old enough to delete yet
+                continue
+            # Save the version we examined so we can make sure to only
+            # delete that version.
+            change_versions[cache_stat.key] = cache_stat.version
+            outdated_keys.add(cache_stat.key)
+        to_prune = outdated_keys - set(relevant)
         for key in to_prune:
-            self.delete(key)
+            self.delete(key, change_versions[key])
 
     def cleanup(self):
         valid_uuids = {c.cache_stat.uuid
@@ -347,12 +359,20 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             change = self.get(key)
         return change
 
-    def delete(self, key):
+    def delete(self, key, version=-1):
         cache_path = self._cachePath(key._hash)
         # Only delete the cache entry and NOT the data node in order to
         # prevent race conditions with other consumers. The stale data
         # nodes will be removed by the periodic cleanup.
-        self.kazoo_client.delete(cache_path, recursive=True)
+        try:
+            self.kazoo_client.delete(cache_path, version)
+        except BadVersionError:
+            # Someone else may have written a new entry since we
+            # decided to delete this, so we should no longer delete
+            # the entry.
+            return
+        except NoNodeError:
+            pass
 
         with contextlib.suppress(KeyError):
             del self._change_cache[key._hash]

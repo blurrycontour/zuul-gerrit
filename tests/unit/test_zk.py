@@ -1315,6 +1315,30 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         invalid_key = ChangeKey('conn', 'project', 'change', 'invalid', '1')
         self.cache.delete(invalid_key)
 
+    def test_concurrent_delete(self):
+        change = DummyChange("project", {"foo": "bar"})
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        self.cache.set(key, change)
+        old_version = change.cache_version
+        # Simulate someone updating the cache after we decided to
+        # delete the entry
+        self.cache.set(key, change, old_version)
+        self.assertNotEqual(old_version, change.cache_version)
+        self.cache.delete(key, old_version)
+        # The change should still be in the cache
+        self.assertIsNotNone(self.cache.get(key))
+
+    def test_prune(self):
+        change1 = DummyChange("project", {"foo": "bar"})
+        change2 = DummyChange("project", {"foo": "baz"})
+        key1 = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        key2 = ChangeKey('conn', 'project', 'change', 'foo', '2')
+        self.cache.set(key1, change1)
+        self.cache.set(key2, change2)
+        self.cache.prune([key1], max_age=0)
+        self.assertIsNotNone(self.cache.get(key1))
+        self.assertIsNone(self.cache.get(key2))
+
     def test_concurrent_update(self):
         change = DummyChange("project", {"foo": "bar"})
         key = ChangeKey('conn', 'project', 'change', 'foo', '1')
