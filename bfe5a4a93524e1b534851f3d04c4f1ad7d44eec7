@@ -33,6 +33,24 @@
       "message": "We pass here so that we still delete from the local dict.  But we return above so that we don\u0027t delete from ZK.  In both cases, we should leave this function with either an entry in both, or no entries in either.",
       "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f573972a_695bcf0b",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-18T22:16:06Z",
+      "side": 1,
+      "message": "As mentioned in the Matrix room I was thinking that maybe we should remove the stale entry below. In that case I guess we should always use pass. However, Jim pointed out that a watch should do that for us.",
+      "parentUuid": "0d5e6bc7_b79057bf",
+      "revId": "bfe5a4a93524e1b534851f3d04c4f1ad7d44eec7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
