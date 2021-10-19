@@ -133,6 +133,7 @@ class PipelineManager(metaclass=ABCMeta):
             change_queue.append(project)
             self.log.debug("Added project %s to queue: %s" %
                            (project, queue_name))
+        self.pipeline.setRelativePriorityQueues(change_queues)
 
     def getSubmitAllowNeeds(self):
         # Get a list of code review labels that are allowed to be
