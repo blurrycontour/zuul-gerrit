@@ -24,6 +24,7 @@ from zuul.exceptions import StreamingError
 from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, FingerGatewayComponent
 from zuul.zk.executor import ExecutorApi
@@ -177,7 +178,7 @@ class FingerGateway(object):
         self.zk_client = ZooKeeperClient.fromConfig(config)
         self.zk_client.connect()
         self.component_info = FingerGatewayComponent(
-            self.zk_client, self.hostname
+            self.zk_client, self.hostname, version=get_version_string()
         )
         if self.zone is not None:
             self.component_info.zone = self.zone

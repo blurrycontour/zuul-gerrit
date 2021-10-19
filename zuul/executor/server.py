@@ -66,6 +66,7 @@ from zuul.model import (
 )
 import zuul.model
 from zuul.nodepool import Nodepool
+from zuul.version import get_version_string
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.components import ExecutorComponent
 from zuul.zk.exceptions import JobRequestNotFound
@@ -3059,7 +3060,8 @@ class ExecutorServer(BaseMergeServer):
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
-        self.component_info = ExecutorComponent(self.zk_client, self.hostname)
+        self.component_info = ExecutorComponent(
+            self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()

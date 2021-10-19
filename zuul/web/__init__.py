@@ -36,6 +36,7 @@ from zuul.lib import streamer_utils
 from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
 import zuul.rpcclient
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, WebComponent
 from zuul.zk.executor import ExecutorApi
@@ -760,6 +761,7 @@ class ZuulWebAPI(object):
                 comp_json = {
                     "hostname": comp.hostname,
                     "state": comp.state,
+                    "version": comp.version,
                 }
                 ret.setdefault(kind, []).append(comp_json)
         resp = cherrypy.response
@@ -1319,7 +1321,8 @@ class ZuulWeb(object):
 
         self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
 
-        self.component_info = WebComponent(self.zk_client, self.hostname)
+        self.component_info = WebComponent(
+            self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
 
         self.component_registry = ComponentRegistry(self.zk_client)
