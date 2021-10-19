@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86fc9d38_1dae4473",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-19T06:44:00Z",
+      "side": 1,
+      "message": "I just came across this change and I like the idea to define those colours in a central place.\nHowever, I have the feeling that those are too many different colours (or too many different shades per color). I didn\u0027t check it out in detail though and will try to do that in the next days.\nIs there a reason why you went away from the PF4 CSS color constants? I was using them wherever possible to ensure that our colours harmonize with the PF4 design/components.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
