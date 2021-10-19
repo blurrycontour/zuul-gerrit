@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae2e930b_ec6ad3e8",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1977,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-19T01:22:55Z",
+      "side": 1,
+      "message": "For some reason, this change appears to eliminate a serialize/deserialize cycle which exposed an error in the change above where we would set these as lists instead of sets.  We should probably fix that in the change above.",
+      "revId": "eb886aa1b43cbaff7e6fa58f05df8af6ab42755e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
