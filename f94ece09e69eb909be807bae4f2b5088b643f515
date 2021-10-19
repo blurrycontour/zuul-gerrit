@@ -34,6 +34,24 @@
       "parentUuid": "86fc9d38_1dae4473",
       "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "236e6d73_a78c2ead",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-19T08:47:35Z",
+      "side": 1,
+      "message": "You can just use the CSS variables and the color codes interchangeable, like here https://review.opendev.org/c/zuul/zuul/+/812523/1/web/src/containers/build/Misc.jsx#b38\n\nThe same goes for any other CSS (color) variable, like var(--pf-global--palette--blue-50) or var(--pf-c-table--m-compact--cell--PaddingTop).",
+      "parentUuid": "7844396e_12ceee7d",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
