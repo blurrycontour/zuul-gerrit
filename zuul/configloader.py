@@ -1480,7 +1480,7 @@ class TenantParser(object):
         self.keystorage = keystorage
         self.unparsed_config_cache = self.scheduler.unparsed_config_cache
 
-    classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
+    classes = vs.Any('pipeline', 'job', 'semaphore', 'pragma', 'project',
                      'project-template', 'nodeset', 'secret', 'queue')
 
     project_dict = {str: {
@@ -1970,6 +1970,9 @@ class TenantParser(object):
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in unparsed_config.pragmas:
+            classes = self._getLoadClasses(tenant, config_pragma)
+            if 'pragma' not in classes:
+                continue
             try:
                 pcontext.pragma_parser.fromYaml(config_pragma)
             except ConfigurationSyntaxError as e:
