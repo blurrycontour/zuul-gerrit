@@ -5020,6 +5020,33 @@ class TestPragma(ZuulTestCase):
             self.assertIsNone(job.branch_matcher)
 
 
+class TestIncludePragma(ZuulTestCase):
+    tenant_config_file = 'config/pragma-include/main.yaml'
+
+    def test_pragma_include(self):
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+        file_dict = {'.zuul.yaml': textwrap.dedent(
+            """
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - job
+            """)}
+
+        self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                       files=file_dict)
+        self.waitUntilSettled()
+        # The job should work because the pragma was not included.
+        self.assertHistory([
+            dict(name='job', result='SUCCESS', changes='1,1'),
+        ])
+
+
 class TestPragmaMultibranch(ZuulTestCase):
     tenant_config_file = 'config/pragma-multibranch/main.yaml'
 
