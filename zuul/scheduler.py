@@ -1613,6 +1613,7 @@ class Scheduler(threading.Thread):
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
                         pipeline.state.refresh(ctx)
+                        pipeline.state.cleanup(ctx)
                         self._process_pipeline(tenant, pipeline)
 
             except LockException:
