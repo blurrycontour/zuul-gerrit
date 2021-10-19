@@ -28,7 +28,7 @@ from zuul.model import MergeRequest, SourceContext
 class TenantParserTestCase(ZuulTestCase):
     create_project_keys = True
 
-    CONFIG_SET = set(['pipeline', 'job', 'semaphore', 'project',
+    CONFIG_SET = set(['pipeline', 'job', 'semaphore', 'pragma', 'project',
                       'project-template', 'nodeset', 'secret', 'queue'])
     UNTRUSTED_SET = CONFIG_SET - set(['pipeline'])
 
@@ -178,7 +178,7 @@ class TestTenantOverride(TenantParserTestCase):
                          tpc.load_classes)
         project = tenant.untrusted_projects[1]
         tpc = tenant.project_configs[project.canonical_name]
-        self.assertEqual(set(['job']), tpc.load_classes)
+        self.assertEqual(set(['pragma', 'job']), tpc.load_classes)
         self.assertTrue('common-config-job' in tenant.layout.jobs)
         self.assertTrue('project1-job' in tenant.layout.jobs)
         self.assertTrue('project2-job' in tenant.layout.jobs)
@@ -288,7 +288,7 @@ class TestTenantGroups3(TenantParserTestCase):
         self.assertEqual(set(['job']), tpc.load_classes)
         project = tenant.untrusted_projects[1]
         tpc = tenant.project_configs[project.canonical_name]
-        self.assertEqual(set(['project', 'job']), tpc.load_classes)
+        self.assertEqual(set(['pragma', 'project', 'job']), tpc.load_classes)
         self.assertTrue('common-config-job' in tenant.layout.jobs)
         self.assertTrue('project1-job' in tenant.layout.jobs)
         self.assertTrue('project2-job' in tenant.layout.jobs)
@@ -359,7 +359,7 @@ class TestTenantGroups5(TenantParserTestCase):
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
         project = tenant.untrusted_projects[0]
         tpc = tenant.project_configs[project.canonical_name]
-        self.assertEqual(set([]),
+        self.assertEqual(set(['pragma']),
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes

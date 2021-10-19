@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Tenant configuration can now exclude pragma from a project configuration.
+    This may be used to work around implied branch matcher when re-using a
+    job with custom branch names.

@@ -1480,12 +1480,14 @@ class TenantParser(object):
         self.keystorage = keystorage
         self.unparsed_config_cache = self.scheduler.unparsed_config_cache
 
-    classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
-                     'project-template', 'nodeset', 'secret', 'queue')
+    _classes = ['pipeline', 'job', 'semaphore', 'project',
+                'project-template', 'nodeset', 'secret', 'queue']
+    classes = vs.Any(*_classes)
+    exclude_classes = vs.Any(*(_classes + ["pragma"]))
 
     project_dict = {str: {
         'include': to_list(classes),
-        'exclude': to_list(classes),
+        'exclude': to_list(exclude_classes),
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
         'extra-config-paths': to_list(str),
@@ -1679,8 +1681,9 @@ class TenantParser(object):
             if conf[project_name].get("include") is None:
                 project_include = current_include
             else:
+                # note: pragma are always included
                 project_include = frozenset(
-                    as_list(conf[project_name]['include']))
+                    as_list(conf[project_name]['include']) + ["pragma"])
             project_exclude = frozenset(
                 as_list(conf[project_name].get('exclude', [])))
             if project_exclude:
@@ -1739,9 +1742,9 @@ class TenantParser(object):
         config_projects = []
         untrusted_projects = []
 
-        default_include = frozenset(['pipeline', 'job', 'semaphore', 'project',
-                                     'secret', 'project-template', 'nodeset',
-                                     'queue'])
+        default_include = frozenset(['pipeline', 'job', 'semaphore', 'pragma',
+                                     'project', 'secret', 'project-template',
+                                     'nodeset', 'queue'])
 
         for source_name, conf_source in conf_tenant.get('source', {}).items():
             source = self.connections.getSource(source_name)
@@ -1970,6 +1973,9 @@ class TenantParser(object):
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in unparsed_config.pragmas:
+            classes = self._getLoadClasses(tenant, config_pragma)
+            if 'pragma' not in classes:
+                continue
             try:
                 pcontext.pragma_parser.fromYaml(config_pragma)
             except ConfigurationSyntaxError as e:
