@@ -1561,6 +1561,51 @@ class ZuulRole(Role):
         return self
 
 
+class JobData(zkobject.ShardedZKObject):
+    """Data or variables for a job.
+
+    These can be arbitrarily large, so they are stored as sharded ZK objects.
+
+    A hash attribute can be stored on the job object itself to detect
+    whether the data need to be refreshed.
+
+    """
+
+    # We can always recreate data if necessary, so go ahead and
+    # truncate when we update so we avoid corrupted data.
+    truncate_on_create = True
+
+    def __repr__(self):
+        return '<JobData>'
+
+    def getPath(self):
+        return self._path
+
+    @classmethod
+    def new(klass, context, **kw):
+        """Create a new instance and save it in ZooKeeper"""
+        obj = klass()
+        kw['hash'] = JobData.getHash(kw['data'])
+        obj._set(**kw)
+        obj._save(context, create=True)
+        return obj
+
+    @staticmethod
+    def getHash(data):
+        hasher = hashlib.sha256()
+        # Use json_dumps to strip any ZuulMark entries
+        hasher.update(json_dumps(data).encode('utf8'))
+        return hasher.hexdigest()
+
+    def serialize(self):
+        data = {
+            "data": self.data,
+            "hash": self.hash,
+            "_path": self._path,
+        }
+        return json.dumps(data).encode("utf8")
+
+
 class FrozenJob(zkobject.ZKObject):
     """A rendered job definition that will actually be run.
 
@@ -1572,6 +1617,42 @@ class FrozenJob(zkobject.ZKObject):
     variables which deal with the current state of the job in the
     pipeline.
     """
+    attributes = ('ansible_version',
+                  'dependencies',
+                  'extra_variables',
+                  'group_variables',
+                  'host_variables',
+                  'inheritance_path',
+                  'name',
+                  'nodeset',
+                  'override_branch',
+                  'override_checkout',
+                  'post_timeout',
+                  'required_projects',
+                  'semaphores',
+                  'tags',
+                  'timeout',
+                  'voting',
+                  'queued',
+                  'hold_following_changes',
+                  'waiting_status',
+                  'pre_run',
+                  'run',
+                  'post_run',
+                  'cleanup_run',
+                  'variables',
+                  'attempts',
+                  'success_message',
+                  'failure_message',
+                  'provides',
+                  'requires',
+                  'workspace_scheme')
+
+    def __init__(self):
+        super().__init__()
+        self._set(_parent_data=None,
+                  _secret_parent_data=None,
+                  _artifact_data=None)
 
     def isBase(self):
         return self.parent is None
@@ -1584,9 +1665,6 @@ class FrozenJob(zkobject.ZKObject):
         return self.jobPath(self.buildset.getPath())
 
     def serialize(self):
-        # This needs a unique implementation; toDict only represents
-        # the surface level attributes, and the executor api
-        # serialization is not reusable.
         data = {}
         for k in self.attributes:
             v = getattr(self, k)
@@ -1604,6 +1682,11 @@ class FrozenJob(zkobject.ZKObject):
                 # dict of name->JobProject
                 v = {project_name: job_project.toDict()
                      for (project_name, job_project) in v.items()}
+            elif k in ('parent_data', 'secret_parent_data', 'artifact_data'):
+                if v:
+                    v = {'path': v.path, 'hash': v.hash}
+                else:
+                    v = None
             data[k] = v
 
         # Use json_dumps to strip any ZuulMark entries
@@ -1642,6 +1725,20 @@ class FrozenJob(zkobject.ZKObject):
 
         data['provides'] = frozenset(data['provides'])
         data['requires'] = frozenset(data['requires'])
+
+        for job_data_key in ('parent_data', 'secret_parent_data',
+                             'artifact_data'):
+            job_data = data.get(job_data_key)
+            if job_data:
+                # This should be a dict with path and hash
+                existing_job_data = getattr(self, job_data_key, None)
+                if getattr(existing_job_data, 'hash') == job_data['hash']:
+                    # Re-use the existing object since it's the same
+                    data[job_data_key] = existing_job_data
+                else:
+                    # Load the object from ZK
+                    data[job_data_key] = JobData.fromZK(
+                        context, job_data['path'])
         return data
 
     def setWaitingStatus(self, status):
@@ -1650,6 +1747,27 @@ class FrozenJob(zkobject.ZKObject):
         self.updateAttributes(
             self.buildset.item.pipeline.manager.current_context,
             waiting_status=status)
+
+    @property
+    def parent_data(self):
+        if self._parent_data is None:
+            return None
+        else:
+            return self._parent_data.data
+
+    @property
+    def secret_parent_data(self):
+        if self._secret_parent_data is None:
+            return None
+        else:
+            return self._secret_parent_data.data
+
+    @property
+    def artifact_data(self):
+        if self._artifact_data is None:
+            return None
+        else:
+            return self._artifact_data.data
 
     @property
     def combined_variables(self):
@@ -1711,23 +1829,33 @@ class FrozenJob(zkobject.ZKObject):
         return parent_data, secret_parent_data, artifact_data
 
     def setParentData(self, parent_data, secret_parent_data, artifact_data):
+        context = self.buildset.item.pipeline.manager.current_context
         kw = {}
         if self.parent_data != parent_data:
-            kw['parent_data'] = parent_data
+            kw['_parent_data'] = JobData.new(
+                context, _path=self.getPath() + '/parent_data',
+                data=parent_data)
         if self.secret_parent_data != secret_parent_data:
-            kw['secret_parent_data'] = secret_parent_data
+            kw['_secret_parent_data'] = JobData.new(
+                context, _path=self.getPath() + '/secret_parent_data',
+                data=secret_parent_data)
         if self.artifact_data != artifact_data:
-            kw['artifact_data'] = artifact_data
+            kw['_artifact_data'] = JobData.new(
+                context, _path=self.getPath() + '/artifact_data',
+                data=artifact_data)
         if kw:
             self.updateAttributes(
                 self.buildset.item.pipeline.manager.current_context,
                 **kw)
 
     def setArtifactData(self, artifact_data):
+        context = self.buildset.item.pipeline.manager.current_context
         if self.artifact_data != artifact_data:
             self.updateAttributes(
-                self.buildset.item.pipeline.manager.current_context,
-                artifact_data=artifact_data)
+                context,
+                _artifact_data=JobData.new(
+                    context, _path=self.getPath() + '/artifact_data',
+                    data=artifact_data))
 
 
 class Job(ConfigObject):
@@ -1943,32 +2071,9 @@ class Job(ConfigObject):
                   redact_secrets_and_keys):
         buildset = item.current_build_set
         kw = {}
-        for k in ('ansible_version',
-                  'artifact_data',
-                  'dependencies',
-                  'extra_variables',
-                  'group_variables',
-                  'host_variables',
-                  'inheritance_path',
-                  'name',
-                  'nodeset',
-                  'override_branch',
-                  'override_checkout',
-                  'post_timeout',
-                  'required_projects',
-                  'secret_parent_data',
-                  'semaphores',
-                  'tags',
-                  'timeout',
-                  'voting',
-                  'queued',
-                  'hold_following_changes',
-                  'waiting_status',
-                  'pre_run', 'run', 'post_run', 'cleanup_run',
-                  'parent_data', 'variables', 'attempts',
-                  'success_message', 'failure_message',
-                  'provides', 'requires',
-                  'workspace_scheme'):
+        attributes = set(FrozenJob.attributes)
+        attributes -= {'parent_data', 'secret_parent_data', 'artifact_data'}
+        for k in attributes:
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
             v = getattr(self, k)
@@ -1988,7 +2093,6 @@ class Job(ConfigObject):
             kw[k] = v
         kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
-        kw['attributes'] = list(kw.keys())
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
         return FrozenJob.new(context, **kw)
