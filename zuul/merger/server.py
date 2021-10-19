@@ -32,6 +32,7 @@ from zuul.merger.merger import nullcontext
 from zuul.model import (
     FilesChangesCompletedEvent, MergeCompletedEvent, MergeRequest
 )
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import MergerComponent
 from zuul.zk.event_queues import PipelineResultEventQueue
@@ -465,7 +466,8 @@ class MergeServer(BaseMergeServer):
     ):
         super().__init__(config, 'merger', connections)
         self.hostname = socket.getfqdn()
-        self.component_info = MergerComponent(self.zk_client, self.hostname)
+        self.component_info = MergerComponent(
+            self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
 
         self.command_map = dict(

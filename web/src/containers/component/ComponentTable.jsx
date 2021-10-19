@@ -23,6 +23,7 @@ import {
   TableVariant,
 } from '@patternfly/react-table'
 import {
+  CodeIcon,
   OnRunningIcon,
   OutlinedHddIcon,
   PauseCircleIcon,
@@ -112,6 +113,10 @@ function ComponentTable({ components }) {
       title: <IconProperty icon={<OnRunningIcon />} value="State" />,
       dataLabel: 'State',
     },
+    {
+      title: <IconProperty icon={<CodeIcon />} value="Version" />,
+      dataLabel: 'Version',
+    },
   ]
 
   function createSectionRow(kind, childrenCount) {
@@ -138,6 +143,7 @@ function ComponentTable({ components }) {
         {
           title: <ComponentState state={component.state} />,
         },
+        component.version,
       ],
     }
   }

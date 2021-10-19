@@ -51,13 +51,14 @@ class BaseComponent(ZooKeeperBase):
     log = logging.getLogger("zuul.Component")
     kind = "base"
 
-    def __init__(self, client, hostname):
+    def __init__(self, client, hostname, version=None):
         # Ensure that the content is available before setting any other
         # attribute, because our __setattr__ implementation is relying on it.
         self.__dict__["content"] = {
             "hostname": hostname,
             "state": self.STOPPED,
             "kind": self.kind,
+            "version": version,
         }
         super().__init__(client)
 
@@ -136,8 +137,8 @@ class SchedulerComponent(BaseComponent):
 class ExecutorComponent(BaseComponent):
     kind = "executor"
 
-    def __init__(self, client, hostname):
-        super().__init__(client, hostname)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.initial_state = {
             "accepting_work": False,
             "zone": None,
@@ -154,8 +155,8 @@ class MergerComponent(BaseComponent):
 class FingerGatewayComponent(BaseComponent):
     kind = "fingergw"
 
-    def __init__(self, client, hostname):
-        super().__init__(client, hostname)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.initial_state = {
             "zone": None,
             "public_port": None,
