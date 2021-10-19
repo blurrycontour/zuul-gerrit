@@ -567,6 +567,22 @@ class PipelineState(zkobject.ZKObject):
             queue.refresh(context)
         return data
 
+    def cleanup(self, context):
+        pipeline_path = self.getPath()
+        try:
+            all_items = set(context.client.get_children(
+                f"{pipeline_path}/item"))
+        except NoNodeError:
+            return
+
+        known_items = {item.uuid for item in self.pipeline.getAllItems()}
+        stale_items = all_items - known_items
+        for item_uuid in stale_items:
+            self.pipeline.manager.log.debug("Cleaning up stale item %s",
+                                            item_uuid)
+            context.client.delete(QueueItem.itemPath(pipeline_path, item_uuid),
+                                  recursive=True)
+
 
 class ChangeQueue(zkobject.ZKObject):
     """A ChangeQueue contains Changes to be processed for related projects.
