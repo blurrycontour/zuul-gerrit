@@ -1,0 +1,7 @@
+- pragma:
+    implied-branches:
+      - feature/r1
+
+- job:
+    name: job
+    run: noop.yaml

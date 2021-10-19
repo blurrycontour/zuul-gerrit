@@ -179,6 +179,8 @@ configuration. Some examples of tenant definitions are:
 
             A list of **configuration items** that should not be loaded.
 
+            In addition to the include list, ``pragma`` can also be excluded.
+
          .. attr:: shadow
 
             A list of projects which this project is permitted to

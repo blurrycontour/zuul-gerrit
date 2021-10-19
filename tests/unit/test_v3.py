@@ -5020,6 +5020,41 @@ class TestPragma(ZuulTestCase):
             self.assertIsNone(job.branch_matcher)
 
 
+class TestIncludePragma(ZuulTestCase):
+    tenant_config_file = 'config/pragma-include/main.yaml'
+
+    def test_pragma_include(self):
+        # This test verify the pragma can be skipped when including a project.
+        # In that scenario, the common-jobs sets a pragma to force the branch
+        # matcher of the 'job'. Thus we are verifying we can use the 'job'
+        # with any branch by not including the pragma in the tenant config.
+
+        # Propose a new project pipeline configuration for the stable branch
+        # using the job that is normally affected by the pragma:
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+        file_dict = {'.zuul.yaml': textwrap.dedent(
+            """
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - job
+            """)}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # The job should work because the pragma was not included.
+        self.assertHistory([
+            dict(name='job', result='SUCCESS', changes='1,1'),
+        ])
+
+
 class TestPragmaMultibranch(ZuulTestCase):
     tenant_config_file = 'config/pragma-multibranch/main.yaml'
 
