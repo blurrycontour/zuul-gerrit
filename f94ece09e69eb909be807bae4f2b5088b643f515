@@ -16,6 +16,24 @@
       "message": "I just came across this change and I like the idea to define those colours in a central place.\nHowever, I have the feeling that those are too many different colours (or too many different shades per color). I didn\u0027t check it out in detail though and will try to do that in the next days.\nIs there a reason why you went away from the PF4 CSS color constants? I was using them wherever possible to ensure that our colours harmonize with the PF4 design/components.",
       "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7844396e_12ceee7d",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-19T08:20:11Z",
+      "side": 1,
+      "message": "I wanted to give a unique color to each result, but it is true that that\u0027s a lot of dispersion, and besides, some colors are actually hard to distinguish depending on your display\u0027s configuration (and quality).\n\nI think that at the very least, we should assign one color by type of result, so that it is clearer whose attention is required to address a potential problem. I\u0027ve proposed this grouping below, and I\u0027d appreciate feedback from other folks about its pertinence.\n\nAlso note that while I\u0027m not using the CSS constants, the values *are* taken from the PF CSS palette, as is mentioned in the comments, see https://www.patternfly.org/v4/guidelines/colors/#color-palette - I\u0027m sure it\u0027s possible to use the constants but I\u0027m not very familiar with how to use styles, so any nudge in the right direction is welcome.",
+      "parentUuid": "86fc9d38_1dae4473",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
