@@ -28,7 +28,7 @@ from zuul.model import MergeRequest, SourceContext
 class TenantParserTestCase(ZuulTestCase):
     create_project_keys = True
 
-    CONFIG_SET = set(['pipeline', 'job', 'semaphore', 'project',
+    CONFIG_SET = set(['pipeline', 'job', 'semaphore', 'pragma', 'project',
                       'project-template', 'nodeset', 'secret', 'queue'])
     UNTRUSTED_SET = CONFIG_SET - set(['pipeline'])
 

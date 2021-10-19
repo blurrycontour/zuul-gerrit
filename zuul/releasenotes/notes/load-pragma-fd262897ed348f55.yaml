@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    Project configured to include a custom set of objects, for example
+    `include: [job]`, no longer includes the pragma by default.
+    If needed, such project now need to use `include: [job, pragma]`.
