@@ -170,6 +170,7 @@ configuration. Some examples of tenant definitions are:
             * pipeline
             * job
             * semaphore
+            * pragma
             * project
             * project-template
             * nodeset
