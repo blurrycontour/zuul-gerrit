@@ -448,7 +448,8 @@ class Pipeline(object):
         self.manager = manager
 
     def addQueue(self, queue):
-        self.queues.append(queue)
+        with self.state.activeContext(self.manager.current_context):
+            self.state.queues.append(queue)
 
     def getQueue(self, project_cname, branch):
         # Queues might be branch specific so match with branch
@@ -462,6 +463,10 @@ class Pipeline(object):
             if project in queue:
                 return queue
         return [project]
+
+    def setRelativePriorityQueues(self, queues):
+        self.state.updateAttributes(self.manager.current_context,
+                                    relative_priority_queues=queues)
 
     def removeQueue(self, queue):
         if queue in self.queues:
