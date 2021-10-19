@@ -31,7 +31,6 @@ from apscheduler.triggers.interval import IntervalTrigger
 from kazoo.exceptions import NotEmptyError
 
 from zuul import configloader, exceptions
-from zuul import version as zuul_version
 from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
@@ -70,6 +69,7 @@ from zuul.model import (
     SystemAttributes,
     STATE_FAILED,
 )
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.cleanup import (
     SemaphoreCleanupLock,
@@ -177,7 +177,11 @@ class Scheduler(threading.Thread):
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
         self.system = ZuulSystem(self.zk_client)
-        self.component_info = SchedulerComponent(self.zk_client, self.hostname)
+
+        self.zuul_version = get_version_string()
+
+        self.component_info = SchedulerComponent(
+            self.zk_client, self.hostname, version=self.zuul_version)
         self.component_info.register()
         self.component_registry = ComponentRegistry(self.zk_client)
         self.system_config_cache = SystemConfigCache(self.zk_client,
@@ -229,11 +233,6 @@ class Scheduler(threading.Thread):
             '/var/lib/zuul/scheduler.socket')
         self.command_socket = commandsocket.CommandSocket(command_socket)
 
-        if zuul_version.is_release is False:
-            self.zuul_version = "%s %s" % (zuul_version.release_string,
-                                           zuul_version.git_version)
-        else:
-            self.zuul_version = zuul_version.release_string
         self.last_reconfigured = None
 
         self.globals = SystemAttributes.fromConfig(self.config)

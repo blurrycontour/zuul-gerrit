@@ -239,7 +239,7 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(len(data["web"]), 1)
 
         # Each component should contain hostname and state information
-        for key in ["hostname", "state"]:
+        for key in ["hostname", "state", "version"]:
             self.assertIn(key, data["executor"][0])
             self.assertIn(key, data["scheduler"][0])
             self.assertIn(key, data["web"][0])
