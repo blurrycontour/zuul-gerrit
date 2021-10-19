@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "3d861e72_4ebc02bc",
         "filename": "tox.ini",
@@ -20,8 +21,31 @@
         "endChar": 10
       },
       "revId": "94b64dc9523fcc61af10c70195fa8bc309c7dc0c",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bab8f47e_a00be0cf",
+        "filename": "tox.ini",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-19T08:22:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d861e72_4ebc02bc",
+      "range": {
+        "startLine": 47,
+        "startChar": 4,
+        "endLine": 47,
+        "endChar": 10
+      },
+      "revId": "94b64dc9523fcc61af10c70195fa8bc309c7dc0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

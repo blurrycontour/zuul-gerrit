@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "8417874f_83405077",
         "filename": "tox.ini",
@@ -20,10 +21,34 @@
         "endChar": 4
       },
       "revId": "f6738b4ab447d20dcfcf2ccc37e5f87d1d39cd28",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e103c14f_fd903c86",
+        "filename": "tox.ini",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-19T08:22:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8417874f_83405077",
+      "range": {
+        "startLine": 47,
+        "startChar": 2,
+        "endLine": 47,
+        "endChar": 4
+      },
+      "revId": "f6738b4ab447d20dcfcf2ccc37e5f87d1d39cd28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "7d7c46e7_398c242f",
         "filename": "tox.ini",
@@ -43,8 +68,31 @@
         "endChar": 4
       },
       "revId": "f6738b4ab447d20dcfcf2ccc37e5f87d1d39cd28",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "737f92ff_d2217db4",
+        "filename": "tox.ini",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-19T08:22:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d7c46e7_398c242f",
+      "range": {
+        "startLine": 49,
+        "startChar": 2,
+        "endLine": 49,
+        "endChar": 4
+      },
+      "revId": "f6738b4ab447d20dcfcf2ccc37e5f87d1d39cd28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
