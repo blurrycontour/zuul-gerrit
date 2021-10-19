@@ -917,6 +917,7 @@ class Client(zuul.cmd.ZuulApp):
         args = self.args
         keystore.deleteProjectSSHKeys(args.connection, args.project)
         keystore.deleteProjectsSecretsKeys(args.connection, args.project)
+        keystore.deleteProjectDir(args.connection, args.project)
         self.log.info("Delete keys from %s %s",
                       args.connection, args.project)
         sys.exit(0)

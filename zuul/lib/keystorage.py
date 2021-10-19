@@ -30,8 +30,12 @@ RSA_KEY_SIZE = 2048
 
 class KeyStorage(ZooKeeperBase):
     log = logging.getLogger("zuul.KeyStorage")
-    SECRETS_PATH = "/keystorage/{}/{}/secrets"
-    SSH_PATH = "/keystorage/{}/{}/ssh"
+    # /keystorage/connection/orgname
+    PREFIX_PATH = "/keystorage/{}/{}"
+    # /keystorage/connection/orgname/projectuniqname
+    PROJECT_PATH = PREFIX_PATH + "/{}"
+    SECRETS_PATH = PROJECT_PATH + "/secrets"
+    SSH_PATH = PROJECT_PATH + "/ssh"
 
     def __init__(self, zookeeper_client, password, backup=None):
         super().__init__(zookeeper_client)
@@ -78,8 +82,8 @@ class KeyStorage(ZooKeeperBase):
                     self.log.warning(f"Not overwriting existing key at {path}")
 
     def getSSHKeysPath(self, connection_name, project_name):
-        key_project_name = strings.unique_project_name(project_name)
-        key_path = self.SSH_PATH.format(connection_name, key_project_name)
+        prefix, name = strings.unique_project_name(project_name)
+        key_path = self.SSH_PATH.format(connection_name, prefix, name)
         return key_path
 
     @cachetools.cached(cache={})
@@ -157,8 +161,8 @@ class KeyStorage(ZooKeeperBase):
         self.saveProjectSSHKeys(connection_name, project_name, keydata)
 
     def getProjectSecretsKeysPath(self, connection_name, project_name):
-        key_project_name = strings.unique_project_name(project_name)
-        key_path = self.SECRETS_PATH.format(connection_name, key_project_name)
+        prefix, name = strings.unique_project_name(project_name)
+        key_path = self.SECRETS_PATH.format(connection_name, prefix, name)
         return key_path
 
     @cachetools.cached(cache={})
@@ -235,3 +239,24 @@ class KeyStorage(ZooKeeperBase):
             'keys': keys
         }
         self.saveProjectsSecretsKeys(connection_name, project_name, keydata)
+
+    def deleteProjectDir(self, connection_name, project_name):
+        prefix, name = strings.unique_project_name(project_name)
+        project_path = self.PROJECT_PATH.format(connection_name, prefix, name)
+        prefix_path = self.PREFIX_PATH.format(connection_name, prefix)
+        try:
+            self.kazoo_client.delete(project_path)
+        except kazoo.exceptions.NotEmptyError:
+            # Rely on delete only deleting empty paths by default
+            self.log.warning(f"Not deleting non empty path {project_path}")
+        except kazoo.exceptions.NoNodeError:
+            # Already deleted
+            pass
+        try:
+            self.kazoo_client.delete(prefix_path)
+        except kazoo.exceptions.NotEmptyError:
+            # Normal for the org to remain due to other projects existing.
+            pass
+        except kazoo.exceptions.NoNodeError:
+            # Already deleted
+            pass

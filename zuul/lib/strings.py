@@ -22,16 +22,15 @@ import zuul.model
 def unique_project_name(project_name):
     parts = project_name.split('/')
     prefix = parts[0]
-
     name = quote_plus(project_name)
-    return f'{prefix}/{name}'
+    return (prefix, name)
 
 
 def workspace_project_path(hostname, project_name, scheme):
     """Return the project path based on the specified scheme"""
     if scheme == zuul.model.SCHEME_UNIQUE:
-        project_name = unique_project_name(project_name)
-        return os.path.join(hostname, project_name)
+        prefix, project_name = unique_project_name(project_name)
+        return os.path.join(hostname, prefix, project_name)
     elif scheme == zuul.model.SCHEME_GOLANG:
         return os.path.join(hostname, project_name)
     elif scheme == zuul.model.SCHEME_FLAT:

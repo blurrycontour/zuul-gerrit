@@ -20,9 +20,9 @@ from tests.base import BaseTestCase
 class TestStrings(BaseTestCase):
 
     def test_unique_project_name(self):
-        self.assertEqual('project/project',
+        self.assertEqual(('project', 'project'),
                          strings.unique_project_name('project'))
-        self.assertEqual('project/project%2Fsubproject',
+        self.assertEqual(('project', 'project%2Fsubproject'),
                          strings.unique_project_name('project/subproject'))
-        self.assertEqual('project/project%2Fsub%2Fproject',
+        self.assertEqual(('project', 'project%2Fsub%2Fproject'),
                          strings.unique_project_name('project/sub/project'))
