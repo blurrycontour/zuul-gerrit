@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09610ebc_157a4dbc",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-19T01:23:00Z",
+      "side": 1,
+      "message": "This is tricky.  Previously we would reset the buildset, then report dequeued on the new buildset, then remove the item from the queue.  But if we\u0027re trying to avoid creating buildsets, we shouldn\u0027t create a new buildset just to dequeue it.  So I think we should keep the current buildset, then adjust the rest of the code to handle the fact that it might be reporting a buildset with builds that have never started.",
+      "revId": "23f5a1218cee12c96c5225aeed2b21d5b980b969",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
