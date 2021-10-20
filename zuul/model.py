@@ -534,11 +534,22 @@ class PipelineState(zkobject.ZKObject):
         )
 
     @classmethod
+    def fromZK(klass, context, path, pipeline, **kw):
+        obj = klass()
+        obj._set(pipeline=pipeline, **kw)
+        # Bind the state to the pipeline, so child objects can access
+        # the the full pipeline state.
+        pipeline.state = obj
+        obj._load(context, path=path)
+        return obj
+
+    @classmethod
     def resetOrCreate(cls, pipeline):
         ctx = pipeline.manager.current_context
         try:
-            state = cls.fromZK(ctx, cls.pipelinePath(pipeline))
-            reset_state = {**state.defaultState(), "pipeline": pipeline}
+            state = cls.fromZK(ctx, cls.pipelinePath(pipeline),
+                               pipeline=pipeline)
+            reset_state = {**cls.defaultState(), "pipeline": pipeline}
             state.updateAttributes(ctx, **reset_state)
             return state
         except NoNodeError:
@@ -656,7 +667,8 @@ class ChangeQueue(zkobject.ZKObject):
             if item:
                 item.refresh(context)
             else:
-                item = QueueItem.fromZK(context, item_path)
+                item = QueueItem.fromZK(context, item_path,
+                                        pipeline=self.pipeline, queue=self)
             items_by_path[item.getPath()] = item
 
         # Resolve ahead/behind references between queue items
@@ -3326,8 +3338,7 @@ class BuildSet(zkobject.ZKObject):
                     self.jobs[job_name].refresh(context)
                 else:
                     job_path = FrozenJob.jobPath(job_name, self.getPath())
-                    job = FrozenJob.fromZK(context, job_path)
-                    job._set(buildset=self)
+                    job = FrozenJob.fromZK(context, job_path, buildset=self)
                     self.jobs[job_name] = job
 
         # These are local cache objects only valid for one pipeline run
@@ -3615,8 +3626,8 @@ class QueueItem(zkobject.ZKObject):
             build_set.refresh(context)
         else:
             build_set = (data["current_build_set"] and
-                         BuildSet.fromZK(context, data["current_build_set"]))
-            build_set._set(item=self)
+                         BuildSet.fromZK(context, data["current_build_set"],
+                                         item=self))
 
         data.update({
             "event": event,
@@ -4649,7 +4660,8 @@ class Bundle:
                 bundle_item.refresh(context)
 
         bundle.items = [
-            relevant_items.get(p) or QueueItem.fromZK(context, p)
+            relevant_items.get(p) or QueueItem.fromZK(
+                context, p, pipeline=queue.pipeline, queue=queue)
             for p in data["items"]
         ]
         bundle.started_reporting = data["started_reporting"]
