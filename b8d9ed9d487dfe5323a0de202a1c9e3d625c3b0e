@@ -51,6 +51,23 @@
       "parentUuid": "1b5ee053_5c281632",
       "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c9d0f96_19e06655",
+        "filename": "zuul/releasenotes/notes/load-pragma-fd262897ed348f55.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-20T20:58:01Z",
+      "side": 1,
+      "message": "I would think we should always include it unless there\u0027s some special reason not to.  It\u0027s a project\u0027s way of saying \"This project has only one branch that matters\" (implied-branch-matchers: false), or \"Branch foo on this project is the same as branch bar elsewhere\" (implied-branches: [foo, bar]).\n\nGenerally speaking, I would expect both of those to be true no matter what system the repo was loaded into.\n\nI just looked at the devstack project to see what it\u0027s pragma was, and I see that it\u0027s the thing gtema set up for the feature branch.  I don\u0027t think that is the right way to use pragmas or the right way to solve that problem.\n\nI\u0027m starting to think that the best solution to your issue might be to remove the pragma from devstack.",
+      "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
