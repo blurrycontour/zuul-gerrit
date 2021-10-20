@@ -132,9 +132,10 @@ class ZKObject:
         return obj
 
     @classmethod
-    def fromZK(klass, context, path):
+    def fromZK(klass, context, path, **kw):
         """Instantiate a new object from data in ZK"""
         obj = klass()
+        obj._set(**kw)
         obj._load(context, path=path)
         return obj
 
