@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7f7eab0_def60bd0",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1571,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4058d5ee_59f97e98",
+      "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e6fe6fa_8994355e",
@@ -75,6 +93,48 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7243533d_0978fcac",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3010,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf184cc3_c88eaa82",
+      "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12e81328_6f735b1b",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3010,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a81301bc_ca04247e",
+      "range": {
+        "startLine": 3010,
+        "startChar": 49,
+        "endLine": 3010,
+        "endChar": 63
+      },
+      "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "112e7e8e_bbb15a55",
@@ -88,6 +148,24 @@
       "writtenOn": "2021-10-20T10:56:28Z",
       "side": 1,
       "message": "This should be job._set(buildset\u003dself).",
+      "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5a96b3f_db310df2",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3012,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:51:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "112e7e8e_bbb15a55",
       "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
