@@ -54,6 +54,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a81301bc_ca04247e",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3010,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:26:12Z",
+      "side": 1,
+      "message": "We need to set our UUID before calling getPath() to make that work with the fromZK() method.",
+      "range": {
+        "startLine": 3010,
+        "startChar": 49,
+        "endLine": 3010,
+        "endChar": 63
+      },
+      "revId": "7d2992d98db08f6860f74d3d929801b2d85a9e20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "112e7e8e_bbb15a55",
         "filename": "zuul/model.py",
         "patchSetId": 2
