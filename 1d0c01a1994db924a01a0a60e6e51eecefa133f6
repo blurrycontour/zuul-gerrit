@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1ee8e7b_d4f3afb2",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:49:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be54aa9f_1c400b6c",
+      "revId": "1d0c01a1994db924a01a0a60e6e51eecefa133f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18e3ac9a_dd9e229d",
@@ -31,6 +49,24 @@
       "writtenOn": "2021-10-20T12:13:18Z",
       "side": 1,
       "message": "I think there is no need to include the layout UUID in the path.",
+      "revId": "1d0c01a1994db924a01a0a60e6e51eecefa133f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa19e8ab_97d23b29",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:49:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18e3ac9a_dd9e229d",
       "revId": "1d0c01a1994db924a01a0a60e6e51eecefa133f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
