@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be54aa9f_1c400b6c",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T11:59:11Z",
+      "side": 1,
+      "message": "This should be:\n\n  \"project_branches\": [tuple(pb) for pb in data[\"project_branches\"]],",
+      "revId": "1d0c01a1994db924a01a0a60e6e51eecefa133f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
