@@ -517,6 +517,7 @@ class TestGerritCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
 
         # Make sure the items still share a change queue, and the
         # first one is not live.
