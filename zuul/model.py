@@ -15,6 +15,7 @@
 
 import abc
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
+import contextlib
 import copy
 import json
 import hashlib
@@ -533,6 +534,7 @@ class PipelineState(zkobject.ZKObject):
         return dict(
             state=Pipeline.STATE_NORMAL,
             queues=[],
+            old_queues=[],
             relative_priority_queues={},
             consecutive_failures=0,
             disabled=False,
@@ -570,19 +572,44 @@ class PipelineState(zkobject.ZKObject):
         safe_pipeline = urllib.parse.quote_plus(pipeline.name)
         return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
 
+    def setOldQueues(self, context, queues):
+        for queue in queues:
+            queue._set(pipeline=self.pipeline)
+            for item in queue.queue:
+                item._set(pipeline=self.pipeline)
+        self.updateAttributes(context, old_queues=queues)
+
+    def removeOldQueue(self, context, queue):
+        with contextlib.suppress(ValueError):
+            self.old_queues.remove(queue)
+            self._save(context)
+
     def serialize(self):
         data = {
             "state": self.state,
             "consecutive_failures": self.consecutive_failures,
             "disabled": self.disabled,
             "queues": [q.getPath() for q in self.queues],
+            "old_queues": [q.getPath() for q in self.old_queues],
         }
         return json.dumps(data).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
-
         existing_queues = {q.getPath(): q for q in self.queues}
+
+        # Restore the old queues first, so that in case an item is
+        # already in one of the new queues the item(s) ahead/behind
+        # pointers are corrected when restoring the new queues.
+        old_queues_by_path = OrderedDict()
+        for queue_path in data["old_queues"]:
+            queue = existing_queues.get(queue_path)
+            if queue:
+                queue.refresh(context)
+            else:
+                queue = ChangeQueue.fromZK(context, queue_path,
+                                           pipeline=self.pipeline)
+            old_queues_by_path[queue_path] = queue
 
         queues_by_path = OrderedDict()
         for queue_path in data["queues"]:
@@ -596,6 +623,7 @@ class PipelineState(zkobject.ZKObject):
 
         data.update({
             "queues": list(queues_by_path.values()),
+            "old_queues": list(old_queues_by_path.values()),
         })
         return data
 
