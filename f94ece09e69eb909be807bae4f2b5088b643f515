@@ -52,6 +52,109 @@
       "parentUuid": "7844396e_12ceee7d",
       "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fc1f2e0_130ca201",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-20T13:49:41Z",
+      "side": 1,
+      "message": "Regarding the variety of colours proposed in this patch:\nI think we should stick to a small amount of expressive colours which you could clearly differentiate rather than a lot of different colours with a variety of shades for two reasons:\n1. As Matthieu already mentioned those shades might be hard to distinguish depending on the display configuration and quality.\n2. IMHO the amount of colours is distracting from the actual result and depending on the combination of the results next to each other it might even become hard to distinguish between e.g. green and blue results.\n...There might be more reasons but those are the first two that came to my mind.\n\nI would stick to the colours we have so far as they correspond very well to each other and also to the overall PF4 design (actually they are taken from other PF4 components and more or less reflect the main colours used for e.g. success and warning icons/buttons, progress bars and other parts). I assume that the PF4 developers took quite some time to come up with those colours and I find them a very good match. Those are\n\n- green: --pf-global--success-color--100 (--pf-global--palette--green-500)\n- red: --pf-global--danger-color--100 (--pf-global--palette--red-100)\n- blue: --pf-global--info-color--100 (--pf-global--palette--blue-300)\n- yellow: --pf-global--warning-color--100 (--pf-global--palette--gold-400)\n\nWe could then think about adding one different colous to e.g. highlight infrastructure errors, but I wouldn\u0027t add more colours. We should also keep in mind that non-voting builds are greyed out so we should avoid using anything \"greyish\" as colour for a build result.\n\nIn the current implementation we use the following \"categories\" (as I came up with the mapping I\u0027ve also added a few notes):\n\nSUCCESS -\u003e green (The one-and-only \"everything is fine\" result)\nFAILURE, RETRY_LIMIT -\u003e red (To me those were the two \"final\" failure results which might not directly be related to infrastructure or something else).\nSKIPPED -\u003e blue\nABORTED, CANCELED, RETRY and all other \"known\" failures reasons -\u003e yellow (This is kind of the \"remaining results\" category where I put in everything else). IMHO this category would be a good starting point if we want to revise some categories. \n\nI think it might be worth to revise some of the \"categories\" and move certain results into another category, but I wouldn\u0027t change too much about this.",
+      "parentUuid": "236e6d73_a78c2ead",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8cec93a_41d52452",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-20T13:49:41Z",
+      "side": 1,
+      "message": "If we say that those results are not \"error related\", but due to normal events, I think it\u0027s a good idea to use the same color as for SKIPPED builds. However, I would stick to the current blue-300/info-100 colour as I find it much clearer to differentiate from the other colours and the cyan used here looks way to light.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8518e24e_2627a6ed",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-20T13:49:41Z",
+      "side": 1,
+      "message": "I would group those together with either the failure results or the infra failure results. I don\u0027t think it\u0027s worth to spend a dedicated colour only to those.\n\nI would also avoid to use both yellow and orange as they are quite hard to differentiate. Instead I would stick to the current yellow colour.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5f863e4_c7bbe48c",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-20T13:49:41Z",
+      "side": 1,
+      "message": "This is a category that could be worth spending a dedicated color to. Depending on how we split the other results, we might be able to re-use the current yellow color. Otherwise a purple variant might be a good match.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7730add0_d49fb30c",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-20T13:49:41Z",
+      "side": 1,
+      "message": "To me a POST_FAILURE is similar to a FAILURE result and might not be related to job configuration but could also be related to infrastructure or to the build itself (maybe an error in a script or something). I would use the same color as for FAILURE results or move it to the infrastructure/other failure category.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "625da04c_7be46fd6",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-20T13:49:41Z",
+      "side": 1,
+      "message": "How often do we see those results in the UI? I don\u0027t think it\u0027s worth to highlight those. As those are all \"failed\" results I would also use infra/other failure color for them.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
