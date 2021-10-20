@@ -16,6 +16,24 @@
       "message": "This method should return the created object.\n\nnit: As noted elsewhere I\u0027d rather not use `self` for the object here as this can be confusing.",
       "revId": "8212c1277af5cd5574df98104934abbde98add53",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ea26f57_837b3684",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2272,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:50:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8aee1ac4_56771f68",
+      "revId": "8212c1277af5cd5574df98104934abbde98add53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
