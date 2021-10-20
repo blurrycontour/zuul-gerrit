@@ -5471,6 +5471,7 @@ class TestScheduler(ZuulTestCase):
         self.commitConfigUpdate('org/common-config',
                                 'layouts/reconfigure-window2.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         queue = tenant.layout.pipelines['gate'].queues[0]
         # Even though we have configured a smaller window, the value
@@ -5529,6 +5530,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 4)
 
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         queue = tenant.layout.pipelines['gate'].queues[0]
         self.assertEqual(queue.window, 1)
