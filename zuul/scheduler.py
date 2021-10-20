@@ -1132,11 +1132,13 @@ class Scheduler(threading.Thread):
     def _reenqueueGetProject(self, tenant, item):
         project = item.change.project
         # Attempt to get the same project as the one passed in.  If
-        # the project is now found on a different connection, return
-        # the new version of the project.  If it is no longer
-        # available (due to a connection being removed), return None.
+        # the project is now found on a different connection or if it
+        # is no longer available (due to a connection being removed),
+        # return None.
         (trusted, new_project) = tenant.getProject(project.canonical_name)
         if new_project:
+            if project.connection_name != new_project.connection_name:
+                return None
             return new_project
 
         if item.live:
