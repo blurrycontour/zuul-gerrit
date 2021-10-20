@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "590376f0_cd11333e",
+        "filename": "tests/fixtures/config/pragma-include/main.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-20T19:59:11Z",
+      "side": 1,
+      "message": "oops, pipeline should not be included, it\u0027s actually not possible to include pipeline from untrusted-projects.",
+      "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
