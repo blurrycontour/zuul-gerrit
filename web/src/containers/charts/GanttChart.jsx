@@ -43,8 +43,8 @@ function BuildsetGanttChart(props) {
     const data = sortedByStartTime.map((build) => {
         return {
             x: build.job_name,
-            y0: (moment.utc(build.start_time).tz(timezone) - origin) / 1000,
-            y: (moment.utc(build.end_time).tz(timezone) - origin) / 1000,
+            y0: build.start_time ? (moment.utc(build.start_time).tz(timezone) - origin) / 1000 : 0,
+            y: build.end_time ? (moment.utc(build.end_time).tz(timezone) - origin) / 1000 : 0,
             result: build.result,
             started: moment.utc(build.start_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
             ended: moment.utc(build.end_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
