@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dd30e79_e79ce36e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1210,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T15:20:54Z",
+      "side": 1,
+      "message": "I think I don\u0027t fully understand this. AFAIKS the pipeline window is only passed to change queues as the initial start value but never adjusted. I don\u0027t see why we need to use the max of the old pipeline window and the new window floor.",
+      "revId": "19adac27d93fcde15e8ac68a4b95719031303365",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
