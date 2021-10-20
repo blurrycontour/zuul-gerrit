@@ -15,6 +15,7 @@
 
 import abc
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
+import contextlib
 import copy
 import json
 import hashlib
@@ -533,6 +534,7 @@ class PipelineState(zkobject.ZKObject):
         return dict(
             state=Pipeline.STATE_NORMAL,
             queues=[],
+            old_queues=[],
             relative_priority_queues={},
             consecutive_failures=0,
             disabled=False,
@@ -555,7 +557,11 @@ class PipelineState(zkobject.ZKObject):
         try:
             state = cls.fromZK(ctx, cls.pipelinePath(pipeline),
                                pipeline=pipeline)
-            reset_state = {**cls.defaultState(), "pipeline": pipeline}
+            reset_state = {
+                **cls.defaultState(),
+                "pipeline": pipeline,
+                "old_queues": state.old_queues,
+            }
             state.updateAttributes(ctx, **reset_state)
             return state
         except NoNodeError:
@@ -570,19 +576,49 @@ class PipelineState(zkobject.ZKObject):
         safe_pipeline = urllib.parse.quote_plus(pipeline.name)
         return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
 
+    def setOldQueues(self, context, queues):
+        old_queues = OrderedDict()
+        for queue in queues:
+            queue._set(pipeline=self.pipeline)
+            for item in queue.queue:
+                item._set(pipeline=self.pipeline)
+            old_queues[queue.uuid] = queue
+
+        self.updateAttributes(context, old_queues=list(old_queues.values()))
+
+    def removeOldQueue(self, context, queue):
+        with contextlib.suppress(ValueError):
+            self.old_queues.remove(queue)
+            self._save(context)
+
     def serialize(self):
         data = {
             "state": self.state,
             "consecutive_failures": self.consecutive_failures,
             "disabled": self.disabled,
             "queues": [q.getPath() for q in self.queues],
+            "old_queues": [q.getPath() for q in self.old_queues],
         }
         return json.dumps(data).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+        existing_queues = {
+            q.getPath(): q for q in self.queues + self.old_queues
+        }
 
-        existing_queues = {q.getPath(): q for q in self.queues}
+        # Restore the old queues first, so that in case an item is
+        # already in one of the new queues the item(s) ahead/behind
+        # pointers are corrected when restoring the new queues.
+        old_queues_by_path = OrderedDict()
+        for queue_path in data["old_queues"]:
+            queue = existing_queues.get(queue_path)
+            if queue:
+                queue.refresh(context)
+            else:
+                queue = ChangeQueue.fromZK(context, queue_path,
+                                           pipeline=self.pipeline)
+            old_queues_by_path[queue_path] = queue
 
         queues_by_path = OrderedDict()
         for queue_path in data["queues"]:
@@ -596,8 +632,15 @@ class PipelineState(zkobject.ZKObject):
 
         data.update({
             "queues": list(queues_by_path.values()),
+            "old_queues": list(old_queues_by_path.values()),
         })
         return data
+
+    def _getKnownItems(self):
+        items = []
+        for queue in (*self.old_queues, *self.queues):
+            items.extend(queue.queue)
+        return items
 
     def cleanup(self, context):
         pipeline_path = self.getPath()
@@ -605,15 +648,30 @@ class PipelineState(zkobject.ZKObject):
             all_items = set(context.client.get_children(
                 f"{pipeline_path}/item"))
         except NoNodeError:
-            return
+            all_items = set()
 
-        known_items = {item.uuid for item in self.pipeline.getAllItems()}
+        known_items = {i.uuid for i in self._getKnownItems()}
         stale_items = all_items - known_items
         for item_uuid in stale_items:
             self.pipeline.manager.log.debug("Cleaning up stale item %s",
                                             item_uuid)
             context.client.delete(QueueItem.itemPath(pipeline_path, item_uuid),
                                   recursive=True)
+
+        try:
+            all_queues = set(context.client.get_children(
+                f"{pipeline_path}/queue"))
+        except NoNodeError:
+            all_queues = set()
+
+        known_queues = {q.uuid for q in (*self.old_queues, *self.queues)}
+        stale_queues = all_queues - known_queues
+        for queue_uuid in stale_queues:
+            self.pipeline.manager.log.debug("Cleaning up stale queue %s",
+                                            queue_uuid)
+            context.client.delete(
+                ChangeQueue.queuePath(pipeline_path, queue_uuid),
+                recursive=True)
 
 
 class ChangeQueue(zkobject.ZKObject):
@@ -714,7 +772,11 @@ class ChangeQueue(zkobject.ZKObject):
 
     def getPath(self):
         pipeline_path = self.pipeline.state.getPath()
-        return f"{pipeline_path}/queue/{self.uuid}"
+        return self.queuePath(pipeline_path, self.uuid)
+
+    @classmethod
+    def queuePath(cls, pipeline_path, queue_uuid):
+        return f"{pipeline_path}/queue/{queue_uuid}"
 
     @property
     def zk_context(self):
