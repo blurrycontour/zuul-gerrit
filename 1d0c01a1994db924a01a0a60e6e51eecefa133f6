@@ -16,6 +16,23 @@
       "message": "This should be:\n\n  \"project_branches\": [tuple(pb) for pb in data[\"project_branches\"]],",
       "revId": "1d0c01a1994db924a01a0a60e6e51eecefa133f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18e3ac9a_dd9e229d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:13:18Z",
+      "side": 1,
+      "message": "I think there is no need to include the layout UUID in the path.",
+      "revId": "1d0c01a1994db924a01a0a60e6e51eecefa133f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
