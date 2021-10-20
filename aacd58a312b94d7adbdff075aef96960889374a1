@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f0d4a83_adb3f9fc",
+        "filename": "zuul/model.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 2718,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T12:11:18Z",
+      "side": 1,
+      "message": "Need to also add the UUID",
+      "revId": "aacd58a312b94d7adbdff075aef96960889374a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
