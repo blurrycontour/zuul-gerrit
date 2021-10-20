@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "445b521c_a98f929b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1558,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-20T10:58:43Z",
+      "side": 1,
+      "message": "nit: Maybe we should call the object `job` or `obj` instead of self as this might be confusing.",
+      "revId": "eac6b1aa7294f24e0341ccb6592f9e107dfc9528",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
