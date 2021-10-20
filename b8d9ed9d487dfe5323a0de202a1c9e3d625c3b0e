@@ -33,6 +33,24 @@
       "message": "This is the thing that concerns me a bit.  We apparently thought pragma was special enough we should always obey it.  But I agree you have found a situation where you don\u0027t want it.  And basically anyone with a tenant config with \u0027include\u0027 will need to make a change in order to keep the status quo.\n\nWhat we have now \"include: [\u0027job\u0027]\" is so simple, straightforward, and intuitive, and \u0027pragma\u0027 is such a weird and advanced concept, I sort of hesitate to suggest that everyone should need to remember to \"include\" pragma in order for jobs to work as intended.\n\nIf we keep the change as-is, we should probably at least split it into two in order to let people add pragma as a no-op now, then make the actual change shortly afterwords.\n\nBut I wonder if, instead, we could do something like make pragma \"exclude only\".  Like, it\u0027s always included unless you add an exclude line.  So if I remember your case correctly, it would be:\n  include: job\n  exclude: pragma\n\nMaybe that would be a reasonable compromise between having the ability to disable it, but having things work as expected/designed by default?",
       "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb116ea4_94fe218c",
+        "filename": "zuul/releasenotes/notes/load-pragma-fd262897ed348f55.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-20T20:32:44Z",
+      "side": 1,
+      "message": "That would work, but I wonder in which situation do we actually want to include the pragma?",
+      "parentUuid": "1b5ee053_5c281632",
+      "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
