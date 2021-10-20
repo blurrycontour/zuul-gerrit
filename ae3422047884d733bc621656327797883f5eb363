@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd6ac634_e53bb021",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-20T22:10:30Z",
+      "side": 1,
+      "message": "Thank you for the feedback. I agree our issue should be solved by removing the pragma from the devstack configuration. But since this can always happen to a third party system, it seems important to enable excluding pragma. I think that should be the default as I don\u0027t see a use for pragma outside of integrated system",
+      "revId": "ae3422047884d733bc621656327797883f5eb363",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
