@@ -16,7 +16,14 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Button, Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
+import {
+  Button,
+  Flex,
+  FlexItem,
+  List,
+  ListItem,
+  Title,
+} from '@patternfly/react-core'
 import {
   CodeIcon,
   CodeBranchIcon,
@@ -39,25 +46,86 @@ function Buildset({ buildset, timezone, tenant }) {
   const buildset_link = buildExternalLink(buildset)
   const [isGanttChartModalOpen, setIsGanttChartModalOpen] = useState(false)
 
-  const firstStartBuild = buildset.builds.reduce(
-    (prev, cur) => (prev.start_time < cur.start_time ? prev : cur)
-  )
-  const lastEndBuild = buildset.builds.reduce(
-    (prev, cur) => (prev.end_time > cur.end_time ? prev : cur)
-  )
-  const totalDuration = (
-    moment.utc(lastEndBuild.end_time).tz(timezone)
-    - moment.utc(firstStartBuild.start_time).tz(timezone)) / 1000
+  function renderBuildTimes() {
+    const firstStartBuild = buildset.builds.reduce((prev, cur) =>
+      prev.start_time < cur.start_time ? prev : cur
+    )
+    const lastEndBuild = buildset.builds.reduce((prev, cur) =>
+      prev.end_time > cur.end_time ? prev : cur
+    )
+    const totalDuration =
+      (moment.utc(lastEndBuild.end_time).tz(timezone) -
+        moment.utc(firstStartBuild.start_time).tz(timezone)) /
+      1000
 
-  const buildLink = (build) => (
-    <Link
-      to={`${tenant.linkPrefix}/build/${build.uuid}`}
-    >
-      {build.job_name}
-    </Link>
-  )
-  const firstStartLink = buildLink(firstStartBuild)
-  const lastEndLink = buildLink(lastEndBuild)
+    const buildLink = (build) => (
+      <Link to={`${tenant.linkPrefix}/build/${build.uuid}`}>
+        {build.job_name}
+      </Link>
+    )
+    const firstStartLink = buildLink(firstStartBuild)
+    const lastEndLink = buildLink(lastEndBuild)
+
+    return (
+      <Flex flex={{ default: 'flex_1' }}>
+        <FlexItem>
+          <List style={{ listStyle: 'none' }}>
+            <IconProperty
+              WrapElement={ListItem}
+              icon={<OutlinedCalendarAltIcon />}
+              value={
+                <span>
+                  <strong>Starting build </strong>
+                  {firstStartLink} <br />
+                  <i>
+                    (started{' '}
+                    {moment
+                      .utc(firstStartBuild.start_time)
+                      .tz(timezone)
+                      .format('YYYY-MM-DD HH:mm:ss')}
+                    )
+                  </i>
+                  <br />
+                  <strong>Ending build </strong>
+                  {lastEndLink} <br />
+                  <i>
+                    (ended{' '}
+                    {moment
+                      .utc(lastEndBuild.end_time)
+                      .tz(timezone)
+                      .format('YYYY-MM-DD HH:mm:ss')}
+                    )
+                  </i>
+                </span>
+              }
+            />
+            <IconProperty
+              WrapElement={ListItem}
+              icon={<OutlinedClockIcon />}
+              value={
+                <>
+                  <strong>Total duration </strong>
+                  {moment
+                    .duration(totalDuration, 'seconds')
+                    .format('h [hr] m [min] s [sec]')}{' '}
+                  &nbsp;
+                  <Button
+                    key="GanttChartToggle"
+                    variant="secondary"
+                    onClick={() => {
+                      setIsGanttChartModalOpen(true)
+                    }}
+                  >
+                    Show timeline
+                  </Button>
+                </>
+              }
+            />
+          </List>
+        </FlexItem>
+      </Flex>
+    )
+  }
 
   return (
     <>
@@ -134,50 +202,7 @@ function Buildset({ buildset, timezone, tenant }) {
             </List>
           </FlexItem>
         </Flex>
-        <Flex flex={{ default: 'flex_1' }}>
-          <FlexItem>
-            <List style={{ listStyle: 'none' }}>
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<OutlinedCalendarAltIcon />}
-                value={
-                  <span>
-                    <strong>Starting build </strong>
-                    {firstStartLink} <br />
-                    <i>(started {moment
-                      .utc(firstStartBuild.start_time)
-                      .tz(timezone)
-                      .format('YYYY-MM-DD HH:mm:ss')})</i>
-                    <br />
-                    <strong>Ending build </strong>
-                    {lastEndLink} <br />
-                    <i>(ended {moment
-                      .utc(lastEndBuild.end_time)
-                      .tz(timezone)
-                      .format('YYYY-MM-DD HH:mm:ss')})</i>
-                  </span>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<OutlinedClockIcon />}
-                value={
-                  <>
-                    <strong>Total duration </strong>
-                    {moment
-                      .duration(totalDuration, 'seconds')
-                      .format('h [hr] m [min] s [sec]')} &nbsp;
-                    <Button
-                      key='GanttChartToggle'
-                      variant='secondary'
-                      onClick={() => { setIsGanttChartModalOpen(true) }}>Show timeline
-                    </Button>
-                  </>
-                }
-              />
-            </List>
-          </FlexItem>
-        </Flex>
+        {buildset.builds && renderBuildTimes()}
         <Flex flex={{ default: 'flex_1' }}>
           <FlexItem>
             <List style={{ listStyle: 'none' }}>
@@ -198,8 +223,10 @@ function Buildset({ buildset, timezone, tenant }) {
       <ChartModal
         chart={<BuildsetGanttChart builds={buildset.builds} />}
         isOpen={isGanttChartModalOpen}
-        title='Builds Timeline'
-        onClose={() => { setIsGanttChartModalOpen(false) }}
+        title="Builds Timeline"
+        onClose={() => {
+          setIsGanttChartModalOpen(false)
+        }}
       />
     </>
   )
