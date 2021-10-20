@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9f4a90f_e2dd9365",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-20T16:20:12Z",
+      "side": 1,
+      "message": "Nit it is actually a dict.",
+      "range": {
+        "startLine": 235,
+        "startChar": 14,
+        "endLine": 235,
+        "endChar": 18
+      },
+      "revId": "1df09a82ef67e9536bce76b9ef071756f9164faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
