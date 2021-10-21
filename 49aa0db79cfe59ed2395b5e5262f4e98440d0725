@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffa86a47_f1911ba8",
+        "filename": "requirements.txt",
+        "patchSetId": 19
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 23851
+      },
+      "writtenOn": "2021-10-21T08:02:01Z",
+      "side": 1,
+      "message": "nit: this is not needed",
+      "range": {
+        "startLine": 15,
+        "startChar": 20,
+        "endLine": 15,
+        "endChar": 29
+      },
+      "revId": "49aa0db79cfe59ed2395b5e5262f4e98440d0725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbe2ff96_2a84ebce",
+        "filename": "tox.ini",
+        "patchSetId": 19
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 23851
+      },
+      "writtenOn": "2021-10-21T08:02:01Z",
+      "side": 1,
+      "message": "nit: blank space",
+      "range": {
+        "startLine": 47,
+        "startChar": 6,
+        "endLine": 47,
+        "endChar": 7
+      },
+      "revId": "49aa0db79cfe59ed2395b5e5262f4e98440d0725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
