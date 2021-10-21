@@ -5042,7 +5042,8 @@ class TestIncludePragma(ZuulTestCase):
                 name: org/project
                 check:
                   jobs:
-                    - job
+                    - job:
+                        override-checkout: stable
             """)}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)

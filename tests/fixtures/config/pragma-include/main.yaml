@@ -5,6 +5,5 @@
         config-projects:
           - common-config
         untrusted-projects:
-          - common-jobs:
-              exclude: [pragma]
+          - common-jobs
           - org/project
