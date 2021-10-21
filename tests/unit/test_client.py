@@ -57,7 +57,7 @@ class BaseClientTestCase(BaseTestCase):
 
 
 class TestTenantValidationClient(BaseClientTestCase):
-    config_with_zk = False
+    config_with_zk = True
 
     def test_client_tenant_conf_check(self):
         self.config.set(

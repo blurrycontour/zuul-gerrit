@@ -33,6 +33,7 @@ import zuul.manager.serial
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.lib.varnames import check_varnames
+from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.semaphore import SemaphoreHandler
 
 
@@ -1130,8 +1131,9 @@ class PipelineParser(object):
         'dequeue': 'dequeue_actions',
     }
 
-    def __init__(self, pcontext):
+    def __init__(self, connections, pcontext):
         self.log = logging.getLogger("zuul.PipelineParser")
+        self.connections = connections
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
@@ -1275,18 +1277,19 @@ class PipelineParser(object):
             'window-decrease-factor', 2)
 
         manager_name = conf['manager']
+        sql = self.connections.getSqlReporter(None)
         if manager_name == 'dependent':
             manager = zuul.manager.dependent.DependentPipelineManager(
-                self.pcontext.scheduler, pipeline)
+                self.pcontext.scheduler, sql, pipeline)
         elif manager_name == 'independent':
             manager = zuul.manager.independent.IndependentPipelineManager(
-                self.pcontext.scheduler, pipeline)
+                self.pcontext.scheduler, sql, pipeline)
         elif manager_name == 'serial':
             manager = zuul.manager.serial.SerialPipelineManager(
-                self.pcontext.scheduler, pipeline)
+                self.pcontext.scheduler, sql, pipeline)
         elif manager_name == 'supercedent':
             manager = zuul.manager.supercedent.SupercedentPipelineManager(
-                self.pcontext.scheduler, pipeline)
+                self.pcontext.scheduler, sql, pipeline)
 
         pipeline.setManager(manager)
 
@@ -1410,7 +1413,7 @@ class ParseContext(object):
         self.tenant = tenant
         self.ansible_manager = ansible_manager
         self.pragma_parser = PragmaParser(self)
-        self.pipeline_parser = PipelineParser(self)
+        self.pipeline_parser = PipelineParser(self.connections, self)
         self.nodeset_parser = NodeSetParser(self)
         self.secret_parser = SecretParser(self)
         self.job_parser = JobParser(self)
@@ -1447,13 +1450,17 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self, connections, zk_client, scheduler, merger, keystorage,
+                 zuul_globals, statsd):
         self.log = logging.getLogger("zuul.TenantParser")
         self.connections = connections
+        self.zk_client = zk_client
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
-        self.unparsed_config_cache = self.scheduler.unparsed_config_cache
+        self.globals = zuul_globals
+        self.statsd = statsd
+        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue')
@@ -1534,7 +1541,7 @@ class TenantParser(object):
             tenant.authorization_rules = conf['admin-rules']
         if conf.get('authentication-realm') is not None:
             tenant.default_auth_realm = conf['authentication-realm']
-        tenant.web_root = conf.get('web-root', self.scheduler.globals.web_root)
+        tenant.web_root = conf.get('web-root', self.globals.web_root)
         if tenant.web_root and not tenant.web_root.endswith('/'):
             tenant.web_root += '/'
         tenant.allowed_triggers = conf.get('allowed-triggers')
@@ -1603,8 +1610,7 @@ class TenantParser(object):
         tenant.layout = self._parseLayout(
             tenant, parsed_config, loading_errors, layout_uuid)
         tenant.semaphore_handler = SemaphoreHandler(
-            self.scheduler.zk_client, self.scheduler.statsd,
-            tenant.name, tenant.layout
+            self.zk_client, self.statsd, tenant.name, tenant.layout
         )
 
         return tenant
@@ -1786,7 +1792,10 @@ class TenantParser(object):
 
                 extra_config_files = abide.getExtraConfigFiles(project.name)
                 extra_config_dirs = abide.getExtraConfigDirs(project.name)
-                ltime = self.scheduler.zk_client.getCurrentLtime()
+                ltime = self.zk_client.getCurrentLtime()
+                if not self.merger:
+                    raise RuntimeError(
+                        "Cannot load config files without a merger client.")
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
@@ -2200,8 +2209,12 @@ class TenantParser(object):
 
         self._addLayoutItems(layout, tenant, data)
 
-        for pipeline in layout.pipelines.values():
-            pipeline.manager._postConfig(layout)
+        # Only call the postConfig hook if we have a scheduler as this will
+        # change data in ZooKeeper. In case we are in a zuul-web context,
+        # we don't want to do that.
+        if self.scheduler:
+            for pipeline in layout.pipelines.values():
+                pipeline.manager._postConfig(layout)
 
         return layout
 
@@ -2209,13 +2222,17 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self, connections, zk_client, zuul_globals, statsd=None,
+                 scheduler=None, merger=None, keystorage=None):
         self.connections = connections
+        self.zk_client = zk_client
+        self.globals = zuul_globals
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
-        self.tenant_parser = TenantParser(connections, scheduler,
-                                          merger, self.keystorage)
+        self.tenant_parser = TenantParser(
+            connections, zk_client, scheduler, merger, keystorage,
+            zuul_globals, statsd)
         self.admin_rule_parser = AuthorizationRuleParser()
 
     def expandConfigPath(self, config_path):
