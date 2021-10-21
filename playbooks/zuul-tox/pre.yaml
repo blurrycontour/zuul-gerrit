@@ -1,4 +1,6 @@
 - hosts: all
   roles:
+    - ensure-dstat-graph
+    - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
