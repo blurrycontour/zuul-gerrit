@@ -832,7 +832,8 @@ class Client(zuul.cmd.ZuulApp):
 
         sched = SchedulerConfig(self.config, self.connections)
         loader = configloader.ConfigLoader(
-            sched.connections, sched, None, None)
+            sched.connections, sched.zk_client, sched.globals, sched.statsd,
+            sched)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
         unparsed_abide = loader.readConfig(tenant_config, from_script=script)
         try:
