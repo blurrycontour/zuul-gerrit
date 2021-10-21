@@ -49,7 +49,10 @@
     description: |
       Zuul unit tests with ZooKeeper running
     parent: tox
-    nodeset: ubuntu-bionic
+    nodeset:
+      nodes:
+        - name: ubuntu-bionic
+          label: ubuntu-bionic-32GB
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
