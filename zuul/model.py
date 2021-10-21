@@ -3735,10 +3735,12 @@ class QueueItem(zkobject.ZKObject):
 
     def resetAllBuilds(self):
         context = self.pipeline.manager.current_context
+        old_build_set = self.current_build_set
         self.updateAttributes(
             context,
             current_build_set=BuildSet.new(context, item=self),
             layout_uuid=None)
+        old_build_set.delete(context)
 
     def addBuild(self, build):
         self.current_build_set.addBuild(build)
