@@ -103,6 +103,24 @@
       "message": "I may hove not been clear.  Here is an example of how the branch matcher pragma was intended to be used:\n\nOpenStack Cinder interacts with Ceph.  They both have branch codenames based on their release.\n\nThe cinder stable/pike branch is designed to work with the ceph stable/jewel branch.  In that case, the cinder project should add the pragma:\n\nimplied-branches:\n - stable/pike\n - stable/jewel\n\nNo matter what system you load cinder into, the stable/pike branch of cinder is designed to work with the stable/jewel branch of ceph.",
       "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf810234_fab50230",
+        "filename": "zuul/releasenotes/notes/load-pragma-fd262897ed348f55.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-10-21T01:23:20Z",
+      "side": 1,
+      "message": "How a project\u0027s branch named `foo` designed to work with `pike` is supposed to use the cinder job? Should it be added to the implied-branches pragma, or does it have to use custom override-checkout for both ceph and cinder?",
+      "parentUuid": "f1249d46_383269e4",
+      "revId": "b8d9ed9d487dfe5323a0de202a1c9e3d625c3b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
