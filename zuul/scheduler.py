@@ -745,7 +745,8 @@ class Scheduler(threading.Thread):
             self.primeSystemConfig()
 
         loader = configloader.ConfigLoader(
-            self.connections, self, self.merger, self.keystore)
+            self.connections, self.zk_client, self.globals, self.statsd, self,
+            self.merger, self.keystore)
         new_tenants = (set(self.unparsed_abide.tenants)
                        - self.abide.tenants.keys())
 
@@ -755,6 +756,8 @@ class Scheduler(threading.Thread):
                 # In case we don't have a cached layout state we need to
                 # acquire the write lock since we load a new tenant.
                 if layout_state is None:
+                    # TODO (felix): zuul-web should only use a read lock
+                    # -> continue
                     tlock = tenant_write_lock(self.zk_client, tenant_name)
                 else:
                     tlock = tenant_read_lock(self.zk_client, tenant_name)
@@ -958,7 +961,8 @@ class Scheduler(threading.Thread):
         # Consider all caches valid (min. ltime -1)
         min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
         loader = configloader.ConfigLoader(
-            self.connections, self, self.merger, self.keystore)
+            self.connections, self.zk_client, self.globals, self.statsd, self,
+            self.merger, self.keystore)
         with self.layout_lock:
             self.log.debug("Updating local layout of tenant %s ", tenant_name)
             tenant = loader.loadTenant(self.abide, tenant_name,
@@ -1002,7 +1006,8 @@ class Scheduler(threading.Thread):
             start = time.monotonic()
 
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger, self.keystore)
+                self.connections, self.zk_client, self.globals, self.statsd,
+                self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             unparsed_abide = loader.readConfig(tenant_config,
                                                from_script=script)
@@ -1056,7 +1061,8 @@ class Scheduler(threading.Thread):
                 default_version=self.globals.default_ansible_version)
 
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger, self.keystore)
+                self.connections, self.zk_client, self.globals, self.statsd,
+                self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
@@ -1136,7 +1142,8 @@ class Scheduler(threading.Thread):
                     ] = event.zuul_event_ltime
 
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger, self.keystore)
+                self.connections, self.zk_client, self.globals, self.statsd,
+                self, self.merger, self.keystore)
             old_tenant = self.abide.tenants.get(event.tenant_name)
             loader.loadTPCs(self.abide, self.unparsed_abide,
                             [event.tenant_name])
@@ -1606,7 +1613,8 @@ class Scheduler(threading.Thread):
     def primeSystemConfig(self):
         with self.layout_lock:
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger, self.keystore)
+                self.connections, self.zk_client, self.globals, self.statsd,
+                self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
@@ -1621,7 +1629,8 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=self.globals.default_ansible_version)
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger, self.keystore)
+                self.connections, self.zk_client, self.globals, self.statsd,
+                self, self.merger, self.keystore)
             loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
 

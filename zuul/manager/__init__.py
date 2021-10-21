@@ -53,7 +53,7 @@ class StaticChangeQueueContextManager(object):
 class PipelineManager(metaclass=ABCMeta):
     """Abstract Base Class for enqueing and processing Changes in a Pipeline"""
 
-    def __init__(self, sched, pipeline):
+    def __init__(self, sched, sql, pipeline):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
@@ -63,7 +63,7 @@ class PipelineManager(metaclass=ABCMeta):
         self.ref_filters = []
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
-        self.sql = self.sched.sql
+        self.sql = sql
         # A small local cache to avoid hitting the ZK-based connection
         # change cache for multiple hits in the same pipeline run.
         self._change_cache = {}
@@ -888,7 +888,8 @@ class PipelineManager(metaclass=ABCMeta):
         # Late import to break an import loop
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
-            self.sched.connections, self.sched, None, None)
+            self.sched.connections, self.sched.zk_client, self.sched.globals,
+            self.sched.statsd, self.sched)
 
         log.debug("Loading dynamic layout")
 
