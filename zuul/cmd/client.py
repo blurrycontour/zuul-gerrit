@@ -31,6 +31,7 @@ import urllib.parse
 import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
+from zuul.model import SystemAttributes
 from zuul.zk import ZooKeeperClient
 from zuul.lib.keystorage import KeyStorage
 
@@ -830,9 +831,12 @@ class Client(zuul.cmd.ZuulApp):
                 self.connections = connections
                 self.unparsed_config_cache = None
 
-        sched = SchedulerConfig(self.config, self.connections)
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        zuul_globals = SystemAttributes.fromConfig(self.config)
         loader = configloader.ConfigLoader(
-            sched.connections, sched, None, None)
+            self.connections, zk_client, zuul_globals)
+        sched = SchedulerConfig(self.config, self.connections)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
         unparsed_abide = loader.readConfig(tenant_config, from_script=script)
         try:

@@ -65,12 +65,14 @@ class PipelineManager(metaclass=ABCMeta):
         self.ref_filters = []
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
-        self.sql = self.sched.sql
         # A small local cache to avoid hitting the ZK-based connection
         # change cache for multiple hits in the same pipeline run.
         self._change_cache = {}
         # Current ZK context when the pipeline is locked
         self.current_context = None
+
+        if sched:
+            self.sql = sched.sql
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -896,7 +898,8 @@ class PipelineManager(metaclass=ABCMeta):
         # Late import to break an import loop
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
-            self.sched.connections, self.sched, None, None)
+            self.sched.connections, self.sched.zk_client, self.sched.globals,
+            self.sched.statsd, self.sched)
 
         log.debug("Loading dynamic layout")
 
