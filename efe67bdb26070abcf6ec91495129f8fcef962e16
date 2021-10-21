@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d65aa6d4_5ea3fdd3",
+        "filename": "zuul/rpcclient.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-21T16:34:32Z",
+      "side": 1,
+      "message": "Not sure if we should do this now or later, but I think the data we need can be queried now directly via zookeeper with the help of the SystemConfigCache class. It uses zk locking so it would be used to hold a local copy of the config and update itself on callbacks.\n\nThis way we could avoid adding a gearman function now and removing it later again when working towards scale out scheduler (and also be independent from the scheduler).",
+      "revId": "efe67bdb26070abcf6ec91495129f8fcef962e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
