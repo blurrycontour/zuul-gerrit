@@ -16,6 +16,23 @@
       "message": "I think I don\u0027t fully understand this. AFAIKS the pipeline window is only passed to change queues as the initial start value but never adjusted. I don\u0027t see why we need to use the max of the old pipeline window and the new window floor.",
       "revId": "19adac27d93fcde15e8ac68a4b95719031303365",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6053ddd2_0ced1f39",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1210,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-22T01:49:27Z",
+      "side": 1,
+      "message": "Huh.  My guess is that this is ancient code and didn\u0027t get updated during some change to how queues were handled.  Or maybe it never did anything.\n\nI agree it looks like it doesn\u0027t do anything now.\n\nThe intent is that if you set a new floor in the configuration, we should update that.  So the right thing to do would be to adjust all the queue values here.  If you want to punt on that and just remove this and leave a TODO, that wfm.",
+      "revId": "19adac27d93fcde15e8ac68a4b95719031303365",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
