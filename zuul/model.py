@@ -3068,7 +3068,27 @@ class BuildRequest(JobRequest):
         )
 
 
-class Build(object):
+class ResultData(zkobject.ShardedZKObject):
+    # If the node exists already, it is probably a half-written state
+    # from a crash; truncate it and continue.
+    truncate_on_create = True
+
+    def __init__(self):
+        super().__init__()
+        self._set(data={})
+
+    def getPath(self):
+        return self._path
+
+    def serialize(self):
+        data = {
+            "data": self.data,
+            "_path": self._path,
+        }
+        return json.dumps(data).encode("utf8")
+
+
+class Build(zkobject.ZKObject):
     """A Build is an instance of a single execution of a Job.
 
     While a Job describes what to run, a Build describes an actual
@@ -3076,30 +3096,97 @@ class Build(object):
     Job (related builds are grouped together in a BuildSet).
     """
 
-    def __init__(self, job, build_set, uuid, zuul_event_id=None):
-        self.job = job
-        self.build_set = build_set
-        self.uuid = uuid
-        self.url = None
-        self.result = None
-        self.result_data = {}
-        self.error_detail = None
-        self.execute_time = time.time()
-        self.start_time = None
-        self.end_time = None
-        self.estimated_time = None
-        self.canceled = False
-        self.paused = False
-        self.retry = False
-        self.held = False
-        self.parameters = {}
-        self.zuul_event_id = zuul_event_id
+    def __init__(self):
+        super().__init__()
+        self._set(
+            job=None,
+            build_set=None,
+            uuid=uuid4().hex,
+            url=None,
+            result=None,
+            _result_data=None,
+            _secret_result_data=None,
+            error_detail=None,
+            execute_time=time.time(),
+            start_time=None,
+            end_time=None,
+            estimated_time=None,
+            canceled=False,
+            paused=False,
+            retry=False,
+            held=False,
+            zuul_event_id=None,
+            build_request_ref=None,
+        )
 
-        self.build_request_ref = None
+    def serialize(self):
+        data = {
+            "uuid": self.uuid,
+            "url": self.url,
+            "result": self.result,
+            "_result_data": (self._result_data.getPath()
+                             if self._result_data else None),
+            "_secret_result_data": (self._secret_result_data.getPath()
+                                    if self._secret_result_data else None),
+            "error_detail": self.error_detail,
+            "execute_time": self.execute_time,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "estimated_time": self.estimated_time,
+            "canceled": self.canceled,
+            "paused": self.paused,
+            "retry": self.retry,
+            "held": self.held,
+            "zuul_event_id": self.zuul_event_id,
+            "build_request_ref": self.build_request_ref,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
+
+        # Result data can change (between a pause and build
+        # completion) so de-serialize it every time.
+        for k in ('_result_data', '_secret_result_data'):
+            try:
+                if data[k]:
+                    data[k] = ResultData.fromZK(context, data[k])
+            except Exception:
+                self.log.exception("Failed to restore result data")
+                data[k] = None
+        return data
+
+    def getPath(self):
+        return f"{self.job.getPath()}/build/{self.uuid}"
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s>' %
                 (self.uuid, self.job.name, self.job.voting))
+
+    @property
+    def result_data(self):
+        if self._result_data:
+            return self._result_data.data
+        return {}
+
+    @property
+    def secret_result_data(self):
+        if self._secret_result_data:
+            return self._secret_result_data.data
+        return {}
+
+    def setResultData(self, result_data, secret_result_data):
+        if not self._active_context:
+            raise Exception(
+                "setResultData must be used with a context manager")
+        self._result_data = ResultData.new(
+            self._active_context,
+            data=result_data,
+            _path=self.getPath() + '/result_data')
+        self._secret_result_data = ResultData.new(
+            self._active_context,
+            data=secret_result_data,
+            _path=self.getPath() + '/secret_result_data')
 
     @property
     def failed(self):
@@ -3329,9 +3416,9 @@ class BuildSet(zkobject.ZKObject):
     def serialize(self):
         data = {
             # "item": self.item,
-            # "builds": {k, b.getPath() for k,v in self.builds.items()},
-            # "retry_builds": {k, b.getPath()
-            #                  for k,v in self.retry_builds.items()},
+            "builds": {j: b.getPath() for j, b in self.builds.items()},
+            "retry_builds": {j: [b.getPath() for b in l]
+                             for j, l in self.retry_builds.items()},
             "result": self.result,
             "uuid": self.uuid,
             "commit": self.commit,
@@ -3403,30 +3490,57 @@ class BuildSet(zkobject.ZKObject):
                 self.log.exception("Failed to restore extra repo state")
                 data['extra_repo_state'] = None
 
-        data.update({
-            "config_errors": [ConfigurationError.deserialize(d)
-                              for d in data["config_errors"]],
-        })
-
         # Job graphs are immutable
         if self.job_graph is not None:
             data['job_graph'] = self.job_graph
         elif data['job_graph']:
             data['job_graph'] = JobGraph.fromDict(data['job_graph'], self.jobs)
 
+        builds = {}
+        retry_builds = defaultdict(list)
+        # Flatten dict with lists of retried builds
+        existing_retry_builds = {b.getPath(): b
+                                 for bl in self.retry_builds.values()
+                                 for b in bl}
         # jobs (deserialize as separate objects)
         if data['job_graph']:
             for job_name in data['job_graph'].jobs:
                 if job_name in self.jobs:
-                    self.jobs[job_name].refresh(context)
+                    job = self.jobs[job_name]
+                    job.refresh(context)
                 else:
                     job_path = FrozenJob.jobPath(job_name, self.getPath())
                     job = FrozenJob.fromZK(context, job_path, buildset=self)
                     self.jobs[job_name] = job
 
-        # These are local cache objects only valid for one pipeline run
-        data['_old_job_graph'] = None
-        data['_old_jobs'] = {}
+                build_path = data["builds"].get(job_name)
+                if build_path:
+                    if job_name in self.builds:
+                        build = self.builds[job_name]
+                        build.refresh(context)
+                    else:
+                        build = Build.fromZK(
+                            context, build_path, job=job, build_set=self)
+                    builds[job_name] = build
+
+                for retry_path in data["retry_builds"].get(job_name, []):
+                    retry_build = existing_retry_builds.get(retry_path)
+                    if retry_build:
+                        retry_build.refresh(context)
+                    else:
+                        retry_build = Build.fromZK(
+                            context, retry_path, job=job, build_set=self)
+                    retry_builds[job_name].append(retry_build)
+
+        data.update({
+            "builds": builds,
+            "retry_builds": retry_builds,
+            "config_errors": [ConfigurationError.deserialize(d)
+                              for d in data["config_errors"]],
+            # These are local cache objects only valid for one pipeline run
+            '_old_job_graph': None,
+            '_old_jobs': {},
+        })
         return data
 
     @property
@@ -3470,15 +3584,18 @@ class BuildSet(zkobject.ZKObject):
         self.builds[build.job.name] = build
         if build.job.name not in self.tries:
             self.tries[build.job.name] = 1
+        self._save(self.item.pipeline.manager.current_context)
 
     def addRetryBuild(self, build):
         self.retry_builds.setdefault(build.job.name, []).append(build)
+        self._save(self.item.pipeline.manager.current_context)
 
     def removeBuild(self, build):
         if build.job.name not in self.builds:
             return
         self.tries[build.job.name] += 1
         del self.builds[build.job.name]
+        self._save(self.item.pipeline.manager.current_context)
 
     def getBuild(self, job_name):
         return self.builds.get(job_name)
@@ -4113,8 +4230,9 @@ class QueueItem(zkobject.ZKObject):
             job.setArtifactData(data)
         except RequirementsError as e:
             self.warning(str(e))
-            fakebuild = Build(job, self.current_build_set, None)
-            fakebuild.result = 'FAILURE'
+            fakebuild = Build.new(self.pipeline.manager.current_context,
+                                  job=job, build_set=self.current_build_set,
+                                  result='FAILURE')
             self.addBuild(fakebuild)
             self.setResult(fakebuild)
             ret = False
@@ -4350,16 +4468,22 @@ class QueueItem(zkobject.ZKObject):
         for job in skipped:
             child_build = self.current_build_set.getBuild(job.name)
             if not child_build:
-                fakebuild = Build(job, self.current_build_set, None)
-                fakebuild.result = 'SKIPPED'
+                fakebuild = Build.new(self.pipeline.manager.current_context,
+                                      job=job,
+                                      build_set=self.current_build_set,
+                                      result='SKIPPED')
                 self.addBuild(fakebuild)
 
     def setNodeRequestFailure(self, job):
-        fakebuild = Build(job, self.current_build_set, None)
-        fakebuild.start_time = time.time()
-        fakebuild.end_time = time.time()
+        fakebuild = Build.new(
+            self.pipeline.manager.current_context,
+            job=job,
+            build_set=self.current_build_set,
+            start_time=time.time(),
+            end_time=time.time(),
+            result='NODE_FAILURE',
+        )
         self.addBuild(fakebuild)
-        fakebuild.result = 'NODE_FAILURE'
         self.setResult(fakebuild)
 
     def setDequeuedNeedingChange(self):
@@ -4391,8 +4515,9 @@ class QueueItem(zkobject.ZKObject):
 
     def _setAllJobsSkipped(self):
         for job in self.getJobs():
-            fakebuild = Build(job, self.current_build_set, None)
-            fakebuild.result = 'SKIPPED'
+            fakebuild = Build.new(self.pipeline.manager.current_context,
+                                  job=job, build_set=self.current_build_set,
+                                  result='SKIPPED')
             self.addBuild(fakebuild)
 
     def _setMissingJobsSkipped(self):
@@ -4400,8 +4525,9 @@ class QueueItem(zkobject.ZKObject):
             if job.name in self.current_build_set.builds:
                 # We already have a build for this job
                 continue
-            fakebuild = Build(job, None)
-            fakebuild.result = 'SKIPPED'
+            fakebuild = Build.new(self.pipeline.manager.current_context,
+                                  job=job, build_set=self.current_build_set,
+                                  result='SKIPPED')
             self.addBuild(fakebuild)
 
     def getNodePriority(self):
