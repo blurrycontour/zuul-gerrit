@@ -1246,7 +1246,7 @@ class Scheduler(threading.Thread):
                     for build in item.current_build_set.getBuilds():
                         new_job = item.getJob(build.job.name)
                         if new_job:
-                            build.job = new_job
+                            build._set(job=new_job)
                         else:
                             item.removeBuild(build)
                             builds_to_cancel.append(build)
@@ -1979,22 +1979,23 @@ class Scheduler(threading.Thread):
         if not build:
             return
 
-        build.start_time = event.data["start_time"]
+        with build.activeContext(pipeline.manager.current_context):
+            build.start_time = event.data["start_time"]
 
-        log = get_annotated_logger(
-            self.log, build.zuul_event_id, build=build.uuid)
-        try:
-            change = build.build_set.item.change
-            estimate = self.times.getEstimatedTime(
-                pipeline.tenant.name,
-                change.project.name,
-                getattr(change, 'branch', None),
-                build.job.name)
-            if not estimate:
-                estimate = 0.0
-            build.estimated_time = estimate
-        except Exception:
-            log.exception("Exception estimating build time:")
+            log = get_annotated_logger(
+                self.log, build.zuul_event_id, build=build.uuid)
+            try:
+                change = build.build_set.item.change
+                estimate = self.times.getEstimatedTime(
+                    pipeline.tenant.name,
+                    change.project.name,
+                    getattr(change, 'branch', None),
+                    build.job.name)
+                if not estimate:
+                    estimate = 0.0
+                build.estimated_time = estimate
+            except Exception:
+                log.exception("Exception estimating build time:")
         pipeline.manager.onBuildStarted(build)
 
     def _doBuildStatusEvent(self, event, pipeline):
@@ -2003,7 +2004,8 @@ class Scheduler(threading.Thread):
             return
 
         # Allow URL to be updated
-        build.url = event.data.get('url', build.url)
+        build.updateAttributes(pipeline.manager.current_context,
+                               url=event.data.get('url', build.url))
 
     def _doBuildPausedEvent(self, event, pipeline):
         build = self._getBuildFromPipeline(event, pipeline)
@@ -2012,9 +2014,11 @@ class Scheduler(threading.Thread):
 
         # Setting paused is deferred to event processing stage to avoid a race
         # with child job skipping.
-        build.paused = True
-        build.result_data = event.data.get("data", {})
-        build.secret_result_data = event.data.get("secret_data", {})
+        with build.activeContext(pipeline.manager.current_context):
+            build.paused = True
+            build.setResultData(
+                event.data.get("data", {}),
+                event.data.get("secret_data", {}))
 
         pipeline.manager.onBuildPaused(build)
 
@@ -2030,24 +2034,24 @@ class Scheduler(threading.Thread):
             # Create a fake build with a minimal set of attributes that
             # allows reporting the build via SQL and cleaning up build
             # resources.
-            build = Build(
-                Job(event.job_name),
-                None,
-                event.build_uuid,
+            build = Build()
+            build._set(
+                job=Job(event.job_name),
+                uuid=event.build_uuid,
                 zuul_event_id=event.zuul_event_id,
+
+                # Set the build_request_ref on the fake build to make the
+                # cleanup work.
+                build_request_ref=event.build_request_ref,
+
+                # TODO (felix): Do we have to fully evaluate the build
+                # result (see the if/else block with different results
+                # further down) or is it sufficient to just use the result
+                # as-is from the executor since the build is anyways
+                # outdated. In case the build result is None it won't be
+                # changed to RETRY.
+                result=event.data.get("result"),
             )
-
-            # Set the build_request_ref on the fake build to make the
-            # cleanup work.
-            build.build_request_ref = event.build_request_ref
-
-            # TODO (felix): Do we have to fully evaluate the build
-            # result (see the if/else block with different results
-            # further down) or is it sufficient to just use the result
-            # as-is from the executor since the build is anyways
-            # outdated. In case the build result is None it won't be
-            # changed to RETRY.
-            build.result = event.data.get("result")
 
             self._cleanupCompletedBuild(build)
             try:
@@ -2070,45 +2074,45 @@ class Scheduler(threading.Thread):
 
         log.info("Build complete, result %s, warnings %s", result, warnings)
 
-        build.error_detail = event_result.get("error_detail")
+        with build.activeContext(pipeline.manager.current_context):
+            build.error_detail = event_result.get("error_detail")
 
-        if result is None:
-            build.retry = True
-        if result == "ABORTED":
-            # Always retry if the executor just went away
-            build.retry = True
-        if result == "MERGER_FAILURE":
-            # The build result MERGER_FAILURE is a bit misleading here
-            # because when we got here we know that there are no merge
-            # conflicts. Instead this is most likely caused by some
-            # infrastructure failure. This can be anything like connection
-            # issue, drive corruption, full disk, corrupted git cache, etc.
-            # This may or may not be a recoverable failure so we should
-            # retry here respecting the max retries. But to be able to
-            # distinguish from RETRY_LIMIT which normally indicates pre
-            # playbook failures we keep the build result after the max
-            # attempts.
-            if (
-                build.build_set.getTries(build.job.name) < build.job.attempts
-            ):
+            if result is None:
                 build.retry = True
+            if result == "ABORTED":
+                # Always retry if the executor just went away
+                build.retry = True
+            if result == "MERGER_FAILURE":
+                # The build result MERGER_FAILURE is a bit misleading here
+                # because when we got here we know that there are no merge
+                # conflicts. Instead this is most likely caused by some
+                # infrastructure failure. This can be anything like connection
+                # issue, drive corruption, full disk, corrupted git cache, etc.
+                # This may or may not be a recoverable failure so we should
+                # retry here respecting the max retries. But to be able to
+                # distinguish from RETRY_LIMIT which normally indicates pre
+                # playbook failures we keep the build result after the max
+                # attempts.
+                if build.build_set.getTries(
+                        build.job.name) < build.job.attempts:
+                    build.retry = True
 
-        if build.retry:
-            result = "RETRY"
+            if build.retry:
+                result = "RETRY"
 
-        # If the build was canceled, we did actively cancel the job so
-        # don't overwrite the result and don't retry.
-        if build.canceled:
-            result = build.result or "CANCELED"
-            build.retry = False
+            # If the build was canceled, we did actively cancel the job so
+            # don't overwrite the result and don't retry.
+            if build.canceled:
+                result = build.result or "CANCELED"
+                build.retry = False
 
-        build.end_time = event_result["end_time"]
-        build.result_data = result_data
-        build.secret_result_data = secret_result_data
-        build.build_set.warning_messages.extend(warnings)
-        build.held = event_result.get("held")
+            build.end_time = event_result["end_time"]
+            build.setResultData(result_data, secret_result_data)
+            build.build_set.warning_messages.extend(warnings)
+            build.held = event_result.get("held")
 
-        build.result = result
+            build.result = result
+
         self._reportBuildStats(build)
 
         self._cleanupCompletedBuild(build)
@@ -2289,7 +2293,9 @@ class Scheduler(threading.Thread):
                         "for change %s", build, build.build_set.item.change)
 
                 if build.result is None:
-                    build.result = 'CANCELED'
+                    build.updateAttributes(
+                        buildset.item.pipeline.manager.current_context,
+                        result='CANCELED')
 
                 if force:
                     # Directly delete the build rather than putting a
@@ -2309,8 +2315,10 @@ class Scheduler(threading.Thread):
                 if final:
                     # If final is set make sure that the job is not resurrected
                     # later by re-requesting nodes.
-                    fakebuild = Build(job, item.current_build_set, None)
-                    fakebuild.result = 'CANCELED'
+                    fakebuild = Build.new(
+                        buildset.item.pipeline.manager.current_context,
+                        job=job, build_set=item.current_build_set,
+                        result='CANCELED')
                     buildset.addBuild(fakebuild)
         finally:
             # Release the semaphore in any case
