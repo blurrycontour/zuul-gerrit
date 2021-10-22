@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b871d33c_a0ba50ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-22T12:55:11Z",
+      "side": 1,
+      "message": "PS6/7 sorts each component list by hostname and drops the first \"Component\" column to avoid all the duplicated \"executor\", \"merger\", ... strings in the table.",
+      "revId": "29d4c32d74f8d51706112d860a3ac3cb508b59a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
