@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2ec074c_2af3356e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-10-22T12:34:10Z",
+      "side": 1,
+      "message": "\u003e * Maybe we can sort by hostname within each section?\n\u003e   That would probably be good to go ahead and do in this change if it\u0027s not too hard.\n\nGood idea, I will have a look at that. I was also thinking if we should sort the \"categories\" (type of component) in some \"logical\" order. Currently we are relying on the order that comes from the backend/API. E.g. we could do something like Scheduler|Executor|Merger|Web|Fingergw? That would be a hardcoded order, but I think we won\u0027t add new component types very often.\n \n\u003e * Use the refreshable widget so we get the refresh link in the top right?\n\nI will try that out. Honestly I find it always hard to correctly place the refresh icon and we are not consistently using it.\n\n\u003e \n\u003e * I wonder if we can come up with different icons for the components?  I mean, I realize that\u0027s not easy.\n\u003e   Something like a merging arrow for merger.  Maybe gear for executor?  Fingergw is an opportunity for some fun, but maybe we should keep that to ourselves and use a console icon.\n\u003e   This is probably a good followup change so we don\u0027t get hung up on it.\n\nThat\u0027s also a good idea. I like icons :) I will come up with something in a follow-up change.\n",
+      "revId": "2817e7ee46956c144c568a7bfa6b34d3f565383e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
