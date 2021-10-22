@@ -23,6 +23,7 @@ from kazoo.protocol.states import KazooState
 
 from zuul.lib.config import get_default
 from zuul.zk.exceptions import NoClientException
+from zuul.zk.handler import PoolSequentialThreadingHandler
 
 
 class ZooKeeperClient(object):
@@ -126,6 +127,7 @@ class ZooKeeperClient(object):
                 hosts=self.hosts,
                 read_only=self.read_only,
                 timeout=self.timeout,
+                handler=PoolSequentialThreadingHandler(),
             )
             if self.tls_key:
                 args['use_ssl'] = True
