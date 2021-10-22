@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28d9c6ad_7020c50b",
+        "filename": "zuul/zk/handler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-22T16:31:19Z",
+      "side": 1,
+      "message": "Note to reviewers, I think this is probably the only place this would be used:\nhttps://github.com/python-zk/kazoo/blob/master/kazoo/handlers/threading.py#L168\n\nIt seemed the easiest way to avoid having to alter the stop method.",
+      "revId": "820e276876dbf1bbfdd6c75a988c04ee0d4d6764",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
