@@ -259,6 +259,14 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org/org%2Fproject/ssh'))
         self.assertIsNone(
             data.get('/keystorage/gerrit/org/org%2Fproject'))
+        # Ensure that deleting one project in a tree doesn't remove other
+        # projects in that tree.
+        self.assertIsNotNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject1'))
+        self.assertIsNotNone(
+            data.get('/keystorage/gerrit/org/org%2Fproject2'))
+        self.assertIsNotNone(
+            data.get('/keystorage/gerrit/org'))
 
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
@@ -283,6 +291,8 @@ class TestKeyOperations(ZuulTestCase):
         self.assertEqual(p.returncode, 0)
 
         data = self.getZKTree('/keystorage')
+        # Ensure that the last project being removed also removes its
+        # org prefix entry.
         self.assertIsNone(
             data.get('/keystorage/gerrit/org/org%2Fproject1'))
         self.assertIsNone(
