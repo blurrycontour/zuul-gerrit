@@ -43,6 +43,7 @@ class TestInventoryBase(ZuulTestCase):
             A = self.fake_github.openFakePullRequest(
                 'org/project3', 'master', 'A')
             self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.change_A = A
 
         self.waitUntilSettled()
 
@@ -72,9 +73,12 @@ class TestInventoryBase(ZuulTestCase):
         self.waitUntilSettled()
 
     def cancelExecutorJobs(self):
-        executor_client = self.scheds.first.sched.executor
-        for build in self.getCurrentBuilds():
-            executor_client.cancel(build)
+        if self.use_gerrit:
+            self.fake_gerrit.addEvent(
+                self.change_A.getChangeAbandonedEvent())
+        else:
+            self.fake_github.emitEvent(
+                self.change_A.getPullRequestClosedEvent())
 
 
 class TestInventoryGithub(TestInventoryBase):
