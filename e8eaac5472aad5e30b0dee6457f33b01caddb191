@@ -20,6 +20,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7db8ff56_a75b9e7d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3108,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-22T21:52:37Z",
+      "side": 1,
+      "message": "Actually -- maybe we should go ahead and make it a separate object always, so that we can set ourselves up later for the executor more easily just dumping the result data right into this.  I think it will be simpler too.\n\nAlso, need secret_result_data.",
+      "revId": "e8eaac5472aad5e30b0dee6457f33b01caddb191",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5cd447e1_2535bd10",
         "filename": "zuul/model.py",
         "patchSetId": 3
