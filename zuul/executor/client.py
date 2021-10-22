@@ -63,13 +63,13 @@ class ExecutorClient(object):
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 
-        build = Build(
-            job,
-            item.current_build_set,
-            uuid,
+        build = Build.new(
+            pipeline.manager.current_context,
+            job=job,
+            build_set=item.current_build_set,
+            uuid=uuid,
             zuul_event_id=item.event.zuul_event_id,
         )
-        build.parameters = params
 
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
@@ -134,7 +134,8 @@ class ExecutorClient(object):
             precedence=PRIORITY_MAP[pipeline.precedence]
         )
         self.executor_api.submit(request, params)
-        build.build_request_ref = request.path
+        build.updateAttributes(pipeline.manager.current_context,
+                               build_request_ref=request.path)
 
     def cancel(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,
@@ -142,7 +143,9 @@ class ExecutorClient(object):
         # Returns whether a running build was canceled
         log.info("Cancel build %s for job %s", build, build.job)
 
-        build.canceled = True
+        build.updateAttributes(
+            build.build_set.item.pipeline.manager.current_context,
+            canceled=True)
 
         if not build.build_request_ref:
             log.debug("Build has not been submitted to ZooKeeper")
