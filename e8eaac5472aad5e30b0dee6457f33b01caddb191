@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d5273c1_cbeb6962",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3108,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-22T21:25:57Z",
+      "side": 1,
+      "message": "This looks like a good candidate for the JobData trick where we allow up to 10k to stay on this object, otherwise shard.",
+      "revId": "e8eaac5472aad5e30b0dee6457f33b01caddb191",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cd447e1_2535bd10",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-22T21:25:57Z",
+      "side": 1,
+      "message": "It looks like nothing actually uses this right now (all the params go into the build request), so I think we can remove it.",
+      "revId": "e8eaac5472aad5e30b0dee6457f33b01caddb191",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
