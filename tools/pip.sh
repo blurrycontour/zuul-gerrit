@@ -53,7 +53,7 @@ then
         # Be forgiving of package retrieval errors
         attempts=0
         set +e
-        until yarn install --verbose; do
+        until yarn install; do
             ((attempts++))
             if [[ $attempts > 2 ]]
             then
