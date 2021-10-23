@@ -561,6 +561,25 @@ Here is an example of two job definitions:
       In other words, a playbook may not use a role from a different
       branch of the same project.
 
+      If the job is run on a ref (for example, a branch tip or a tag)
+      then a different form of the branch selection process is used.
+      There is no single branch context available for selecting an
+      appropriate branch of the role's repo to check out, so only the
+      following are considered: First the ref specified by
+      :attr:`job.required-projects.override-checkout`, or
+      :attr:`job.override-checkout`.  Then if the role repo is the
+      playbook repo, that branch is used; otherwise the project's
+      default branch is selected.
+
+      .. warning::
+
+         Keep this behavior difference in mind when designing jobs
+         that run on both branches and tags.  If the same job must be
+         used in both circumstances, ensure that any roles from other
+         repos used by playbooks in the job originate only in
+         un-branched repositories.  Otherwise different branches of
+         the role repo may be checked out.
+
       A project which supplies a role may be structured in one of two
       configurations: a bare role (in which the role exists at the
       root of the project), or a contained role (in which the role
