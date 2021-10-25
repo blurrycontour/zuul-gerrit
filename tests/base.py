@@ -3567,13 +3567,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.fail_tests = {}
         self.return_data = {}
         self.job_builds = {}
-
-    def run_governor(self):
-        while not self.governor_stop_event.wait(1):
-            try:
-                self.manageLoad()
-            except Exception:
-                self.log.exception("Exception in governor thread:")
+        self.sensors = []
 
     def failJob(self, name, change):
         """Instruct the executor to report matching builds as failures.
