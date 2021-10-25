@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa91c45c_030b6b15",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T23:22:01Z",
+      "side": 1,
+      "message": "I don\u0027t love this because of the gap in testing it opens up... if we can just do the parent change I think that would be better.  But if we do this, we\u0027ll need to make sure we have some explicit test of the manageLoad method with sensors set.",
+      "revId": "985dbd1c044e791bf1735aa04e1319c2ec26bfc6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
