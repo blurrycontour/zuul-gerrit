@@ -643,6 +643,13 @@ class TestPagureDriver(ZuulTestCase):
 
         # There should be no more changes in the queue
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        # NOTE (felix): This test case is not failing with multiple,
+        # schedulers but I'm thinking if we should keep our eyes open
+        # for assertions like this as they might lead to unexpected
+        # results in a multi scheduler setup. If we only check if the
+        # check pipeline on scheduler-0 is empty, but scheduler-1 is
+        # the one that (for whatever reason) still runs the job, this
+        # assertion would still be successful.
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
     @simple_layout('layouts/crd-pagure.yaml', driver='pagure')
