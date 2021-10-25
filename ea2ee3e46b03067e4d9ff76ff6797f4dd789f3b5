@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a3e60f5_f85b789a",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1484,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T20:09:21Z",
+      "side": 1,
+      "message": "Should this check that the zk path for the object is gone?",
+      "revId": "ea2ee3e46b03067e4d9ff76ff6797f4dd789f3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9db3111_98c5cde9",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T20:09:21Z",
+      "side": 1,
+      "message": "I\u0027m not entirely sure that this check is correct. I think you might want:\n\n  ((not self.lock or self.lock.is_still_valid()) and (not self.stop_event or not self.stop_event.is_set()))\n\nThe reason for this is if either the lock is no longer valid or the stop event is set we should return False because if we\u0027ve lost one then we are no longer valid? But due to precedence I think this can evaluate to true if there is no lock at all but we have a stop event that has been set:\n\n  \u003e\u003e\u003e True or False and False or False\n  True",
+      "revId": "ea2ee3e46b03067e4d9ff76ff6797f4dd789f3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63114f3c_6955b283",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T20:09:21Z",
+      "side": 1,
+      "message": "Nit this docstring seems to belong to serialize not deserialize.",
+      "range": {
+        "startLine": 53,
+        "startChar": 11,
+        "endLine": 53,
+        "endChar": 66
+      },
+      "revId": "ea2ee3e46b03067e4d9ff76ff6797f4dd789f3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fed02890_5eb5c29a",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T20:09:21Z",
+      "side": 1,
+      "message": "Why not update the local contents after updating zk? Then we don\u0027t need to rollback?",
+      "revId": "ea2ee3e46b03067e4d9ff76ff6797f4dd789f3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
