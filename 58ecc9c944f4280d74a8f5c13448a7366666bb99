@@ -33,6 +33,24 @@
       "message": "Could we just make the wait a class constant that we override in tests, that way we don\u0027t have to override the whole method (which makes it untested)?",
       "revId": "58ecc9c944f4280d74a8f5c13448a7366666bb99",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd3910a5_0054c385",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3572,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T23:24:15Z",
+      "side": 1,
+      "message": "Yes, we could do that. I actually half expect this change won\u0027t be sufficient which is why I also pushed the followup. But I\u0027ll update this change in case it does become sufficient and we want to merge it as is.",
+      "parentUuid": "a8acd5ef_e5e1fdf8",
+      "revId": "58ecc9c944f4280d74a8f5c13448a7366666bb99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
