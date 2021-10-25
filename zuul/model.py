@@ -630,6 +630,22 @@ class PipelineState(zkobject.ZKObject):
                                            pipeline=self.pipeline)
             queues_by_path[queue_path] = queue
 
+        if hasattr(self.pipeline.manager, "change_queue_managers"):
+            # Clear out references to old queues
+            for cq_manager in self.pipeline.manager.change_queue_managers:
+                cq_manager.created_for_branches.clear()
+
+            # Add queues to matching change queue managers
+            for queue in queues_by_path.values():
+                project_cname, branch = queue.project_branches[0]
+                for cq_manager in self.pipeline.manager.change_queue_managers:
+                    managed_projects = {
+                        p.canonical_name for p in cq_manager.projects
+                    }
+                    if project_cname in managed_projects:
+                        cq_manager.created_for_branches[branch] = queue
+                        break
+
         data.update({
             "queues": list(queues_by_path.values()),
             "old_queues": list(old_queues_by_path.values()),
