@@ -920,6 +920,7 @@ class TestTenantExtra(TenantParserTestCase):
 
 class TestTenantDuplicate(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/duplicate.yaml'
+    scheduler_count = 1
 
     def setUp(self):
         with testtools.ExpectedException(Exception, 'Duplicate configuration'):
