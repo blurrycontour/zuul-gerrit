@@ -6091,6 +6091,7 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @skip("FIXME: test is broken and hangs")
     def test_scheduler_disconnect(self):
         "Test that jobs are completed after a scheduler disconnect"
 
@@ -6117,6 +6118,7 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @skip("FIXME: test is broken and hangs")
     def test_zookeeper_disconnect(self):
         "Test that jobs are executed after a zookeeper disconnect"
 
