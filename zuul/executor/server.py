@@ -31,6 +31,8 @@ import threading
 import time
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
+import sys
+import traceback
 
 from kazoo.exceptions import NoNodeError
 import git
@@ -1021,8 +1023,12 @@ class AnsibleJob(object):
         self._resume_event.set()
 
     def wait(self):
+        self.log.debug("FE: self.thread %s", self.thread)
+
         if self.thread:
+            #traceback.print_stack(sys._current_frames()[self.thread.ident])
             self.thread.join()
+        self.log.debug("FE: thread joined")
 
     def execute(self):
         try:
