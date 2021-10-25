@@ -4846,6 +4846,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.scheds = SchedulerTestManager(self.validate_tenants)
         self.createScheduler()
+        self.createScheduler()
 
         self.merge_server = None
 
