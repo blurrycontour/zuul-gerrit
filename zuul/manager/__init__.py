@@ -836,6 +836,9 @@ class PipelineManager(metaclass=ABCMeta):
         old_build_set = item.current_build_set
         jobs_to_cancel = item.getJobs()
 
+        for job in jobs_to_cancel:
+            self.sched.cancelJob(old_build_set, job)
+
         # Don't reset builds for a failing bundle when it has already started
         # reporting, to keep available build results. Those items will be
         # reported immediately afterwards during queue processing.
@@ -847,9 +850,6 @@ class PipelineManager(metaclass=ABCMeta):
                 item.current_build_set, 'dequeue', final=False,
                 result='DEQUEUED')
             item.resetAllBuilds()
-
-        for job in jobs_to_cancel:
-            self.sched.cancelJob(old_build_set, job)
 
         for item_behind in item.items_behind:
             log.debug("Canceling jobs for change %s, behind change %s",
