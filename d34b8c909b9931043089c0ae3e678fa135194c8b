@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0363226_ab8b7f73",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 34
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T23:10:20Z",
+      "side": 1,
+      "message": "Er, this is poorly named, will update, sorry.",
+      "revId": "d34b8c909b9931043089c0ae3e678fa135194c8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
