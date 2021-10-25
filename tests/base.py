@@ -131,6 +131,8 @@ import tests.fakegithub
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 KEEP_TEMPDIRS = bool(os.environ.get('KEEP_TEMPDIRS', False))
+# FIXME (swestphahl): Use one scheduler by default
+SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 2))
 
 
 def repack_repo(path):
@@ -4668,6 +4670,7 @@ class ZuulTestCase(BaseTestCase):
     log_console_port: int = 19885
     fake_sql: bool = False
     validate_tenants = None
+    scheduler_count = SCHEDULER_COUNT
 
     def __getattr__(self, name):
         """Allows to access fake connections the old way, e.g., using
@@ -4845,7 +4848,8 @@ class ZuulTestCase(BaseTestCase):
         self.builds = self.executor_server.running_builds
 
         self.scheds = SchedulerTestManager(self.validate_tenants)
-        self.createScheduler()
+        for _ in range(self.scheduler_count):
+            self.createScheduler()
 
         self.merge_server = None
 
