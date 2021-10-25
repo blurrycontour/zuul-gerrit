@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d497b515_3448a74c",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 2725,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T21:43:33Z",
+      "side": 1,
+      "message": "Exactly; the buildsets aren\u0027t in ZK yet, so serializing this isn\u0027t useful at this point.  It\u0027s added in https://review.opendev.org/812452",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cb69dfc_ae3cdcaf",
@@ -35,6 +52,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6d58515_9de3b2b5",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 2784,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T21:43:33Z",
+      "side": 1,
+      "message": "We\u0027re promoting the dynamic_state object from a plain dict to a defaultdict.\n\nThis is part of a pattern that happens in a lot of these deserialize methods.  Remember that the parent deserialize is just going to turn a json-bytestring into a dict of scalars.  But these objects have some attributes which are more complex.  So we need to turn some of those scalars into real objects.  \"change\" becomes an actual Change object, and dynamic_state becomes a defaultdict object.",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f01547ee_30635972",
@@ -48,6 +82,23 @@
       "writtenOn": "2021-10-25T21:22:13Z",
       "side": 1,
       "message": "It isn\u0027t clear to me why we need to set the context on the pipeline manager while we do this? We pass contenxt to reenqueuePipeline() and refer to it directly there.",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01eb44c7_2f5be26f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 1180,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T21:43:33Z",
+      "side": 1,
+      "message": "Setting currentContext allows any of the model objects to use their internal references up the chain to the pipeline to set attributes.  For example, reEnqueueItem calls ChangeQueue.enqueueItem which calls item.updateAttributes using the pipeline context.",
       "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
