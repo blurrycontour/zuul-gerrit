@@ -3569,6 +3569,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.fail_tests = {}
         self.return_data = {}
         self.job_builds = {}
+        self.sensors = []
 
     def failJob(self, name, change):
         """Instruct the executor to report matching builds as failures.
