@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "6a6b583d_f8fc72a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T23:18:19Z",
+      "side": 1,
+      "message": "https://zuul.opendev.org/t/zuul/build/96d222c7f0554b01a783ab9005459473/log/job-output.txt#11047 shows us governing during a failed test. Logging doesn\u0027t report every failure after that but I suspect at least part of the issue is we are evaluating things too slowly? That said system load may also be a slow to update value?",
+      "revId": "58ecc9c944f4280d74a8f5c13448a7366666bb99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a8acd5ef_e5e1fdf8",
         "filename": "tests/base.py",
         "patchSetId": 1
