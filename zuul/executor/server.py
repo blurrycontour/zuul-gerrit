@@ -3037,6 +3037,8 @@ class ExecutorServer(BaseMergeServer):
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
+    # Number of seconds between consulting the Governor sensors.
+    GOVERNOR_SENSOR_WAIT = 10
 
     def __init__(
         self,
@@ -3618,7 +3620,7 @@ class ExecutorServer(BaseMergeServer):
             self.completeBuild(build_request, result)
 
     def run_governor(self):
-        while not self.governor_stop_event.wait(10):
+        while not self.governor_stop_event.wait(self.GOVERNOR_SENSOR_WAIT):
             try:
                 self.manageLoad()
             except Exception:

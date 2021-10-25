@@ -3551,6 +3551,8 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
     _job_class = RecordingAnsibleJob
 
+    GOVERNOR_SENSOR_WAIT = 1
+
     def __init__(self, *args, **kw):
         self._run_ansible = kw.pop('_run_ansible', False)
         self._test_root = kw.pop('_test_root', False)
