@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2872c25_6a88134b",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:42:04Z",
+      "side": 1,
+      "message": "Nit we used klass elsewhere.",
+      "range": {
+        "startLine": 422,
+        "startChar": 21,
+        "endLine": 422,
+        "endChar": 24
+      },
+      "revId": "36f558fdbead49d75d9e92ac265ede8022384ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a390c78_e581b253",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:42:04Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 433,
+        "startChar": 22,
+        "endLine": 433,
+        "endChar": 25
+      },
+      "revId": "36f558fdbead49d75d9e92ac265ede8022384ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a5fd708_32af4c45",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:42:04Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 447,
+        "startChar": 21,
+        "endLine": 447,
+        "endChar": 24
+      },
+      "revId": "36f558fdbead49d75d9e92ac265ede8022384ffe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
