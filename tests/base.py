@@ -130,7 +130,7 @@ import tests.fakegitlab
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 KEEP_TEMPDIRS = bool(os.environ.get('KEEP_TEMPDIRS', False))
-SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 1))
+SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 2))
 
 
 def repack_repo(path):
