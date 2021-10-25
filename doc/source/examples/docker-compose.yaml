@@ -4,14 +4,14 @@ version: '2'
 
 services:
   gerrit:
-    image: gerritcodereview/gerrit
+    image: docker.io/gerritcodereview/gerrit
     ports:
       - "8080:8080"
       - "29418:29418"
     environment:
       - CANONICAL_WEB_URL=http://localhost:8080/
   gerritconfig:
-    image: zuul/zuul-executor
+    image: docker.io/zuul/zuul-executor
     environment:
       - http_proxy
       - https_proxy
@@ -28,7 +28,7 @@ services:
     # default version of ansible for Zuul.
     command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
   zk:
-    image: zookeeper
+    image: docker.io/zookeeper
     hostname: examples_zk_1.examples_default
     volumes:
       - "./playbooks/:/var/playbooks/:z"
@@ -36,7 +36,7 @@ services:
       - "./zoo.cfg:/conf/zoo.cfg:z"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zkServer.sh start-foreground'"
   mysql:
-    image: mariadb
+    image: docker.io/mariadb
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: zuul
@@ -60,7 +60,7 @@ services:
              zuul-scheduler -f'
     # FIXME: The scheduler has no ansible anymore so use the executor image.
     #        This needs to be changes such that ansible is not required for startup.
-    image: zuul/zuul-scheduler
+    image: docker.io/zuul/zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -76,7 +76,7 @@ services:
       - mysql
     ports:
       - "9000:9000"
-    image: zuul/zuul-web
+    image: docker.io/zuul/zuul-web
     environment:
       ZUUL_MYSQL_PASSWORD: secret
     volumes:
@@ -92,7 +92,7 @@ services:
       - ZUUL_MYSQL_PASSWORD=secret
     depends_on:
       - scheduler
-    image: zuul/zuul-executor
+    image: docker.io/zuul/zuul-executor
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -113,7 +113,7 @@ services:
   launcher:
     depends_on:
       - zk
-    image: zuul/nodepool-launcher
+    image: docker.io/zuul/nodepool-launcher
     volumes:
       - "./playbooks/:/var/playbooks/:z"
       - "./etc_nodepool/:/etc/nodepool/:z"
