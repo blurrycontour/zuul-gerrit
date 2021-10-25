@@ -16,6 +16,23 @@
       "message": "debug leftover",
       "revId": "4a785d5174d68590d357bfadda87010c9582b380",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8da36f1_3b45d9b2",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T20:27:01Z",
+      "side": 1,
+      "message": "This print should be cleaned up.",
+      "revId": "4a785d5174d68590d357bfadda87010c9582b380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
