@@ -16,6 +16,23 @@
       "message": "As an idea for future optimization. Some callers (e.g. the pipeline manager) sets some attributes manually (some via updateAttributes, some via the context manager) and later calls methods like this. I think we could save zookeeper round trips if we check for an active context here and just set the attributes in this case. This way we broaden the context managers use in the calling method and batch more zk round trips.",
       "revId": "e89cff28ef07ef69afb5ddfb07139a8962f0dfef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fb905ef_6a039a86",
+        "filename": "zuul/model.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 2801,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T15:57:09Z",
+      "side": 1,
+      "message": "That sounds like a good idea.",
+      "revId": "e89cff28ef07ef69afb5ddfb07139a8962f0dfef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
