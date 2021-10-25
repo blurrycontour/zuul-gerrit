@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11266ea5_897da502",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T18:01:55Z",
+      "side": 1,
+      "message": "We can propbably drop this mock in favor of the local zk context later.",
+      "revId": "95cf1f97ed55f5835175dc1ec13f60d28f4a36c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25c4cd39_41ac16d3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T18:01:55Z",
+      "side": 1,
+      "message": "[note] reportStats has an internal exception handler, so it won\u0027t raise an exception here, which is good.",
+      "revId": "95cf1f97ed55f5835175dc1ec13f60d28f4a36c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
