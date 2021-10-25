@@ -49,7 +49,7 @@
     description: |
       Zuul unit tests with ZooKeeper running
     parent: tox
-    nodeset: ubuntu-bionic
+    nodeset: ubuntu-focal
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
@@ -99,6 +99,7 @@
     vars:
       tox_envlist: py36
       python_version: 3.6
+    nodeset: ubuntu-bionic
 
 - job:
     name: zuul-tox-py38
@@ -195,8 +196,8 @@
     allowed-projects: zuul/zuul
     timeout: 2700  # 45 minutes
     requires:
-      - python-builder-3.8-container-image
-      - python-base-3.8-container-image
+      - python-builder-3.8-bullseye-container-image
+      - python-base-3.8-bullseye-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
       docker_images:
@@ -234,8 +235,8 @@
     description: Build Docker images and upload to Docker Hub.
     allowed-projects: zuul/zuul
     requires:
-      - python-builder-3.8-container-image
-      - python-base-3.8-container-image
+      - python-builder-3.8-bullseye-container-image
+      - python-base-3.8-bullseye-container-image
     provides: zuul-container-image
     secrets:
       name: docker_credentials
