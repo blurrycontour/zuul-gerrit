@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa74c63c_862e02b2",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-25T21:55:13Z",
+      "side": 1,
+      "message": "I think this logic reversal is why the sort isn\u0027t working.",
+      "revId": "9fc0f108b28baee5f88bd67c0d062c43050d8192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
