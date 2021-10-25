@@ -5668,13 +5668,16 @@ class ZuulTestCase(BaseTestCase):
         # Make sure there are no orphaned jobs
         for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
-                for pipeline_queue in pipeline.queues:
-                    if len(pipeline_queue.queue) != 0:
-                        print('pipeline %s queue %s contents %s' % (
-                            pipeline.name, pipeline_queue.name,
-                            pipeline_queue.queue))
-                    self.assertEqual(len(pipeline_queue.queue), 0,
-                                     "Pipelines queues should be empty")
+                ctx = self.createZKContext()
+                with pipeline.manager.currentContext(ctx):
+                    pipeline.state.refresh(ctx)
+                    for pipeline_queue in pipeline.queues:
+                        if len(pipeline_queue.queue) != 0:
+                            print('pipeline %s queue %s contents %s' % (
+                                pipeline.name, pipeline_queue.name,
+                                pipeline_queue.queue))
+                        self.assertEqual(len(pipeline_queue.queue), 0,
+                                         "Pipelines queues should be empty")
 
     def assertCleanZooKeeper(self):
         # Make sure there are no extraneous ZK nodes
