@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dddab9f_957ba3d2",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 2725,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:22:13Z",
+      "side": 1,
+      "message": "Why not write this uuid?\n\nI guess later changes will serialize more info when we switch to having more state in zk?",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cb69dfc_ae3cdcaf",
+        "filename": "zuul/model.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 2784,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:22:13Z",
+      "side": 1,
+      "message": "dynamic_state is serialized above which means the super().deserialize call on line 2750 will populate this attribute. Are we not able to properly serialize and deserialize this yet?",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f01547ee_30635972",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 1180,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:22:13Z",
+      "side": 1,
+      "message": "It isn\u0027t clear to me why we need to set the context on the pipeline manager while we do this? We pass contenxt to reenqueuePipeline() and refer to it directly there.",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "163d1290_76c281fa",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 1362,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-25T21:22:13Z",
+      "side": 1,
+      "message": "This seems to be the one place where the pipeline manager context attribute it used via the early questioned context manager. Seems a bit heavyweight to do both the pass in of the context and the attribute in different places?",
+      "revId": "3706d676e3884899a0b69e55af1bd32ff8eda3b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
