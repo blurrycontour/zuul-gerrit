@@ -33,6 +33,24 @@
       "message": "This is number 4 according to my grep.  Who disables asserts in the interpreter?  That\u0027s just asking for trouble.  But I don\u0027t feel strongly about it.  We can switch them.  But maybe we could do that as a followup standalone change and get all 4 of them?",
       "revId": "c352ec8d04e6368724c698361cbc8a98a34947b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbfc55b8_7d36d986",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 6305,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-26T21:34:07Z",
+      "side": 1,
+      "message": "Well, if there\u0027s already a pattern I\u0027ve overlooked I\u0027m ok with that. I\u0027d never disable asserts as well ;).",
+      "parentUuid": "b6034aa1_71086087",
+      "revId": "c352ec8d04e6368724c698361cbc8a98a34947b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
