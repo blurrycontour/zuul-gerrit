@@ -778,6 +778,15 @@ class ChangeQueue(zkobject.ZKObject):
                 items_behind=[items_by_path[p] for p in item.items_behind
                               if p in items_by_path])
 
+        bundle_by_uuid = {}
+        for item in items_by_path.values():
+            if not item.bundle:
+                continue
+            bundle_data = item.bundle
+            item._set(bundle=bundle_by_uuid.setdefault(
+                bundle_data["uuid"],
+                Bundle.deserialize(context, self, items_by_path, bundle_data)))
+
         data.update({
             "_jobs": set(data["_jobs"]),
             "queue": list(items_by_path.values()),
@@ -3838,9 +3847,6 @@ class QueueItem(zkobject.ZKObject):
         change = self.pipeline.manager.resolveChangeKeys(
             [data["change"]])[0]
 
-        bundle = data["bundle"] and Bundle.deserialize(
-            context, self.queue, data["bundle"])
-
         build_set = self.current_build_set
         if build_set and build_set.getPath() == data["current_build_set"]:
             build_set.refresh(context)
@@ -3854,7 +3860,6 @@ class QueueItem(zkobject.ZKObject):
             "change": change,
             "log": get_annotated_logger(self.log, event),
             "dynamic_state": defaultdict(dict, data["dynamic_state"]),
-            "bundle": bundle,
             "current_build_set": build_set,
         })
         return data
@@ -4841,7 +4846,8 @@ class QueueItem(zkobject.ZKObject):
 class Bundle:
     """Identifies a collection of changes that must be treated as one unit."""
 
-    def __init__(self):
+    def __init__(self, uuid=None):
+        self.uuid = uuid or uuid4().hex
         self.items = []
         self.started_reporting = False
         self.failed_reporting = False
@@ -4859,6 +4865,7 @@ class Bundle:
 
     def serialize(self):
         return {
+            "uuid": self.uuid,
             "items": [i.getPath() for i in self.items],
             "started_reporting": self.started_reporting,
             "failed_reporting": self.failed_reporting,
@@ -4866,32 +4873,10 @@ class Bundle:
         }
 
     @classmethod
-    def deserialize(cls, context, queue, data):
-        # Collect all known items
-        existing_items = {}
-        for item in queue.queue:
-            existing_items[item.getPath()] = item
-            if item.bundle:
-                # We need to consider items that are part of a bundle
-                # as some items might have been dequeued aready.
-                existing_items.update({
-                    i.getPath(): i for i in item.bundle.items
-                })
-
-        relevant_items = {p: i for p, i in existing_items.items()
-                          if p in data["items"]}
-
-        bundle = cls()
-        for bundle_item in relevant_items.values():
-            # Re-use existing bundle instance
-            bundle = bundle_item.bundle
-            if bundle_item not in queue.queue:
-                # We need to refresh items that are part of a bundle
-                # but were already dequeued.
-                bundle_item.refresh(context)
-
+    def deserialize(cls, context, queue, items_by_path, data):
+        bundle = cls(data["uuid"])
         bundle.items = [
-            relevant_items.get(p) or QueueItem.fromZK(
+            items_by_path.get(p) or QueueItem.fromZK(
                 context, p, pipeline=queue.pipeline, queue=queue)
             for p in data["items"]
         ]
