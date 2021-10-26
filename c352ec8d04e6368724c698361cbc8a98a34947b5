@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "656dc929_6f71da74",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 6305,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-26T21:24:22Z",
+      "side": 1,
+      "message": "We don\u0027t have asserts yet in the non-test code. Do we want to introduce them here? Since they can be disabled in the interpreter I think we should avoid asserts in the code for parameter validation.",
+      "revId": "c352ec8d04e6368724c698361cbc8a98a34947b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
