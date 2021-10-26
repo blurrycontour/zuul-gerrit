@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d765fe7f_47d3e610",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1249,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-26T22:13:46Z",
+      "side": 1,
+      "message": "Why don\u0027t we need to use update_attributes here?",
+      "revId": "997839ce70101d0a5b0ff55bea86718da54eed17",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
