@@ -16,6 +16,23 @@
       "message": "Why don\u0027t we need to use update_attributes here?",
       "revId": "997839ce70101d0a5b0ff55bea86718da54eed17",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60ab2ea9_c577b039",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1249,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T22:22:37Z",
+      "side": 1,
+      "message": "Because in ZK the build would reference the job by name, which won\u0027t have changed.  But the actual job object may have changed.\n\nHaving said that, I wonter if we should see if this is dead code at this point.",
+      "revId": "997839ce70101d0a5b0ff55bea86718da54eed17",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
