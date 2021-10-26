@@ -16,6 +16,24 @@
       "message": "I believe this is done in https://review.opendev.org/c/zuul/zuul/+/814773/8/zuul/scheduler.py#1269",
       "revId": "b7d89ce2193cae4da526d2b41cb04c2937518026",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9972d09f_29141c8c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-26T05:07:16Z",
+      "side": 1,
+      "message": "Yes, this is done. Forgot to remote the TODO on the last rebase.",
+      "parentUuid": "a3752cd2_a868b03e",
+      "revId": "b7d89ce2193cae4da526d2b41cb04c2937518026",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
