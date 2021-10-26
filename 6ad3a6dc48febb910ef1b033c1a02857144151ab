@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71cb0c8e_d96b5b12",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2735,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-26T20:35:50Z",
+      "side": 1,
+      "message": "nit: this can be simplified a little bit using a defaultdict",
+      "range": {
+        "startLine": 2734,
+        "startChar": 0,
+        "endLine": 2735,
+        "endChar": 38
+      },
+      "revId": "6ad3a6dc48febb910ef1b033c1a02857144151ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
