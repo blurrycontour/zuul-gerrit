@@ -3111,6 +3111,8 @@ class Build(zkobject.ZKObject):
     Job (related builds are grouped together in a BuildSet).
     """
 
+    log = logging.getLogger("zuul.Build")
+
     def __init__(self):
         super().__init__()
         self._set(
@@ -3328,6 +3330,8 @@ class BuildSet(zkobject.ZKObject):
     builders check out.
 
     """
+
+    log = logging.getLogger("zuul.BuildSet")
 
     # Merge states:
     NEW = 1
