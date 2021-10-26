@@ -16,6 +16,23 @@
       "message": "I think we might want to use the `sort_keys\u003dTrue` option for json dumping here. Insertion order for dicts is preserved since Python 3.6 and guaranteed since Python 3.7 but I don\u0027t know how deterministic our dict creation is (also in the future, e.g. in case lines get shuffled around).",
       "revId": "eb51f09a7e5eee23989f31ee4d3be4216ec89f28",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e509862_7bfbddbe",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1853,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T21:22:01Z",
+      "side": 1,
+      "message": "Done in PS10, sorry I missed this.",
+      "revId": "eb51f09a7e5eee23989f31ee4d3be4216ec89f28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
