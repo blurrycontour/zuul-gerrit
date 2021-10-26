@@ -432,7 +432,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         server.fulfillCancel(a)
         server.unlock(a)
         self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
-        for _ in iterate_timeout(5, "Wait for watches to be registered"):
+        for _ in iterate_timeout(10, "Wait for watches to be registered"):
             if self.getZKWatches():
                 break
 
