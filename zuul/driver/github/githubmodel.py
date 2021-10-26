@@ -30,7 +30,6 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 class PullRequest(Change):
     def __init__(self, project):
         super(PullRequest, self).__init__(project)
-        self.project = None
         self.pr = None
         self.updated_at = None
         self.title = None
@@ -84,6 +83,7 @@ class PullRequest(Change):
 
     def deserialize(self, data):
         super().deserialize(data)
+        self.title = data.get("title")
         self.pr = data.get("pr")
         self.updated_at = data.get("updated_at")
         self.body_text = data.get("body_text")
