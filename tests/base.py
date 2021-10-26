@@ -5414,7 +5414,17 @@ class ZuulTestCase(BaseTestCase):
                 build_request.uuid)
             if worker_build:
                 if worker_build.paused:
-                    continue
+                    # Avoid a race between setting the resume flag and
+                    # the job actually resuming.  If the build is
+                    # paused, make sure that there is no resume flag
+                    # and if that's true, that the build is still
+                    # paused.  If there's no resume flag between two
+                    # checks of the paused attr, it should still be
+                    # paused.
+                    if not self.zk_client.client.exists(
+                            build_request.path + '/resume'):
+                        if worker_build.paused:
+                            continue
                 if worker_build.isWaiting():
                     continue
                 self.log.debug("%s is running", worker_build)
