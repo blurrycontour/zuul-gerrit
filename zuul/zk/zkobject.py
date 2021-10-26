@@ -176,7 +176,7 @@ class ZKObject:
             try:
                 if create:
                     real_path, zstat = context.client.create(
-                        path, data, include_data=True)
+                        path, data, makepath=True, include_data=True)
                 else:
                     zstat = context.client.set(path, data,
                                                version=self._zstat.version)
