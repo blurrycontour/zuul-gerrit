@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9686b67_fb36a39b",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-26T22:29:59Z",
+      "side": 1,
+      "message": "Do we need an elif not data: case here to set data to {} ?\n\nI think the deserialize expects a dict? Currently the code will raise an InvalidObjectError, but maybe we can more graciously handle the case where an empty object is treated as such?",
+      "revId": "36782e35fdee52d8ee268a7e98c2e0156df6789b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
