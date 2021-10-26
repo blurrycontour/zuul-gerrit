@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4cfc5cf_29e0cb2d",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 2968,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-26T20:47:23Z",
+      "side": 1,
+      "message": "The configured flag should be on the buildset, not the queue item.",
+      "revId": "586cc5ac34b829ecb4e47ef639a4805f163b5d2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
