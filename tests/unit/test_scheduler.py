@@ -5907,8 +5907,8 @@ For CI problems and help debugging, contact ci@example.org"""
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         self.assertEqual(3, tenant.layout.pipelines['check'].disable_at)
         self.assertEqual(
-            0, tenant.layout.pipelines['check']._consecutive_failures)
-        self.assertFalse(tenant.layout.pipelines['check']._disabled)
+            0, tenant.layout.pipelines['check'].state.consecutive_failures)
+        self.assertFalse(tenant.layout.pipelines['check'].state.disabled)
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
@@ -5939,15 +5939,15 @@ For CI problems and help debugging, contact ci@example.org"""
         self.waitUntilSettled()
 
         self.assertEqual(
-            2, tenant.layout.pipelines['check']._consecutive_failures)
-        self.assertFalse(tenant.layout.pipelines['check']._disabled)
+            2, tenant.layout.pipelines['check'].state.consecutive_failures)
+        self.assertFalse(tenant.layout.pipelines['check'].state.disabled)
 
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
         self.assertEqual(
-            0, tenant.layout.pipelines['check']._consecutive_failures)
-        self.assertFalse(tenant.layout.pipelines['check']._disabled)
+            0, tenant.layout.pipelines['check'].state.consecutive_failures)
+        self.assertFalse(tenant.layout.pipelines['check'].state.disabled)
 
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(E.getPatchsetCreatedEvent(1))
@@ -5956,8 +5956,8 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # We should be disabled now
         self.assertEqual(
-            3, tenant.layout.pipelines['check']._consecutive_failures)
-        self.assertTrue(tenant.layout.pipelines['check']._disabled)
+            3, tenant.layout.pipelines['check'].state.consecutive_failures)
+        self.assertTrue(tenant.layout.pipelines['check'].state.disabled)
 
         # We need to wait between each of these patches to make sure the
         # smtp messages come back in an expected order
@@ -6006,16 +6006,16 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertEqual(3, tenant.layout.pipelines['check'].disable_at)
         self.assertEqual(
-            0, tenant.layout.pipelines['check']._consecutive_failures)
-        self.assertFalse(tenant.layout.pipelines['check']._disabled)
+            0, tenant.layout.pipelines['check'].state.consecutive_failures)
+        self.assertFalse(tenant.layout.pipelines['check'].state.disabled)
 
         self.fake_gerrit.addEvent(J.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(K.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
         self.assertEqual(
-            2, tenant.layout.pipelines['check']._consecutive_failures)
-        self.assertFalse(tenant.layout.pipelines['check']._disabled)
+            2, tenant.layout.pipelines['check'].state.consecutive_failures)
+        self.assertFalse(tenant.layout.pipelines['check'].state.disabled)
 
         # J and K went back to gerrit
         self.assertEqual(1, len(J.messages))
