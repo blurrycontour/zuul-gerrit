@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfcb8c9d_4af7d423",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2679,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T22:19:04Z",
+      "side": 1,
+      "message": "We can also write it when we call BuildSet.new() -- that creates an object (in the normal way, so __init__ gets called) then saves it to zk.  That\u0027s going to be the typical way these initial values get written to zk.  setConfiguration is likely to update it after already existing.",
+      "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "291c04d0_47a1ec00",
@@ -41,6 +58,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "02fe1e92_a0682c5e",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2724,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T22:19:04Z",
+      "side": 1,
+      "message": "I agree.",
+      "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "785e19d6_94ccaaff",
@@ -54,6 +88,23 @@
       "writtenOn": "2021-10-26T22:09:38Z",
       "side": 1,
       "message": "The above code is actually the same as the parent class now. Can we call super instead? Should we?",
+      "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15d31f3c_85c7738f",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2920,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T22:19:04Z",
+      "side": 1,
+      "message": "We could probably do that.",
       "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
