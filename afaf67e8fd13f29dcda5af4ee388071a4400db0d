@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6b385a2_5a13b42b",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3744,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T21:54:47Z",
+      "side": 1,
+      "message": "We could still leak this if we crash between these two lines, but that\u0027s low probability and it\u0027ll eventually get cleaned up when the item is dequeued.",
+      "revId": "afaf67e8fd13f29dcda5af4ee388071a4400db0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
