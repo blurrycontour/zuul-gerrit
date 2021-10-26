@@ -6849,7 +6849,8 @@ class Layout(object):
         # configured pipeline, if so return an empty JobGraph.
         if old:
             job_map = item.current_build_set._old_jobs
-            assert(context is None)
+            if context is not None:
+                raise RuntimeError("Context should be none for old job graphs")
             context = zkobject.LocalZKContext(self.log)
         else:
             job_map = item.current_build_set.jobs

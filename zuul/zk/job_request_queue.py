@@ -198,8 +198,10 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         path = "/".join([self.REQUEST_ROOT, request.uuid])
         request.path = path
 
-        assert isinstance(request, self.request_class)
-        assert request.state == self.request_class.UNSUBMITTED
+        if not isinstance(request, self.request_class):
+            raise RuntimeError("Request of wrong class")
+        if request.state != self.request_class.UNSUBMITTED:
+            raise RuntimeError("Request state must be submitted")
         request.state = self.initial_state
 
         result = None
