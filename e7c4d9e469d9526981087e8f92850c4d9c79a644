@@ -16,6 +16,23 @@
       "message": "Should the configured flag be part of the serialized data?",
       "revId": "e7c4d9e469d9526981087e8f92850c4d9c79a644",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec44235d_95e1e126",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2708,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-26T20:07:05Z",
+      "side": 1,
+      "message": "Yes I think so.",
+      "revId": "e7c4d9e469d9526981087e8f92850c4d9c79a644",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
