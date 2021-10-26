@@ -24,3 +24,4 @@ documentation instead.
    enhanced-regional-executors
    tenant-resource-quota
    community-matrix
+   arm64-wheels
