@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f639a9e2_53f02f83",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2679,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-26T22:09:38Z",
+      "side": 1,
+      "message": "We aren\u0027t writing this back to zookeeper until we call setConfiguration() I guess?",
+      "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "291c04d0_47a1ec00",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2724,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-26T22:09:38Z",
+      "side": 1,
+      "message": "I don\u0027t think this comment is accurate anymore.",
+      "range": {
+        "startLine": 2724,
+        "startChar": 10,
+        "endLine": 2724,
+        "endChar": 61
+      },
+      "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "785e19d6_94ccaaff",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 2920,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-26T22:09:38Z",
+      "side": 1,
+      "message": "The above code is actually the same as the parent class now. Can we call super instead? Should we?",
+      "revId": "4ee56af65c4cc843260fa8674afab3b47a889735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
