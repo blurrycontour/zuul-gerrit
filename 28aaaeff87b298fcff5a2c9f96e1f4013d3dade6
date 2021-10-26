@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14e5cfac_3ad61e73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-26T14:49:59Z",
+      "side": 1,
+      "message": "This seems to break tests that require sensors to function in order to pass (they test sensor behavior like slow start?)",
+      "revId": "28aaaeff87b298fcff5a2c9f96e1f4013d3dade6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
