@@ -482,7 +482,7 @@ class PipelineManager(metaclass=ABCMeta):
                     log.info("Dequeing change %s since at least one project "
                              "does not allow circular dependencies", change)
                     actions = self.pipeline.failure_actions
-                    ci = model.QueueItem(self, cycle[-1], event)
+                    ci = change_queue.enqueueChange(cycle[-1], event)
                     ci.warning("Dependency cycle detected")
                     ci.setReportedResult('FAILURE')
 
@@ -493,6 +493,7 @@ class PipelineManager(metaclass=ABCMeta):
                         ci
                     ):
                         self.sendReport(actions, ci)
+                    self.dequeueItem(ci)
                     self.sql.reportBuildsetEnd(ci.current_build_set,
                                                'failure', final=True)
 
