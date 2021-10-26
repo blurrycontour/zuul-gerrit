@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e0b38d4_d47a8c6a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-26T09:07:03Z",
+      "side": 1,
+      "message": "The way the bundle is deserialized in this change doesn\u0027t work properly when using multiple schedulers. https://review.opendev.org/c/zuul/zuul/+/815450 fixes that. TBD if we are ok with this as a separate change or if we want to squash 815450.",
+      "revId": "78cbacc9a1bfe85dc1042af606a7bce7872eea24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
