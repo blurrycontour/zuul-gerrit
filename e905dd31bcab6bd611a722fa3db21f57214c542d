@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab2b48d0_abe42c26",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2249,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-27T23:36:23Z",
+      "side": 1,
+      "message": "I think this OrderedDict comment is no longer necessary. Seems it referred to the old self.jobs which is now a list instead.",
+      "revId": "e905dd31bcab6bd611a722fa3db21f57214c542d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
