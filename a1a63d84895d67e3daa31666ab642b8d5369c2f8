@@ -16,6 +16,23 @@
       "message": "this will probably break a lot of !bullseye platforms here?  do we care?",
       "revId": "a1a63d84895d67e3daa31666ab642b8d5369c2f8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c253f1f0_2393562d",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T21:37:03Z",
+      "side": 1,
+      "message": "Yeah, I think our unit tests will care.\n\nCome to think of it, maybe we should just leave this in the Dockerfile and possibly think about moving the krb stuff there too?",
+      "revId": "a1a63d84895d67e3daa31666ab642b8d5369c2f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
