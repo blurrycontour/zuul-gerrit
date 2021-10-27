@@ -227,6 +227,10 @@ class ZKObject:
 
 
 class ShardedZKObject(ZKObject):
+    # If the node exists when we create we normally error, unless this
+    # is set, in which case we proceed and truncate.
+    truncate_on_create = False
+
     def _load(self, context, path=None):
         if path is None:
             path = self.getPath()
@@ -260,7 +264,9 @@ class ShardedZKObject(ZKObject):
         path = self.getPath()
         while context.sessionIsValid():
             try:
-                if create and context.client.exists(path) is not None:
+                if (create and
+                    not self.truncate_on_create and
+                    context.client.exists(path) is not None):
                     raise NodeExistsError
                 with sharding.BufferedShardWriter(
                         context.client, path) as stream:

@@ -1611,8 +1611,8 @@ class PipelineManager(metaclass=ABCMeta):
             source.setChangeAttributes(
                 item.change, containing_branches=event.item_in_branches)
         with build_set.activeContext(self.current_context):
+            build_set.setMergeRepoState(event.repo_state)
             build_set.merge_state = build_set.COMPLETE
-            build_set.repo_state = event.repo_state
             if event.merged:
                 build_set.commit = event.commit
                 items_ahead = item.getNonLiveItemsAhead()
@@ -1634,14 +1634,9 @@ class PipelineManager(metaclass=ABCMeta):
                           % item.change)
             item.setUnableToMerge()
         else:
-            repo_state = build_set.repo_state
-            for connection in event.repo_state.keys():
-                if connection in repo_state:
-                    repo_state[connection].update(event.repo_state[connection])
-                else:
-                    repo_state[connection] = event.repo_state[connection]
-            build_set.updateAttributes(self.current_context,
-                                       repo_state_state=build_set.COMPLETE)
+            with build_set.activeContext(self.current_context):
+                build_set.setExtraRepoState(event.repo_state)
+                build_set.repo_state_state = build_set.COMPLETE
 
     def onNodesProvisioned(self, request, nodeset, build_set):
         # TODOv3(jeblair): handle provisioning failure here
