@@ -3839,7 +3839,7 @@ class QueueItem(zkobject.ZKObject):
                     data["event"]["data"]["driver_name"])
             )
         else:
-            event_class = globals().get(event_type)
+            event_class = EventTypeIndex.event_type_mapping.get(event_type)
 
         if event_class is None:
             raise NotImplementedError(
@@ -5203,7 +5203,19 @@ class Change(Branch):
         return d
 
 
-class AbstractEvent(abc.ABC):
+class EventTypeIndex(type(abc.ABC)):
+    """A metaclass used to maintain a mapping of Event class names to
+    class definitions when serializing and deserializing to and from
+    ZooKeeper
+    """
+    event_type_mapping = {}
+
+    def __init__(cls, name, bases, clsdict):
+        EventTypeIndex.event_type_mapping[name] = cls
+        super().__init__(name, bases, clsdict)
+
+
+class AbstractEvent(abc.ABC, metaclass=EventTypeIndex):
     """Base class defining the interface for all events."""
 
     # Opaque identifier in order to acknowledge an event
