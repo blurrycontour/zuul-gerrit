@@ -91,7 +91,7 @@ class PipelineManager(metaclass=ABCMeta):
             ctx = self.sched.createZKContext(lock, self.log)
             with self.currentContext(ctx):
                 self.pipeline.state = PipelineState.resetOrCreate(
-                    self.pipeline)
+                    self.pipeline, layout.uuid)
                 self.buildChangeQueues(layout)
 
     def buildChangeQueues(self, layout):
