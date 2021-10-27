@@ -14,6 +14,7 @@
 # limitations under the License.
 import cherrypy
 import socket
+from collections import defaultdict
 
 from cachetools.func import ttl_cache
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
@@ -30,19 +31,24 @@ import ssl
 import threading
 
 from zuul import exceptions
+from zuul.configloader import ConfigLoader
 import zuul.lib.repl
 from zuul.lib import commandsocket
 from zuul.lib import streamer_utils
+from zuul.lib.ansible import AnsibleManager
+from zuul.lib.keystorage import KeyStorage
 from zuul.lib.re2util import filter_allowed_disallowed
-import zuul.model
+from zuul.model import Abide, SystemAttributes, UnparsedAbideConfig, WebInfo
 import zuul.rpcclient
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, WebComponent
+from zuul.zk.config_cache import SystemConfigCache
 from zuul.zk.executor import ExecutorApi
+from zuul.zk.layout import LayoutStateStore
+from zuul.zk.locks import tenant_read_lock
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
-from zuul.zk.config_cache import SystemConfigCache
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 
@@ -1303,7 +1309,7 @@ class ZuulWeb(object):
                  config,
                  connections,
                  authenticators: AuthenticatorRegistry,
-                 info: zuul.model.WebInfo = None):
+                 info: WebInfo = None):
         self.start_time = time.time()
         self.config = config
         self.listen_address = get_default(self.config,
@@ -1345,14 +1351,24 @@ class ZuulWeb(object):
         self.system_config_cache = SystemConfigCache(
             self.zk_client,
             self.system_config_cache_wake_event.set)
-        # Fetch an initial value so we we have something to serve
-        # requests before the initial callback fires.
-        self.unparsed_abide, _ = self.system_config_cache.get()
 
         self.connections = connections
         self.authenticators = authenticators
         self.stream_manager = StreamManager()
         self.zone = get_default(self.config, 'web', 'zone')
+
+        self.keystore = KeyStorage(
+            self.zk_client, password=self._get_key_store_password())
+        self.globals = SystemAttributes.fromConfig(self.config)
+        self.ansible_manager = AnsibleManager(
+            default_version=self.globals.default_ansible_version)
+        self.abide = Abide()
+        self.unparsed_abide = UnparsedAbideConfig()
+        # TODO (felix): Do we need the layout store? The scheduler seems
+        # to use this only to determine changes, but for zuul-web
+        # it seems to be enough to use the SystemConfigCache.
+        self.tenant_layout_state = LayoutStateStore(
+            self.zk_client, self.system_config_cache_wake_event.set)
 
         command_socket = get_default(
             self.config, 'web', 'command_socket',
@@ -1508,9 +1524,44 @@ class ZuulWeb(object):
                 self.system_config_cache_wake_event.wait()
                 if not self._system_config_running:
                     return
-                self.unparsed_abide, _ = self.system_config_cache.get()
+                self.updateLayoutState()
             except Exception:
                 self.log.exception("Exception while processing command")
+
+    def initializeSystemConfig(self):
+        self.log.debug("Updating system config")
+        self.unparsed_abide, self.globals = self.system_config_cache.get()
+        self.ansible_manager = AnsibleManager(
+            default_version=self.globals.default_ansible_version)
+
+        loader = ConfigLoader(
+            self.connections, self.zk_client, self.globals,
+            keystorage=self.keystore)
+
+        loader.loadTPCs(self.abide, self.unparsed_abide)
+        loader.loadAdminRules(self.abide, self.unparsed_abide)
+
+        # Initialize the layout state after the unparsed_abide was
+        # loaded from ZooKeeper. The initial callback from the
+        # layout store is called to early.
+        # TODO (felix): Is that something to be fixed?
+        self.updateLayoutState()
+
+    def updateLayoutState(self):
+        self.log.debug("Updating layout state")
+        loader = ConfigLoader(
+            self.connections, self.zk_client, self.globals,
+            keystorage=self.keystore)
+
+        min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
+        for tenant_name in self.unparsed_abide.tenants:
+            with tenant_read_lock(self.zk_client, tenant_name):
+                # The tenant will be stored in self.abide.tenants after
+                # it was loaded.
+                loader.loadTenant(
+                    self.abide, tenant_name, self.ansible_manager,
+                    self.unparsed_abide, min_ltimes=min_ltimes)
+        self.log.debug("FE: abide.tenants %s", self.abide.tenants)
 
     def start(self):
         self.log.debug("ZuulWeb starting")
@@ -1534,6 +1585,8 @@ class ZuulWeb(object):
         self._system_config_running = True
         self.system_config_thread.daemon = True
         self.system_config_thread.start()
+
+        self.initializeSystemConfig()
 
     def stop(self):
         self.log.debug("ZuulWeb stopping")
@@ -1578,3 +1631,9 @@ class ZuulWeb(object):
             return
         self.repl.stop()
         self.repl = None
+
+    def _get_key_store_password(self):
+        try:
+            return self.config["keystore"]["password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")

@@ -165,6 +165,7 @@ class ZuulApp(object):
     def configure_connections(self, source_only=False, include_drivers=None,
                               require_sql=False):
         self.connections = zuul.lib.connections.ConnectionRegistry()
+        # TODO (felix): Remove the include_drivers argument?
         self.connections.configure(self.config, source_only, include_drivers,
                                    require_sql)
 
