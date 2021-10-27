@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db9fc053_a8931f9a",
+        "filename": "doc/source/howtos/openid-connect-examples.rst",
+        "patchSetId": 40
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T00:45:54Z",
+      "side": 1,
+      "message": "If new patchset needed: Capitalize \u0027More\u0027",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "debcbeed_0b15ecfe",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T00:45:54Z",
+      "side": 1,
+      "message": "Why this change?",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4eccff36_7bafa1e7",
+        "filename": "web/src/App.test.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T00:45:54Z",
+      "side": 1,
+      "message": "Is anything in this file changed other than whitespace?  It would be better to avoid these changes to make things easier for reviewers and future maintenance (git blame, etc).",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d41f9278_6f534504",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T00:45:54Z",
+      "side": 1,
+      "message": "This looks like it\u0027s gdpr related.  Have we gotten any advice that this is correct or necessary?  Or is this just being overly cautious?",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cad74c93_3b804cfc",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T00:45:54Z",
+      "side": 1,
+      "message": "I agree the update to the first sentence adds some clarity, but I\u0027m not sure the second sentence does.  What do you want to convey here?",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b83798b_7db209f4",
+        "filename": "web/src/pages/AuthCallback.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T00:45:54Z",
+      "side": 1,
+      "message": "We have no plans to get rid of redux.  We rely on it for our state and state transitions, and we can continue to do so.\n\nIf AuthProvider did work with redux, would this file be unecessary?",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
