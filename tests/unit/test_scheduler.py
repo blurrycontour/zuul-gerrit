@@ -6216,6 +6216,15 @@ For CI problems and help debugging, contact ci@example.org"""
         self.scheds.execute(lambda app: app.sched.zk_client.client.stop())
         self.scheds.execute(lambda app: app.sched.zk_client.client.start())
         self.fake_nodepool.unpause()
+        # Wait until we win the nodepool election in order to avoid a
+        # race in waitUntilSettled with the request being fulfilled
+        # without submitting an event.
+        for x in iterate_timeout(60, 'nodepool election won'):
+            found = [app for app in self.scheds
+                     if (app.sched.nodepool.election_won and
+                         app.sched.nodepool.election.is_still_valid())]
+            if found:
+                break
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
