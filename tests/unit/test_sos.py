@@ -101,6 +101,10 @@ class TestScaleOutScheduler(ZuulTestCase):
                              for a in self.scheds.instances]
             if all(l == new for l in layout_states):
                 break
+
+        layout_uuids = [a.sched.abide.tenants["tenant-one"].layout.uuid
+                        for a in self.scheds.instances]
+        self.assertTrue(all(l == new.uuid for l in layout_uuids))
         self.waitUntilSettled()
 
     def test_change_cache(self):
