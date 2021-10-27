@@ -44,9 +44,9 @@ class LayoutState:
     may aid in debugging.
     """
 
-    def __init__(self, tenant_name, hostname, last_reconfigured, uuid=None,
+    def __init__(self, tenant_name, hostname, last_reconfigured, uuid,
                  ltime=-1):
-        self.uuid = uuid or uuid4().hex
+        self.uuid = uuid
         self.ltime = ltime
         self.tenant_name = tenant_name
         self.hostname = hostname
