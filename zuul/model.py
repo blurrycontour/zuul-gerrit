@@ -405,6 +405,7 @@ class Pipeline(object):
         self.window_decrease_type = None
         self.window_decrease_factor = None
         self.state = None
+        self.change_list = None
 
     @property
     def queues(self):
@@ -691,7 +692,65 @@ class PipelineState(zkobject.ZKObject):
                 recursive=True)
 
 
+class PipelineChangeList(zkobject.ZKObject):
+    """A list of change references within a pipeline
+
+       This is used by the scheduler to quickly decide if events which
+       otherwise don't match the pipeline triggers should be
+       nevertheless forwarded to the pipeline.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            changes=[],
+        )
+
+    def getPath(self):
+        return self.getChangeListPath(self.pipeline)
+
+    @classmethod
+    def getChangeListPath(cls, pipeline):
+        pipeline_path = pipeline.state.getPath()
+        return pipeline_path + '/change_list'
+
+    @classmethod
+    def create(cls, pipeline):
+        ctx = pipeline.manager.current_context
+        try:
+            change_list = cls.fromZK(ctx, cls.getChangeListPath(pipeline),
+                                     pipeline=pipeline)
+            return change_list
+        except NoNodeError:
+            return cls.new(ctx, pipeline=pipeline)
+
+    def serialize(self):
+        data = {
+            "changes": self.changes,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def deserialize(self, data, context):
+        data = super().deserialize(data, context)
+        change_keys = []
+        for ref in data.get('changes', []):
+            change_keys.append(ChangeKey.fromReference(ref))
+        data['_change_keys'] = change_keys
+        return data
+
+    def setChangeKeys(self, context, change_keys):
+        change_refs = [key.reference for key in change_keys]
+        if change_refs == self.changes:
+            return
+        self.updateAttributes(context, changes=change_refs)
+        self._set(_change_keys=change_keys)
+
+    def getChangeKeys(self):
+        return self._change_keys
+
+
 class ChangeQueue(zkobject.ZKObject):
+
     """A ChangeQueue contains Changes to be processed for related projects.
 
     A Pipeline with a DependentPipelineManager has multiple parallel
