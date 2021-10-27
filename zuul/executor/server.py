@@ -3525,20 +3525,18 @@ class ExecutorServer(BaseMergeServer):
         self.job_workers[build_request.uuid].run()
 
     def _handleBuildEvent(self, build_request, build_event):
-        # TODO (felix): Would it harm to simply keep the cancel/resume node? If
-        # not we could avoid this ZK update. The cancel request can anyway
-        # only be fulfilled by the executor that executes the job. So, if
-        # that executor died, no other can pick up the request.
         log = get_annotated_logger(
             self.log, build_request.event_id, build=build_request.uuid)
         log.debug(
             "Received %s event for build %s", build_event.name, build_request)
+        # Fulfill the resume/cancel requests after our internal calls
+        # to aid the test suite in avoiding races.
         if build_event == JobRequestEvent.CANCELED:
-            self.executor_api.fulfillCancel(build_request)
             self.stopJob(build_request)
+            self.executor_api.fulfillCancel(build_request)
         elif build_event == JobRequestEvent.RESUMED:
-            self.executor_api.fulfillResume(build_request)
             self.resumeJob(build_request)
+            self.executor_api.fulfillResume(build_request)
         elif build_event == JobRequestEvent.DELETED:
             self.stopJob(build_request)
 
