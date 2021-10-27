@@ -138,9 +138,11 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
     cleaned up in the cache's cleanup() method. This is expected to
     happen periodically.
     """
-    log = logging.getLogger("zuul.zk.AbstractChangeCache")
 
     def __init__(self, client, connection):
+        self.log = logging.getLogger(
+            f"zuul.ChangeCache.{connection.connection_name}")
+
         super().__init__(client)
         self.connection = connection
         self.root_path = f"{CHANGE_CACHE_ROOT}/{connection.connection_name}"
@@ -170,6 +172,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         existing_keys = set(self._change_cache.keys())
         deleted_keys = existing_keys - cache_keys
         for key in deleted_keys:
+            self.log.debug("Watcher removing %s from cache", key)
             with contextlib.suppress(KeyError):
                 del self._change_cache[key]
             with contextlib.suppress(KeyError):
@@ -200,6 +203,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         return key, data['data_uuid']
 
     def prune(self, relevant, max_age=3600):  # 1h
+        self.log.debug("Pruning cache")
         cutoff_time = time.time() - max_age
         outdated_versions = dict()
         for c in list(self._change_cache.values()):
@@ -218,6 +222,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             self.delete(key, outdated_versions[key])
 
     def cleanup(self):
+        self.log.debug("Cleaning cache")
         valid_uuids = {c.cache_stat.uuid
                        for c in list(self._change_cache.values())}
         stale_uuids = self._data_cleanup_candidates - valid_uuids
@@ -358,6 +363,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         return change
 
     def delete(self, key, version=-1):
+        self.log.debug("Deleting %s from cache", key)
         cache_path = self._cachePath(key._hash)
         # Only delete the cache entry and NOT the data node in order to
         # prevent race conditions with other consumers. The stale data
