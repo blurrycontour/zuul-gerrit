@@ -538,6 +538,7 @@ class PipelineState(zkobject.ZKObject):
             consecutive_failures=0,
             disabled=False,
             pipeline=None,
+            layout_uuid=None,
         )
 
     @classmethod
@@ -551,20 +552,21 @@ class PipelineState(zkobject.ZKObject):
         return obj
 
     @classmethod
-    def resetOrCreate(cls, pipeline):
+    def resetOrCreate(cls, pipeline, layout_uuid):
         ctx = pipeline.manager.current_context
         try:
             state = cls.fromZK(ctx, cls.pipelinePath(pipeline),
                                pipeline=pipeline)
-            reset_state = {
-                **cls.defaultState(),
-                "pipeline": pipeline,
-                "old_queues": state.old_queues,
-            }
-            state.updateAttributes(ctx, **reset_state)
+            if state.layout_uuid != layout_uuid:
+                reset_state = {
+                    **cls.defaultState(),
+                    "pipeline": pipeline,
+                    "old_queues": state.old_queues + state.queues,
+                }
+                state.updateAttributes(ctx, **reset_state)
             return state
         except NoNodeError:
-            return cls.new(ctx, pipeline=pipeline)
+            return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
 
     def getPath(self):
         return self.pipelinePath(self.pipeline)
