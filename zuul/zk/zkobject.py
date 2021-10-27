@@ -130,7 +130,7 @@ class ZKObject:
         path = self.getPath()
         while context.sessionIsValid():
             try:
-                context.client.delete(path)
+                context.client.delete(path, recursive=True)
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
