@@ -4047,12 +4047,8 @@ class ZuulWebFixture(fixtures.Fixture):
         self.connections = TestConnectionRegistry(
             changes, config, additional_event_queues, upstream_root, rpcclient,
             poller_events, git_url_with_auth, add_cleanup, fake_sql)
-        self.connections.configure(
-            config,
-            include_drivers=[zuul.driver.sql.SQLDriver,
-                             GithubDriverMock,
-                             GitlabDriverMock,
-                             PagureDriverMock])
+        self.connections.configure(config)
+
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)
         if info is None:
