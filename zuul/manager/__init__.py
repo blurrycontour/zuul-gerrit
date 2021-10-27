@@ -22,7 +22,9 @@ from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
-from zuul.model import Change, DequeueEvent, PipelineState, QueueItem
+from zuul.model import (
+    Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
+)
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.locks import pipeline_lock
 
@@ -92,6 +94,8 @@ class PipelineManager(metaclass=ABCMeta):
             with self.currentContext(ctx):
                 self.pipeline.state = PipelineState.resetOrCreate(
                     self.pipeline, layout.uuid)
+                self.pipeline.change_list = PipelineChangeList.create(
+                    self.pipeline)
                 self.buildChangeQueues(layout)
 
     def buildChangeQueues(self, layout):
@@ -221,8 +225,8 @@ class PipelineManager(metaclass=ABCMeta):
 
     def isAnyVersionOfChangeInPipeline(self, change):
         # Checks any items in the pipeline
-        for item in self.pipeline.getAllItems():
-            if change.cache_stat.key.isSameChange(item.change.cache_stat.key):
+        for change_key in self.pipeline.change_list.getChangeKeys():
+            if change.cache_stat.key.isSameChange(change_key):
                 return True
         return False
 
@@ -1476,6 +1480,7 @@ class PipelineManager(metaclass=ABCMeta):
         # Do whatever needs to be done for each change in the queue
         self.log.debug("Starting queue processor: %s" % self.pipeline.name)
         changed = False
+        change_keys = set()
         for queue in self.pipeline.queues:
             queue_changed = False
             nnfi = None  # Nearest non-failing item
@@ -1485,6 +1490,10 @@ class PipelineManager(metaclass=ABCMeta):
                 if item_changed:
                     queue_changed = True
                 self.reportStats(item)
+                if len(change_keys) < 1024:
+                    # Only keep 1024 of these so we don't have to deal
+                    # with sharding.
+                    change_keys.add(item.change.cache_stat.key)
             if queue_changed:
                 changed = True
                 status = ''
@@ -1494,6 +1503,9 @@ class PipelineManager(metaclass=ABCMeta):
                     self.log.debug("Queue %s status is now:\n %s" %
                                    (queue.name, status))
 
+        self.pipeline.change_list.setChangeKeys(
+            self.pipeline.manager.current_context,
+            change_keys)
         self._maintainCache()
         self.log.debug("Finished queue processor: %s (changed: %s)" %
                        (self.pipeline.name, changed))
