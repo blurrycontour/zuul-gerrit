@@ -37,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "635d5ad9_df4acda3",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-27T13:39:40Z",
+      "side": 1,
+      "message": "Looks like a remnant of attempting to use the top-level AuthProvider component. I will revert this",
+      "parentUuid": "debcbeed_0b15ecfe",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "4eccff36_7bafa1e7",
         "filename": "web/src/App.test.jsx",
         "patchSetId": 40
@@ -48,6 +66,24 @@
       "writtenOn": "2021-10-27T00:45:54Z",
       "side": 1,
       "message": "Is anything in this file changed other than whitespace?  It would be better to avoid these changes to make things easier for reviewers and future maintenance (git blame, etc).",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d89341b4_3538fa4c",
+        "filename": "web/src/App.test.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-27T13:39:40Z",
+      "side": 1,
+      "message": "The woes of auto-formatting ... I\u0027ll revert in next PS",
+      "parentUuid": "4eccff36_7bafa1e7",
       "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "be23abbf_3f75d304",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-27T13:39:40Z",
+      "side": 1,
+      "message": "Overly cautious. This should actually be reformulated to indicate that the user data is never stored server-side and only lives in the browser for the duration of the authenticated session.\n\nIf anybody knows the exact legalese, if required at all, let me know!",
+      "parentUuid": "d41f9278_6f534504",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "cad74c93_3b804cfc",
         "filename": "web/src/containers/config/Config.jsx",
         "patchSetId": 40
@@ -88,6 +142,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d0cd6f72_9e079389",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-27T13:39:40Z",
+      "side": 1,
+      "message": "It means that if you log in as another user on the same browser, these settings will also apply to the other user. I\u0027m updating this in next PS, let me know if it is clearer.",
+      "parentUuid": "cad74c93_3b804cfc",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "8b83798b_7db209f4",
         "filename": "web/src/pages/AuthCallback.jsx",
         "patchSetId": 40
@@ -99,6 +171,24 @@
       "writtenOn": "2021-10-27T00:45:54Z",
       "side": 1,
       "message": "We have no plans to get rid of redux.  We rely on it for our state and state transitions, and we can continue to do so.\n\nIf AuthProvider did work with redux, would this file be unecessary?",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddc6a138_cfeaa8bc",
+        "filename": "web/src/pages/AuthCallback.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-27T13:39:40Z",
+      "side": 1,
+      "message": "I believe so. We could replace useEffect below with the onSignIn callback of the config property of AuthProvider, see https://github.com/bjerkio/oidc-react#usage",
+      "parentUuid": "8b83798b_7db209f4",
       "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
