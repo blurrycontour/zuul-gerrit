@@ -37,7 +37,7 @@ from tests.base import (AnsibleZuulTestCase, BaseTestCase,
                         simple_layout, random_sha1)
 from tests.base import ZuulWebFixture
 
-EMPTY_LAYOUT_STATE = LayoutState("", "", 0)
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None)
 
 
 class TestGithubDriver(ZuulTestCase):

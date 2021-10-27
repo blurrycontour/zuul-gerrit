@@ -1516,7 +1516,8 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager, min_ltimes=None):
+    def fromYaml(self, abide, conf, ansible_manager, min_ltimes=None,
+                 layout_uuid=None):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1597,7 +1598,7 @@ class TenantParser(object):
         self.cacheConfig(tenant, parsed_config)
 
         tenant.layout = self._parseLayout(
-            tenant, parsed_config, loading_errors)
+            tenant, parsed_config, loading_errors, layout_uuid)
         tenant.semaphore_handler = SemaphoreHandler(
             self.scheduler.zk_client, self.scheduler.statsd,
             tenant.name, tenant.layout
@@ -2187,10 +2188,10 @@ class TenantParser(object):
                     for ppc in project_config.pipelines.values():
                         inner_validate_ppcs(ppc)
 
-    def _parseLayout(self, tenant, data, loading_errors):
+    def _parseLayout(self, tenant, data, loading_errors, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
-        layout = model.Layout(tenant)
+        layout = model.Layout(tenant, layout_uuid)
         layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
 
@@ -2277,7 +2278,7 @@ class ConfigLoader(object):
                 abide.addUntrustedTPC(tenant_name, tpc)
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
-                   min_ltimes=None):
+                   min_ltimes=None, layout_uuid=None):
         """(Re-)load a single tenant.
 
         Description of cache stages:
@@ -2353,7 +2354,7 @@ class ConfigLoader(object):
 
         unparsed_config = unparsed_abide.tenants[tenant_name]
         new_tenant = self.tenant_parser.fromYaml(
-            abide, unparsed_config, ansible_manager, min_ltimes)
+            abide, unparsed_config, ansible_manager, min_ltimes, layout_uuid)
         # Copy tenants dictionary to not break concurrent iterations.
         tenants = abide.tenants.copy()
         tenants[tenant_name] = new_tenant
