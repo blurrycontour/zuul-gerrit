@@ -16,6 +16,24 @@
       "message": "This should be `bundle_by_uuid.setdefault(...)`",
       "revId": "6175cf28e4d3abe7211d7b879093e8afee84c443",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ee5a008_e9719c16",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 786,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-27T12:18:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51d4efa7_4be3e93a",
+      "revId": "6175cf28e4d3abe7211d7b879093e8afee84c443",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
