@@ -129,6 +129,24 @@ class ZuulMark:
         return (self.line == other.line and
                 self.snippet == other.snippet)
 
+    def serialize(self):
+        return {
+            "name": self.name,
+            "index": self.index,
+            "line": self.line,
+            "end_line": self.end_line,
+            "end_index": self.end_index,
+            "column": self.column,
+            "end_column": self.end_column,
+            "snipped": self.snippet,
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        o = cls.__new__(cls)
+        o.__dict__.update(data)
+        return o
+
 
 class ConfigurationErrorKey(object):
     """A class which attempts to uniquely identify configuration errors
@@ -159,6 +177,25 @@ class ConfigurationErrorKey(object):
         elements.append(error_text)
         self._hash = hash('|'.join([str(x) for x in elements]))
 
+    def serialize(self):
+        return {
+            "context": self.context and self.context.serialize(),
+            "mark": self.mark and self.mark.serialize(),
+            "error_text": self.error_text,
+            "_hash": self._hash,
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        data.update({
+            "context": data["context"] and SourceContext.deserialize(
+                data["context"]),
+            "mark": data["mark"] and ZuulMark.deserialize(data["mark"]),
+        })
+        o = cls.__new__(cls)
+        o.__dict__.update(data)
+        return o
+
     def __hash__(self):
         return self._hash
 
@@ -180,6 +217,20 @@ class ConfigurationError(object):
         self.error = str(error)
         self.short_error = short_error
         self.key = ConfigurationErrorKey(context, mark, self.error)
+
+    def serialize(self):
+        return {
+            "error": self.error,
+            "short_error": self.short_error,
+            "key": self.key.serialize()
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        data["key"] = ConfigurationErrorKey.deserialize(data["key"])
+        o = cls.__new__(cls)
+        o.__dict__.update(data)
+        return o
 
 
 class LoadingErrors(object):
@@ -1262,6 +1313,24 @@ class SourceContext(ConfigObject):
                 self.branch == other.branch and
                 self.path == other.path and
                 self.trusted == other.trusted)
+
+    def serialize(self):
+        return {
+            "project_canonical_name": self.project_canonical_name,
+            "project_name": self.project_name,
+            "project_connection_name": self.project_connection_name,
+            "branch": self.branch,
+            "path": self.path,
+            "trusted": self.trusted,
+            "implied_branch_matchers": self.implied_branch_matchers,
+            "implied_branches": self.implied_branches,
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        o = cls.__new__(cls)
+        o.__dict__.update(data)
+        return o
 
     def toDict(self):
         return dict(
@@ -2553,7 +2622,7 @@ class RepoFiles(object):
         return host.get(project_name, {}).get(branch, {}).get(fn)
 
 
-class BuildSet(object):
+class BuildSet(zkobject.ZKObject):
     """A collection of Builds for one specific potential future repository
     state.
 
@@ -2580,38 +2649,80 @@ class BuildSet(object):
         3: 'COMPLETE',
     }
 
-    def __init__(self, item):
-        self.item = item
-        self.builds = {}
-        self.retry_builds = {}
-        self.result = None
-        self.uuid = None
-        self.commit = None
-        self.dependent_changes = None
-        self.merger_items = None
-        self.unable_to_merge = False
-        self.config_errors = []  # list of ConfigurationErrors
-        self.failing_reasons = []
-        self.debug_messages = []
-        self.warning_messages = []
-        self.merge_state = self.NEW
-        self.nodeset_info = {}  # job -> dict of nodeset info
-        self.node_requests = {}  # job -> request id
-        self.files = RepoFiles()
-        self.repo_state = {}
-        self.tries = {}
-        if item.change.files is not None:
-            self.files_state = self.COMPLETE
-        else:
-            self.files_state = self.NEW
-        self.repo_state_state = self.NEW
+    def __init__(self):
+        super().__init__()
+        self._set(
+            item=None,
+            builds={},
+            retry_builds={},
+            result=None,
+            uuid=uuid4().hex,
+            commit=None,
+            dependent_changes=None,
+            merger_items=None,
+            unable_to_merge=False,
+            config_errors=[],  # list of ConfigurationErrors
+            failing_reasons=[],
+            debug_messages=[],
+            warning_messages=[],
+            merge_state=self.NEW,
+            nodeset_info={},  # job -> dict of nodeset info
+            node_requests={},  # job -> request id
+            # FIXME: init to None and make this a separate ZK node
+            files=RepoFiles(),
+            # FIXME: make this a separate object
+            repo_state={},
+            tries={},
+            files_state=self.NEW,
+            repo_state_state=self.NEW,
+            configured=False
+        )
+
+    def getPath(self):
+        return f"{self.item.getPath()}/buildset/{self.uuid}"
+
+    def serialize(self):
+        data = {
+            # "item": self.item,
+            # "builds": {k, b.getPath() for k,v in self.builds.items()},
+            # "retry_builds": {k, b.getPath()
+            #                  for k,v in self.retry_builds.items()},
+            "result": self.result,
+            "uuid": self.uuid,
+            "commit": self.commit,
+            "dependent_changes": self.dependent_changes,
+            "merger_items": self.merger_items,
+            "unable_to_merge": self.unable_to_merge,
+            "config_errors": [e.serialize() for e in self.config_errors],
+            "failing_reasons": self.failing_reasons,
+            "debug_messages": self.debug_messages,
+            "warning_messages": self.warning_messages,
+            "merge_state": self.merge_state,
+            "nodeset_info": self.nodeset_info,
+            "node_requests": self.node_requests,
+            # "files": RepoFiles(),
+            # "repo_state": self.repo_state,
+            "tries": self.tries,
+            "files_state": self.files_state,
+            "repo_state_state": self.repo_state_state,
+            "configured": self.configured,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
+        data.update({
+            "config_errors": [ConfigurationError.deserialize(d)
+                              for d in data["config_errors"]]
+        })
+        return data
 
     @property
     def ref(self):
         # NOTE(jamielennox): The concept of buildset ref is to be removed and a
         # buildset UUID identifier available instead. Currently the ref is
         # checked to see if the BuildSet has been configured.
-        return 'Z' + self.uuid if self.uuid else None
+        return 'Z' + self.uuid if self.configured else None
 
     def __repr__(self):
         return '<BuildSet item: %s #builds: %s merge state: %s>' % (
@@ -2619,24 +2730,25 @@ class BuildSet(object):
             len(self.builds),
             self.getStateName(self.merge_state))
 
-    def setConfiguration(self):
-        # The change isn't enqueued until after it's created
-        # so we don't know what the other changes ahead will be
-        # until jobs start.
-        if not self.uuid:
-            self.uuid = uuid4().hex
-        if self.dependent_changes is None:
-            items = []
-            if self.item.bundle:
-                items.extend(reversed(self.item.bundle.items))
-            else:
-                items.append(self.item)
+    def setConfiguration(self, context):
+        with self.activeContext(context):
+            # The change isn't enqueued until after it's created
+            # so we don't know what the other changes ahead will be
+            # until jobs start.
+            if self.dependent_changes is None:
+                items = []
+                if self.item.bundle:
+                    items.extend(reversed(self.item.bundle.items))
+                else:
+                    items.append(self.item)
 
-            items.extend(i for i in self.item.items_ahead if i not in items)
-            items.reverse()
+                items.extend(i for i in self.item.items_ahead
+                             if i not in items)
+                items.reverse()
 
-            self.dependent_changes = [i.change.toDict() for i in items]
-            self.merger_items = [i.makeMergerItem() for i in items]
+                self.dependent_changes = [i.change.toDict() for i in items]
+                self.merger_items = [i.makeMergerItem() for i in items]
+            self.configured = True
 
     def getStateName(self, state_num):
         return self.states_map.get(
@@ -2805,8 +2917,11 @@ class QueueItem(zkobject.ZKObject):
     def new(klass, context, **kw):
         obj = klass()
         obj._set(**kw)
-        obj._set(current_build_set=BuildSet(obj))
         obj._save(context, create=True)
+        files_state = (BuildSet.COMPLETE if obj.change.files is not None
+                       else BuildSet.NEW)
+        obj.updateAttributes(context, current_build_set=BuildSet.new(
+            context, item=obj, files_state=files_state))
         return obj
 
     def getPath(self):
@@ -2829,7 +2944,8 @@ class QueueItem(zkobject.ZKObject):
             # This needs change cache and the API to resolve change by key.
             "change": self.change.cache_key,
             "dequeued_needing_change": self.dequeued_needing_change,
-            # "current_build_set": self.current_build_set.uuid,
+            "current_build_set": (self.current_build_set and
+                                  self.current_build_set.getPath()),
             "enqueue_time": self.enqueue_time,
             "report_time": self.report_time,
             "dequeue_time": self.dequeue_time,
@@ -2887,12 +3003,21 @@ class QueueItem(zkobject.ZKObject):
         bundle = data["bundle"] and Bundle.deserialize(
             context, self.queue, data["bundle"])
 
+        build_set = self.current_build_set
+        if build_set and build_set.getPath() == data["current_build_set"]:
+            build_set.refresh(context)
+        else:
+            build_set = (data["current_build_set"] and
+                         BuildSet.fromZK(context, data["current_build_set"]))
+            build_set._set(item=self)
+
         data.update({
             "event": event,
             "change": change,
             "log": get_annotated_logger(self.log, event),
             "dynamic_state": defaultdict(dict, data["dynamic_state"]),
             "bundle": bundle,
+            "current_build_set": build_set,
         })
         return data
 
@@ -2909,9 +3034,10 @@ class QueueItem(zkobject.ZKObject):
             self.uuid, self.change, pipeline)
 
     def resetAllBuilds(self):
+        context = self.pipeline.manager.current_context
         self.updateAttributes(
-            self.pipeline.manager.current_context,
-            current_build_set=BuildSet(self),
+            context,
+            current_build_set=BuildSet.new(context, item=self),
             layout_uuid=None,
             project_pipeline_config=None,
             job_graph=None,
@@ -2929,7 +3055,8 @@ class QueueItem(zkobject.ZKObject):
     def setReportedResult(self, result):
         self.updateAttributes(self.pipeline.manager.current_context,
                               report_time=time.time())
-        self.current_build_set.result = result
+        self.current_build_set.updateAttributes(
+            self.pipeline.manager.current_context, result=result)
 
     def debug(self, msg, indent=0):
         if (not self.project_pipeline_config or
@@ -3520,7 +3647,8 @@ class QueueItem(zkobject.ZKObject):
         self._setMissingJobsSkipped()
 
     def setUnableToMerge(self):
-        self.current_build_set.unable_to_merge = True
+        self.current_build_set.updateAttributes(
+            self.pipeline.manager.current_context, unable_to_merge=True)
         self._setAllJobsSkipped()
 
     def setConfigError(self, error):
@@ -3528,7 +3656,9 @@ class QueueItem(zkobject.ZKObject):
         self.setConfigErrors([err])
 
     def setConfigErrors(self, errors):
-        self.current_build_set.config_errors = errors
+        self.current_build_set.updateAttributes(
+            self.pipeline.manager.current_context,
+            config_errors=errors)
         self._setAllJobsSkipped()
 
     def _setAllJobsSkipped(self):
