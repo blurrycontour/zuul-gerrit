@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "523f356a_521cca89",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-27T17:42:25Z",
+      "side": 1,
+      "message": "I think I would prefer that we define an explicit map to avoid accidental cross contamination. The globals dict is quite large with all of the model contents in it not just the event types. I don\u0027t feel strongly enough to -1 this as the code isn\u0027t currently wrong but it seems like a bad practice.",
+      "revId": "affe9b52398f3a33f71e38d59bbcf36a61d49908",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
