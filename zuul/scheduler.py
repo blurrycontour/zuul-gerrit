@@ -1664,6 +1664,16 @@ class Scheduler(threading.Thread):
             with trigger_queue_lock(
                 self.zk_client, tenant.name, blocking=False
             ):
+                # Update the pipeline changes
+                ctx = self.createZKContext(None, self.log)
+                for pipeline in tenant.layout.pipelines.values():
+                    try:
+                        pipeline.change_list.refresh(ctx)
+                    except Exception:
+                        self.log.exception(
+                            "Unable to refresh pipeline change list for %s",
+                            pipeline.name)
+
                 for event in self.trigger_events[tenant.name]:
                     log = get_annotated_logger(self.log, event.zuul_event_id)
                     log.debug("Forwarding trigger event %s", event)
