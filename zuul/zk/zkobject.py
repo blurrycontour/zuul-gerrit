@@ -50,11 +50,13 @@ class ZKObject:
         raise NotImplementedError()
 
     # This should work for most classes
-    def deserialize(self, data):
+    def deserialize(self, data, context):
         """Implement this method to convert serialized data into object
         attributes.
 
         :param bytes data: A byte string to deserialize
+        :param ZKContext context: A ZKContext object with the current
+            ZK session and lock.
 
         :returns: A dictionary of attributes and values to be set on
         the object.
@@ -155,7 +157,7 @@ class ZKObject:
         while context.sessionIsValid():
             try:
                 data, zstat = context.client.get(path)
-                self._set(**self.deserialize(data))
+                self._set(**self.deserialize(data, context))
                 self._set(_zstat=zstat)
                 return
             except ZookeeperError:
