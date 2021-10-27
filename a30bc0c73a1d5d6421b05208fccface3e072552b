@@ -16,6 +16,24 @@
       "message": "What will both of these be used for?",
       "revId": "a30bc0c73a1d5d6421b05208fccface3e072552b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8a2efbc_13f7f347",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-10-27T13:03:54Z",
+      "side": 1,
+      "message": "The driver helps identify periodic pipelines (timer driver). This is used later to add an icon to pipelines in https://review.opendev.org/c/zuul/zuul/+/810699 - I suppose we could do without it and it\u0027s not strictly related to admin features, but I thought a visual cue about how the difference between pipelines would be helpful to users.\n\nThe manager is needed when implementing promotes via the GUI. Promoting only makes sense on dependent pipelines; we show the promote action only for these pipelines in https://review.opendev.org/c/zuul/zuul/+/781858/15/web/src/containers/status/Change.jsx#184",
+      "parentUuid": "d0b40e2f_c8486c18",
+      "revId": "a30bc0c73a1d5d6421b05208fccface3e072552b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
