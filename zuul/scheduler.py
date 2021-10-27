@@ -757,8 +757,6 @@ class Scheduler(threading.Thread):
                 # In case we don't have a cached layout state we need to
                 # acquire the write lock since we load a new tenant.
                 if layout_state is None:
-                    # TODO (felix): zuul-web should only use a read lock
-                    # -> continue
                     tlock = tenant_write_lock(self.zk_client, tenant_name)
                 else:
                     tlock = tenant_read_lock(self.zk_client, tenant_name)
