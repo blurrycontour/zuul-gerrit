@@ -16,6 +16,23 @@
       "message": "Could we run jobs with the wrong repo state in this case or will job processing error properly when the repo state is None?",
       "revId": "455fb23f8220baed0747104d63167255c1c76a0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77a5218e_2ff3bce6",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 2809,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-27T17:36:06Z",
+      "side": 1,
+      "message": "I expect it to fail rather than run with the wrong state.  How catastrophic a failure depends on whether the jobs have already been frozen.",
+      "revId": "455fb23f8220baed0747104d63167255c1c76a0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
