@@ -103,8 +103,17 @@ from zuul.zk.locks import (
 )
 from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
+from zuul.zk.election import SessionAwareElection
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
+
+
+class SchedulerStatsElection(SessionAwareElection):
+    """Election for emitting scheduler stats."""
+
+    def __init__(self, client):
+        self.election_root = "/zuul/scheduler/stats-election"
+        super().__init__(client.client, self.election_root)
 
 
 class Scheduler(threading.Thread):
@@ -162,7 +171,7 @@ class Scheduler(threading.Thread):
         self.rpc = rpclistener.RPCListener(config, self)
         self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
         self.repl = None
-        self.stats_thread = threading.Thread(target=self.runStats)
+        self.stats_thread = threading.Thread(target=self.runStatsElection)
         self.stats_thread.daemon = True
         self.stop_event = threading.Event()
         self.apsched = BackgroundScheduler()
@@ -240,6 +249,8 @@ class Scheduler(threading.Thread):
         self.ansible_manager = AnsibleManager(
             default_version=self.globals.default_ansible_version)
 
+        self.stats_election = SchedulerStatsElection(self.zk_client)
+
         if not testonly:
             self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
@@ -307,8 +318,20 @@ class Scheduler(threading.Thread):
     def stopConnections(self):
         self.connections.stop()
 
+    def runStatsElection(self):
+        while not self._stopped:
+            try:
+                self.stats_election.run(self.runStats)
+            except Exception:
+                self.log.exception("Exception running election stats:")
+                time.sleep(1)
+
     def runStats(self):
+        self.log.debug("Won stats election")
         while not self.stop_event.wait(self._stats_interval):
+            if not self.stats_election.is_still_valid():
+                self.log.debug("Stats election no longer valid")
+                return
             try:
                 self._runStats()
             except Exception:
