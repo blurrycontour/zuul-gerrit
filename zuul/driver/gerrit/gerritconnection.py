@@ -1114,9 +1114,9 @@ class GerritConnection(ZKChangeCacheMixin, BaseConnection):
              not any(part.startswith('.') or part.endswith('.lock')
                      for part in parts))
 
-    def getProjectBranches(self, project: Project, tenant) -> List[str]:
+    def getProjectBranches(self, project, tenant, refresh=False):
         branches = self._project_branch_cache.get(project.name)
-        if branches is not None:
+        if not refresh and branches is not None:
             return branches
 
         refs = self.getInfoRefs(project)
