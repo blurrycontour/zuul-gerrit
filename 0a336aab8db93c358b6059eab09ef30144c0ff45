@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fd336ee_47c90fa2",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T22:40:14Z",
+      "side": 1,
+      "message": "I see we would have to do something like:\n\n  job_data_vars \u003d {}\n  for k in klass.job_data_attributes:\n    v \u003d kw.pop(k, None)\n    job_data_vars[k] \u003d v\n\n  obj.set(**kw)\n  obj._save(context, create\u003dTrue)\n  \n  update_kw \u003d {}\n  for (k, v) in job_data_vars.items():\n    update_kw[\u0027_\u0027 + k] \u003d obj._makeJobData(context, k, v)\n  if update_kw:\n    obj.updateAttributes(context, **update_kw)\n  return obj",
+      "parentUuid": "435b19f9_79ad51be",
+      "revId": "0a336aab8db93c358b6059eab09ef30144c0ff45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b22b9220_3500b8d8",
