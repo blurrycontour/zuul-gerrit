@@ -210,13 +210,14 @@ class CachedBranchConnection(BaseConnection):
         return cache
 
     def getProjectBranches(self, project: Project,
-                           tenant: Tenant) -> List[str]:
+                           tenant: Tenant, refresh: bool = False) -> List[str]:
         """Get the branch names for the given project.
 
         :param zuul.model.Project project:
             The project for which the branches are returned.
         :param zuul.model.Tenant tenant:
             The related tenant.
+        :param bool refresh: Specify whether to refresh the project branches.
 
         :returns: The list of branch names.
         """
@@ -224,7 +225,7 @@ class CachedBranchConnection(BaseConnection):
         cache = self.getCachedBranches(exclude_unprotected)
         branches = cache.get(project.name)
 
-        if branches is not None:
+        if not refresh and branches is not None:
             return branches
 
         branches = self._fetchProjectBranches(project, exclude_unprotected)
