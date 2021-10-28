@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71ffceaa_e569b303",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3009,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T18:07:03Z",
+      "side": 1,
+      "message": "I see, data[\u0027job_graph\u0027] is capable of being None as well in which case we don\u0027t reuse or reset.",
+      "parentUuid": "af263e53_cd480d7d",
+      "revId": "1c2c5f58f9da618b6d741a47d86858d714e110d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a00e5e_a32c1539",
