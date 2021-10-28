@@ -451,8 +451,11 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                 continue
             # Double check that our cache isn't out of date: it should
             # still exist and be running.
-            req = self.get(req.path)
-            if req is not None and req.state == self.request_class.RUNNING:
+            oldreq = req
+            req = self.get(oldreq.path)
+            if req is None:
+                self._deleteLock(oldreq.uuid)
+            elif req.state == self.request_class.RUNNING:
                 yield req
 
     def _getAllRequestIds(self):
