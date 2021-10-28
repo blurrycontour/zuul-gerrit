@@ -2707,7 +2707,9 @@ class BuildSet(zkobject.ZKObject):
             tries={},
             files_state=self.NEW,
             repo_state_state=self.NEW,
-            configured=False
+            configured=False,
+            debug=False,
+            fail_fast=False,
         )
 
     def setFiles(self, items):
@@ -2791,6 +2793,8 @@ class BuildSet(zkobject.ZKObject):
             "files_state": self.files_state,
             "repo_state_state": self.repo_state_state,
             "configured": self.configured,
+            "debug": self.debug,
+            "fail_fast": self.fail_fast,
         }
         return json.dumps(data).encode("utf8")
 
@@ -3019,7 +3023,6 @@ class QueueItem(zkobject.ZKObject):
             active=False,  # Whether an item is within an active window
             live=True,  # Whether an item is intended to be processed at all
             layout_uuid=None,
-            project_pipeline_config=None,
             job_graph=None,
             _old_job_graph=None,  # Cached job graph of previous layout
             _cached_sql_results={},
@@ -3078,7 +3081,6 @@ class QueueItem(zkobject.ZKObject):
             "active": self.active,
             "live": self.live,
             "layout_uuid": self.layout_uuid,
-            # "project_pipeline_config": self.project_pipeline_config,
             # "job_graph": self.job_graph,
             # "_old_job_graph": self._old_job_graph,
             "event": {
@@ -3161,7 +3163,6 @@ class QueueItem(zkobject.ZKObject):
             context,
             current_build_set=BuildSet.new(context, item=self),
             layout_uuid=None,
-            project_pipeline_config=None,
             job_graph=None,
             _old_job_graph=None)
 
@@ -3181,8 +3182,7 @@ class QueueItem(zkobject.ZKObject):
             self.pipeline.manager.current_context, result=result)
 
     def debug(self, msg, indent=0):
-        if (not self.project_pipeline_config or
-            not self.project_pipeline_config.debug):
+        if not self.current_build_set.debug:
             return
         if indent:
             indent = '  ' * indent
@@ -3200,10 +3200,11 @@ class QueueItem(zkobject.ZKObject):
 
         ppc = layout.getProjectPipelineConfig(self)
         try:
-            # Conditionally set self.ppc so that the debug method can
-            # consult it as we resolve the jobs.
-            self.updateAttributes(context, project_pipeline_config=ppc)
+            # Conditionally set self.current_build_set.debug so that
+            # the debug method can consult it as we resolve the jobs.
             if ppc:
+                self.current_build_set.updateAttributes(
+                    context, debug=ppc.debug, fail_fast=ppc.fail_fast)
                 for msg in ppc.debug_messages:
                     self.debug(msg)
             job_graph = layout.createJobGraph(self, ppc, skip_file_matcher)
@@ -3222,8 +3223,7 @@ class QueueItem(zkobject.ZKObject):
 
             self.updateAttributes(context, job_graph=job_graph)
         except Exception:
-            self.updateAttributes(context, project_pipeline_config=None,
-                                  job_graph=None, _old_job_graph=None)
+            self.updateAttributes(context, job_graph=None, _old_job_graph=None)
             raise
 
     def hasJobGraph(self):
