@@ -432,9 +432,6 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         server.fulfillCancel(a)
         server.unlock(a)
         self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
-        for _ in iterate_timeout(10, "Wait for watches to be registered"):
-            if self.getZKWatches():
-                break
 
         # Scheduler removes build request on completion
         client.remove(sched_a)
@@ -447,7 +444,6 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                               '/zuul/executor/unzoned/result-data',
                               '/zuul/executor/unzoned/results',
                               '/zuul/executor/unzoned/waiters']))
-        self.assertEqual(self.getZKWatches(), {})
 
     def test_build_request_remove(self):
         # Test the scheduler forcibly removing a request (perhaps the
@@ -716,7 +712,6 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(self.getZKPaths(client.RESULT_DATA_ROOT), [])
         self.assertEqual(self.getZKPaths(client.WAITER_ROOT), [])
         self.assertEqual(self.getZKPaths(client.LOCK_ROOT), [])
-        self.assertEqual(self.getZKWatches(), {})
 
     def test_merge_request(self):
         # Test the lifecycle of a merge request

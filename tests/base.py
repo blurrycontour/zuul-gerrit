@@ -4420,27 +4420,6 @@ class BaseTestCase(testtools.TestCase):
             ChrootedKazooFixture(self.id())
         )
 
-    def getZKWatches(self):
-        chroot = self.zk_chroot_fixture.zookeeper_chroot
-        data = self.zk_client.client.command(b'wchp')
-        ret = {}
-        sessions = None
-        for line in data.split('\n'):
-            if line.startswith('\t'):
-                if sessions is not None:
-                    sessions.append(line.strip())
-            else:
-                line = line.strip()
-                if not line:
-                    continue
-                if line.startswith(chroot):
-                    line = line[len(chroot):]
-                    sessions = []
-                    ret[line] = sessions
-                else:
-                    sessions = None
-        return ret
-
     def getZKTree(self, path, ret=None):
         """Return the contents of a ZK tree as a dictionary"""
         if ret is None:
