@@ -329,12 +329,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             self.clearParams(request)
         except NoNodeError:
             pass
-        try:
-            # Delete the lock parent node as well
-            path = "/".join([self.LOCK_ROOT, request.uuid])
-            self.kazoo_client.delete(path, recursive=True)
-        except NoNodeError:
-            pass
+        self._deleteLock(request.uuid)
 
     # We use child nodes here so that we don't need to lock the
     # request node.
@@ -414,12 +409,18 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
         # We may have just re-created the lock parent node just after the
         # scheduler deleted it; therefore we should (re-) delete it.
-        try:
-            # Delete the lock parent node as well.
-            path = "/".join([self.LOCK_ROOT, request.uuid])
-            self.kazoo_client.delete(path, recursive=True)
-        except NoNodeError:
-            pass
+        self._deleteLock(request.uuid)
+
+    def _deleteLock(self, uuid):
+        # Recursively delete the children and the lock parent node.
+        path = "/".join([self.LOCK_ROOT, uuid])
+        children = self.kazoo_client.get_children(path)
+        tr = self.kazoo_client.transaction()
+        for child in children:
+            tr.delete("/".join([path, child]))
+        tr.delete(path)
+        # We don't care about the results
+        tr.commit()
 
     def unlock(self, request):
         if request.lock is None:
