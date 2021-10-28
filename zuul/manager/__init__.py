@@ -1086,7 +1086,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if not item.current_build_set.job_graph:
                     continue
 
-                for job in item.current_build_set.job_graph.jobs.values():
+                for job in item.current_build_set.job_graph.getJobs():
                     if job.override_checkout:
                         branches.add(job.override_checkout)
 
