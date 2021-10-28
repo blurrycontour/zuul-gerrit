@@ -2257,8 +2257,9 @@ class JobGraph(object):
         data = {
             "jobs": self.jobs,
             "dependencies": self._dependencies,
-            # TODO: serialize
-            # "project_metadata": self.project_metadata,
+            "project_metadata": {
+                k: v.toDict() for (k, v) in self.project_metadata.items()
+            },
         }
         return data
 
@@ -2267,7 +2268,10 @@ class JobGraph(object):
         self = klass(job_map)
         self.jobs = data['jobs']
         self._dependencies = data['dependencies']
-        # self.project_metadata = data['project_metadata']
+        self.project_metadata = {
+            k: ProjectMetadata.fromDict(v)
+            for (k, v) in data['project_metadata'].items()
+        }
         return self
 
     def addJob(self, job):
@@ -5256,7 +5260,7 @@ class ProjectConfig(ConfigObject):
         return d
 
 
-class ProjectMetadata(object):
+class ProjectMetadata:
     """Information about a Project
 
     A Layout holds one of these for each project it knows about.
@@ -5268,6 +5272,21 @@ class ProjectMetadata(object):
         self.merge_mode = None
         self.default_branch = None
         self.queue_name = None
+
+    def toDict(self):
+        return {
+            'merge_mode': self.merge_mode,
+            'default_branch': self.default_branch,
+            'queue_name': self.queue_name,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        o = cls()
+        o.merge_mode = data['merge_mode']
+        o.default_branch = data['default_branch']
+        o.queue_name = data['queue_name']
+        return o
 
 
 class SystemAttributes:
