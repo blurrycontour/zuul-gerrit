@@ -41,6 +41,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5468f19_1ef53be2",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T23:08:46Z",
+      "side": 1,
+      "message": "In that case I think we should update getQueue below to use self.state.queues. And similar with getRelativePriorityQueue.",
+      "parentUuid": "ec6f2706_8f2ce74c",
+      "revId": "11c8c9e8f40f63752be8f4d39100ad98470a9867",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8054ec1_1e49c844",
