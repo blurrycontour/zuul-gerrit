@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01f9d288_eb8cf3f1",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T22:18:16Z",
+      "side": 1,
+      "message": "Couldn\u0027t this be a simple list? We seem to append to the list and then serialize the list out again. We don\u0027t depend on this being a key value store.",
+      "revId": "eb7f1a42ce96aab6773418b7825e25b56e15401c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
