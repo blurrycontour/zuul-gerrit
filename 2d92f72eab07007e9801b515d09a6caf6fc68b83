@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97ab9d00_64146a34",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1627,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T16:41:03Z",
+      "side": 1,
+      "message": "Should this return a FrozenJob? It seems weird that a FrozenJob can return an unfrozen job. Like some sort of violation of the frozen property.",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12c544f8_415b2cd9",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1664,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T16:41:03Z",
+      "side": 1,
+      "message": "See above but should we be operating on a FrozenJob here?",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf5f7013_38d32616",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T16:41:03Z",
+      "side": 1,
+      "message": "If we go to serialize this FrozenJob to ZK I think this wants to be a FrozenJob too? (related to comments above).",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5f6eee8_58d1766f",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1726,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T16:41:03Z",
+      "side": 1,
+      "message": "Wouldn\u0027t a normal super call continue to do the right thing here since AbstractJob has no __init__?",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7680f75c_4411237b",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1853,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T16:41:03Z",
+      "side": 1,
+      "message": "It seems a little weird that the Job class would use special attribute access and AbstractJob and FrozenJob do not. I suppose that is because Job has to build out the total set of attributes and doing it this way simplifies things.",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
