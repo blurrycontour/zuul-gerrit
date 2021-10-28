@@ -125,6 +125,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "96cac5da_78132569",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T15:06:32Z",
+      "side": 1,
+      "message": "Based on my limited understand, I suspect we don\u0027t need anything because the server never actually receives this data, so it\u0027s not collected.\n\nBut if the server starts logging usernames, that might make it more relevant.  But then we\u0027d look at the exclusions for required operation.\n\nHaving said that, actually just clearly saying what happens with the data isn\u0027t a bad thing, and happens to be in the spirit of the law anyway, so maybe we should keep it and just adjust it to be a little more clear?  You\u0027ve done that in a later PS, so lgtm.  :)",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "cad74c93_3b804cfc",
         "filename": "web/src/containers/config/Config.jsx",
         "patchSetId": 40
@@ -160,6 +177,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "05f2caa8_7ee7e2ee",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T15:06:32Z",
+      "side": 1,
+      "message": "Thanks!",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "8b83798b_7db209f4",
         "filename": "web/src/pages/AuthCallback.jsx",
         "patchSetId": 40
@@ -189,6 +223,23 @@
       "side": 1,
       "message": "I believe so. We could replace useEffect below with the onSignIn callback of the config property of AuthProvider, see https://github.com/bjerkio/oidc-react#usage",
       "parentUuid": "8b83798b_7db209f4",
+      "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd7635f_79716722",
+        "filename": "web/src/pages/AuthCallback.jsx",
+        "patchSetId": 40
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T15:06:32Z",
+      "side": 1,
+      "message": "Okay, I might play around with this a bit, at least so I understand it better.  It would be cool not to need this, but even if we do, this is pretty easy to follow.",
       "revId": "2dc38b62bdcf36ef581925ad11fd2815f1058978",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
