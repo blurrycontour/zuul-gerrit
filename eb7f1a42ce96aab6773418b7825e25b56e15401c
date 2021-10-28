@@ -16,6 +16,23 @@
       "message": "Couldn\u0027t this be a simple list? We seem to append to the list and then serialize the list out again. We don\u0027t depend on this being a key value store.",
       "revId": "eb7f1a42ce96aab6773418b7825e25b56e15401c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df564bed_5c8421e6",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T22:38:09Z",
+      "side": 1,
+      "message": "I suppose there is a de-duplication aspect, but that doesn\u0027t seem to be likely to happen.  I\u0027ll make a followup so we can keep this stack moving.",
+      "revId": "eb7f1a42ce96aab6773418b7825e25b56e15401c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
