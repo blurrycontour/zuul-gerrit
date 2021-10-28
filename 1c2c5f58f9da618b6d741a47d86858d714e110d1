@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af263e53_cd480d7d",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3009,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T18:00:16Z",
+      "side": 1,
+      "message": "I think it can be None; it\u0027s initialized to that value and remains so until the buildset configuration is set.\n\nThe conditions above give us a JobGraph object if we have a job_graph variable in ZK.  Then here, iff we have a JobGraph object we populate its jobs.",
+      "revId": "1c2c5f58f9da618b6d741a47d86858d714e110d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a00e5e_a32c1539",
@@ -31,6 +48,23 @@
       "writtenOn": "2021-10-28T17:52:32Z",
       "side": 1,
       "message": "Thinking out loud here would it make sense to have updateAttributes handle the check for equivalence before doing the zk writes? Then we wouldn\u0027t need to guard all these updates.",
+      "revId": "1c2c5f58f9da618b6d741a47d86858d714e110d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "964491e7_45c2ea89",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3840,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T18:00:16Z",
+      "side": 1,
+      "message": "Yeah, that could be an improvement.",
       "revId": "1c2c5f58f9da618b6d741a47d86858d714e110d1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
