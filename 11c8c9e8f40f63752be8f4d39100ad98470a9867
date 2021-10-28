@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1de0e72b_0ce8924d",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T23:03:08Z",
+      "side": 1,
+      "message": "To avoid confusion it would be nice if we could add and get from objects symmetrically. self.queues is a property defined as returning self.state.queues. Can we use self.state.queues or self.queues for both operations?",
+      "range": {
+        "startLine": 452,
+        "startChar": 12,
+        "endLine": 452,
+        "endChar": 23
+      },
+      "revId": "11c8c9e8f40f63752be8f4d39100ad98470a9867",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8054ec1_1e49c844",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T23:03:08Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "11c8c9e8f40f63752be8f4d39100ad98470a9867",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
