@@ -5974,6 +5974,7 @@ For CI problems and help debugging, contact ci@example.org"""
         # Now reload the configuration (simulate a HUP) to check the pipeline
         # comes out of disabled
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
 
