@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "516ebb27_40b3d05e",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T18:05:10Z",
+      "side": 1,
+      "message": "Do we need to get the children as part of the transaction as well? That way we don\u0027t get_children with a short list and fail to delete path below because one of its children remain?",
+      "revId": "ed275436d8640b1cb0ef739dbd661322b5bf9321",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
