@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f2b79fa_fbbaf5f4",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1673,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T17:11:21Z",
+      "side": 1,
+      "message": "Minor nit: might consider calling this new_parent_data and use new_secret_parent_data and new_artifact_data below as well.\n\nCan help ensure that when we return we only return the sanitized data and don\u0027t accidentally return an unupdated parent_data (though for this to happen line 1665 wouldhave to be removed which would cause 1666 to fail as v won\u0027t be defined). Probably overthinking this.",
+      "revId": "6e3c95b65ddc63292cad93a9a0f648a6c0d8b1ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
