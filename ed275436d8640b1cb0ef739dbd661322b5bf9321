@@ -16,6 +16,23 @@
       "message": "Do we need to get the children as part of the transaction as well? That way we don\u0027t get_children with a short list and fail to delete path below because one of its children remain?",
       "revId": "ed275436d8640b1cb0ef739dbd661322b5bf9321",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f689e10_60136c28",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 417,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T18:14:07Z",
+      "side": 1,
+      "message": "The transactions are basically write only; it\u0027s basically zk operations bundled into one.  So there\u0027s no opportunity to get data back from that one operation (you can, however, embed stat checks in it, so you can ensure nodes are still up to date).  In this way, it differs from a SQL transaction.\n\nPut another way, the transaction() method doesn\u0027t do anything on the server.  The only interaction with the server is the commit() method, which is all-or-none.\n\nThis behavior is pretty close to the existing recursive delete which just lists children then deletes them and the parent (but goes \u003e1 level deep; we only need 1).  This isn\u0027t perfect, but should work most of the time.  It will prevent the issue with isLocked because that checks the parent before trying to create the children.  It won\u0027t prevent a case where two workers try to lock at the same time and then one of them finishes the job before the other one cleans up its failed lock attempt.  The chance of that happening is vanishingly small, but I guess we\u0027ll see if it shows up in the unit tests.\n\nBTW, failure here is harmless -- this was just tripping our \"is ZK clean\" check at the end of test runs.",
+      "revId": "ed275436d8640b1cb0ef739dbd661322b5bf9321",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
