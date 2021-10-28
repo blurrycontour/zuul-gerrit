@@ -34,6 +34,40 @@
       "parentUuid": "d0b40e2f_c8486c18",
       "revId": "a30bc0c73a1d5d6421b05208fccface3e072552b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abd3adec_282af0a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T14:53:40Z",
+      "side": 1,
+      "message": "The use of pipeline manager sense.\n\nTechnically you can promote any item in any kind of pipeline.  But since it just moves it up to the top of the change queue, it doesn\u0027t shift position in an independent pipeline; but it does restart jobs.  In a supercedent or serial pipeline it would probably do the wrong thing, in that it would publish artifacts out of order.\n\nSo I think I agree that it probably makes sense to only show it in the UI for a dependent pipeline.  And if we want to expose a \"restart\" feature, we should actually just make a new feature rather than abusing promote for that, since while it would be okay for independent, it would be detrimental for serial/supercedent.\n\nI\u0027m a bit conflicted on the triggers.  It\u0027s entirely possible to have a pipeline with, say, a gerrit and a timer trigger.  So it\u0027s a multi-valued characteristic of a pipeline.  In fact, a pipeline with gerrit, github, zuul, and timer would be an unsurprising configuration to me.  How we actually manage displaying that will be interesting, but I agree it\u0027s interesting information to expose.\n\nThanks for the info, that all makes sense.  In the future, at least a brief mention of \"why\" in the commit message would be helpful.",
+      "revId": "a30bc0c73a1d5d6421b05208fccface3e072552b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9c2b92d_73cfbe65",
+        "filename": "zuul/model.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T14:53:40Z",
+      "side": 1,
+      "message": "This is good forward-compatible design; there\u0027s room to extend information about the triggers later if we want.",
+      "revId": "a30bc0c73a1d5d6421b05208fccface3e072552b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
