@@ -96,7 +96,7 @@ from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import zkobject, ZooKeeperClient
 from zuul.zk.event_queues import ConnectionEventQueue
 from zuul.zk.executor import ExecutorApi
-from zuul.zk.locks import SessionAwareLock
+from zuul.zk.locks import tenant_read_lock, pipeline_lock, SessionAwareLock
 from zuul.zk.merger import MergerApi
 from psutil import Popen
 
@@ -4730,6 +4730,9 @@ class ZuulTestCase(BaseTestCase):
         self.scheds.execute(
             lambda app: app.start(self.validate_tenants))
 
+        if not self.validate_tenants:
+            self.waitUntilSettled()
+
     def createScheduler(self):
         self.scheds.create(
             self.log, self.config, self.changes,
@@ -4737,10 +4740,12 @@ class ZuulTestCase(BaseTestCase):
             self.poller_events, self.git_url_with_auth,
             self.fake_sql, self.addCleanup, self.validate_tenants)
 
-    def createZKContext(self):
-        # Just make sure the lock is acquired
-        self._context_lock.acquire(blocking=False)
-        return zkobject.ZKContext(self.zk_client, self._context_lock,
+    def createZKContext(self, lock=None):
+        if lock is None:
+            # Just make sure the lock is acquired
+            self._context_lock.acquire(blocking=False)
+            lock = self._context_lock
+        return zkobject.ZKContext(self.zk_client, lock,
                                   stop_event=None, log=self.log)
 
     def __event_queues(self, matcher) -> List[Queue]:
@@ -5064,6 +5069,7 @@ class ZuulTestCase(BaseTestCase):
                                    (id(obj), repr(obj)))
         finally:
             gc.enable()
+        self.refreshPipelines(self.scheds.first.sched)
         self.assertEmptyQueues()
         self.assertNodepoolState()
         self.assertNoGeneratedKeys()
@@ -5454,6 +5460,7 @@ class ZuulTestCase(BaseTestCase):
                     # report that we are settled.
                     for sched in map(lambda app: app.sched,
                                      self.scheds.filter(matcher)):
+                        self.refreshPipelines(sched)
                         sched.run_handler_lock.release()
                     self.executor_server.lock.release()
                     self.log.debug("...settled after %.3f ms / %s loops (%s)",
@@ -5469,6 +5476,17 @@ class ZuulTestCase(BaseTestCase):
                 sched.wake_event.wait(0.1)
             # Let other threads work
             time.sleep(0.1)
+
+    def refreshPipelines(self, sched):
+        for tenant in sched.abide.tenants.values():
+            with tenant_read_lock(self.zk_client, tenant.name):
+                for pipeline in tenant.layout.pipelines.values():
+                    with pipeline_lock(
+                        self.zk_client, tenant.name, pipeline.name
+                    ) as lock:
+                        ctx = self.createZKContext(lock)
+                        with pipeline.manager.currentContext(ctx):
+                            pipeline.state.refresh(ctx)
 
     def _logQueueStatus(self, logger, matcher, all_zk_queues_empty,
                         all_merge_jobs_waiting, all_builds_reported,
@@ -5550,16 +5568,13 @@ class ZuulTestCase(BaseTestCase):
         # Make sure there are no orphaned jobs
         for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
-                ctx = self.createZKContext()
-                with pipeline.manager.currentContext(ctx):
-                    pipeline.state.refresh(ctx)
-                    for pipeline_queue in pipeline.queues:
-                        if len(pipeline_queue.queue) != 0:
-                            print('pipeline %s queue %s contents %s' % (
-                                pipeline.name, pipeline_queue.name,
-                                pipeline_queue.queue))
-                        self.assertEqual(len(pipeline_queue.queue), 0,
-                                         "Pipelines queues should be empty")
+                for pipeline_queue in pipeline.queues:
+                    if len(pipeline_queue.queue) != 0:
+                        print('pipeline %s queue %s contents %s' % (
+                            pipeline.name, pipeline_queue.name,
+                            pipeline_queue.queue))
+                    self.assertEqual(len(pipeline_queue.queue), 0,
+                                     "Pipelines queues should be empty")
 
     def assertCleanZooKeeper(self):
         # Make sure there are no extraneous ZK nodes
