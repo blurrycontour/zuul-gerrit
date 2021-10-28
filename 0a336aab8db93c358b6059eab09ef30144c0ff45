@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "435b19f9_79ad51be",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T22:32:05Z",
+      "side": 1,
+      "message": "Responding here -- unfortunately, in order to create the JobData object in ZK, we need this object to exist first.  So here we need to make the check to decide whether or not we are going to store the data on this object as a dict.  Then in line 1676 we create the object in ZK, then below that we create the actual JobData object which writes that to ZK.",
+      "revId": "0a336aab8db93c358b6059eab09ef30144c0ff45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b22b9220_3500b8d8",
