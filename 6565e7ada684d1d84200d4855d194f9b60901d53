@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a4db87a_9f07ff52",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1162,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T21:41:27Z",
+      "side": 1,
+      "message": "Is this log entry overindented? I\u0027m not sure how useful it is to get an ever growing set of projects? We can\u0027t reallytell which come from a specific job in that case.",
+      "revId": "6565e7ada684d1d84200d4855d194f9b60901d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7c6fc2b_26df8e3c",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1935,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T21:41:27Z",
+      "side": 1,
+      "message": "Should we include this attribute of the role in the freeze output?",
+      "range": {
+        "startLine": 1935,
+        "startChar": 12,
+        "endLine": 1935,
+        "endChar": 24
+      },
+      "revId": "6565e7ada684d1d84200d4855d194f9b60901d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
