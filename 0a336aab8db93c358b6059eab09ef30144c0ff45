@@ -53,6 +53,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbb30f0b_ef749811",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T22:53:59Z",
+      "side": 1,
+      "message": "We could do that, but it means we would always make two ZK writes.  So we\u0027re trading the cost of a local cpu-bound json serialization in the rare case that the job data is very large, for the cost of an extra network round-trip in every case.  I think it\u0027d be better to just save the serialized json if we\u0027re worried about the cost of that.\n\nI\u0027m not, since this only triggers if someone returns 10kb worth of data via zuul_return; that should be exceedingly rare.",
+      "revId": "0a336aab8db93c358b6059eab09ef30144c0ff45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b22b9220_3500b8d8",
