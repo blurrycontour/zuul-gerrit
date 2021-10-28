@@ -69,10 +69,7 @@ COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 
-# https://podman.io/getting-started/installation.html
-COPY tools/4D64390375060AA4.asc /etc/apt/trusted.gpg.d/kubic.asc
-RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_11/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
-  && apt-get update \
+RUN apt-get update \
   && apt-get install -y skopeo \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
