@@ -24,6 +24,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec6f2706_8f2ce74c",
+        "filename": "zuul/model.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T23:06:09Z",
+      "side": 1,
+      "message": "I see self.queues as being an external-facing compat shim; I think I like that internally we\u0027re using the real object; to me it seems more clear and is a good reminder of the split between in-memory layout object and ZK state representation.",
+      "revId": "11c8c9e8f40f63752be8f4d39100ad98470a9867",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8054ec1_1e49c844",
