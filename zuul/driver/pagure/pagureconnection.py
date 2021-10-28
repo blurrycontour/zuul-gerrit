@@ -568,10 +568,10 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
             url += '/c/%s' % sha
         return url
 
-    def getProjectBranches(self, project, tenant):
+    def getProjectBranches(self, project, tenant, refresh=False):
         branches = self.project_branch_cache.get(project.name)
 
-        if branches is not None:
+        if not refresh and branches is not None:
             return branches
 
         pagure = self.get_project_api_client(project.name)
