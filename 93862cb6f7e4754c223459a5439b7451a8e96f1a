@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e432f7e_11289a5d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1608,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-28T06:38:58Z",
+      "side": 1,
+      "message": "We also need to refresh the change list here.",
+      "revId": "93862cb6f7e4754c223459a5439b7451a8e96f1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
