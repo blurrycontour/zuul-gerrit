@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4265d4f_037112c3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T21:53:24Z",
+      "side": 1,
+      "message": "There\u0027s a log line above it which emits the job name, so you could check the delta to figure that out.\n\nAs for the usefulness, I can\u0027t say; I haven\u0027t used this line.",
+      "revId": "6565e7ada684d1d84200d4855d194f9b60901d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7c6fc2b_26df8e3c",
@@ -37,6 +54,23 @@
         "endLine": 1935,
         "endChar": 24
       },
+      "revId": "6565e7ada684d1d84200d4855d194f9b60901d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72e08ae6_cb3a44b6",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1935,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T21:53:24Z",
+      "side": 1,
+      "message": "You mean whether the role project is a trusted project?  It doesn\u0027t matter; whether a project is trusted or not doesn\u0027t affect roles (only playbooks; and it\u0027s included there).",
       "revId": "6565e7ada684d1d84200d4855d194f9b60901d53",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
