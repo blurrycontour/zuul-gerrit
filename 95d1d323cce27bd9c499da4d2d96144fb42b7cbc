@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a56252c9_55eb1897",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T22:49:31Z",
+      "side": 1,
+      "message": "This should be old_queues\u003dold_queues now.",
+      "range": {
+        "startLine": 589,
+        "startChar": 39,
+        "endLine": 589,
+        "endChar": 74
+      },
+      "revId": "95d1d323cce27bd9c499da4d2d96144fb42b7cbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
