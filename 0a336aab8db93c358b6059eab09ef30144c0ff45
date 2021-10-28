@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6bb5faa_fccf4a24",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T22:06:58Z",
+      "side": 1,
+      "message": "See below comment.",
+      "revId": "0a336aab8db93c358b6059eab09ef30144c0ff45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b22b9220_3500b8d8",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1887,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T22:06:58Z",
+      "side": 1,
+      "message": "We appear to do this check twice in some circumstances. When we add to job_data_vars above and here for example. Above can we just call _makeJobData and have it return the correct type for us and cut out a json conversion?",
+      "range": {
+        "startLine": 1887,
+        "startChar": 11,
+        "endLine": 1887,
+        "endChar": 67
+      },
+      "revId": "0a336aab8db93c358b6059eab09ef30144c0ff45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
