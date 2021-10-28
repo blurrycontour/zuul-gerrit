@@ -551,7 +551,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         """
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
         self.kazoo_client.set(
-            path, json.dumps(node_request.toDict()).encode('utf8'))
+            path, json.dumps(node_request.toDict()).encode('utf8'),
+            version=node_request.stat.version)
 
     def updateNodeRequest(self, node_request, data=None):
         """
