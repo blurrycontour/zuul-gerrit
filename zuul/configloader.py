@@ -1617,7 +1617,7 @@ class TenantParser(object):
 
     def _getProjectBranches(self, tenant, tpc):
         branches = sorted(tpc.project.source.getProjectBranches(
-            tpc.project, tenant))
+            tpc.project, tenant, refresh=True))
         if 'master' in branches:
             branches.remove('master')
             branches = ['master'] + branches
