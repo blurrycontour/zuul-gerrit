@@ -579,12 +579,12 @@ class PipelineState(zkobject.ZKObject):
         return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
 
     def setOldQueues(self, context, queues):
-        old_queues = OrderedDict()
+        old_queues = []
         for queue in queues:
             queue._set(pipeline=self.pipeline)
             for item in queue.queue:
                 item._set(pipeline=self.pipeline)
-            old_queues[queue.uuid] = queue
+            old_queues.append(queue)
 
         self.updateAttributes(context, old_queues=list(old_queues.values()))
 
@@ -612,7 +612,7 @@ class PipelineState(zkobject.ZKObject):
         # Restore the old queues first, so that in case an item is
         # already in one of the new queues the item(s) ahead/behind
         # pointers are corrected when restoring the new queues.
-        old_queues_by_path = OrderedDict()
+        old_queues = []
         for queue_path in data["old_queues"]:
             queue = existing_queues.get(queue_path)
             if queue:
@@ -620,9 +620,9 @@ class PipelineState(zkobject.ZKObject):
             else:
                 queue = ChangeQueue.fromZK(context, queue_path,
                                            pipeline=self.pipeline)
-            old_queues_by_path[queue_path] = queue
+            old_queues.append(queue)
 
-        queues_by_path = OrderedDict()
+        queues = []
         for queue_path in data["queues"]:
             queue = existing_queues.get(queue_path)
             if queue:
@@ -630,7 +630,7 @@ class PipelineState(zkobject.ZKObject):
             else:
                 queue = ChangeQueue.fromZK(context, queue_path,
                                            pipeline=self.pipeline)
-            queues_by_path[queue_path] = queue
+            queues.append(queue)
 
         if hasattr(self.pipeline.manager, "change_queue_managers"):
             # Clear out references to old queues
@@ -638,7 +638,7 @@ class PipelineState(zkobject.ZKObject):
                 cq_manager.created_for_branches.clear()
 
             # Add queues to matching change queue managers
-            for queue in queues_by_path.values():
+            for queue in queues:
                 project_cname, branch = queue.project_branches[0]
                 for cq_manager in self.pipeline.manager.change_queue_managers:
                     managed_projects = {
@@ -649,8 +649,8 @@ class PipelineState(zkobject.ZKObject):
                         break
 
         data.update({
-            "queues": list(queues_by_path.values()),
-            "old_queues": list(old_queues_by_path.values()),
+            "queues": queues,
+            "old_queues": old_queues,
         })
         return data
 
