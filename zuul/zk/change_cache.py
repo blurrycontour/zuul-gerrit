@@ -169,22 +169,19 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
     def _cacheWatcher(self, cache_keys):
         # This method deals with key hashes exclusively
         cache_keys = set(cache_keys)
-        existing_keys = set(self._change_cache.keys())
-        deleted_keys = existing_keys - cache_keys
-        for key in deleted_keys:
+
+        deleted_watches = self._watched_keys - cache_keys
+        for key in deleted_watches:
             self.log.debug("Watcher removing %s from cache", key)
+            self._watched_keys.discard(key)
             with contextlib.suppress(KeyError):
                 del self._change_cache[key]
             with contextlib.suppress(KeyError):
                 del self._change_locks[key]
 
-        stale_watches = self._watched_keys - cache_keys
-        for key in stale_watches:
-            with contextlib.suppress(KeyError):
-                self._watched_keys.remove(key)
-
         new_keys = cache_keys - self._watched_keys
         for key in new_keys:
+            self.log.debug("Watcher adding %s", key)
             ExistingDataWatch(self.kazoo_client,
                               f"{self.cache_root}/{key}",
                               self._cacheItemWatcher)
