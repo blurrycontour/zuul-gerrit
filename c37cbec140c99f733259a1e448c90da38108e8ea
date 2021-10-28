@@ -33,6 +33,23 @@
       "message": "recheck gather more data",
       "revId": "c37cbec140c99f733259a1e448c90da38108e8ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46c1e819_87547de2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-28T16:16:38Z",
+      "side": 1,
+      "message": "That last failure was due to high system load: https://zuul.opendev.org/t/zuul/build/1549250827ff4d9ebc149b10e8ac36eb/log/job-output.txt#10910 and we never seemed to drop off low enough after that to reregister. I suspect that polling more frequently isn\u0027t fixing this.\n\nWe might need to disable the sensors in testing instead? But that causes sensor specific tests to fail which means we need to do a bit more work in that space.",
+      "revId": "c37cbec140c99f733259a1e448c90da38108e8ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
