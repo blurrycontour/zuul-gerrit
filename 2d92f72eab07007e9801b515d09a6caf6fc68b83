@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07641a22_afd43029",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1627,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T16:47:25Z",
+      "side": 1,
+      "message": "Actually that\u0027s just a static method that returns a dictionary.\n\nProbably this should be a util method or something, but I think this one may be tailored to the circumstances of a job, so we\u0027d have to check that.",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12c544f8_415b2cd9",
@@ -31,6 +48,23 @@
       "writtenOn": "2021-10-28T16:41:03Z",
       "side": 1,
       "message": "See above but should we be operating on a FrozenJob here?",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54b9246b_f2784f6f",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1664,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T16:47:25Z",
+      "side": 1,
+      "message": "Ditto, this is just a dict.",
       "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +103,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fdabba4f_c64dda8a",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1726,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T16:47:25Z",
+      "side": 1,
+      "message": "I think that\u0027s right; this is probably left over from an earlier design.  Given that it\u0027s not wrong, do we want to bother changing it?",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7680f75c_4411237b",
@@ -82,6 +133,23 @@
       "writtenOn": "2021-10-28T16:41:03Z",
       "side": 1,
       "message": "It seems a little weird that the Job class would use special attribute access and AbstractJob and FrozenJob do not. I suppose that is because Job has to build out the total set of attributes and doing it this way simplifies things.",
+      "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09f07cca_4172e018",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1853,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T16:47:25Z",
+      "side": 1,
+      "message": "Yes, FrozenJob is a much more \"normal\" class since its attributes have fixed values.",
       "revId": "2d92f72eab07007e9801b515d09a6caf6fc68b83",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
