@@ -16,6 +16,23 @@
       "message": "Do we need to activate the current context here? We are passing the context directly to the `refresh()` method, so it looks like this is not necessary.",
       "revId": "a37c76c13355d7ca3a5c50a4314cc4f9cffb4e18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76b23c5d_411d3839",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-28T05:33:33Z",
+      "side": 1,
+      "message": "Good point, we probably don\u0027t.",
+      "revId": "a37c76c13355d7ca3a5c50a4314cc4f9cffb4e18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
