@@ -16,6 +16,23 @@
       "message": "Do we ignore failures here on purpose?",
       "revId": "d682253bb2322ea9452b2ed02490708aec60c0fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af2c60ef_b4fa15d5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1674,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-29T17:04:20Z",
+      "side": 1,
+      "message": "Yes.  I can\u0027t think of a reason to fail (because writes are atomic), so this is truly an exceptional situation.  If we can\u0027t load for some reason I don\u0027t think it\u0027s critical, we just might miss some events.  And if the reason is some kind of corruption, then the correct info will be written out later.",
+      "revId": "d682253bb2322ea9452b2ed02490708aec60c0fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
