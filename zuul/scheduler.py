@@ -292,6 +292,7 @@ class Scheduler(threading.Thread):
         self.stop_event.set()
         self.stopConnections()
         self.wake_event.set()
+        self.stats_election.cancel()
         self.stats_thread.join()
         self.apsched.shutdown()
         self.rpc.stop()
