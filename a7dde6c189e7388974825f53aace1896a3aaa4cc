@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcc5f26c_3d36c05a",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3079,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T15:36:28Z",
+      "side": 1,
+      "message": "Since this path attribute is set externally we should probably make it a public attribute. I think we may have done this in at least one other place (ExtraRepoState?), but it might be good to clean this up to make it more clear when reading.",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6b10674_31e996d0",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3183,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T15:36:28Z",
+      "side": 1,
+      "message": "See above comment.",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46e375c7_ad777114",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3187,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T15:36:28Z",
+      "side": 1,
+      "message": "See above comment.",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9840dfdc_23ff5e9c",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3586,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T15:36:28Z",
+      "side": 1,
+      "message": "Why not use the activeContext context manager here?",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0440e9b_253a6684",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3590,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T15:36:28Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c495258c_c7bd7e4a",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3597,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T15:36:28Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
