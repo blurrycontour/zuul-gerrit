@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "464c07f1_a5e7f243",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3079,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-29T15:42:44Z",
+      "side": 1,
+      "message": "I think we should rework zkobject to basically just do this for all objects, and then we won\u0027t actually need to supply it with updateAttributes; it would just be included in the constructors.  I think I used the underscore here to remind us that it isn\u0027t actually stored as a real attribute.",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6b10674_31e996d0",
@@ -65,6 +82,23 @@
       "writtenOn": "2021-10-29T15:36:28Z",
       "side": 1,
       "message": "Why not use the activeContext context manager here?",
+      "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d89f23a1_09a7482d",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3586,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-10-29T15:42:44Z",
+      "side": 1,
+      "message": "Hrm, I can\u0027t think of a reason.  I\u0027ll make a followup.",
       "revId": "a7dde6c189e7388974825f53aace1896a3aaa4cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
