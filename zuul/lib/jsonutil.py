@@ -31,5 +31,5 @@ class ZuulJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-def json_dumps(obj):
-    return json.dumps(obj, cls=ZuulJSONEncoder)
+def json_dumps(obj, **kw):
+    return json.dumps(obj, cls=ZuulJSONEncoder, **kw)
