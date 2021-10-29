@@ -69,6 +69,24 @@
       "parentUuid": "8bb0f716_25cd13e0",
       "revId": "ba1d165f3bafa1a8eb75bac3646a95774ca86786",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "580fe45a_ba8ace01",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-10-29T17:17:34Z",
+      "side": 1,
+      "message": "The layout UUID will not be False, but None.\n\nThis is basically a shorthand for:\n\n    layout_uuid \u003d layout_state.uuid if (layout_state and layout_state.uuid) else None",
+      "parentUuid": "2220f2f9_860d7b18",
+      "revId": "ba1d165f3bafa1a8eb75bac3646a95774ca86786",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
