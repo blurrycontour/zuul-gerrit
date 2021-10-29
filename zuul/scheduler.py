@@ -1203,8 +1203,9 @@ class Scheduler(threading.Thread):
                 continue
 
             with new_pipeline.manager.currentContext(context):
-                self._reenqueuePipeline(
-                    tenant, new_pipeline, old_pipeline, context)
+                new_pipeline.state.setOldQueues(
+                    context, [*old_pipeline.state.old_queues,
+                              *old_pipeline.state.queues])
 
         for name, old_pipeline in old_tenant.layout.pipelines.items():
             new_pipeline = tenant.layout.pipelines.get(name)
@@ -1212,7 +1213,7 @@ class Scheduler(threading.Thread):
                 with old_pipeline.manager.currentContext(context):
                     self._reconfigureDeletePipeline(old_pipeline)
 
-    def _reenqueuePipeline(self, tenant, new_pipeline, old_pipeline, context):
+    def _reenqueuePipeline(self, tenant, new_pipeline, context):
         self.log.debug("Re-enqueueing changes for pipeline %s",
                        new_pipeline.name)
         # TODO(jeblair): This supports an undocument and
@@ -1229,20 +1230,12 @@ class Scheduler(threading.Thread):
             static_window = True
         else:
             static_window = False
-        if old_pipeline.window and (not static_window):
-            new_pipeline.window = max(old_pipeline.window,
-                                      new_pipeline.window_floor)
+
         items_to_remove = []
         builds_to_cancel = []
         requests_to_cancel = []
-        for shared_queue in old_pipeline.queues:
+        for shared_queue in list(new_pipeline.state.old_queues):
             last_head = None
-            # Attempt to keep window sizes from shrinking where possible
-            project, branch = shared_queue.project_branches[0]
-            new_queue = new_pipeline.getQueue(project, branch)
-            if new_queue and shared_queue.window and (not static_window):
-                new_queue.window = max(shared_queue.window,
-                                       new_queue.window_floor)
             for item in shared_queue.queue:
                 # If the old item ahead made it in, re-enqueue
                 # this one behind it.
@@ -1288,6 +1281,15 @@ class Scheduler(threading.Thread):
                                 (item.current_build_set, request))
                 else:
                     items_to_remove.append(item)
+
+            # Attempt to keep window sizes from shrinking where possible
+            project, branch = shared_queue.project_branches[0]
+            new_queue = new_pipeline.getQueue(project, branch)
+            if new_queue and shared_queue.window and (not static_window):
+                new_queue.updateAttributes(
+                    context, window=max(shared_queue.window,
+                                        new_queue.window_floor))
+            new_pipeline.state.removeOldQueue(context, shared_queue)
         for item in items_to_remove:
             self.log.info(
                 "Removing item %s during reconfiguration" % (item,))
@@ -1638,6 +1640,8 @@ class Scheduler(threading.Thread):
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
                         pipeline.state.refresh(ctx)
+                        if pipeline.state.old_queues:
+                            self._reenqueuePipeline(tenant, pipeline, ctx)
                         pipeline.state.cleanup(ctx)
                         self._process_pipeline(tenant, pipeline)
 
