@@ -19,14 +19,10 @@ import time
 from abc import ABCMeta
 from typing import List
 
-import zuul.executor.common
-
-from zuul import model
 from zuul.connection import BaseConnection
 from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
-from zuul.zk.zkobject import LocalZKContext
 
 
 class RPCListenerBase(metaclass=ABCMeta):
@@ -157,8 +153,6 @@ class RPCListener(RPCListenerBase):
         'job_list',
         'project_get',
         'project_list',
-        'project_freeze_jobs',
-        'project_freeze_job',
         'pipeline_list',
         'key_get',
         'config_errors_list',
@@ -426,71 +420,6 @@ class RPCListener(RPCListenerBase):
             output.append(pobj)
         job.sendWorkComplete(json.dumps(
             sorted(output, key=lambda project: project["name"])))
-
-    def handle_project_freeze_jobs(self, gear_job):
-        args = json.loads(gear_job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        project = None
-        pipeline = None
-        if tenant:
-            (trusted, project) = tenant.getProject(args.get("project"))
-            pipeline = tenant.layout.pipelines.get(args.get("pipeline"))
-        if not project or not pipeline:
-            gear_job.sendWorkComplete(json.dumps(None))
-            return
-
-        change = model.Branch(project)
-        change.branch = args.get("branch", "master")
-        context = LocalZKContext(self.log)
-        queue = model.ChangeQueue.new(context, pipeline=pipeline)
-        item = model.QueueItem.new(context, queue=queue, change=change,
-                                   pipeline=queue.pipeline)
-        item.freezeJobGraph(tenant.layout, context,
-                            skip_file_matcher=True,
-                            redact_secrets_and_keys=True)
-
-        output = []
-
-        for job in item.current_build_set.job_graph.getJobs():
-            output.append({
-                'name': job.name,
-                'dependencies':
-                    list(map(lambda x: x.toDict(), job.dependencies)),
-            })
-
-        gear_job.sendWorkComplete(json.dumps(output))
-
-    def handle_project_freeze_job(self, gear_job):
-        args = json.loads(gear_job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        project = None
-        pipeline = None
-        if tenant:
-            (trusted, project) = tenant.getProject(args.get("project"))
-            pipeline = tenant.layout.pipelines.get(args.get("pipeline"))
-        if not project or not pipeline:
-            gear_job.sendWorkComplete(json.dumps(None))
-            return
-
-        change = model.Branch(project)
-        change.branch = args.get("branch", "master")
-        context = LocalZKContext(self.log)
-        queue = model.ChangeQueue.new(context, pipeline=pipeline)
-        item = model.QueueItem.new(context, queue=queue, change=change,
-                                   pipeline=queue.pipeline)
-        item.freezeJobGraph(tenant.layout, context,
-                            skip_file_matcher=True,
-                            redact_secrets_and_keys=True)
-
-        job = item.current_build_set.jobs.get(args.get("job"))
-        if not job:
-            gear_job.sendWorkComplete(json.dumps(None))
-            return
-        uuid = '0' * 32
-        params = zuul.executor.common.construct_build_params(
-            uuid, self.sched, job, item, pipeline)
-        params['zuul']['buildset'] = None
-        gear_job.sendWorkComplete(json.dumps(params, cls=ZuulJSONEncoder))
 
     def handle_allowed_labels_get(self, job):
         args = json.loads(job.arguments)

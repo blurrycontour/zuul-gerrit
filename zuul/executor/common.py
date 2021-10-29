@@ -17,7 +17,7 @@ import os
 from zuul.lib import strings
 
 
-def construct_build_params(uuid, sched, job, item, pipeline,
+def construct_build_params(uuid, connections, job, item, pipeline,
                            dependent_changes=[], merger_items=[],
                            redact_secrets_and_keys=True):
     """Returns a list of all the parameters needed to build a job.
@@ -160,7 +160,7 @@ def construct_build_params(uuid, sched, job, item, pipeline,
         except Exception:
             # We have to find the project this way because it may not
             # be registered in the tenant (ie, a foreign project).
-            source = sched.connections.getSourceByCanonicalHostname(
+            source = connections.getSourceByCanonicalHostname(
                 change['project']['canonical_hostname'])
             project = source.getProject(change['project']['name'])
 
