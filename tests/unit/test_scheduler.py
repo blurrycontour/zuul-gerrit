@@ -6655,6 +6655,33 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
+    @simple_layout('layouts/vars.yaml')
+    def test_jobdata(self):
+        # Test the use of JobData objects for job variables
+        self.executor_server.hold_jobs_in_build = True
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.model.FrozenJob.MAX_DATA_LEN',
+            1))
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Make sure we're really using JobData objects
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        item = tenant.layout.pipelines['check'].queues[0].queue[0]
+        job = item.getJobs()[0]
+        self.assertTrue(isinstance(job._variables, zuul.model.JobData))
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestChangeQueues(ZuulTestCase):
     tenant_config_file = 'config/change-queues/main.yaml'
