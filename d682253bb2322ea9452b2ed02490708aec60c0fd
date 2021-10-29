@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a62e52dc_8f08a22e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1674,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-29T17:00:55Z",
+      "side": 1,
+      "message": "Do we ignore failures here on purpose?",
+      "revId": "d682253bb2322ea9452b2ed02490708aec60c0fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
