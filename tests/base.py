@@ -4421,6 +4421,11 @@ class BaseTestCase(testtools.TestCase):
         )
 
     def getZKWatches(self):
+        # TODO: The client.command method used here returns only the
+        # first 8k of data.  That means this method can return {} when
+        # there actually are watches (and this happens in practice in
+        # heavily loaded test environments).  We should replace that
+        # method with something more robust.
         chroot = self.zk_chroot_fixture.zookeeper_chroot
         data = self.zk_client.client.command(b'wchp')
         ret = {}
