@@ -16,6 +16,24 @@
       "message": "Thinking out loud here would it be safer to serialize and deserialize these queues with an explicit association rather than inferring it from a project + branch name?\n\nI wonder what would happen if you reconfigure to move a project from one queue to another and that doesn\u0027t get serialized properly due to an outage. I guess the second scheduler would read the old data and reconcile it against the new config and then write that out to zookeeper? So for a (short) period of time you may run the old config for queues?",
       "revId": "f47cf3d6c2f0c6606ddfe93eca3365271cdcd782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "200dbc21_608fce12",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T16:07:19Z",
+      "side": 1,
+      "message": "https://review.opendev.org/c/zuul/zuul/+/814773/ hints at the expected behavior here if there is a failure. Basically to move the shared state would have to be updated. This means if sched1 fails then the project hasn\u0027t moved yet and sched2 can recover things and do the move. We shouldn\u0027t flip flop. For this reason this code should be sufficient.",
+      "parentUuid": "dfba8138_88893bde",
+      "revId": "f47cf3d6c2f0c6606ddfe93eca3365271cdcd782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
