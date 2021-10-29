@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26aecbe6_b84b0e0d",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T17:08:43Z",
+      "side": 1,
+      "message": "Related to my other comment we might want to also assert the \"shape\" of the uuid value here?",
+      "revId": "ba1d165f3bafa1a8eb75bac3646a95774ca86786",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bb0f716_25cd13e0",
+        "filename": "zuul/zk/layout.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-10-29T17:08:43Z",
+      "side": 1,
+      "message": "In scheduler.py we use this method a couple of times for getting the layout uuid from the LayoutState:\n\n  layout_state \u003d self.tenant_layout_state.get(tenant_name)\n  layout_uuid \u003d layout_state and layout_state.uuid\n\nThis means we can pass in a layout_state of False. In that case I think we should generate a new uuid? Otherwise we\u0027ll end up with False serialized uuids?\n\nBut also we want to generate a new uuid anytime we generate a brand new layout state in zookeeper and this would be the way to do that?",
+      "revId": "ba1d165f3bafa1a8eb75bac3646a95774ca86786",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
