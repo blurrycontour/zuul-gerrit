@@ -50,6 +50,23 @@
       "message": "That last failure was due to high system load: https://zuul.opendev.org/t/zuul/build/1549250827ff4d9ebc149b10e8ac36eb/log/job-output.txt#10910 and we never seemed to drop off low enough after that to reregister. I suspect that polling more frequently isn\u0027t fixing this.\n\nWe might need to disable the sensors in testing instead? But that causes sensor specific tests to fail which means we need to do a bit more work in that space.",
       "revId": "c37cbec140c99f733259a1e448c90da38108e8ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53a6a3de_d75d4779",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-10-29T21:31:52Z",
+      "side": 1,
+      "message": "There as another failure due to this problem [1].\n\nJudging from the discussion here I think we have the following possibilities:\n1. disable sensors in test\n2. tweak sensor parameters in test (probably increase executor.load_multiplier in the zuul.conf test fixtures)\n3. increase all the timeouts where we wait for jobs\n4. reduce concurrency\n5. larger nodes\n\nSo I guess we decide against #1 it seems to me that probably the easiest thing would be to try out #2.\n\n[1] https://11a58606918618718cd5-a21c5a2f7ec31a719791313ddc031133.ssl.cf5.rackcdn.com/815764/4/gate/zuul-tox-py38/a1e5f86/testr_results.html",
+      "revId": "c37cbec140c99f733259a1e448c90da38108e8ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
