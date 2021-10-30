@@ -763,13 +763,16 @@ class Scheduler(threading.Thread):
                 # Consider all caches valid (min. ltime -1)
                 min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
                 with tlock:
-                    tenant = loader.loadTenant(
-                        self.abide, tenant_name, self.ansible_manager,
-                        self.unparsed_abide, min_ltimes=min_ltimes)
-
                     # Refresh the layout state now that we are holding the lock
                     # and we can be sure it won't be changed concurrently.
                     layout_state = self.tenant_layout_state.get(tenant_name)
+                    layout_uuid = layout_state and layout_state.uuid
+
+                    tenant = loader.loadTenant(
+                        self.abide, tenant_name, self.ansible_manager,
+                        self.unparsed_abide, min_ltimes=min_ltimes,
+                        layout_uuid=layout_uuid)
+
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
                         ctx = self.createZKContext(tlock, self.log)
@@ -962,12 +965,14 @@ class Scheduler(threading.Thread):
             self.connections, self, self.merger, self.keystore)
         with self.layout_lock:
             self.log.debug("Updating local layout of tenant %s ", tenant_name)
+            layout_state = self.tenant_layout_state.get(tenant_name)
+            layout_uuid = layout_state and layout_state.uuid
             tenant = loader.loadTenant(self.abide, tenant_name,
                                        self.ansible_manager,
                                        self.unparsed_abide,
-                                       min_ltimes=min_ltimes)
+                                       min_ltimes=min_ltimes,
+                                       layout_uuid=layout_uuid)
             if tenant is not None:
-                layout_state = self.tenant_layout_state[tenant.name]
                 self.local_layout_state[tenant_name] = layout_state
                 self.connections.reconfigureDrivers(tenant)
             else:
@@ -1325,6 +1330,7 @@ class Scheduler(threading.Thread):
             tenant_name=tenant.name,
             hostname=self.hostname,
             last_reconfigured=int(time.time()),
+            uuid=tenant.layout.uuid,
         )
         # We need to update the local layout state before the remote state,
         # to avoid race conditions in the layout changed callback.
