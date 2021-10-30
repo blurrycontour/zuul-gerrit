@@ -1293,6 +1293,11 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self._poller_event = poller_event
         self._ref_watcher_event = ref_watcher_event
 
+    def onStop(self):
+        super().onStop()
+        if self.web_server:
+            self.web_server.stop()
+
     def addFakeChecker(self, **kw):
         self.fake_checkers.append(kw)
 
@@ -5097,7 +5102,6 @@ class ZuulTestCase(BaseTestCase):
         # before noticing they should exit, but they should exit on their own.
         whitelist = ['watchdog',
                      'socketserver_Thread',
-                     'GerritWebServer',
                      'cleanup start',
                      ]
         # Ignore threads that start with
