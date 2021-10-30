@@ -21,7 +21,7 @@ kazoo>=2.8.0
 sqlalchemy
 alembic
 cryptography>=1.6
-cachecontrol
+cachecontrol<0.12.7
 cachetools
 pyjwt>=2.0.0,<3.0
 iso8601
