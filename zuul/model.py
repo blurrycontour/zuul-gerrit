@@ -451,7 +451,7 @@ class Pipeline(object):
 
     def addQueue(self, queue):
         with self.state.activeContext(self.manager.current_context):
-            self.state.queues.append(queue)
+            self.queues.append(queue)
 
     def getQueue(self, project_cname, branch):
         # Queues might be branch specific so match with branch
@@ -473,7 +473,7 @@ class Pipeline(object):
     def removeQueue(self, queue):
         if queue in self.queues:
             with self.state.activeContext(self.manager.current_context):
-                self.state.queues.remove(queue)
+                self.queues.remove(queue)
             queue.delete(self.manager.current_context)
 
     def getChangesInQueue(self):
