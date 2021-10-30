@@ -168,11 +168,11 @@ class ChangePanel extends React.Component {
     }
     return (
       <React.Fragment>
-        <small title='Remaining Time' className='time'>
+        <small title='Remaining Time' className='time' style={{display: 'inline'}}>
           {remainingTime}
         </small>
         <br />
-        <small title='Elapsed Time' className='time'>
+        <small title='Elapsed Time' className='time' style={{display: 'inline'}}>
           {this.enqueueTime(change.enqueue_time)}
         </small>
       </React.Fragment>
