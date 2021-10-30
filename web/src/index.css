@@ -61,6 +61,17 @@ a.refresh {
     font-size: var(--pf-global--FontSize--md);
 }
 
+/* Align padding of compact expendable (child) rows. Without this there is
+   nearly no padding. */
+.zuul-build-table .pf-c-table__expandable-row.pf-m-expanded {
+    --pf-c-table--cell--PaddingTop: var(
+        --pf-c-table--m-compact--cell--PaddingTop
+    );
+    --pf-c-table--cell--PaddingBottom: var(
+        --pf-c-table--m-compact--cell--PaddingBottom
+    );
+}
+
 /* Use the same hover effect on table rows like for the selectable data list */
 .zuul-build-table tbody tr:hover {
     box-shadow: var(--pf-global--BoxShadow--sm-top),
