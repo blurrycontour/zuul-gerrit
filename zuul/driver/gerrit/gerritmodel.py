@@ -30,10 +30,12 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 class GerritChange(Change):
     def __init__(self, project):
         super(GerritChange, self).__init__(project)
+        self.id = None
         self.status = None
         self.wip = None
         self.approvals = []
         self.missing_labels = set()
+        self.commit = None
 
     def update(self, data, connection):
         if data.format == data.SSH:
@@ -44,19 +46,23 @@ class GerritChange(Change):
     def serialize(self):
         d = super().serialize()
         d.update({
+            "id": self.id,
             "status": self.status,
             "wip": self.wip,
             "approvals": self.approvals,
             "missing_labels": list(self.missing_labels),
+            "commit": self.commit,
         })
         return d
 
     def deserialize(self, data):
         super().deserialize(data)
+        self.id = data.get("id")
         self.status = data["status"]
         self.wip = data["wip"]
         self.approvals = data["approvals"]
         self.missing_labels = set(data["missing_labels"])
+        self.commit = data.get("commit")
 
     def updateFromSSH(self, data, connection):
         if self.patchset is None:
