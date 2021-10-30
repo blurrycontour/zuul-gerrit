@@ -1195,25 +1195,6 @@ class Scheduler(threading.Thread):
 
         return None
 
-    def _reenqueueTenant(self, context, old_tenant, tenant):
-        for name, new_pipeline in tenant.layout.pipelines.items():
-            old_pipeline = old_tenant.layout.pipelines.get(name)
-            if not old_pipeline:
-                self.log.warning("No old pipeline matching %s found "
-                                 "when reconfiguring" % name)
-                continue
-
-            with new_pipeline.manager.currentContext(context):
-                new_pipeline.state.setOldQueues(
-                    context, [*old_pipeline.state.old_queues,
-                              *old_pipeline.state.queues])
-
-        for name, old_pipeline in old_tenant.layout.pipelines.items():
-            new_pipeline = tenant.layout.pipelines.get(name)
-            if not new_pipeline:
-                with old_pipeline.manager.currentContext(context):
-                    self._reconfigureDeletePipeline(old_pipeline)
-
     def _reenqueuePipeline(self, tenant, new_pipeline, context):
         self.log.debug("Re-enqueueing changes for pipeline %s",
                        new_pipeline.name)
@@ -1325,7 +1306,11 @@ class Scheduler(threading.Thread):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
         if old_tenant:
-            self._reenqueueTenant(context, old_tenant, tenant)
+            for name, old_pipeline in old_tenant.layout.pipelines.items():
+                new_pipeline = tenant.layout.pipelines.get(name)
+                if not new_pipeline:
+                    with old_pipeline.manager.currentContext(context):
+                        self._reconfigureDeletePipeline(old_pipeline)
 
         self.connections.reconfigureDrivers(tenant)
 
