@@ -62,7 +62,6 @@ import testtools
 import testtools.content
 import testtools.content_type
 from git.exc import NoSuchPathError
-from git.util import IterableList
 import yaml
 import paramiko
 import prometheus_client.exposition
@@ -127,6 +126,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 
 import tests.fakegithub
+import tests.fakegitlab
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -326,7 +326,7 @@ class GitlabDriverMock(GitlabDriver):
             changes_db=db,
             upstream_root=self.upstream_root)
         setattr(self.registry, 'fake_' + name, connection)
-        registerProjects(connection.source.name, connection.gl_client,
+        registerProjects(connection.source.name, connection,
                          self.config)
         return connection
 
@@ -1924,33 +1924,51 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         self.zuul_web_port = port
 
 
+FakeGitlabBranch = namedtuple('Branch', ('name', 'protected'))
+
+
 class FakeGitlabConnection(gitlabconnection.GitlabConnection):
     log = logging.getLogger("zuul.test.FakeGitlabConnection")
 
     def __init__(self, driver, connection_name, connection_config, rpcclient,
                  changes_db=None, upstream_root=None):
-        super(FakeGitlabConnection, self).__init__(driver, connection_name,
-                                                   connection_config)
         self.merge_requests = changes_db
-        self.gl_client = FakeGitlabAPIClient(
-            self.baseurl, self.api_token, 60, merge_requests_db=changes_db)
         self.rpcclient = rpcclient
         self.upstream_root = upstream_root
         self.mr_number = 0
 
+        self._test_web_server = tests.fakegitlab.GitlabWebServer(changes_db)
+        self._test_web_server.start()
+        self._test_baseurl = 'http://localhost:%s' % self._test_web_server.port
+        connection_config['baseurl'] = self._test_baseurl
+
+        super(FakeGitlabConnection, self).__init__(driver, connection_name,
+                                                   connection_config)
+
+    def onStop(self):
+        super().onStop()
+        self._test_web_server.stop()
+
     def addProject(self, project):
         super(FakeGitlabConnection, self).addProject(project)
-        self.gl_client.addProject(project)
+        self.addProjectByName(project.name)
+
+    def addProjectByName(self, project_name):
+        owner, proj = project_name.split('/')
+        repo = self._test_web_server.fake_repos[(owner, proj)]
+        branch = FakeGitlabBranch('master', False)
+        if 'master' not in repo:
+            repo.append(branch)
 
     def protectBranch(self, owner, project, branch, protected=True):
-        if branch in self.gl_client.fake_repos[(owner, project)]:
-            del self.gl_client.fake_repos[(owner, project)][branch]
-        fake_branch = FakeBranch(branch, protected=protected)
-        self.gl_client.fake_repos[(owner, project)].append(fake_branch)
+        if branch in self._test_web_server.fake_repos[(owner, project)]:
+            del self._test_web_server.fake_repos[(owner, project)][branch]
+        fake_branch = FakeGitlabBranch(branch, protected=protected)
+        self._test_web_server.fake_repos[(owner, project)].append(fake_branch)
 
     def deleteBranch(self, owner, project, branch):
-        if branch in self.gl_client.fake_repos[(owner, project)]:
-            del self.gl_client.fake_repos[(owner, project)][branch]
+        if branch in self._test_web_server.fake_repos[(owner, project)]:
+            del self._test_web_server.fake_repos[(owner, project)][branch]
 
     def getGitUrl(self, project):
         return 'file://' + os.path.join(self.upstream_root, project.name)
@@ -2019,162 +2037,9 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
 
     @contextmanager
     def enable_community_edition(self):
-        self.gl_client.community_edition = True
+        self._test_web_server.options['community_edition'] = True
         yield
-        self.gl_client.community_edition = False
-
-
-FakeBranch = namedtuple('Branch', ('name', 'protected'))
-
-
-class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
-    log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
-
-    def __init__(self, baseurl, api_token, keepalive,
-                 merge_requests_db={}):
-        super(FakeGitlabAPIClient, self).__init__(
-            baseurl, api_token, keepalive)
-        self.merge_requests = merge_requests_db
-        self.fake_repos = defaultdict(lambda: IterableList('name'))
-        self.community_edition = False
-
-    def gen_error(self, verb):
-        return {
-            'message': 'some error',
-        }, 503, "", verb
-
-    def _get_mr(self, match):
-        project, number = match.groups()
-        project = urllib.parse.unquote(project)
-        mr = self.merge_requests.get(project, {}).get(number)
-        if not mr:
-            return self.gen_error("GET")
-        return mr
-
-    def get(self, url, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        log.debug("Getting resource %s ..." % url)
-
-        match = re.match(r'.+/projects/(.+)/merge_requests/(\d+)$', url)
-        if match:
-            mr = self._get_mr(match)
-            return {
-                'target_branch': mr.branch,
-                'title': mr.subject,
-                'state': mr.state,
-                'description': mr.description,
-                'author': {
-                    'name': 'Administrator',
-                    'username': 'admin'
-                },
-                'updated_at': mr.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                'sha': mr.sha,
-                'labels': mr.labels,
-                'merged_at': mr.merged_at,
-                'diff_refs': {
-                    'base_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00',
-                    'head_sha': '2be7ddb704c7b6b83732fdd5b9f09d5a397b5f8f',
-                    'start_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00'
-                },
-                'merge_status': mr.merge_status,
-            }, 200, "", "GET"
-
-        match = re.match('.+/projects/(.+)/'
-                         'repository/branches\\?.*$', url)
-        if match:
-            project = urllib.parse.unquote(match.group(1)).split('/')
-            req = urllib.parse.urlparse(url)
-            query = urllib.parse.parse_qs(req.query)
-            per_page = int(query["per_page"][0])
-            page = int(query["page"][0])
-
-            repo = self.fake_repos[tuple(project)]
-            first_entry = (page - 1) * per_page
-            last_entry = min(len(repo), (page) * per_page)
-
-            if first_entry >= len(repo):
-                branches = []
-            else:
-                branches = [{'name': repo[i].name,
-                             'protected': repo[i].protected}
-                            for i in range(first_entry, last_entry)]
-
-            return branches, 200, "", "GET"
-
-        match = re.match(
-            r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
-        if match:
-            mr = self._get_mr(match)
-            if not self.community_edition:
-                return {
-                    'approvals_left': 0 if mr.approved else 1,
-                }, 200, "", "GET"
-            else:
-                return {
-                    'approved': mr.approved,
-                }, 200, "", "GET"
-
-        match = re.match(r'.+/projects/(.+)/repository/branches/(.+)$', url)
-        if match:
-            project, branch = match.groups()
-            project = urllib.parse.unquote(project)
-            branch = urllib.parse.unquote(branch)
-            owner, name = project.split('/')
-            if branch in self.fake_repos[(owner, name)]:
-                protected = self.fake_repos[(owner, name)][branch].protected
-                return {'protected': protected}, 200, "", "GET"
-            else:
-                return {}, 404, "", "GET"
-
-    def post(self, url, params=None, zuul_event_id=None):
-
-        self.log.info(
-            "Posting on resource %s, params (%s) ..." % (url, params))
-
-        match = re.match(r'.+/projects/(.+)/merge_requests/(\d+)/notes$', url)
-        if match:
-            mr = self._get_mr(match)
-            mr.addNote(params['body'])
-
-        match = re.match(
-            r'.+/projects/(.+)/merge_requests/(\d+)/approve$', url)
-        if match:
-            assert 'sha' in params
-            mr = self._get_mr(match)
-            if params['sha'] != mr.sha:
-                return {'message': 'SHA does not match HEAD of source '
-                        'branch: <new_sha>'}, 409, "", "POST"
-            mr.approved = True
-
-        match = re.match(
-            r'.+/projects/(.+)/merge_requests/(\d+)/unapprove$', url)
-        if match:
-            mr = self._get_mr(match)
-            mr.approved = False
-
-        return {}, 200, "", "POST"
-
-    def put(self, url, params=None, zuul_event_id=None):
-
-        self.log.info(
-            "Put on resource %s, params (%s) ..." % (url, params))
-
-        match = re.match(r'.+/projects/(.+)/merge_requests/(\d+)/merge$', url)
-        if match:
-            mr = self._get_mr(match)
-            mr.mergeMergeRequest()
-
-        return {'state': 'merged'}, 200, "", "PUT"
-
-    def addProject(self, project):
-        self.addProjectByName(project.name)
-
-    def addProjectByName(self, project_name):
-        owner, proj = project_name.split('/')
-        repo = self.fake_repos[(owner, proj)]
-        branch = FakeBranch('master', False)
-        if 'master' not in repo:
-            repo.append(branch)
+        self._test_web_server.options['community_edition'] = False
 
 
 class GitlabChangeReference(git.Reference):

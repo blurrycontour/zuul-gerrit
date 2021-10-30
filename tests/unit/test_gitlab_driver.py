@@ -108,7 +108,8 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(str(A.number), zuulvars['change'])
         self.assertEqual(str(A.sha), zuulvars['patchset'])
         self.assertEqual('master', zuulvars['branch'])
-        self.assertEquals('https://gitlab/org/project/merge_requests/1',
+        self.assertEquals(f'{self.fake_gitlab._test_baseurl}/'
+                          'org/project/merge_requests/1',
                           zuulvars['items'][0]['change_url'])
         self.assertEqual(zuulvars["message"], strings.b64encode(description))
         self.assertEqual(2, len(self.history))
@@ -282,7 +283,8 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual('project-post-job', zuulvars['job'])
         self.assertEqual('master', zuulvars['branch'])
         self.assertEqual(
-            'https://gitlab/org/project/tree/%s' % zuulvars['newrev'],
+            f'{self.fake_gitlab._test_baseurl}/org/project/tree/'
+            f'{zuulvars["newrev"]}',
             zuulvars['change_url'])
         self.assertEqual(expected_newrev, zuulvars['newrev'])
         self.assertEqual(expected_oldrev, zuulvars['oldrev'])
@@ -711,7 +713,8 @@ class TestGitlabDriver(ZuulTestCase):
         project_git_url = self.fake_gitlab.real_getGitUrl(project)
         # cloneurl created from config 'server' should be used
         # without credentials
-        self.assertEqual("https://gitlab/org/project1.git", project_git_url)
+        self.assertEqual(f"{self.fake_gitlab._test_baseurl}/org/project1.git",
+                         project_git_url)
 
     @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab2')
     def test_api_token_cloneurl(self):
@@ -743,7 +746,9 @@ class TestGitlabDriver(ZuulTestCase):
         project_git_url = self.fake_gitlab4.real_getGitUrl(project)
         # cloneurl is not set, generate one from token name, token secret and
         # server
-        self.assertEqual("https://tokenname4:444@gitlabfour/org/project1.git",
+        self.assertEqual("http://tokenname4:444@localhost:"
+                         f"{self.fake_gitlab4._test_web_server.port}"
+                         "/org/project1.git",
                          project_git_url)
 
     @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab5')
