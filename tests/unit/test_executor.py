@@ -612,7 +612,7 @@ class TestStartingBuildsSensor(ZuulTestCase):
 
 
 class TestGovernor(ZuulTestCase):
-    config_file = 'zuul-executor-hostname.conf'
+    config_file = 'zuul-executor-governor.conf'
     tenant_config_file = 'config/governor/main.yaml'
 
     @mock.patch('os.getloadavg')
