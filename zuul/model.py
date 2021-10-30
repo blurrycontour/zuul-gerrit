@@ -7006,6 +7006,7 @@ class Tenant(object):
         self.default_ansible_version = None
 
         self.authorization_rules = []
+        self.default_auth_realm = None
 
     @property
     def all_projects(self):
@@ -7296,20 +7297,20 @@ class Capabilities(object):
     or not, keep track of distinct capability flags.
     """
     def __init__(self, **kwargs):
-        self._capabilities = kwargs
+        self.capabilities = kwargs
 
     def __repr__(self):
         return '<Capabilities 0x%x %s>' % (id(self), self._renderFlags())
 
     def _renderFlags(self):
         return " ".join(['{k}={v}'.format(k=k, v=repr(v))
-                         for (k, v) in self._capabilities.items()])
+                         for (k, v) in self.capabilities.items()])
 
     def copy(self):
         return Capabilities(**self.toDict())
 
     def toDict(self):
-        return self._capabilities
+        return self.capabilities
 
 
 class WebInfo(object):
