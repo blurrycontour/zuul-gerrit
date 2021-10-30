@@ -114,6 +114,13 @@ The supported options in ``zuul.conf`` connections are:
 
       TCP connection keepalive timeout; ``0`` disables.
 
+   .. attr:: disable_connection_pool
+      :default: false
+
+      Connection pooling improves performance and resource usage under
+      normal circumstances, but in adverse network conditions it can
+      be problematic.  Set this to ``true`` to disable.
+
 
 
 Trigger Configuration
