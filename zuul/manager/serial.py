@@ -18,6 +18,7 @@ class SerialPipelineManager(SharedQueuePipelineManager):
     """PipelineManager with shared queues and a window of 1"""
 
     changes_merge = False
+    type = 'serial'
 
     def constructChangeQueue(self, queue_name):
         return model.ChangeQueue.new(
