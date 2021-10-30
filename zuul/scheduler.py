@@ -1269,9 +1269,7 @@ class Scheduler(threading.Thread):
                 if reenqueued:
                     for build in item.current_build_set.getBuilds():
                         new_job = item.getJob(build.job.name)
-                        if new_job:
-                            build._set(job=new_job)
-                        else:
+                        if not new_job:
                             item.removeBuild(build)
                             builds_to_cancel.append(build)
                     for request_job, request in \
