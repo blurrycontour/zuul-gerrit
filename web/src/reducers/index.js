@@ -16,6 +16,7 @@ import { combineReducers } from 'redux'
 
 import configErrors from './configErrors'
 import change from './change'
+import component from './component'
 import errors from './errors'
 import build from './build'
 import info from './info'
@@ -36,6 +37,7 @@ import timezone from './timezone'
 const reducers = {
   build,
   change,
+  component,
   configErrors,
   errors,
   info,
