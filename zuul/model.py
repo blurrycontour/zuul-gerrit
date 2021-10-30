@@ -15,7 +15,6 @@
 
 import abc
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
-import contextlib
 import copy
 import json
 import hashlib
@@ -593,9 +592,9 @@ class PipelineState(zkobject.ZKObject):
         self.updateAttributes(context, old_queues=old_queues)
 
     def removeOldQueue(self, context, queue):
-        with contextlib.suppress(ValueError):
-            self.old_queues.remove(queue)
-            self._save(context)
+        if queue in self.old_queues:
+            with self.activeContext(context):
+                self.old_queues.remove(queue)
 
     def serialize(self):
         data = {
@@ -3674,21 +3673,21 @@ class BuildSet(zkobject.ZKObject):
             state_num, 'UNKNOWN (%s)' % state_num)
 
     def addBuild(self, build):
-        self.builds[build.job.name] = build
-        if build.job.name not in self.tries:
-            self.tries[build.job.name] = 1
-        self._save(self.item.pipeline.manager.current_context)
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.builds[build.job.name] = build
+            if build.job.name not in self.tries:
+                self.tries[build.job.name] = 1
 
     def addRetryBuild(self, build):
-        self.retry_builds.setdefault(build.job.name, []).append(build)
-        self._save(self.item.pipeline.manager.current_context)
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.retry_builds.setdefault(build.job.name, []).append(build)
 
     def removeBuild(self, build):
         if build.job.name not in self.builds:
             return
-        self.tries[build.job.name] += 1
-        del self.builds[build.job.name]
-        self._save(self.item.pipeline.manager.current_context)
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.tries[build.job.name] += 1
+            del self.builds[build.job.name]
 
     def getBuild(self, job_name):
         return self.builds.get(job_name)
