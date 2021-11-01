@@ -172,6 +172,9 @@ class BubblewrapDriver(Driver, WrapperInterface):
 
     def _bwrap_command(self):
         bwrap_command = [
+            "setpriv",
+            "--ambient-caps",
+            "'-all'",
             'bwrap',
             '--dir', '/tmp',
             '--tmpfs', '/tmp',
