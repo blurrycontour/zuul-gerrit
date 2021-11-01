@@ -12,68 +12,25 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-
 import React, { useEffect } from 'react'
-import { connect, useDispatch } from 'react-redux'
-import PropTypes from 'prop-types'
+import { useHistory } from 'react-router-dom'
 
-import { UserManager } from 'oidc-react'
-
-import { userLoggedIn } from '../actions/user'
 import { Fetching } from '../containers/Fetching'
 
-import stateStore from '../stateStore'
+// Several pages use the location hash in a way that would be
+// difficult to disentangle from the OIDC callback parameters.  This
+// dedicated callback page accepts the OIDC params and then internally
+// redirects to the page we saved before redirecting to the IDP.
 
-/* TODO [mhu] - calling signinRedirectCallback may not be needed
-when using oidc-react's AuthProvider top component. The useAuth()
-hook would also allow us to handle the user from the redux state.
-
-I haven't been able to get auth working with AuthProvider so far
-due to redux issues. This may be nice to revisit if we ever get
-rid of redux.
-*/
-
-function AuthCallbackPage(prop) {
-
-  const { userManagerConfig, tenant } = prop
-
-  const dispatch = useDispatch()
+function AuthCallbackPage() {
+  let history = useHistory()
 
   useEffect(() => {
-    if (userManagerConfig) {
-      const currentUrl = window.location.href
-      const manager = new UserManager(
-        { ...userManagerConfig, stateStore: stateStore })
-      let tenantName = tenant.name
-      manager.signinRedirectCallback(currentUrl).then((user) => {
-        dispatch(userLoggedIn(user, tenantName))
-        let redirect = localStorage.getItem('zuul_auth_redirect')
-        if (redirect) {
-          // TODO(mhu) This reloads the whole page. Could we have a "soft" redirection instead
-          // like when changing pages from the menu bar?
-          window.location.replace(redirect)
-        }
-      }).catch(
-        (err) => {
-          console.log(err)
-        })
-    }
-  },
-    [userManagerConfig, tenant, dispatch]
-  )
-  if (userManagerConfig) {
-    return (<div>Login successful. You will be redirected shortly...</div>)
-  } else {
-    return <Fetching />
-  }
+    const redirect = localStorage.getItem('zuul_auth_redirect')
+    history.push(redirect)
+  }, [history])
 
+  return <Fetching />
 }
 
-AuthCallbackPage.propTypes = {
-  userManagerConfig: PropTypes.object,
-}
-
-export default connect((state) => ({
-  userManagerConfig: state.auth.userManagerConfig,
-  tenant: state.tenant,
-}))(AuthCallbackPage)
+export default AuthCallbackPage
