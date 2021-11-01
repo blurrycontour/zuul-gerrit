@@ -12,33 +12,63 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import initialState from './initialState'
-
 import {
-  USERMANAGER_CREATE,
-  USERMANAGER_FAIL,
-  USERMANAGER_SUCCESS,
+  AUTH_CONFIG_REQUEST,
+  AUTH_CONFIG_SUCCESS,
+  AUTH_CONFIG_FAIL,
 } from '../actions/auth'
 
-export default (state = initialState.auth, action) => {
+// Load the defaults from local storage if it exists so that we
+// construct the same AuthProvider we had before we navigated to the
+// IDP redirect.
+const stored_params = localStorage.getItem('zuul_auth_params')
+let auth_params = {
+  authority: '',
+  clientId: '',
+  scope: '',
+}
+if (stored_params !== null) {
+  auth_params = JSON.parse(stored_params)
+}
+
+export default (state = {
+  isFetching: false,
+  info: null,
+  auth_params: auth_params,
+}, action) => {
   switch (action.type) {
-    case USERMANAGER_CREATE:
-      return {
+    case AUTH_CONFIG_REQUEST:
+    return {
+      ...state,
         isFetching: true,
-        userManagerConfig: null,
-        capabilities: null,
+        info: null,
       }
-    case USERMANAGER_SUCCESS:
+    case AUTH_CONFIG_SUCCESS:
+    // Make sure we only update the auth_params object if something actually
+    // changes.  Otherwise, it will re-create the AuthProvider which
+    // may cause errors with auth state if it happens concurrently with
+    // a login.
+    const json_params = JSON.stringify(action.auth_params)
+    if (json_params === JSON.stringify(state.auth_params)) {
       return {
+        ...state,
         isFetching: false,
-        userManagerConfig: action.userManagerConfig,
-        capabilities: action.capabilities
+        info: action.info,
       }
-    case USERMANAGER_FAIL:
+    } else {
+      localStorage.setItem('zuul_auth_params', json_params)
       return {
+        ...state,
         isFetching: false,
-        userManager: null,
-        capabilities: null,
+        info: action.info,
+        auth_params: action.auth_params,
+      }
+    }
+    case AUTH_CONFIG_FAIL:
+    return {
+      ...state,
+        isFetching: false,
+        info: null,
       }
     default:
       return state
