@@ -39,6 +39,7 @@ RUN assemble
 # /root/.local/share/virtualenv after because it adds wheels into /root
 # that we don't need after the install step so are a waste of space.
 RUN /output/install-from-bindep \
+  && chmod u+s /usr/bin/bwrap \
   && zuul-manage-ansible \
   && rm -rf /root/.local/share/virtualenv \
 # Install openshift
