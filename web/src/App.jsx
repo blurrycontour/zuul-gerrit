@@ -68,7 +68,7 @@ import { clearNotification } from './actions/notifications'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
-import { createUserManagerFromTenant } from './actions/auth'
+import { configureAuthFromTenant } from './actions/auth'
 
 class App extends React.Component {
   static propTypes = {
@@ -180,7 +180,7 @@ class App extends React.Component {
         this.props.dispatch(tenantAction)
         if (tenantName) {
           this.props.dispatch(fetchConfigErrorsAction(tenantAction.tenant))
-          this.props.dispatch(createUserManagerFromTenant(tenantName))
+          this.props.dispatch(configureAuthFromTenant(tenantName))
         }
       }
     }
