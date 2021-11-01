@@ -36,7 +36,9 @@ const fetchInfoFail = error => ({
 const fetchInfo = () => dispatch => {
   dispatch(fetchInfoRequest())
   return API.fetchInfo()
-    .then(response => dispatch(fetchInfoSuccess(response.data)))
+    .then(response => {
+      dispatch(fetchInfoSuccess(response.data))
+    })
     .catch(error => {
       dispatch(fetchInfoFail(error))
       setTimeout(() => {dispatch(fetchInfo())}, 5000)

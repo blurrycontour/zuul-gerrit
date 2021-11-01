@@ -15,7 +15,6 @@
 
 import {
   USER_LOGGED_IN,
-  USER_IN_LOCALSTORAGE,
   USER_LOGGED_OUT,
 } from '../actions/user'
 import {
@@ -26,42 +25,35 @@ import {
 
 export default (state = {
   isFetching: false,
-  user: null,
-  token: null,
+  data: null,
   scope: [],
-  isAdmin: false
+  isAdmin: false,
+  tenant: null,
 }, action) => {
   switch (action.type) {
     case USER_LOGGED_IN: {
-      let user_stringified = JSON.stringify(action.user)
-      localStorage.setItem('zuul_user', user_stringified)
       return {
         isFetching: false,
-        user: action.user,
+        data: action.user,
         token: action.token,
         scope: [],
         isAdmin: false
       }
     }
-    case USER_IN_LOCALSTORAGE:
-      return {
-        isFetching: false,
-        user: action.user,
-        token: action.token,
-        scope: [],
-        isAdmin: false
-      }
     case USER_LOGGED_OUT:
-      localStorage.removeItem('zuul_user')
       return {
         isFetching: false,
-        user: null,
+        data: null,
         token: null,
         scope: [],
         isAdmin: false
       }
     case USER_ACL_REQUEST:
-      return { ...state, isFetching: true }
+      return {
+        ...state,
+        tenant: action.tenant,
+        isFetching: true
+      }
     case USER_ACL_FAIL:
       return {
         ...state,

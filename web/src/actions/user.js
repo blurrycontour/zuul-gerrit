@@ -18,7 +18,6 @@ import { USER_ACL_FAIL, USER_ACL_REQUEST, USER_ACL_SUCCESS } from './auth'
 
 export const USER_LOGGED_IN = 'USER_LOGGED_IN'
 export const USER_LOGGED_OUT = 'USER_LOGGED_OUT'
-export const USER_IN_LOCALSTORAGE = 'USER_IN_LOCALSTORAGE'
 
 // Access tokens are not necessary JWTs (Google OAUTH uses a custom format)
 // check the access token, if it isn't a JWT, use the ID token
@@ -32,35 +31,23 @@ export function getToken(user) {
   }
 }
 
-export const fetchUserACLRequest = () => ({
-  type: USER_ACL_REQUEST
+export const fetchUserACLRequest = (tenant) => ({
+  type: USER_ACL_REQUEST,
+  tenant: tenant,
 })
 
-export const userLoggedIn = (user, tenant) => (dispatch) => {
-  let tkn = getToken(user)
+export const userLoggedIn = (user) => (dispatch) => {
   dispatch({
     type: USER_LOGGED_IN,
     user: user,
-    token: tkn,
-  })
-  dispatch(fetchUserACL(tenant, tkn))
-}
-
-export const userLoggingOut = (userManager) => (dispatch) => {
-  userManager.removeUser()
-  dispatch({
-    type: USER_LOGGED_OUT
+    token: getToken(user),
   })
 }
 
-export const userInStore = (user, tenant) => (dispatch) => {
-  let tkn = getToken(user)
+export const userLoggedOut = () => (dispatch) => {
   dispatch({
-    type: USER_IN_LOCALSTORAGE,
-    user: user,
-    token: tkn,
+    type: USER_LOGGED_OUT,
   })
-  dispatch(fetchUserACL(tenant, tkn))
 }
 
 const fetchUserACLSuccess = (json) => ({
@@ -74,10 +61,10 @@ const fetchUserACLFail = error => ({
   error
 })
 
-export const fetchUserACL = (tenant, token) => (dispatch) => {
-  dispatch(fetchUserACLRequest())
+export const fetchUserACL = (tenant, user) => (dispatch) => {
+  dispatch(fetchUserACLRequest(tenant))
   let apiPrefix = 'tenant/' + tenant + '/'
-  return API.fetchUserAuthorizations(apiPrefix, token)
+  return API.fetchUserAuthorizations(apiPrefix, user.token)
     .then(response => dispatch(fetchUserACLSuccess(response.data)))
     .catch(error => {
       dispatch(fetchUserACLFail(error))

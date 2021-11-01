@@ -56,7 +56,7 @@ function renderAutoholdModal(
     function handleConfirm() {
         let ah_change = change === '' ? null : change
         let ah_ref = ref === '' ? null : ref
-        let ah_owner = user.user ? user.user.profile.preferred_username : '[unknown]'
+        let ah_owner = user.data ? user.data.profile.preferred_username : '[unknown]'
         let reason_prefix = 'Requested by ' + ah_owner + ': '
 
         autohold(tenant.apiPrefix, project, job_name, ah_change, ah_ref, reason_prefix + reason, parseInt(count), parseInt(nodeHoldExpiration), user.token)

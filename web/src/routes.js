@@ -149,7 +149,8 @@ const routes = () => [
   {
     to: '/auth_callback',
     component: AuthCallbackPage,
-  }
+    noTenantPrefix: true,
+  },
 ]
 
 export { routes }

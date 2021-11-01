@@ -36,26 +36,30 @@ import {
 } from '@patternfly/react-icons'
 
 import * as moment from 'moment'
-import { UserManager } from 'oidc-react'
 
 import { apiUrl } from '../../api'
-import { userLoggingOut, userInStore } from '../../actions/user'
-import stateStore from '../../stateStore'
+import { fetchUserACL } from '../../actions/user'
+import { withAuth } from 'oidc-react'
+import { getHomepageUrl } from '../../api'
+import { userLoggedIn, userLoggedOut } from '../../actions/user'
 
 
 class AuthContainer extends React.Component {
   static propTypes = {
-    userManagerConfig: PropTypes.object,
     user: PropTypes.object,
     tenant: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     timezone: PropTypes.string.isRequired,
     info: PropTypes.object,
+    auth: PropTypes.object,
+    // Props coming from withAuth
+    signIn: PropTypes.func,
+    signOut: PropTypes.func,
+    userData: PropTypes.object,
   }
 
   constructor(props) {
     super(props)
-    const { tenant } = this.props
     this.state = {
       isModalOpen: false,
       showZuulClientConfig: false,
@@ -70,17 +74,40 @@ class AuthContainer extends React.Component {
         showZuulClientConfig: !showZuulClientConfig
       }))
     }
-    const stored_user = localStorage.getItem('zuul_user')
-    if (stored_user !== null) {
-      let user = JSON.parse(stored_user)
-      const now = Date.now() / 1000
-      if (user.expires_at > now) {
-        this.props.dispatch(userInStore(user, tenant.name))
-      }
+  }
+
+  componentDidMount() {
+    const { user, userData } = this.props
+
+    // Make sure redux is synced with the userManager
+    const now = Date.now() / 1000
+    if (userData && userData.expires_at < now) {
+      console.log('Token expired, logging out')
+      this.props.signOut()
+      this.props.dispatch(userLoggedOut())
+    } else if (user.data !== userData) {
+      console.log('Restoring login from userManager')
+      this.props.dispatch(userLoggedIn(userData))
     }
   }
 
-  ZuulClientConfig(tenant, user) {
+  componentDidUpdate() {
+    const { user, tenant } = this.props
+
+    // Make sure the token is current and the tenant is up to date.
+    const now = Date.now() / 1000
+    if (user.data && user.data.expires_at < now) {
+      console.log('Token expired, logging out')
+      this.props.signOut()
+    } else if (user.data && user.tenant !== tenant.name) {
+      console.log('Refreshing ACL', user.tenant, tenant.name)
+      this.props.dispatch(fetchUserACL(tenant.name, user))
+    }
+  }
+
+  ZuulClientConfig() {
+    const { user, tenant } = this.props
+
     let ZCconfig
     ZCconfig = '[' + tenant.name + ']\n'
     ZCconfig = ZCconfig + 'url=' + apiUrl.slice(0, -4) + '\n'
@@ -90,10 +117,11 @@ class AuthContainer extends React.Component {
     return ZCconfig
   }
 
-  renderModal(user, userManager, tenant, timezone) {
+  renderModal() {
+    const { user, tenant, timezone } = this.props
     const { isModalOpen, showZuulClientConfig } = this.state
-    let config = this.ZuulClientConfig(tenant, user)
-    let valid_until = moment.unix(user.user.expires_at).tz(timezone).format('YYYY-MM-DD HH:mm:ss')
+    let config = this.ZuulClientConfig(tenant, user.data)
+    let valid_until = moment.unix(user.data.expires_at).tz(timezone).format('YYYY-MM-DD HH:mm:ss')
     return (
       <React.Fragment>
         <Modal
@@ -106,8 +134,7 @@ class AuthContainer extends React.Component {
               key="SignOut"
               variant="primary"
               onClick={() => {
-                localStorage.setItem('zuul_auth_redirect', null)
-                this.props.dispatch(userLoggingOut(userManager))
+                this.props.signOut()
               }}
               title="Note that you will be logged out of Zuul, but not out of your identity provider.">
               Sign Out &nbsp;
@@ -116,8 +143,8 @@ class AuthContainer extends React.Component {
           ]}
         >
           <div>
-            <p key="user">Name: <strong>{user.user.profile.name}</strong></p>
-            <p key="preferred_username">Logged in as: <strong>{user.user.profile.preferred_username}</strong>&nbsp;
+            <p key="user">Name: <strong>{user.data.profile.name}</strong></p>
+            <p key="preferred_username">Logged in as: <strong>{user.data.profile.preferred_username}</strong>&nbsp;
               {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) && (
                 <HatWizardIcon title='This user can perform admin tasks' />
               )}</p>
@@ -150,18 +177,17 @@ class AuthContainer extends React.Component {
 
   renderButton(containerStyles) {
 
-    const { user, userManagerConfig, tenant, timezone } = this.props
-    const userManager = new UserManager(
-      { ...userManagerConfig, stateStore: stateStore })
-    if (!user.user) {
+    const { user } = this.props
+    if (!user.data) {
       return (
         <div style={containerStyles}>
           <Button
             key="SignIn"
             variant={ButtonVariant.plain}
             onClick={() => {
-              localStorage.setItem('zuul_auth_redirect', window.location.href)
-              userManager.signinRedirect()
+              const redirect_target = window.location.href.slice(getHomepageUrl().length)
+              localStorage.setItem('zuul_auth_redirect', redirect_target)
+              this.props.signIn({ redirect_uri: getHomepageUrl() + 'auth_callback' })
             }}>
             Sign in &nbsp;
             <SignInAltIcon title='Sign In' />
@@ -169,15 +195,15 @@ class AuthContainer extends React.Component {
         </div>
       )
     } else {
-      return (user.isFetching ? <div style={containerStyles}>Loading...</div> :
+      return (user.data.isFetching ? <div style={containerStyles}>Loading...</div> :
         <div style={containerStyles}>
-          {this.renderModal(user, userManager, tenant, timezone)}
+          {this.renderModal()}
           <Button
             variant={ButtonVariant.plain}
             key="userinfo"
             onClick={this.handleModalToggle}>
             <UserIcon title='User details' />
-            &nbsp;{user.user.profile.preferred_username}&nbsp;
+            &nbsp;{user.data.profile.preferred_username}&nbsp;
           </Button>
         </div>
       )
@@ -185,7 +211,7 @@ class AuthContainer extends React.Component {
   }
 
   render() {
-    const { userManagerConfig, info } = this.props
+    const { info, auth } = this.props
     const textColor = '#d1d1d1'
     const containerStyles = {
       color: textColor,
@@ -194,10 +220,11 @@ class AuthContainer extends React.Component {
       display: 'initial',
       padding: '6px'
     }
+
     if (info.isFetching) {
       return (<><div style={containerStyles}>Fetching auth info ...</div></>)
     }
-    if (userManagerConfig) {
+    if (auth.info) {
       return this.renderButton(containerStyles)
     } else {
       return (<div style={containerStyles} title="Authentication disabled">-</div>)
@@ -206,9 +233,9 @@ class AuthContainer extends React.Component {
 }
 
 export default connect(state => ({
-  userManagerConfig: state.auth.userManagerConfig,
+  auth: state.auth,
   user: state.user,
   tenant: state.tenant,
   timezone: state.timezone,
   info: state.info,
-}))(AuthContainer)
+}))(withAuth(AuthContainer))
