@@ -42,7 +42,7 @@ import { buildExternalLink, ExternalLink, IconProperty } from '../../Misc'
 import renderAutoholdModal from '../autohold/autoholdModal'
 
 function Build({ build, tenant, timezone, user }) {
-  let default_form_reason = user.user ? 'Requested from the web UI by ' + user.user.profile.preferred_username : '-'
+  let default_form_reason = user.data ? 'Requested from the web UI by ' + user.data.profile.preferred_username : '-'
   const [showAutoholdModal, setShowAutoholdModal] = useState(false)
   const [ahFormChange, setAhFormChange] = useState(build.change ? build.change : '')
   const [ahFormRef, setAhFormRef] = useState(build.change ? '' : build.ref)

@@ -15,61 +15,71 @@
 
 import * as API from '../api'
 
-export const USERMANAGER_CREATE = 'USERMANAGER_CREATE'
-export const USERMANAGER_SUCCESS = 'USERMANAGER_SUCCESS'
-export const USERMANAGER_FAIL = 'USERMANAGER_FAIL'
+export const AUTH_CONFIG_REQUEST = 'AUTH_CONFIG_REQUEST'
+export const AUTH_CONFIG_SUCCESS = 'AUTH_CONFIG_SUCCESS'
+export const AUTH_CONFIG_FAIL = 'AUTH_CONFIG_FAIL'
 
 export const USER_ACL_REQUEST = 'USER_ACL_REQUEST'
 export const USER_ACL_SUCCESS = 'USER_ACL_SUCCESS'
 export const USER_ACL_FAIL = 'USER_ACL_FAIL'
 
-export const userManagerCreateRequest = () => ({
-    type: USERMANAGER_CREATE
+export const AUTH_START = 'AUTH_START'
+
+const authConfigRequest = () => ({
+  type: AUTH_CONFIG_REQUEST
 })
 
-function createUserManagerConfigFromJson(json) {
-    let tenant = json.info.tenant
-    let auth_info = json.info.capabilities.auth
-    if (!auth_info) {
-        console.log('No auth config')
-        return null
-    }
-    let realm = auth_info.default_realm
-    let client_config = auth_info.realms[realm]
-    if (client_config.driver === 'OpenIDConnect') {
-        let userManagerConfig = {
-            client_id: client_config.client_id,
-            redirect_uri: API.getHomepageUrl() + 't/' + tenant + '/auth_callback',
-            response_type: 'token id_token',
-            scope: client_config.scope,
-            authority: client_config.authority,
-            automaticSilentRenew: false,
-            filterProtocolClaims: true,
-            loadUserInfo: true,
-        }
-        return userManagerConfig
-    } else {
-        console.log('No OpenIDConnect provider found')
-        return null
-    }
+function createAuthParamsFromJson(json) {
+  let auth_info = json.info.capabilities.auth
+
+  let auth_params = {
+    authority: '',
+    clientId: '',
+    scope: '',
+  }
+  if (!auth_info) {
+    console.log('No auth config')
+    return auth_params
+  }
+  const realm = auth_info.default_realm
+  const client_config = auth_info.realms[realm]
+  if (client_config.driver === 'OpenIDConnect') {
+    auth_params.clientId = client_config.client_id
+    auth_params.scope = client_config.scope
+    auth_params.authority = client_config.authority
+    return auth_params
+  } else {
+    console.log('No OpenIDConnect provider found')
+    return auth_params
+  }
 }
 
-const fetchTenantInfoSuccess = json => ({
-    type: USERMANAGER_SUCCESS,
-    capabilities: json.info.capabilities,
-    userManagerConfig: createUserManagerConfigFromJson(json)
+const authConfigSuccess = (json, auth_params) => ({
+  type: AUTH_CONFIG_SUCCESS,
+  info: json.info,
+  auth_params: auth_params,
 })
 
-const fetchTenantInfoFail = error => ({
-    type: USERMANAGER_FAIL,
+const authConfigFail = error => ({
+    type: AUTH_CONFIG_FAIL,
     error
 })
 
-export const createUserManagerFromTenant = (tenantName) => (dispatch) => {
-    dispatch(userManagerCreateRequest())
-    return API.fetchTenantInfo('tenant/' + tenantName + '/')
-        .then(response => dispatch(fetchTenantInfoSuccess(response.data)))
-        .catch(error => {
-            dispatch(fetchTenantInfoFail(error))
-        })
+export const configureAuthFromTenant = (tenantName) => (dispatch) => {
+  dispatch(authConfigRequest())
+  return API.fetchTenantInfo('tenant/' + tenantName + '/')
+    .then(response => {
+      dispatch(authConfigSuccess(
+        response.data,
+        createAuthParamsFromJson(response.data)))
+    })
+    .catch(error => {
+      dispatch(authConfigFail(error))
+    })
+}
+
+export const configureAuthFromInfo = (info) => (dispatch) => {
+  dispatch(authConfigSuccess(
+    {info: info},
+    createAuthParamsFromJson({info: info})))
 }
