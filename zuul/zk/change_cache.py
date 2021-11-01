@@ -92,6 +92,11 @@ class ChangeKey:
         return (isinstance(other, ChangeKey) and
                 self.reference == other.reference)
 
+    def __repr__(self):
+        return (f'<ChangeKey {self.connection_name} {self.project_name} '
+                f'{self.change_type} {self.stable_id} {self.revision} '
+                f'hash={self._hash}>')
+
     @classmethod
     def fromReference(cls, data):
         data = json.loads(data)
@@ -181,7 +186,6 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
         new_keys = cache_keys - self._watched_keys
         for key in new_keys:
-            self.log.debug("Watcher adding %s", key)
             ExistingDataWatch(self.kazoo_client,
                               f"{self.cache_root}/{key}",
                               self._cacheItemWatcher)
@@ -217,6 +221,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         to_prune = set(outdated_versions.keys()) - set(relevant)
         for key in to_prune:
             self.delete(key, outdated_versions[key])
+        self.log.debug("Done pruning cache")
 
     def cleanup(self):
         self.log.debug("Cleaning cache")
@@ -228,6 +233,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
         data_uuids = set(self.kazoo_client.get_children(self.data_root))
         self._data_cleanup_candidates = data_uuids - valid_uuids
+        self.log.debug("Done cleaning cache")
 
     def __iter__(self):
         try:
@@ -267,11 +273,21 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             return change
 
         try:
-            data = self._getData(data_uuid)
-        except (NoNodeError, json.JSONDecodeError):
+            raw_data = self._getData(data_uuid)
+        except NoNodeError:
             cache_path = self._cachePath(key._hash)
-            self.log.error("Removing cache entry %s without any data",
-                           cache_path)
+            self.log.error("Removing cache key %s with no data node uuid %s",
+                           key, data_uuid)
+            # TODO: handle no node + version mismatch
+            self.kazoo_client.delete(cache_path, zstat.version)
+            return None
+        try:
+            data = json.loads(raw_data)
+        except json.JSONDecodeError:
+            cache_path = self._cachePath(key._hash)
+            self.log.error("Removing cache key %s with corrupt data node "
+                           "uuid %s data %s len %s",
+                           key, data_uuid, repr(raw_data), len(raw_data))
             # TODO: handle no node + version mismatch
             self.kazoo_client.delete(cache_path, zstat.version)
             return None
@@ -296,11 +312,13 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
     def _getData(self, data_uuid):
         with sharding.BufferedShardReader(
                 self.kazoo_client, self._dataPath(data_uuid)) as stream:
-            data = stream.read()
-        return json.loads(data)
+            return stream.read()
 
     def set(self, key, change, version=-1):
-        data_uuid = self._setData(self._dataFromChange(change))
+        data = self._dataFromChange(change)
+        raw_data = json.dumps(data).encode("utf8")
+
+        data_uuid = self._setData(raw_data)
         # Add the change_key info here mostly for debugging since the
         # hash is non-reversible.
         cache_data = json.dumps(dict(
@@ -311,6 +329,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         with self._change_locks[key._hash]:
             try:
                 if version == -1:
+                    self.log.debug(
+                        "Create cache key %s with data uuid %s len %s",
+                        key, data_uuid, len(raw_data))
                     _, zstat = self.kazoo_client.create(
                         cache_path,
                         cache_data.encode("utf8"),
@@ -324,6 +345,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                             f"{self._change_cache[key._hash]} vs. "
                             f"new {change} "
                             f"for key '{key.reference}'")
+                    self.log.debug(
+                        "Update cache key %s with data uuid %s len %s",
+                        key, data_uuid, len(raw_data))
                     zstat = self.kazoo_client.set(
                         cache_path, cache_data.encode("utf8"), version)
             except (BadVersionError, NodeExistsError, NoNodeError) as exc:
@@ -335,10 +359,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def _setData(self, data):
         data_uuid = uuid.uuid4().hex
-        payload = json.dumps(data).encode("utf8")
         with sharding.BufferedShardWriter(
                 self.kazoo_client, self._dataPath(data_uuid)) as stream:
-            stream.write(payload)
+            stream.write(data)
         return data_uuid
 
     def updateChangeWithRetry(self, key, change, update_func, retry_count=5):
