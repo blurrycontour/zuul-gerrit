@@ -61,3 +61,6 @@ coreutils [platform:apk]
 openafs-krb5 [platform:debian]
 openafs-client [platform:debian]
 krb5-user [platform:debian]
+setpriv [platform:ubuntu]
+util-linux [platform:debian platform:rpm platform:apk]
+
