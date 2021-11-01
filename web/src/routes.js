@@ -30,7 +30,6 @@ import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
 import OpenApiPage from './pages/OpenApi'
-import AuthCallbackPage from './pages/AuthCallback'
 
 // The Route object are created in the App component.
 // Object with a title are created in the menu.
@@ -140,10 +139,6 @@ const routes = () => [
     component: OpenApiPage,
     noTenantPrefix: true,
   },
-  {
-    to: '/auth_callback',
-    component: AuthCallbackPage,
-  }
 ]
 
 export { routes }
