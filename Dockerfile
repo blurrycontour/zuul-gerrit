@@ -74,6 +74,8 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+RUN chmod u+s /usr/bin/bwrap
+
 CMD ["/usr/local/bin/zuul-executor", "-f"]
 
 FROM zuul as zuul-fingergw
