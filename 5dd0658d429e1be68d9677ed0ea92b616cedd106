@@ -22,6 +22,23 @@
       },
       "revId": "5dd0658d429e1be68d9677ed0ea92b616cedd106",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af41421c_be98bd24",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5031,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-02T23:19:13Z",
+      "side": 1,
+      "message": "Yeah, I copied the docstring to the base class since it\u0027s the general documentation for the method.",
+      "revId": "5dd0658d429e1be68d9677ed0ea92b616cedd106",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
