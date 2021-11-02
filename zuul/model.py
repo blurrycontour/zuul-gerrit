@@ -5028,7 +5028,13 @@ class Ref(object):
         return False
 
     def getRelatedChanges(self, sched, related):
-        pass
+        """Recursively update a set of related changes
+
+        :arg Scheduler sched: The scheduler instance
+        :arg set related: The cache keys of changes which have been inspected
+           so far.  Will be updated with additional changes by this method.
+        """
+        related.add(self.cache_stat.key)
 
     def updatesConfig(self, tenant):
         tpc = tenant.project_configs.get(self.project.canonical_name)
