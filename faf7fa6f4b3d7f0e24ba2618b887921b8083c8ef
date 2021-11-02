@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9648c64_75dedf13",
+        "filename": "doc/source/reference/developer/specs/arm64-wheels.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-02T18:45:20Z",
+      "side": 1,
+      "message": "This still seems like the simpler approach to me; it has fewer OpenDev moving parts.  Why do you prefer the option above?",
+      "revId": "faf7fa6f4b3d7f0e24ba2618b887921b8083c8ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e007b083_b0a2ad28",
+        "filename": "doc/source/reference/developer/specs/arm64-wheels.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-02T18:45:20Z",
+      "side": 1,
+      "message": "This sounds like a good plan if you\u0027re volunteering to do it (but I notice you left the assignee part blank).  I think the work item details are probably more of an OpenDev thing and it\u0027s fine to leave the details out of this spec.  But if the outcome of this is \"The Zuul project would like to expand the OpenDev service to support this additional feature\" we should probably have at least one person who\u0027s willing to make that happen.",
+      "revId": "faf7fa6f4b3d7f0e24ba2618b887921b8083c8ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
