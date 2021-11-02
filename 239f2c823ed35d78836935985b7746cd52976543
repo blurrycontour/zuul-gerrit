@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c538de_a6575a7b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3869,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-02T17:54:55Z",
+      "side": 1,
+      "message": "Should you serialize the strings as the \u0027_\u0027 prefixed names for consistency?",
+      "revId": "239f2c823ed35d78836935985b7746cd52976543",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
