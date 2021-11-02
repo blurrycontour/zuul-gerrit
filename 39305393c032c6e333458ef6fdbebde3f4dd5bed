@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2480a753_3af24036",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-02T14:57:20Z",
+      "side": 1,
+      "message": "I suspect that quickstart testing covers this well enough to be sure it doesn\u0027t just break and Albin reports that testing on their previously unhappy system shows this change fixes that. Seems reasonable since bwrap expects to be able to manage this stuff.",
+      "revId": "39305393c032c6e333458ef6fdbebde3f4dd5bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
