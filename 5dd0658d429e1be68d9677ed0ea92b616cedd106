@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d308372_4766a706",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5031,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-02T22:44:55Z",
+      "side": 1,
+      "message": "Nit this method doesn\u0027t seem to recurse. The method on Change does.",
+      "range": {
+        "startLine": 5031,
+        "startChar": 11,
+        "endLine": 5031,
+        "endChar": 22
+      },
+      "revId": "5dd0658d429e1be68d9677ed0ea92b616cedd106",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
