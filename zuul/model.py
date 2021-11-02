@@ -838,8 +838,8 @@ class ChangeQueue(zkobject.ZKObject):
             # The pipeline manager will take care of correcting the
             # references on the next queue iteration.
             item._set(
-                item_ahead=items_by_path.get(item.item_ahead),
-                items_behind=[items_by_path[p] for p in item.items_behind
+                item_ahead=items_by_path.get(item._item_ahead),
+                items_behind=[items_by_path[p] for p in item._items_behind
                               if p in items_by_path])
 
         bundle_by_uuid = {}
@@ -3925,6 +3925,8 @@ class QueueItem(zkobject.ZKObject):
             "dynamic_state": defaultdict(dict, data["dynamic_state"]),
             "current_build_set": build_set,
         })
+        data['_item_ahead'] = data.pop('item_ahead')
+        data['_items_behind'] = data.pop('items_behind')
         return data
 
     def annotateLogger(self, logger):
