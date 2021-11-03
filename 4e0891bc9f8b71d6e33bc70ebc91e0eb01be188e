@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6b9828f_d21d2187",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1674,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-03T15:36:34Z",
+      "side": 1,
+      "message": "change_keys is an iterable (list?) of ChangeKey objects. We get their references from them and then use those reference to create new ChangeKey objects to lookup the actual changes from the cache (or populate them if not cached). I wonder if we should have a pipeline manager method to resolve change keys directly and not from references?",
+      "revId": "4e0891bc9f8b71d6e33bc70ebc91e0eb01be188e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
