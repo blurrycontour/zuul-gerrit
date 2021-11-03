@@ -1406,15 +1406,20 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.assertEqual(len(_getCachedChanges()), 2)
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.setMerged()
+        self.fake_gerrit.addEvent(C.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual(len(_getCachedChanges()), 3)
         sched.maintainConnectionCache()
-        self.assertEqual(len(_getCachedChanges()), 2)
+        self.assertEqual(len(_getCachedChanges()), 3)
 
         # Test this method separately to make sure we are getting
         # cache keys of the correct type, since we don't do run-time
         # validation.
         relevant = sched._gatherConnectionCacheKeys()
-        self.assertEqual(len(relevant), 2)
+        self.assertEqual(len(relevant), 3)
         for k in relevant:
             if not isinstance(k, ChangeKey):
                 raise RuntimeError("Cache key %s is not a ChangeKey" % repr(k))
@@ -1423,15 +1428,15 @@ class TestScheduler(ZuulTestCase):
         self.executor_api.release()
         self.waitUntilSettled()
 
-        self.assertEqual(len(_getCachedChanges()), 2)
+        self.assertEqual(len(_getCachedChanges()), 3)
         sched.maintainConnectionCache()
-        self.assertEqual(len(_getCachedChanges()), 2)
+        self.assertEqual(len(_getCachedChanges()), 3)
 
         # Test that outdated but still relevant changes are not cleaned up
         for connection in sched.connections.connections.values():
             connection.maintainCache(
                 [c.cache_stat.key for c in _getCachedChanges()], max_age=0)
-        self.assertEqual(len(_getCachedChanges()), 2)
+        self.assertEqual(len(_getCachedChanges()), 3)
 
         for connection in sched.connections.connections.values():
             connection.maintainCache([], max_age=0)
