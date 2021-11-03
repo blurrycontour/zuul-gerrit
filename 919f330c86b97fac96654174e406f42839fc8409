@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5423060_068e0a20",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "I think this should be a 400 Bad Request instead and we might also include a more specific error message (e.g. f\"unknown tenant {tenant_name}\").",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "573b1197_de499114",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a21fa45_2c4a8d08",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "Maybe we can also validate the pipeline name and directly add the event to the pipeline event queue. That way we don\u0027t need to take a detour via the tenant management event queue.",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd666f7a_deb4fde8",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "Here you have the error message already, but I think we should still make this a 400 Bad Request.",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcb194a7_dc98b1af",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "Can we also directly put this into the pipeline event queue?",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33ef7727_344eb211",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "The rpcclient uses a default timeout of 300 (ms?). I think we should do the same here.",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10badaa2_fc9ae1e9",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-03T14:22:43Z",
+      "side": 1,
+      "message": "same here re. the timeout",
+      "revId": "919f330c86b97fac96654174e406f42839fc8409",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
