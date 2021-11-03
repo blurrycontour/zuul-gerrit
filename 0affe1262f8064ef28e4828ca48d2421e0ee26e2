@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32a77897_8bea7d91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-11-03T08:01:46Z",
+      "side": 1,
+      "message": "Anyone would like to do a code review of this simple change?",
+      "revId": "0affe1262f8064ef28e4828ca48d2421e0ee26e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
