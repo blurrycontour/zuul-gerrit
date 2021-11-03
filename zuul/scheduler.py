@@ -257,6 +257,7 @@ class Scheduler(threading.Thread):
             self.nodepool = nodepool.Nodepool(
                 self.zk_client, self.system.system_id, self.statsd,
                 scheduler=True)
+        self.debug_connection_cache = False
 
     def start(self):
         super(Scheduler, self).start()
@@ -1678,10 +1679,12 @@ class Scheduler(threading.Thread):
         # We'll only remove changes older than `max_age` from the cache, as
         # it may take a while for an event that was processed by a connection
         # (which updated/populated the cache) to end up in a pipeline.
+        self.log.debug("Found %s relevant changes", len(relevant))
         for connection in self.connections.connections.values():
-            connection.maintainCache(relevant, max_age=7200)  # 2h
-            self.log.debug("Finished connection cache maintenance for: %s",
-                           connection)
+            if not self.debug_connection_cache:
+                connection.maintainCache(relevant, max_age=7200)  # 2h
+                self.log.debug("Finished connection cache maintenance for: %s",
+                               connection)
         self.log.debug("Finished connection cache maintenance")
 
     def process_tenant_trigger_queue(self, tenant):
