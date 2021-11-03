@@ -44,6 +44,8 @@ from zuul.model import (
     Abide,
     Branch,
     ChangeQueue,
+    DequeueEvent,
+    EnqueueEvent,
     QueueItem,
     SystemAttributes,
     UnparsedAbideConfig,
@@ -54,6 +56,7 @@ from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, WebComponent
 from zuul.zk.config_cache import SystemConfigCache
+from zuul.zk.event_queues import TenantManagementEventQueue
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.layout import LayoutStateStore
 from zuul.zk.locks import tenant_read_lock
@@ -325,7 +328,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['POST', ])
-    def dequeue(self, tenant, project):
+    def dequeue(self, tenant_name, project_name):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -335,35 +338,38 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, tenant)
+        self.is_authorized(claims, tenant_name)
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
             msg % (claims['__zuul_uid_claim'], 'dequeue',
-                   tenant, project))
+                   tenant_name, project_name))
+
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if tenant is None:
+            return cherrypy.HTTPError(404)
+        _, project = tenant.getProject(project_name)
+        if project is None:
+            return cherrypy.HTTPError(404)
 
         body = cherrypy.request.json
         if 'pipeline' in body and (
-            ('change' in body and 'ref' not in body) or
-            ('change' not in body and 'ref' in body)):
-            job = self.rpc.submitJob('zuul:dequeue',
-                                     {'tenant': tenant,
-                                      'pipeline': body['pipeline'],
-                                      'project': project,
-                                      'change': body.get('change', None),
-                                      'ref': body.get('ref', None)})
-            result = not job.failure
+                ('change' in body and 'ref' not in body) or
+                ('change' not in body and 'ref' in body)):
+            event = DequeueEvent(
+                tenant_name, body['pipeline'], project.canonical_hostname,
+                project.name, body.get('change', None), body.get('ref', None))
+            self.zuulweb.management_events[tenant_name].put(event)
             resp = cherrypy.response
             resp.headers['Access-Control-Allow-Origin'] = '*'
-            return result
         else:
-            raise cherrypy.HTTPError(400,
-                                     'Invalid request body')
+            raise cherrypy.HTTPError(400, 'Invalid request body')
+        return True
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['POST', ])
-    def enqueue(self, tenant, project):
+    def enqueue(self, tenant_name, project_name):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -373,11 +379,18 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, tenant)
+        self.is_authorized(claims, tenant_name)
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
             msg % (claims['__zuul_uid_claim'], 'enqueue',
-                   tenant, project))
+                   tenant_name, project_name))
+
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if tenant is None:
+            raise cherrypy.HTTPError(404, f'Unknown tenant {tenant_name}')
+        _, project = tenant.getProject(project_name)
+        if project is None:
+            raise cherrypy.HTTPError(404, f'Unknown project {project_name}')
 
         body = cherrypy.request.json
         if all(p in body for p in ['change', 'pipeline']):
@@ -386,33 +399,35 @@ class ZuulWebAPI(object):
                                      'newrev', 'pipeline']):
             return self._enqueue_ref(tenant, project, **body)
         else:
-            raise cherrypy.HTTPError(400,
-                                     'Invalid request body')
+            raise cherrypy.HTTPError(400, 'Invalid request body')
 
-    def _enqueue(self, tenant, project, change, pipeline, **kwargs):
-        job = self.rpc.submitJob('zuul:enqueue',
-                                 {'tenant': tenant,
-                                  'pipeline': pipeline,
-                                  'project': project,
-                                  'change': change, })
-        result = not job.failure
+    def _enqueue(self, tenant, project, change, pipeline_name, **kwargs):
+        event = EnqueueEvent(tenant.name, pipeline_name,
+                             project.canonical_hostname, project.name,
+                             change, ref=None, oldrev=None, newrev=None)
+        result = self.zuulweb.management_events[tenant.name].put(event)
+        self.log.debug("Waiting for enqueue")
+        res = result.wait()
+        self.log.debug("Enqueue complete")
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return result
+        return res
 
     def _enqueue_ref(self, tenant, project, ref,
                      oldrev, newrev, pipeline, **kwargs):
-        job = self.rpc.submitJob('zuul:enqueue_ref',
-                                 {'tenant': tenant,
-                                  'pipeline': pipeline,
-                                  'project': project,
-                                  'ref': ref,
-                                  'oldrev': oldrev,
-                                  'newrev': newrev, })
-        result = not job.failure
+        event = EnqueueEvent(tenant.name, pipeline,
+                             project.canonical_hostname, project.name,
+                             change=None, ref=ref, oldrev=oldrev,
+                             newrev=newrev)
+        result = self.zuulweb.management_events[tenant.name].put(event)
+        self.log.debug("Waiting for enqueue")
+        res = result.wait()
+        self.log.debug("Enqueue complete")
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return result
+        return res
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -1399,6 +1414,9 @@ class ZuulWeb(object):
             self.zk_client, self.system_config_cache_wake_event.set)
         self.local_layout_state = {}
 
+        self.management_events = TenantManagementEventQueue.createRegistry(
+            self.zk_client)
+
         self.connections = connections
         self.authenticators = authenticators
         self.stream_manager = StreamManager()
@@ -1467,11 +1485,11 @@ class ZuulWeb(object):
                 controller=api, action='autohold')
             route_map.connect(
                 'api',
-                '/api/tenant/{tenant}/project/{project:.*}/enqueue',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/enqueue',
                 controller=api, action='enqueue')
             route_map.connect(
                 'api',
-                '/api/tenant/{tenant}/project/{project:.*}/dequeue',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/dequeue',
                 controller=api, action='dequeue')
         route_map.connect('api', '/api/tenant/{tenant}/autohold/{request_id}',
                           controller=api,
