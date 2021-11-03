@@ -678,6 +678,8 @@ class Repo(object):
                 files.update(cmt.stats.files.keys())
         else:
             files.update(head.stats.files.keys())
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("Changed files........" + len(files))
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
