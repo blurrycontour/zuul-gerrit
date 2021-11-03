@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82f82e84_79f66300",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-03T22:22:23Z",
+      "side": 1,
+      "message": "PS42 ensures callback redirection works when serving the GUI under a subdirectory.",
+      "revId": "f42c35fee3a04cec06630ceb0e8b1fd64baab960",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
