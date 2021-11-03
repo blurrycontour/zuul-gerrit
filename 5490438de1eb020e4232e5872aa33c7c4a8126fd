@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c66e440_c7262787",
+        "filename": "web/src/ZuulAuthProvider.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-03T09:58:07Z",
+      "side": 1,
+      "message": "Does it work if oidcConfig is empty? How does this behave if no auth is configured?",
+      "revId": "5490438de1eb020e4232e5872aa33c7c4a8126fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
