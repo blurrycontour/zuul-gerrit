@@ -43,6 +43,8 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
 from zuul.zk.change_cache import ChangeKey
 
+import traceback
+
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
 MERGER_CHERRY_PICK = 3    # "git cherry-pick"
@@ -1388,6 +1390,8 @@ class Job(ConfigObject):
 
         self.name = name
 
+        self.log = logging.getLogger("zuul.Job")
+
     @property
     def combined_variables(self):
         """
@@ -1883,14 +1887,21 @@ class Job(ConfigObject):
         return True
 
     def changeMatchesFiles(self, change):
+        self.log.debug("Debug.......0")
+        for line in traceback.format_stack():
+            self.log.debug(line.strip())
+
         if self.file_matcher and not self.file_matcher.matches(change):
+            self.log.debug("Debug.......1")
             return False
 
         # NB: This is a negative match.
         if (self.irrelevant_file_matcher and
             self.irrelevant_file_matcher.matches(change)):
+            self.log.debug("Debug.......2")
             return False
 
+        self.log.debug("Debug........3")
         return True
 
     def _projectsFromPlaybooks(self, playbooks, with_implicit=False):

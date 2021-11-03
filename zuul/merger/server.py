@@ -207,6 +207,8 @@ class BaseMergeServer(metaclass=ABCMeta):
         log = get_annotated_logger(
             self.log, merge_request.event_id
         )
+
+        log.info("_runMergeJob......." + str(merge_request))
         # Lock and update the merge request
         if not self.merger_api.lock(merge_request, blocking=False):
             return

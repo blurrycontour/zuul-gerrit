@@ -1241,6 +1241,11 @@ class PipelineManager(metaclass=ABCMeta):
         if not item.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
+                if hasattr(item.change, 'files') and item.change.files:
+                    self.log.debug("Files........5:" + str(len(item.change.files)))
+                else:
+                    self.log.debug("Files........6")
+
                 item.freezeJobGraph(self.getLayout(item))
             except Exception as e:
                 # TODOv3(jeblair): nicify this exception as it will be reported
@@ -1315,6 +1320,11 @@ class PipelineManager(metaclass=ABCMeta):
                 changed = True
                 self.cancelJobs(item)
             if actionable:
+                if hasattr(item.change, 'files') and item.change.files:
+                    self.log.debug("Files........3:" + str(len(item.change.files)))
+                else:
+                    self.log.debug("Files........4")
+
                 ready = self.prepareItem(item)
                 # Starting jobs reporting should only be done once if there are
                 # jobs to run for this item.
@@ -1430,6 +1440,11 @@ class PipelineManager(metaclass=ABCMeta):
             queue_changed = False
             nnfi = None  # Nearest non-failing item
             for item in queue.queue[:]:
+                if hasattr(item.change, 'files') and item.change.files:
+                    self.log.debug("Files........1:" + str(len(item.change.files)))
+                else:
+                    self.log.debug("Files........2")
+
                 item_changed, nnfi = self._processOneItem(
                     item, nnfi)
                 if item_changed:
