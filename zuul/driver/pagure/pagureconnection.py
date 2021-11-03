@@ -23,7 +23,7 @@ import requests
 import cherrypy
 import voluptuous as v
 
-from zuul.connection import BaseConnection, ZKChangeCacheMixin
+from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
@@ -331,9 +331,7 @@ class PagureEventConnector(threading.Thread):
         event.ref = 'refs/heads/%s' % event.branch
         event.newrev = data.get('rev')
         event.oldrev = '0' * 40
-        event.branch_created = True
-        self.connection.project_branch_cache[
-            event.project_name].append(event.branch)
+        self.connection.clearConnectionCacheOnBranchEvent(event)
         return event
 
     def _event_ref_deleted(self, body):
@@ -344,9 +342,7 @@ class PagureEventConnector(threading.Thread):
         event.ref = 'refs/heads/%s' % event.branch
         event.oldrev = data.get('rev')
         event.newrev = '0' * 40
-        event.branch_deleted = True
-        self.connection.project_branch_cache[
-            event.project_name].remove(event.branch)
+        self.connection.clearConnectionCacheOnBranchEvent(event)
         return event
 
 
@@ -465,14 +461,13 @@ class PagureAPIClient():
         return resp[0]['webhook']['token']
 
 
-class PagureConnection(ZKChangeCacheMixin, BaseConnection):
+class PagureConnection(ZKChangeCacheMixin, CachedBranchConnection):
     driver_name = 'pagure'
     log = logging.getLogger("zuul.PagureConnection")
 
     def __init__(self, driver, connection_name, connection_config):
         super(PagureConnection, self).__init__(
             driver, connection_name, connection_config)
-        self.project_branch_cache = {}
         self.projects = {}
         self.server = self.connection_config.get('server', 'pagure.io')
         self.canonical_hostname = self.connection_config.get(
@@ -568,18 +563,16 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
             url += '/c/%s' % sha
         return url
 
-    def getProjectBranches(self, project, tenant):
-        branches = self.project_branch_cache.get(project.name)
-
-        if branches is not None:
-            return branches
-
+    def _fetchProjectBranches(self, project, exclude_unprotected):
         pagure = self.get_project_api_client(project.name)
         branches = pagure.get_project_branches()
-        self.project_branch_cache[project.name] = branches
 
         self.log.info("Got branches for %s" % project.name)
         return branches
+
+    def isBranchProtected(self, project_name, branch_name,
+                          zuul_event_id=None):
+        return True
 
     def getGitUrl(self, project):
         return '%s/%s' % (self.cloneurl, project.name)
