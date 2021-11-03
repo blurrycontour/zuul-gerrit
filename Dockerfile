@@ -15,9 +15,11 @@
 
 FROM docker.io/library/node:14-bullseye as js-builder
 
+# Optional public URL if zuul-gui is served under a directory
+ARG ZUUL_PUBLIC_URL
 COPY web /tmp/src
 # Explicitly run the Javascript build
-RUN cd /tmp/src && yarn install -d && yarn build
+RUN cd /tmp/src && yarn install -d && PUBLIC_URL="${ZUUL_PUBLIC_URL:-.}" yarn build
 
 FROM docker.io/opendevorg/python-builder:3.8-bullseye as builder
 ENV DEBIAN_FRONTEND=noninteractive
@@ -41,7 +43,7 @@ RUN assemble
 RUN /output/install-from-bindep \
   && zuul-manage-ansible \
   && rm -rf /root/.local/share/virtualenv \
-# Install openshift
+  # Install openshift
   && mkdir /tmp/openshift-install \
   && curl -L $OPENSHIFT_URL -o /tmp/openshift-install/openshift-client.tgz \
   && cd /tmp/openshift-install/ \
@@ -55,9 +57,9 @@ COPY --from=builder /output/ /output
 RUN /output/install-from-bindep zuul_base \
   && rm -rf /output \
   && useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul \
-# This enables git protocol v2 which is more efficient at negotiating
-# refs.  This can be removed after the images are built with git 2.26
-# where it becomes the default.
+  # This enables git protocol v2 which is more efficient at negotiating
+  # refs.  This can be removed after the images are built with git 2.26
+  # where it becomes the default.
   && git config --system protocol.version 2
 
 VOLUME /var/lib/zuul
