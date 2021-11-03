@@ -1663,12 +1663,17 @@ class Scheduler(threading.Thread):
     def _gatherConnectionCacheKeys(self):
         relevant = set()
         with self.layout_lock:
+            ctx = self.createZKContext(None, self.log)
             for tenant in self.abide.tenants.values():
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",
                                    tenant.name, pipeline.name)
-                    for item in pipeline.getAllItems():
-                        item.change.getRelatedChanges(self, relevant)
+                    pipeline.change_list.refresh(ctx)
+                    change_keys = pipeline.change_list.getChangeKeys()
+                    relevant_changes = pipeline.manager.resolveChangeKeys(
+                        [k.reference for k in change_keys])
+                    for change in relevant_changes:
+                        change.getRelatedChanges(self, relevant)
         return relevant
 
     def maintainConnectionCache(self):
