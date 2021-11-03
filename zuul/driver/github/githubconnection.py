@@ -1668,10 +1668,10 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
                     break
                 self.log.warning("Pull request #%s of %s/%s returned None!" % (
                                  number, owner, proj))
-            except github3.exceptions.GitHubException:
+            except github3.exceptions.GitHubException as e:
                 self.log.warning(
-                    "Failed to get pull request #%s of %s/%s; retrying" %
-                    (number, owner, proj))
+                    "Failed to get pull request #%s of %s/%s: %s; retrying" %
+                    (number, owner, proj, str(e)))
             time.sleep(1)
         else:
             raise Exception("Failed to get pull request #%s of %s/%s" % (
