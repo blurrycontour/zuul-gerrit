@@ -1388,6 +1388,8 @@ class Job(ConfigObject):
 
         self.name = name
 
+        self.log = logging.getLogger("zuul.Job")
+
     @property
     def combined_variables(self):
         """
@@ -1884,11 +1886,13 @@ class Job(ConfigObject):
 
     def changeMatchesFiles(self, change):
         if self.file_matcher and not self.file_matcher.matches(change):
+            log.debug("Debug.......1")
             return False
 
         # NB: This is a negative match.
         if (self.irrelevant_file_matcher and
             self.irrelevant_file_matcher.matches(change)):
+            log.debug("Debug.......2")
             return False
 
         return True
