@@ -602,7 +602,7 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
         # Can be "can_be_merged"
         change.merge_status = change.mr['merge_status']
         change.approved = change.mr['approved']
-        change.message = change.mr['description']
+        change.message = change.mr.get('description', "")
         change.labels = change.mr['labels']
         change.updated_at = int(dateutil.parser.parse(
             change.mr['updated_at']).timestamp())
