@@ -6,6 +6,7 @@
   "author": "Zuul Developers",
   "license": "Apache-2.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@patternfly/react-charts": "^6.15.23",
     "@patternfly/react-core": "4.152.4",
