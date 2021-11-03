@@ -18,7 +18,7 @@ configuration.
 """
 
 import re
-
+import logging
 
 class AbstractChangeMatcher(object):
 
@@ -120,22 +120,29 @@ class AbstractMatchFiles(AbstractMatcherCollection):
 class MatchAllFiles(AbstractMatchFiles):
 
     def matches(self, change):
+        log = logging.getLogger("zuul.MatchAllFiles")
         # NOTE(yoctozepto): make irrelevant files matcher match when
         # there are no files to check - return False (NB: reversed)
         if not (hasattr(change, 'files') and change.files):
+            log.debug("Debug...........1")
             return False
         if len(change.files) == 1 and self.commit_regex.match(change.files[0]):
+            log.debug("Debug...........2")
             return False
         for file_ in change.files:
             matched_file = False
             for regex in self.regexes:
                 if regex.match(file_):
+                    log.debug("Debug...........2.1" + str(file_))
                     matched_file = True
                     break
             if self.commit_regex.match(file_):
+                log.debug("Debug...........3" )
                 matched_file = True
             if not matched_file:
+                log.debug("Debug...........4" + str(file_))
                 return False
+        log.debug("Debug...........5")
         return True
 
 
