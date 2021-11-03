@@ -178,10 +178,13 @@ class PipelineManager(metaclass=ABCMeta):
                  i.live]
         return items.index(item)
 
+    def resolveChangeReferences(self, change_references):
+        return self.resolveChangeKeys(
+            [ChangeKey.fromReference(r) for r in change_references])
+
     def resolveChangeKeys(self, change_keys):
         resolved_changes = []
-        for reference in change_keys:
-            key = ChangeKey.fromReference(reference)
+        for key in change_keys:
             change = self._change_cache.get(key)
             if change is None:
                 source = self.sched.connections.getSource(key.connection_name)

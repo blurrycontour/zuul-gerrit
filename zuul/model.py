@@ -3907,7 +3907,7 @@ class QueueItem(zkobject.ZKObject):
                 f"Event type {event_type} not deserializable")
 
         event = event_class.fromDict(data["event"]["data"])
-        change = self.pipeline.manager.resolveChangeKeys(
+        change = self.pipeline.manager.resolveChangeReferences(
             [data["change"]])[0]
 
         build_set = self.current_build_set

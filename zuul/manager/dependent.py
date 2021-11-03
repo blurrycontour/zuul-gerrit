@@ -87,7 +87,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                     change_queue.project_branches]
         sources = {p.source for p in projects}
 
-        needed_by_changes = self.resolveChangeKeys(change.needed_by_changes)
+        needed_by_changes = self.resolveChangeReferences(
+            change.needed_by_changes)
         seen = set(needed_by_changes)
         for source in sources:
             log.debug("  Checking source: %s", source)
@@ -182,7 +183,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         changes_needed = []
         # Ignore supplied change_queue
         with self.getChangeQueue(change, event) as change_queue:
-            for needed_change in self.resolveChangeKeys(change.needs_changes):
+            for needed_change in self.resolveChangeReferences(
+                    change.needs_changes):
                 log.debug("  Change %s needs change %s:" % (
                     change, needed_change))
                 if needed_change.is_merged:
@@ -231,7 +233,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         if not item.change.needs_changes:
             return None
         failing_items = set()
-        for needed_change in self.resolveChangeKeys(item.change.needs_changes):
+        for needed_change in self.resolveChangeReferences(
+                item.change.needs_changes):
             needed_item = self.getItemForChange(needed_change)
             if not needed_item:
                 continue
