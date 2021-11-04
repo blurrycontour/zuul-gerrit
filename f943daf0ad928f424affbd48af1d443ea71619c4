@@ -20,6 +20,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "978d7602_406c7584",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T23:13:25Z",
+      "side": 1,
+      "message": "Thinking about this a little bit more....\n\nI wrote https://review.opendev.org/c/zuul/zuul/+/816767 to implement my suggestion.  I think we should probably land that, but technically I don\u0027t think it\u0027s strictly necessary.\n\nWhat I think we should do is:\n\n1) Instantiate all of the drivers and connections in zuul-web (we only instantiate the ones with webhooks now).  That\u0027s because I think no matter what the configloader is going to need the full set of connections and their connection branch caches.\n\n2) Alter the onLoad method to be aware of whether it\u0027s being used in a scheduler or web context.  Right now, GerritConnection.onLoad instantiates the branch cache (good for both) as well as starts the background ssh stream thread (bad for web).\n\n3) Base this all on 816767 so that the connections on zuul-web don\u0027t have to make any outbound calls to get branches.  Maybe also update the getProjectBranches method to fail if it is running in zuul-web and it doesn\u0027t have the branch list cached.",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "184b7810_a43a402a",
         "filename": "zuul/configloader.py",
         "patchSetId": 6
