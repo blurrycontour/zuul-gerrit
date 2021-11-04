@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9fe5c77_43f02727",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T14:13:31Z",
+      "side": 1,
+      "message": "Should this be rlock?",
+      "revId": "a175cf08760f64bd2ab2382e493a4c756eb4d2b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
