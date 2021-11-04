@@ -1164,16 +1164,25 @@ class TestLayoutStore(ZooKeeperBaseTestCase):
     def test_layout_state(self):
         store = LayoutStateStore(self.zk_client, lambda: None)
         layout_uuid = uuid.uuid4().hex
-        state = LayoutState("tenant", "hostname", 0, layout_uuid)
+        branch_cache_min_ltimes = {
+            "gerrit": 123,
+            "github": 456,
+        }
+        state = LayoutState("tenant", "hostname", 0, layout_uuid,
+                            branch_cache_min_ltimes)
         store["tenant"] = state
         self.assertEqual(state, store["tenant"])
         self.assertNotEqual(state.ltime, -1)
         self.assertNotEqual(store["tenant"].ltime, -1)
+        self.assertEqual(store["tenant"].branch_cache_min_ltimes,
+                         branch_cache_min_ltimes)
 
     def test_ordering(self):
         layout_uuid = uuid.uuid4().hex
-        state_one = LayoutState("tenant", "hostname", 1, layout_uuid, ltime=1)
-        state_two = LayoutState("tenant", "hostname", 2, layout_uuid, ltime=2)
+        state_one = LayoutState("tenant", "hostname", 1, layout_uuid,
+                                {}, ltime=1)
+        state_two = LayoutState("tenant", "hostname", 2, layout_uuid,
+                                {}, ltime=2)
 
         self.assertGreater(state_two, state_one)
 

@@ -771,6 +771,18 @@ class Scheduler(threading.Thread):
                     layout_state = self.tenant_layout_state.get(tenant_name)
                     layout_uuid = layout_state and layout_state.uuid
 
+                    if layout_state:
+                        branch_cache_min_ltimes = (
+                            layout_state.branch_cache_min_ltimes)
+                    else:
+                        # Assemble a new list of min. ltimes of the project
+                        # branch caches.
+                        branch_cache_min_ltimes = {
+                            s.connection.connection_name:
+                                s.getProjectBranchCacheLtime()
+                            for s in self.connections.getSources()
+                        }
+
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -779,7 +791,8 @@ class Scheduler(threading.Thread):
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
                         ctx = self.createZKContext(tlock, self.log)
-                        self._reconfigureTenant(ctx, tenant)
+                        self._reconfigureTenant(ctx, branch_cache_min_ltimes,
+                                                tenant)
                     else:
                         self.local_layout_state[tenant_name] = layout_state
                     self.connections.reconfigureDrivers(tenant)
@@ -1103,6 +1116,14 @@ class Scheduler(threading.Thread):
                     # Consider caches valid if the cache ltime >= event ltime
                     min_ltimes = defaultdict(
                         lambda: defaultdict(lambda: event.zuul_event_ltime))
+
+                # Assemble a list of min. ltimes of the project branch caches.
+                branch_cache_min_ltimes = {
+                    s.connection.connection_name:
+                        s.getProjectBranchCacheLtime()
+                    for s in self.connections.getSources()
+                }
+
                 with tenant_write_lock(self.zk_client, tenant_name) as lock:
                     tenant = loader.loadTenant(self.abide, tenant_name,
                                                self.ansible_manager,
@@ -1111,7 +1132,8 @@ class Scheduler(threading.Thread):
                     reconfigured_tenants.append(tenant_name)
                     ctx = self.createZKContext(lock, self.log)
                     if tenant is not None:
-                        self._reconfigureTenant(ctx, tenant, old_tenant)
+                        self._reconfigureTenant(ctx, branch_cache_min_ltimes,
+                                                tenant, old_tenant)
                     else:
                         self._reconfigureDeleteTenant(ctx, old_tenant)
 
@@ -1144,6 +1166,18 @@ class Scheduler(threading.Thread):
                         branch_name
                     ] = event.zuul_event_ltime
 
+            # Assemble a new list of min. ltimes of the project branch caches.
+            branch_cache_min_ltimes = {
+                s.connection.connection_name: s.getProjectBranchCacheLtime()
+                for s in self.connections.getSources()
+            }
+            for connection_name, ltime in event.branch_cache_ltimes.items():
+                current_ltime = branch_cache_min_ltimes.get(connection_name)
+                if current_ltime is None:
+                    continue
+                branch_cache_min_ltimes[connection_name] = max(current_ltime,
+                                                               ltime)
+
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
             old_tenant = self.abide.tenants.get(event.tenant_name)
@@ -1156,7 +1190,8 @@ class Scheduler(threading.Thread):
                                   min_ltimes=min_ltimes)
                 tenant = self.abide.tenants[event.tenant_name]
                 ctx = self.createZKContext(lock, self.log)
-                self._reconfigureTenant(ctx, tenant, old_tenant)
+                self._reconfigureTenant(ctx, branch_cache_min_ltimes,
+                                        tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
         self.log.info("Tenant reconfiguration complete for %s (duration: %s "
                       "seconds)", event.tenant_name, duration)
@@ -1310,7 +1345,8 @@ class Scheduler(threading.Thread):
                 request)
             self.cancelJob(build_set, request_job)
 
-    def _reconfigureTenant(self, context, tenant, old_tenant=None):
+    def _reconfigureTenant(self, context, branch_cache_min_ltimes, tenant,
+                           old_tenant=None):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
         if old_tenant:
@@ -1334,6 +1370,7 @@ class Scheduler(threading.Thread):
             hostname=self.hostname,
             last_reconfigured=int(time.time()),
             uuid=tenant.layout.uuid,
+            branch_cache_min_ltimes=branch_cache_min_ltimes,
         )
         # We need to update the local layout state before the remote state,
         # to avoid race conditions in the layout changed callback.
