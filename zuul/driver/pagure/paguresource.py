@@ -108,6 +108,9 @@ class PagureSource(BaseSource):
     def getProjectBranches(self, project, tenant, min_ltime=-1):
         return self.connection.getProjectBranches(project, tenant, min_ltime)
 
+    def getProjectBranchCacheLtime(self):
+        return self.connection._branch_cache.ltime
+
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
         raise NotImplementedError()
