@@ -60,6 +60,9 @@ class GitSource(BaseSource):
     def getProjectBranches(self, project, tenant, min_ltime=-1):
         return self.connection.getProjectBranches(project, tenant, min_ltime)
 
+    def getProjectBranchCacheLtime(self):
+        return -1
+
     def getGitUrl(self, project):
         return self.connection.getGitUrl(project)
 
