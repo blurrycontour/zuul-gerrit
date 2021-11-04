@@ -50,6 +50,23 @@
       "message": "Agreed.",
       "revId": "c77f2c77d89e477762f7a437c9b489f3f77d82ad",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36ff89f5_3b239105",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T19:20:46Z",
+      "side": 1,
+      "message": "See Clark\u0027s message on 816691 -- we may need to construct the dict twice, once before and once after loadTenant.",
+      "revId": "c77f2c77d89e477762f7a437c9b489f3f77d82ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
