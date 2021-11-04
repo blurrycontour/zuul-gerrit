@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "322081f2_360f138a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-04T16:08:11Z",
+      "side": 1,
+      "message": "I think we should do this afteer the loadTenant call below since that can alter the branch cache by adding missing projects.\nSame for the other do*ReconfigureEvent methods.",
+      "revId": "c77f2c77d89e477762f7a437c9b489f3f77d82ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
