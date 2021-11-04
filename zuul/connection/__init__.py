@@ -192,6 +192,7 @@ class ZKBranchCacheMixin:
                 # but for the moment, implement the lowest common
                 # denominator and clear the cache so that we query.
                 self._branch_cache.clearProjectCache(project.name)
+            event.branch_cache_ltime = self._branch_cache.ltime
         return event
 
     def getProjectBranches(self, project, tenant, min_ltime=-1):
@@ -273,6 +274,7 @@ class ZKBranchCacheMixin:
                     project_name)
                 self._branch_cache.clearProtectedProjectCache(
                     project_name)
+                event.branch_cache_ltime = self._branch_cache.ltime
 
             event.branch_protected = protected
         else:
