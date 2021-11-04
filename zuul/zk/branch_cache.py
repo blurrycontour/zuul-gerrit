@@ -163,18 +163,37 @@ class BranchCache:
                         remainder = branches
                     self.cache.remainder[project_name] = remainder
 
-    def clearProjectCache(self, project_name):
-        """Clear the connection cache for this project."""
-        with locked(self.wlock):
-            with self.cache.activeContext(self.zk_context):
-                self.cache.protected.pop(project_name, None)
-                self.cache.remainder.pop(project_name, None)
+    def setProtected(self, project_name, branch, protected):
+        """Correct the protection state of a branch.
 
-    def clearProtectedProjectCache(self, project_name):
-        """Clear the protected branch list only for this project."""
+        This may be called if a branch has changed state without us
+        receiving an explicit event.
+        """
+
         with locked(self.wlock):
             with self.cache.activeContext(self.zk_context):
-                self.cache.protected.pop(project_name, None)
+                protected_branches = self.cache.protected.get(project_name)
+                remainder_branches = self.cache.remainder.get(project_name)
+                if protected:
+                    if remainder_branches and branch in remainder_branches:
+                        remainder_branches.remove(branch)
+                    if protected_branches is None:
+                        # We've never run a protected query, so we
+                        # should ignore this branch.
+                        return
+                    else:
+                        if branch not in protected_branches:
+                            protected_branches.append(branch)
+                else:
+                    if protected_branches and branch in protected_branches:
+                        protected_branches.remove(branch)
+                    if remainder_branches is None:
+                        # We've never run an unprotected query, so we
+                        # should ignore this branch.
+                        return
+                    else:
+                        if branch not in remainder_branches:
+                            remainder_branches.append(branch)
 
     @property
     def ltime(self):
