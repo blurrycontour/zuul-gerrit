@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "222b9a73_8c482816",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T18:41:30Z",
+      "side": 1,
+      "message": "The previous change mentions that we need to create branch_cache_min_ltimes after we loadTenant, but here it becomes an input to loadTenant. I suspect this means we need to populate it again before using it below.",
+      "revId": "c28823310c5963eb3026a4d3c2b1cdb5e37eb44b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
