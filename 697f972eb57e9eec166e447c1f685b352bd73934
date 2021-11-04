@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6725e662_cb6f7c03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-04T09:56:31Z",
+      "side": 1,
+      "message": "\u003e In the mean time, we may want to adjust the import file to include that setting\n\nDone in PS28\n\n\u003e and also our documentation to mention that.\n\nDone in https://review.opendev.org/c/zuul/zuul/+/734082 as of Nov.4 2021",
+      "revId": "697f972eb57e9eec166e447c1f685b352bd73934",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
