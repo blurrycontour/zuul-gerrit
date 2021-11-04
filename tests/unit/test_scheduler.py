@@ -51,7 +51,7 @@ from tests.base import (
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.layout import LayoutState
 
-EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None)
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {})
 
 
 class TestSchedulerSSL(SSLZuulTestCase):
