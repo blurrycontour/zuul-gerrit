@@ -706,14 +706,17 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Exception reporting runtime stats")
 
-    def reconfigureTenant(self, tenant, project, event):
+    def reconfigureTenant(self, tenant, project, trigger_event):
         self.log.debug("Submitting tenant reconfiguration event for "
                        "%s due to event %s in project %s",
-                       tenant.name, event, project)
-        branch = event.branch if event is not None else None
+                       tenant.name, trigger_event, project)
+        branch = trigger_event and trigger_event.branch
         event = TenantReconfigureEvent(
-            tenant.name, project.canonical_name, branch
+            tenant.name, project.canonical_name, branch,
         )
+        if trigger_event:
+            event.branch_cache_ltimes[trigger_event.connection_name] = (
+                trigger_event.branch_cache_ltime)
         self.management_events[tenant.name].put(event, needs_result=False)
 
     def fullReconfigureCommandHandler(self):

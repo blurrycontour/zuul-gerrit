@@ -5375,6 +5375,7 @@ class TenantReconfigureEvent(ManagementEvent):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant_name
         self.project_branches = set([(project_name, branch_name)])
+        self.branch_cache_ltimes = {}
         self.merged_events = []
 
     def __ne__(self, other):
@@ -5391,6 +5392,9 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
+        for connection_name, ltime in other.branch_cache_ltimes:
+            self.branch_cache_ltimes[connection_name] = max(
+                self.branch_cache_ltimes.get(connection_name, ltime), ltime)
         self.zuul_event_ltime = max(self.zuul_event_ltime,
                                     other.zuul_event_ltime)
         self.merged_events.append(other)
@@ -5399,6 +5403,7 @@ class TenantReconfigureEvent(ManagementEvent):
         d = super().toDict()
         d["tenant_name"] = self.tenant_name
         d["project_branches"] = list(self.project_branches)
+        d["branch_cache_ltimes"] = self.branch_cache_ltimes
         return d
 
     @classmethod
@@ -5413,6 +5418,7 @@ class TenantReconfigureEvent(ManagementEvent):
         event.project_branches = set(
             tuple(pb) for pb in data["project_branches"]
         )
+        event.branch_cache_ltimes = data.get("branch_cache_ltimes", {})
         return event
 
 
