@@ -126,6 +126,10 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
+    def getProjectBranchCacheLtime(self):
+        """Return the current ltime of the project branch cache."""
+
+    @abc.abstractmethod
     def getRequireFilters(self, config):
         """Return a list of ChangeFilters for the scheduler to match against.
         """
