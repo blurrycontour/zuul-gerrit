@@ -1747,13 +1747,12 @@ class Scheduler(threading.Thread):
         # a tenant reconfiguration if the branch is set as well.
         if event.branch_created and event.branch:
             reconfigure_tenant = True
-
         # If the driver knows the branch but we don't have a config, we
         # also need to reconfigure. This happens if a GitHub branch
         # was just configured as protected without a push in between.
-        if (event.branch in project.source.getProjectBranches(
-                project, tenant)
-            and not self.abide.hasUnparsedBranchCache(
+        elif (event.branch in project.source.getProjectBranches(
+                project, tenant, min_ltime=event.branch_cache_ltime)
+              and not self.abide.hasUnparsedBranchCache(
                 project.canonical_name, event.branch)):
             reconfigure_tenant = True
 
