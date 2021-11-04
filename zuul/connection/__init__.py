@@ -15,7 +15,7 @@
 import abc
 import logging
 
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Project, Tenant
@@ -132,12 +132,10 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         }
 
 
-class CachedBranchConnection(BaseConnection):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._project_branch_cache_exclude_unprotected = {}
-        self._project_branch_cache_include_unprotected = {}
+class ZKBranchCacheMixin:
+    # Expected to be defined by the connection and to be an instance
+    # of BranchCache
+    _branch_cache = None
 
     @abc.abstractmethod
     def isBranchProtected(self, project_name: str, branch_name: str,
@@ -186,28 +184,15 @@ class CachedBranchConnection(BaseConnection):
                 # know if branch protection has been disabled before deletion
                 # of the branch.
                 # FIXME(tobiash): Find a way to handle that case
-                self.clearProjectCache(project)
+                self._branch_cache.clearProjectCache(project.name)
             elif event.branch_created:
-                # A new branch never can be protected because that needs to be
-                # configured after it has been created.
-                self.clearProjectCache(project)
+                # In GitHub, a new branch never can be protected
+                # because that needs to be configured after it has
+                # been created.  Other drivers could optimize this,
+                # but for the moment, implement the lowest common
+                # denominator and clear the cache so that we query.
+                self._branch_cache.clearProjectCache(project.name)
         return event
-
-    def getCachedBranches(self, exclude_unprotected) -> Dict[str, List[str]]:
-        """Get the connection cache: the branches foreach project.
-
-        :param bool exclude_unprotected:
-            Specify whether the cache excludes or contains unprotected
-            branches.
-        :returns: A dictionary where keys are project names and values are list
-            of branch names.
-        """
-        if exclude_unprotected:
-            cache = self._project_branch_cache_exclude_unprotected
-        else:
-            cache = self._project_branch_cache_include_unprotected
-
-        return cache
 
     def getProjectBranches(self, project: Project,
                            tenant: Tenant) -> List[str]:
@@ -221,26 +206,25 @@ class CachedBranchConnection(BaseConnection):
         :returns: The list of branch names.
         """
         exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
-        cache = self.getCachedBranches(exclude_unprotected)
-        branches = cache.get(project.name)
+        if self._branch_cache:
+            branches = self._branch_cache.getProjectBranches(
+                project.name, exclude_unprotected)
+        else:
+            # Handle the case where tenant validation doesn't use the cache
+            branches = None
 
         if branches is not None:
-            return branches
+            return sorted(branches)
 
+        # We need to perform a query
         branches = self._fetchProjectBranches(project, exclude_unprotected)
         self.log.info("Got branches for %s" % project.name)
 
-        cache[project.name] = branches
-        return branches
+        if self._branch_cache:
+            self._branch_cache.setProjectBranches(
+                project.name, exclude_unprotected, branches)
 
-    def clearProjectCache(self, project: Project) -> None:
-        """Clear the connection cache for this project.
-        """
-
-        self.log.debug("Clearing cache for %s:%s", self.connection_name,
-                       project.name)
-        self._project_branch_cache_exclude_unprotected.pop(project.name, None)
-        self._project_branch_cache_include_unprotected.pop(project.name, None)
+        return sorted(branches)
 
     def checkBranchCache(self, project_name: str, event,
                          protected: bool = None) -> None:
@@ -272,16 +256,22 @@ class CachedBranchConnection(BaseConnection):
             # All branches should always appear in the include_unprotected
             # cache, so we never clear it.
 
-            cache = self._project_branch_cache_exclude_unprotected
-            branches = cache.get(project_name, [])
+            branches = self._branch_cache.getProjectBranches(
+                project_name, True)
+            if not branches:
+                branches = []
+
+            clear = False
             if (event.branch in branches) and (not protected):
-                self.log.debug("Clearing protected branch cache for %s",
-                               project_name)
-                cache.pop(project_name, None)
+                clear = True
             if (event.branch not in branches) and (protected):
-                self.log.debug("Clearing protected branch cache for %s",
-                               project_name)
-                cache.pop(project_name, None)
+                clear = True
+            if clear:
+                self.log.debug(
+                    "Clearing protected branch cache for %s",
+                    project_name)
+                self._branch_cache.clearProtectedProjectCache(
+                    project_name)
 
             event.branch_protected = protected
         else:

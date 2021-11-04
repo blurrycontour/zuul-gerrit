@@ -35,13 +35,16 @@ from typing import Dict, List
 from uuid import uuid4
 
 from zuul import version as zuul_version
-from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
+from zuul.connection import (
+    BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
+)
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
+from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -548,7 +551,7 @@ class GerritPoller(threading.Thread):
         self.poller_election.cancel()
 
 
-class GerritConnection(ZKChangeCacheMixin, CachedBranchConnection):
+class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
     iolog = logging.getLogger("zuul.GerritConnection.io")
@@ -1591,6 +1594,9 @@ class GerritConnection(ZKChangeCacheMixin, CachedBranchConnection):
 
         self.log.debug('Creating Zookeeper change cache')
         self._change_cache = GerritChangeCache(self.sched.zk_client, self)
+
+        self.log.debug('Creating Zookeeper branch cache')
+        self._branch_cache = BranchCache(self.sched.zk_client, self)
 
         if self.enable_stream_events:
             self._start_watcher_thread()

@@ -22,6 +22,7 @@ import testtools
 from zuul import model
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
+from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -1586,3 +1587,74 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
     def test_sharded_zk_object_exception(self):
         self._test_zk_object_exception(DummyShardedZKObject)
+
+
+class TestBranchCache(ZooKeeperBaseTestCase):
+    def test_branch_cache(self):
+        conn = DummyConnection()
+        cache = BranchCache(self.zk_client, conn)
+
+        test_data = {
+            'project1': {
+                'all': ['protected1', 'protected2',
+                        'unprotected1', 'unprotected2'],
+                'protected': ['protected1', 'protected2'],
+            },
+        }
+
+        # Test a protected-only query followed by all
+        cache.setProjectBranches('project1', True,
+                                 test_data['project1']['protected'])
+        self.assertEqual(
+            sorted(cache.getProjectBranches('project1', True)),
+            test_data['project1']['protected']
+        )
+        self.assertEqual(
+            cache.getProjectBranches('project1', False),
+            None,
+        )
+
+        cache.setProjectBranches('project1', False,
+                                 test_data['project1']['all'])
+        self.assertEqual(
+            sorted(cache.getProjectBranches('project1', True)),
+            test_data['project1']['protected']
+        )
+        self.assertEqual(
+            sorted(cache.getProjectBranches('project1', False)),
+            test_data['project1']['all']
+        )
+
+        # Clear them to start over
+        cache.clearProjectCache('project1')
+        self.assertEqual(
+            cache.getProjectBranches('project1', True),
+            None
+        )
+        self.assertEqual(
+            cache.getProjectBranches('project1', False),
+            None
+        )
+
+        # Test the other order; all followed by protected-only
+        cache.setProjectBranches('project1', False,
+                                 test_data['project1']['all'])
+        self.assertEqual(
+            cache.getProjectBranches('project1', True),
+            None
+        )
+        self.assertEqual(
+            sorted(cache.getProjectBranches('project1', False)),
+            test_data['project1']['all']
+        )
+
+        cache.setProjectBranches('project1', True,
+                                 test_data['project1']['protected'])
+        self.assertEqual(
+            sorted(cache.getProjectBranches('project1', True)),
+            test_data['project1']['protected']
+        )
+        self.assertEqual(
+            sorted(cache.getProjectBranches('project1', False)),
+            test_data['project1']['all']
+        )

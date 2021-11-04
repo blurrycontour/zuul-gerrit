@@ -40,7 +40,9 @@ import github3.exceptions
 import github3.pulls
 from github3.session import AppInstallationTokenAuth
 
-from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
+from zuul.connection import (
+    BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
+)
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
@@ -48,6 +50,7 @@ from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 from zuul.model import DequeueEvent
+from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -1186,7 +1189,7 @@ class GithubClientManager:
         return github
 
 
-class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
+class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'github'
     log = logging.getLogger("zuul.GithubConnection")
     payload_path = 'payload'
@@ -1235,6 +1238,8 @@ class GithubConnection(ZKChangeCacheMixin, CachedBranchConnection):
         )
         self.log.debug('Creating Zookeeper change cache')
         self._change_cache = GithubChangeCache(self.sched.zk_client, self)
+        self.log.debug('Creating Zookeeper branch cache')
+        self._branch_cache = BranchCache(self.sched.zk_client, self)
         self.log.info('Starting event connector')
         self._start_event_connector()
 
