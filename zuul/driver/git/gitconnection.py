@@ -137,7 +137,7 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
             change = self._change_cache.get(key)
         return change
 
-    def getProjectBranches(self, project, tenant):
+    def getProjectBranches(self, project, tenant, min_ltime=-1):
         refs = self.lsRemote(project.name)
         branches = [ref[len('refs/heads/'):] for ref in
                     refs if ref.startswith('refs/heads/')]

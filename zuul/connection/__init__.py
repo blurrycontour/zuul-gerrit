@@ -18,7 +18,7 @@ import logging
 from typing import List, Optional
 
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Project, Tenant
+from zuul.model import Project
 
 
 class BaseConnection(object, metaclass=abc.ABCMeta):
@@ -194,21 +194,22 @@ class ZKBranchCacheMixin:
                 self._branch_cache.clearProjectCache(project.name)
         return event
 
-    def getProjectBranches(self, project: Project,
-                           tenant: Tenant) -> List[str]:
+    def getProjectBranches(self, project, tenant, min_ltime=-1):
         """Get the branch names for the given project.
 
         :param zuul.model.Project project:
             The project for which the branches are returned.
         :param zuul.model.Tenant tenant:
             The related tenant.
+        :param int min_ltime:
+            The minimum ltime to determine if we need to refresh the cache.
 
         :returns: The list of branch names.
         """
         exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
         if self._branch_cache:
             branches = self._branch_cache.getProjectBranches(
-                project.name, exclude_unprotected)
+                project.name, exclude_unprotected, min_ltime)
         else:
             # Handle the case where tenant validation doesn't use the cache
             branches = None
