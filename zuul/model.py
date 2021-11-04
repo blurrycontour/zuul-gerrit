@@ -5752,6 +5752,7 @@ class TriggerEvent(AbstractEvent):
         self.timestamp = None
         self.arrived_at_scheduler_timestamp = None
         self.driver_name = None
+        self.branch_cache_ltime = -1
 
     def toDict(self):
         return {
@@ -5783,6 +5784,7 @@ class TriggerEvent(AbstractEvent):
                 self.arrived_at_scheduler_timestamp
             ),
             "driver_name": self.driver_name,
+            "branch_cache_ltime": self.branch_cache_ltime,
         }
 
     def updateFromDict(self, d):
@@ -5814,6 +5816,7 @@ class TriggerEvent(AbstractEvent):
             d["arrived_at_scheduler_timestamp"]
         )
         self.driver_name = d["driver_name"]
+        self.branch_cache_ltime = d.get("branch_cache_ltime", -1)
 
     @property
     def canonical_project_name(self):
