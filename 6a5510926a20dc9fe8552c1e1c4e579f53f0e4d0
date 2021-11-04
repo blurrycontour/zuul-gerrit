@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f0eb777_4e8123a4",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 5755,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T17:52:10Z",
+      "side": 1,
+      "message": "This means that new events by default won\u0027t cause a branch refresh. We\u0027ll only refresh if a previous event had cleared the branch and now we have a new event for the branch indicating it has reappeared and we need to repopulate?",
+      "revId": "6a5510926a20dc9fe8552c1e1c4e579f53f0e4d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
