@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b545ed3_01f14c4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T18:35:59Z",
+      "side": 1,
+      "message": "Just making a note here so that I remember I was happy with this change other than the issue Tobiash pointed out.",
+      "revId": "c77f2c77d89e477762f7a437c9b489f3f77d82ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "322081f2_360f138a",
