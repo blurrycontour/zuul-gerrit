@@ -184,16 +184,41 @@ class ZKBranchCacheMixin:
                 # know if branch protection has been disabled before deletion
                 # of the branch.
                 # FIXME(tobiash): Find a way to handle that case
-                self._branch_cache.clearProjectCache(project.name)
+                self.updateProjectBranches(project)
             elif event.branch_created:
                 # In GitHub, a new branch never can be protected
                 # because that needs to be configured after it has
                 # been created.  Other drivers could optimize this,
                 # but for the moment, implement the lowest common
                 # denominator and clear the cache so that we query.
-                self._branch_cache.clearProjectCache(project.name)
+                self.updateProjectBranches(project)
             event.branch_cache_ltime = self._branch_cache.ltime
         return event
+
+    def updateProjectBranches(self, project):
+        """Update the branch cache for the project.
+
+        :param zuul.model.Project project:
+            The project for which the branches are returned.
+        """
+        # Figure out which queries we have a cache for
+        protected_branches = self._branch_cache.getProjectBranches(
+            project.name, True)
+        all_branches = self._branch_cache.getProjectBranches(
+            project.name, False)
+
+        # Update them if we have them
+        if protected_branches is not None:
+            protected_branches = self._fetchProjectBranches(
+                project, True)
+            self._branch_cache.setProjectBranches(
+                project.name, True, protected_branches)
+
+        if all_branches is not None:
+            all_branches = self._fetchProjectBranches(project, False)
+            self._branch_cache.setProjectBranches(
+                project.name, False, all_branches)
+        self.log.info("Got branches for %s" % project.name)
 
     def getProjectBranches(self, project, tenant, min_ltime=-1):
         """Get the branch names for the given project.
@@ -263,17 +288,17 @@ class ZKBranchCacheMixin:
             if not branches:
                 branches = []
 
-            clear = False
+            update = False
             if (event.branch in branches) and (not protected):
-                clear = True
+                update = True
             if (event.branch not in branches) and (protected):
-                clear = True
-            if clear:
-                self.log.debug(
-                    "Clearing protected branch cache for %s",
-                    project_name)
-                self._branch_cache.clearProtectedProjectCache(
-                    project_name)
+                update = True
+            if update:
+                self.log.info("Project %s branch %s protected state "
+                              "changed to %s",
+                              project_name, event.branch, protected)
+                self._branch_cache.setProtected(project_name, event.branch,
+                                                protected)
                 event.branch_cache_ltime = self._branch_cache.ltime
 
             event.branch_protected = protected
