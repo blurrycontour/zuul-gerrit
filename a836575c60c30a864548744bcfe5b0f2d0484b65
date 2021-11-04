@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04de2ab4_e4dc9d91",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T18:02:25Z",
+      "side": 1,
+      "message": "It\u0027s startup process: we instantiate connectors without a scheduler, so no zk client available.\n\nThis mirrors the change cache as well; so all connections use both caches and they\u0027re initialized the same way.",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6baa8cfe_2372f202",
@@ -41,6 +58,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9668486_0d800334",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T18:02:25Z",
+      "side": 1,
+      "message": "Probably so.  But this extends into the tenant config file, so we\u0027re probably best to stick with it at this point for consistency unless we want to make a user-facing deprecation.",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e16632a2_d161a75b",
@@ -58,6 +92,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e751a174_4bae4edc",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T18:02:25Z",
+      "side": 1,
+      "message": "Later patch.",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a93f0bf_42093d86",
@@ -71,6 +122,23 @@
       "writtenOn": "2021-11-04T17:37:27Z",
       "side": 1,
       "message": "Do we not need to set protected_branches in this case too?\n\nIt seems the way we\u0027ve done this we must set branches excluding unprotected first. Then we can set branches a second time setting the unprotected branches. Otherwise we won\u0027t have a complete cohesive picture. I worry that this might end up leading to errors and if we can make it more atomic that would be better.\n\nThe new tests seem to confirm this behavior as the second half of the test does a query which matches None for protected branches then a query for unprotected which matches all branches. Essentially we have protected branches but we can\u0027t get them back at that point?",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb07a8d6_81200578",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T18:02:25Z",
+      "side": 1,
+      "message": "Yeah, this is pretty twisted code, but it\u0027s all in service of two goals:\n1) Be able to answer both of these questions independently:\n   a) What is the full list of branches for the repo?\n   b) What is list of protected branches for the repo?\n2) Store that data efficiently in ZK.\n\nThe old code only had the first constraint, so it actually just stored two dictionaries that were completely independent (basically, two caches in one code base).  But it duplicated thet data between the two.  I have trouble convincing myself that doing that in ZK is desirable, so the complexity here is trying to fulfill #1 without that data structure.\n\nTo do that, we can obviously have a list of protected branches, then the list of the rest of the branches, and add the two together to answer 1.a.\n\nBut we have no idea whether the system will be asking for 1.a, or 1.b, or both.  And if it\u0027s both, we don\u0027t know what order.  That\u0027s because two tenants can have the same project in them with different exclude-unprotected-branches settings.\n\nSo the code here is designed to handle any of those cases.  If we narrow down the question for the code after the else on line 143, we know that the system is currently dealing with the response to a query for all branches.  We have the following possibilities:\n\nA) We already have a cached list of protected branches.  In this case, we take our list of all branches, subtract the protected branches from it, and store the remainder in the remainder field.\nB) We don\u0027t hove a list of protected branches (or it\u0027s empty).  All branches are remainder branches in that case.\n\nThat sets us up for the following possibilities for a consumer in a future \"get\" call to the cache:\n\nI) The call is for all branches.  In either A or B above, we configured the cache so that protected+remainder will return all, so that\u0027s what we return.\nII) The call is for protected branches.  In this case there are two possibilities (and we need to refer to getProjectBranches to see this tree):\n    i) self.cache.protected[project_name] is None.  In this case we have never performed an exclude-unprotected query, so we don\u0027t have the data.  We return None and the caller performs the query and updates the cache (thereby triggering the first part of the if/else in this method to update the cache in the mirror of what we\u0027ve done here so far).\n    ii) self.cache.protected[project_name] is not None.  In this case, we have data, so that\u0027s what we return.\n\nBecause of I.i, we need to make sure not to set self.cache.protected unless we have actual data.\n\ntl;dr: a cache value of None means we haven\u0027t performed that type of query, and this cache is supposed to mutate in both directions.",
       "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
