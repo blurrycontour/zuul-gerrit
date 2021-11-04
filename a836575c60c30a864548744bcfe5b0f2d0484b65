@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1e99bed_2463834f",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T17:37:27Z",
+      "side": 1,
+      "message": "All of the connections seem to use the same branch cache. Why do we need to set it externally in this case?\n\nIs this due to the tenant validation case which is mentioned in a comment below?",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6baa8cfe_2372f202",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T17:37:27Z",
+      "side": 1,
+      "message": "Nit this is from existing code terminology but it might be a bit more readable if we made this more positive rather than negative flag? Something like \"only_protected\".",
+      "range": {
+        "startLine": 100,
+        "startChar": 47,
+        "endLine": 100,
+        "endChar": 66
+      },
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e16632a2_d161a75b",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T17:37:27Z",
+      "side": 1,
+      "message": "We have a read lock but we don\u0027t use it here. Should we?",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a93f0bf_42093d86",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T17:37:27Z",
+      "side": 1,
+      "message": "Do we not need to set protected_branches in this case too?\n\nIt seems the way we\u0027ve done this we must set branches excluding unprotected first. Then we can set branches a second time setting the unprotected branches. Otherwise we won\u0027t have a complete cohesive picture. I worry that this might end up leading to errors and if we can make it more atomic that would be better.\n\nThe new tests seem to confirm this behavior as the second half of the test does a query which matches None for protected branches then a query for unprotected which matches all branches. Essentially we have protected branches but we can\u0027t get them back at that point?",
+      "revId": "a836575c60c30a864548744bcfe5b0f2d0484b65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
