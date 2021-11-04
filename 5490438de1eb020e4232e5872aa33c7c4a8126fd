@@ -16,6 +16,23 @@
       "message": "Does it work if oidcConfig is empty? How does this behave if no auth is configured?",
       "revId": "5490438de1eb020e4232e5872aa33c7c4a8126fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61272f7d_0b455466",
+        "filename": "web/src/ZuulAuthProvider.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T15:38:52Z",
+      "side": 1,
+      "message": "We define oidcConfig just above, so it won\u0027t be empty, but I assume you mean what if auth_params is empty (which is a component of oidcConfig).\n\nIn reducers/auth.js, we default auth_params to the empty string for authority, clientId, and scope.  If there\u0027s no previously stored value in localStorage, then we\u0027ll use that (also, if we switch tenants, and there\u0027s no auth info for the new tenant, the same is true; that\u0027s in actions/auth.js).\n\nThe AuthProvider accepts these values.  Of course, a login won\u0027t work, but we won\u0027t display the button in this case anyway.",
+      "revId": "5490438de1eb020e4232e5872aa33c7c4a8126fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
