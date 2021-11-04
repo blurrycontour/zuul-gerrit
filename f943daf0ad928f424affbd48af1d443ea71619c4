@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "529a1609_b209c865",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T21:18:52Z",
+      "side": 1,
+      "message": "This is going to conflict with the project branch cache stack which is about to merge.  But it should be an easy fix.  We\u0027ll just need to supply branch cache min_ltimes to loadTenant.\n\nI think we probably don\u0027t ever want a zuul-web loading a tenant without a layout state.  Obviously this is a test method, but we might want to think about testing that here?\n\nSince we\u0027ll have a layout state, we can use those min_ltimes for the caches.\n\nFinally, this makes me think that we may want to go ahead and make sure that the branch cache is always populated.  Currently we sometimes clear parts of the cache and expect the scheduler+connection to query and fill in the missing data.  But zuul-web instances won\u0027t have connections to do that with, so we need to rely entirely on ZK.  If a scheduler clears an entry from the branch cache while zuul-web is trying to read from it, we\u0027ll error.",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "184b7810_a43a402a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1798,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T21:18:52Z",
+      "side": 1,
+      "message": "Should probably move this check before the ltime call.",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56a02c64_055dcb20",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-04T21:18:52Z",
+      "side": 1,
+      "message": "I agree with the comment but two questions:\n1) Zuul-web shouldn\u0027t be loading any tenants we don\u0027t have layout states for.\n2) This file is the scheduler, so this comment shouldn\u0027t really apply here?\n\nEdit: it looks like you remove this in the next patch, so I\u0027m assuming this comment was just a note to yourself to make that change when you copied and adapted this code to zuul-web.  That makes sense.  But we should remove it here now.  :)",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
