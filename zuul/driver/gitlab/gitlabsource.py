@@ -99,8 +99,8 @@ class GitlabSource(BaseSource):
             self.connection.addProject(p)
         return p
 
-    def getProjectBranches(self, project, tenant):
-        return self.connection.getProjectBranches(project, tenant)
+    def getProjectBranches(self, project, tenant, min_ltime=-1):
+        return self.connection.getProjectBranches(project, tenant, min_ltime)
 
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
