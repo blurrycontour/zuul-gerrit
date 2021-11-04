@@ -1518,7 +1518,7 @@ class TenantParser(object):
         return vs.Schema(tenant)
 
     def fromYaml(self, abide, conf, ansible_manager, min_ltimes=None,
-                 layout_uuid=None):
+                 layout_uuid=None, branch_cache_min_ltimes=None):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1560,7 +1560,7 @@ class TenantParser(object):
                 tpc.project.canonical_name, tpc.project.name)
             with project_configuration_exceptions(source_context,
                                                   loading_errors):
-                self._getProjectBranches(tenant, tpc)
+                self._getProjectBranches(tenant, tpc, branch_cache_min_ltimes)
                 self._resolveShadowProjects(tenant, tpc)
 
         # Set default ansible version
@@ -1618,9 +1618,14 @@ class TenantParser(object):
             shadow_projects.append(project.canonical_name)
         tpc.shadow_projects = frozenset(shadow_projects)
 
-    def _getProjectBranches(self, tenant, tpc):
+    def _getProjectBranches(self, tenant, tpc, branch_cache_min_ltimes=None):
+        if branch_cache_min_ltimes:
+            min_ltime = branch_cache_min_ltimes.get(
+                tpc.project.source.connection.connection_name, -1)
+        else:
+            min_ltime = -1
         branches = sorted(tpc.project.source.getProjectBranches(
-            tpc.project, tenant))
+            tpc.project, tenant, min_ltime))
         if 'master' in branches:
             branches.remove('master')
             branches = ['master'] + branches
@@ -2281,7 +2286,8 @@ class ConfigLoader(object):
                 abide.addUntrustedTPC(tenant_name, tpc)
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
-                   min_ltimes=None, layout_uuid=None):
+                   min_ltimes=None, layout_uuid=None,
+                   branch_cache_min_ltimes=None):
         """(Re-)load a single tenant.
 
         Description of cache stages:
@@ -2357,7 +2363,8 @@ class ConfigLoader(object):
 
         unparsed_config = unparsed_abide.tenants[tenant_name]
         new_tenant = self.tenant_parser.fromYaml(
-            abide, unparsed_config, ansible_manager, min_ltimes, layout_uuid)
+            abide, unparsed_config, ansible_manager, min_ltimes, layout_uuid,
+            branch_cache_min_ltimes)
         # Copy tenants dictionary to not break concurrent iterations.
         tenants = abide.tenants.copy()
         tenants[tenant_name] = new_tenant
