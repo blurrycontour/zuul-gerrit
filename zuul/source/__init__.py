@@ -114,7 +114,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """Get a project."""
 
     @abc.abstractmethod
-    def getProjectBranches(self, project, tenant):
+    def getProjectBranches(self, project, tenant, min_ltime=-1):
         """Get branches for a project
 
         This method is called very frequently, and should generally

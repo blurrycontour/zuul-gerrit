@@ -125,8 +125,11 @@ class GerritSource(BaseSource):
     def getProjectOpenChanges(self, project):
         return self.connection.getProjectOpenChanges(project)
 
-    def getProjectBranches(self, project, tenant):
-        return self.connection.getProjectBranches(project, tenant)
+    def getProjectBranches(self, project, tenant, min_ltime=-1):
+        return self.connection.getProjectBranches(project, tenant, min_ltime)
+
+    def getProjectBranchCacheLtime(self):
+        return self.connection._branch_cache.ltime
 
     def getGitUrl(self, project):
         return self.connection.getGitUrl(project)

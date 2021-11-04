@@ -66,7 +66,15 @@ class BranchCacheZKObject(ShardedZKObject):
         }
         return json.dumps(data).encode("utf8")
 
-    # TODO: return an ltime
+    def _save(self, context, create=False):
+        super()._save(context, create)
+        zstat = context.client.exists(self.getPath())
+        self._set(_zstat=zstat)
+
+    def _load(self, context, path=None):
+        super()._load(context, path)
+        zstat = context.client.exists(self.getPath())
+        self._set(_zstat=zstat)
 
 
 class BranchCache:
@@ -91,23 +99,29 @@ class BranchCache:
         with locked(self.wlock):
             try:
                 self.cache = BranchCacheZKObject.fromZK(
-                    self.zk_context, data_path)
-                self.cache._set(_path=data_path)
+                    self.zk_context, data_path, _path=data_path)
             except NoNodeError:
                 self.cache = BranchCacheZKObject.new(
                     self.zk_context, _path=data_path)
 
-    def getProjectBranches(self, project_name, exclude_unprotected):
+    def getProjectBranches(self, project_name, exclude_unprotected,
+                           min_ltime=-1):
         """Get the branch names for the given project.
 
         :param str project_name:
             The project for which the branches are returned.
         :param bool exclude_unprotected:
             Whether to return all or only protected branches.
+        :param int min_ltime:
+            The minimum cache ltime to consider the cache valid.
 
         :returns: The list of branch names, or None if the cache
             cannot satisfy the request.
         """
+        if self.ltime < min_ltime:
+            with locked(self.wlock):
+                self.cache.refresh(self.zk_context)
+
         protected_branches = self.cache.protected.get(project_name)
         remainder_branches = self.cache.remainder.get(project_name)
 
@@ -161,3 +175,7 @@ class BranchCache:
         with locked(self.wlock):
             with self.cache.activeContext(self.zk_context):
                 self.cache.protected.pop(project_name, None)
+
+    @property
+    def ltime(self):
+        return self.cache._zstat.last_modified_transaction_id
