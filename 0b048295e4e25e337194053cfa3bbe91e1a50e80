@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d167e1d_66e11536",
+        "filename": "zuul/driver/git/gitsource.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-04T18:23:09Z",
+      "side": 1,
+      "message": "Wouldn\u0027t this prevent us from updating the project branch cache for a git source?",
+      "revId": "0b048295e4e25e337194053cfa3bbe91e1a50e80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
