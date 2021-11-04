@@ -23,11 +23,14 @@ import requests
 import cherrypy
 import voluptuous as v
 
-from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
+from zuul.connection import (
+    BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
+)
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
 from zuul.lib import dependson
+from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -461,7 +464,7 @@ class PagureAPIClient():
         return resp[0]['webhook']['token']
 
 
-class PagureConnection(ZKChangeCacheMixin, CachedBranchConnection):
+class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'pagure'
     log = logging.getLogger("zuul.PagureConnection")
 
@@ -497,6 +500,8 @@ class PagureConnection(ZKChangeCacheMixin, CachedBranchConnection):
         )
         self.log.debug('Creating Zookeeper change cache')
         self._change_cache = PagureChangeCache(self.sched.zk_client, self)
+        self.log.debug('Creating Zookeeper branch cache')
+        self._branch_cache = BranchCache(self.sched.zk_client, self)
         self.log.info('Starting event connector')
         self._start_event_connector()
 

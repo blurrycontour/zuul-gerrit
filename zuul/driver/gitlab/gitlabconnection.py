@@ -28,7 +28,9 @@ import dateutil.parser
 from urllib.parse import quote_plus
 from typing import List, Optional
 
-from zuul.connection import CachedBranchConnection, ZKChangeCacheMixin
+from zuul.connection import (
+    BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
+)
 from zuul.web.handler import BaseWebController
 from zuul.lib.http import ZuulHTTPAdapter
 from zuul.lib.logutil import get_annotated_logger
@@ -36,6 +38,7 @@ from zuul.lib.config import any_to_bool
 from zuul.exceptions import MergeFailure
 from zuul.model import Branch, Project, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
+from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -436,7 +439,7 @@ class GitlabAPIClient():
         return resp[0]
 
 
-class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
+class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'gitlab'
     log = logging.getLogger("zuul.GitlabConnection")
     payload_path = 'payload'
@@ -484,6 +487,8 @@ class GitlabConnection(ZKChangeCacheMixin, CachedBranchConnection):
         )
         self.log.debug('Creating Zookeeper change cache')
         self._change_cache = GitlabChangeCache(self.sched.zk_client, self)
+        self.log.debug('Creating Zookeeper branch cache')
+        self._branch_cache = BranchCache(self.sched.zk_client, self)
         self.log.info('Starting event connector')
         self._start_event_connector()
 
