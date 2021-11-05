@@ -16,6 +16,23 @@
       "message": "fixed linting errors",
       "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be0322b4_683d8b9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-05T17:13:51Z",
+      "side": 1,
+      "message": "the signin redirection doesn\u0027t seem to work correctly when the GUI is served as a subdirectory behind a reverse proxy: from \"https://zuuldemo.strangerpings.eu/zuul/t/example-tenant/status\" I was redirected to \"https://zuuldemo.strangerpings.eu/zuul/zuul/t/example-tenant/status#\" - my guess is that the default redirect method uses window.location.pathname instead of href.",
+      "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
