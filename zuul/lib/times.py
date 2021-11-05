@@ -63,7 +63,10 @@ class Times:
                 # was requested
                 if key in self.cache:
                     continue
-                with self.statsd.timer('zuul.scheduler.time_query'):
+                if self.statsd:
+                    with self.statsd.timer('zuul.scheduler.time_query'):
+                        self._getTime(key)
+                else:
                     self._getTime(key)
             except Exception:
                 self.log.exception("Error querying DB for build %s", key)
