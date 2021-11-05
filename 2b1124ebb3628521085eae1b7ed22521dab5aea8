@@ -73,6 +73,23 @@
       },
       "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a24fc5a_64bd7f77",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-05T23:39:06Z",
+      "side": 1,
+      "message": "Fixed.",
+      "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
