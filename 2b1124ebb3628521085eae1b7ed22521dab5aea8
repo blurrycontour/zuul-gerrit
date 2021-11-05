@@ -33,6 +33,46 @@
       "message": "the signin redirection doesn\u0027t seem to work correctly when the GUI is served as a subdirectory behind a reverse proxy: from \"https://zuuldemo.strangerpings.eu/zuul/t/example-tenant/status\" I was redirected to \"https://zuuldemo.strangerpings.eu/zuul/zuul/t/example-tenant/status#\" - my guess is that the default redirect method uses window.location.pathname instead of href.",
       "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "829bec66_4c5a03eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-05T18:29:15Z",
+      "side": 1,
+      "message": "I\u0027ve noticed a funny bug when signing in from the status page: the callback parameters appear in the search bar when coming back from the identity provider. See https://ibb.co/xGMkhhM",
+      "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48f673d6_7d2be6f2",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-05T18:29:15Z",
+      "side": 1,
+      "message": "using window.location.href fixes the redirection bug.",
+      "range": {
+        "startLine": 188,
+        "startChar": 48,
+        "endLine": 188,
+        "endChar": 91
+      },
+      "revId": "2b1124ebb3628521085eae1b7ed22521dab5aea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
