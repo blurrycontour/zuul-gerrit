@@ -16,6 +16,23 @@
       "message": "Shouldn\u0027t we in this case also not remove the branch from the remainder branches?",
       "revId": "94fc856e1f7290582d3924cf4db3019038a8a34f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3140697f_1d519d9f",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-05T14:59:58Z",
+      "side": 1,
+      "message": "Yes.",
+      "revId": "94fc856e1f7290582d3924cf4db3019038a8a34f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
