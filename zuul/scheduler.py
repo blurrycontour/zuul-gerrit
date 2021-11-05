@@ -285,25 +285,34 @@ class Scheduler(threading.Thread):
         self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
+        self.log.debug("Stopping scheduler")
         self._stopped = True
         self.component_info.state = self.component_info.STOPPED
         self.times.stop()
+        self.log.debug("Stopping nodepool")
         self.nodepool.stop()
         self.stop_event.set()
+        self.log.debug("Stopping connections")
         self.stopConnections()
         self.wake_event.set()
+        self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
+        self.log.debug("Stopping apscheduler")
         self.apsched.shutdown()
+        self.log.debug("Stopping RPC thread")
         self.rpc.stop()
         self.rpc.join()
         self.rpc_slow.stop()
         self.rpc_slow.join()
         self.stop_repl()
         self._command_running = False
+        self.log.debug("Stopping command socket")
         self.command_socket.stop()
         self.command_thread.join()
+        self.log.debug("Stopping timedb thread")
         self.times.join()
+        self.log.debug("Waiting for main thread")
         self.join()
         self.zk_client.disconnect()
 
@@ -322,6 +331,7 @@ class Scheduler(threading.Thread):
     def runStatsElection(self):
         while not self._stopped:
             try:
+                self.log.debug("Running stats election")
                 self.stats_election.run(self.runStats)
             except Exception:
                 self.log.exception("Exception running election stats:")
