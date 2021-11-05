@@ -53,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3d74c9c_e9589d11",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-05T08:16:31Z",
+      "side": 1,
+      "message": "Regarding 2): The onLoad() method is only called in registerScheduler() which we don\u0027t call in zuul-web. So we should be safe here. But if I understand you correctly, we would need parts of onLoad() in zuul-web as well to initialize the branch cache.\n\nMaybe it would work if we call onLoad() directly in zuul-web (not via registerScheduler) and add a check inside the onLoad() method that checks if self.sched is set. In case it\u0027s not set we could skip the steps that aren\u0027t necessary (or even bad).",
+      "parentUuid": "21580c00_f9d8d483",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "184b7810_a43a402a",
