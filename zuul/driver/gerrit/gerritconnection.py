@@ -1580,7 +1580,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         }
         self.addEvent(event)
 
-    def onLoad(self):
+    def onLoad(self, zk_client):
         self.log.debug("Starting Gerrit Connection/Watchers")
         try:
             if self.session:
@@ -1588,15 +1588,24 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         except Exception:
             self.log.exception("Unable to determine remote Gerrit version")
 
-        self.log.info("Creating Zookeeper event queue")
-        self.event_queue = ConnectionEventQueue(self.sched.zk_client,
-                                                self.connection_name)
+        # Set the project branch cache to read only if no scheduler is
+        # provided to prevent fetching the branches from the connection.
+        self.read_only = not self.sched
 
         self.log.debug('Creating Zookeeper change cache')
-        self._change_cache = GerritChangeCache(self.sched.zk_client, self)
+        self._change_cache = GerritChangeCache(zk_client, self)
 
         self.log.debug('Creating Zookeeper branch cache')
-        self._branch_cache = BranchCache(self.sched.zk_client, self)
+        self._branch_cache = BranchCache(zk_client, self)
+
+        self.log.info("Creating Zookeeper event queue")
+        self.event_queue = ConnectionEventQueue(
+            zk_client, self.connection_name)
+
+        # If the connection was not loaded by a scheduler, but by e.g.
+        # zuul-web, we want to stop here.
+        if not self.sched:
+            return
 
         if self.enable_stream_events:
             self._start_watcher_thread()
