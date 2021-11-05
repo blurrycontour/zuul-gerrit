@@ -771,10 +771,19 @@ class Scheduler(threading.Thread):
                     layout_state = self.tenant_layout_state.get(tenant_name)
                     layout_uuid = layout_state and layout_state.uuid
 
+                    if layout_state:
+                        branch_cache_min_ltimes = (
+                            layout_state.branch_cache_min_ltimes)
+                    else:
+                        # Consider all project branch caches valid if
+                        # we don't have a layout state.
+                        branch_cache_min_ltimes = defaultdict(lambda: -1)
+
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
-                        layout_uuid=layout_uuid)
+                        layout_uuid=layout_uuid,
+                        branch_cache_min_ltimes=branch_cache_min_ltimes)
 
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
@@ -970,11 +979,16 @@ class Scheduler(threading.Thread):
             self.log.debug("Updating local layout of tenant %s ", tenant_name)
             layout_state = self.tenant_layout_state.get(tenant_name)
             layout_uuid = layout_state and layout_state.uuid
-            tenant = loader.loadTenant(self.abide, tenant_name,
-                                       self.ansible_manager,
-                                       self.unparsed_abide,
-                                       min_ltimes=min_ltimes,
-                                       layout_uuid=layout_uuid)
+            if layout_state:
+                branch_cache_min_ltimes = layout_state.branch_cache_min_ltimes
+            else:
+                # We don't need the cache ltimes as the tenant was deleted
+                branch_cache_min_ltimes = None
+            tenant = loader.loadTenant(
+                self.abide, tenant_name, self.ansible_manager,
+                self.unparsed_abide, min_ltimes=min_ltimes,
+                layout_uuid=layout_uuid,
+                branch_cache_min_ltimes=branch_cache_min_ltimes)
             if tenant is not None:
                 self.local_layout_state[tenant_name] = layout_state
                 self.connections.reconfigureDrivers(tenant)
@@ -1103,11 +1117,15 @@ class Scheduler(threading.Thread):
                     # Consider caches valid if the cache ltime >= event ltime
                     min_ltimes = defaultdict(
                         lambda: defaultdict(lambda: event.zuul_event_ltime))
+
+                # Consider all project branch caches valid.
+                branch_cache_min_ltimes = defaultdict(lambda: -1)
+
                 with tenant_write_lock(self.zk_client, tenant_name) as lock:
-                    tenant = loader.loadTenant(self.abide, tenant_name,
-                                               self.ansible_manager,
-                                               self.unparsed_abide,
-                                               min_ltimes=min_ltimes)
+                    tenant = loader.loadTenant(
+                        self.abide, tenant_name, self.ansible_manager,
+                        self.unparsed_abide, min_ltimes=min_ltimes,
+                        branch_cache_min_ltimes=branch_cache_min_ltimes)
                     reconfigured_tenants.append(tenant_name)
                     ctx = self.createZKContext(lock, self.log)
                     if tenant is not None:
@@ -1144,6 +1162,12 @@ class Scheduler(threading.Thread):
                         branch_name
                     ] = event.zuul_event_ltime
 
+            # Consider all branch caches valid except for the ones where
+            # the events provides a minimum ltime.
+            branch_cache_min_ltimes = defaultdict(lambda: -1)
+            for connection_name, ltime in event.branch_cache_ltimes.items():
+                branch_cache_min_ltimes[connection_name] = ltime
+
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
             old_tenant = self.abide.tenants.get(event.tenant_name)
@@ -1151,9 +1175,10 @@ class Scheduler(threading.Thread):
                             [event.tenant_name])
 
             with tenant_write_lock(self.zk_client, event.tenant_name) as lock:
-                loader.loadTenant(self.abide, event.tenant_name,
-                                  self.ansible_manager, self.unparsed_abide,
-                                  min_ltimes=min_ltimes)
+                loader.loadTenant(
+                    self.abide, event.tenant_name, self.ansible_manager,
+                    self.unparsed_abide, min_ltimes=min_ltimes,
+                    branch_cache_min_ltimes=branch_cache_min_ltimes)
                 tenant = self.abide.tenants[event.tenant_name]
                 ctx = self.createZKContext(lock, self.log)
                 self._reconfigureTenant(ctx, tenant, old_tenant)
