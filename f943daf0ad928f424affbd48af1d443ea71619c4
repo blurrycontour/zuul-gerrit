@@ -67,6 +67,24 @@
       "message": "I agree with the comment but two questions:\n1) Zuul-web shouldn\u0027t be loading any tenants we don\u0027t have layout states for.\n2) This file is the scheduler, so this comment shouldn\u0027t really apply here?\n\nEdit: it looks like you remove this in the next patch, so I\u0027m assuming this comment was just a note to yourself to make that change when you copied and adapted this code to zuul-web.  That makes sense.  But we should remove it here now.  :)",
       "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87c88d19_20e0b3d8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-05T06:23:38Z",
+      "side": 1,
+      "message": "Yes, that was only a note for myself. Sorry for the confusion. I thought I had removed it already, but apparently it\u0027s still there. I will take care of it.",
+      "parentUuid": "56a02c64_055dcb20",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
