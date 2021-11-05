@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1397b51a_fa7d5ad4",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-05T16:16:31Z",
+      "side": 1,
+      "message": "Nit: This flag name is no longer super accurate. Would probably make the code more readable to update it.",
+      "revId": "b2b8c730513dd50747f126b09c56b8e4dd8af0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd2ae7a0_c9b3a77a",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-05T16:16:31Z",
+      "side": 1,
+      "message": "Nit: Logging something like this might be easier to understand:\n\n  \"Project %s branch %s protected state was %s and is now %s\" % (project_name, event.branch, !protected, protected)",
+      "revId": "b2b8c730513dd50747f126b09c56b8e4dd8af0a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
