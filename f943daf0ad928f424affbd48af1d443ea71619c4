@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "21580c00_f9d8d483",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-05T06:55:27Z",
+      "side": 1,
+      "message": "Thanks for the comments. I will have a look at those.\nBut I think those suggestions should be implemented in https://review.opendev.org/c/zuul/zuul/+/816361/3, or? There I add the ConfigLoader and other parts to zuul-web. \n\nI think 1) is already implemented as otherwise I wasn\u0027t able to use the ConfigLoader in zuul-web because of missing connections. That\u0027s why I changed e.g. https://review.opendev.org/c/zuul/zuul/+/816361/3/zuul/cmd/web.py#91.",
+      "parentUuid": "978d7602_406c7584",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "184b7810_a43a402a",
