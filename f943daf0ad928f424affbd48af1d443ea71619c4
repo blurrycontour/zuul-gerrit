@@ -71,6 +71,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8804e5a1_5447a39e",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-05T09:43:32Z",
+      "side": 1,
+      "message": "I\u0027ve addressed 2) and 3) in a dedicated change https://review.opendev.org/c/zuul/zuul/+/816807. I\u0027ve based that change directly on master as it\u0027s mostly independent. We can rebase this change here later on when the rest of the branch cache stack is merged.",
+      "parentUuid": "e3d74c9c_e9589d11",
+      "revId": "f943daf0ad928f424affbd48af1d443ea71619c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "184b7810_a43a402a",
