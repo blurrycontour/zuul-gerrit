@@ -68,7 +68,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         except Exception:
             self.log.exception("Exception reporting event stats")
 
-    def onLoad(self):
+    def onLoad(self, zk_client):
         pass
 
     def onStop(self):
@@ -136,6 +136,7 @@ class ZKBranchCacheMixin:
     # Expected to be defined by the connection and to be an instance
     # of BranchCache
     _branch_cache = None
+    read_only = False
 
     @abc.abstractmethod
     def isBranchProtected(self, project_name: str, branch_name: str,
@@ -217,6 +218,10 @@ class ZKBranchCacheMixin:
 
         if branches is not None:
             return sorted(branches)
+
+        if self.read_only:
+            raise RuntimeError(
+                "Won't fetch project branches as read-only is set.")
 
         # We need to perform a query
         branches = self._fetchProjectBranches(project, exclude_unprotected)

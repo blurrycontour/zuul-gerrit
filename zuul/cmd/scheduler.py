@@ -141,6 +141,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                               self.connections, self)
         if self.args.validate_tenants is None:
             self.connections.registerScheduler(self.sched)
+            self.connections.load(self.sched.zk_client)
 
         self.log.info('Starting scheduler')
         try:
