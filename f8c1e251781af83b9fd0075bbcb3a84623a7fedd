@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c65541f6_1095c9ad",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-05T15:13:00Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we remove the branch from remainder here?",
+      "revId": "f8c1e251781af83b9fd0075bbcb3a84623a7fedd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
