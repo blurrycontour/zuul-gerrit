@@ -1329,11 +1329,19 @@ class Scheduler(threading.Thread):
             for reporter in pipeline.actions:
                 reporter.postConfig()
 
+        # Assemble a new list of min. ltimes of the project branch caches.
+        branch_cache_min_ltimes = {
+            s.connection.connection_name:
+                s.getProjectBranchCacheLtime()
+            for s in self.connections.getSources()
+        }
+
         layout_state = LayoutState(
             tenant_name=tenant.name,
             hostname=self.hostname,
             last_reconfigured=int(time.time()),
             uuid=tenant.layout.uuid,
+            branch_cache_min_ltimes=branch_cache_min_ltimes,
         )
         # We need to update the local layout state before the remote state,
         # to avoid race conditions in the layout changed callback.
