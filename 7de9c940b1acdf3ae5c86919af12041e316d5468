@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c52e43b4_03bc0e27",
+        "filename": "web/src/containers/status/Change.jsx",
+        "patchSetId": 33
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-06T21:35:17Z",
+      "side": 1,
+      "message": "Looks leftover from development",
+      "revId": "7de9c940b1acdf3ae5c86919af12041e316d5468",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "666d0710_9a069948",
+        "filename": "web/src/containers/status/Change.jsx",
+        "patchSetId": 33
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-06T21:35:17Z",
+      "side": 1,
+      "message": "This should be pipeline.name",
+      "revId": "7de9c940b1acdf3ae5c86919af12041e316d5468",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4d2ce0_aecda52b",
+        "filename": "web/src/containers/status/Change.jsx",
+        "patchSetId": 33
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-06T21:35:17Z",
+      "side": 1,
+      "message": "pipeline.name",
+      "revId": "7de9c940b1acdf3ae5c86919af12041e316d5468",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
