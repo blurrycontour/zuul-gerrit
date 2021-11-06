@@ -13,7 +13,7 @@
 // under the License.
 
 import React from 'react'
-import ReactTestUtils from 'react-dom/test-utils'
+import { create, act } from 'react-test-renderer'
 import ReactDOM from 'react-dom'
 import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
@@ -31,16 +31,17 @@ api.fetchStatus = jest.fn()
 api.fetchConfigErrors = jest.fn()
 api.fetchConfigErrors.mockImplementation(() => Promise.resolve({data: []}))
 
-const store = configureStore()
 
 it('renders without crashing', () => {
+  const store = configureStore()
   const div = document.createElement('div')
   ReactDOM.render(<Provider store={store}><Router><App /></Router></Provider>,
     div)
   ReactDOM.unmountComponentAtNode(div)
 })
 
-it('renders multi tenant', () => {
+it('renders multi tenant', async () => {
+  const store = configureStore()
   api.fetchInfo.mockImplementation(
     () => Promise.resolve({data: {
       info: {capabilities: {}}
@@ -49,28 +50,34 @@ it('renders multi tenant', () => {
   api.fetchTenants.mockImplementation(
     () => Promise.resolve({data: [{name: 'openstack'}]})
   )
-  const application = ReactTestUtils.renderIntoDocument(
+
+  const application = create(
     <Provider store={store}><Router><App /></Router></Provider>
   )
-  store.dispatch(fetchInfoIfNeeded()).then(() => {
-    // Link should be tenant scoped
-    const topMenuLinks = ReactTestUtils.scryRenderedComponentsWithType(
-      application, Link)
-    expect(topMenuLinks[0].props.to).toEqual('/t/openstack/status')
-    expect(topMenuLinks[1].props.to).toEqual('/t/openstack/projects')
-    // Location should be /tenants
-    expect(location.pathname).toEqual('/tenants')
-    // Info should tell multi tenants
-    expect(store.getState().info.tenant).toEqual(undefined)
-    // Tenants list has been rendered
-    expect(ReactTestUtils.findRenderedComponentWithType(
-      application, TenantsPage)).not.toEqual(null)
-    // Fetch tenants has been called
-    expect(api.fetchTenants).toBeCalled()
+
+  await act(async () => {
+    await store.dispatch(fetchInfoIfNeeded())
   })
+
+  // Link should be tenant scoped
+  const topMenuLinks = application.root.findAllByType(Link)
+  expect(topMenuLinks[0].props.to).toEqual('/')
+  expect(topMenuLinks[1].props.to).toEqual('/components')
+  expect(topMenuLinks[2].props.to).toEqual('/openapi')
+  expect(topMenuLinks[3].props.to).toEqual('/t/openstack/status')
+  expect(topMenuLinks[4].props.to).toEqual('/t/openstack/projects')
+  // Location should be /tenants
+  expect(location.pathname).toEqual('/tenants')
+  // Info should tell multi tenants
+  expect(store.getState().info.tenant).toEqual(undefined)
+  // Tenants list has been rendered
+  expect(application.root.findAllByType(TenantsPage)).not.toEqual(null)
+  // Fetch tenants has been called
+  expect(api.fetchTenants).toBeCalled()
 })
 
-it('renders single tenant', () => {
+it('renders single tenant', async () => {
+  const store = configureStore()
   api.fetchInfo.mockImplementation(
     () => Promise.resolve({data: {
       info: {capabilities: {}, tenant: 'openstack'}
@@ -79,24 +86,26 @@ it('renders single tenant', () => {
   api.fetchStatus.mockImplementation(
     () => Promise.resolve({data: {pipelines: []}})
   )
-  const application = ReactTestUtils.renderIntoDocument(
+
+  const application = create(
     <Provider store={store}><Router><App /></Router></Provider>
   )
 
-  store.dispatch(fetchInfoIfNeeded()).then(() => {
-    // Link should be white-label scoped
-    const topMenuLinks = ReactTestUtils.scryRenderedComponentsWithType(
-      application, Link)
-    expect(topMenuLinks[0].props.to).toEqual('/status')
-    expect(topMenuLinks[1].props.to).toEqual('/projects')
-    // Location should be /status
-    expect(location.pathname).toEqual('/status')
-    // Info should tell white label tenant openstack
-    expect(store.getState().info.tenant).toEqual('openstack')
-    // Status page has been rendered
-    expect(ReactTestUtils.findRenderedComponentWithType(
-      application, StatusPage)).not.toEqual(null)
-    // Fetch status has been called
-    expect(api.fetchStatus).toBeCalled()
+  await act(async () => {
+    await store.dispatch(fetchInfoIfNeeded())
   })
+
+  // Link should be white-label scoped
+  const topMenuLinks = application.root.findAllByType(Link)
+  expect(topMenuLinks[0].props.to).toEqual('/status')
+  expect(topMenuLinks[1].props.to.pathname).toEqual('/status')
+  expect(topMenuLinks[2].props.to.pathname).toEqual('/projects')
+  // Location should be /status
+  expect(location.pathname).toEqual('/status')
+  // Info should tell white label tenant openstack
+  expect(store.getState().info.tenant).toEqual('openstack')
+  // Status page has been rendered
+  expect(application.root.findAllByType(StatusPage)).not.toEqual(null)
+  // Fetch status has been called
+  expect(api.fetchStatus).toBeCalled()
 })

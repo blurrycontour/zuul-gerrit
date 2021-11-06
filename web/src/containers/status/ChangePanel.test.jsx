@@ -13,9 +13,9 @@
 // under the License.
 
 import React from 'react'
-import ReactTestUtils from 'react-dom/test-utils'
 import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { create } from 'react-test-renderer'
 
 import { setTenantAction } from '../../actions/tenant'
 import configureStore from '../../store'
@@ -31,34 +31,33 @@ const fakeChange = {
   }]
 }
 
-const store = configureStore()
 
 it('change panel render multi tenant links', () => {
+  const store = configureStore()
   store.dispatch(setTenantAction('tenant-one', false))
-  const application = ReactTestUtils.renderIntoDocument(
-    <Provider store={store}>
-      <Router>
-        <ChangePanel change={fakeChange} globalExpanded={true} />
-      </Router>
-    </Provider>
-  )
-  const jobLink = ReactTestUtils.findRenderedComponentWithType(
-    application, Link)
+  const application = create(
+      <Provider store={store}>
+        <Router>
+          <ChangePanel change={fakeChange} globalExpanded={true} />
+        </Router>
+      </Provider>
+    )
+  const jobLink = application.root.findByType(Link)
   expect(jobLink.props.to).toEqual(
     '/t/tenant-one/stream/42')
 })
 
 it('change panel render white-label tenant links', () => {
+  const store = configureStore()
   store.dispatch(setTenantAction('tenant-one', true))
-  const application = ReactTestUtils.renderIntoDocument(
+  const application = create(
     <Provider store={store}>
       <Router>
         <ChangePanel change={fakeChange} globalExpanded={true} />
       </Router>
     </Provider>
   )
-  const jobLink = ReactTestUtils.findRenderedComponentWithType(
-    application, Link)
+  const jobLink = application.root.findByType(Link)
   expect(jobLink.props.to).toEqual(
     '/stream/42')
 })
