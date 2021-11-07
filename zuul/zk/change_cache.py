@@ -229,6 +229,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                        for c in list(self._change_cache.values())}
         stale_uuids = self._data_cleanup_candidates - valid_uuids
         for data_uuid in stale_uuids:
+            self.log.debug("Deleting stale data uuid %s", data_uuid)
             self.kazoo_client.delete(self._dataPath(data_uuid), recursive=True)
 
         data_uuids = set(self.kazoo_client.get_children(self.data_root))
