@@ -192,10 +192,12 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             self._watched_keys.add(key)
 
     def _cacheItemWatcher(self, data, zstat, event=None):
-        if not all((data, zstat, event)):
+        if not all((data, zstat)):
             return
 
         key, data_uuid = self._loadKey(data)
+        self.log.debug("Noticed update to key %s data uuid %s",
+                       key, data_uuid)
         self._get(key, data_uuid, zstat)
 
     def _loadKey(self, data):

@@ -1403,6 +1403,18 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         other_cache.delete(key)
         self.assertIsNone(self.cache.get(key))
 
+    def test_cache_sync_on_start(self):
+        key = ChangeKey('conn', 'project', 'change', 'foo', '1')
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set(key, change)
+        change.number = 123
+        self.cache.set(key, change, change.cache_version)
+
+        other_cache = DummyChangeCache(self.zk_client, DummyConnection())
+        other_cache.cleanup()
+        other_cache.cleanup()
+        self.assertIsNotNone(other_cache.get(key))
+
     def test_cleanup(self):
         change = DummyChange("project", {"foo": "bar"})
         key = ChangeKey('conn', 'project', 'change', 'foo', '1')
