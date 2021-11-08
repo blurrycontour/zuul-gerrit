@@ -15,7 +15,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import socket
 import sys
@@ -2277,58 +2276,6 @@ class Scheduler(threading.Thread):
         else:
             self.log.warning("Duplicate nodes provisioned event: %s",
                              event)
-
-    def formatStatusJSON(self, tenant_name):
-        # TODOv3(jeblair): use tenants
-        data = {}
-        data['zuul_version'] = self.zuul_version
-
-        data['trigger_event_queue'] = {}
-        data['trigger_event_queue']['length'] = len(
-            self.trigger_events[tenant_name])
-        data['management_event_queue'] = {}
-        data['management_event_queue']['length'] = len(
-            self.management_events[tenant_name]
-        ) + self.reconfigure_event_queue.qsize()
-        data['connection_event_queues'] = {}
-        for connection in self.connections.connections.values():
-            queue = connection.getEventQueue()
-            if queue is not None:
-                data['connection_event_queues'][connection.connection_name] = {
-                    'length': len(queue),
-                }
-
-        layout_state = self.tenant_layout_state.get(tenant_name)
-        if layout_state:
-            data['last_reconfigured'] = layout_state.last_reconfigured * 1000
-
-        pipelines = []
-        data['pipelines'] = pipelines
-        tenant = self.abide.tenants.get(tenant_name)
-        if not tenant:
-            if tenant_name not in self.unparsed_abide.tenants:
-                return json.dumps({
-                    "message": "Unknown tenant",
-                    "code": 404
-                })
-            self.log.warning("Tenant %s isn't loaded" % tenant_name)
-            return json.dumps({
-                "message": "Tenant %s isn't ready" % tenant_name,
-                "code": 204
-            })
-        trigger_event_queues = self.pipeline_trigger_events[tenant_name]
-        result_event_queues = self.pipeline_result_events[tenant_name]
-        management_event_queues = self.pipeline_management_events[tenant_name]
-        for pipeline in tenant.layout.pipelines.values():
-            status = pipeline.formatStatusJSON(self.globals.websocket_url)
-            status['trigger_events'] = len(
-                trigger_event_queues[pipeline.name])
-            status['result_events'] = len(
-                result_event_queues[pipeline.name])
-            status['management_events'] = len(
-                management_event_queues[pipeline.name])
-            pipelines.append(status)
-        return json.dumps(data)
 
     def cancelJob(self, buildset, job, build=None, final=False,
                   force=False):
