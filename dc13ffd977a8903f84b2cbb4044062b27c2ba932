@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27df9306_ae2f6f55",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-08T23:17:18Z",
+      "side": 1,
+      "message": "Nope, this is copypasta, i\u0027ll remove.",
+      "revId": "dc13ffd977a8903f84b2cbb4044062b27c2ba932",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de97db90_08223cc4",
@@ -31,6 +48,23 @@
       "writtenOn": "2021-11-08T23:15:29Z",
       "side": 1,
       "message": "I guess we don\u0027t need to update lists of errors at all? Or if we do we\u0027ll hit the warning case and get a new errors object to set?",
+      "revId": "dc13ffd977a8903f84b2cbb4044062b27c2ba932",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "873cbe44_1da5a6f9",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4665,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-08T23:17:18Z",
+      "side": 1,
+      "message": "That\u0027s the idea.",
       "revId": "dc13ffd977a8903f84b2cbb4044062b27c2ba932",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
