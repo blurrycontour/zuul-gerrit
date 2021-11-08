@@ -721,7 +721,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
             raise LockException("Did not get lock on %s" % path)
 
         request.lock = lock
-        self.updateNodeRequest(request)
 
     def unlockNodeRequest(self, request):
         """
