@@ -872,7 +872,7 @@ class PipelineManager(metaclass=ABCMeta):
             self.pipeline.tenant.layout.loading_errors.error_keys)
         for item_ahead in item.items_ahead:
             parent_error_keys.extend(
-                e.key for e in item.item_ahead.current_build_set.config_errors)
+                e.key for e in item.item_ahead.getConfigErrors())
 
         # Then find config errors which aren't in the parent.  But
         # include errors in this project-branch because the error
