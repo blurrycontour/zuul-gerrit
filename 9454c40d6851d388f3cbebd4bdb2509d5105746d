@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7705060f_203a1995",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-08T14:01:04Z",
+      "side": 1,
+      "message": "\u003e Patch Set 5:\n\u003e \n\u003e The two mouseovers of the pipelines types (one for the name, the other for the description) is a little confusing and seems a little redundant (for one thing, I keep mousing over the wrong one to see the description).  How about we remove the (?) icon, and make the mouseover for the pipeline type icon include the description?  So if you mouseover the flask it says \"Independent pipeline: every change is independent of other changes...\" or something similar.\n\nI turned it into a tooltip. We lose the link to the documentation, but this is something I can live with!",
+      "revId": "9454c40d6851d388f3cbebd4bdb2509d5105746d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
