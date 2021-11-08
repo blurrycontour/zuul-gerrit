@@ -22,6 +22,30 @@
       },
       "revId": "7a0a7ddfccefd993cfcf418ac2b701bb15aa491e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bdead91_335eee5d",
+        "filename": "web/src/pf4-migration.css",
+        "patchSetId": 34
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-08T13:30:43Z",
+      "side": 1,
+      "message": "I just pushed https://review.opendev.org/c/zuul/zuul/+/816993 which removes the pf-c-content CSS role from the status page. But I think, we could simply drop this part here as well.",
+      "parentUuid": "709f7320_f193ebe2",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 1
+      },
+      "revId": "7a0a7ddfccefd993cfcf418ac2b701bb15aa491e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
