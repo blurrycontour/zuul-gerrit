@@ -782,6 +782,41 @@ class PipelineChangeList(zkobject.ZKObject):
         return self._change_keys
 
 
+class PipelineSummary(zkobject.ShardedZKObject):
+
+    log = logging.getLogger("zuul.PipelineSummary")
+    truncate_on_create = True
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            status={},
+        )
+
+    def getPath(self):
+        return f"{PipelineState.pipelinePath(self.pipeline)}/status"
+
+    def update(self, context, zuul_globals):
+        status = self.pipeline.formatStatusJSON(zuul_globals.websocket_url)
+        self.updateAttributes(context, status=status)
+
+    def serialize(self):
+        data = {
+            "status": self.status,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def refresh(self, context):
+        # Ignore exceptions and just re-use the previous state. This
+        # might happen in case the sharded status data is truncated
+        # while zuul-web tries to read it.
+        try:
+            super().refresh(context)
+        except Exception:
+            self.log.exception("Failed to refresh data")
+        return self.status
+
+
 class ChangeQueue(zkobject.ZKObject):
 
     """A ChangeQueue contains Changes to be processed for related projects.
