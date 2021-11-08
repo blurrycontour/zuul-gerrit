@@ -58,13 +58,19 @@ from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, WebComponent
 from zuul.zk.config_cache import SystemConfigCache
-from zuul.zk.event_queues import PipelineManagementEventQueue
+from zuul.zk.event_queues import (
+    TenantManagementEventQueue,
+    TenantTriggerEventQueue,
+    PipelineManagementEventQueue,
+    PipelineResultEventQueue,
+    PipelineTriggerEventQueue,
+)
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.layout import LayoutStateStore
 from zuul.zk.locks import tenant_read_lock
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
-from zuul.zk.zkobject import LocalZKContext
+from zuul.zk.zkobject import LocalZKContext, ZKContext
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 
@@ -899,25 +905,67 @@ class ZuulWebAPI(object):
         resp.headers["Access-Control-Allow-Origin"] = "*"
         return ret
 
-    def _getStatus(self, tenant):
+    def _getStatus(self, tenant_name):
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if not tenant:
+            if tenant_name not in self.zuulweb.unparsed_abide.tenants:
+                raise cherrypy.HTTPError(404, "Unknown tenant")
+            self.log.warning("Tenant %s isn't loaded", tenant_name)
+            raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
+
         with self.status_lock:
             if tenant not in self.cache or \
                (time.time() - self.cache_time[tenant]) > self.cache_expiry:
-                job = self.rpc.submitJob('zuul:status_get',
-                                         {'tenant': tenant})
-                self.cache[tenant] = json.loads(job.data[0])
-                self.cache_time[tenant] = time.time()
-        payload = self.cache[tenant]
-        if payload.get('code') == 404:
-            raise cherrypy.HTTPError(404, payload['message'])
+                self.cache[tenant_name] = self.formatStatus(tenant)
+                self.cache_time[tenant_name] = time.time()
+
+        payload = self.cache[tenant_name]
         resp = cherrypy.response
-        resp.headers["Cache-Control"] = "public, max-age=%d" % \
-                                        self.cache_expiry
-        last_modified = datetime.utcfromtimestamp(self.cache_time[tenant])
+        resp.headers["Cache-Control"] = f"public, max-age={self.cache_expiry}"
+        last_modified = datetime.utcfromtimestamp(self.cache_time[tenant_name])
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return payload
+
+    def formatStatus(self, tenant):
+        data = {}
+        data['zuul_version'] = self.zuulweb.component_info.version
+
+        data['trigger_event_queue'] = {}
+        data['trigger_event_queue']['length'] = len(
+            self.zuulweb.trigger_events[tenant.name])
+        data['management_event_queue'] = {}
+        data['management_event_queue']['length'] = len(
+            self.zuulweb.management_events[tenant.name]
+        )
+        data['connection_event_queues'] = {}
+        for connection in self.zuulweb.connections.connections.values():
+            queue = connection.getEventQueue()
+            if queue is not None:
+                data['connection_event_queues'][connection.connection_name] = {
+                    'length': len(queue),
+                }
+
+        layout_state = self.zuulweb.tenant_layout_state[tenant.name]
+        data['last_reconfigured'] = layout_state.last_reconfigured * 1000
+
+        pipelines = []
+        data['pipelines'] = pipelines
+
+        trigger_event_queues = self.zuulweb.pipeline_trigger_events[
+            tenant.name]
+        result_event_queues = self.zuulweb.pipeline_result_events[tenant.name]
+        management_event_queues = self.zuulweb.pipeline_management_events[
+            tenant.name]
+        for pipeline in tenant.layout.pipelines.values():
+            status = pipeline.status.refresh(self.zuulweb.zk_context)
+            status['trigger_events'] = len(trigger_event_queues[pipeline.name])
+            status['result_events'] = len(result_event_queues[pipeline.name])
+            status['management_events'] = len(
+                management_event_queues[pipeline.name])
+            pipelines.append(status)
+        return data
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1499,14 +1547,29 @@ class ZuulWeb(object):
             self.zk_client, self.system_config_cache_wake_event.set)
         self.local_layout_state = {}
 
-        self.pipeline_management_events = (
-            PipelineManagementEventQueue.createRegistry(self.zk_client)
-        )
-
         self.connections = connections
         self.authenticators = authenticators
         self.stream_manager = StreamManager()
         self.zone = get_default(self.config, 'web', 'zone')
+
+        self.management_events = TenantManagementEventQueue.createRegistry(
+            self.zk_client)
+        self.pipeline_management_events = (
+            PipelineManagementEventQueue.createRegistry(self.zk_client)
+        )
+        self.trigger_events = TenantTriggerEventQueue.createRegistry(
+            self.zk_client, self.connections
+        )
+        self.pipeline_trigger_events = (
+            PipelineTriggerEventQueue.createRegistry(
+                self.zk_client, self.connections
+            )
+        )
+        self.pipeline_result_events = PipelineResultEventQueue.createRegistry(
+            self.zk_client
+        )
+
+        self.zk_context = ZKContext(self.zk_client, None, None, self.log)
 
         command_socket = get_default(
             self.config, 'web', 'command_socket',
