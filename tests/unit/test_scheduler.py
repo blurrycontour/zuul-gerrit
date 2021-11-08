@@ -1075,19 +1075,18 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         time.sleep(2)
 
-        data = json.loads(self.scheds.first.sched
-                          .formatStatusJSON('tenant-one'))
         found_job = None
-        for pipeline in data['pipelines']:
-            if pipeline['name'] != 'gate':
-                continue
-            for queue in pipeline['change_queues']:
-                for head in queue['heads']:
-                    for item in head:
-                        for job in item['jobs']:
-                            if job['name'] == 'project-merge':
-                                found_job = job
-                                break
+        pipeline = self.scheds.first.sched.abide.tenants[
+            'tenant-one'].layout.pipelines['gate']
+        pipeline_status = pipeline.formatStatusJSON(
+            self.scheds.first.sched.globals.websocket_url)
+        for queue in pipeline_status['change_queues']:
+            for head in queue['heads']:
+                for item in head:
+                    for job in item['jobs']:
+                        if job['name'] == 'project-merge':
+                            found_job = job
+                            break
 
         self.assertIsNotNone(found_job)
         if iteration == 1:
@@ -4155,10 +4154,11 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         def get_job():
-            data = json.loads(self.scheds.first.sched
-                              .formatStatusJSON('tenant-one'))
-            for pipeline in data['pipelines']:
-                for queue in pipeline['change_queues']:
+            tenant = self.scheds.first.sched.abide.tenants['tenant-one']
+            for pipeline in tenant.layout.pipelines.values():
+                pipeline_status = pipeline.formatStatusJSON(
+                    self.scheds.first.sched.globals.websocket_url)
+                for queue in pipeline_status['change_queues']:
                     for head in queue['heads']:
                         for item in head:
                             for job in item['jobs']:
@@ -4333,11 +4333,13 @@ class TestScheduler(ZuulTestCase):
 
         # Ensure that the status json has the ref so we can render it in the
         # web ui.
-        data = json.loads(self.scheds.first.sched
-                          .formatStatusJSON('tenant-one'))
-        pipeline = [x for x in data['pipelines'] if x['name'] == 'periodic'][0]
-        first = pipeline['change_queues'][0]['heads'][0][0]
-        second = pipeline['change_queues'][1]['heads'][0][0]
+        pipeline = self.scheds.first.sched.abide.tenants[
+            'tenant-one'].layout.pipelines['periodic']
+        pipeline_status = pipeline.formatStatusJSON(
+            self.scheds.first.sched.globals.websocket_url)
+
+        first = pipeline_status['change_queues'][0]['heads'][0][0]
+        second = pipeline_status['change_queues'][1]['heads'][0][0]
         self.assertIn(first['ref'], ['refs/heads/master', 'refs/heads/stable'])
         self.assertIn(second['ref'],
                       ['refs/heads/master', 'refs/heads/stable'])
