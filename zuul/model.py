@@ -3610,8 +3610,8 @@ class BuildSet(zkobject.ZKObject):
 
                 build_path = data["builds"].get(job_name)
                 if build_path:
-                    if job_name in self.builds:
-                        build = self.builds[job_name]
+                    build = self.builds.get(job_name)
+                    if build and build.getPath() == build_path:
                         build.refresh(context)
                     else:
                         build = Build.fromZK(
@@ -3620,7 +3620,7 @@ class BuildSet(zkobject.ZKObject):
 
                 for retry_path in data["retry_builds"].get(job_name, []):
                     retry_build = existing_retry_builds.get(retry_path)
-                    if retry_build:
+                    if retry_build and retry_build.getPath() == retry_path:
                         retry_build.refresh(context)
                     else:
                         retry_build = Build.fromZK(
