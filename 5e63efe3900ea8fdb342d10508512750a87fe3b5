@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07454200_eeb0a5ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-08T16:06:31Z",
+      "side": 1,
+      "message": "LGTM, provided tests pass",
+      "revId": "5e63efe3900ea8fdb342d10508512750a87fe3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cb54f49_d79a4bcb",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1583,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-08T16:06:31Z",
+      "side": 1,
+      "message": "NIT: Not sure why {tenant} is changed to {tenant_name} here but if we commit to this, we should change it everywhere in these routes for consistency.",
+      "range": {
+        "startLine": 1570,
+        "startChar": 0,
+        "endLine": 1583,
+        "endChar": 70
+      },
+      "revId": "5e63efe3900ea8fdb342d10508512750a87fe3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
