@@ -15,6 +15,7 @@
 # under the License.
 
 import logging
+import threading
 import time
 from uuid import uuid4
 
@@ -26,19 +27,49 @@ from zuul.driver.timer import timertrigger
 from zuul.driver.timer import timermodel
 from zuul.driver.timer.timermodel import TimerTriggerEvent
 from zuul.lib.logutil import get_annotated_logger
+from zuul.zk.election import SessionAwareElection
 
 
 class TimerDriver(Driver, TriggerInterface):
     name = 'timer'
+    election_root = "/zuul/scheduler/timer-election"
     log = logging.getLogger("zuul.TimerDriver")
 
     def __init__(self):
         self.apsched = BackgroundScheduler()
         self.apsched.start()
         self.tenant_jobs = {}
+        self.election = None
+        self.election_thread = None
+        self.election_won = False
+        self.stop_event = threading.Event()
+        self.stopped = False
 
     def registerScheduler(self, scheduler):
         self.sched = scheduler
+        self.election = SessionAwareElection(
+            self.sched.zk_client.client, self.election_root)
+        self.election_thread = threading.Thread(name="TimerElection",
+                                                target=self._runElection,
+                                                daemon=True)
+        self.election_thread.start()
+
+    def _runElection(self):
+        while not self.stopped:
+            try:
+                self.log.info("Running timer election")
+                self.election.run(self._electionInner)
+            except Exception:
+                self.log.exception("Error in timer election:")
+
+    def _electionInner(self):
+        try:
+            self.election_won = True
+            self.log.info("Won timer election")
+            self.stop_event.wait()
+        finally:
+            self.election_won = False
+            self.stop_event.clear()
 
     def reconfigure(self, tenant):
         self._removeJobs(tenant)
@@ -106,6 +137,20 @@ class TimerDriver(Driver, TriggerInterface):
                     jobs.append(job)
 
     def _onTrigger(self, tenant, pipeline_name, timespec):
+        if not self.election_won:
+            return
+
+        if not self.election.is_still_valid():
+            self.stop_event.set()
+            return
+
+        try:
+            self._dispatchEvent(tenant, pipeline_name, timespec)
+        except Exception:
+            self.stop_event.set()
+            raise
+
+    def _dispatchEvent(self, tenant, pipeline_name, timespec):
         self.log.debug('Got trigger for tenant %s and pipeline %s with '
                        'timespec %s', tenant.name, pipeline_name, timespec)
         for project_name, pcs in tenant.layout.project_configs.items():
@@ -133,9 +178,15 @@ class TimerDriver(Driver, TriggerInterface):
                 self.sched.addTriggerEvent(self.name, event)
 
     def stop(self):
+        self.stopped = True
+        self.stop_event.set()
         if self.apsched:
             self.apsched.shutdown()
             self.apsched = None
+        if self.election:
+            self.election.cancel()
+        if self.election_thread:
+            self.election_thread.join()
 
     def getTrigger(self, connection_name, config=None):
         return timertrigger.TimerTrigger(self, config)
