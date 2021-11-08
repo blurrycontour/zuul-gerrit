@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "593dc515_0e507783",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-08T23:15:29Z",
+      "side": 1,
+      "message": "Do we need to serialize the path? We don\u0027t deserialize it from this structure and instead set the ._path attribute when we call fromZK or new() against the zkobject type for this path.",
+      "revId": "dc13ffd977a8903f84b2cbb4044062b27c2ba932",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de97db90_08223cc4",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4665,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-08T23:15:29Z",
+      "side": 1,
+      "message": "I guess we don\u0027t need to update lists of errors at all? Or if we do we\u0027ll hit the warning case and get a new errors object to set?",
+      "revId": "dc13ffd977a8903f84b2cbb4044062b27c2ba932",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
