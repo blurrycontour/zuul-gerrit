@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9db869ac_48ec2b3c",
+        "filename": "web/src/pages/AuthCallback.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-08T14:38:36Z",
+      "side": 1,
+      "message": "NIT: I suggest we should keep the original \"login successful, you will be redirected shortly\" message. The redirection is fast, but for a short moment the user doesn\u0027t really know what is going on.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 21
+      },
+      "revId": "01140fe25e457dd4c5ab6078bae56daf924a7430",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
