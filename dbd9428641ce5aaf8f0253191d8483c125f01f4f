@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64953a34_78105756",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-08T13:44:39Z",
+      "side": 1,
+      "message": "Maybe there is a better name for this as it\u0027s quite similar to `PipelineState`.",
+      "revId": "dbd9428641ce5aaf8f0253191d8483c125f01f4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
