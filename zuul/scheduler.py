@@ -1688,7 +1688,8 @@ class Scheduler(threading.Thread):
                             self._reenqueuePipeline(tenant, pipeline, ctx)
                         pipeline.state.cleanup(ctx)
                         self._process_pipeline(tenant, pipeline)
-
+                    # Update pipeline status for zuul-web
+                    pipeline.status.update(ctx, self.globals)
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
                                pipeline.name, tenant.name)

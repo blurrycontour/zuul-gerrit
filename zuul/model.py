@@ -15,6 +15,7 @@
 
 import abc
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
+import contextlib
 import copy
 import json
 import hashlib
@@ -30,7 +31,7 @@ import textwrap
 import types
 import itertools
 
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import NoNodeError, ZookeeperError
 from cachetools.func import lru_cache
 
 from zuul.lib import yamlutil as yaml
@@ -750,6 +751,38 @@ class PipelineChangeList(zkobject.ZKObject):
 
     def getChangeKeys(self):
         return self._change_keys
+
+
+class PipelineStatus(zkobject.ShardedZKObject):
+
+    truncate_on_create = True
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            status={},
+        )
+
+    def getPath(self):
+        return f"{PipelineState.pipelinePath(self.pipeline)}/status"
+
+    def update(self, context, zuul_globals):
+        status = self.pipeline.formatStatusJSON(zuul_globals.websocket_url)
+        self.updateAttributes(context, status=status)
+
+    def serialize(self):
+        data = {
+            "status": self.status,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def refresh(self, context):
+        # Ignore Zookeeper exceptions and just re-use the previous state.
+        # This might happen in case the sharded status data is truncated
+        # while zuul-web tries to read it.
+        with contextlib.suppress(ZookeeperError):
+            super().refresh(context)
+        return self.status
 
 
 class ChangeQueue(zkobject.ZKObject):
