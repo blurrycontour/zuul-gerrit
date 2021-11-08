@@ -235,6 +235,34 @@ class ConfigurationError(object):
         return o
 
 
+class ConfigurationErrorList(zkobject.ShardedZKObject):
+    """A list of configuration errors.
+
+    BuildSets may have zero or one of these.
+    """
+
+    def __repr__(self):
+        return '<ConfigurationErrorList>'
+
+    def getPath(self):
+        return self._path
+
+    def serialize(self):
+        data = {
+            "errors": [e.serialize() for e in self.errors],
+            "_path": self._path,
+        }
+        return json.dumps(data).encode("utf8")
+
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
+        data.update({
+            "errors": [ConfigurationError.deserialize(d)
+                       for d in data["errors"]],
+        })
+        return data
+
+
 class LoadingErrors(object):
     """A configuration errors accumalator attached to a layout object
     """
@@ -3482,6 +3510,16 @@ class BuildSet(zkobject.ZKObject):
                 d[connection].update(rs.state.get(connection, {}))
         return d
 
+    def setConfigErrors(self, config_errors):
+        if not self._active_context:
+            raise Exception("setConfigErrors must be used "
+                            "with a context manager")
+        path = self.getPath() + '/config_errors/' + uuid4().hex
+        el = ConfigurationErrorList.new(self._active_context,
+                                        errors=config_errors,
+                                        _path=path)
+        self.config_errors = el
+
     def setMergeRepoState(self, repo_state):
         if self.merge_repo_state is not None:
             raise Exception("Merge repo state can not be updated")
@@ -3519,7 +3557,8 @@ class BuildSet(zkobject.ZKObject):
             "dependent_changes": self.dependent_changes,
             "merger_items": self.merger_items,
             "unable_to_merge": self.unable_to_merge,
-            "config_errors": [e.serialize() for e in self.config_errors],
+            "config_errors": (self.config_errors.getPath()
+                              if self.config_errors else None),
             "failing_reasons": self.failing_reasons,
             "debug_messages": self.debug_messages,
             "warning_messages": self.warning_messages,
@@ -3585,6 +3624,16 @@ class BuildSet(zkobject.ZKObject):
                 self.log.exception("Failed to restore extra repo state")
                 data['extra_repo_state'] = None
 
+        config_errors = data.get('config_errors')
+        if config_errors:
+            if (self.config_errors and
+                self.config_errors._path == config_errors):
+                data['config_errors'] == self.config_errors
+            else:
+                data['config_errors'] = ConfigurationErrorList.fromZK(
+                    context, data['config_errors'],
+                    _path=data['config_errors'])
+
         # Job graphs are immutable
         if self.job_graph is not None:
             data['job_graph'] = self.job_graph
@@ -3630,8 +3679,6 @@ class BuildSet(zkobject.ZKObject):
         data.update({
             "builds": builds,
             "retry_builds": retry_builds,
-            "config_errors": [ConfigurationError.deserialize(d)
-                              for d in data["config_errors"]],
             # These are local cache objects only valid for one pipeline run
             '_old_job_graph': None,
             '_old_jobs': {},
@@ -4152,7 +4199,9 @@ class QueueItem(zkobject.ZKObject):
         return self.current_build_set.unable_to_merge
 
     def getConfigErrors(self):
-        return self.current_build_set.config_errors
+        if self.current_build_set.config_errors:
+            return self.current_build_set.config_errors.errors
+        return []
 
     def wasDequeuedNeedingChange(self):
         return self.dequeued_needing_change
@@ -4601,9 +4650,19 @@ class QueueItem(zkobject.ZKObject):
         self.setConfigErrors([err])
 
     def setConfigErrors(self, errors):
-        self.current_build_set.updateAttributes(
-            self.pipeline.manager.current_context,
-            config_errors=errors)
+        # The manager may call us with the same errors object to
+        # trigger side effects of setting jobs to 'skipped'.
+        if (self.current_build_set.config_errors and
+            errors is not self.current_build_set.config_errors):
+            # TODO: This is not expected, but if it happens we should
+            # look into cleaning up leaked config_errors objects in
+            # zk.
+            self.log.warning("Differing config errors set on item %s",
+                             self)
+        if errors is not self.current_build_set.config_errors:
+            with self.current_build_set.activeContext(
+                    self.pipeline.manager.current_context):
+                self.current_build_set.setConfigErrors(errors)
         self._setAllJobsSkipped()
 
     def _setAllJobsSkipped(self):
