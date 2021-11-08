@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3499b01d_f1846156",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 30
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-08T13:29:43Z",
+      "side": 1,
+      "message": "\u003e Patch Set 29:\n\u003e \n\u003e We should default the reason to something like \"Requested by {username}\".  Or maybe \"By {username} for ...\" to encourage good reasons.  Otherwise we just rely on asking around to figure out why there was an autohold and who set it.\n\nPS31 adds a prefix to the reason, they will all start with \"Requested by {username}: \". Is that what you had in mind?",
+      "revId": "5457baed15afd158ef4b559d7616df934ab401d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
