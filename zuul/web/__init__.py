@@ -38,6 +38,7 @@ from zuul.connection import BaseConnection
 import zuul.lib.repl
 from zuul.lib import commandsocket, encryption, streamer_utils
 from zuul.lib.ansible import AnsibleManager
+from zuul.lib.jsonutil import ZuulJSONEncoder
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.model import (
@@ -128,6 +129,25 @@ def handle_options(allowed_methods=None):
 
 cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
                                               handle_options)
+
+
+# Custom JSONEncoder that combines the ZuulJSONEncoder with cherrypy's
+# JSON functionality.
+class ZuulWebJSONEncoder(ZuulJSONEncoder):
+
+    def iterencode(self, value):
+        # Adapted from cherrypy/_json.py
+        for chunk in super().iterencode(value):
+            yield chunk.encode("utf-8")
+
+
+json_encoder = ZuulWebJSONEncoder()
+
+
+def json_handler(*args, **kwargs):
+    # Adapted from cherrypy/lib/jsontools.py
+    value = cherrypy.serving.request._json_inner_handler(*args, **kwargs)
+    return json_encoder.iterencode(value)
 
 
 class ChangeFilter(object):
@@ -1003,15 +1023,49 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def jobs(self, tenant):
-        job = self.rpc.submitJob('zuul:job_list', {'tenant': tenant})
-        ret = json.loads(job.data[0])
-        if ret is None:
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+    @cherrypy.tools.json_out(
+        content_type='application/json; charset=utf-8', handler=json_handler,
+    )
+    def jobs(self, tenant_name):
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if not tenant:
+            raise cherrypy.HTTPError(
+                404, f'Tenant {tenant_name} does not exist')
+
+        result = []
+        for job_name in sorted(tenant.layout.jobs):
+            desc = None
+            tags = set()
+            variants = []
+            for variant in tenant.layout.jobs[job_name]:
+                if not desc and variant.description:
+                    desc = variant.description.split('\n')[0]
+                if variant.tags:
+                    tags.update(list(variant.tags))
+                job_variant = {}
+                if not variant.isBase():
+                    if variant.parent:
+                        job_variant['parent'] = str(variant.parent)
+                    else:
+                        job_variant['parent'] = tenant.default_base_job
+                branches = variant.getBranches()
+                if branches:
+                    job_variant['branches'] = branches
+                if job_variant:
+                    variants.append(job_variant)
+
+            job_output = {"name": job_name}
+            if desc:
+                job_output["description"] = desc
+            if variants:
+                job_output["variants"] = variants
+            if tags:
+                job_output["tags"] = list(tags)
+            result.append(job_output)
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return result
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1029,16 +1083,22 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def job(self, tenant, job_name):
-        job = self.rpc.submitJob(
-            'zuul:job_get', {'tenant': tenant, 'job': job_name})
-        ret = json.loads(job.data[0])
-        if not ret:
-            raise cherrypy.HTTPError(404, 'Job %s does not exist.' % job_name)
+    @cherrypy.tools.json_out(
+        content_type='application/json; charset=utf-8', handler=json_handler)
+    def job(self, tenant_name, job_name):
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if not tenant:
+            raise cherrypy.HTTPError(
+                404, f'Tenant {tenant_name} does not exist')
+
+        job_variants = tenant.layout.jobs.get(job_name)
+        result = []
+        for job in job_variants:
+            result.append(job.toDict(tenant))
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return result
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1636,9 +1696,9 @@ class ZuulWeb(object):
                           controller=api, action='status')
         route_map.connect('api', '/api/tenant/{tenant}/status/change/{change}',
                           controller=api, action='status_change')
-        route_map.connect('api', '/api/tenant/{tenant}/jobs',
+        route_map.connect('api', '/api/tenant/{tenant_name}/jobs',
                           controller=api, action='jobs')
-        route_map.connect('api', '/api/tenant/{tenant}/job/{job_name}',
+        route_map.connect('api', '/api/tenant/{tenant_name}/job/{job_name}',
                           controller=api, action='job')
         # if no auth configured, deactivate admin routes
         if self.authenticators.authenticators:
