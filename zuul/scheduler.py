@@ -563,10 +563,19 @@ class Scheduler(threading.Thread):
         outstanding_requests = set()
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
-                for item in pipeline.getAllItems():
-                    for req_id in (
-                            item.current_build_set.node_requests.values()):
-                        outstanding_requests.add(req_id)
+                with pipeline_lock(
+                    self.zk_client, tenant.name, pipeline.name,
+                ) as lock:
+                    ctx = self.createZKContext(lock, self.log)
+                    with pipeline.manager.currentContext(ctx):
+                        pipeline.change_list.refresh(ctx)
+                        pipeline.state.refresh(ctx)
+                        # In case we're in the middle of a reconfig,
+                        # include the old queue items.
+                        for item in pipeline.getAllItems(include_old=True):
+                            nrs = item.current_build_set.node_requests
+                            for req_id in (nrs.values()):
+                                outstanding_requests.add(req_id)
         leaked_requests = zk_requests - outstanding_requests
         for req_id in leaked_requests:
             try:

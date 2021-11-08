@@ -481,10 +481,13 @@ class Pipeline(object):
             changes.extend([x.change for x in shared_queue.queue])
         return changes
 
-    def getAllItems(self):
+    def getAllItems(self, include_old=False):
         items = []
         for shared_queue in self.queues:
             items.extend(shared_queue.queue)
+        if include_old:
+            for shared_queue in self.state.old_queues:
+                items.extend(shared_queue.queue)
         return items
 
     def formatStatusJSON(self, websocket_url=None):
