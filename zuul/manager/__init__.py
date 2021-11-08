@@ -70,6 +70,10 @@ class PipelineManager(metaclass=ABCMeta):
         self._change_cache = {}
         # Current ZK context when the pipeline is locked
         self.current_context = None
+        # The pipeline summary used by zuul-web that is updated by the
+        # schedulers after processing a pipeline.
+        self.pipeline.summary = model.PipelineSummary()
+        self.pipeline.summary._set(pipeline=self.pipeline)
 
         if sched:
             self.sql = sched.sql
