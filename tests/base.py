@@ -4064,6 +4064,7 @@ class ZuulWebFixture(fixtures.Fixture):
             info=self.info,
             connections=self.connections,
             authenticators=self.authenticators)
+        self.connections.load(self.web.zk_client)
         self.web.start()
         self.addCleanup(self.stop)
 
