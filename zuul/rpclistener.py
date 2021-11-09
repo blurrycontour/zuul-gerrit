@@ -148,7 +148,6 @@ class RPCListener(RPCListenerBase):
         'job_list',
         'project_get',
         'project_list',
-        'config_errors_list',
     ]
 
     def start(self):
@@ -359,16 +358,3 @@ class RPCListener(RPCListenerBase):
             output.append(pobj)
         job.sendWorkComplete(json.dumps(
             sorted(output, key=lambda project: project["name"])))
-
-    def handle_config_errors_list(self, job):
-        args = json.loads(job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        output = []
-        if not tenant:
-            job.sendWorkComplete(json.dumps(None))
-            return
-        for err in tenant.layout.loading_errors.errors:
-            output.append({
-                'source_context': err.key.context.toDict(),
-                'error': err.error})
-        job.sendWorkComplete(json.dumps(output))
