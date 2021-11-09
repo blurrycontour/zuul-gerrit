@@ -46,6 +46,7 @@ import App from './App'
 // style attributes of PF4 component (as their CSS is loaded when the component
 // is imported within the App).
 import './index.css'
+import ZuulAuthProvider from './ZuulAuthProvider'
 
 const store = configureStore()
 
@@ -54,6 +55,8 @@ store.dispatch(fetchInfoIfNeeded())
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    <ZuulAuthProvider>
+      <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    </ZuulAuthProvider>
   </Provider>, document.getElementById('root'))
 registerServiceWorker()
