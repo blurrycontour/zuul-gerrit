@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ddfe64e_720dd484",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-09T10:28:26Z",
+      "side": 1,
+      "message": "You should also migrate RPC\u0027s get_admin_tenants in the same patch.",
+      "revId": "f8b54a83905b2bcad0836ac47a8cc59208a5a3ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
