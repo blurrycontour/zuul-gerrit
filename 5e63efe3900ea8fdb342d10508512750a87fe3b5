@@ -56,6 +56,30 @@
       },
       "revId": "5e63efe3900ea8fdb342d10508512750a87fe3b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2f28032_2c2dbc56",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1583,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-09T07:58:15Z",
+      "side": 1,
+      "message": "AFAIK those variable names must go in hand with the parameter names of the action function. Otherwise cherrypy won\u0027t find a matching function. As I changed the parameter names to be more precise (and as we are now using a tenant variable inside those functions), I had to change the API parameters accordingly. My plan was to change those whenever I change the corresponding function.\n\nIn the end it would make sense to change the remaining ones if there are any left.",
+      "parentUuid": "8cb54f49_d79a4bcb",
+      "range": {
+        "startLine": 1570,
+        "startChar": 0,
+        "endLine": 1583,
+        "endChar": 70
+      },
+      "revId": "5e63efe3900ea8fdb342d10508512750a87fe3b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
