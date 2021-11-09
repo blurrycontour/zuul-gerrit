@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "54b3c856e8aa5194fb4f24ecb5600920dd907f1e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d88a998f_415ef709",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-09T12:18:36Z",
+      "side": 1,
+      "message": "That should not be required, in the autohold modal we already set a mandatory prefix to the reason, this prefix includes the user\u0027s preferred username.",
+      "range": {
+        "startLine": 45,
+        "startChar": 40,
+        "endLine": 45,
+        "endChar": 110
+      },
+      "revId": "54b3c856e8aa5194fb4f24ecb5600920dd907f1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
