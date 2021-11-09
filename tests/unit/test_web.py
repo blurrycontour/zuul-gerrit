@@ -87,7 +87,6 @@ class BaseTestWeb(ZuulTestCase):
         self.waitUntilSettled()
 
     def get_url(self, url, *args, **kwargs):
-        zuul.web.ZuulWebAPI._tenants.cache_clear()
         return requests.get(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
 

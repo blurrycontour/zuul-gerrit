@@ -143,7 +143,6 @@ class RPCListener(RPCListenerBase):
         'autohold_info',
         'autohold_list',
         'get_running_jobs',
-        'tenant_list',
     ]
 
     def start(self):
@@ -239,18 +238,3 @@ class RPCListener(RPCListenerBase):
                         running_items.append(item.formatJSON())
 
         job.sendWorkComplete(json.dumps(running_items))
-
-    def handle_tenant_list(self, job):
-        output = []
-        for tenant_name, tenant in sorted(self.sched.abide.tenants.items()):
-            queue_size = 0
-            for pipeline_name, pipeline in tenant.layout.pipelines.items():
-                for queue in pipeline.queues:
-                    for item in queue.queue:
-                        if item.live:
-                            queue_size += 1
-
-            output.append({'name': tenant_name,
-                           'projects': len(tenant.untrusted_projects),
-                           'queue': queue_size})
-        job.sendWorkComplete(json.dumps(output))
