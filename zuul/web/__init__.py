@@ -34,6 +34,7 @@ import threading
 import zuul.executor.common
 from zuul import exceptions
 from zuul.configloader import ConfigLoader
+from zuul.connection import BaseConnection
 import zuul.lib.repl
 from zuul.lib import commandsocket
 from zuul.lib import streamer_utils
@@ -906,13 +907,7 @@ class ZuulWebAPI(object):
         return ret
 
     def _getStatus(self, tenant_name):
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if not tenant:
-            if tenant_name not in self.zuulweb.unparsed_abide.tenants:
-                raise cherrypy.HTTPError(404, "Unknown tenant")
-            self.log.warning("Tenant %s isn't loaded", tenant_name)
-            raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
-
+        tenant = self._getTenantOrRaise(tenant_name)
         with self.status_lock:
             if tenant not in self.cache or \
                (time.time() - self.cache_time[tenant]) > self.cache_expiry:
@@ -966,6 +961,15 @@ class ZuulWebAPI(object):
                 management_event_queues[pipeline.name])
             pipelines.append(status)
         return data
+
+    def _getTenantOrRaise(self, tenant_name):
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if tenant:
+            return tenant
+        if tenant_name not in self.zuulweb.unparsed_abide.tenants:
+            raise cherrypy.HTTPError(404, "Unknown tenant")
+        self.log.warning("Tenant %s isn't loaded", tenant_name)
+        raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1050,11 +1054,23 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def pipelines(self, tenant):
-        job = self.rpc.submitJob('zuul:pipeline_list', {'tenant': tenant})
-        ret = json.loads(job.data[0])
-        if ret is None:
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+    def pipelines(self, tenant_name):
+        tenant = self._getTenantOrRaise(tenant_name)
+        ret = []
+        for pipeline, pipeline_config in tenant.layout.pipelines.items():
+            triggers = []
+            for trigger in pipeline_config.triggers:
+                if isinstance(trigger.connection, BaseConnection):
+                    name = trigger.connection.connection_name
+                else:
+                    # Trigger not based on a connection doesn't use this attr
+                    name = trigger.name
+                triggers.append({
+                    "name": name,
+                    "driver": trigger.driver.name,
+                })
+            ret.append({"name": pipeline, "triggers": triggers})
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
@@ -1662,7 +1678,7 @@ class ZuulWeb(object):
             '/freeze-job/{job_name}',
             controller=api, action='project_freeze_job'
         )
-        route_map.connect('api', '/api/tenant/{tenant}/pipelines',
+        route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
                           controller=api, action='pipelines')
         route_map.connect('api', '/api/tenant/{tenant}/labels',
                           controller=api, action='labels')
