@@ -17,7 +17,6 @@ import socket
 from collections import defaultdict
 from contextlib import suppress
 
-from cachetools.func import ttl_cache
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
@@ -904,18 +903,29 @@ class ZuulWebAPI(object):
         return [n for n, t in self.zuulweb.abide.tenants.items()
                 if self._is_authorized(t, claims)]
 
-    @ttl_cache(ttl=60)
-    def _tenants(self):
-        job = self.rpc.submitJob('zuul:tenant_list', {})
-        return json.loads(job.data[0])
-
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenants(self):
-        ret = self._tenants()
+        result = []
+        for tenant_name, tenant in sorted(self.zuulweb.abide.tenants.items()):
+            queue_size = 0
+            for pipeline in tenant.layout.pipelines.values():
+                status = pipeline.status.refresh(self.zuulweb.zk_context)
+                for queue in status["change_queues"]:
+                    for head in queue["heads"]:
+                        for item in head:
+                            if item["live"]:
+                                queue_size += 1
+
+            result.append({
+                'name': tenant_name,
+                'projects': len(tenant.untrusted_projects),
+                'queue': queue_size,
+            })
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return result
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1330,7 +1340,7 @@ class ZuulWebAPI(object):
                limit=50, skip=0):
         connection = self._get_connection()
 
-        if tenant not in [x['name'] for x in self._tenants()]:
+        if tenant not in self.zuulweb.abide.tenants.keys():
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
 
         # If final is None, we return all builds, both final and non-final
