@@ -16,6 +16,23 @@
       "message": "Why not remove these three methods and stop calling them in the scheduler?",
       "revId": "ea7bd9f2fcf9534e1bdd923c80719966737a6d7e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d18aba6_1c18976c",
+        "filename": "zuul/lib/times.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-09T20:09:48Z",
+      "side": 1,
+      "message": "Yeah, that\u0027s probably a better change.  I had the vague idea we might want to try to do something clever, but they\u0027re easy enough to put back if we do.",
+      "revId": "ea7bd9f2fcf9534e1bdd923c80719966737a6d7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
