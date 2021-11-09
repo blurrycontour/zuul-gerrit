@@ -151,7 +151,6 @@ class RPCListener(RPCListenerBase):
         'project_list',
         'config_errors_list',
         'connection_list',
-        'authorize_user',
     ]
 
     def start(self):
@@ -272,14 +271,6 @@ class RPCListener(RPCListenerBase):
                         msg % (uid, tenant, rule))
                     break
         return authorized
-
-    def handle_authorize_user(self, job):
-        args = json.loads(job.arguments)
-        tenant_name = args['tenant']
-        claims = args['claims']
-        tenant = self.sched.abide.tenants.get(tenant_name)
-        authorized = self._is_authorized(tenant, claims)
-        job.sendWorkComplete(json.dumps(authorized))
 
     def handle_get_admin_tenants(self, job):
         args = json.loads(job.arguments)
