@@ -36,8 +36,7 @@ from zuul import exceptions
 from zuul.configloader import ConfigLoader
 from zuul.connection import BaseConnection
 import zuul.lib.repl
-from zuul.lib import commandsocket
-from zuul.lib import streamer_utils
+from zuul.lib import commandsocket, encryption, streamer_utils
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.re2util import filter_allowed_disallowed
@@ -1128,17 +1127,16 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    def key(self, tenant, project):
-        job = self.rpc.submitJob('zuul:key_get', {'tenant': tenant,
-                                                  'project': project,
-                                                  'key': 'secrets'})
-        if not job.data:
-            raise cherrypy.HTTPError(
-                404, 'Project %s does not exist.' % project)
+    def key(self, tenant_name, project_name):
+        tenant = self._getTenantOrRaise(tenant_name)
+        _, project = tenant.getProject(project_name)
+        if not project:
+            raise cherrypy.HTTPError(404, "Project does not exist.")
+        key = encryption.serialize_rsa_public_key(project.public_secrets_key)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
-        return job.data[0]
+        return key
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1684,8 +1682,9 @@ class ZuulWeb(object):
                           controller=api, action='labels')
         route_map.connect('api', '/api/tenant/{tenant}/nodes',
                           controller=api, action='nodes')
-        route_map.connect('api', '/api/tenant/{tenant}/key/{project:.*}.pub',
-                          controller=api, action='key')
+        route_map.connect(
+            'api', '/api/tenant/{tenant_name}/key/{project_name:.*}.pub',
+            controller=api, action='key')
         route_map.connect('api', '/api/tenant/{tenant}/'
                           'project-ssh-key/{project:.*}.pub',
                           controller=api, action='project_ssh_key')
