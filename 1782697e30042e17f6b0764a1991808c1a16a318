@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "1782697e30042e17f6b0764a1991808c1a16a318",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cc7a00b_a50d6378",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-09T14:08:17Z",
+      "side": 1,
+      "message": "+1 for informative error messages, we should do this for all the endpoints.",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 563,
+        "endChar": 59
+      },
+      "revId": "1782697e30042e17f6b0764a1991808c1a16a318",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
