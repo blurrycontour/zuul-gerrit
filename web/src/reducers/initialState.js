@@ -26,4 +26,6 @@ export default {
     isFetching: false,
     url: null,
   },
+  auth: {},
+  user: {},
 }
