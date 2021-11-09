@@ -757,14 +757,6 @@ class PipelineManager(metaclass=ABCMeta):
         else:
             relative_priority = 0
         for job in jobs:
-            # Request an estimated time here in order to give the time
-            # thread an opportunity to perform the SQL query in the
-            # background if necessary.
-            self.sched.times.getEstimatedTime(
-                item.pipeline.tenant.name,
-                item.change.project.name,
-                getattr(item.change, 'branch', None),
-                job.name)
             provider = self._getPausedParentProvider(build_set, job)
             priority = self._calculateNodeRequestPriority(build_set, job)
             tenant_name = build_set.item.pipeline.tenant.name
