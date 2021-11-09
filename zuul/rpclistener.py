@@ -18,7 +18,6 @@ import logging
 from abc import ABCMeta
 from typing import List
 
-from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
 
@@ -142,7 +141,6 @@ class RPCListener(RPCListenerBase):
         'autohold_delete',
         'autohold_info',
         'autohold_list',
-        'allowed_labels_get',
         'get_running_jobs',
         'tenant_list',
         'job_get',
@@ -361,17 +359,6 @@ class RPCListener(RPCListenerBase):
             output.append(pobj)
         job.sendWorkComplete(json.dumps(
             sorted(output, key=lambda project: project["name"])))
-
-    def handle_allowed_labels_get(self, job):
-        args = json.loads(job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        if not tenant:
-            job.sendWorkComplete(json.dumps(None))
-            return
-        ret = {}
-        ret['allowed_labels'] = tenant.allowed_labels or []
-        ret['disallowed_labels'] = tenant.disallowed_labels or []
-        job.sendWorkComplete(json.dumps(ret))
 
     def handle_config_errors_list(self, job):
         args = json.loads(job.arguments)
