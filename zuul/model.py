@@ -609,7 +609,7 @@ class PipelineState(zkobject.ZKObject):
     def pipelinePath(cls, pipeline):
         safe_tenant = urllib.parse.quote_plus(pipeline.tenant.name)
         safe_pipeline = urllib.parse.quote_plus(pipeline.name)
-        return f"/zuul/{safe_tenant}/pipeline/{safe_pipeline}"
+        return f"/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}"
 
     def setOldQueues(self, context, queues):
         old_queues = []
