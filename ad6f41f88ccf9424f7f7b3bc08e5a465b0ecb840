@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9d116bd_a4c1f80c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-09T18:14:49Z",
+      "side": 1,
+      "message": "In an earlier PS you asked about the name.  I think this is fine, but if you prefer another one, I might suggest PipelineSummary.  That seems different enough from PipelineState to avoid confusion.",
+      "revId": "ad6f41f88ccf9424f7f7b3bc08e5a465b0ecb840",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7dbd412_641abb21",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-09T18:14:49Z",
+      "side": 1,
+      "message": "We could get a json decode error too, right?",
+      "revId": "ad6f41f88ccf9424f7f7b3bc08e5a465b0ecb840",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
