@@ -150,7 +150,6 @@ class RPCListener(RPCListenerBase):
         'job_list',
         'project_get',
         'project_list',
-        'key_get',
         'config_errors_list',
         'connection_list',
         'authorize_user',
@@ -417,26 +416,6 @@ class RPCListener(RPCListenerBase):
         ret['allowed_labels'] = tenant.allowed_labels or []
         ret['disallowed_labels'] = tenant.disallowed_labels or []
         job.sendWorkComplete(json.dumps(ret))
-
-    def handle_key_get(self, job):
-        args = json.loads(job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        project = None
-        if tenant:
-            (trusted, project) = tenant.getProject(args.get("project"))
-        if not project:
-            job.sendWorkComplete("")
-            return
-        keytype = args.get('key', 'secrets')
-        if keytype == 'secrets':
-            job.sendWorkComplete(
-                encryption.serialize_rsa_public_key(
-                    project.public_secrets_key))
-        elif keytype == 'ssh':
-            job.sendWorkComplete(project.public_ssh_key)
-        else:
-            job.sendWorkComplete("")
-            return
 
     def handle_config_errors_list(self, job):
         args = json.loads(job.arguments)
