@@ -1101,30 +1101,63 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def projects(self, tenant):
-        job = self.rpc.submitJob('zuul:project_list', {'tenant': tenant})
-        ret = json.loads(job.data[0])
-        if ret is None:
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+    def projects(self, tenant_name):
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if not tenant:
+            raise cherrypy.HTTPError(
+                404, f'Tenant {tenant_name} does not exist')
+
+        result = []
+        for project in tenant.config_projects:
+            pobj = project.toDict()
+            pobj['type'] = "config"
+            result.append(pobj)
+        for project in tenant.untrusted_projects:
+            pobj = project.toDict()
+            pobj['type'] = "untrusted"
+            result.append(pobj)
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return sorted(result, key=lambda project: project["name"])
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def project(self, tenant, project):
-        job = self.rpc.submitJob(
-            'zuul:project_get', {'tenant': tenant, 'project': project})
-        ret = json.loads(job.data[0])
-        if ret is None:
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
-        if not ret:
+    @cherrypy.tools.json_out(
+        content_type='application/json; charset=utf-8', handler=json_handler)
+    def project(self, tenant_name, project_name):
+        tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        if not tenant:
             raise cherrypy.HTTPError(
-                404, 'Project %s does not exist.' % project)
+                404, f'Tenant {tenant_name} does not exist')
+
+        _, project = tenant.getProject(project_name)
+        if not project:
+            raise cherrypy.HTTPError(
+                404, f'Project {project_name} does not exist')
+
+        result = project.toDict()
+        result['configs'] = []
+        configs = tenant.layout.getAllProjectConfigs(project.canonical_name)
+        for config_obj in configs:
+            config = config_obj.toDict()
+            config['pipelines'] = []
+            for pipeline_name, pipeline_config in sorted(
+                    config_obj.pipelines.items()):
+                pipeline = pipeline_config.toDict()
+                pipeline['name'] = pipeline_name
+                pipeline['jobs'] = []
+                for jobs in pipeline_config.job_list.jobs.values():
+                    job_list = []
+                    for job in jobs:
+                        job_list.append(job.toDict(tenant))
+                    pipeline['jobs'].append(job_list)
+                config['pipelines'].append(pipeline)
+            result['configs'].append(config)
+
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return result
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1726,9 +1759,10 @@ class ZuulWeb(object):
                           controller=api, action='autohold_by_request_id')
         route_map.connect('api', '/api/tenant/{tenant_name}/autohold',
                           controller=api, action='autohold_list')
-        route_map.connect('api', '/api/tenant/{tenant}/projects',
+        route_map.connect('api', '/api/tenant/{tenant_name}/projects',
                           controller=api, action='projects')
-        route_map.connect('api', '/api/tenant/{tenant}/project/{project:.*}',
+        route_map.connect('api', '/api/tenant/{tenant_name}/project/'
+                          '{project_name:.*}',
                           controller=api, action='project')
         route_map.connect(
             'api',
