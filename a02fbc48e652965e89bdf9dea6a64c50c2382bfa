@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3259d3b1_d965bea2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-09T16:26:01Z",
+      "side": 1,
+      "message": "Nit I think it is tenant names that can conflict?",
+      "range": {
+        "startLine": 9,
+        "startChar": 39,
+        "endLine": 9,
+        "endChar": 53
+      },
+      "revId": "a02fbc48e652965e89bdf9dea6a64c50c2382bfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
