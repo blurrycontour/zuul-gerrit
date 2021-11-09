@@ -897,8 +897,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def connections(self):
-        job = self.rpc.submitJob('zuul:connection_list', {})
-        ret = json.loads(job.data[0])
+        ret = [s.connection.toDict()
+               for s in self.zuulweb.connections.getSources()]
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
