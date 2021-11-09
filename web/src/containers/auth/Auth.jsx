@@ -1,0 +1,242 @@
+// Copyright 2020 Red Hat, Inc
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License. You may obtain
+// a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
+import {
+  Accordion,
+  AccordionItem,
+  AccordionToggle,
+  AccordionContent,
+  Button,
+  ButtonVariant,
+  ClipboardCopy,
+  ClipboardCopyVariant,
+  Modal,
+  ModalVariant
+} from '@patternfly/react-core'
+import {
+  UserIcon,
+  SignInAltIcon,
+  SignOutAltIcon,
+  HatWizardIcon
+} from '@patternfly/react-icons'
+
+import * as moment from 'moment'
+
+import { apiUrl } from '../../api'
+import { fetchUserACL } from '../../actions/user'
+import { withAuth } from 'oidc-react'
+import { getHomepageUrl } from '../../api'
+import { userLoggedIn, userLoggedOut } from '../../actions/user'
+
+
+class AuthContainer extends React.Component {
+  static propTypes = {
+    user: PropTypes.object,
+    tenant: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
+    timezone: PropTypes.string.isRequired,
+    info: PropTypes.object,
+    auth: PropTypes.object,
+    // Props coming from withAuth
+    signIn: PropTypes.func,
+    signOut: PropTypes.func,
+    userData: PropTypes.object,
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      isModalOpen: false,
+      showZuulClientConfig: false,
+    }
+    this.handleModalToggle = () => {
+      this.setState(({ isModalOpen }) => ({
+        isModalOpen: !isModalOpen
+      }))
+    }
+    this.handleConfigToggle = () => {
+      this.setState(({ showZuulClientConfig }) => ({
+        showZuulClientConfig: !showZuulClientConfig
+      }))
+    }
+  }
+
+  componentDidMount() {
+    const { user, userData } = this.props
+
+    // Make sure redux is synced with the userManager
+    const now = Date.now() / 1000
+    if (userData && userData.expires_at < now) {
+      console.log('Token expired, logging out')
+      this.props.signOut()
+      this.props.dispatch(userLoggedOut())
+    } else if (user.data !== userData) {
+      console.log('Restoring login from userManager')
+      this.props.dispatch(userLoggedIn(userData))
+    }
+  }
+
+  componentDidUpdate() {
+    const { user, tenant } = this.props
+
+    // Make sure the token is current and the tenant is up to date.
+    const now = Date.now() / 1000
+    if (user.data && user.data.expires_at < now) {
+      console.log('Token expired, logging out')
+      this.props.signOut()
+    } else if (user.data && user.tenant !== tenant.name) {
+      console.log('Refreshing ACL', user.tenant, tenant.name)
+      this.props.dispatch(fetchUserACL(tenant.name, user))
+    }
+  }
+
+  ZuulClientConfig() {
+    const { user, tenant } = this.props
+
+    let ZCconfig
+    ZCconfig = '[' + tenant.name + ']\n'
+    ZCconfig = ZCconfig + 'url=' + apiUrl.slice(0, -4) + '\n'
+    ZCconfig = ZCconfig + 'tenant=' + tenant.name + '\n'
+    ZCconfig = ZCconfig + 'auth_token=' + user.token + '\n'
+
+    return ZCconfig
+  }
+
+  renderModal() {
+    const { user, tenant, timezone } = this.props
+    const { isModalOpen, showZuulClientConfig } = this.state
+    let config = this.ZuulClientConfig(tenant, user.data)
+    let valid_until = moment.unix(user.data.expires_at).tz(timezone).format('YYYY-MM-DD HH:mm:ss')
+    return (
+      <React.Fragment>
+        <Modal
+          variant={ModalVariant.small}
+          title="User Info"
+          isOpen={isModalOpen}
+          onClose={this.handleModalToggle}
+          actions={[
+            <Button
+              key="SignOut"
+              variant="primary"
+              onClick={() => {
+                this.props.signOut()
+              }}
+              title="Note that you will be logged out of Zuul, but not out of your identity provider.">
+              Sign Out &nbsp;
+              <SignOutAltIcon title='Sign Out' />
+            </Button>
+          ]}
+        >
+          <div>
+            <p key="user">Name: <strong>{user.data.profile.name}</strong></p>
+            <p key="preferred_username">Logged in as: <strong>{user.data.profile.preferred_username}</strong>&nbsp;
+              {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) && (
+                <HatWizardIcon title='This user can perform admin tasks' />
+              )}</p>
+            <Accordion asDefinitionList>
+              <AccordionItem>
+                <AccordionToggle
+                  onClick={this.handleConfigToggle}
+                  isExpanded={showZuulClientConfig}
+                  title='Configuration parameters that can be used to perform tasks with the CLI'
+                  id="ZCConfig">
+                  Show Zuul Client Config
+                </AccordionToggle>
+                <AccordionContent
+                  isHidden={!showZuulClientConfig}>
+                  <ClipboardCopy isCode isReadOnly variant={ClipboardCopyVariant.expansion}>{config}</ClipboardCopy>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <p key="valid_until">Token expiry date: <strong>{valid_until}</strong></p>
+            <p key="footer">
+              Zuul stores and uses information such as your username
+              and your email to provide some features. This data is
+              stored <strong>in your browser only</strong> and is
+              discarded once you log out.
+            </p>
+          </div>
+        </Modal>
+      </React.Fragment>
+    )
+  }
+
+  renderButton(containerStyles) {
+
+    const { user } = this.props
+    if (!user.data) {
+      return (
+        <div style={containerStyles}>
+          <Button
+            key="SignIn"
+            variant={ButtonVariant.plain}
+            onClick={() => {
+              const redirect_target = window.location.href.slice(getHomepageUrl().length)
+              localStorage.setItem('zuul_auth_redirect', redirect_target)
+              this.props.signIn({ redirect_uri: getHomepageUrl() + 'auth_callback' })
+            }}>
+            Sign in &nbsp;
+            <SignInAltIcon title='Sign In' />
+          </Button>
+        </div>
+      )
+    } else {
+      return (user.data.isFetching ? <div style={containerStyles}>Loading...</div> :
+        <div style={containerStyles}>
+          {this.renderModal()}
+          <Button
+            variant={ButtonVariant.plain}
+            key="userinfo"
+            onClick={this.handleModalToggle}>
+            <UserIcon title='User details' />
+            &nbsp;{user.data.profile.preferred_username}&nbsp;
+          </Button>
+        </div>
+      )
+    }
+  }
+
+  render() {
+    const { info, auth } = this.props
+    const textColor = '#d1d1d1'
+    const containerStyles = {
+      color: textColor,
+      border: 'solid #2b2b2b',
+      borderWidth: '0 0 0 1px',
+      display: 'initial',
+      padding: '6px'
+    }
+
+    if (info.isFetching) {
+      return (<><div style={containerStyles}>Fetching auth info ...</div></>)
+    }
+    if (auth.info) {
+      return this.renderButton(containerStyles)
+    } else {
+      return (<div style={containerStyles} title="Authentication disabled">-</div>)
+    }
+  }
+}
+
+export default connect(state => ({
+  auth: state.auth,
+  user: state.user,
+  tenant: state.tenant,
+  timezone: state.timezone,
+  info: state.info,
+}))(withAuth(AuthContainer))

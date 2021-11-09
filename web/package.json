@@ -16,6 +16,8 @@
     "moment": "^2.22.2",
     "moment-duration-format": "2.3.2",
     "moment-timezone": "^0.5.28",
+    "oidc-client": "^1.10.1",
+    "oidc-react": "^1.5.1",
     "patternfly-react": "^2.39.16",
     "prop-types": "^15.6.2",
     "react": "^16.13.1",
