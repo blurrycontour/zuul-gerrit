@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cb6b26c_044dbddd",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-09T17:26:35Z",
+      "side": 1,
+      "message": "Do we actually want to wait for these events?  I\u0027m not sure it\u0027s actually worth it.  Maybe we should make this fire-and-forget in order to avoid a DoS issue with zuul-web?\n\nThis matches the current behavior, so I\u0027m not going to -1 this change, but I think we should go ahead and make a followup to do that.",
+      "revId": "0042a3995d206b406f3e16bd89af0f37c2992ca5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
