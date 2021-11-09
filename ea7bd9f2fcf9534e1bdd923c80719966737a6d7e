@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfb4c879_32f51823",
+        "filename": "zuul/lib/times.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-09T20:04:43Z",
+      "side": 1,
+      "message": "Why not remove these three methods and stop calling them in the scheduler?",
+      "revId": "ea7bd9f2fcf9534e1bdd923c80719966737a6d7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
