@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a106e695_1f79e908",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 882,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-09T20:57:53Z",
+      "side": 1,
+      "message": "Good catch, this is indeed a bug. This should be \n\n  return claims[\u0027zuul\u0027][\u0027admin\u0027]\n\nWe ensure this is a list and that this override of admin rules is allowed in zuul/driver/auth/jwt.py.\n\nI will add a test for this case in a follow-up.",
+      "range": {
+        "startLine": 881,
+        "startChar": 0,
+        "endLine": 882,
+        "endChar": 65
+      },
+      "revId": "020b4c4a3a301e9a8fb12f324391d3b46d24d163",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
