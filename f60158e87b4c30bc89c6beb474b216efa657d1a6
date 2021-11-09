@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1550c0c9_0df324cf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-11-09T13:28:41Z",
+      "side": 1,
+      "message": "Should this include object lifecycle too? For example, something like plantuml diagram could be helpful.",
+      "revId": "f60158e87b4c30bc89c6beb474b216efa657d1a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
