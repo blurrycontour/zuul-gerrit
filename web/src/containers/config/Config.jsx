@@ -90,7 +90,7 @@ class ConfigModal extends React.Component {
           ]}
         >
           <div>
-            <p key="info">User configurable settings are saved in browser local storage only.</p>
+            <p key="info">Application settings are saved in browser local storage only. They are applied whether authenticated or not.</p>
             <Switch
               key="autoreload"
               id="autoreload"

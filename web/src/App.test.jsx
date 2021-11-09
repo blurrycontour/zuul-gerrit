@@ -23,6 +23,7 @@ import configureStore from './store'
 import App from './App'
 import TenantsPage from './pages/Tenants'
 import StatusPage from './pages/Status'
+import ZuulAuthProvider from './ZuulAuthProvider'
 import * as api from './api'
 
 api.fetchInfo = jest.fn()
@@ -35,7 +36,10 @@ api.fetchConfigErrors.mockImplementation(() => Promise.resolve({data: []}))
 it('renders without crashing', () => {
   const store = configureStore()
   const div = document.createElement('div')
-  ReactDOM.render(<Provider store={store}><Router><App /></Router></Provider>,
+  ReactDOM.render(
+    <Provider store={store}>
+      <ZuulAuthProvider><Router><App /></Router></ZuulAuthProvider>
+    </Provider>,
     div)
   ReactDOM.unmountComponentAtNode(div)
 })
@@ -52,7 +56,9 @@ it('renders multi tenant', async () => {
   )
 
   const application = create(
-    <Provider store={store}><Router><App /></Router></Provider>
+    <Provider store={store}>
+      <ZuulAuthProvider><Router><App /></Router></ZuulAuthProvider>
+    </Provider>
   )
 
   await act(async () => {
@@ -88,7 +94,9 @@ it('renders single tenant', async () => {
   )
 
   const application = create(
-    <Provider store={store}><Router><App /></Router></Provider>
+    <Provider store={store}>
+      <ZuulAuthProvider><Router><App /></Router></ZuulAuthProvider>
+    </Provider>
   )
 
   await act(async () => {
