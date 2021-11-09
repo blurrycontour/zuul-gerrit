@@ -53,7 +53,6 @@ from zuul.model import (
     UnparsedAbideConfig,
     WebInfo,
 )
-import zuul.rpcclient
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, WebComponent
@@ -298,7 +297,6 @@ class ZuulWebAPI(object):
     log = logging.getLogger("zuul.web")
 
     def __init__(self, zuulweb):
-        self.rpc = zuulweb.rpc
         self.zk_client = zuulweb.zk_client
         self.system = ZuulSystem(self.zk_client)
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client,
@@ -1637,16 +1635,6 @@ class ZuulWeb(object):
         )
         self.hostname = socket.getfqdn()
 
-        gear_server = get_default(self.config, 'gearman', 'server')
-        gear_port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-
-        # instanciate handlers
-        self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
-                                            ssl_key, ssl_cert, ssl_ca,
-                                            client_id='Zuul Web Server')
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
@@ -1893,7 +1881,6 @@ class ZuulWeb(object):
     def stop(self):
         self.log.debug("ZuulWeb stopping")
         self.component_info.state = self.component_info.STOPPED
-        self.rpc.shutdown()
         cherrypy.engine.exit()
         # Not strictly necessary, but without this, if the server is
         # started again (e.g., in the unit tests) it will reuse the
