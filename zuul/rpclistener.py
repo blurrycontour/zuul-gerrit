@@ -149,8 +149,6 @@ class RPCListener(RPCListenerBase):
         'get_running_jobs',
         'tenant_list',
         'status_get',
-        'project_get',
-        'project_list',
         'pipeline_list',
         'key_get',
         'config_errors_list',
@@ -318,55 +316,6 @@ class RPCListener(RPCListenerBase):
                        '%d bytes', args.get("tenant"), end - start,
                        len(output))
         job.sendWorkComplete(output)
-
-    def handle_project_get(self, gear_job):
-        args = json.loads(gear_job.arguments)
-        tenant = self.sched.abide.tenants.get(args["tenant"])
-        if not tenant:
-            gear_job.sendWorkComplete(json.dumps(None))
-            return
-        trusted, project = tenant.getProject(args["project"])
-        if not project:
-            gear_job.sendWorkComplete(json.dumps({}))
-            return
-        result = project.toDict()
-        result['configs'] = []
-        configs = tenant.layout.getAllProjectConfigs(project.canonical_name)
-        for config_obj in configs:
-            config = config_obj.toDict()
-            config['pipelines'] = []
-            for pipeline_name, pipeline_config in sorted(
-                    config_obj.pipelines.items()):
-                pipeline = pipeline_config.toDict()
-                pipeline['name'] = pipeline_name
-                pipeline['jobs'] = []
-                for jobs in pipeline_config.job_list.jobs.values():
-                    job_list = []
-                    for job in jobs:
-                        job_list.append(job.toDict(tenant))
-                    pipeline['jobs'].append(job_list)
-                config['pipelines'].append(pipeline)
-            result['configs'].append(config)
-
-        gear_job.sendWorkComplete(json.dumps(result, cls=ZuulJSONEncoder))
-
-    def handle_project_list(self, job):
-        args = json.loads(job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        if not tenant:
-            job.sendWorkComplete(json.dumps(None))
-            return
-        output = []
-        for project in tenant.config_projects:
-            pobj = project.toDict()
-            pobj['type'] = "config"
-            output.append(pobj)
-        for project in tenant.untrusted_projects:
-            pobj = project.toDict()
-            pobj['type'] = "untrusted"
-            output.append(pobj)
-        job.sendWorkComplete(json.dumps(
-            sorted(output, key=lambda project: project["name"])))
 
     def handle_allowed_labels_get(self, job):
         args = json.loads(job.arguments)
