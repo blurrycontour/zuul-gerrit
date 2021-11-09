@@ -1140,17 +1140,17 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    def project_ssh_key(self, tenant, project):
-        job = self.rpc.submitJob('zuul:key_get', {'tenant': tenant,
-                                                  'project': project,
-                                                  'key': 'ssh'})
-        if not job.data:
-            raise cherrypy.HTTPError(
-                404, 'Project %s does not exist.' % project)
+    def project_ssh_key(self, tenant_name, project_name):
+        tenant = self._getTenantOrRaise(tenant_name)
+        _, project = tenant.getProject(project_name)
+        if not project:
+            raise cherrypy.HTTPError(404, "Project does not exist.")
+
+        key = f"{project.public_ssh_key}\n"
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
-        return job.data[0] + '\n'
+        return key
 
     def buildToDict(self, build, buildset=None):
         start_time = build.start_time
@@ -1685,8 +1685,8 @@ class ZuulWeb(object):
         route_map.connect('api', '/api/tenant/{tenant_name}/key/'
                           '{project_name:.*}.pub',
                           controller=api, action='key')
-        route_map.connect('api', '/api/tenant/{tenant}/'
-                          'project-ssh-key/{project:.*}.pub',
+        route_map.connect('api', '/api/tenant/{tenant_name}/'
+                          'project-ssh-key/{project_name:.*}.pub',
                           controller=api, action='project_ssh_key')
         route_map.connect('api', '/api/tenant/{tenant}/console-stream',
                           controller=api, action='console_stream')
