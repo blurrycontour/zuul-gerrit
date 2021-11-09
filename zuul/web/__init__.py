@@ -1092,19 +1092,10 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def labels(self, tenant):
-        job = self.rpc.submitJob('zuul:allowed_labels_get', {'tenant': tenant})
-        data = json.loads(job.data[0])
-        if data is None:
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
-        # TODO(jeblair): The first case can be removed after 3.16.0 is
-        # released.
-        if isinstance(data, list):
-            allowed_labels = data
-            disallowed_labels = []
-        else:
-            allowed_labels = data['allowed_labels']
-            disallowed_labels = data['disallowed_labels']
+    def labels(self, tenant_name):
+        tenant = self._getTenantOrRaise(tenant_name)
+        allowed_labels = tenant.allowed_labels or []
+        disallowed_labels = tenant.disallowed_labels or []
         labels = set()
         for launcher in self.zk_nodepool.getRegisteredLaunchers():
             labels.update(filter_allowed_disallowed(
@@ -1693,7 +1684,7 @@ class ZuulWeb(object):
         )
         route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
                           controller=api, action='pipelines')
-        route_map.connect('api', '/api/tenant/{tenant}/labels',
+        route_map.connect('api', '/api/tenant/{tenant_name}/labels',
                           controller=api, action='labels')
         route_map.connect('api', '/api/tenant/{tenant}/nodes',
                           controller=api, action='nodes')
