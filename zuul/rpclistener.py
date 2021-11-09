@@ -148,7 +148,6 @@ class RPCListener(RPCListenerBase):
         'project_get',
         'project_list',
         'config_errors_list',
-        'connection_list',
     ]
 
     def start(self):
@@ -371,10 +370,4 @@ class RPCListener(RPCListenerBase):
             output.append({
                 'source_context': err.key.context.toDict(),
                 'error': err.error})
-        job.sendWorkComplete(json.dumps(output))
-
-    def handle_connection_list(self, job):
-        output = []
-        for source in self.sched.connections.getSources():
-            output.append(source.connection.toDict())
         job.sendWorkComplete(json.dumps(output))
