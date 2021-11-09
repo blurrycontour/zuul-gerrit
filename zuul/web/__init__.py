@@ -346,7 +346,7 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, tenant_name)
+        self.isAuthorizedOrRaise(claims, tenant_name)
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
             msg % (claims['__zuul_uid_claim'], 'dequeue',
@@ -397,7 +397,7 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, tenant_name)
+        self.isAuthorizedOrRaise(claims, tenant_name)
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
             msg % (claims['__zuul_uid_claim'], 'enqueue',
@@ -473,7 +473,7 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, tenant_name)
+        self.isAuthorizedOrRaise(claims, tenant_name)
 
         body = cherrypy.request.json
         pipeline_name = body.get('pipeline')
@@ -533,7 +533,7 @@ class ZuulWebAPI(object):
             claims, token_error = self._auth_token_check()
             if token_error is not None:
                 return token_error
-            self.is_authorized(claims, tenant_name)
+            self.isAuthorizedOrRaise(claims, tenant_name)
             msg = 'User "%s" requesting "%s" on %s/%s'
             self.log.info(
                 msg % (claims['__zuul_uid_claim'], 'autohold',
@@ -679,7 +679,7 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, request.tenant)
+        self.isAuthorizedOrRaise(claims, request.tenant)
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
             msg % (claims['__zuul_uid_claim'], 'autohold-delete',
@@ -791,20 +791,36 @@ class ZuulWebAPI(object):
         resp.last_modified = self.zuulweb.start_time
         return ret
 
-    def is_authorized(self, claims, tenant):
+    def isAuthorizedOrRaise(self, claims, tenant_name):
+        tenant = self._getTenantOrRaise(tenant_name)
+        authorized = self._is_authorized(tenant, claims)
+        if not authorized:
+            raise cherrypy.HTTPError(403)
+
+    def _is_authorized(self, tenant, claims):
         # First, check for zuul.admin override
         override = claims.get('zuul', {}).get('admin', [])
         if (override == '*' or
-            (isinstance(override, list) and tenant in override)):
+            (isinstance(override, list) and tenant.name in override)):
             return True
-        # Next, get the rules for tenant
-        data = {'tenant': tenant, 'claims': claims}
-        # TODO: it is probably worth caching
-        job = self.rpc.submitJob('zuul:authorize_user', data)
-        user_authz = json.loads(job.data[0])
-        if not user_authz:
-            raise cherrypy.HTTPError(403)
-        return user_authz
+
+        for rule_name in tenant.authorization_rules:
+            rule = self.zuulweb.abide.admin_rules.get(rule_name)
+            if not rule:
+                self.log.error('Undefined rule "%s"', rule_name)
+                continue
+            self.log.debug('Applying rule "%s" from tenant "%s" to claims %s',
+                           rule_name, tenant.name, json.dumps(claims))
+            authorized = rule(claims, tenant)
+            if authorized:
+                if '__zuul_uid_claim' in claims:
+                    uid = claims['__zuul_uid_claim']
+                else:
+                    uid = json.dumps(claims)
+                self.log.info('%s authorized on tenant "%s" by rule "%s"',
+                              uid, tenant.name, rule_name)
+                return True
+        return False
 
     # TODO(mhu) deprecated, remove next version
     @cherrypy.expose
