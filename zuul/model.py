@@ -5176,11 +5176,13 @@ class Tag(Ref):
     def serialize(self):
         d = super().serialize()
         d["containing_branches"] = self.containing_branches
+        d["tag"] = self.tag
         return d
 
     def deserialize(self, data):
         super().deserialize(data)
         self.containing_branches = data.get("containing_branches")
+        self.tag = data.get("tag")
 
 
 class Change(Branch):
