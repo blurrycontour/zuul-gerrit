@@ -665,6 +665,22 @@ class TestGitlabDriver(ZuulTestCase):
                          self.getJobFromHistory('project-test').result)
         self.assertEqual('merged', A.state)
 
+    @simple_layout('layouts/merging-gitlab-squash-merge.yaml', driver='gitlab')
+    def test_merge_squash(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project1', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        # canMerge is validated
+        self.assertEqual(1, len(self.history))
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test').result)
+        self.assertEqual('merged', A.state)
+        self.assertTrue(A.squash_merge)
+
     @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab')
     def test_crd_dependent(self):
 

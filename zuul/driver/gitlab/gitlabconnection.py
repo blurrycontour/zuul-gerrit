@@ -431,7 +431,8 @@ class GitlabAPIClient():
         params = {}
         if method == "squash":
             params['squash'] = True
-        resp = self.put(self.baseurl + path, zuul_event_id=zuul_event_id)
+        resp = self.put(
+            self.baseurl + path, params, zuul_event_id=zuul_event_id)
         try:
             self._manage_error(*resp, zuul_event_id=zuul_event_id)
             if resp[0]['state'] != 'merged':
