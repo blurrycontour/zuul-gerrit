@@ -442,30 +442,24 @@ class ZuulWebAPI(object):
         event = EnqueueEvent(tenant.name, pipeline.name,
                              project.canonical_hostname, project.name,
                              change, ref=None, oldrev=None, newrev=None)
-        result = self.zuulweb.pipeline_management_events[tenant.name][
+        self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
-        self.log.debug("Waiting for enqueue")
-        res = result.wait(300)
-        self.log.debug("Enqueue complete")
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return res
+        return True
 
     def _enqueue_ref(self, tenant, project, pipeline, ref, oldrev, newrev):
         event = EnqueueEvent(tenant.name, pipeline.name,
                              project.canonical_hostname, project.name,
                              change=None, ref=ref, oldrev=oldrev,
                              newrev=newrev)
-        result = self.zuulweb.pipeline_management_events[tenant.name][
+        self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
-        self.log.debug("Waiting for enqueue")
-        res = result.wait(300)
-        self.log.debug("Enqueue complete")
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return res
+        return True
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -502,15 +496,12 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400, 'Unknown pipeline')
 
         event = PromoteEvent(tenant_name, pipeline_name, changes)
-        result = self.zuulweb.pipeline_management_events[tenant_name][
+        self.zuulweb.pipeline_management_events[tenant_name][
             pipeline_name].put(event)
-        self.log.debug("Waiting for promotion")
-        res = result.wait(300)
-        self.log.debug("Promotion complete")
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return res
+        return True
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
