@@ -39,6 +39,23 @@
       },
       "revId": "7477297f5f55b083a7f950887098c3b65ad46bf4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67cdc6d4_a4ab2624",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-10T14:06:19Z",
+      "side": 1,
+      "message": "Yep, that matches the tenant reconfig and works.",
+      "revId": "7477297f5f55b083a7f950887098c3b65ad46bf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
