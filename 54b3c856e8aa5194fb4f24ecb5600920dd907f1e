@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91fdcf93_0dcd1805",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-10T15:02:00Z",
+      "side": 1,
+      "message": "This change was squashed into https://review.opendev.org/c/zuul/zuul/+/734082",
+      "revId": "54b3c856e8aa5194fb4f24ecb5600920dd907f1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d88a998f_415ef709",
