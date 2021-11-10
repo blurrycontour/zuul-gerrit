@@ -34,7 +34,6 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
-from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.queue import NamedQueue
@@ -390,10 +389,6 @@ class Scheduler(threading.Thread):
             if executor_component.accepting_work:
                 executors_accepting += 1
 
-        for merger_component in self.component_registry.all("merger"):
-            if merger_component.state == BaseComponent.RUNNING:
-                mergers_online += 1
-
         # Get all builds so we can filter by state and zone
         for build_request in self.executor.executor_api.inState():
             zone_stats = zoned_executor_stats.setdefault(
@@ -445,18 +440,17 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.executors.online', executors_online)
 
         # Publish the merger stats
-        self.statsd.gauge('zuul.mergers.online', mergers_online)
+        for merger_component in self.component_registry.all("merger"):
+            if merger_component.state == BaseComponent.RUNNING:
+                mergers_online += 1
 
-        functions = getGearmanFunctions(self.rpc.gearworker.gearman)
-        functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        merge_queue = 0
-        merge_running = 0
-        for (name, (queued, running, registered)) in functions.items():
-            if name == 'merger:merge':
-                mergers_online = registered
-            if name.startswith('merger:'):
-                merge_queue += queued - running
-                merge_running += running
+        for merge_request in self.merger.merger_api.inState():
+            if merge_request.state == merge_request.REQUESTED:
+                merge_queue += 1
+            if merge_request.state == merge_request.RUNNING:
+                merge_running += 1
+
+        self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
