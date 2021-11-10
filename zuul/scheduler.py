@@ -1003,6 +1003,8 @@ class Scheduler(threading.Thread):
             else:
                 # We don't need the cache ltimes as the tenant was deleted
                 branch_cache_min_ltimes = None
+            loader.loadTPCs(self.abide, self.unparsed_abide,
+                            [tenant_name])
             tenant = loader.loadTenant(
                 self.abide, tenant_name, self.ansible_manager,
                 self.unparsed_abide, min_ltimes=min_ltimes,

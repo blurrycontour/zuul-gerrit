@@ -1238,6 +1238,75 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test3', result='SUCCESS', changes='2,1'),
         ], ordered=False)
 
+    def test_cross_scheduler_config_update(self):
+        # This is a regression test.  We observed duplicate entries in
+        # the TPC config cache when a second scheduler updates its
+        # layout.  This test performs a reconfiguration on one
+        # scheduler, then allows the second scheduler to process the
+        # change.
+
+        # Create the second scheduler.
+        self.waitUntilSettled()
+        self.createScheduler()
+        self.scheds[1].start()
+        self.waitUntilSettled()
+
+        # Create a change which will trigger a tenant configuration
+        # update.
+        in_repo_conf = textwrap.dedent(
+            """
+            - nodeset:
+                name: test-nodeset
+                nodes: []
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        X = self.fake_gerrit.addFakeChange('org/project1', 'master', 'X',
+                                           files=file_dict)
+        X.setMerged()
+
+        # Let the first scheduler process the reconfiguration.
+        with self.scheds[1].sched.run_handler_lock:
+            self.fake_gerrit.addEvent(X.getChangeMergedEvent())
+            self.waitUntilSettled(matcher=[self.scheds[0]])
+
+        # Wait for the second scheduler to update its config to match.
+        self.waitUntilSettled()
+
+        # Do the same process again.
+        X = self.fake_gerrit.addFakeChange('org/project1', 'master', 'X',
+                                           files=file_dict)
+        X.setMerged()
+        with self.scheds[1].sched.run_handler_lock:
+            self.fake_gerrit.addEvent(X.getChangeMergedEvent())
+            self.waitUntilSettled(matcher=[self.scheds[0]])
+
+        # And wait for the second scheduler again.  If we're re-using
+        # cache objects, we will have created duplicates at this
+        # point.
+        self.waitUntilSettled()
+
+        # Create a change which will perform a dynamic config update.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-testx
+                parent: common-config-test
+            - project:
+                check:
+                  jobs:
+                    - project-testx
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        with self.scheds[0].sched.run_handler_lock:
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[self.scheds[1]])
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-testx', result='SUCCESS', changes='3,1'),
+        ], ordered=False)
+
     def test_dynamic_template(self):
         # Tests that a project can't update a template in another
         # project.
