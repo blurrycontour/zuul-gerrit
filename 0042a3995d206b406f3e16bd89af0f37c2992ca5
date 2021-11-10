@@ -34,6 +34,24 @@
       "parentUuid": "0cb6b26c_044dbddd",
       "revId": "0042a3995d206b406f3e16bd89af0f37c2992ca5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b95fd0be_903adc11",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-10T09:04:12Z",
+      "side": 1,
+      "message": "I\u0027ve implemented this in a follow-up change 817363",
+      "parentUuid": "38caa995_01bc8cdc",
+      "revId": "0042a3995d206b406f3e16bd89af0f37c2992ca5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
