@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31951ee4_ffadeb24",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-10T08:25:27Z",
+      "side": 1,
+      "message": "I don\u0027t think we should return user supplied strings in a response as this might open the door for certain types of injection attacks.",
+      "revId": "be086ca80f6e9c99feeb6daa3b50d20a6572cfb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37a30774_6ec5e2c9",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1004,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-10T08:25:27Z",
+      "side": 1,
+      "message": "same here.",
+      "revId": "be086ca80f6e9c99feeb6daa3b50d20a6572cfb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
