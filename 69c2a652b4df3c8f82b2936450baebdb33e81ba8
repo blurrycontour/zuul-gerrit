@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36e7faa2_107879bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-11-10T14:47:39Z",
+      "side": 1,
+      "message": "Would it makes more sense to make the tenant parser works with a non empty TPCs in that situation?",
+      "revId": "69c2a652b4df3c8f82b2936450baebdb33e81ba8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
