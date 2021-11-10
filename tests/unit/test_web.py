@@ -2134,6 +2134,38 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
 
+    def test_tenant_authorizations_override(self):
+        """Test that user gets overriden tenant authz if allowed"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ],
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        req = self.get_url(
+            'api/tenant/tenant-one/authorizations',
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertTrue('zuul' in data)
+        self.assertTrue(data['zuul']['admin'], data)
+        self.asserTrue(data['zuul']['scope'] == ['tenant-one', ], data)
+        # change tenant
+        authz['zuul']['admin'] = ['tenant-whatever', ]
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        req = self.get_url(
+            'api/tenant/tenant-one/authorizations',
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertTrue('zuul' in data)
+        self.assertTrue(data['zuul']['admin'] is False, data)
+        self.asserTrue(data['zuul']['scope'] == ['tenant-one', ], data)
+
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
     config_file = 'zuul-admin-web-no-override.conf'
