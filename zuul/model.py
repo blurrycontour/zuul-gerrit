@@ -177,7 +177,11 @@ class ConfigurationErrorKey(object):
         else:
             elements.extend([None, None])
         elements.append(error_text)
-        self._hash = hash('|'.join([str(x) for x in elements]))
+
+        hasher = hashlib.sha256()
+        # Use json_dumps to strip any ZuulMark entries
+        hasher.update(json.dumps(elements).encode('utf8'))
+        self._hash = hasher.hexdigest()
 
     def serialize(self):
         return {
@@ -199,7 +203,7 @@ class ConfigurationErrorKey(object):
         return o
 
     def __hash__(self):
-        return self._hash
+        return hash(self._hash)
 
     def __ne__(self, other):
         return not self.__eq__(other)
