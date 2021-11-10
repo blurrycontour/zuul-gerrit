@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "edc4ebca_f674c213",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-10T06:37:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "f1192c2f_1109c143",
+      "revId": "ad6f41f88ccf9424f7f7b3bc08e5a465b0ecb840",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f7dbd412_641abb21",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Yeah you are probably right. The ZookeperError will be thrown by the BufferedShardReader but it will result in some kind of JSON exception as we are using the shard reader as the file-like object for json.loads()",
       "parentUuid": "f7dbd412_641abb21",
+      "revId": "ad6f41f88ccf9424f7f7b3bc08e5a465b0ecb840",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fbc1d5b_b1db42d6",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-10T06:37:36Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "87f2b55c_bc92e2c6",
       "revId": "ad6f41f88ccf9424f7f7b3bc08e5a465b0ecb840",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
