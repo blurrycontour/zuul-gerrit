@@ -189,6 +189,8 @@ class PipelineManager(metaclass=ABCMeta):
             if change is None:
                 source = self.sched.connections.getSource(key.connection_name)
                 change = source.getChangeByKey(key)
+                if change is None:
+                    self.log.error("Unable to resolve change from key %s", key)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
