@@ -39,10 +39,10 @@ class ZuulSystem(ZooKeeperBase):
             data, stat = self.kazoo_client.get(SYSTEM_ROOT)
         except NoNodeError:
             system_id = uuid.uuid4().hex
-            data = json.dumps({'system_id': system_id}).encode('utf8')
+            data = self._dictToBytes({'system_id': system_id})
             try:
                 self.kazoo_client.create(SYSTEM_ROOT, data)
             except NodeExistsError:
                 data, stat = self.kazoo_client.get(SYSTEM_ROOT)
 
-        self.system_id = json.loads(data.decode('utf8'))['system_id']
+        self.system_id = self._bytesToDict(data)['system_id']

@@ -22,7 +22,6 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
-from zuul.lib.jsonutil import json_dumps
 from zuul.model import HoldRequest, NodeRequest, Node
 from zuul.zk import ZooKeeperBase
 from zuul.zk.exceptions import LockException
@@ -128,7 +127,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
                 # launcher disappeared
                 continue
 
-            objs.append(Launcher.fromDict(json.loads(data.decode('utf8'))))
+            objs.append(Launcher.fromDict(self._bytesToDict(data)))
         return objs
 
     def getNodes(self, cached=False):
@@ -163,7 +162,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if not data:
             return None
 
-        d = json.loads(data.decode('utf8'))
+        d = self._bytesToDict(data)
         d['id'] = node
         return d
 
@@ -235,7 +234,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if not data:
             return None
 
-        obj = HoldRequest.fromDict(json.loads(data.decode('utf8')))
+        obj = HoldRequest.fromDict(self._bytesToDict(data))
         obj.id = hold_request_id
         obj.stat = stat
         return obj
@@ -461,7 +460,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         data = node_request.toDict()
 
         path = '{}/{:0>3}-'.format(self.REQUEST_ROOT, priority)
-        path = self.kazoo_client.create(path, json.dumps(data).encode('utf8'),
+        path = self.kazoo_client.create(path, self._dictToBytes(data),
                                         makepath=True, sequence=True)
         reqid = path.split("/")[-1]
         node_request.id = reqid
@@ -505,7 +504,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if not data:
             return None
 
-        json_data = json.loads(data.decode("utf-8"))
+        json_data = self._bytesToDict(data)
 
         obj = NodeRequest.fromDict(json_data)
         obj.id = node_request_id
@@ -551,7 +550,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         """
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
         self.kazoo_client.set(
-            path, json.dumps(node_request.toDict()).encode('utf8'),
+            path, self._dictToBytes(node_request.toDict()),
             version=node_request.stat.version)
 
     def updateNodeRequest(self, node_request, data=None):
@@ -564,7 +563,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if data is None:
             path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
             data, stat = self.kazoo_client.get(path)
-        data = json.loads(data.decode('utf8'))
+        data = self._bytesToDict(data)
         node_request.updateFromDict(data)
 
     def nodeCacheListener(self, event):
@@ -629,7 +628,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         :param Node node: The node to update.
         """
         path = '%s/%s' % (self.NODES_ROOT, node.id)
-        self.kazoo_client.set(path, json.dumps(node.toDict()).encode('utf8'))
+        self.kazoo_client.set(path, self._dictToBytes(node.toDict()))
 
     def updateNode(self, node, node_id):
         """
@@ -644,7 +643,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         node_path = '%s/%s' % (self.NODES_ROOT, node_id)
         node.id = node_id
         node_data, node_stat = self.kazoo_client.get(node_path)
-        node_data = json.loads(node_data.decode('utf8'))
+        node_data = self._bytesToDict(node_data)
         node.updateFromDict(node_data)
 
     def lockNode(self, node, blocking=True, timeout=None):
@@ -762,20 +761,11 @@ class ZooKeeperNodepool(ZooKeeperBase):
             if not node_data:
                 self.log.warning("Node ID %s has no data", nodeid)
                 continue
-            node_data = json.loads(node_data.decode('utf8'))
+            node_data = self._bytesToDict(node_data)
             if (node_data['state'] == zuul.model.STATE_HOLD and
                     node_data.get('hold_job') == identifier):
                 count += 1
         return count
-
-    @staticmethod
-    def _bytesToDict(data):
-        return json.loads(data.decode("utf-8"))
-
-    @staticmethod
-    def _dictToBytes(data):
-        # The custom json_dumps() will also serialize MappingProxyType objects
-        return json_dumps(data).encode("utf-8")
 
 
 class Launcher:

@@ -90,7 +90,7 @@ class BaseComponent(ZooKeeperBase):
                 return
 
             # Update the ZooKeeper node
-            content = json.dumps(self.content).encode("utf-8")
+            content = self._dictToBytes(self.content)
             try:
                 zstat = self.kazoo_client.set(
                     self.path, content, version=self._zstat.version
@@ -105,7 +105,7 @@ class BaseComponent(ZooKeeperBase):
             self.log.info("Registering component in ZooKeeper %s", path)
             self.path, self._zstat = self.kazoo_client.create(
                 path,
-                json.dumps(self.content).encode("utf-8"),
+                self._dictToBytes(self.content),
                 makepath=True,
                 ephemeral=True,
                 sequence=True,
@@ -255,7 +255,7 @@ class ComponentRegistry(ZooKeeperBase):
 
             # Perform an in-place update of the cached component (if any)
             component = self._cached_components.get(kind, {}).get(hostname)
-            d = json.loads(data.decode("utf-8"))
+            d = self._bytesToDict(data)
 
             self.log.info(
                 "Component %s %s updated: %s",

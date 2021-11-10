@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import time
 from contextlib import suppress
@@ -22,7 +21,6 @@ from enum import Enum
 from kazoo.exceptions import LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType
 
-from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import JobRequest
 from zuul.zk import ZooKeeperSimpleBase, sharding
@@ -554,15 +552,6 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                         "Unable to delete lock %s", path)
         except Exception:
             self.log.exception("Error cleaning up locks %s", self)
-
-    @staticmethod
-    def _bytesToDict(data):
-        return json.loads(data.decode("utf-8"))
-
-    @staticmethod
-    def _dictToBytes(data):
-        # The custom json_dumps() will also serialize MappingProxyType objects
-        return json_dumps(data).encode("utf-8")
 
     def _getParamsPath(self, uuid):
         return '/'.join([self.PARAM_ROOT, uuid])

@@ -252,17 +252,17 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         event_path = f"{self.event_root}/"
 
         side_channel_data = None
-        encoded_data = json.dumps(data).encode("utf-8")
+        encoded_data = self._dictToBytes(data)
         if (len(encoded_data) > sharding.NODE_BYTE_SIZE_LIMIT
             and 'event_data' in data):
             # Get a unique data node
             data_id = str(uuid.uuid4())
             data_root = f'{self.data_root}/{data_id}'
-            side_channel_data = json.dumps(data['event_data']).encode("utf-8")
+            side_channel_data = self._dictToBytes(data['event_data'])
             data = data.copy()
             del data['event_data']
             data['event_data_path'] = data_root
-            encoded_data = json.dumps(data).encode("utf-8")
+            encoded_data = self._dictToBytes(data)
 
             with sharding.BufferedShardWriter(
                     self.kazoo_client, data_root) as stream:
@@ -285,7 +285,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             # Load the event metadata
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
+                event = self._bytesToDict(data)
             except json.JSONDecodeError:
                 self.log.exception("Malformed event data in %s", path)
                 self._remove(path)
@@ -307,7 +307,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
                     continue
 
                 try:
-                    event_data = json.loads(side_channel_data)
+                    event_data = self._bytesToDict(side_channel_data)
                 except json.JSONDecodeError:
                     self.log.exception("Malformed side channel "
                                        "event data in %s",
@@ -325,7 +325,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             side_channel_path = None
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
+                event = self._bytesToDict(data)
                 side_channel_path = event.get('event_data_path')
             except json.JSONDecodeError:
                 pass
@@ -365,7 +365,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             path = "/".join((self.event_root, event_id))
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
+                event = self._bytesToDict(data)
             except json.JSONDecodeError:
                 self.log.exception("Malformed event data in %s", path)
                 self._remove(path)
@@ -430,7 +430,7 @@ class EventResultFuture(ZooKeeperSimpleBase):
         try:
             try:
                 data = self._read()
-                self.data = json.loads(data.decode("utf-8"))
+                self.data = self._bytesToDict(data)
             except json.JSONDecodeError:
                 self.log.exception(
                     "Malformed result data in %s", self._result_path
@@ -460,7 +460,7 @@ class JobResultFuture(EventResultFuture):
 
     def _read(self):
         result_node = self.kazoo_client.get(self._result_path)[0]
-        result = json.loads(result_node)
+        result = self._bytesToDict(result_node)
         self._result_data_path = result['result_data_path']
         with sharding.BufferedShardReader(
                 self.kazoo_client, self._result_data_path) as stream:
@@ -590,7 +590,7 @@ class ManagementEventQueue(ZooKeeperEventQueue):
         try:
             self.kazoo_client.set(
                 event.result_ref,
-                json.dumps(result_data).encode("utf-8"),
+                self._dictToBytes(result_data),
             )
         except NoNodeError:
             self.log.warning(f"No result node found for {event}; "

@@ -53,7 +53,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
             "extra_dirs_searched": list(extra_config_dirs),
             "ltime": ltime,
         }
-        payload = json.dumps(data).encode("utf8")
+        payload = self._dictToBytes(data)
         try:
             self.kazoo_client.set(self.root_path, payload)
         except NoNodeError:
@@ -236,6 +236,6 @@ class SystemConfigCache(ZooKeeperSimpleBase):
                 self.kazoo_client, self.conf_path
             ) as stream:
                 stream.truncate(0)
-                stream.write(json.dumps(data).encode("utf8"))
+                stream.write(self._dictToBytes(data))
             zstat = self.kazoo_client.exists(self.conf_path)
             unparsed_abide.ltime = zstat.last_modified_transaction_id

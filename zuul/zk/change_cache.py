@@ -201,7 +201,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         self._get(key, data_uuid, zstat)
 
     def _loadKey(self, data):
-        data = json.loads(data.decode("utf8"))
+        data = self._bytesToDict(data)
         key = ChangeKey.fromReference(data['key_reference'])
         return key, data['data_uuid']
 
@@ -319,12 +319,12 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def set(self, key, change, version=-1):
         data = self._dataFromChange(change)
-        raw_data = json.dumps(data).encode("utf8")
+        raw_data = self._dictToBytes(data)
 
         data_uuid = self._setData(raw_data)
         # Add the change_key info here mostly for debugging since the
         # hash is non-reversible.
-        cache_data = json.dumps(dict(
+        cache_data = self._dictToBytes(dict(
             data_uuid=data_uuid,
             key_reference=key.reference,
         ))
@@ -337,7 +337,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                         key, data_uuid, len(raw_data))
                     _, zstat = self.kazoo_client.create(
                         cache_path,
-                        cache_data.encode("utf8"),
+                        cache_data,
                         include_data=True)
                 else:
                     # Sanity check that we only have a single change instance
@@ -352,7 +352,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                         "Update cache key %s with data uuid %s len %s",
                         key, data_uuid, len(raw_data))
                     zstat = self.kazoo_client.set(
-                        cache_path, cache_data.encode("utf8"), version)
+                        cache_path, cache_data, version)
             except (BadVersionError, NodeExistsError, NoNodeError) as exc:
                 raise ConcurrentUpdateError from exc
 

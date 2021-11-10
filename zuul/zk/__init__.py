@@ -9,6 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import json
 import logging
 import time
 from abc import ABCMeta
@@ -22,6 +23,7 @@ from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 
 from zuul.lib.config import get_default
+from zuul.lib.jsonutil import json_dumps
 from zuul.zk.exceptions import NoClientException
 from zuul.zk.handler import PoolSequentialThreadingHandler
 
@@ -227,6 +229,15 @@ class ZooKeeperSimpleBase(metaclass=ABCMeta):
         if not self.client.client:
             raise NoClientException()
         return self.client.client
+
+    @staticmethod
+    def _bytesToDict(data):
+        return json.loads(data.decode("utf-8"))
+
+    @staticmethod
+    def _dictToBytes(data):
+        # The custom json_dumps() will also serialize MappingProxyType objects
+        return json_dumps(data).encode("utf-8")
 
 
 class ZooKeeperBase(ZooKeeperSimpleBase):
