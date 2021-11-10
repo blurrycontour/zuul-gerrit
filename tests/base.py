@@ -2193,7 +2193,8 @@ class FakeGitlabMergeRequest(object):
     def _updateTimeStamp(self):
         self.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
-    def getMergeRequestEvent(self, action, previous_labels=None):
+    def getMergeRequestEvent(self, action, previous_labels=None,
+                             discussions_resolved=None):
         name = 'gl_merge_request'
         data = {
             'object_kind': 'merge_request',
@@ -2220,6 +2221,10 @@ class FakeGitlabMergeRequest(object):
                 'previous': [{'title': label} for label in previous_labels],
                 'current': data['labels']
             }
+
+        if discussions_resolved is not None:
+            data['object_attributes']['blocking_discussions_resolved'] = \
+                discussions_resolved
         return (name, data)
 
     def getMergeRequestOpenedEvent(self):
@@ -2245,9 +2250,11 @@ class FakeGitlabMergeRequest(object):
             removed_files=removed_files,
             modified_files=modified_files)
 
-    def getMergeRequestApprovedEvent(self):
+    def getMergeRequestApprovedEvent(self, discussions_resolved=True):
         self.approved = True
-        return self.getMergeRequestEvent(action='approved')
+        return self.getMergeRequestEvent(
+            action='approved',
+            discussions_resolved=discussions_resolved)
 
     def getMergeRequestUnapprovedEvent(self):
         self.approved = False
