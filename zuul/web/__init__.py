@@ -369,12 +369,8 @@ class ZuulWebAPI(object):
             msg % (claims['__zuul_uid_claim'], 'dequeue',
                    tenant_name, project_name))
 
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if tenant is None:
-            raise cherrypy.HTTPError(400, f'Unknown tenant {tenant_name}')
-        _, project = tenant.getProject(project_name)
-        if project is None:
-            raise cherrypy.HTTPError(400, f'Unknown project {project_name}')
+        tenant = self._getTenantOrRaise(tenant_name)
+        project = self._getProjectOrRaise(project_name)
 
         body = cherrypy.request.json
         if 'pipeline' in body and (
@@ -419,12 +415,8 @@ class ZuulWebAPI(object):
             msg % (claims['__zuul_uid_claim'], 'enqueue',
                    tenant_name, project_name))
 
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if tenant is None:
-            raise cherrypy.HTTPError(400, f'Unknown tenant {tenant_name}')
-        _, project = tenant.getProject(project_name)
-        if project is None:
-            raise cherrypy.HTTPError(400, f'Unknown project {project_name}')
+        tenant = self._getTenantOrRaise(tenant_name)
+        project = self._getProjectOrRaise(tenant, project_name)
 
         body = cherrypy.request.json
         if 'pipeline' not in body:
@@ -500,9 +492,7 @@ class ZuulWebAPI(object):
             msg % (claims['__zuul_uid_claim'], 'promote',
                    tenant_name, pipeline_name))
 
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if tenant is None:
-            raise cherrypy.HTTPError(400, f'Unknown tenant {tenant_name}')
+        tenant = self._getTenantOrRaise(tenant_name)
 
         # Validate the pipeline so we can enqueue the event directly
         # in the pipeline management event queue and don't need to
@@ -576,13 +566,8 @@ class ZuulWebAPI(object):
             if count < 0:
                 raise cherrypy.HTTPError(400, "Count must be greater 0")
 
-            tenant = self.zuulweb.abide.tenants.get(tenant_name)
-            if not tenant:
-                raise cherrypy.HTTPError(400, f'Unknown tenant {tenant_name}')
-            _, project = tenant.getProject(project_name)
-            if not project:
-                raise cherrypy.HTTPError(
-                    400, f'Unknown project {project_name}')
+            tenant = self._getTenantOrRaise(tenant_name)
+            project = self._getProjectOrRaise(tenant, project_name)
 
             if jbody['change']:
                 ref_filter = project.source.getRefForChange(jbody['change'])
@@ -1012,6 +997,12 @@ class ZuulWebAPI(object):
         self.log.warning("Tenant %s isn't loaded", tenant_name)
         raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
 
+    def _getProjectOrRaise(self, tenant, project_name):
+        _, project = tenant.getProject(project_name)
+        if not project:
+            raise cherrypy.HTTPError(404, "Unknown project")
+        return project
+
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1032,11 +1023,7 @@ class ZuulWebAPI(object):
         content_type='application/json; charset=utf-8', handler=json_handler,
     )
     def jobs(self, tenant_name):
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if not tenant:
-            raise cherrypy.HTTPError(
-                404, f'Tenant {tenant_name} does not exist')
-
+        tenant = self._getTenantOrRaise(tenant_name)
         result = []
         for job_name in sorted(tenant.layout.jobs):
             desc = None
@@ -1091,11 +1078,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
     def job(self, tenant_name, job_name):
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if not tenant:
-            raise cherrypy.HTTPError(
-                404, f'Tenant {tenant_name} does not exist')
-
+        tenant = self._getTenantOrRaise(tenant_name)
         job_variants = tenant.layout.jobs.get(job_name)
         result = []
         for job in job_variants:
@@ -1109,11 +1092,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def projects(self, tenant_name):
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if not tenant:
-            raise cherrypy.HTTPError(
-                404, f'Tenant {tenant_name} does not exist')
-
+        tenant = self._getTenantOrRaise(tenant_name)
         result = []
         for project in tenant.config_projects:
             pobj = project.toDict()
@@ -1133,15 +1112,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
     def project(self, tenant_name, project_name):
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        if not tenant:
-            raise cherrypy.HTTPError(
-                404, f'Tenant {tenant_name} does not exist')
-
-        _, project = tenant.getProject(project_name)
-        if not project:
-            raise cherrypy.HTTPError(
-                404, f'Project {project_name} does not exist')
+        tenant = self._getTenantOrRaise(tenant_name)
+        project = self._getProjectOrRaise(tenant, project_name)
 
         result = project.toDict()
         result['configs'] = []
@@ -1236,9 +1208,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     def key(self, tenant_name, project_name):
         tenant = self._getTenantOrRaise(tenant_name)
-        _, project = tenant.getProject(project_name)
-        if not project:
-            raise cherrypy.HTTPError(404, "Project does not exist.")
+        project = self._getProjectOrRaise(tenant, project_name)
+
         key = encryption.serialize_rsa_public_key(project.public_secrets_key)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -1249,9 +1220,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     def project_ssh_key(self, tenant_name, project_name):
         tenant = self._getTenantOrRaise(tenant_name)
-        _, project = tenant.getProject(project_name)
-        if not project:
-            raise cherrypy.HTTPError(404, "Project does not exist.")
+        project = self._getProjectOrRaise(tenant, project_name)
 
         key = f"{project.public_ssh_key}\n"
         resp = cherrypy.response
@@ -1501,15 +1470,11 @@ class ZuulWebAPI(object):
     def _freeze_jobs(self, tenant_name, pipeline_name, project_name,
                      branch_name):
 
-        tenant = self.zuulweb.abide.tenants.get(tenant_name)
-        project = None
-        pipeline = None
-
-        if tenant:
-            _, project = tenant.getProject(project_name)
-            pipeline = tenant.layout.pipelines.get(pipeline_name)
-        if not project or not pipeline:
-            raise cherrypy.HTTPError(404)
+        tenant = self._getTenantOrRaise(tenant_name)
+        project = self._getProjectOrRaise(tenant, project_name)
+        pipeline = tenant.layout.pipelines.get(pipeline_name)
+        if not pipeline:
+            raise cherrypy.HTTPError(404, 'Unknown pipeline')
 
         change = Branch(project)
         change.branch = branch_name or "master"
