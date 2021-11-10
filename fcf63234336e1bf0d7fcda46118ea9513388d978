@@ -16,6 +16,23 @@
       "message": "It\u0027s not obvious if repr could be used before a name is assigned, would it be safer to add a class name \u003d \"N/A\" attribute to prevent unexpected AttributeError exception on repr() call?",
       "revId": "fcf63234336e1bf0d7fcda46118ea9513388d978",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63fffcce_edd1a2ba",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1904,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-10T23:33:40Z",
+      "side": 1,
+      "message": "I think I\u0027d prefer a getattr for that, just to avoid masking any errors that might dereference it before it\u0027s set (obviously, this one is okay, but somewhere else using object.name without it being set could be a serious bug).",
+      "revId": "fcf63234336e1bf0d7fcda46118ea9513388d978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
