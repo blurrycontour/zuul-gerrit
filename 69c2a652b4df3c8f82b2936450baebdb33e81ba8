@@ -16,6 +16,23 @@
       "message": "Would it makes more sense to make the tenant parser works with a non empty TPCs in that situation?",
       "revId": "69c2a652b4df3c8f82b2936450baebdb33e81ba8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2fbbb72_cc993ffb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-10T16:10:46Z",
+      "side": 1,
+      "message": "Maybe, or it may be easier to do something like Clark suggested and incorporate the clearing into the loading.",
+      "revId": "69c2a652b4df3c8f82b2936450baebdb33e81ba8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
