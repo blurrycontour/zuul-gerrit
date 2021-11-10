@@ -16,6 +16,24 @@
       "message": "nit: I think we\u0027re only adding the sql argument to avoid the null dereference here.  We probably could just wrap this in an \"if sched\" and keep things simpler?",
       "revId": "215445f34437518496bf5cd904f60ca1952ea32b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e2c57c_64e075c4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-10T08:39:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8c2b0c1_84636ebf",
+      "revId": "215445f34437518496bf5cd904f60ca1952ea32b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
