@@ -19,6 +19,7 @@ import { connect } from 'react-redux'
 
 import { AuthProvider } from 'oidc-react'
 import { userLoggedIn, userLoggedOut } from './actions/user'
+import { getHomepageUrl } from './api'
 
 
 class ZuulAuthProvider extends React.Component {
@@ -59,6 +60,7 @@ class ZuulAuthProvider extends React.Component {
       },
       responseType: 'token id_token',
       autoSignIn: false,
+      silentRedirectUri: getHomepageUrl() + 'auth_callback',
       ...auth_params,
     }
     return (

@@ -56,6 +56,7 @@ class AuthContainer extends React.Component {
     signIn: PropTypes.func,
     signOut: PropTypes.func,
     userData: PropTypes.object,
+    userManager: PropTypes.object,
   }
 
   constructor(props) {
@@ -77,8 +78,14 @@ class AuthContainer extends React.Component {
   }
 
   componentDidMount() {
-    const { user, userData } = this.props
-
+    const { user, userData, userManager } = this.props
+    // Silent reload if we know we're already logged in
+    const doSilentSignin = localStorage.getItem('do_silent_signin')
+    if (doSilentSignin && !user.data) {
+      userManager.signinSilent().then((u) => {
+        this.props.dispatch(userLoggedIn(u))
+      })
+    }
     // Make sure redux is synced with the userManager
     const now = Date.now() / 1000
     if (userData && userData.expires_at < now) {
@@ -93,7 +100,6 @@ class AuthContainer extends React.Component {
 
   componentDidUpdate() {
     const { user, tenant } = this.props
-
     // Make sure the token is current and the tenant is up to date.
     const now = Date.now() / 1000
     if (user.data && user.data.expires_at < now) {

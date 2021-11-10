@@ -32,6 +32,7 @@ export default (state = {
 }, action) => {
   switch (action.type) {
     case USER_LOGGED_IN: {
+      localStorage.setItem('do_silent_signin', true)
       return {
         isFetching: false,
         data: action.user,
@@ -41,6 +42,7 @@ export default (state = {
       }
     }
     case USER_LOGGED_OUT:
+      localStorage.setItem('do_silent_signin', false)
       return {
         isFetching: false,
         data: null,
