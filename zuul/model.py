@@ -1899,6 +1899,9 @@ class FrozenJob(zkobject.ZKObject):
                            'parent_data',
                            )
 
+    def __repr__(self):
+        return '<FrozenJob %s>' % (self.name)
+
     @classmethod
     def new(klass, context, **kw):
         obj = klass()
