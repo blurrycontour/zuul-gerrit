@@ -33,6 +33,23 @@
       "message": "I think I\u0027d prefer a getattr for that, just to avoid masking any errors that might dereference it before it\u0027s set (obviously, this one is okay, but somewhere else using object.name without it being set could be a serious bug).",
       "revId": "fcf63234336e1bf0d7fcda46118ea9513388d978",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87a875f9_0bc3d1ac",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1904,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-10T23:35:24Z",
+      "side": 1,
+      "message": "Actually, on second thought, I think it isn\u0027t possible for name to be unset since these are always created from Jobs which have names.  So this is probably safe enough.",
+      "revId": "fcf63234336e1bf0d7fcda46118ea9513388d978",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
