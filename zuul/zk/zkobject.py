@@ -187,12 +187,25 @@ class ZKObject:
                 context.log.exception(
                     "Exception loading ZKObject %s, will retry", self)
                 time.sleep(5)
+            except Exception:
+                # A higher level must handle this exception, but log
+                # ourself here so we know what object triggered it.
+                context.log.error(
+                    "Exception loading ZKObject %s", self)
+                raise
         raise Exception("ZooKeeper session or lock not valid")
 
     def _save(self, context, create=False):
         if isinstance(context, LocalZKContext):
             return
-        data = self.serialize()
+        try:
+            data = self.serialize()
+        except Exception:
+            # A higher level must handle this exception, but log
+            # ourself here so we know what object triggered it.
+            context.log.error(
+                "Exception serializing ZKObject %s", self)
+            raise
         path = self.getPath()
         while context.sessionIsValid():
             try:
@@ -254,6 +267,10 @@ class ShardedZKObject(ZKObject):
                     "Exception loading ZKObject %s, will retry", self)
                 time.sleep(5)
             except Exception as exc:
+                # A higher level must handle this exception, but log
+                # ourself here so we know what object triggered it.
+                context.log.error(
+                    "Exception loading ZKObject %s", self)
                 self.delete(context)
                 raise InvalidObjectError from exc
         raise Exception("ZooKeeper session or lock not valid")
@@ -261,7 +278,14 @@ class ShardedZKObject(ZKObject):
     def _save(self, context, create=False):
         if isinstance(context, LocalZKContext):
             return
-        data = self.serialize()
+        try:
+            data = self.serialize()
+        except Exception:
+            # A higher level must handle this exception, but log
+            # ourself here so we know what object triggered it.
+            context.log.error(
+                "Exception serializing ZKObject %s", self)
+            raise
         path = self.getPath()
         while context.sessionIsValid():
             try:
