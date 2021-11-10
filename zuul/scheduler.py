@@ -16,6 +16,7 @@
 # under the License.
 
 import logging
+import random
 import socket
 import sys
 import threading
@@ -1611,6 +1612,12 @@ class Scheduler(threading.Thread):
             self.log.debug("Statsd enabled")
         else:
             self.log.debug("Statsd not configured")
+
+        # Create a seeded shuffle function for this scheduler instance. This
+        # will be used for shuffling the list of tenants in order to avoid
+        # follow-effects with multiple schedulers.
+        seeded_shuffle = random.Random(random.random()).shuffle
+
         while True:
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
@@ -1627,7 +1634,11 @@ class Scheduler(threading.Thread):
                 if self.unparsed_abide.ltime < self.system_config_cache.ltime:
                     self.updateSystemConfig()
 
-                for tenant_name in self.unparsed_abide.tenants:
+                tenant_list = list(self.unparsed_abide.tenants)
+                # Shuffle the list of tenant names to avoid follow-effects
+                # with multiple schedulers.
+                seeded_shuffle(tenant_list)
+                for tenant_name in tenant_list:
                     if self._stopped:
                         break
 
