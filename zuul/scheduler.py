@@ -17,6 +17,7 @@
 
 import json
 import logging
+import random
 import socket
 import sys
 import threading
@@ -1600,7 +1601,11 @@ class Scheduler(threading.Thread):
                 if self.unparsed_abide.ltime < self.system_config_cache.ltime:
                     self.updateSystemConfig()
 
-                for tenant_name in self.unparsed_abide.tenants:
+                tenant_list = list(self.unparsed_abide.tenants)
+                # Shuffle the list of tenant names so we avoid
+                # "follow-effects" with multiple schedulers.
+                random.shuffle(tenant_list)
+                for tenant_name in tenant_list:
                     if self._stopped:
                         break
 
