@@ -16,6 +16,29 @@
       "message": "Callpath seems to be: \n\n scheduler.run()\n   scheduler.updateTenantLayout()\n     loader.loadTPCs()\n       tenant_parser.loadTenantProjects()\n         creates new TPC objects on the abide with empty\n         parsed_branch_config dicts.\n     loader.loadTenant()\n       TenantParser.fromYaml()\n         tenant.addConfigProject()/tenant.addUntrustedProject()\n           tenant._addProject()\n             populates tenant.project_configs dict with TPC objects created\n             by loader.loadTPCs()\n         TenantParser.cacheConfig()\n           ParsedConfig from above parsed_branch_config is appended to. \n           Without the loadTPCs the append creates duplicate entries\n           on the existing parsed_branch_config entries as they were not\n           reset.\n\nThen sometime later we call loader._loadDynamicProjectData() which relies\non the cacheConfig() not containing duplicates.\n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/configloader.py#L2058 is where we append. For belts and suspenders or an alternate fix should we consider having cacheConfig() clear out the parsed_branch_config dicts on the TPC objects before updating them with appends?",
       "revId": "7477297f5f55b083a7f950887098c3b65ad46bf4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05e8d866_37cc600f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-10T06:09:46Z",
+      "side": 1,
+      "message": "I think this should be\n\n    loader.loadTPCs(self.abide, self.unparsed_abide, [tenant_name])",
+      "range": {
+        "startLine": 1006,
+        "startChar": 12,
+        "endLine": 1006,
+        "endChar": 60
+      },
+      "revId": "7477297f5f55b083a7f950887098c3b65ad46bf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
