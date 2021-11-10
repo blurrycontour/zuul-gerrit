@@ -418,7 +418,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if item.current_build_set.unable_to_merge:
                     item.setUnableToMerge()
                 if item.current_build_set.config_errors:
-                    item.setConfigErrors(item.current_build_set.config_errors)
+                    item.setConfigErrors(item.getConfigErrors())
                 if item.dequeued_needing_change:
                     item.setDequeuedNeedingChange()
 
