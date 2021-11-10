@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dad18090_114b5e38",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-10T22:52:00Z",
+      "side": 1,
+      "message": "This seems to be a method on item not current_build_set: https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L4200-L4203",
+      "range": {
+        "startLine": 422,
+        "startChar": 47,
+        "endLine": 422,
+        "endChar": 62
+      },
+      "revId": "a28331b77c710547393f5c00e4f47d4e79ba6d19",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
