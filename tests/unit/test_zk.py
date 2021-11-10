@@ -20,6 +20,7 @@ import uuid
 import testtools
 
 from zuul import model
+from zuul.lib import yamlutil as yaml
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.branch_cache import BranchCache
@@ -1742,3 +1743,38 @@ class TestBranchCache(ZooKeeperBaseTestCase):
             sorted(cache.getProjectBranches('project1', False)),
             data1['project1']['all']
         )
+
+
+class TestConfigurationErrorList(ZooKeeperBaseTestCase):
+    def test_config_error_list(self):
+        stop_event = threading.Event()
+        self.zk_client.client.create('/zuul/pipeline', makepath=True)
+
+        source_context = model.SourceContext(
+            'cname', 'project', 'connection', 'branch', 'test', True)
+
+        m1 = yaml.Mark('name', 0, 0, 0, '', 0)
+        m2 = yaml.Mark('name', 1, 0, 0, '', 0)
+        start_mark = model.ZuulMark(m1, m2, 'hello')
+
+        # Create a new object
+        with tenant_write_lock(self.zk_client, 'test') as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            pipeline = DummyZKObject.new(context, name="test", foo="bar")
+            e1 = model.ConfigurationError(
+                source_context, start_mark, "Test error1")
+            e2 = model.ConfigurationError(
+                source_context, start_mark, "Test error2")
+            with pipeline.activeContext(context):
+                path = '/zuul/pipeline/test/errors'
+                el1 = model.ConfigurationErrorList.new(
+                    context, errors=[e1, e2], _path=path)
+
+            el2 = model.ConfigurationErrorList.fromZK(
+                context, path, _path=path)
+            self.assertEqual(el1.errors, el2.errors)
+            self.assertFalse(el1 is el2)
+            self.assertEqual(el1.errors[0], el2.errors[0])
+            self.assertEqual(el1.errors[0], e1)
+            self.assertNotEqual(e1, e2)
+            self.assertEqual([e1, e2], [e1, e2])

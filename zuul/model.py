@@ -140,7 +140,7 @@ class ZuulMark:
             "end_index": self.end_index,
             "column": self.column,
             "end_column": self.end_column,
-            "snipped": self.snippet,
+            "snippet": self.snippet,
         }
 
     @classmethod
@@ -233,6 +233,16 @@ class ConfigurationError(object):
         o = cls.__new__(cls)
         o.__dict__.update(data)
         return o
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, ConfigurationError):
+            return False
+        return (self.error == other.error and
+                self.short_error == other.short_error and
+                self.key == other.key)
 
 
 class ConfigurationErrorList(zkobject.ShardedZKObject):
@@ -3458,7 +3468,7 @@ class BuildSet(zkobject.ZKObject):
             dependent_changes=None,
             merger_items=None,
             unable_to_merge=False,
-            config_errors=[],  # list of ConfigurationErrors
+            config_errors=None,  # ConfigurationErrorList or None
             failing_reasons=[],
             debug_messages=[],
             warning_messages=[],
@@ -3627,11 +3637,13 @@ class BuildSet(zkobject.ZKObject):
         if config_errors:
             if (self.config_errors and
                 self.config_errors._path == config_errors):
-                data['config_errors'] == self.config_errors
+                data['config_errors'] = self.config_errors
             else:
                 data['config_errors'] = ConfigurationErrorList.fromZK(
                     context, data['config_errors'],
                     _path=data['config_errors'])
+        else:
+            data['config_errors'] = None
 
         # Job graphs are immutable
         if self.job_graph is not None:
@@ -4652,13 +4664,13 @@ class QueueItem(zkobject.ZKObject):
         # The manager may call us with the same errors object to
         # trigger side effects of setting jobs to 'skipped'.
         if (self.current_build_set.config_errors and
-            errors is not self.current_build_set.config_errors):
+            self.current_build_set.config_errors != errors):
             # TODO: This is not expected, but if it happens we should
             # look into cleaning up leaked config_errors objects in
             # zk.
             self.log.warning("Differing config errors set on item %s",
                              self)
-        if errors is not self.current_build_set.config_errors:
+        if self.current_build_set.config_errors != errors:
             with self.current_build_set.activeContext(
                     self.pipeline.manager.current_context):
                 self.current_build_set.setConfigErrors(errors)
