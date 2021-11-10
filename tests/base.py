@@ -5175,7 +5175,7 @@ class ZuulTestCase(BaseTestCase):
         repo.head.reset(working_tree=True)
         repo.delete_head(repo.heads[branch], force=True)
 
-    def create_commit(self, project, files=None, head='master',
+    def create_commit(self, project, files=None, delete_files=None, head='master',
                       message='Creating a fake commit', **kwargs):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
@@ -5188,6 +5188,13 @@ class ZuulTestCase(BaseTestCase):
             with open(file_name, 'a') as f:
                 f.write(content)
             repo.index.add([file_name])
+
+        delete_files = delete_files or []
+        for name in delete_files:
+            file_name = os.path.join(path, name)
+            os.remove(file_name)
+            repo.index.add([file_name])
+
         commit = repo.index.commit(message, **kwargs)
         return commit.hexsha
 
