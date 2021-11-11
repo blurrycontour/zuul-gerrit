@@ -5399,6 +5399,19 @@ class ZuulTestCase(BaseTestCase):
             return False
         return True
 
+    def __areAllBuildsScheduled(self, matcher):
+        for app in self.scheds.filter(matcher):
+            for tenant in app.sched.abide.tenants.values():
+                for pipeline in tenant.layout.pipelines.values():
+                    for item in pipeline.getAllItems():
+                        for build in item.current_build_set.builds.values():
+                            if not build.uuid or build.job.name == 'noop':
+                                continue
+                            if not build.scheduled:
+                                self.log.warning('Build %s not scheduled', build)
+                                return False
+        return True
+
     def __areAllBuildsWaiting(self):
         # Look up the queued build requests directly from ZooKeeper
         queued_build_requests = list(self.executor_api.all())
@@ -5548,6 +5561,7 @@ class ZuulTestCase(BaseTestCase):
                                  self.scheds.filter(matcher)):
                     sched.run_handler_lock.acquire()
                 if (self.__areAllSchedulersPrimed(matcher) and
+                    self.__areAllBuildsScheduled(matcher) and
                     self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported() and
                     self.__areAllBuildsWaiting() and

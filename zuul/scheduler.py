@@ -277,6 +277,7 @@ class Scheduler(threading.Thread):
         self.component_info.state = self.component_info.STOPPED
         self.times.stop()
         self.nodepool.stop()
+        self.executor.stop()
         self.stop_event.set()
         self.stopConnections()
         self.wake_event.set()

@@ -13,7 +13,9 @@
 # under the License.
 
 import logging
+import threading
 import time
+from queue import Queue
 from uuid import uuid4
 
 import zuul.executor.common
@@ -44,7 +46,53 @@ class ExecutorClient(object):
             self.sched.zk_client
         )
 
+        self._stopped = False
+        self.build_request_queue = Queue()
+        self.build_request_thread = threading.Thread(
+            name=self.__class__.__name__,
+            target=self._run_build_request_thread, daemon=True
+        )
+        self.build_request_thread.start()
+
+    def _run_build_request_thread(self):
+        while True:
+            if self._stopped:
+                return
+
+            try:
+                args = self.build_request_queue.get()
+                if args is None:
+                    return
+
+                request, params, build, item, job = args
+
+                # It could be that the build is already canceled. In this case
+                # don't push it to zookeeper.
+                if build.canceled:
+                    continue
+
+                try:
+                    self.executor_api.submit(request, params)
+                    build.build_request_ref = request.path
+                    build.scheduled = True
+                except Exception:
+                    self.log.exception('Exception while submitting job request')
+                    try:
+                        # If we hit an exception we don't have a build in the
+                        # current item so a potentially aquired semaphore must be
+                        # released as it won't be released on dequeue of the item.
+                        tenant = item.pipeline.tenant
+                        tenant.semaphore_handler.release(item, job)
+                    except Exception:
+                        self.log.exception("Exception while releasing semaphore")
+            except Exception:
+                self.log.exception('Error while scheduling build request')
+            finally:
+                self.build_request_queue.task_done()
+
     def stop(self):
+        self._stopped = True
+        self.build_request_queue.put(None)
         self.log.debug("Stopping")
 
     def execute(self, job, nodes, item, pipeline, executor_zone,
@@ -133,8 +181,7 @@ class ExecutorClient(object):
             event_id=item.event.zuul_event_id,
             precedence=PRIORITY_MAP[pipeline.precedence]
         )
-        self.executor_api.submit(request, params)
-        build.build_request_ref = request.path
+        self.build_request_queue.put((request, params, build, item, job))
 
     def cancel(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,

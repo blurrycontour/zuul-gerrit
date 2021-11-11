@@ -2307,6 +2307,9 @@ class Build(object):
         self.worker = Worker()
         self.zuul_event_id = zuul_event_id
 
+        # Only used for test case syncing
+        self.scheduled = False
+
         self.build_request_ref = None
 
     def __repr__(self):
