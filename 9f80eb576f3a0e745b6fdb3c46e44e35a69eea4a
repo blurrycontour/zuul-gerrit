@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b641d5db_d8892145",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-11T08:34:35Z",
+      "side": 1,
+      "message": "I like the idea of having pagination support in zuul-web. I\u0027ve made a similar change https://review.opendev.org/c/zuul/zuul/+/746328/3/zuul/driver/sql/sqlconnection.py a long time ago (with a follow up that includes the pagination in the frontend). However, the drawback was the performance of the SQL query which resulted in much longer query durations (at least in our setup). I\u0027m not sure how to tackle this but I think this will be the main blocker for a pagination.",
+      "revId": "9f80eb576f3a0e745b6fdb3c46e44e35a69eea4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
