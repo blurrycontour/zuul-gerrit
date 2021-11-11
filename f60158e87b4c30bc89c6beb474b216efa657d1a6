@@ -16,6 +16,23 @@
       "message": "Should this include object lifecycle too? For example, something like plantuml diagram could be helpful.",
       "revId": "f60158e87b4c30bc89c6beb474b216efa657d1a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3d86ac6_de61a7b7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-11T22:25:50Z",
+      "side": 1,
+      "message": "That wouldn\u0027t be a bad idea, but my primary aim is to help us keep the zookeeper paths straight.  I think the object lifecycle is orthogonal to that.",
+      "revId": "f60158e87b4c30bc89c6beb474b216efa657d1a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
