@@ -165,9 +165,15 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         # Pass the event to the scheduler
         self.sched.addTriggerEvent(self.driver_name, event)
 
-    def onLoad(self):
+    def onLoad(self, zk_client):
         self.log.debug("Creating Zookeeper change cache")
-        self._change_cache = GitChangeCache(self.sched.zk_client, self)
+        self._change_cache = GitChangeCache(zk_client, self)
+
+        # If the connection was not loaded by a scheduler, but by e.g.
+        # zuul-web, we want to stop here.
+        if not self.sched:
+            return
+
         self.log.debug("Starting Git Watcher")
         self._start_watcher_thread()
 

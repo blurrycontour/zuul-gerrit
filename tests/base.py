@@ -4366,6 +4366,7 @@ class SchedulerTestApp:
 
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
+            self.connections.load(self.sched.zk_client)
 
         # TODO (swestphahl): Can be removed when we no longer use global
         # management events.

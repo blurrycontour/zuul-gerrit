@@ -290,7 +290,7 @@ class SQLConnection(BaseConnection):
             else:
                 alembic.command.upgrade(config, 'head', tag=tag)
 
-    def onLoad(self):
+    def onLoad(self, zk_client=None):
         while True:
             try:
                 self._migrate()

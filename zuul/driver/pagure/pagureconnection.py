@@ -492,16 +492,29 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             r"^\*\*Metadata Update", re.MULTILINE)
         self.sched = None
 
-    def onLoad(self):
+    def onLoad(self, zk_client):
         self.log.info('Starting Pagure connection: %s', self.connection_name)
+
+        # Set the project branch cache to read only if no scheduler is
+        # provided to prevent fetching the branches from the connection.
+        self.read_only = not self.sched
+
+        self.log.debug('Creating Zookeeper branch cache')
+        self._branch_cache = BranchCache(zk_client, self)
+
         self.log.info('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(
-            self.sched.zk_client, self.connection_name
+            zk_client, self.connection_name
         )
+
+        # If the connection was not loaded by a scheduler, but by e.g.
+        # zuul-web, we want to stop here.
+        if not self.sched:
+            return
+
         self.log.debug('Creating Zookeeper change cache')
-        self._change_cache = PagureChangeCache(self.sched.zk_client, self)
-        self.log.debug('Creating Zookeeper branch cache')
-        self._branch_cache = BranchCache(self.sched.zk_client, self)
+        self._change_cache = PagureChangeCache(zk_client, self)
+
         self.log.info('Starting event connector')
         self._start_event_connector()
 
