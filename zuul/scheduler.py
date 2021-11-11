@@ -764,6 +764,7 @@ class Scheduler(threading.Thread):
             self.updateSystemConfig()
         else:
             self.log.info("Creating initial system config")
+            # This verifies the voluptuous schema
             self.primeSystemConfig()
 
         loader = configloader.ConfigLoader(
@@ -798,6 +799,7 @@ class Scheduler(threading.Thread):
                         # we don't have a layout state.
                         branch_cache_min_ltimes = defaultdict(lambda: -1)
 
+                    # This load validates the entire tenant config
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1050,14 +1052,12 @@ class Scheduler(threading.Thread):
                 self.connections, self.zk_client, self.globals, self.statsd,
                 self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
-            unparsed_abide = loader.readConfig(tenant_config,
-                                               from_script=script)
-
+            unparsed_abide = loader.readConfig(
+                tenant_config,
+                from_script=script,
+                tenants_to_validate=tenants_to_validate)
             available_tenants = list(unparsed_abide.tenants)
             tenants_to_load = tenants_to_validate or available_tenants
-            if not set(tenants_to_load).issubset(available_tenants):
-                invalid = tenants_to_load.difference(available_tenants)
-                raise RuntimeError(f"Invalid tenant(s) found: {invalid}")
 
             # Use a temporary config cache for the validation
             validate_root = f"/zuul/validate/{uuid.uuid4().hex}"

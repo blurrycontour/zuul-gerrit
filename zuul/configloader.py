@@ -51,6 +51,24 @@ def as_list(item):
     return [item]
 
 
+def no_dup_config_paths(v):
+    if isinstance(v, list):
+        for x in v:
+            check_config_path(x)
+    elif isinstance(v, str):
+        check_config_path(x)
+    else:
+        raise vs.Invalid("Expected str or list of str for extra-config-paths")
+
+
+def check_config_path(path):
+    if not isinstance(path, str):
+        raise vs.Invalid("Expected str or list of str for extra-config-paths")
+    elif path in ["zuul.yaml", "zuul.d/", ".zuul.yaml", ".zuul.d/"]:
+        raise vs.Invalid("Default zuul configs are not "
+                         "allowed in extra-config-paths")
+
+
 class ConfigurationSyntaxError(Exception):
     pass
 
@@ -1468,7 +1486,7 @@ class TenantParser(object):
         'exclude': to_list(classes),
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
-        'extra-config-paths': to_list(str),
+        'extra-config-paths': no_dup_config_paths,
         'load-branch': str,
         'allow-circular-dependencies': bool,
     }}
@@ -1524,6 +1542,13 @@ class TenantParser(object):
 
     def fromYaml(self, abide, conf, ansible_manager, min_ltimes=None,
                  layout_uuid=None, branch_cache_min_ltimes=None):
+        # Note: This vs schema validation is not necessary in most cases as we
+        # verify the schema when loading tenant configs into zookeeper.
+        # However, it is theoretically possible in a multi scheduler setup that
+        # one scheduler would load the config into zk with validated schema
+        # then another newer or older scheduler could load it from zk and fail.
+        # We validate again to help users debug this situation should it
+        # happen.
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -2246,7 +2271,8 @@ class ConfigLoader(object):
                             config_path)
         return config_path
 
-    def readConfig(self, config_path, from_script=False):
+    def readConfig(self, config_path, from_script=False,
+                   tenants_to_validate=None):
         config_path = self.expandConfigPath(config_path)
         if not from_script:
             with open(config_path) as config_file:
@@ -2274,6 +2300,16 @@ class ConfigLoader(object):
                     data = []
         unparsed_abide = model.UnparsedAbideConfig()
         unparsed_abide.extend(data)
+
+        available_tenants = list(unparsed_abide.tenants)
+        tenants_to_validate = tenants_to_validate or available_tenants
+        if not set(tenants_to_validate).issubset(available_tenants):
+            invalid = tenants_to_validate.difference(available_tenants)
+            raise RuntimeError(f"Invalid tenant(s) found: {invalid}")
+        for tenant_name in tenants_to_validate:
+            # Validate the voluptuous schema early when reading the config
+            # as multiple subsequent steps need consistent yaml input.
+            self.tenant_parser.getSchema()(unparsed_abide.tenants[tenant_name])
         return unparsed_abide
 
     def loadAdminRules(self, abide, unparsed_abide):

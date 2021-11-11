@@ -838,8 +838,9 @@ class Client(zuul.cmd.ZuulApp):
             self.connections, zk_client, zuul_globals)
         sched = SchedulerConfig(self.config, self.connections)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
-        unparsed_abide = loader.readConfig(tenant_config, from_script=script)
         try:
+            unparsed_abide = loader.readConfig(
+                tenant_config, from_script=script)
             for conf_tenant in unparsed_abide.tenants.values():
                 loader.tenant_parser.getSchema()(conf_tenant)
             print("Tenants config validated with success")
