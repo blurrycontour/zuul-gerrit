@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1985eaa_b46d7a28",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-11T08:21:36Z",
+      "side": 1,
+      "message": "FontAwesome/PF4 don\u0027t provide a merge icon. The branch icon is the closest I could find.",
+      "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8148c559_07112c40",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-11T08:21:36Z",
+      "side": 1,
+      "message": "I didn\u0027t came up with something for the Fingergw yet. If anybody has an idea, let me know.",
+      "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
