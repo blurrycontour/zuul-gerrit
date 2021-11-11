@@ -48,10 +48,10 @@ function Buildset({ buildset, timezone, tenant }) {
 
   function renderBuildTimes() {
     const firstStartBuild = buildset.builds.reduce((prev, cur) =>
-      prev.start_time < cur.start_time ? prev : cur
+      !cur.start_time || prev.start_time < cur.start_time ? prev : cur
     )
     const lastEndBuild = buildset.builds.reduce((prev, cur) =>
-      prev.end_time > cur.end_time ? prev : cur
+      !cur.end_time || prev.end_time > cur.end_time ? prev : cur
     )
     const totalDuration =
       (moment.utc(lastEndBuild.end_time).tz(timezone) -
