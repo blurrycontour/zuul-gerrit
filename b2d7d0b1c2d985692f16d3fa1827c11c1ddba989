@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "b2d7d0b1c2d985692f16d3fa1827c11c1ddba989",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8f5d050_6eef0684",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 906,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-11T18:58:35Z",
+      "side": 1,
+      "message": "Due to the pipeline refreshes this is likely quite expensive. I think we should add caching in a followup change similarly like we do for the status.json.",
+      "revId": "b2d7d0b1c2d985692f16d3fa1827c11c1ddba989",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
