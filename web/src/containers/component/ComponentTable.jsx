@@ -24,16 +24,36 @@ import {
 } from '@patternfly/react-table'
 import {
   CodeIcon,
+  CodeBranchIcon,
+  CogsIcon,
+  DesktopIcon,
+  IntegrationIcon,
   OnRunningIcon,
   OutlinedHddIcon,
   PauseCircleIcon,
+  // TODO (felix): Alternative icon for the scheduler.
+  // But this icon also shows a cog with some "automation" arrows around
+  // it, so it might be too similar to the executor icon.
+  //ProcessAutomationIcon,
   RunningIcon,
   QuestionIcon,
+  ServiceIcon,
   StopCircleIcon,
   HistoryIcon,
+  TerminalIcon,
 } from '@patternfly/react-icons'
 
 import { IconProperty } from '../../Misc'
+
+const COMPONENT_ICONS = {
+  scheduler: IntegrationIcon,
+  executor: CogsIcon,
+  merger: CodeBranchIcon,
+  web: DesktopIcon,
+  fingergw: TerminalIcon,
+}
+
+const DEFAULT_COMPONENT_ICON = ServiceIcon
 
 const STATE_ICON_CONFIGS = {
   RUNNING: {
@@ -68,6 +88,8 @@ function ComponentStateIcon({ state }) {
     <span style={{ color: iconConfig.color }}>
       <Icon
         size="sm"
+        // TODO (felix): We use this style for all icons, so it might
+        // make sense to define that somewhere centrally.
         style={{
           marginRight: 'var(--pf-global--spacer--sm)',
           verticalAlign: '-0.2em',
@@ -160,11 +182,27 @@ function ComponentTable({ components }) {
   ]
 
   function createSectionRow(kind, childrenCount) {
+    const Icon = COMPONENT_ICONS[kind] || DEFAULT_COMPONENT_ICON
     return {
       // Keep all sections open on initial page load. The handleCollapse()
       // function will deal with open/closing sections.
       isOpen: true,
-      cells: [`${capitalize(kind)} (${childrenCount})`],
+      cells: [
+        {
+          title: (
+            <>
+              <Icon
+                size="sm"
+                style={{
+                  marginRight: 'var(--pf-global--spacer--sm)',
+                  verticalAlign: '-0.2em',
+                }}
+              />
+              {capitalize(kind)} ({childrenCount})
+            </>
+          ),
+        },
+      ],
     }
   }
 
