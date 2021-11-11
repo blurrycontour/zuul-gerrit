@@ -1678,6 +1678,7 @@ class Scheduler(threading.Thread):
 
     def process_pipelines(self, tenant):
         for pipeline in tenant.layout.pipelines.values():
+            stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             if self._stopped:
                 return
             try:
@@ -1686,8 +1687,9 @@ class Scheduler(threading.Thread):
                 ) as lock:
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
-                        pipeline.change_list.refresh(ctx)
-                        pipeline.state.refresh(ctx)
+                        with self.statsd.timer(f'{stats_key}.refresh'):
+                            pipeline.change_list.refresh(ctx)
+                            pipeline.state.refresh(ctx)
                         if pipeline.state.old_queues:
                             self._reenqueuePipeline(tenant, pipeline, ctx)
                         pipeline.state.cleanup(ctx)
@@ -1698,14 +1700,16 @@ class Scheduler(threading.Thread):
                                pipeline.name, tenant.name)
 
     def _process_pipeline(self, tenant, pipeline):
+        stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         self.process_pipeline_management_queue(tenant, pipeline)
         # Give result events priority -- they let us stop builds, whereas
         # trigger events cause us to execute builds.
         self.process_pipeline_result_queue(tenant, pipeline)
         self.process_pipeline_trigger_queue(tenant, pipeline)
         try:
-            while not self._stopped and pipeline.manager.processQueue():
-                pass
+            with self.statsd.timer(f'{stats_key}.process'):
+                while not self._stopped and pipeline.manager.processQueue():
+                    pass
         except Exception:
             self.log.exception("Exception in pipeline processing:")
             pipeline.state.updateAttributes(
