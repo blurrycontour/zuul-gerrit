@@ -765,6 +765,7 @@ class Scheduler(threading.Thread):
             self.updateSystemConfig()
         else:
             self.log.info("Creating initial system config")
+            # This is called without first validating the config
             self.primeSystemConfig()
 
         loader = configloader.ConfigLoader(
@@ -798,6 +799,7 @@ class Scheduler(threading.Thread):
                         # we don't have a layout state.
                         branch_cache_min_ltimes = defaultdict(lambda: -1)
 
+                    # This load validates the config
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,

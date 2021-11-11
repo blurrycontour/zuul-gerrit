@@ -50,6 +50,24 @@ def as_list(item):
     return [item]
 
 
+def no_dup_config_paths(v):
+    if isinstance(v, list):
+        for x in v:
+            check_config_path(x)
+    elif isinstance(v, str):
+        check_config_path(x)
+    else:
+        raise vs.Invalid("Expected str or list of str for extra-config-paths")
+
+
+def check_config_path(path):
+    if not isinstance(path, str):
+        raise vs.Invalid("Expected str or list of str for extra-config-paths")
+    elif path in ["zuul.yaml", "zuul.d/", ".zuul.yaml", ".zuul.d/"]:
+        raise vs.Invalid("Default zuul configs are not "
+                         "allowed in extra-config-paths")
+
+
 class ConfigurationSyntaxError(Exception):
     pass
 
@@ -1463,7 +1481,7 @@ class TenantParser(object):
         'exclude': to_list(classes),
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
-        'extra-config-paths': to_list(str),
+        'extra-config-paths': no_dup_config_paths,
         'load-branch': str,
         'allow-circular-dependencies': bool,
     }}

@@ -17,6 +17,7 @@ import fixtures
 import logging
 import textwrap
 import testtools
+import voluptuous as vs
 
 from zuul import model
 from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
@@ -916,6 +917,32 @@ class TestTenantExtra(TenantParserTestCase):
             dict(name='project2-job', result='SUCCESS', changes='2,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestTenantExtraConfigsInvalidType(TenantParserTestCase):
+    tenant_config_file = 'config/tenant-parser/extra_invalid_type.yaml'
+
+    def setUp(self):
+        with testtools.ExpectedException(vs.MultipleInvalid,
+                "Expected str or list of str for extra-config-paths.*"):
+            super().setUp()
+
+    def test_tenant_extra_configs_invalid_type(self):
+        # The magic is in setUp
+        pass
+
+
+class TestTenantExtraConfigsInvalidValue(TenantParserTestCase):
+    tenant_config_file = 'config/tenant-parser/extra_invalid_value.yaml'
+
+    def setUp(self):
+        with testtools.ExpectedException(vs.MultipleInvalid,
+                "Default zuul configs are not allowed in extra-config-paths.*"):
+            super().setUp()
+
+    def test_tenant_extra_configs_invalid_value(self):
+        # The magic is in setUp
+        pass
 
 
 class TestTenantDuplicate(TenantParserTestCase):
