@@ -33,6 +33,24 @@
       "message": "I didn\u0027t came up with something for the Fingergw yet. If anybody has an idea, let me know.",
       "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5148485e_687645e6",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-11T08:28:09Z",
+      "side": 1,
+      "message": "I added the TerminalIcon for Fingergw in PS2 as Jim suggested this in his original idea https://review.opendev.org/c/zuul/zuul/+/760807/8#message-99d6494fdd7abb556b1f7dbab54a9e9799b60a53.",
+      "parentUuid": "8148c559_07112c40",
+      "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
