@@ -79,6 +79,11 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          The number of items currently being processed by this
          pipeline.
 
+      .. stat:: process
+         :type: timer
+
+         The time taken to process the pipeline.
+
       .. stat:: project
 
          This hierarchy holds more specific metrics for each project
@@ -139,6 +144,11 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
                      The number of changes for this project processed by the
                      pipeline since Zuul started.
+
+      .. stat:: refresh
+         :type: timer
+
+         The time taken to refresh the state from ZooKeeper.
 
       .. stat:: resident_time
          :type: timer
