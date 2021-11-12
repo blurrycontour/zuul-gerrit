@@ -3832,12 +3832,14 @@ class BuildSet(zkobject.ZKObject):
     def removeJobNodeSetInfo(self, job_name):
         if job_name not in self.nodeset_info:
             raise Exception("No job nodeset for %s" % (job_name))
-        del self.nodeset_info[job_name]
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            del self.nodeset_info[job_name]
 
     def setJobNodeRequestID(self, job_name, request_id):
         if job_name in self.node_requests:
             raise Exception("Prior node request for %s" % (job_name))
-        self.node_requests[job_name] = request_id
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.node_requests[job_name] = request_id
 
     def getJobNodeRequestID(self, job_name):
         return self.node_requests.get(job_name)
@@ -3858,7 +3860,8 @@ class BuildSet(zkobject.ZKObject):
                 info['zone'] = None
             info['provider'] = node.provider
             info['nodes'] = [n.id for n in nodeset.getNodes()]
-        self.nodeset_info[job_name] = info
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.nodeset_info[job_name] = info
 
     def getTries(self, job_name):
         return self.tries.get(job_name, 0)

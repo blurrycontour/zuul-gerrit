@@ -23,6 +23,9 @@ from zuul.zk import sharding
 from zuul.zk.exceptions import InvalidObjectError
 
 
+NULL_ARGUMENT = object()
+
+
 class ZKContext:
     def __init__(self, zk_client, lock, stop_event, log):
         self.client = zk_client.client
@@ -98,13 +101,16 @@ class ZKObject:
         call as possible for efficient network use.
         """
         old = self.__dict__.copy()
+        oldserial = self._trySerialize(context)
         self._set(**kw)
-        try:
-            self._save(context)
-        except Exception:
-            # Roll back our old values if we aren't able to update ZK.
-            self._set(**old)
-            raise
+        newserial = self._trySerialize(context)
+        if oldserial != newserial:
+            try:
+                self._save(context, newserial)
+            except Exception:
+                # Roll back our old values if we aren't able to update ZK.
+                self._set(**old)
+                raise
 
     @contextlib.contextmanager
     def activeContext(self, context):
@@ -113,14 +119,17 @@ class ZKObject:
                 f"Another context is already active {self._active_context}")
         try:
             old = self.__dict__.copy()
+            oldserial = self._trySerialize(context)
             self._set(_active_context=context)
             yield
-            try:
-                self._save(context)
-            except Exception:
-                # Roll back our old values if we aren't able to update ZK.
-                self._set(**old)
-                raise
+            newserial = self._trySerialize(context)
+            if oldserial != newserial:
+                try:
+                    self._save(context, newserial)
+                except Exception:
+                    # Roll back our old values if we aren't able to update ZK.
+                    self._set(**old)
+                    raise
         finally:
             self._set(_active_context=None)
 
@@ -143,6 +152,18 @@ class ZKObject:
     def refresh(self, context):
         """Update data from ZK"""
         self._load(context)
+
+    def _trySerialize(self, context):
+        if isinstance(context, LocalZKContext):
+            return b''
+        try:
+            return self.serialize()
+        except Exception:
+            # A higher level must handle this exception, but log
+            # ourself here so we know what object triggered it.
+            context.log.error(
+                "Exception serializing ZKObject %s", self)
+            raise
 
     def delete(self, context):
         path = self.getPath()
@@ -195,17 +216,11 @@ class ZKObject:
                 raise
         raise Exception("ZooKeeper session or lock not valid")
 
-    def _save(self, context, create=False):
+    def _save(self, context, data=NULL_ARGUMENT, create=False):
         if isinstance(context, LocalZKContext):
             return
-        try:
-            data = self.serialize()
-        except Exception:
-            # A higher level must handle this exception, but log
-            # ourself here so we know what object triggered it.
-            context.log.error(
-                "Exception serializing ZKObject %s", self)
-            raise
+        if data is NULL_ARGUMENT:
+            data = self._trySerialize(context)
         path = self.getPath()
         while context.sessionIsValid():
             try:
@@ -275,17 +290,11 @@ class ShardedZKObject(ZKObject):
                 raise InvalidObjectError from exc
         raise Exception("ZooKeeper session or lock not valid")
 
-    def _save(self, context, create=False):
+    def _save(self, context, data=NULL_ARGUMENT, create=False):
         if isinstance(context, LocalZKContext):
             return
-        try:
-            data = self.serialize()
-        except Exception:
-            # A higher level must handle this exception, but log
-            # ourself here so we know what object triggered it.
-            context.log.error(
-                "Exception serializing ZKObject %s", self)
-            raise
+        if data is NULL_ARGUMENT:
+            data = self._trySerialize(context)
         path = self.getPath()
         while context.sessionIsValid():
             try:
