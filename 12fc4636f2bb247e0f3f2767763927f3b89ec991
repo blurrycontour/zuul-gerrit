@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "340b4963_f2ed469c",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-12T21:24:27Z",
+      "side": 1,
+      "message": "Nit: Would it be clearer to always call save with the serialized data instead? _save() is already a private method so we shouldn\u0027t only need to do that in this file for places like new(), etc",
+      "revId": "12fc4636f2bb247e0f3f2767763927f3b89ec991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
