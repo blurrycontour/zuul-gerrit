@@ -15,7 +15,6 @@
 
 import json
 import logging
-import time
 from abc import ABCMeta
 from typing import List
 
@@ -148,7 +147,6 @@ class RPCListener(RPCListenerBase):
         'get_admin_tenants',
         'get_running_jobs',
         'tenant_list',
-        'status_get',
         'job_get',
         'job_list',
         'project_get',
@@ -310,16 +308,6 @@ class RPCListener(RPCListenerBase):
                            'projects': len(tenant.untrusted_projects),
                            'queue': queue_size})
         job.sendWorkComplete(json.dumps(output))
-
-    def handle_status_get(self, job):
-        args = json.loads(job.arguments)
-        start = time.monotonic()
-        output = self.sched.formatStatusJSON(args.get("tenant"))
-        end = time.monotonic()
-        self.log.debug('Formatting tenant %s status took %.3f seconds for '
-                       '%d bytes', args.get("tenant"), end - start,
-                       len(output))
-        job.sendWorkComplete(output)
 
     def handle_job_get(self, gear_job):
         args = json.loads(gear_job.arguments)
