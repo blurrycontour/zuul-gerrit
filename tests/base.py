@@ -2632,11 +2632,12 @@ class FakeGithubClientManager(GithubClientManager):
 
     log = logging.getLogger("zuul.test.FakeGithubClientManager")
 
+    github_data = None
+
     def __init__(self, connection_config):
         super().__init__(connection_config)
         self.record_clients = False
         self.recorded_clients = []
-        self.github_data = None
 
     def getGithubClient(self,
                         project_name=None,
@@ -4208,6 +4209,8 @@ class BaseTestCase(testtools.TestCase):
 
     def setUp(self):
         super(BaseTestCase, self).setUp()
+        # Reset the shared github data from the last test run
+        FakeGithubClientManager.github_data = None
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
         try:
             test_timeout = int(test_timeout)

@@ -777,6 +777,8 @@ class FakeGithubData(object):
 
 class FakeGithubClient(object):
 
+    projects = {}
+
     def __init__(self, session=None, data=None):
         self._data = data
         self._inst_id = None
@@ -801,13 +803,17 @@ class FakeGithubClient(object):
 
     def addProject(self, project):
         owner, proj = project.name.split('/')
-        self._data.repos[(owner, proj)] = FakeRepository(
-            project.name, self._data)
+        #repo = self.projects.get(project.name)
+        #if repo is None:
+        repo = FakeRepository(project.name, self._data)
+        self._data.repos[(owner, proj)] = repo
 
     def addProjectByName(self, project_name):
         owner, proj = project_name.split('/')
-        self._data.repos[(owner, proj)] = FakeRepository(
-            project_name, self._data)
+        #repo = self.projects.get(project_name)
+        #if repo is None:
+        repo = FakeRepository(project_name, self._data)
+        self._data.repos[(owner, proj)] = repo
 
     def pull_request(self, owner, project, number):
         fake_pr = self._data.pull_requests[int(number)]
