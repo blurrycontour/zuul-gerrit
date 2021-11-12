@@ -32,4 +32,4 @@ class ZuulJSONEncoder(json.JSONEncoder):
 
 
 def json_dumps(obj, **kw):
-    return json.dumps(obj, cls=ZuulJSONEncoder, **kw)
+    return json.dumps(obj, cls=ZuulJSONEncoder, sort_keys=True, **kw)

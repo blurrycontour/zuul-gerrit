@@ -81,7 +81,7 @@ class ChangeKey:
             revision=revision,
         )
 
-        self.reference = json.dumps(reference)
+        self.reference = json.dumps(reference, sort_keys=True)
         msg = self.reference.encode('utf8')
         self._hash = hashlib.sha256(msg).hexdigest()
 
@@ -319,7 +319,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def set(self, key, change, version=-1):
         data = self._dataFromChange(change)
-        raw_data = json.dumps(data).encode("utf8")
+        raw_data = json.dumps(data, sort_keys=True).encode("utf8")
 
         data_uuid = self._setData(raw_data)
         # Add the change_key info here mostly for debugging since the
@@ -327,7 +327,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         cache_data = json.dumps(dict(
             data_uuid=data_uuid,
             key_reference=key.reference,
-        ))
+        ), sort_keys=True)
         cache_path = self._cachePath(key._hash)
         with self._change_locks[key._hash]:
             try:
