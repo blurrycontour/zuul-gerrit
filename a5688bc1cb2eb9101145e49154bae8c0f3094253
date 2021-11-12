@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b505cee_0231ee08",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-12T23:50:29Z",
+      "side": 1,
+      "message": "Will this work since json_dumps defaults to setting sort_keys\u003dTrue. I don\u0027t know what python will do if the same kwarg is passed twice.",
+      "range": {
+        "startLine": 565,
+        "startChar": 32,
+        "endLine": 565,
+        "endChar": 46
+      },
+      "revId": "a5688bc1cb2eb9101145e49154bae8c0f3094253",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
