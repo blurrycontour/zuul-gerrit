@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec3d8e82_42c4f0b6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1547,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-12T19:12:56Z",
+      "side": 1,
+      "message": "I think it\u0027s probably safe to remove this.  Try it and see what the tests say?  :)",
+      "revId": "5d746b11d8a7e941dba43259685db3901fbf93db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
