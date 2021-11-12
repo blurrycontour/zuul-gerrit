@@ -46,6 +46,7 @@ from zuul.model import (
     ChangeQueue,
     DequeueEvent,
     EnqueueEvent,
+    HoldRequest,
     PromoteEvent,
     QueueItem,
     SystemAttributes,
@@ -500,23 +501,23 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def autohold_list(self, tenant, *args, **kwargs):
+    def autohold_list(self, tenant_name, *args, **kwargs):
         # we don't use json_in because a payload is not mandatory with GET
         if cherrypy.request.method != 'GET':
             raise cherrypy.HTTPError(405)
         # filter by project if passed as a query string
-        project = cherrypy.request.params.get('project', None)
-        return self._autohold_list(tenant, project)
+        project_name = cherrypy.request.params.get('project', None)
+        return self._autohold_list(tenant_name, project_name)
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', 'POST', ])
-    def autohold(self, tenant, project=None):
+    def autohold(self, tenant_name, project_name=None):
         # we don't use json_in because a payload is not mandatory with GET
         # Note: GET handling is redundant with autohold_list
         # and could be removed.
         if cherrypy.request.method == 'GET':
-            return self._autohold_list(tenant, project)
+            return self._autohold_list(tenant_name, project_name)
         elif cherrypy.request.method == 'POST':
             basic_error = self._basic_auth_header_check()
             if basic_error is not None:
@@ -525,11 +526,11 @@ class ZuulWebAPI(object):
             claims, token_error = self._auth_token_check()
             if token_error is not None:
                 return token_error
-            self.is_authorized(claims, tenant)
+            self.is_authorized(claims, tenant_name)
             msg = 'User "%s" requesting "%s" on %s/%s'
             self.log.info(
                 msg % (claims['__zuul_uid_claim'], 'autohold',
-                       tenant, project))
+                       tenant_name, project_name))
 
             length = int(cherrypy.request.headers['Content-Length'])
             body = cherrypy.request.body.read(length)
@@ -537,104 +538,133 @@ class ZuulWebAPI(object):
                 jbody = json.loads(body.decode('utf-8'))
             except ValueError:
                 raise cherrypy.HTTPError(406, 'JSON body required')
-            if (jbody.get('change') and jbody.get('ref')):
-                raise cherrypy.HTTPError(400,
-                                         'change and ref are '
-                                         'mutually exclusive')
+
+            # Validate the payload
+            jbody['change'] = jbody.get('change', None)
+            jbody['ref'] = jbody.get('ref', None)
+            count = jbody.get('count')
+            if jbody['change'] and jbody['ref']:
+                raise cherrypy.HTTPError(
+                    400, 'change and ref are mutually exclusive')
+            if not all(p in jbody for p in [
+                    'job', 'count', 'change', 'ref', 'reason',
+                    'node_hold_expiration']):
+                raise cherrypy.HTTPError(400, 'Invalid request body')
+            if count < 0:
+                raise cherrypy.HTTPError(400, "Count must be greater 0")
+
+            tenant = self.zuulweb.abide.tenants.get(tenant_name)
+            if not tenant:
+                raise cherrypy.HTTPError(400, f'Unknown tenant {tenant_name}')
+            _, project = tenant.getProject(project_name)
+            if not project:
+                raise cherrypy.HTTPError(
+                    400, f'Unknown project {project_name}')
+
+            if jbody['change']:
+                ref_filter = project.source.getRefForChange(jbody['change'])
+            if jbody['ref']:
+                ref_filter = str(jbody['ref'])
             else:
-                jbody['change'] = jbody.get('change', None)
-                jbody['ref'] = jbody.get('ref', None)
-            if all(p in jbody for p in ['job', 'change', 'ref',
-                                        'count', 'reason',
-                                        'node_hold_expiration']):
-                data = {'tenant': tenant,
-                        'project': project,
-                        'job': jbody['job'],
-                        'change': jbody['change'],
-                        'ref': jbody['ref'],
-                        'reason': jbody['reason'],
-                        'count': jbody['count'],
-                        'node_hold_expiration': jbody['node_hold_expiration']}
-                result = self.rpc.submitJob('zuul:autohold', data)
-                return not result.failure
-            else:
-                raise cherrypy.HTTPError(400,
-                                         'Invalid request body')
+                ref_filter = ".*"
+
+            self._autohold(tenant_name, project_name, jbody['job'], ref_filter,
+                           jbody['reason'], jbody['count'],
+                           jbody['node_hold_expiration'])
+            return True
         else:
             raise cherrypy.HTTPError(405)
 
-    def _autohold_list(self, tenant, project=None):
-        job = self.rpc.submitJob('zuul:autohold_list', {})
-        if job.failure:
-            raise cherrypy.HTTPError(500, 'autohold-list failed')
-        else:
-            payload = json.loads(job.data[0])
-            result = []
-            for request in payload:
-                if tenant == request['tenant']:
-                    if (project is None or
-                            request['project'].endswith(project)):
-                        result.append(
-                            {'id': request['id'],
-                             'tenant': request['tenant'],
-                             'project': request['project'],
-                             'job': request['job'],
-                             'ref_filter': request['ref_filter'],
-                             'max_count': request['max_count'],
-                             'current_count': request['current_count'],
-                             'reason': request['reason'],
-                             'node_expiration': request['node_expiration'],
-                             'expired': request['expired'],
-                             'nodes': request['nodes']
-                            })
-            resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
-            return result
+    def _autohold(self, tenant_name, project_name, job_name, ref_filter,
+                  reason, count, node_hold_expiration):
+        key = (tenant_name, project_name, job_name, ref_filter)
+        self.log.debug("Autohold requested for %s", key)
+
+        request = HoldRequest()
+        request.tenant = tenant_name
+        request.project = project_name
+        request.job = job_name
+        request.ref_filter = ref_filter
+        request.reason = reason
+        request.max_count = count
+
+        zuul_globals = self.zuulweb.globals
+        # Set node_hold_expiration to default if no value is supplied
+        if node_hold_expiration is None:
+            node_hold_expiration = zuul_globals.default_hold_expiration
+
+        # Reset node_hold_expiration to max if it exceeds the max
+        elif zuul_globals.max_hold_expiration and (
+                node_hold_expiration == 0 or
+                node_hold_expiration > zuul_globals.max_hold_expiration):
+            node_hold_expiration = zuul_globals.max_hold_expiration
+
+        request.node_expiration = node_hold_expiration
+
+        # No need to lock it since we are creating a new one.
+        self.zk_nodepool.storeHoldRequest(request)
+
+    def _autohold_list(self, tenant_name, project_name=None):
+        result = []
+        for request_id in self.zk_nodepool.getHoldRequests():
+            request = self.zk_nodepool.getHoldRequest(request_id)
+            if not request:
+                continue
+
+            if tenant_name != request.tenant:
+                continue
+
+            if project_name is None or request.project.endswith(project_name):
+                result.append({
+                    'id': request.id,
+                    'tenant': request.tenant,
+                    'project': request.project,
+                    'job': request.job,
+                    'ref_filter': request.ref_filter,
+                    'max_count': request.max_count,
+                    'current_count': request.current_count,
+                    'reason': request.reason,
+                    'node_expiration': request.node_expiration,
+                    'expired': request.expired,
+                    'nodes': request.nodes,
+                })
+
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return result
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', 'DELETE', ])
-    def autohold_by_request_id(self, tenant, request_id):
+    def autohold_by_request_id(self, tenant_name, request_id):
         if cherrypy.request.method == 'GET':
-            return self._autohold_info(tenant, request_id)
+            return self._autohold_info(tenant_name, request_id)
         elif cherrypy.request.method == 'DELETE':
-            return self._autohold_delete(tenant, request_id)
+            return self._autohold_delete(tenant_name, request_id)
         else:
             raise cherrypy.HTTPError(405)
 
-    def _autohold_info(self, tenant, request_id):
-        job = self.rpc.submitJob('zuul:autohold_info',
-                                 {'request_id': request_id})
-        if job.failure:
-            raise cherrypy.HTTPError(500, 'autohold-info failed')
-        else:
-            request = json.loads(job.data[0])
-            if not request:
-                raise cherrypy.HTTPError(
-                    404, 'Hold request %s not found.' % request_id)
-            if tenant != request['tenant']:
-                # return 404 rather than 403 to avoid leaking tenant info
-                raise cherrypy.HTTPError(
-                    404, 'Hold request %s not found.' % request_id)
-            resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
-            return {
-                'id': request['id'],
-                'tenant': request['tenant'],
-                'project': request['project'],
-                'job': request['job'],
-                'ref_filter': request['ref_filter'],
-                'max_count': request['max_count'],
-                'current_count': request['current_count'],
-                'reason': request['reason'],
-                'node_expiration': request['node_expiration'],
-                'expired': request['expired'],
-                'nodes': request['nodes']
-            }
+    def _autohold_info(self, tenant_name, request_id):
+        request = self._get_autohold_request(tenant_name, request_id)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return {
+            'id': request.id,
+            'tenant': request.tenant,
+            'project': request.project,
+            'job': request.job,
+            'ref_filter': request.ref_filter,
+            'max_count': request.max_count,
+            'current_count': request.current_count,
+            'reason': request.reason,
+            'node_expiration': request.node_expiration,
+            'expired': request.expired,
+            'nodes': request.nodes,
+        }
 
-    def _autohold_delete(self, tenant, request_id):
+    def _autohold_delete(self, tenant_name, request_id):
         # We need tenant info from the request for authz
-        request = self._autohold_info(tenant, request_id)
+        request = self._get_autohold_request(tenant_name, request_id)
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -642,18 +672,39 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
-        self.is_authorized(claims, request['tenant'])
+        self.is_authorized(claims, request.tenant)
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
             msg % (claims['__zuul_uid_claim'], 'autohold-delete',
-                   request['tenant'], request['project']))
+                   request.tenant, request.project))
 
-        job = self.rpc.submitJob('zuul:autohold_delete',
-                                 {'request_id': request_id})
-        if job.failure:
-            raise cherrypy.HTTPError(500, 'autohold-delete failed')
+        # User is authorized, so remove the autohold request
+        self.log.debug("Removing autohold %s", request)
+        try:
+            self.zk_nodepool.deleteHoldRequest(request)
+        except Exception:
+            self.log.exception(
+                "Error removing autohold request %s:", request)
 
         cherrypy.response.status = 204
+
+    def _get_autohold_request(self, tenant_name, request_id):
+        hold_request = None
+        try:
+            hold_request = self.zk_nodepool.getHoldRequest(request_id)
+        except Exception:
+            self.log.exception("Error retrieving autohold ID %s", request_id)
+
+        if hold_request is None:
+            raise cherrypy.HTTPError(
+                404, f'Hold request {request_id} not found.')
+
+        if tenant_name != hold_request.tenant:
+            # return 404 rather than 403 to avoid leaking tenant info
+            raise cherrypy.HTTPError(
+                404, 'Hold request {request_id} not found.')
+
+        return hold_request
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1515,7 +1566,7 @@ class ZuulWeb(object):
                               controller=api, action='promote')
             route_map.connect(
                 'api',
-                '/api/tenant/{tenant}/project/{project:.*}/autohold',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
                 controller=api, action='autohold')
             route_map.connect(
                 'api',
@@ -1525,10 +1576,10 @@ class ZuulWeb(object):
                 'api',
                 '/api/tenant/{tenant_name}/project/{project_name:.*}/dequeue',
                 controller=api, action='dequeue')
-        route_map.connect('api', '/api/tenant/{tenant}/autohold/{request_id}',
-                          controller=api,
-                          action='autohold_by_request_id')
-        route_map.connect('api', '/api/tenant/{tenant}/autohold',
+        route_map.connect('api', '/api/tenant/{tenant_name}/autohold/'
+                          '{request_id}',
+                          controller=api, action='autohold_by_request_id')
+        route_map.connect('api', '/api/tenant/{tenant_name}/autohold',
                           controller=api, action='autohold_list')
         route_map.connect('api', '/api/tenant/{tenant}/projects',
                           controller=api, action='projects')
