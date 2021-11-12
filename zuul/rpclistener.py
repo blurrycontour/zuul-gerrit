@@ -18,7 +18,6 @@ import logging
 from abc import ABCMeta
 from typing import List
 
-from zuul.connection import BaseConnection
 from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
@@ -151,7 +150,6 @@ class RPCListener(RPCListenerBase):
         'job_list',
         'project_get',
         'project_list',
-        'pipeline_list',
         'key_get',
         'config_errors_list',
         'connection_list',
@@ -419,28 +417,6 @@ class RPCListener(RPCListenerBase):
         ret['allowed_labels'] = tenant.allowed_labels or []
         ret['disallowed_labels'] = tenant.disallowed_labels or []
         job.sendWorkComplete(json.dumps(ret))
-
-    def handle_pipeline_list(self, job):
-        args = json.loads(job.arguments)
-        tenant = self.sched.abide.tenants.get(args.get("tenant"))
-        if not tenant:
-            job.sendWorkComplete(json.dumps(None))
-            return
-        output = []
-        for pipeline, pipeline_config in tenant.layout.pipelines.items():
-            triggers = []
-            for trigger in pipeline_config.triggers:
-                if isinstance(trigger.connection, BaseConnection):
-                    name = trigger.connection.connection_name
-                else:
-                    # Trigger not based on a connection doesn't use this attr
-                    name = trigger.name
-                triggers.append({
-                    "name": name,
-                    "driver": trigger.driver.name,
-                })
-            output.append({"name": pipeline, "triggers": triggers})
-        job.sendWorkComplete(json.dumps(output))
 
     def handle_key_get(self, job):
         args = json.loads(job.arguments)
