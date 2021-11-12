@@ -11,18 +11,52 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from configparser import ConfigParser
-
 import fixtures
 import logging
 import textwrap
 import testtools
+from collections import defaultdict
+from configparser import ConfigParser
 
 from zuul import model
-from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
+from zuul.lib.ansible import AnsibleManager
+from zuul.configloader import (
+    AuthorizationRuleParser, ConfigLoader, safe_load_yaml
+)
+from zuul.model import Abide, MergeRequest, SourceContext
+from zuul.zk.locks import tenant_read_lock
 
 from tests.base import ZuulTestCase
-from zuul.model import MergeRequest, SourceContext
+
+
+class TestConfigLoader(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_update_system_config(self):
+        """Test if the system config can be updated without a scheduler."""
+        sched = self.scheds.first.sched
+
+        # Get the current system config before instantiating a ConfigLoader.
+        unparsed_abide, zuul_globals = sched.system_config_cache.get()
+        ansible_manager = AnsibleManager(
+            default_version=zuul_globals.default_ansible_version)
+        loader = ConfigLoader(
+            sched.connections, self.zk_client, zuul_globals, sched.statsd,
+            keystorage=sched.keystore)
+        abide = Abide()
+        loader.loadTPCs(abide, unparsed_abide)
+        loader.loadAdminRules(abide, unparsed_abide)
+
+        for tenant_name in unparsed_abide.tenants:
+            tlock = tenant_read_lock(self.zk_client, tenant_name)
+            # Consider all caches valid (min. ltime -1)
+            min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
+            with tlock:
+                tenant = loader.loadTenant(
+                    abide, tenant_name, ansible_manager, unparsed_abide,
+                    min_ltimes=min_ltimes)
+
+                self.assertEqual(tenant.name, tenant_name)
 
 
 class TenantParserTestCase(ZuulTestCase):
