@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e03c3c2_dc57ab01",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1528,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-12T18:46:12Z",
+      "side": 1,
+      "message": "I guess this is debug leftover",
+      "revId": "5fd7bf94c5905d91470a2b1f6082b1630458e71c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
