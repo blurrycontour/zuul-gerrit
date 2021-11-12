@@ -66,8 +66,8 @@ class BranchCacheZKObject(ShardedZKObject):
         }
         return json.dumps(data).encode("utf8")
 
-    def _save(self, context, create=False):
-        super()._save(context, create)
+    def _save(self, context, data, create=False):
+        super()._save(context, data, create)
         zstat = context.client.exists(self.getPath())
         self._set(_zstat=zstat)
 

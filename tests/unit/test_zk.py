@@ -1496,18 +1496,39 @@ class TestZKObject(ZooKeeperBaseTestCase):
                                               '/zuul/pipeline/fake_tenant')
             self.assertEqual(pipeline2.foo, 'bar')
 
+        def get_ltime(obj):
+            zstat = self.zk_client.client.exists(obj.getPath())
+            return zstat.last_modified_transaction_id
+
         # Update an object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
-            pipeline1.updateAttributes(context, foo='baz')
-            self.assertEqual(pipeline1.foo, 'baz')
+            ltime1 = get_ltime(pipeline1)
+            pipeline1.updateAttributes(context, foo='qux')
+            self.assertEqual(pipeline1.foo, 'qux')
+            ltime2 = get_ltime(pipeline1)
+            self.assertNotEqual(ltime1, ltime2)
+
+            # This should not produce an unnecessary write
+            pipeline1.updateAttributes(context, foo='qux')
+            ltime3 = get_ltime(pipeline1)
+            self.assertEqual(ltime2, ltime3)
 
         # Update an object using an active context
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            ltime1 = get_ltime(pipeline1)
             with pipeline1.activeContext(context):
                 pipeline1.foo = 'baz'
-        self.assertEqual(pipeline1.foo, 'baz')
+            self.assertEqual(pipeline1.foo, 'baz')
+            ltime2 = get_ltime(pipeline1)
+            self.assertNotEqual(ltime1, ltime2)
+
+            # This should not produce an unnecessary write
+            with pipeline1.activeContext(context):
+                pipeline1.foo = 'baz'
+            ltime3 = get_ltime(pipeline1)
+            self.assertEqual(ltime2, ltime3)
 
         # Update of object w/o active context should not work
         with testtools.ExpectedException(Exception):
