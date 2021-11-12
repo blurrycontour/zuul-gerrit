@@ -57,7 +57,7 @@ class ExecutorClient(object):
             job, uuid, nodes, item.change, dependent_changes)
 
         params = zuul.executor.common.construct_build_params(
-            uuid, self.sched,
+            uuid, self.sched.connections,
             job, item, pipeline, dependent_changes, merger_items,
             redact_secrets_and_keys=False)
         # TODO: deprecate and remove this variable?
