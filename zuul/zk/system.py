@@ -39,7 +39,8 @@ class ZuulSystem(ZooKeeperBase):
             data, stat = self.kazoo_client.get(SYSTEM_ROOT)
         except NoNodeError:
             system_id = uuid.uuid4().hex
-            data = json.dumps({'system_id': system_id}).encode('utf8')
+            data = json.dumps({'system_id': system_id},
+                              sort_keys=True).encode('utf8')
             try:
                 self.kazoo_client.create(SYSTEM_ROOT, data)
             except NodeExistsError:

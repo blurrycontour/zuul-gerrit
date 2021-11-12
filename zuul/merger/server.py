@@ -346,7 +346,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         if result is None:
             result = {}
 
-        payload = json.dumps(result)
+        payload = json.dumps(result, sort_keys=True)
         self.log.debug("Completed %s job %s: payload size: %s",
                        merge_request.job_type, merge_request.uuid,
                        sys.getsizeof(payload))

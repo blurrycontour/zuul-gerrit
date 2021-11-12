@@ -70,7 +70,7 @@ class KeyStorage(ZooKeeperBase):
             if not path.startswith('/keystorage'):
                 self.log.error(f"Invalid path: {path}")
                 return
-            data = json.dumps(data).encode('utf8')
+            data = json.dumps(data, sort_keys=True).encode('utf8')
             try:
                 self.kazoo_client.create(path, value=data, makepath=True)
                 self.log.info(f"Created key at {path}")
@@ -124,7 +124,7 @@ class KeyStorage(ZooKeeperBase):
     def saveProjectSSHKeys(self, connection_name, project_name, keydata):
         """Store the complete internal data structure"""
         key_path = self.getSSHKeysPath(connection_name, project_name)
-        data = json.dumps(keydata).encode("utf-8")
+        data = json.dumps(keydata, sort_keys=True).encode("utf-8")
         self.kazoo_client.create(key_path, value=data, makepath=True)
 
     def deleteProjectSSHKeys(self, connection_name, project_name):
@@ -207,7 +207,7 @@ class KeyStorage(ZooKeeperBase):
         """Store the complete internal data structure"""
         key_path = self.getProjectSecretsKeysPath(
             connection_name, project_name)
-        data = json.dumps(keydata).encode("utf-8")
+        data = json.dumps(keydata, sort_keys=True).encode("utf-8")
         self.kazoo_client.create(key_path, value=data, makepath=True)
 
     def deleteProjectsSecretsKeys(self, connection_name, project_name):

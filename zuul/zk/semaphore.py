@@ -30,7 +30,7 @@ def holdersFromData(data):
 
 
 def holdersToData(holders):
-    return json.dumps(holders).encode("utf8")
+    return json.dumps(holders, sort_keys=True).encode("utf8")
 
 
 class SemaphoreHandler(ZooKeeperSimpleBase):

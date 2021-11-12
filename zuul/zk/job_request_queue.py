@@ -562,7 +562,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
     @staticmethod
     def _dictToBytes(data):
         # The custom json_dumps() will also serialize MappingProxyType objects
-        return json_dumps(data).encode("utf-8")
+        return json_dumps(data, sort_keys=True).encode("utf-8")
 
     def _getParamsPath(self, uuid):
         return '/'.join([self.PARAM_ROOT, uuid])
