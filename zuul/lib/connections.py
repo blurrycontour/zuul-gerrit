@@ -90,8 +90,7 @@ class ConnectionRegistry(object):
         for driver in self.drivers.values():
             driver.stop()
 
-    def configure(self, config, source_only=False, include_drivers=None,
-                  require_sql=False):
+    def configure(self, config, source_only=False, require_sql=False):
         # Register connections from the config
         connections = OrderedDict()
 
@@ -126,16 +125,6 @@ class ConnectionRegistry(object):
             # the scheduler process
             if source_only and not isinstance(driver, SourceInterface):
                 continue
-
-            # Zuul web needs only the SQL driver, accomodate that here:
-            if include_drivers is not None:
-                found = False
-                for driver_class in include_drivers:
-                    if isinstance(driver, driver_class):
-                        found = True
-                        break
-                if not found:
-                    continue
 
             connection = driver.getConnection(con_name, con_config)
             connections[con_name] = connection

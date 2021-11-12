@@ -88,12 +88,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.log = logging.getLogger("zuul.WebServer")
 
         try:
-            self.configure_connections(
-                include_drivers=[zuul.driver.sql.SQLDriver,
-                                 zuul.driver.github.GithubDriver,
-                                 zuul.driver.pagure.PagureDriver,
-                                 zuul.driver.gitlab.GitlabDriver],
-                require_sql=True)
+            self.configure_connections(require_sql=True)
             self.configure_authenticators()
             self._run()
         except Exception:
