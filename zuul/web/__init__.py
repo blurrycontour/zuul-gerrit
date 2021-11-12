@@ -871,16 +871,15 @@ class ZuulWebAPI(object):
         return {'zuul': {'admin': tenant in admin_tenants,
                          'scope': [tenant, ]}, }
 
-    # TODO good candidate for caching
     def _authorizations(self):
         rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
         claims = self.zuulweb.authenticators.authenticate(rawToken)
+
         if 'zuul' in claims and 'admin' in claims.get('zuul', {}):
-            return {'zuul': {'admin': claims['zuul']['admin']}, }
-        job = self.rpc.submitJob('zuul:get_admin_tenants',
-                                 {'claims': claims})
-        admin_tenants = json.loads(job.data[0])
-        return admin_tenants
+            return claims['zuul']['admin']
+
+        return [n for n, t in self.zuulweb.abide.tenants.items()
+                if self._is_authorized(t, claims)]
 
     @ttl_cache(ttl=60)
     def _tenants(self):
