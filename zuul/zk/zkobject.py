@@ -99,12 +99,13 @@ class ZKObject:
         """
         old = self.__dict__.copy()
         self._set(**kw)
-        try:
-            self._save(context)
-        except Exception:
-            # Roll back our old values if we aren't able to update ZK.
-            self._set(**old)
-            raise
+        if self.__dict__ != old:
+            try:
+                self._save(context)
+            except Exception:
+                # Roll back our old values if we aren't able to update ZK.
+                self._set(**old)
+                raise
 
     @contextlib.contextmanager
     def activeContext(self, context):
@@ -113,14 +114,18 @@ class ZKObject:
                 f"Another context is already active {self._active_context}")
         try:
             old = self.__dict__.copy()
+            old.pop('_active_context', None)
             self._set(_active_context=context)
             yield
-            try:
-                self._save(context)
-            except Exception:
-                # Roll back our old values if we aren't able to update ZK.
-                self._set(**old)
-                raise
+            new = self.__dict__.copy()
+            new.pop('_active_context', None)
+            if new != old:
+                try:
+                    self._save(context)
+                except Exception:
+                    # Roll back our old values if we aren't able to update ZK.
+                    self._set(**old)
+                    raise
         finally:
             self._set(_active_context=None)
 

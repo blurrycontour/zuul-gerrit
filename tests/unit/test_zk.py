@@ -1499,15 +1499,38 @@ class TestZKObject(ZooKeeperBaseTestCase):
         # Update an object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
-            pipeline1.updateAttributes(context, foo='baz')
-            self.assertEqual(pipeline1.foo, 'baz')
+            data, zstat = self.zk_client.client.get(pipeline1.getPath())
+            version1 = zstat.version
+            pipeline1.updateAttributes(context, foo='qux')
+            self.assertEqual(pipeline1.foo, 'qux')
+            data, zstat = self.zk_client.client.get(pipeline1.getPath())
+            version2 = zstat.version
+            self.assertNotEqual(version1, version2)
+
+            # This should not produce an unecessary write
+            pipeline1.updateAttributes(context, foo='qux')
+            data, zstat = self.zk_client.client.get(pipeline1.getPath())
+            version3 = zstat.version
+            self.assertEqual(version2, version3)
 
         # Update an object using an active context
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            data, zstat = self.zk_client.client.get(pipeline1.getPath())
+            version1 = zstat.version
             with pipeline1.activeContext(context):
                 pipeline1.foo = 'baz'
-        self.assertEqual(pipeline1.foo, 'baz')
+            self.assertEqual(pipeline1.foo, 'baz')
+            data, zstat = self.zk_client.client.get(pipeline1.getPath())
+            version2 = zstat.version
+            self.assertNotEqual(version1, version2)
+
+            # This should not produce an unecessary write
+            with pipeline1.activeContext(context):
+                pipeline1.foo = 'baz'
+            data, zstat = self.zk_client.client.get(pipeline1.getPath())
+            version3 = zstat.version
+            self.assertEqual(version2, version3)
 
         # Update of object w/o active context should not work
         with testtools.ExpectedException(Exception):
