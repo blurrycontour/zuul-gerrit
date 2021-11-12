@@ -253,63 +253,6 @@ class TestSchedulerZoneFallback(ZuulTestCase):
                          'label1')
 
 
-class TestAuthorizeViaRPC(ZuulTestCase):
-    tenant_config_file = 'config/authorization/single-tenant/main.yaml'
-
-    def test_authorize_via_rpc(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        claims = {'__zuul_uid_claim': 'venkman'}
-        authorized = client.submitJob('zuul:authorize_user',
-                                      {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(json.loads(authorized))
-        claims = {'sub': 'gozer'}
-        authorized = client.submitJob('zuul:authorize_user',
-                                      {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(not json.loads(authorized))
-        claims = {'sub': 'stantz',
-                  'iss': 'columbia.edu'}
-        authorized = client.submitJob('zuul:authorize_user',
-                                      {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(json.loads(authorized))
-        claims = {'sub': 'slimer',
-                  'groups': ['ghostbusters', 'ectoplasms']}
-        authorized = client.submitJob('zuul:authorize_user',
-                                      {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(json.loads(authorized))
-
-
-class TestAuthorizeWithTemplatingViaRPC(ZuulTestCase):
-    tenant_config_file = 'config/authorization/rules-templating/main.yaml'
-
-    def test_authorize_via_rpc(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        tenants = ['tenant-zero', 'tenant-one', 'tenant-two']
-        for t_claim in tenants:
-            claims = {'groups': [t_claim, ]}
-            for tenant in tenants:
-                authorized = client.submitJob('zuul:authorize_user',
-                                              {'tenant': tenant,
-                                               'claims': claims}).data[0]
-                if t_claim == tenant:
-                    self.assertTrue(
-                        json.loads(authorized),
-                        "Failed for t_claim: %s, tenant: %s" % (t_claim,
-                                                                tenant))
-                else:
-                    self.assertTrue(
-                        not json.loads(authorized),
-                        "Failed for t_claim: %s, tenant: %s" % (t_claim,
-                                                                tenant))
-
-
 class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
     '''
     This class of tests validates the autohold node expiration values
