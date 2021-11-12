@@ -106,6 +106,16 @@ SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'  # Internal use only
 
 
+def add_debug_line(debug_messages, msg, indent=0):
+    if debug_messages is None:
+        return
+    if indent:
+        indent = '  ' * indent
+    else:
+        indent = ''
+    debug_messages.append(indent + msg)
+
+
 class ZuulMark:
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to
@@ -3523,7 +3533,6 @@ class BuildSet(zkobject.ZKObject):
             files_state=self.NEW,
             repo_state_state=self.NEW,
             configured=False,
-            debug=False,
             fail_fast=False,
             job_graph=None,
             jobs={},
@@ -3624,7 +3633,6 @@ class BuildSet(zkobject.ZKObject):
             "files_state": self.files_state,
             "repo_state_state": self.repo_state_state,
             "configured": self.configured,
-            "debug": self.debug,
             "fail_fast": self.fail_fast,
             "job_graph": (self.job_graph.toDict()
                           if self.job_graph else None),
@@ -4067,17 +4075,10 @@ class QueueItem(zkobject.ZKObject):
         self.current_build_set.updateAttributes(
             self.pipeline.manager.current_context, result=result)
 
-    def debug(self, msg, indent=0):
-        if not self.current_build_set.debug:
-            return
-        if indent:
-            indent = '  ' * indent
-        else:
-            indent = ''
-        self.current_build_set.debug_messages.append(indent + msg)
-
     def warning(self, msg):
-        self.current_build_set.warning_messages.append(msg)
+        with self.current_build_set.activeContext(
+                self.pipeline.manager.current_context):
+            self.current_build_set.warning_messages.append(msg)
         self.log.info(msg)
 
     def freezeJobGraph(self, layout, context,
@@ -4089,15 +4090,13 @@ class QueueItem(zkobject.ZKObject):
         # TODO: move this and related methods to BuildSet
         ppc = layout.getProjectPipelineConfig(self)
         try:
-            # Conditionally set self.current_build_set.debug so that
-            # the debug method can consult it as we resolve the jobs.
             if ppc:
-                self.current_build_set.updateAttributes(
-                    context, debug=ppc.debug, fail_fast=ppc.fail_fast)
-                for msg in ppc.debug_messages:
-                    self.debug(msg)
+                debug_messages = ppc.debug_messages.copy()
+            else:
+                debug_messages = None
             job_graph = layout.createJobGraph(
-                context, self, ppc, skip_file_matcher, redact_secrets_and_keys)
+                context, self, ppc, skip_file_matcher, redact_secrets_and_keys,
+                debug_messages)
             for job in job_graph.getJobs():
                 # Ensure that each jobs's dependencies are fully
                 # accessible.  This will raise an exception if not.
@@ -4111,8 +4110,12 @@ class QueueItem(zkobject.ZKObject):
             # created the layout.
             job_graph.project_metadata = layout.project_metadata
 
+            if not ppc.debug:
+                debug_messages = self.current_build_set.debug_messages
             self.current_build_set.updateAttributes(
-                context, job_graph=job_graph)
+                context, job_graph=job_graph,
+                fail_fast=ppc.fail_fast,
+                debug_messages=debug_messages)
         except Exception:
             self.current_build_set.updateAttributes(
                 context, job_graph=None, _old_job_graph=None)
@@ -5000,6 +5003,7 @@ class QueueItem(zkobject.ZKObject):
                             None, self, ppc,
                             skip_file_matcher=True,
                             redact_secrets_and_keys=False,
+                            debug_messages=None,
                             old=True))
                     log.debug("Done creating job graph for "
                               "config change detection")
@@ -6845,7 +6849,7 @@ class Layout(object):
                 override_checkouts[req.project_name] = req.override_checkout
 
     def _collectJobVariants(self, item, jobname, change, path, jobs, stack,
-                            override_checkouts, indent):
+                            override_checkouts, indent, debug_messages):
         log = item.annotateLogger(self.log)
         matched = False
         local_override_checkouts = override_checkouts.copy()
@@ -6865,13 +6869,15 @@ class Layout(object):
                     change,
                     override_branch=override_branch):
                 log.debug("Variant %s did not match %s", repr(variant), change)
-                item.debug("Variant {variant} did not match".format(
-                    variant=repr(variant)), indent=indent)
+                add_debug_line(debug_messages,
+                               "Variant {variant} did not match".format(
+                                   variant=repr(variant)), indent=indent)
                 continue
             else:
                 log.debug("Variant %s matched %s", repr(variant), change)
-                item.debug("Variant {variant} matched".format(
-                    variant=repr(variant)), indent=indent)
+                add_debug_line(debug_messages,
+                               "Variant {variant} matched".format(
+                                   variant=repr(variant)), indent=indent)
             if not variant.isBase():
                 parent = variant.parent
                 if not jobs and parent is None:
@@ -6883,14 +6889,16 @@ class Layout(object):
                 if parent in stack:
                     raise Exception("Dependency cycle in jobs: %s" % stack)
                 self.collectJobs(item, parent, change, path, jobs,
-                                 stack + [jobname], local_override_checkouts)
+                                 stack + [jobname], local_override_checkouts,
+                                 debug_messages=debug_messages)
+
             matched = True
             if variant not in jobs:
                 jobs.append(variant)
         return matched
 
     def collectJobs(self, item, jobname, change, path=None, jobs=None,
-                    stack=None, override_checkouts=None):
+                    stack=None, override_checkouts=None, debug_messages=None):
         log = item.annotateLogger(self.log)
         # Stack is the recursion stack of job parent names.  Each time
         # we go up a level, we add to stack, and it's popped as we
@@ -6918,31 +6926,34 @@ class Layout(object):
         indent = len(path) + 1
         msg = "Collecting job variants for {jobname}".format(jobname=jobname)
         log.debug(msg)
-        item.debug(msg, indent=indent)
+        add_debug_line(debug_messages, msg, indent=indent)
         matched = self._collectJobVariants(
             item, jobname, change, path, jobs, stack, override_checkouts,
-            indent)
+            indent, debug_messages)
         if not matched:
             log.debug("No matching parents for job %s and change %s",
                       jobname, change)
-            item.debug("No matching parents for {jobname}".format(
-                jobname=repr(jobname)), indent=indent)
+            add_debug_line(debug_messages,
+                           "No matching parents for {jobname}".format(
+                               jobname=repr(jobname)), indent=indent)
             raise NoMatchingParentError()
         return jobs
 
     def _createJobGraph(self, context, item, ppc, job_graph,
-                        skip_file_matcher, redact_secrets_and_keys):
+                        skip_file_matcher, redact_secrets_and_keys,
+                        debug_messages):
         log = item.annotateLogger(self.log)
         job_list = ppc.job_list
         change = item.change
         pipeline = item.pipeline
-        item.debug("Freezing job graph")
+        add_debug_line(debug_messages, "Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
             frozen_job = None
             log.debug("Collecting jobs %s for %s", jobname, change)
-            item.debug("Freezing job {jobname}".format(
-                jobname=jobname), indent=1)
+            add_debug_line(debug_messages,
+                           "Freezing job {jobname}".format(
+                               jobname=jobname), indent=1)
             # Create the initial list of override_checkouts, which are
             # used as we walk up the hierarchy to expand the set of
             # jobs which match.
@@ -6953,7 +6964,8 @@ class Layout(object):
             try:
                 variants = self.collectJobs(
                     item, jobname, change,
-                    override_checkouts=override_checkouts)
+                    override_checkouts=override_checkouts,
+                    debug_messages=debug_messages)
             except NoMatchingParentError:
                 variants = None
             log.debug("Collected jobs %s for %s", jobname, change)
@@ -6961,8 +6973,9 @@ class Layout(object):
                 # A change must match at least one defined job variant
                 # (that is to say that it must match more than just
                 # the job that is defined in the tree).
-                item.debug("No matching variants for {jobname}".format(
-                    jobname=jobname), indent=2)
+                add_debug_line(debug_messages,
+                               "No matching variants for {jobname}".format(
+                                   jobname=jobname), indent=2)
                 continue
             for variant in variants:
                 if frozen_job is None:
@@ -6993,18 +7006,21 @@ class Layout(object):
                     matched = True
                     log.debug("Pipeline variant %s matched %s",
                               repr(variant), change)
-                    item.debug("Pipeline variant {variant} matched".format(
-                        variant=repr(variant)), indent=2)
+                    add_debug_line(debug_messages,
+                                   "Pipeline variant {variant} matched".format(
+                                       variant=repr(variant)), indent=2)
                 else:
                     log.debug("Pipeline variant %s did not match %s",
                               repr(variant), change)
-                    item.debug("Pipeline variant {variant} did not match".
-                               format(variant=repr(variant)), indent=2)
+                    add_debug_line(debug_messages,
+                                   "Pipeline variant {variant} did not match".
+                                   format(variant=repr(variant)), indent=2)
             if not matched:
                 # A change must match at least one project pipeline
                 # job variant.
-                item.debug("No matching pipeline variants for {jobname}".
-                           format(jobname=jobname), indent=2)
+                add_debug_line(debug_messages,
+                               "No matching pipeline variants for {jobname}".
+                               format(jobname=jobname), indent=2)
                 continue
             updates_job_config = False
             if not skip_file_matcher and \
@@ -7021,14 +7037,16 @@ class Layout(object):
                     log.debug("The configuration of job %s is "
                               "changed by %s; ignoring file matcher",
                               repr(frozen_job), change)
-                    item.debug("The configuration of job {jobname} is "
-                               "changed; ignoring file matcher".
-                               format(jobname=jobname), indent=2)
+                    add_debug_line(debug_messages,
+                                   "The configuration of job {jobname} is "
+                                   "changed; ignoring file matcher".
+                                   format(jobname=jobname), indent=2)
                 else:
                     log.debug("Job %s did not match files in %s",
                               repr(frozen_job), change)
-                    item.debug("Job {jobname} did not match files".
-                               format(jobname=jobname), indent=2)
+                    add_debug_line(debug_messages,
+                                   "Job {jobname} did not match files".
+                                   format(jobname=jobname), indent=2)
                     continue
             if frozen_job.abstract:
                 raise Exception("Job %s is abstract and may not be "
@@ -7052,7 +7070,7 @@ class Layout(object):
                 redact_secrets_and_keys))
 
     def createJobGraph(self, context, item, ppc, skip_file_matcher,
-                       redact_secrets_and_keys, old=False):
+                       redact_secrets_and_keys, debug_messages, old=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         if old:
@@ -7064,7 +7082,8 @@ class Layout(object):
         job_graph = JobGraph(job_map)
         if ppc:
             self._createJobGraph(context, item, ppc, job_graph,
-                                 skip_file_matcher, redact_secrets_and_keys)
+                                 skip_file_matcher, redact_secrets_and_keys,
+                                 debug_messages)
         return job_graph
 
 
