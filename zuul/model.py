@@ -4098,7 +4098,7 @@ class QueueItem(zkobject.ZKObject):
         # TODO: move this and related methods to BuildSet
         ppc = layout.getProjectPipelineConfig(self)
         try:
-            if ppc:
+            if ppc and ppc.debug:
                 debug_messages = ppc.debug_messages.copy()
             else:
                 debug_messages = None
@@ -4118,7 +4118,7 @@ class QueueItem(zkobject.ZKObject):
             # created the layout.
             job_graph.project_metadata = layout.project_metadata
 
-            if not ppc.debug:
+            if debug_messages is None:
                 debug_messages = self.current_build_set.debug_messages
             self.current_build_set.updateAttributes(
                 context, job_graph=job_graph,
