@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce005862_b892501e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-11-13T00:06:16Z",
+      "side": 1,
+      "message": "Should the `json.dumps` be replaced by `jsonutil.json_dumps` instead for consistency?",
+      "revId": "b7e2e49f7fc4d0d4807c573d23c311971eb5afde",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
