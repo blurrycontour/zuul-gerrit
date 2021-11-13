@@ -2200,7 +2200,9 @@ class Scheduler(threading.Thread):
 
             build.end_time = event_result["end_time"]
             build.setResultData(result_data, secret_result_data)
-            build.build_set.warning_messages.extend(warnings)
+            build.build_set.updateAttributes(
+                pipeline.manager.current_context,
+                warning_messages=build.build_set.warning_messages + warnings)
             build.held = event_result.get("held")
 
             build.result = result
