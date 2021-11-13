@@ -2325,12 +2325,9 @@ class Scheduler(threading.Thread):
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset
                 # so it gets requested again.
-                try:
+                req_info = buildset.getJobNodeSetInfo(job_name)
+                if req_info:
                     buildset.removeJobNodeSetInfo(job_name)
-                except Exception:
-                    log.exception(
-                        "Exception while removing nodeset from build %s "
-                        "for change %s", build, build.build_set.item.change)
 
                 if build.result is None:
                     build.updateAttributes(
