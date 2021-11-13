@@ -126,7 +126,7 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
     def __setitem__(self, tenant_name, state):
         path = f"{self.layout_root}/{tenant_name}"
         self.kazoo_client.ensure_path(path)
-        data = json.dumps(state.toDict()).encode("utf-8")
+        data = json.dumps(state.toDict(), sort_keys=True).encode("utf-8")
         zstat = self.kazoo_client.set(path, data)
         # Set correct ltime of the layout in Zookeeper
         state.ltime = zstat.last_modified_transaction_id

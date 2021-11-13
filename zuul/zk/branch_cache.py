@@ -64,7 +64,7 @@ class BranchCacheZKObject(ShardedZKObject):
             "protected": self.protected,
             "remainder": self.remainder,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def _save(self, context, data, create=False):
         super()._save(context, data, create)

@@ -274,7 +274,7 @@ class ConfigurationErrorList(zkobject.ShardedZKObject):
         data = {
             "errors": [e.serialize() for e in self.errors],
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -657,7 +657,7 @@ class PipelineState(zkobject.ZKObject):
             "queues": [q.getPath() for q in self.queues],
             "old_queues": [q.getPath() for q in self.old_queues],
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -784,7 +784,7 @@ class PipelineChangeList(zkobject.ZKObject):
         data = {
             "changes": self.changes,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, data, context):
         data = super().deserialize(data, context)
@@ -827,7 +827,7 @@ class PipelineSummary(zkobject.ShardedZKObject):
         data = {
             "status": self.status,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def refresh(self, context):
         # Ignore exceptions and just re-use the previous state. This
@@ -894,7 +894,7 @@ class ChangeQueue(zkobject.ZKObject):
             "window_decrease_factor": self.window_decrease_factor,
             "dynamic": self.dynamic,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -1881,7 +1881,7 @@ class JobData(zkobject.ShardedZKObject):
     def getHash(data):
         hasher = hashlib.sha256()
         # Use json_dumps to strip any ZuulMark entries
-        hasher.update(json_dumps(data).encode('utf8'))
+        hasher.update(json_dumps(data, sort_keys=True).encode('utf8'))
         return hasher.hexdigest()
 
     def serialize(self):
@@ -1890,7 +1890,7 @@ class JobData(zkobject.ShardedZKObject):
             "hash": self.hash,
             "_path": self._path,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
 
 class FrozenJob(zkobject.ZKObject):
@@ -1959,7 +1959,8 @@ class FrozenJob(zkobject.ZKObject):
             if v:
                 # If the value is long, we need to make this a JobData;
                 # otherwise we can use the dict as-is.
-                if len(json_dumps(v).encode('utf8')) > klass.MAX_DATA_LEN:
+                if (len(json_dumps(v, sort_keys=True).encode('utf8')) >
+                    klass.MAX_DATA_LEN):
                     job_data_vars[k] = v
                     v = None
             kw['_' + k] = v
@@ -2017,7 +2018,7 @@ class FrozenJob(zkobject.ZKObject):
             data[k] = v
 
         # Use json_dumps to strip any ZuulMark entries
-        return json_dumps(data).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -2176,7 +2177,8 @@ class FrozenJob(zkobject.ZKObject):
 
     def _makeJobData(self, context, name, data):
         # If the data is large, store it in another object
-        if len(json_dumps(data).encode('utf8')) > self.MAX_DATA_LEN:
+        if (len(json_dumps(data, sort_keys=True).encode('utf8')) >
+            self.MAX_DATA_LEN):
             return JobData.new(
                 context, _path=self.getPath() + '/' + name,
                 data=data)
@@ -3265,7 +3267,7 @@ class ResultData(zkobject.ShardedZKObject):
             "data": self.data,
             "_path": self._path,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
 
 class Build(zkobject.ZKObject):
@@ -3322,7 +3324,7 @@ class Build(zkobject.ZKObject):
             "zuul_event_id": self.zuul_event_id,
             "build_request_ref": self.build_request_ref,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -3430,7 +3432,7 @@ class RepoFiles(zkobject.ShardedZKObject):
             "connections": self.connections,
             "_buildset_path": self._buildset_path,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
 
 class BaseRepoState(zkobject.ShardedZKObject):
@@ -3466,7 +3468,7 @@ class BaseRepoState(zkobject.ShardedZKObject):
             "state": self.state,
             "_buildset_path": self._buildset_path,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
 
 class MergeRepoState(BaseRepoState):
@@ -3640,7 +3642,7 @@ class BuildSet(zkobject.ZKObject):
                           if self.job_graph else None),
             # jobs (serialize as separate objects)
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -4001,7 +4003,7 @@ class QueueItem(zkobject.ZKObject):
             "bundle": self.bundle and self.bundle.serialize(),
             "dequeued_bundle_failing": self.dequeued_bundle_failing,
         }
-        return json.dumps(data).encode("utf8")
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -7612,7 +7614,7 @@ class HoldRequest(object):
 
         Used for storing the object data in ZooKeeper.
         '''
-        return json.dumps(self.toDict()).encode('utf8')
+        return json.dumps(self.toDict(), sort_keys=True).encode('utf8')
 
 
 # AuthZ models

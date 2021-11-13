@@ -90,7 +90,7 @@ class BaseComponent(ZooKeeperBase):
                 return
 
             # Update the ZooKeeper node
-            content = json.dumps(self.content).encode("utf-8")
+            content = json.dumps(self.content, sort_keys=True).encode("utf-8")
             try:
                 zstat = self.kazoo_client.set(
                     self.path, content, version=self._zstat.version
@@ -105,7 +105,7 @@ class BaseComponent(ZooKeeperBase):
             self.log.info("Registering component in ZooKeeper %s", path)
             self.path, self._zstat = self.kazoo_client.create(
                 path,
-                json.dumps(self.content).encode("utf-8"),
+                json.dumps(self.content, sort_keys=True).encode("utf-8"),
                 makepath=True,
                 ephemeral=True,
                 sequence=True,

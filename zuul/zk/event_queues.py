@@ -252,17 +252,18 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         event_path = f"{self.event_root}/"
 
         side_channel_data = None
-        encoded_data = json.dumps(data).encode("utf-8")
+        encoded_data = json.dumps(data, sort_keys=True).encode("utf-8")
         if (len(encoded_data) > sharding.NODE_BYTE_SIZE_LIMIT
             and 'event_data' in data):
             # Get a unique data node
             data_id = str(uuid.uuid4())
             data_root = f'{self.data_root}/{data_id}'
-            side_channel_data = json.dumps(data['event_data']).encode("utf-8")
+            side_channel_data = json.dumps(data['event_data'],
+                                           sort_keys=True).encode("utf-8")
             data = data.copy()
             del data['event_data']
             data['event_data_path'] = data_root
-            encoded_data = json.dumps(data).encode("utf-8")
+            encoded_data = json.dumps(data, sort_keys=True).encode("utf-8")
 
             with sharding.BufferedShardWriter(
                     self.kazoo_client, data_root) as stream:
@@ -590,7 +591,7 @@ class ManagementEventQueue(ZooKeeperEventQueue):
         try:
             self.kazoo_client.set(
                 event.result_ref,
-                json.dumps(result_data).encode("utf-8"),
+                json.dumps(result_data, sort_keys=True).encode("utf-8"),
             )
         except NoNodeError:
             self.log.warning(f"No result node found for {event}; "
