@@ -30,6 +30,7 @@ import {
   RunningIcon,
   QuestionIcon,
   StopCircleIcon,
+  HistoryIcon,
 } from '@patternfly/react-icons'
 
 import { IconProperty } from '../build/Misc'
@@ -38,6 +39,10 @@ const STATE_ICON_CONFIGS = {
   RUNNING: {
     icon: RunningIcon,
     color: 'var(--pf-global--success-color--100)',
+  },
+  INITIALIZING: {
+    icon: HistoryIcon,
+    color: 'var(--pf-global--warning-color--100)',
   },
   PAUSED: {
     icon: PauseCircleIcon,
