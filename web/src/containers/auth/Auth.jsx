@@ -41,7 +41,6 @@ import { apiUrl } from '../../api'
 import { fetchUserACL } from '../../actions/user'
 import { withAuth } from 'oidc-react'
 import { getHomepageUrl } from '../../api'
-import { userLoggedIn, userLoggedOut } from '../../actions/user'
 
 
 class AuthContainer extends React.Component {
@@ -55,7 +54,6 @@ class AuthContainer extends React.Component {
     // Props coming from withAuth
     signIn: PropTypes.func,
     signOut: PropTypes.func,
-    userData: PropTypes.object,
   }
 
   constructor(props) {
@@ -76,30 +74,11 @@ class AuthContainer extends React.Component {
     }
   }
 
-  componentDidMount() {
-    const { user, userData } = this.props
-
-    // Make sure redux is synced with the userManager
-    const now = Date.now() / 1000
-    if (userData && userData.expires_at < now) {
-      console.log('Token expired, logging out')
-      this.props.signOut()
-      this.props.dispatch(userLoggedOut())
-    } else if (user.data !== userData) {
-      console.log('Restoring login from userManager')
-      this.props.dispatch(userLoggedIn(userData))
-    }
-  }
-
   componentDidUpdate() {
     const { user, tenant } = this.props
 
     // Make sure the token is current and the tenant is up to date.
-    const now = Date.now() / 1000
-    if (user.data && user.data.expires_at < now) {
-      console.log('Token expired, logging out')
-      this.props.signOut()
-    } else if (user.data && user.tenant !== tenant.name) {
+    if (user.data && user.tenant !== tenant.name) {
       console.log('Refreshing ACL', user.tenant, tenant.name)
       this.props.dispatch(fetchUserACL(tenant.name, user))
     }
@@ -188,7 +167,7 @@ class AuthContainer extends React.Component {
             onClick={() => {
               const redirect_target = window.location.href.slice(getHomepageUrl().length)
               localStorage.setItem('zuul_auth_redirect', redirect_target)
-              this.props.signIn({ redirect_uri: getHomepageUrl() + 'auth_callback' })
+              this.props.signIn()
             }}>
             Sign in &nbsp;
             <SignInAltIcon title='Sign In' />
