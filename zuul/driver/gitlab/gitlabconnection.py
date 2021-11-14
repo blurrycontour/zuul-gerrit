@@ -91,6 +91,11 @@ class GitlabEventConnector(threading.Thread):
         return not self._stopped
 
     def run(self):
+        # Wait for the scheduler to prime its config so that we have
+        # the full tenant list before we start moving events.
+        self.connection.sched.primed_event.wait()
+        if self._stopped:
+            return
         self.event_queue.registerEventWatch(self._onNewEvent)
         while not self._stopped:
             try:

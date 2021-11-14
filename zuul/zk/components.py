@@ -44,6 +44,7 @@ class BaseComponent(ZooKeeperBase):
     """
 
     # Component states
+    INITIALIZING = "initializing"
     RUNNING = "running"
     PAUSED = "paused"
     STOPPED = "stopped"

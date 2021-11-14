@@ -150,6 +150,7 @@ class Scheduler(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
         self.hostname = socket.getfqdn()
+        self.primed_event = threading.Event()
         self.wake_event = threading.Event()
         self.layout_lock = threading.Lock()
         self.run_handler_lock = threading.Lock()
@@ -282,7 +283,7 @@ class Scheduler(threading.Thread):
             target=self.startCleanup, name='cleanup start')
         self.start_cleanup_thread.daemon = True
         self.start_cleanup_thread.start()
-        self.component_info.state = self.component_info.RUNNING
+        self.component_info.state = self.component_info.INITIALIZING
 
     def stop(self):
         self.log.debug("Stopping scheduler")
@@ -302,6 +303,8 @@ class Scheduler(threading.Thread):
         self.nodepool.stop()
         self.log.debug("Stopping connections")
         self.stopConnections()
+        # Connections may be waiting on the primed event
+        self.primed_event.set()
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
@@ -844,7 +847,9 @@ class Scheduler(threading.Thread):
         duration = round(time.monotonic() - start, 3)
         self.log.info("Config priming complete (duration: %s seconds)",
                       duration)
+        self.primed_event.set()
         self.wake_event.set()
+        self.component_info.state = self.component_info.RUNNING
 
     def reconfigure(self, config, smart=False):
         self.log.debug("Submitting reconfiguration event")
