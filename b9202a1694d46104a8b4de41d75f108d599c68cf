@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c9d811b_c76a90fb",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T16:52:25Z",
+      "side": 1,
+      "message": "Note: the doc urls are no longer used, but maybe we can find a way to use them in the future; I\u0027m happy to have them in for now.  If we refresh this, it might be worth a comment saying they\u0027re unused.",
+      "revId": "b9202a1694d46104a8b4de41d75f108d599c68cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f760ee7e_30881e0f",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T16:52:25Z",
+      "side": 1,
+      "message": "I don\u0027t think we should do this.  It\u0027s perfectly feasible to combine periodic triggers with others.  Someone could put a periodic trigger on their check pipeline.  In that case, we\u0027de override it here.\n\nLet\u0027s be strict and just show the pipeline managers.",
+      "revId": "b9202a1694d46104a8b4de41d75f108d599c68cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
