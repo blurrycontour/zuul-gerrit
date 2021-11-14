@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5da1aaea_9f79bb79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 37
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T16:18:32Z",
+      "side": 1,
+      "message": "Reviewer note: this refers to the popup network error notifications, not the config errors.  :)",
+      "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b553d696_69fa50c8",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 37
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T16:18:32Z",
+      "side": 1,
+      "message": "leftover",
+      "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57448a94_1c75cafe",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 37
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T16:18:32Z",
+      "side": 1,
+      "message": "I don\u0027t think we should have 4 columns; that starts to look very crowded on a non-ultrawide monitor.  Why don\u0027t we put it below the message above?",
+      "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
