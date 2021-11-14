@@ -34,7 +34,7 @@ function createAuthParamsFromJson(json) {
 
   let auth_params = {
     authority: '',
-    clientId: '',
+    client_id: '',
     scope: '',
   }
   if (!auth_info) {
@@ -44,7 +44,7 @@ function createAuthParamsFromJson(json) {
   const realm = auth_info.default_realm
   const client_config = auth_info.realms[realm]
   if (client_config.driver === 'OpenIDConnect') {
-    auth_params.clientId = client_config.client_id
+    auth_params.client_id = client_config.client_id
     auth_params.scope = client_config.scope
     auth_params.authority = client_config.authority
     return auth_params
