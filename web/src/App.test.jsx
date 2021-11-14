@@ -17,6 +17,7 @@ import { create, act } from 'react-test-renderer'
 import ReactDOM from 'react-dom'
 import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
 
 import { fetchInfoIfNeeded } from './actions/info'
 import configureStore from './store'
@@ -32,20 +33,27 @@ api.fetchStatus = jest.fn()
 api.fetchConfigErrors = jest.fn()
 api.fetchConfigErrors.mockImplementation(() => Promise.resolve({data: []}))
 
-
-it('renders without crashing', () => {
+it('renders without crashing', async () => {
   const store = configureStore()
+  const channel = new BroadcastChannel('zuul')
+  const auth_election = createLeaderElection(channel)
   const div = document.createElement('div')
   ReactDOM.render(
     <Provider store={store}>
-      <ZuulAuthProvider><Router><App /></Router></ZuulAuthProvider>
+      <ZuulAuthProvider channel={channel} election={auth_election}>
+        <Router><App /></Router>
+      </ZuulAuthProvider>
     </Provider>,
     div)
   ReactDOM.unmountComponentAtNode(div)
+  await auth_election.die()
+  await channel.close()
 })
 
 it('renders multi tenant', async () => {
   const store = configureStore()
+  const channel = new BroadcastChannel('zuul')
+  const auth_election = createLeaderElection(channel)
   api.fetchInfo.mockImplementation(
     () => Promise.resolve({data: {
       info: {capabilities: {}}
@@ -57,7 +65,9 @@ it('renders multi tenant', async () => {
 
   const application = create(
     <Provider store={store}>
-      <ZuulAuthProvider><Router><App /></Router></ZuulAuthProvider>
+      <ZuulAuthProvider channel={channel} election={auth_election}>
+        <Router><App /></Router>
+      </ZuulAuthProvider>
     </Provider>
   )
 
@@ -80,10 +90,14 @@ it('renders multi tenant', async () => {
   expect(application.root.findAllByType(TenantsPage)).not.toEqual(null)
   // Fetch tenants has been called
   expect(api.fetchTenants).toBeCalled()
+  await auth_election.die()
+  await channel.close()
 })
 
 it('renders single tenant', async () => {
   const store = configureStore()
+  const channel = new BroadcastChannel('zuul')
+  const auth_election = createLeaderElection(channel)
   api.fetchInfo.mockImplementation(
     () => Promise.resolve({data: {
       info: {capabilities: {}, tenant: 'openstack'}
@@ -95,7 +109,9 @@ it('renders single tenant', async () => {
 
   const application = create(
     <Provider store={store}>
-      <ZuulAuthProvider><Router><App /></Router></ZuulAuthProvider>
+      <ZuulAuthProvider channel={channel} election={auth_election}>
+        <Router><App /></Router>
+      </ZuulAuthProvider>
     </Provider>
   )
 
@@ -116,4 +132,6 @@ it('renders single tenant', async () => {
   expect(application.root.findAllByType(StatusPage)).not.toEqual(null)
   // Fetch status has been called
   expect(api.fetchStatus).toBeCalled()
+  await auth_election.die()
+  await channel.close()
 })
