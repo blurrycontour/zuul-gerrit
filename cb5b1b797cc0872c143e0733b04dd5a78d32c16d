@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2937dcec_0e81c189",
+        "filename": "web/src/pages/Build.jsx",
+        "patchSetId": 35
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T16:27:32Z",
+      "side": 1,
+      "message": "The Build container maps user to state, so this isn\u0027t necessary.  This is the only substantive change in this file, so I think you can revert it.",
+      "revId": "cb5b1b797cc0872c143e0733b04dd5a78d32c16d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
