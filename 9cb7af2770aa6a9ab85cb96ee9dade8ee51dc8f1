@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf08718c_d08fef06",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 24
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T17:25:14Z",
+      "side": 1,
+      "message": "-1: I think the word request was better.",
+      "revId": "9cb7af2770aa6a9ab85cb96ee9dade8ee51dc8f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9460625_e8c21516",
+        "filename": "web/src/containers/autohold/autoholdModal.jsx",
+        "patchSetId": 24
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T17:25:14Z",
+      "side": 1,
+      "message": "0: This could also just be \"fetchAutoholds\" instead of forcing true.",
+      "revId": "9cb7af2770aa6a9ab85cb96ee9dade8ee51dc8f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b0ddd14_e1f8e67f",
+        "filename": "web/src/containers/autohold/autoholdModal.jsx",
+        "patchSetId": 24
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T17:25:14Z",
+      "side": 1,
+      "message": "-1: Leftover?",
+      "revId": "9cb7af2770aa6a9ab85cb96ee9dade8ee51dc8f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
