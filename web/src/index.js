@@ -19,6 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
 import 'patternfly/dist/css/patternfly.min.css'
 import 'patternfly/dist/css/patternfly-additions.min.css'
 // NOTE (felix): The Patternfly 4 CSS file must be imported before the App
@@ -47,16 +48,48 @@ import App from './App'
 // is imported within the App).
 import './index.css'
 import ZuulAuthProvider from './ZuulAuthProvider'
+import SilentCallback from './pages/SilentCallback'
 
-const store = configureStore()
+// Uncomment the next 3 lines to enable debug-level logging from
+// oidc-client.
+// import { Log } from 'oidc-client'
+// Log.logger = console
+// Log.level = Log.DEBUG
 
-// Load info endpoint
-store.dispatch(fetchInfoIfNeeded())
+// Don't render the entire application to handle a silent
+// authentication callback.
+if ((window.location.origin + window.location.pathname) ===
+    (getHomepageUrl() + 'silent_callback')) {
 
-ReactDOM.render(
-  <Provider store={store}>
-    <ZuulAuthProvider>
-      <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
-    </ZuulAuthProvider>
-  </Provider>, document.getElementById('root'))
-registerServiceWorker()
+  ReactDOM.render(
+    <SilentCallback/>,
+    document.getElementById('root'))
+
+} else {
+
+  const store = configureStore()
+
+  // Load info endpoint
+  store.dispatch(fetchInfoIfNeeded())
+
+  // Create a broadcast channel for sending auth (or other)
+  // information between tabs.
+  const channel = new BroadcastChannel('zuul')
+
+  // Create an election so that only one tab will renew auth tokens.  We run the
+  // election perpetually and just check whether we are the leader when it's time
+  // to renew tokens.
+  const auth_election = createLeaderElection(channel)
+  const waitForever = new Promise(function () {})
+  auth_election.awaitLeadership().then(()=> {
+    waitForever.then(function() {})
+  })
+
+  ReactDOM.render(
+    <Provider store={store}>
+      <ZuulAuthProvider channel={channel} election={auth_election}>
+        <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+      </ZuulAuthProvider>
+    </Provider>, document.getElementById('root'))
+  registerServiceWorker()
+}
