@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77e8d800_6f23a8ff",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 36
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-14T15:08:37Z",
+      "side": 1,
+      "message": "It doesn\u0027t look like pipeline or dispatch are used.  I think those are the only substantive changes to this file, so I think that means you can just revert the whole file to its original state.",
+      "revId": "fed410116f2cc2f8c9d64b46952e1a324e9ac5a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
