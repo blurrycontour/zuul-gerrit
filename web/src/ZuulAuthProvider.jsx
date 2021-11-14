@@ -19,6 +19,8 @@ import { connect } from 'react-redux'
 
 import { AuthProvider } from 'oidc-react'
 import { userLoggedIn, userLoggedOut } from './actions/user'
+import { UserManager, User } from 'oidc-client'
+import { getHomepageUrl } from './api'
 
 
 class ZuulAuthProvider extends React.Component {
@@ -41,26 +43,107 @@ class ZuulAuthProvider extends React.Component {
    */
   static propTypes = {
     auth_params: PropTypes.object,
+    channel: PropTypes.object,
+    election: PropTypes.object,
     dispatch: PropTypes.func,
     children: PropTypes.any,
   }
 
   render() {
-    const { auth_params } = this.props
+    const { auth_params, channel, election } = this.props
 
     console.debug('ZuulAuthProvider rendering with params', auth_params)
 
+    const userManager = new UserManager({
+      ...auth_params,
+      response_type: 'token id_token',
+      silent_redirect_uri: getHomepageUrl() + 'silent_callback',
+      redirect_uri: getHomepageUrl() + 'auth_callback',
+      includeIdTokenInSilentRenew: false,
+    })
+
     const oidcConfig = {
       onSignIn: async (user) => {
+        // Update redux with the logged in state and send the
+        // credentials to any other tabs.
         this.props.dispatch(userLoggedIn(user))
+        this.props.channel.postMessage({'type': 'signIn', 'user': user})
       },
       onSignOut: async () => {
+        // Update redux with the logged out state and send the
+        // credentials to any other tabs.
         this.props.dispatch(userLoggedOut())
+        this.props.channel.postMessage({'type': 'signOut'})
       },
-      responseType: 'token id_token',
       autoSignIn: false,
-      ...auth_params,
+      userManager: userManager,
     }
+
+    // This is called whenever we receive a message from another tab
+    channel.onmessage = (msg) => {
+      console.debug("Received broadcast message", msg)
+
+      if (msg.type === 'signIn') {
+        const user = new User(msg.user)
+        userManager.getUser().then((olduser) => {
+          // In some cases, we can receive our own message, so make
+          // sure that the user info we received is different from
+          // what we already have.
+          let needToUpdate = true
+          if (olduser) {
+            if (user.toStorageString() === olduser.toStorageString()) {
+              needToUpdate = false
+            }
+          }
+          if (needToUpdate) {
+            console.debug("New token from other tab")
+            userManager.storeUser(user)
+            userManager.events.load(user)
+            this.props.dispatch(userLoggedIn(user))
+          }
+        })
+      }
+      else if (msg.type === 'signOut') {
+        userManager.removeUser()
+        this.props.dispatch(userLoggedOut())
+      }
+    }
+
+    // If we already have user data saved in session storage, we need to
+    // tell redux about it.
+    userManager.getUser().then((user) => {
+      if (user) {
+        console.debug('Restoring initial login from userManager')
+        this.props.dispatch(userLoggedIn(user))
+      }
+    })
+
+    // This is called when a token is expired
+    userManager.events.addAccessTokenExpired(() => {
+      console.log("Auth token expired")
+      userManager.removeUser()
+      this.props.dispatch(userLoggedOut())
+      this.props.channel.postMessage({'type': 'signOut'})
+    })
+
+    // This is called about 1 minute before a token is expired.  We will try
+    // to renew the token.  We use a leader election so that only one tab
+    // makes the attempt; the others will receive the token via a broadcast
+    // event.
+    userManager.events.addAccessTokenExpiring(() => {
+      if (election.isLeader) {
+        console.debug("Token is expiring; renewing")
+        userManager.signinSilent().then(user => {
+          console.debug("Token renewal successful")
+          channel.postMessage({'type': 'signIn', 'user': user})
+        }, err => {
+          console.error("Error renewing token:", err.message)
+        })
+      } else {
+        console.debug("Token is expiring; expecting leader to renew")
+      }
+    })
+
     return (
       <React.Fragment>
         <AuthProvider {...oidcConfig} key={JSON.stringify(auth_params)}>
