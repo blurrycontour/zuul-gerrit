@@ -60,7 +60,7 @@ span.zuul-job-result.label {
 }
 
 /* Avoid that the change boxes are stretched out (too much space in between) */
-.zuul-status-content .pf-c-content table:not(:last-child) {
+.zuul-status-content table:not(:last-child) {
     margin-bottom: 0;
 }
 
@@ -70,7 +70,7 @@ span.zuul-job-result.label {
 }
 
 /* Avoid duplicated lines/borders for the job items on the status page */
-.zuul-status-content .pf-c-content li+li {
+.zuul-status-content li+li {
     margin-top: 0;
 }
 

@@ -15,7 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { Badge } from 'patternfly-react'
-import { Tooltip } from '@patternfly/react-core'
+import { Title, Tooltip } from '@patternfly/react-core'
 
 import ChangeQueue from './ChangeQueue'
 
@@ -117,11 +117,11 @@ class Pipeline extends React.Component {
     const { pipeline, filter, expanded } = this.props
     const count = this.createTree(pipeline)
     return (
-      <div className="pf-c-content zuul-pipeline col-sm-6 col-md-4">
+      <div className="zuul-pipeline col-sm-6 col-md-4">
         <div className="zuul-pipeline-header">
-          <h3>
+          <Title headingLevel="h3">
             {pipeline.name} <Badge>{count}</Badge>
-          </h3>
+          </Title>
           {pipeline.description ? (
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
