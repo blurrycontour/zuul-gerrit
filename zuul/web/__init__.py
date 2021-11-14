@@ -1792,6 +1792,7 @@ class ZuulWeb(object):
     def start(self):
         self.log.debug("ZuulWeb starting")
 
+        self.component_info.state = self.component_info.INITIALIZING
         # Wait for system config and layouts to be loaded
         while not self.system_config_cache.is_valid:
             self.system_config_cache_wake_event.wait()

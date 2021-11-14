@@ -150,6 +150,7 @@ class Scheduler(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
         self.hostname = socket.getfqdn()
+        self.primed_event = threading.Event()
         self.wake_event = threading.Event()
         self.layout_lock = threading.Lock()
         self.run_handler_lock = threading.Lock()
@@ -281,11 +282,12 @@ class Scheduler(threading.Thread):
         t = threading.Thread(target=self.startCleanup, name='cleanup start')
         t.daemon = True
         t.start()
-        self.component_info.state = self.component_info.RUNNING
+        self.component_info.state = self.component_info.INITIALIZING
 
     def stop(self):
         self.log.debug("Stopping scheduler")
         self._stopped = True
+        self.primed_event.set()
         self.component_info.state = self.component_info.STOPPED
         self.times.stop()
         self.log.debug("Stopping nodepool")
@@ -832,6 +834,7 @@ class Scheduler(threading.Thread):
         duration = round(time.monotonic() - start, 3)
         self.log.info("Config priming complete (duration: %s seconds)",
                       duration)
+        self.primed_event.set()
         self.wake_event.set()
 
     def reconfigure(self, config, smart=False):
@@ -1590,6 +1593,12 @@ class Scheduler(threading.Thread):
             self.log.debug("Statsd enabled")
         else:
             self.log.debug("Statsd not configured")
+        self.log.debug("Run handler waiting for config priming")
+        self.primed_event.wait()
+        if self._stopped:
+            self.log.debug("Run handler stopping")
+            return
+        self.component_info.state = self.component_info.RUNNING
         while True:
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
