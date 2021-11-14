@@ -24,7 +24,7 @@ import {
 const stored_params = localStorage.getItem('zuul_auth_params')
 let auth_params = {
   authority: '',
-  clientId: '',
+  client_id: '',
   scope: '',
 }
 if (stored_params !== null) {
