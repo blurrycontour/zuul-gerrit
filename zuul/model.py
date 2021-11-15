@@ -4120,10 +4120,15 @@ class QueueItem(zkobject.ZKObject):
 
             if debug_messages is None:
                 debug_messages = self.current_build_set.debug_messages
+
+            fail_fast = None
+            if ppc:
+                fail_fast = ppc.fail_fast
             self.current_build_set.updateAttributes(
                 context, job_graph=job_graph,
-                fail_fast=ppc.fail_fast,
+                fail_fast=fail_fast,
                 debug_messages=debug_messages)
+
         except Exception:
             self.current_build_set.updateAttributes(
                 context, job_graph=None, _old_job_graph=None)
