@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce5218b8_9ae39a72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-15T15:24:32Z",
+      "side": 1,
+      "message": "After discussing this with Tristan, I think it\u0027s wiser to drop the API break. We should add instead a possibility to write search queries with conditions on the builds/buildsets\u0027 primary key indices. Thus \"SELECT ... LIMIT 50 OFFSET 100\" would become \"SELECT ... WHERE id \u003e XXX LIMIT 50\", which would increase performance as it uses an optimized index.\n\nWe will lose informations like page count and total results, and searching backwards becomes a little harder, but I think we can live with that.\n\nUsers probably do not need to know the exact number of results that a search query would return. But if we want to be precise, we can add the following:\n\n- add \"api/tenant/{tenant}/[builds|buildsets]/count\" endpoints, used to query the amount of results a search query would return.\n- add a cache in the sqlreporter to cache the SQL count queries\u0027 results, so as to lower the load on the database.",
+      "revId": "d510b09318c29a4cc9c717e406beda1c0d8124f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "285b9a18_2f4680ce",
