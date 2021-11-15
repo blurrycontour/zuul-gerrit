@@ -32,6 +32,10 @@ class TestMysqlDatabase(BaseTestCase):
         driver = SQLDriver()
         self.connection = driver.getConnection('database', config)
         self.connection.onLoad()
+        self.addCleanup(self._cleanup)
+
+    def _cleanup(self):
+        self.connection.onStop()
 
     def compareMysql(self, alembic_text, sqlalchemy_text):
         alembic_lines = alembic_text.split('\n')
