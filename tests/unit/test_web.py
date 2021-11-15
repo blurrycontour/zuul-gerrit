@@ -237,7 +237,7 @@ class TestWeb(BaseTestWeb):
         # The list should contain one of each kind: executor, scheduler, web
         self.assertEqual(len(data), 3)
         self.assertEqual(len(data["executor"]), 1)
-        self.assertEqual(len(data["scheduler"]), 1)
+        self.assertEqual(len(data["scheduler"]), self.scheduler_count)
         self.assertEqual(len(data["web"]), 1)
 
         # Each component should contain hostname and state information
