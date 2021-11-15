@@ -1291,7 +1291,8 @@ class ZuulWebAPI(object):
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
-               limit=50, skip=0):
+               limit=50, skip=0,
+               **kwargs):
         connection = self._get_connection()
 
         if tenant not in self.zuulweb.abide.tenants.keys():
@@ -1304,12 +1305,18 @@ class ZuulWebAPI(object):
         if complete is not None:
             complete = complete.lower() == 'true'
 
+        # by default, search for exact strings
+        exact_options = dict(
+            (opt, kwargs.get('exact_' + opt, 'true').lower() == 'true')
+            for opt in ['tenant', 'project', 'pipeline',
+                        'ref', 'newrev', 'job_name']
+        )
         builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
             result=result, final=final, held=held, complete=complete,
-            limit=limit, offset=skip)
+            limit=limit, offset=skip, exact_options=exact_options)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -1378,17 +1385,24 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def buildsets(self, tenant, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
-                  uuid=None, result=None, complete=None, limit=50, skip=0):
+                  uuid=None, result=None, complete=None, limit=50, skip=0,
+                  **kwargs):
         connection = self._get_connection()
 
         if complete:
             complete = complete.lower() == 'true'
 
+        # by default, search for exact strings
+        exact_options = dict(
+            (opt, kwargs.get('exact_' + opt, 'true').lower() == 'true')
+            for opt in ['tenant', 'project', 'pipeline',
+                        'ref', 'newrev']
+        )
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, result=result, complete=complete,
-            limit=limit, offset=skip)
+            limit=limit, offset=skip, exact_options=exact_options)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'

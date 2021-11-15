@@ -50,20 +50,23 @@ class DatabaseSession(object):
         self.session().close()
         self.session = None
 
-    def listFilter(self, query, column, value):
+    def listFilter(self, query, column, value, exact=True):
         if value is None:
             return query
         if isinstance(value, list) or isinstance(value, tuple):
             return query.filter(column.in_(value))
-        return query.filter(column == value)
+        if exact:
+            return query.filter(column == value)
+        else:
+            return query.filter(column.ilike('%{}%'.format(value)))
 
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, uuid=None,
                   job_name=None, voting=None, nodeset=None,
                   result=None, provides=None, final=None, held=None,
-                  complete=None, sort_by_buildset=False, limit=50,
-                  offset=0):
+                  complete=None, sort_by_buildset=False, limit=50, offset=0,
+                  exact_options=None):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -91,17 +94,24 @@ class DatabaseSession(object):
         if not (project or change or uuid):
             q = q.with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
 
-        q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.project, project)
-        q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
+        _exact_opts = exact_options or {}
+        q = self.listFilter(q, buildset_table.c.tenant, tenant,
+                            _exact_opts.get('tenant', True))
+        q = self.listFilter(q, buildset_table.c.project, project,
+                            _exact_opts.get('project', True))
+        q = self.listFilter(q, buildset_table.c.pipeline, pipeline,
+                            _exact_opts.get('pipeline', True))
         q = self.listFilter(q, buildset_table.c.change, change)
         q = self.listFilter(q, buildset_table.c.branch, branch)
         q = self.listFilter(q, buildset_table.c.patchset, patchset)
-        q = self.listFilter(q, buildset_table.c.ref, ref)
-        q = self.listFilter(q, buildset_table.c.newrev, newrev)
+        q = self.listFilter(q, buildset_table.c.ref, ref,
+                            _exact_opts.get('ref', True))
+        q = self.listFilter(q, buildset_table.c.newrev, newrev,
+                            _exact_opts.get('newrev', True))
         q = self.listFilter(q, buildset_table.c.event_id, event_id)
         q = self.listFilter(q, build_table.c.uuid, uuid)
-        q = self.listFilter(q, build_table.c.job_name, job_name)
+        q = self.listFilter(q, build_table.c.job_name, job_name,
+                            _exact_opts.get('job_name', True))
         q = self.listFilter(q, build_table.c.voting, voting)
         q = self.listFilter(q, build_table.c.nodeset, nodeset)
         q = self.listFilter(q, build_table.c.result, result)
@@ -160,7 +170,7 @@ class DatabaseSession(object):
     def getBuildsets(self, tenant=None, project=None, pipeline=None,
                      change=None, branch=None, patchset=None, ref=None,
                      newrev=None, uuid=None, result=None, complete=None,
-                     limit=50, offset=0):
+                     limit=50, offset=0, exact_options=None):
 
         buildset_table = self.connection.zuul_buildset_table
 
@@ -169,14 +179,20 @@ class DatabaseSession(object):
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
 
-        q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.project, project)
-        q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
+        _exact_opts = exact_options or {}
+        q = self.listFilter(q, buildset_table.c.tenant, tenant,
+                            _exact_opts.get('tenant', True))
+        q = self.listFilter(q, buildset_table.c.project, project,
+                            _exact_opts.get('project', True))
+        q = self.listFilter(q, buildset_table.c.pipeline, pipeline,
+                            _exact_opts.get('pipeline', True))
         q = self.listFilter(q, buildset_table.c.change, change)
         q = self.listFilter(q, buildset_table.c.branch, branch)
         q = self.listFilter(q, buildset_table.c.patchset, patchset)
-        q = self.listFilter(q, buildset_table.c.ref, ref)
-        q = self.listFilter(q, buildset_table.c.newrev, newrev)
+        q = self.listFilter(q, buildset_table.c.ref, ref,
+                            _exact_opts.get('ref', True))
+        q = self.listFilter(q, buildset_table.c.newrev, newrev,
+                            _exact_opts.get('newrev', True))
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
         q = self.listFilter(q, buildset_table.c.result, result)
         if complete is True:
