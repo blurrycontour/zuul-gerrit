@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63c276fd_d8eb74a5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1597,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-15T07:15:25Z",
+      "side": 1,
+      "message": "I\u0027m fine with this change, but as a note: I don\u0027t see a reason for waiting for config priming in the run handler. Without waiting for config priming the scheduler can already start processing loaded tenants.\n\nThis shouldn\u0027t be a problem as the tenant is only added to the abide after it is *fully* loaded. Also, the priming/reconfig is protected by the read-write lock so there should be no way a scheduler attempts processing a partially loaded tenant.",
+      "revId": "972c7c6acd887e492219d4c89dde0eb645b5b791",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
