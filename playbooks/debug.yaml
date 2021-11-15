@@ -1,0 +1,22 @@
+- hosts: all
+  tasks:
+    - name: Enable access via build key on all nodes
+      authorized_key:
+        user: zuul
+        state: present
+        key: >-
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC99AFMbYuvH6GXM1EC/6inE3vHDevt8
+          laGJVcGryiHPcvxGAQr0zqWS2KeOMiMcWw2r0de+F4n8Hw4WDc60MyJm2uEDOMyoEXkQx
+          P46c8n349dohwzGrlKA44c3iRUTHy7h/vX7G6npkwuTouJwpzKVb6qfSDMKyOLuBO0TN9
+          7Eo0pxWcQoFUU3GXNb0B2oWyipHQ7Oxd+95TTIeruVT+CKHdwOArifLgGNtLkm93WFF/h
+          VGICrS2DksNaUV5gsyfRU9md0NhR2WpTG4/xw86EKK1O/axGbT+qE6ZlCfa5wprOHN6U+
+          XekmmWu3vnLGZQQdllq4wCv0Lqc4x+EJEE9O/22+eFbSuzQh0uIq7k30D0veKnbd3adwM
+          3obxeWSFO1lh32LlMB0K+JplzeQymFsSuKQc7MzF4FkiSJFISkyqpbIi0B1ZkZHl5vclW
+          Ixej10OZ6QY/gAtKCa19NoY8eGVfActfnQp+G62nMNtzRPS6qvZ2KPP0iyc4N02leqNzk
+          bWywRYqdmHowVR9Anqwe3NpnF5dJD5meqnh3mq8Lq5X0yg0LaYxB9ukh/4QihEfn299+s
+          Eg6BFAkx+5vjZ7BCj5ZnodusxraqvDZr0/rquik3SFp9XmDu9KrDDwdCCIdpWbNrfzLPE
+          221nsUsM0SWL/UV4ZNWuPWGU0ybMCP6Q== dong.zhang@bmw.de
+
+    - name: Pause for debug
+      pause:
+        minutes: 7200
