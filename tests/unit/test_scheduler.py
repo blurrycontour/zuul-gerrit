@@ -93,7 +93,7 @@ class TestSchedulerZone(ZuulTestCase):
         executor_connections = TestConnectionRegistry(
             self.changes, self.config, self.additional_event_queues,
             self.upstream_root, self.rpcclient, self.poller_events,
-            self.git_url_with_auth, self.addCleanup, self.fake_sql)
+            self.git_url_with_auth, self.addCleanup)
         executor_connections.configure(self.config,
                                        source_only=True)
         self.executor_server_unzoned = RecordingExecutorServer(

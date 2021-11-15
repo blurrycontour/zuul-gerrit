@@ -28,7 +28,6 @@ class TestScaleOutScheduler(ZuulTestCase):
             self.rpcclient,
             self.poller_events,
             self.git_url_with_auth,
-            self.fake_sql,
             self.addCleanup,
             self.validate_tenants)
 

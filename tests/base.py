@@ -70,7 +70,6 @@ import requests_mock
 
 from kazoo.exceptions import NoNodeError
 
-from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul import model
 from zuul.model import (
     BuildRequest, Change, MergeRequest, PRECEDENCE_NORMAL, WebInfo
@@ -82,7 +81,7 @@ from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
 from zuul.driver.github import GithubDriver
 from zuul.driver.timer import TimerDriver
-from zuul.driver.sql import SQLDriver, sqlconnection, sqlreporter
+from zuul.driver.sql import SQLDriver
 from zuul.driver.bubblewrap import BubblewrapDriver
 from zuul.driver.nullwrap import NullwrapDriver
 from zuul.driver.mqtt import MQTTDriver
@@ -331,22 +330,12 @@ class GitlabDriverMock(GitlabDriver):
         return connection
 
 
-class SQLDriverMock(SQLDriver):
-
-    def getConnection(self, name, config):
-        return FakeSqlConnection(self, name, config)
-
-    def getReporter(self, connection, pipeline, config=None):
-        return FakeSqlReporter(self, connection, config)
-
-
 class TestConnectionRegistry(ConnectionRegistry):
     def __init__(self, changes: Dict[str, Dict[str, Change]],
                  config: ConfigParser, additional_event_queues,
                  upstream_root: str, rpcclient: RPCClient, poller_events,
                  git_url_with_auth: bool,
-                 add_cleanup: Callable[[Callable[[], None]], None],
-                 fake_sql: bool):
+                 add_cleanup: Callable[[Callable[[], None]], None]):
         self.connections = OrderedDict()
         self.drivers = {}
 
@@ -3096,43 +3085,6 @@ class FakeBuild(object):
         return repos
 
 
-class FakeZuulDatabaseSession(DatabaseSession):
-
-    def __exit__(self, etype, value, tb):
-        pass
-
-
-def FakeOrmSessionFactory():
-    class FakeBackendSession:
-        def add(self, *args, **kwargs):
-            pass
-
-    return FakeBackendSession()
-
-
-class FakeSqlConnection(sqlconnection.SQLConnection):
-
-    def __init__(self, driver, connection_name, connection_config):
-        connection_config['dburi'] = 'postgresql://example.com'
-        super().__init__(driver, connection_name, connection_config)
-        self.session = FakeOrmSessionFactory
-
-    def onLoad(self):
-        pass
-
-    def onStop(self):
-        pass
-
-    def getSession(self):
-        return FakeZuulDatabaseSession(self)
-
-
-class FakeSqlReporter(sqlreporter.SQLReporter):
-
-    def report(self, item):
-        pass
-
-
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     result = None
 
@@ -4040,13 +3992,12 @@ class ZuulWebFixture(fixtures.Fixture):
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None],
-                 test_root: str, fake_sql: bool = True,
-                 info: Optional[WebInfo] = None):
+                 test_root: str, info: Optional[WebInfo] = None):
         super(ZuulWebFixture, self).__init__()
         self.config = config
         self.connections = TestConnectionRegistry(
             changes, config, additional_event_queues, upstream_root, rpcclient,
-            poller_events, git_url_with_auth, add_cleanup, fake_sql)
+            poller_events, git_url_with_auth, add_cleanup)
         self.connections.configure(config)
 
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
@@ -4336,8 +4287,8 @@ class SymLink(object):
 class SchedulerTestApp:
     def __init__(self, log, config, changes, additional_event_queues,
                  upstream_root, rpcclient, poller_events,
-                 git_url_with_auth, fake_sql,
-                 add_cleanup, validate_tenants, instance_id):
+                 git_url_with_auth, add_cleanup, validate_tenants,
+                 instance_id):
         self.log = log
         self.config = config
         self.changes = changes
@@ -4353,7 +4304,6 @@ class SchedulerTestApp:
             poller_events,
             git_url_with_auth,
             add_cleanup,
-            fake_sql,
         )
         self.connections.configure(self.config)
 
@@ -4405,8 +4355,7 @@ class SchedulerTestManager:
 
     def create(self, log, config, changes, additional_event_queues,
                upstream_root, rpcclient, poller_events,
-               git_url_with_auth, fake_sql, add_cleanup,
-               validate_tenants):
+               git_url_with_auth, add_cleanup, validate_tenants):
         # Since the config contains a regex we cannot use copy.deepcopy()
         # as this will raise an exception with Python <3.7
         config_data = StringIO()
@@ -4426,8 +4375,7 @@ class SchedulerTestManager:
         app = SchedulerTestApp(log, scheduler_config, changes,
                                additional_event_queues, upstream_root,
                                rpcclient, poller_events,
-                               git_url_with_auth,
-                               fake_sql, add_cleanup,
+                               git_url_with_auth, add_cleanup,
                                validate_tenants, instance_id)
         self.instances.append(app)
         return app
@@ -4539,7 +4487,6 @@ class ZuulTestCase(BaseTestCase):
     use_ssl: bool = False
     git_url_with_auth: bool = False
     log_console_port: int = 19885
-    fake_sql: bool = False
     validate_tenants = None
 
     def __getattr__(self, name):
@@ -4700,7 +4647,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections = TestConnectionRegistry(
             self.changes, self.config, self.additional_event_queues,
             self.upstream_root, self.rpcclient, self.poller_events,
-            self.git_url_with_auth, self.addCleanup, True)
+            self.git_url_with_auth, self.addCleanup)
         executor_connections.configure(self.config,
                                        source_only=True)
         self.executor_api = TestingExecutorApi(self.zk_client)
@@ -4735,7 +4682,7 @@ class ZuulTestCase(BaseTestCase):
             self.log, self.config, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth,
-            self.fake_sql, self.addCleanup, self.validate_tenants)
+            self.addCleanup, self.validate_tenants)
 
     def createZKContext(self):
         # Just make sure the lock is acquired
