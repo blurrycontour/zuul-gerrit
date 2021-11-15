@@ -55,15 +55,16 @@ class DatabaseSession(object):
             return query
         if isinstance(value, list) or isinstance(value, tuple):
             return query.filter(column.in_(value))
-        return query.filter(column == value)
+        if value in [None, True, False]:
+            return query.filter(column == value)
+        return query.filter(column.like(value))
 
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, uuid=None,
                   job_name=None, voting=None, nodeset=None,
                   result=None, provides=None, final=None, held=None,
-                  complete=None, sort_by_buildset=False, limit=50,
-                  offset=0):
+                  complete=None, sort_by_buildset=False, limit=50, offset=0):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -122,6 +123,7 @@ class DatabaseSession(object):
             q = q.order_by(build_table.c.id.desc())
         q = q.limit(limit).offset(offset)
 
+        self.log.debug(str(q))
         try:
             return q.all()
         except sqlalchemy.orm.exc.NoResultFound:
@@ -188,6 +190,7 @@ class DatabaseSession(object):
             limit(limit).\
             offset(offset)
 
+        self.log.debug(str(q))
         try:
             return q.all()
         except sqlalchemy.orm.exc.NoResultFound:
