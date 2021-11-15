@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "8f19f23c1a6955983ae07362ae026b16391728a9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e5b1474_0569d9ff",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-15T20:58:17Z",
+      "side": 1,
+      "message": "Should this be \"unsubmitted\"?",
+      "range": {
+        "startLine": 204,
+        "startChar": 54,
+        "endLine": 204,
+        "endChar": 63
+      },
+      "revId": "8f19f23c1a6955983ae07362ae026b16391728a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
