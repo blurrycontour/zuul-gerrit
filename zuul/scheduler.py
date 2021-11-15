@@ -276,29 +276,35 @@ class Scheduler(threading.Thread):
         self.stats_thread.start()
         self.apsched.start()
         self.times.start()
-        # Start an anonymous thread to perform initial cleanup, then
-        # schedule later cleanup tasks.
-        t = threading.Thread(target=self.startCleanup, name='cleanup start')
-        t.daemon = True
-        t.start()
+        # Start a thread to perform initial cleanup, then schedule
+        # later cleanup tasks.
+        self.start_cleanup_thread = threading.Thread(
+            target=self.startCleanup, name='cleanup start')
+        self.start_cleanup_thread.daemon = True
+        self.start_cleanup_thread.start()
         self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
         self.log.debug("Stopping scheduler")
         self._stopped = True
+        self.wake_event.set()
+        self.start_cleanup_thread.join()
+        self.log.debug("Stopping apscheduler")
+        self.apsched.shutdown()
+        self.log.debug("Waiting for main thread")
+        self.join()
         self.component_info.state = self.component_info.STOPPED
+        # Don't set the stop event until after the main thread is
+        # joined because doing so will terminate the ZKContext.
+        self.stop_event.set()
         self.times.stop()
         self.log.debug("Stopping nodepool")
         self.nodepool.stop()
-        self.stop_event.set()
         self.log.debug("Stopping connections")
         self.stopConnections()
-        self.wake_event.set()
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
-        self.log.debug("Stopping apscheduler")
-        self.apsched.shutdown()
         self.log.debug("Stopping RPC thread")
         self.rpc.stop()
         self.rpc.join()
@@ -311,8 +317,6 @@ class Scheduler(threading.Thread):
         self.command_thread.join()
         self.log.debug("Stopping timedb thread")
         self.times.join()
-        self.log.debug("Waiting for main thread")
-        self.join()
         self.zk_client.disconnect()
 
     def runCommand(self):
@@ -493,6 +497,8 @@ class Scheduler(threading.Thread):
         # Run the first cleanup immediately after the first
         # reconfiguration.
         while not self.stop_event.wait(0):
+            if self._stopped:
+                return
             if not self.last_reconfigured:
                 time.sleep(0.1)
                 continue
@@ -501,14 +507,20 @@ class Scheduler(threading.Thread):
                 self._runSemaphoreCleanup()
             except Exception:
                 self.log.exception("Error in semaphore cleanup:")
+            if self._stopped:
+                return
             try:
                 self._runBuildRequestCleanup()
             except Exception:
                 self.log.exception("Error in build request cleanup:")
+            if self._stopped:
+                return
             try:
                 self._runNodeRequestCleanup()
             except Exception:
                 self.log.exception("Error in node request cleanup:")
+            if self._stopped:
+                return
 
             self.apsched.add_job(self._runSemaphoreCleanup,
                                  trigger=self._semaphore_cleanup_interval)
