@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "285b9a18_2f4680ce",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1318,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-11-15T13:58:40Z",
+      "side": 1,
+      "message": "Isn\u0027t the offset provided by the client? what is the purpose of returning it?",
+      "revId": "d510b09318c29a4cc9c717e406beda1c0d8124f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
