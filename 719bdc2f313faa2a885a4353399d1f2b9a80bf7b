@@ -16,6 +16,23 @@
       "message": "I\u0027m not sure if that is the correct approach. In case there is a better solution, feel free to update this change.",
       "revId": "719bdc2f313faa2a885a4353399d1f2b9a80bf7b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d26bcc46_0053661a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-15T20:57:10Z",
+      "side": 1,
+      "message": "I would do the same fix as for debug_messages; I\u0027ll update.",
+      "revId": "719bdc2f313faa2a885a4353399d1f2b9a80bf7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
