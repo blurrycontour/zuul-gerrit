@@ -106,6 +106,14 @@ class TestMysqlDatabase(BaseTestCase):
         self.assertEqual(len(self.connection.getBuildsets()), 1)
         self.assertEqual(self.connection.getBuildsets()[0].uuid, buildset_uuid)
 
+        # Test full text search
+        for kwargs in [
+            {'project': 'oj'},
+        ]:
+            _buildsets = self.connection.getBuildsets(**kwargs)
+            self.assertEqual(len(_buildsets), 1)
+            self.assertEqual(_buildsets[0].uuid, buildset_uuid)
+
         # Update the buildset using the internal interface
         with self.connection.getSession() as db:
             db_buildset = db.getBuildset(tenant=tenant, uuid=buildset_uuid)
