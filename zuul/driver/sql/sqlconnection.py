@@ -50,12 +50,18 @@ class DatabaseSession(object):
         self.session().close()
         self.session = None
 
-    def listFilter(self, query, column, value):
+    def listFilter(self, query, column, value, exact=True):
         if value is None:
             return query
         if isinstance(value, list) or isinstance(value, tuple):
+            self.log.debug('%s IN %s' % (repr(column), value))
             return query.filter(column.in_(value))
-        return query.filter(column == value)
+        if exact:
+            self.log.debug('%s = %s' % (repr(column), value))
+            return query.filter(column == value)
+        else:
+            self.log.debug('%s LIKE %s' % (repr(column), value))
+            return query.filter(column.like(value))
 
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
@@ -91,8 +97,10 @@ class DatabaseSession(object):
         if not (project or change or uuid):
             q = q.with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
 
+        # TODO make full text search toggle a parameter
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.project, project)
+        q = self.listFilter(q, buildset_table.c.project, project,
+                            exact=False)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
         q = self.listFilter(q, buildset_table.c.change, change)
         q = self.listFilter(q, buildset_table.c.branch, branch)
@@ -101,7 +109,8 @@ class DatabaseSession(object):
         q = self.listFilter(q, buildset_table.c.newrev, newrev)
         q = self.listFilter(q, buildset_table.c.event_id, event_id)
         q = self.listFilter(q, build_table.c.uuid, uuid)
-        q = self.listFilter(q, build_table.c.job_name, job_name)
+        q = self.listFilter(q, build_table.c.job_name, job_name,
+                            exact=False)
         q = self.listFilter(q, build_table.c.voting, voting)
         q = self.listFilter(q, build_table.c.nodeset, nodeset)
         q = self.listFilter(q, build_table.c.result, result)
@@ -122,6 +131,7 @@ class DatabaseSession(object):
             q = q.order_by(build_table.c.id.desc())
         q = q.limit(limit).offset(offset)
 
+        self.log.debug(str(q))
         try:
             return q.all()
         except sqlalchemy.orm.exc.NoResultFound:
@@ -169,8 +179,10 @@ class DatabaseSession(object):
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
 
+        # TODO make full text search toggle a parameter
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.project, project)
+        q = self.listFilter(q, buildset_table.c.project, project,
+                            exact=False)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
         q = self.listFilter(q, buildset_table.c.change, change)
         q = self.listFilter(q, buildset_table.c.branch, branch)
@@ -188,6 +200,7 @@ class DatabaseSession(object):
             limit(limit).\
             offset(offset)
 
+        self.log.debug(str(q))
         try:
             return q.all()
         except sqlalchemy.orm.exc.NoResultFound:

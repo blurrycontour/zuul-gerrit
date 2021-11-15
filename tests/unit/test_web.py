@@ -1435,6 +1435,17 @@ class TestBuildInfo(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/builds")
         self.assertEqual(404, resp.status_code)
 
+        # Full text
+        builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "project=pro").json()
+        self.assertEqual(len(builds_query), 6)
+        builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "job_name=test").json()
+        self.assertTrue(
+            all(build['job_name'] in ('project-test1', 'project-test2')
+                for build in builds_query)
+        )
+
     def test_web_badge(self):
         # Generate some build records in the db.
         self.add_base_changes()
