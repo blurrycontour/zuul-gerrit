@@ -64,7 +64,8 @@ class RawShardIO(io.RawIOBase):
         # Only write one key at a time and defer writing the rest to the caller
         shard_bytes = bytes(shard_data[0:NODE_BYTE_SIZE_LIMIT])
         shard_bytes = zlib.compress(shard_bytes)
-        assert(len(shard_bytes) < NODE_BYTE_SIZE_LIMIT)
+        if not (len(shard_bytes) < NODE_BYTE_SIZE_LIMIT):
+            raise RuntimeError("Shard too large")
         self.client.create(
             "{}/".format(self.shard_base),
             shard_bytes,
