@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a86f17c_dd7345b2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-11-16T00:39:47Z",
+      "side": 1,
+      "message": "Should the RUNNING assignment be removed?",
+      "revId": "130c6b2849d93bcf35163b92b5315896a076bc21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
