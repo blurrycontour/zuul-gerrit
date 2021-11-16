@@ -20,6 +20,7 @@ from tests.base import ZuulGithubAppTestCase, ZuulTestCase, simple_layout
 class TestGithubRequirements(ZuulTestCase):
     """Test pipeline and trigger requirements"""
     config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
 
     @simple_layout('layouts/requirements-github.yaml', driver='github')
     def test_pipeline_require_status(self):
@@ -598,6 +599,7 @@ class TestGithubRequirements(ZuulTestCase):
 class TestGithubAppRequirements(ZuulGithubAppTestCase):
     """Test pipeline and trigger requirements with app authentication"""
     config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
 
     @simple_layout("layouts/requirements-github.yaml", driver="github")
     def test_pipeline_require_check_run(self):

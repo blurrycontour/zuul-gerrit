@@ -42,6 +42,7 @@ EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {})
 
 class TestGithubDriver(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
     def test_pull_event(self):
@@ -1318,6 +1319,7 @@ class TestGithubDriver(ZuulTestCase):
 class TestMultiGithubDriver(ZuulTestCase):
     config_file = 'zuul-multi-github.conf'
     tenant_config_file = 'config/multi-github/main.yaml'
+    scheduler_count = 1
 
     def test_multi_app(self):
         """Test that we can handle multiple app."""
@@ -1335,6 +1337,7 @@ class TestMultiGithubDriver(ZuulTestCase):
 class TestGithubUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
     tenant_config_file = 'config/unprotected-branches/main.yaml'
+    scheduler_count = 1
 
     def test_unprotected_branches(self):
         tenant = self.scheds.first.sched.abide.tenants\
@@ -1653,6 +1656,7 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
 
 class TestGithubWebhook(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
 
     def setUp(self):
         super(TestGithubWebhook, self).setUp()
@@ -1726,6 +1730,7 @@ class TestGithubWebhook(ZuulTestCase):
 
 
 class TestGithubShaCache(BaseTestCase):
+    scheduler_count = 1
 
     def testInsert(self):
         cache = GithubShaCache()
@@ -1817,6 +1822,7 @@ class TestGithubShaCache(BaseTestCase):
 class TestGithubAppDriver(ZuulGithubAppTestCase):
     """Inheriting from ZuulGithubAppTestCase will enable app authentication"""
     config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
 
     @simple_layout("layouts/reporting-github.yaml", driver="github")
     def test_reporting_checks_api(self):
@@ -2098,6 +2104,7 @@ class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):
     """We need Github app authentication and be able to run Ansible jobs"""
     config_file = 'zuul-github-driver.conf'
     tenant_config_file = "config/github-file-comments/main.yaml"
+    scheduler_count = 1
 
     def test_file_comments(self):
         project = "org/project"
@@ -2275,6 +2282,7 @@ class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):
 
 class TestGithubDriverEnterise(ZuulGithubAppTestCase):
     config_file = 'zuul-github-driver-enterprise.conf'
+    scheduler_count = 1
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
     def test_report_pull_merge(self):
@@ -2312,6 +2320,7 @@ class TestGithubDriverEnterise(ZuulGithubAppTestCase):
 
 class TestGithubDriverEnteriseLegacy(ZuulGithubAppTestCase):
     config_file = 'zuul-github-driver-enterprise.conf'
+    scheduler_count = 1
 
     def setUp(self):
         self.old_version = FakeGithubEnterpriseClient.version
