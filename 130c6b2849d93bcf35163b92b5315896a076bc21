@@ -16,6 +16,29 @@
       "message": "Should the RUNNING assignment be removed?",
       "revId": "130c6b2849d93bcf35163b92b5315896a076bc21",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae51a21d_6045c2d8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-16T00:40:20Z",
+      "side": 1,
+      "message": "This line should be removed.",
+      "range": {
+        "startLine": 286,
+        "startChar": 8,
+        "endLine": 286,
+        "endChar": 63
+      },
+      "revId": "130c6b2849d93bcf35163b92b5315896a076bc21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
