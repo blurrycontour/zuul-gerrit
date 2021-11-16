@@ -3245,8 +3245,8 @@ class BuildRequest(JobRequest):
 
     def __repr__(self):
         return (
-            f"<BuildRequest {self.uuid}, state={self.state}, "
-            f"path={self.path} zone={self.zone}>"
+            f"<BuildRequest {self.uuid}, job={self.job_name}, "
+            f"state={self.state}, path={self.path} zone={self.zone}>"
         )
 
 
