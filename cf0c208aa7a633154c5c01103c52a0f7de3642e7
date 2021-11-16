@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "394ca579_780e3425",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-11-16T12:01:32Z",
+      "side": 1,
+      "message": "It seems like the tests are failing with `Exception: More than one thread is running`. Should the config be primed on test shutdown?",
+      "revId": "cf0c208aa7a633154c5c01103c52a0f7de3642e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
