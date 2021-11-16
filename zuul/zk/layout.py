@@ -118,6 +118,9 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
         except NoNodeError:
             raise KeyError(tenant_name)
 
+        if not data:
+            raise KeyError(tenant_name)
+
         return LayoutState.fromDict({
             "ltime": zstat.last_modified_transaction_id,
             **json.loads(data)
@@ -125,9 +128,11 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
 
     def __setitem__(self, tenant_name, state):
         path = f"{self.layout_root}/{tenant_name}"
-        self.kazoo_client.ensure_path(path)
         data = json.dumps(state.toDict(), sort_keys=True).encode("utf-8")
-        zstat = self.kazoo_client.set(path, data)
+        if self.kazoo_client.exists(path):
+            zstat = self.kazoo_client.set(path, data)
+        else:
+            _, zstat = self.kazoo_client.create(path, data, include_data=True)
         # Set correct ltime of the layout in Zookeeper
         state.ltime = zstat.last_modified_transaction_id
 
