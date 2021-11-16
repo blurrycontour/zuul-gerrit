@@ -62,6 +62,7 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
             else:
                 self.canonical_hostname = 'localhost'
         self.projects = {}
+        self.source = driver.getSource(self)
 
     def toDict(self):
         d = super().toDict()
