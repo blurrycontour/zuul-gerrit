@@ -16,6 +16,23 @@
       "message": "I guess ZuulWebFixture will start additional threads and the _start_web thread dies quickly?",
       "revId": "978bfc34c40d50197d25f067d26f2b5236a6c3bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56e9eb54_73b2e566",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2889,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-16T23:14:54Z",
+      "side": 1,
+      "message": "Yeah, as soon as the scheduler starts up, _start_web can finish.",
+      "revId": "978bfc34c40d50197d25f067d26f2b5236a6c3bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
