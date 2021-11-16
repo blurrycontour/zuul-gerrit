@@ -66,23 +66,6 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "certs:/var/certs:z"
-  web:
-    command: |
-      sh -c '/var/playbooks/wait-to-start-certs.sh && \
-             /var/playbooks/wait-to-start-gearman.sh && \
-             zuul-web -f'
-    depends_on:
-      - scheduler
-      - mysql
-    ports:
-      - "9000:9000"
-    image: docker.io/zuul/zuul-web
-    environment:
-      ZUUL_MYSQL_PASSWORD: secret
-    volumes:
-      - "./etc_zuul/:/etc/zuul/:z"
-      - "./playbooks/:/var/playbooks/:z"
-      - "certs:/var/certs:z"
   executor:
     privileged: true
     environment:
@@ -100,6 +83,24 @@ services:
       - "logs:/srv/static/logs:z"
       - "certs:/var/certs:z"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f'"
+  web:
+    command: |
+      sh -c '/var/playbooks/wait-to-start-certs.sh && \
+             /var/playbooks/wait-to-start-gearman.sh && \
+             zuul-web -f'
+    depends_on:
+      - scheduler
+      - executor
+      - mysql
+    ports:
+      - "9000:9000"
+    image: docker.io/zuul/zuul-web
+    environment:
+      ZUUL_MYSQL_PASSWORD: secret
+    volumes:
+      - "./etc_zuul/:/etc/zuul/:z"
+      - "./playbooks/:/var/playbooks/:z"
+      - "certs:/var/certs:z"
   node:
     build:
       dockerfile: node-Dockerfile
