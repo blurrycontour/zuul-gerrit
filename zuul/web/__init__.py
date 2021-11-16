@@ -1916,15 +1916,26 @@ class ZuulWeb(object):
             if (self.local_layout_state.get(tenant_name)
                     == self.tenant_layout_state.get(tenant_name)):
                 continue
+            self.log.debug("Reloading tenant %s", tenant_name)
             with tenant_read_lock(self.zk_client, tenant_name):
                 layout_state = self.tenant_layout_state.get(tenant_name)
                 layout_uuid = layout_state and layout_state.uuid
+
+                if layout_state:
+                    branch_cache_min_ltimes = (
+                        layout_state.branch_cache_min_ltimes)
+                else:
+                    # Consider all project branch caches valid if
+                    # we don't have a layout state.
+                    branch_cache_min_ltimes = defaultdict(lambda: -1)
+
                 # The tenant will be stored in self.abide.tenants after
                 # it was loaded.
                 tenant = loader.loadTenant(
                     self.abide, tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
-                    layout_uuid=layout_uuid)
+                    layout_uuid=layout_uuid,
+                    branch_cache_min_ltimes=branch_cache_min_ltimes)
                 if tenant is not None:
                     self.local_layout_state[tenant_name] = layout_state
                 else:
