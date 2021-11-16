@@ -18,6 +18,7 @@ from tests.base import ZuulTestCase, simple_layout
 class TestGithubCrossRepoDeps(ZuulTestCase):
     """Test Github cross-repo dependencies"""
     config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
 
     @simple_layout('layouts/crd-github.yaml', driver='github')
     def test_crd_independent(self):
