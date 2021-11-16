@@ -347,6 +347,12 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
             if k.value == '<<':
                 continue
 
+            if not isinstance(k.value, collections.abc.Hashable):
+                # This happens with "foo: {{ bar }}"
+                # This will raise an error in the superclass
+                # construct_mapping below; ignore it for now.
+                continue
+
             if k.value in keys:
                 mark = model.ZuulMark(node.start_mark, node.end_mark,
                                       self.zuul_stream)
