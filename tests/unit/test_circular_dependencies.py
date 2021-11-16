@@ -1295,6 +1295,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
     tenant_config_file = "config/circular-dependencies/main.yaml"
+    scheduler_count = 1
 
     def test_cycle_not_ready(self):
         A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
