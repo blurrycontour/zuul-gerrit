@@ -2841,3 +2841,61 @@ class TestCLIViaWebApi(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+class TestWebStartup(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    config_ini_data = {}
+    create_scheduler = False
+
+    def _start_web(self):
+        # Start the web server
+        self.web = ZuulWebFixture(
+            self.changes, self.config, self.additional_event_queues,
+            self.upstream_root, self.rpcclient, self.poller_events,
+            self.git_url_with_auth, self.addCleanup, self.test_root,
+            info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config))
+        self.useFixture(self.web)
+
+    def get_url(self, url, *args, **kwargs):
+        return requests.get(
+            urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
+    def test_web_startup(self):
+        self.zuul_ini_config = FakeConfig(self.config_ini_data)
+        self.web = None
+        import threading
+        t = threading.Thread(target=self._start_web)
+        t.daemon = True
+        t.start()
+
+        for _ in iterate_timeout(30, 'Wait for web to begin startup'):
+            if self.web and getattr(self.web, 'web', None):
+                break
+
+        self.web.web.system_config_cache_wake_event.wait()
+
+        self.createScheduler()
+        self.scheds.execute(
+            lambda app: app.start(self.validate_tenants))
+
+        t.join()
+
+        self.host = 'localhost'
+        # Wait until web server is started
+        while True:
+            if self.web is None:
+                time.sleep(0.1)
+                continue
+            self.port = self.web.port
+            try:
+                with socket.create_connection((self.host, self.port)):
+                    break
+            except ConnectionRefusedError:
+                pass
+        self.base_url = "http://{host}:{port}".format(
+            host=self.host, port=self.port)
+
+        # If the config didn't load correctly, we won't have the jobs
+        jobs = self.get_url("api/tenant/tenant-one/jobs").json()
+        self.assertEqual(len(jobs), 10)

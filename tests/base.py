@@ -4488,6 +4488,7 @@ class ZuulTestCase(BaseTestCase):
     git_url_with_auth: bool = False
     log_console_port: int = 19885
     validate_tenants = None
+    create_scheduler = True
 
     def __getattr__(self, name):
         """Allows to access fake connections the old way, e.g., using
@@ -4665,7 +4666,8 @@ class ZuulTestCase(BaseTestCase):
         self.builds = self.executor_server.running_builds
 
         self.scheds = SchedulerTestManager(self.validate_tenants)
-        self.createScheduler()
+        if self.create_scheduler:
+            self.createScheduler()
 
         self.merge_server = None
 
