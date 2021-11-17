@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f983fc3_57b7dc06",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-17T19:23:38Z",
+      "side": 1,
+      "message": "And it isn\u0027t possible for addChange to be executed again because a single scheduler at a time is processing events for a pipeline. And when the event is pulled off we never put it back again to be processed by another scheduler in the vent of a failure? Basically we either process it here and we\u0027re good or we don\u0027t and move on?",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 29
+      },
+      "revId": "92bbc2fe02423bdfece2c63d80f87c5a44544532",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
