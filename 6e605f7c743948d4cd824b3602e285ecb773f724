@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79c644e3_9f6011c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 40
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-17T14:21:19Z",
+      "side": 1,
+      "message": "\u003e Patch Set 38: Code-Review-1\n\u003e \n\u003e (2 comments)\n\u003e \n\u003e -1: We need to add \u0027/autohold/\u0027 to getHomePageUrl in api.js.\n\u003e No -1 for the inline comments.  Looks good.\n\nDone",
+      "revId": "6e605f7c743948d4cd824b3602e285ecb773f724",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "nit: Instead of force\u003dtrue here, you could just do fetchAutoholds...",
       "revId": "66a4e8f7247c9034da21467b3cfcae03ae75094e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1b7d27d_310c2b44",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 38
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-17T14:21:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99effb2f_50447ddb",
+      "revId": "66a4e8f7247c9034da21467b3cfcae03ae75094e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
