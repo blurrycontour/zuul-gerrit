@@ -37,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "288a2d89_85e16bf3",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 37
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-17T14:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b553d696_69fa50c8",
+      "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "57448a94_1c75cafe",
         "filename": "web/src/containers/build/Buildset.jsx",
         "patchSetId": 37
@@ -48,6 +66,24 @@
       "writtenOn": "2021-11-14T16:18:32Z",
       "side": 1,
       "message": "I don\u0027t think we should have 4 columns; that starts to look very crowded on a non-ultrawide monitor.  Why don\u0027t we put it below the message above?",
+      "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc122a9b_49c84ac1",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 37
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-17T14:20:59Z",
+      "side": 1,
+      "message": "UX-wise actions should be distinct from properties; I was also afraid the action would be hard to notice under the message.\nI\u0027m not satisfied either with this layout anyway, so let\u0027s squeeze this back to 3 columns and if a UX wizard wants to revisit this later, by all means!",
+      "parentUuid": "57448a94_1c75cafe",
       "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
