@@ -693,6 +693,11 @@ class GithubEventConnector:
         return not self._stopped
 
     def run_event_dispatcher(self):
+        # Wait for the scheduler to prime its config so that we have
+        # the full tenant list before we start moving events.
+        self.connection.sched.primed_event.wait()
+        if self._stopped:
+            return
         self.event_queue.registerEventWatch(self._onNewEvent)
         # Set the wake event so we get an initial run
         self._dispatcher_wake_event.set()
