@@ -741,7 +741,21 @@ class PipelineManager(metaclass=ABCMeta):
             if not source:
                 continue
             log.debug("  Found source: %s", source)
-            dep = source.getChangeByURL(match, event)
+            for x in range(3):
+                # We retry this as we are unlikely to be able to report back
+                # failures if our source is broken, but if we can get the
+                # info on subsequent requests we can continue to do the
+                # requested job work.
+                try:
+                    dep = source.getChangeByURL(match, event)
+                except Exception:
+                    retry = x != 2 and " Retrying" or ""
+                    log.exception("Failed to retrieve dependency %s.%s",
+                                  match, retry)
+                    if retry:
+                        time.sleep(1)
+                    else:
+                        raise
             if dep and (not dep.is_merged) and dep not in dependencies:
                 log.debug("  Adding dependency: %s", dep)
                 dependencies.append(dep)
