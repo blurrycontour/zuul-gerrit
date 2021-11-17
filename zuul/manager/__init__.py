@@ -546,10 +546,8 @@ class PipelineManager(metaclass=ABCMeta):
                 self.reportStats(item, added=True)
                 item.quiet = quiet
 
-            if item.live and not item.reported_enqueue:
+            if item.live:
                 self.reportEnqueue(item)
-                item.updateAttributes(self.current_context,
-                                      reported_enqueue=True)
 
             # Items in a dependency cycle are expected to be enqueued after
             # each other. To prevent non-cycle items from being enqueued
