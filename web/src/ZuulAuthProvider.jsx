@@ -143,14 +143,6 @@ class ZuulAuthProvider extends React.Component {
       }
     })
 
-    // This is called when a token is expired
-    userManager.events.addAccessTokenExpired(() => {
-      console.log('Auth token expired')
-      userManager.removeUser()
-      this.props.dispatch(userLoggedOut())
-      this.props.channel.postMessage({ 'type': 'signOut' })
-    })
-
     // This is called about 1 minute before a token is expired.  We will try
     // to renew the token.  We use a leader election so that only one tab
     // makes the attempt; the others will receive the token via a broadcast
