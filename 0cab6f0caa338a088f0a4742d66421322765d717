@@ -16,6 +16,24 @@
       "message": "This LGTM, but I\u0027d love it if this were in the source base class in order to keep this code simpler.",
       "revId": "0cab6f0caa338a088f0a4742d66421322765d717",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "587e5c56_cbe9ea2f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-17T19:12:56Z",
+      "side": 1,
+      "message": "I did it this way so that it would apply to all sources. But I\u0027m happy to move it into source specific implementations instead. Are there sources we don\u0027t want this behavior on?",
+      "parentUuid": "3c57731f_159a303b",
+      "revId": "0cab6f0caa338a088f0a4742d66421322765d717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
