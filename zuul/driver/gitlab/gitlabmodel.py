@@ -77,6 +77,7 @@ class GitlabTriggerEvent(TriggerEvent):
         self.title = None
         self.action = None
         self.labels = []
+        self.unlabels = []
         self.change_number = None
         self.merge_request_description_changed = None
         self.tag = None
@@ -87,6 +88,7 @@ class GitlabTriggerEvent(TriggerEvent):
         d["title"] = self.title
         d["action"] = self.action
         d["labels"] = self.labels
+        d["unlabels"] = self.unlabels
         d["change_number"] = self.change_number
         d["merge_request_description_changed"] = \
             self.merge_request_description_changed
@@ -99,6 +101,7 @@ class GitlabTriggerEvent(TriggerEvent):
         self.title = d["title"]
         self.action = d["action"]
         self.labels = d["labels"]
+        self.unlabels = d.get("unlabels", [])
         self.change_number = d["change_number"]
         self.merge_request_description_changed = \
             d["merge_request_description_changed"]
@@ -113,6 +116,8 @@ class GitlabTriggerEvent(TriggerEvent):
             r.append("mr:%s" % self.change_number)
         if self.labels:
             r.append("labels:%s" % ', '.join(self.labels))
+        if self.unlabels:
+            r.append("unlabels:%s" % ', '.join(self.unlabels))
         return ' '.join(r)
 
     def isPatchsetCreated(self):
@@ -127,7 +132,8 @@ class GitlabTriggerEvent(TriggerEvent):
 class GitlabEventFilter(EventFilter):
     def __init__(
             self, connection_name, trigger, types=None, actions=None,
-            comments=None, refs=None, labels=None, ignore_deletes=True):
+            comments=None, refs=None, labels=None, unlabels=None,
+            ignore_deletes=True):
         super().__init__(connection_name, trigger)
         self._types = types or []
         self.types = [re.compile(x) for x in self._types]
@@ -137,6 +143,7 @@ class GitlabEventFilter(EventFilter):
         self._refs = refs or []
         self.refs = [re.compile(x) for x in self._refs]
         self.labels = labels or []
+        self.unlabels = unlabels or []
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -155,6 +162,8 @@ class GitlabEventFilter(EventFilter):
             ret += ' ignore_deletes: %s' % self.ignore_deletes
         if self.labels:
             ret += ' labels: %s' % ', '.join(self.labels)
+        if self.unlabels:
+            ret += ' unlabels: %s' % ', '.join(self.unlabels)
         ret += '>'
 
         return ret
@@ -199,6 +208,10 @@ class GitlabEventFilter(EventFilter):
 
         if self.labels:
             if not set(event.labels).intersection(set(self.labels)):
+                return False
+
+        if self.unlabels:
+            if not set(event.unlabels).intersection(set(self.unlabels)):
                 return False
 
         return True

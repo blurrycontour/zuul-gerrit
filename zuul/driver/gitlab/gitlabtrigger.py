@@ -34,6 +34,7 @@ class GitlabTrigger(BaseTrigger):
                 comments=to_list(trigger.get('comment')),
                 refs=to_list(trigger.get('ref')),
                 labels=to_list(trigger.get('labels')),
+                unlabels=to_list(trigger.get('unlabels')),
             )
             efilters.append(f)
         return efilters
@@ -53,6 +54,7 @@ def getSchema():
         'action': scalar_or_list(str),
         'comment': scalar_or_list(str),
         'ref': scalar_or_list(str),
-        'labels': scalar_or_list(str)
+        'labels': scalar_or_list(str),
+        'unlabels': scalar_or_list(str),
     }
     return gitlab_trigger

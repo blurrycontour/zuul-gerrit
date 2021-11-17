@@ -190,9 +190,15 @@ the following options.
 
    .. attr:: labels
 
-      This is only used for ``gl_merge_request`` and ``labeled`` actions.  It
-      accepts a string or a list of strings that are searched into the list
-      of labels set to the merge request.
+      This is only used for ``gl_merge_request`` and ``labeled``
+      actions.  It accepts a string or a list of strings that are that
+      must have been added for the event to match.
+
+   .. attr:: unlabels
+
+      This is only used for ``gl_merge_request`` and ``labeled``
+      actions.  It accepts a string or a list of strings that are that
+      must have been removed for the event to match.
 
    .. attr:: ref
 
@@ -273,9 +279,15 @@ in the *opened* state (not merged yet).
       A boolean value (``true`` or ``false``) that indicates whether
       the Merge Request must be approved or not in order to be enqueued.
 
-   .. attr:: labels
+   .. attr:: label
 
-      if present, the list of labels a Merge Request must have.
+      A string or list of strings, each representing a label name
+      which should be added to the merge request.
+
+   .. attr:: unlabel
+
+      A string or list of strings, each representing a label name
+      which should be removed from the merge request.
 
 
 Reference pipelines configuration
