@@ -14,6 +14,7 @@
 
 import * as React from 'react'
 import { Fragment } from 'react'
+import ReAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
 import {
   Card,
@@ -106,11 +107,11 @@ class BuildOutput extends React.Component {
               {task.stdout_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
                   <pre key="stdout" title="stdout">
-                    {task.stdout_lines.slice(0, -max_lines).join('\n')}
+                    <ReAnsi log={task.stdout_lines.slice(0, -max_lines).join('\n')} />
                   </pre>
                 </details>)}
               <pre key="stdout" title="stdout">
-                {task.stdout_lines.slice(-max_lines).join('\n')}
+                <ReAnsi log={task.stdout_lines.slice(-max_lines).join('\n')} />
               </pre>
             </Fragment>
           )}
@@ -119,12 +120,12 @@ class BuildOutput extends React.Component {
               {task.stderr_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
                   <pre key="stderr" title="stderr">
-                    {task.stderr_lines.slice(0, -max_lines).join('\n')}
+                    <ReAnsi log={task.stderr_lines.slice(0, -max_lines).join('\n')} />
                   </pre>
                 </details>
               )}
               <pre key="stderr" title="stderr">
-                {task.stderr_lines.slice(-max_lines).join('\n')}
+                <ReAnsi log={task.stderr_lines.slice(-max_lines).join('\n')} />
               </pre>
             </Fragment>
           )}
