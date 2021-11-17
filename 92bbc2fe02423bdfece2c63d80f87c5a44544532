@@ -22,6 +22,23 @@
       },
       "revId": "92bbc2fe02423bdfece2c63d80f87c5a44544532",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08ac39d1_c1763def",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-17T19:54:18Z",
+      "side": 1,
+      "message": "Exactly; the trigger event queue is a try/finally:\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/scheduler.py#L1872\n\nIt may be possible to have some ZK error that causes us to report enqueued and then fail to remove the event; however, we try almost indefinitely to write the pipeline state to ZK before we leave queue processing, so that is unlikely.",
+      "revId": "92bbc2fe02423bdfece2c63d80f87c5a44544532",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
