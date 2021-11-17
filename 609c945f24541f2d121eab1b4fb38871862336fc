@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "609c945f24541f2d121eab1b4fb38871862336fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5493904_5d447045",
+        "filename": "zuul/vendor/contextlib.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-11-17T09:01:18Z",
+      "side": 1,
+      "message": "I think you need to remove the `AbstractAsyncContextManager` import (and then maybe also aenter/aexit) as it is not available in Python 3.6.",
+      "revId": "609c945f24541f2d121eab1b4fb38871862336fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
