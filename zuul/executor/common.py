@@ -94,7 +94,10 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         params['branch'] = None
     params['override_branch'] = job.override_branch
     params['override_checkout'] = job.override_checkout
-    params['repo_state'] = item.current_build_set.repo_state
+    merge_rs = item.current_build_set.merge_repo_state
+    params['merge_repo_state_ref'] = merge_rs and merge_rs.getPath()
+    extra_rs = item.current_build_set.extra_repo_state
+    params['extra_repo_state_ref'] = extra_rs and extra_rs.getPath()
     params['ansible_version'] = job.ansible_version
     params['workspace_scheme'] = job.workspace_scheme
 

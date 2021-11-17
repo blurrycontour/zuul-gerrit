@@ -62,6 +62,8 @@ from zuul.model import (
     BuildRequest,
     BuildStartedEvent,
     BuildStatusEvent,
+    ExtraRepoState,
+    MergeRepoState,
     NodeSet,
 )
 import zuul.model
@@ -73,6 +75,7 @@ from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
 from zuul.zk.system import ZuulSystem
+from zuul.zk.zkobject import ZKContext
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -1031,6 +1034,7 @@ class AnsibleJob(object):
             )
 
             self.setNodeInfo()
+            self.loadRepoState()
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
@@ -1152,6 +1156,22 @@ class AnsibleJob(object):
                     "Unable to return nodeset %s", self.nodeset
                 )
 
+    def loadRepoState(self):
+        merge_rs_path = self.arguments['merge_repo_state_ref']
+        merge_repo_state = merge_rs_path and MergeRepoState.fromZK(
+            self.executor_server.zk_context, merge_rs_path)
+        extra_rs_path = self.arguments['extra_repo_state_ref']
+        extra_repo_state = extra_rs_path and ExtraRepoState.fromZK(
+            self.executor_server.zk_context, extra_rs_path)
+        d = {}
+        for rs in (merge_repo_state, extra_repo_state):
+            if not rs:
+                continue
+            for connection in rs.state.keys():
+                d.setdefault(connection, {}).update(
+                    rs.state.get(connection, {}))
+        self.repo_state = d
+
     def _base_job_data(self):
         data = {
             # TODO(mordred) worker_name is needed as a unique name for the
@@ -1181,7 +1201,6 @@ class AnsibleJob(object):
         self.log.debug("Job root: %s" % (self.jobdir.root,))
         tasks = []
         projects = set()
-        repo_state = args['repo_state']
 
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Updating repositories\n".format(
@@ -1192,7 +1211,7 @@ class AnsibleJob(object):
             self.log.debug("Updating project %s" % (project,))
             tasks.append(self.executor_server.update(
                 project['connection'], project['name'],
-                repo_state=repo_state,
+                repo_state=self.repo_state,
                 zuul_event_id=self.zuul_event_id,
                 build=self.build_request.uuid))
             projects.add((project['connection'], project['name']))
@@ -1211,7 +1230,7 @@ class AnsibleJob(object):
                 self.log.debug("Updating playbook or role %s" % (
                                repo['project'],))
                 tasks.append(self.executor_server.update(
-                    *key, repo_state=repo_state,
+                    *key, repo_state=self.repo_state,
                     zuul_event_id=self.zuul_event_id,
                     build=self.build_request.uuid))
                 projects.add(key)
@@ -1235,7 +1254,7 @@ class AnsibleJob(object):
 
             # Take refs and branches from repo state
             project_repo_state = \
-                repo_state[task.connection_name][task.project_name]
+                self.repo_state[task.connection_name][task.project_name]
             # All branch names
             branches = [
                 ref[11:]  # strip refs/heads/
@@ -1287,7 +1306,7 @@ class AnsibleJob(object):
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
             item_commit = self.doMergeChanges(
-                merger, merge_items, repo_state, restored_repos)
+                merger, merge_items, self.repo_state, restored_repos)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1302,7 +1321,7 @@ class AnsibleJob(object):
             if (project['connection'], project['name']) in restored_repos:
                 continue
             merger.setRepoState(
-                project['connection'], project['name'], repo_state,
+                project['connection'], project['name'], self.repo_state,
                 process_worker=self.executor_server.process_worker)
 
         # Early abort if abort requested
@@ -2045,7 +2064,7 @@ class AnsibleJob(object):
             merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch,
-                repo_state=args['repo_state'],
+                repo_state=self.repo_state,
                 process_worker=self.executor_server.process_worker,
                 zuul_event_id=self.zuul_event_id)
         else:
@@ -2096,7 +2115,7 @@ class AnsibleJob(object):
                 # If we don't have this repo yet prepared we need to restore
                 # the repo state. Otherwise we have speculative merges in the
                 # repo and must not restore the repo state again.
-                repo_state = args['repo_state']
+                repo_state = self.repo_state
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, root)
@@ -3055,6 +3074,7 @@ class ExecutorServer(BaseMergeServer):
         self.keystore = KeyStorage(
             self.zk_client,
             password=self._get_key_store_password())
+        self.zk_context = ZKContext(self.zk_client, None, None, self.log)
         self._running = False
         self._command_running = False
         # TODOv3(mordred): make the executor name more unique --
