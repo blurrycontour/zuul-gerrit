@@ -64,6 +64,8 @@ class GitlabWebServer(object):
 
             mr_merge_re = re.compile(r'.+/projects/(?P<project>.+)/'
                                      r'merge_requests/(?P<mr>\d+)/merge$')
+            mr_update_re = re.compile(r'.+/projects/(?P<project>.+)/'
+                                      r'merge_requests/(?P<mr>\d+)$')
 
             def _get_mr(self, project, number):
                 project = urllib.parse.unquote(project)
@@ -129,6 +131,9 @@ class GitlabWebServer(object):
                 m = self.mr_merge_re.match(path)
                 if m:
                     return self.put_mr_merge(data, **m.groupdict())
+                m = self.mr_update_re.match(path)
+                if m:
+                    return self.put_mr_update(data, **m.groupdict())
                 self.send_response(500)
                 self.end_headers()
 
@@ -230,6 +235,16 @@ class GitlabWebServer(object):
                 mr = self._get_mr(project, mr)
                 mr.mergeMergeRequest()
                 self.send_data({'state': 'merged'})
+
+            def put_mr_update(self, data, project, mr):
+                mr = self._get_mr(project, mr)
+                labels = set(mr.labels)
+                add_labels = data.get('add_labels', [''])[0].split(',')
+                remove_labels = data.get('remove_labels', [''])[0].split(',')
+                labels = labels - set(remove_labels)
+                labels = labels | set(add_labels)
+                mr.labels = list(labels)
+                self.send_data({})
 
             def log_message(self, fmt, *args):
                 self.log.debug(fmt, *args)

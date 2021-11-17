@@ -196,14 +196,20 @@ class TestGitlabDriver(ZuulTestCase):
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
 
         self.fake_gitlab.emitEvent(A.getMergeRequestLabeledEvent(
-            labels=('label1', 'label2')))
+            add_labels=('label1', 'label2')))
         self.waitUntilSettled()
         self.assertEqual(0, len(self.history))
 
         self.fake_gitlab.emitEvent(A.getMergeRequestLabeledEvent(
-            labels=('gateit', )))
+            add_labels=('gateit', )))
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
+
+        A.labels = ['verified']
+        self.fake_gitlab.emitEvent(A.getMergeRequestLabeledEvent(
+            remove_labels=('verified', )))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_merged(self):
@@ -638,6 +644,18 @@ class TestGitlabDriver(ZuulTestCase):
         self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/gitlab-label-add-remove.yaml', driver='gitlab')
+    def test_label_add_remove(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project1', 'master', 'A')
+        A.labels = ['removeme1', 'removeme2']
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(set(A.labels), {'addme1', 'addme2'})
 
     @simple_layout('layouts/merging-gitlab.yaml', driver='gitlab')
     def test_merge_action_in_independent(self):
