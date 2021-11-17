@@ -61,10 +61,16 @@ class AuthContainer extends React.Component {
     this.state = {
       isModalOpen: false,
       showZuulClientConfig: false,
+      isSessionExpiredModalOpen: false,
     }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
         isModalOpen: !isModalOpen
+      }))
+    }
+    this.handleSessionExpiredModalToggle = () => {
+      this.setState(({ isSessionExpiredModalOpen }) => ({
+        isSessionExpiredModalOpen: !isSessionExpiredModalOpen
       }))
     }
     this.handleConfigToggle = () => {
@@ -72,6 +78,38 @@ class AuthContainer extends React.Component {
         showZuulClientConfig: !showZuulClientConfig
       }))
     }
+    this.onAccessTokenExpired = () => {
+      // If the token has expired, show the modal
+      console.debug('Token expired')
+      this.setState(() => ({
+        isSessionExpiredModalOpen: true,
+        isModalOpen: false,
+      }))
+    }
+    this.onUserLoaded = () => {
+      // If another tab logged in while our expired modal is shown, go
+      // ahead and clear it.
+      console.debug('User signed in')
+      this.setState(() => ({
+        isSessionExpiredModalOpen: false,
+      }))
+    }
+  }
+
+  clickOnSignIn() {
+    const redirect_target = window.location.href.slice(getHomepageUrl().length)
+    localStorage.setItem('zuul_auth_redirect', redirect_target)
+    this.props.signIn()
+  }
+
+  componentDidMount() {
+    this.props.userManager.events.addAccessTokenExpired(this.onAccessTokenExpired)
+    this.props.userManager.events.addUserLoaded(this.onUserLoaded)
+  }
+
+  componentWillUnmount() {
+    this.props.userManager.events.removeAccessTokenExpired(this.onAccessTokenExpired)
+    this.props.userManager.events.removeUserLoaded(this.onUserLoaded)
   }
 
   componentDidUpdate() {
@@ -94,6 +132,30 @@ class AuthContainer extends React.Component {
     ZCconfig = ZCconfig + 'auth_token=' + user.token + '\n'
 
     return ZCconfig
+  }
+
+  renderCredentialsExpiredModal() {
+    const { isSessionExpiredModalOpen } = this.state
+    return <React.Fragment>
+      <Modal
+        position='top'
+        title='You are being logged out'
+        isOpen={isSessionExpiredModalOpen}
+        variant={ModalVariant.small}
+        onClose={() => {
+          this.handleSessionExpiredModalToggle()
+          this.props.signOut()
+        }}>
+        Your session has expired. &nbsp;
+        <Button
+          key="SignIn"
+          isInline
+          variant={ButtonVariant.link}
+          onClick={() => { this.clickOnSignIn() }}>
+          Please renew your credentials.
+        </Button>
+      </Modal>
+    </React.Fragment>
   }
 
   renderModal() {
@@ -164,11 +226,7 @@ class AuthContainer extends React.Component {
           <Button
             key="SignIn"
             variant={ButtonVariant.plain}
-            onClick={() => {
-              const redirect_target = window.location.href.slice(getHomepageUrl().length)
-              localStorage.setItem('zuul_auth_redirect', redirect_target)
-              this.props.signIn()
-            }}>
+            onClick={() => { this.clickOnSignIn() }}>
             Sign in &nbsp;
             <SignInAltIcon title='Sign In' />
           </Button>
@@ -185,6 +243,7 @@ class AuthContainer extends React.Component {
             <UserIcon title='User details' />
             &nbsp;{user.data.profile.preferred_username}&nbsp;
           </Button>
+          {this.renderCredentialsExpiredModal()}
         </div>
       )
     }
