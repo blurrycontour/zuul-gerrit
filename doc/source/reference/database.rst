@@ -33,6 +33,14 @@ The following options can be defined in this section.
 
         GRANT ALL ON my_database TO 'my_user'@'%';
 
+   .. attr:: pool_size
+      :default 10
+
+      Number of connections available in the connection pool. See `The
+      SQLAlchemy connection pool configuration
+      <https://docs.sqlalchemy.org/en/14/core/pooling.html#connection-pool-configuration>`_
+      for more information.
+
    .. attr:: pool_recycle
       :default: 1
 
