@@ -246,7 +246,7 @@ class ZKBranchCacheMixin:
 
         if self.read_only:
             raise RuntimeError(
-                "Won't fetch project branches as read-only is set.")
+                "Will not fetch project branches as read-only is set")
 
         # We need to perform a query
         branches = self._fetchProjectBranches(project, exclude_unprotected)
