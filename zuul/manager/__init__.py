@@ -486,7 +486,29 @@ class PipelineManager(metaclass=ABCMeta):
         # to date and this is a noop; otherwise, we need to refresh
         # them anyway.
         if isinstance(change, model.Change):
-            self.updateCommitDependencies(change, None, event)
+            try:
+                self.updateCommitDependencies(change, None, event)
+            except Exception:
+                log.exception("Unable to update dependencies for "
+                              "change %s" % change)
+                # TODO Is it safe to enqueue for a moment if we didn't update
+                # dependencies?
+                actions = self.pipeline.failure_actions
+                ci = change_queue.enqueueChange(change, event)
+                ci.warning("Unable to update change dependencies")
+                ci.setReportedResult('FAILURE')
+
+                # Only report the error if the project is in the current
+                # pipeline. Otherwise the change could be spammed by
+                # reports from unrelated pipelines.
+                if self.pipeline.tenant.layout.getProjectPipelineConfig(
+                    ci
+                ):
+                    self.sendReport(actions, ci)
+                self.dequeueItem(ci)
+                self.sql.reportBuildsetEnd(ci.current_build_set,
+                                           'failure', final=True)
+                return False
 
         with self.getChangeQueue(change, event, change_queue) as change_queue:
             if not change_queue:
