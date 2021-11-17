@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c57731f_159a303b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-17T19:09:35Z",
+      "side": 1,
+      "message": "This LGTM, but I\u0027d love it if this were in the source base class in order to keep this code simpler.",
+      "revId": "0cab6f0caa338a088f0a4742d66421322765d717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
