@@ -16,6 +16,24 @@
       "message": "Why did you change fullName to queue.name?  We\u0027ll lose the branch addon.",
       "revId": "e2b730d6edaf1a9a38522d9244df9462c3d78e58",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82a2b891_85070ff1",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 25
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-17T14:21:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9937a700_03ac94d3",
+      "revId": "e2b730d6edaf1a9a38522d9244df9462c3d78e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
