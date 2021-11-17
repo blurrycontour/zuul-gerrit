@@ -156,6 +156,8 @@ class GitlabEventConnector(threading.Thread):
                 label in body["changes"]["labels"]["current"]]
             new_labels = set(current_labels) - set(previous_labels)
             event.labels = list(new_labels)
+            removed_labels = set(previous_labels) - set(current_labels)
+            event.unlabels = list(removed_labels)
         elif attrs['action'] in ('approved', 'unapproved'):
             event.action = attrs['action']
         else:
@@ -443,6 +445,17 @@ class GitlabAPIClient():
             raise MergeFailure('Merge request merge failed: %s' % e)
         return resp[0]
 
+    # https://docs.gitlab.com/ee/api/merge_requests.html#update-mr
+    def update_mr(self, project_name, number,
+                  zuul_event_id=None,
+                  **params):
+        path = "/projects/%s/merge_requests/%s" % (
+            quote_plus(project_name), number)
+        resp = self.put(self.baseurl + path, params=params,
+                        zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
 
 class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'gitlab'
@@ -709,6 +722,16 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.gl_client.merge_mr(
             project_name, number, method, zuul_event_id=event)
         log.info("Merged MR %s#%s", project_name, number)
+
+    def updateMRLabels(self, project_name, mr_number, labels, unlabels,
+                       zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        self.gl_client.update_mr(
+            project_name, mr_number, zuul_event_id=zuul_event_id,
+            add_labels=','.join(labels),
+            remove_labels=','.join(unlabels))
+        log.debug("Added labels %s to, and removed labels %s from %s#%s",
+                  labels, unlabels, project_name, mr_number)
 
 
 class GitlabWebController(BaseWebController):

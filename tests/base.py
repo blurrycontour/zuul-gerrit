@@ -2142,7 +2142,7 @@ class FakeGitlabMergeRequest(object):
     def _updateTimeStamp(self):
         self.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
-    def getMergeRequestEvent(self, action, include_labels=False):
+    def getMergeRequestEvent(self, action, previous_labels=None):
         name = 'gl_merge_request'
         data = {
             'object_kind': 'merge_request',
@@ -2164,9 +2164,9 @@ class FakeGitlabMergeRequest(object):
         data['labels'] = [{'title': label} for label in self.labels]
         data['changes'] = {}
 
-        if include_labels:
+        if previous_labels is not None:
             data['changes']['labels'] = {
-                'previous': [],
+                'previous': [{'title': label} for label in previous_labels],
                 'current': data['labels']
             }
         return (name, data)
@@ -2190,9 +2190,14 @@ class FakeGitlabMergeRequest(object):
         self.approved = False
         return self.getMergeRequestEvent(action='unapproved')
 
-    def getMergeRequestLabeledEvent(self, labels):
-        self.labels = labels
-        return self.getMergeRequestEvent(action='update', include_labels=True)
+    def getMergeRequestLabeledEvent(self, add_labels=[], remove_labels=[]):
+        previous_labels = self.labels
+        labels = set(previous_labels)
+        labels = labels - set(remove_labels)
+        labels = labels | set(add_labels)
+        self.labels = list(labels)
+        return self.getMergeRequestEvent(action='update',
+                                         previous_labels=previous_labels)
 
     def getMergeRequestCommentedEvent(self, note):
         self.addNote(note)

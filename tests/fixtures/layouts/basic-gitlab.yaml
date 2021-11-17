@@ -42,6 +42,11 @@
             - labeled
           labels:
             - gateit
+        - event: gl_merge_request
+          action:
+            - labeled
+          unlabels:
+            - verified
 
 - pipeline:
     name: promote
