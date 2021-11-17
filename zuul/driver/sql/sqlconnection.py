@@ -245,6 +245,7 @@ class SQLConnection(BaseConnection):
                 self.dburi,
                 poolclass=sqlalchemy.pool.QueuePool,
                 pool_recycle=self.connection_config.get('pool_recycle', 1),
+                pool_size=self.connection_config.get('pool_size', 10),
                 future=True)
 
             # If we want the objects returned from query() to be
