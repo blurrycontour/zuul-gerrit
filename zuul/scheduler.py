@@ -1720,6 +1720,10 @@ class Scheduler(threading.Thread):
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
                                pipeline.name, tenant.name)
+            except Exception:
+                self.log.exception(
+                    "Exception processing pipeline %s in tenant %s",
+                    pipeline.name, tenant.name)
 
     def _process_pipeline(self, tenant, pipeline):
         self.process_pipeline_management_queue(tenant, pipeline)
