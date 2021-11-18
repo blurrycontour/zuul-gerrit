@@ -63,8 +63,8 @@ from zuul.model import (
     BuildStartedEvent,
     BuildStatusEvent,
     ExtraRepoState,
+    FrozenJob,
     MergeRepoState,
-    NodeSet,
 )
 import zuul.model
 from zuul.nodepool import Nodepool
@@ -759,6 +759,21 @@ class DeduplicateQueue(object):
             self.condition.release()
 
 
+def zuul_params_from_job(job):
+    zuul_params = {
+        "job": job.name,
+        "voting": job.voting,
+        "timeout": job.timeout,
+        "jobtags": sorted(job.tags),
+        "_inheritance_path": list(job.inheritance_path),
+    }
+    if job.artifact_data:
+        zuul_params['artifacts'] = job.artifact_data
+    if job.override_checkout:
+        zuul_params['override_checkout'] = job.override_checkout
+    return zuul_params
+
+
 def squash_variables(nodes, nodeset, jobvars, groupvars, extravars):
     """Combine the Zuul job variable parameters into a hostvars dictionary.
 
@@ -822,10 +837,10 @@ def make_setup_inventory_dict(nodes, hostvars):
     return inventory
 
 
-def is_group_var_set(name, host, nodeset, args):
+def is_group_var_set(name, host, nodeset, job):
     for group in nodeset.getGroups():
         if host in group.nodes:
-            group_vars = args['group_vars'].get(group.name, {})
+            group_vars = job.group_variables.get(group.name, {})
             if name in group_vars:
                 return True
     return False
@@ -889,13 +904,16 @@ class AnsibleJob(object):
     def __init__(self, executor_server, build_request, arguments):
         logger = logging.getLogger("zuul.AnsibleJob")
         self.arguments = arguments
+        self.job = FrozenJob.fromZK(executor_server.zk_context,
+                                    arguments["job_ref"])
+        self.arguments["zuul"].update(zuul_params_from_job(self.job))
+
         self.zuul_event_id = self.arguments["zuul_event_id"]
         # Record ansible version being used for the cleanup phase
-        self.ansible_version = self.arguments.get('ansible_version')
+        self.ansible_version = self.job.ansible_version
         # TODO(corvus): Remove default setting after 4.3.0; this is to handle
         # scheduler/executor version skew.
-        self.scheme = self.arguments.get('workspace_scheme',
-                                         zuul.model.SCHEME_GOLANG)
+        self.scheme = self.job.workspace_scheme or zuul.model.SCHEME_GOLANG
         self.log = get_annotated_logger(
             logger, self.zuul_event_id, build=build_request.uuid
         )
@@ -946,10 +964,10 @@ class AnsibleJob(object):
                 'executor', 'variables')
 
         plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
-            self.arguments.get('ansible_version'))
+            self.ansible_version)
         self.ara_callbacks = \
             self.executor_server.ansible_manager.getAraCallbackPlugin(
-                self.arguments.get('ansible_version'))
+                self.ansible_version)
         self.library_dir = os.path.join(plugin_dir, 'library')
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
@@ -1100,7 +1118,7 @@ class AnsibleJob(object):
         try:
             # This shouldn't fail - but theoretically it could. So we handle
             # it similar to a NodeRequestError.
-            self.nodeset = NodeSet.fromDict(self.arguments["nodeset"])
+            self.nodeset = self.job.nodeset
         except KeyError:
             self.log.error("Unable to deserialize nodeset")
             raise NodeRequestError
@@ -1218,8 +1236,8 @@ class AnsibleJob(object):
 
         # ...as well as all playbook and role projects.
         repos = []
-        playbooks = (args['pre_playbooks'] + args['playbooks'] +
-                     args['post_playbooks'] + args['cleanup_playbooks'])
+        playbooks = (self.job.pre_run + self.job.run +
+                     self.job.post_run + self.job.cleanup_run)
         for playbook in playbooks:
             repos.append(playbook)
             repos += playbook['roles']
@@ -1344,8 +1362,8 @@ class AnsibleJob(object):
                 project['canonical_name'],
                 ref,
                 args['branch'],
-                args['override_branch'],
-                args['override_checkout'],
+                self.job.override_branch,
+                self.job.override_checkout,
                 project['override_branch'],
                 project['override_checkout'],
                 project['default_branch'])
@@ -1651,7 +1669,7 @@ class AnsibleJob(object):
         # pre-run and run playbooks. post-run is different because
         # it is used to copy out job logs and we want to do our best
         # to copy logs even when the job has timed out.
-        job_timeout = args['timeout']
+        job_timeout = self.job.timeout
         for index, playbook in enumerate(self.jobdir.pre_playbooks):
             # TODOv3(pabelanger): Implement pre-run timeout setting.
             ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
@@ -1714,7 +1732,7 @@ class AnsibleJob(object):
         if self.aborted:
             return 'ABORTED'
 
-        post_timeout = args['post_timeout']
+        post_timeout = self.job.post_timeout
         post_unreachable = False
         for index, playbook in enumerate(self.jobdir.post_playbooks):
             # Post timeout operates a little differently to the main job
@@ -1804,7 +1822,7 @@ class AnsibleJob(object):
             for name in node.name:
                 ip = node.interface_ip
                 port = node.connection_port
-                host_vars = args['host_vars'].get(name, {}).copy()
+                host_vars = self.job.host_variables.get(name, {}).copy()
                 check_varnames(host_vars)
                 host_vars.update(dict(
                     ansible_host=ip,
@@ -1834,8 +1852,8 @@ class AnsibleJob(object):
                 # var or all-var, then don't do anything here; let the
                 # user control.
                 api = 'ansible_python_interpreter'
-                if (api not in args['vars'] and
-                    not is_group_var_set(api, name, self.nodeset, args)):
+                if (api not in self.job.combined_variables and
+                    not is_group_var_set(api, name, self.nodeset, self.job)):
                     python = getattr(node, 'python_path', 'auto')
                     host_vars.setdefault(api, python)
 
@@ -1947,12 +1965,12 @@ class AnsibleJob(object):
         self.writeAnsibleConfig(self.jobdir.setup_playbook)
         self.writeAnsibleConfig(self.jobdir.freeze_playbook)
 
-        for playbook in args['pre_playbooks']:
+        for playbook in self.job.pre_run:
             jobdir_playbook = self.jobdir.addPrePlaybook()
             self.preparePlaybook(jobdir_playbook, playbook, args)
 
         job_playbook = None
-        for playbook in args['playbooks']:
+        for playbook in self.job.run:
             jobdir_playbook = self.jobdir.addPlaybook()
             self.preparePlaybook(jobdir_playbook, playbook, args)
             if jobdir_playbook.path is not None:
@@ -1962,11 +1980,11 @@ class AnsibleJob(object):
         if job_playbook is None:
             raise ExecutorError("No playbook specified")
 
-        for playbook in args['post_playbooks']:
+        for playbook in self.job.post_run:
             jobdir_playbook = self.jobdir.addPostPlaybook()
             self.preparePlaybook(jobdir_playbook, playbook, args)
 
-        for playbook in args['cleanup_playbooks']:
+        for playbook in self.job.cleanup_run:
             jobdir_playbook = self.jobdir.addCleanupPlaybook()
             self.preparePlaybook(jobdir_playbook, playbook, args)
 
@@ -2133,15 +2151,14 @@ class AnsibleJob(object):
                             project.name)
         return path
 
-    def mergeSecretVars(self, secrets, args):
+    def mergeSecretVars(self, secrets):
         '''
         Merge secret return data with secrets.
 
         :arg secrets dict: Actual Zuul secrets.
-        :arg args dict: The job arguments.
         '''
 
-        secret_vars = args.get('secret_vars') or {}
+        secret_vars = self.job.secret_parent_data or {}
 
         # We need to handle secret vars specially.  We want to pass
         # them to Ansible as we do secrets, but we want them to have
@@ -2150,12 +2167,12 @@ class AnsibleJob(object):
         # anything above it in precedence.
 
         other_vars = set()
-        other_vars.update(args['vars'].keys())
-        for group_vars in args['group_vars'].values():
+        other_vars.update(self.job.combined_variables.keys())
+        for group_vars in self.job.group_variables.values():
             other_vars.update(group_vars.keys())
-        for host_vars in args['host_vars'].values():
+        for host_vars in self.job.host_variables.values():
             other_vars.update(host_vars.keys())
-        other_vars.update(args['extra_vars'].keys())
+        other_vars.update(self.job.extra_variables.keys())
         other_vars.update(secrets.keys())
 
         ret = secret_vars.copy()
@@ -2224,8 +2241,8 @@ class AnsibleJob(object):
                 project.canonical_name,
                 None,
                 args['branch'],
-                args['override_branch'],
-                args['override_checkout'],
+                self.job.override_branch,
+                self.job.override_checkout,
                 args_project.get('override_branch'),
                 args_project.get('override_checkout'),
                 role['project_default_branch'])
@@ -2382,16 +2399,16 @@ class AnsibleJob(object):
         return zuul_resources
 
     def prepareVars(self, args, zuul_resources):
-        all_vars = args['vars'].copy()
+        all_vars = self.job.combined_variables.copy()
         check_varnames(all_vars)
 
         # Check the group and extra var names for safety; they'll get
         # merged later
         for group in self.nodeset.getGroups():
-            group_vars = args['group_vars'].get(group.name, {})
+            group_vars = self.job.group_variables.get(group.name, {})
             check_varnames(group_vars)
 
-        check_varnames(args['extra_vars'])
+        check_varnames(self.job.extra_variables)
 
         zuul_vars = {}
         # Start with what the client supplied
@@ -2422,7 +2439,7 @@ class AnsibleJob(object):
         host_list = self.host_list + [localhost]
         self.original_hostvars = squash_variables(
             host_list, self.nodeset, all_vars,
-            args['group_vars'], args['extra_vars'])
+            self.job.group_variables, self.job.extra_variables)
 
     def loadFrozenHostvars(self):
         # Read in the frozen hostvars, and remove the frozen variable
