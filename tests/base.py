@@ -2935,18 +2935,22 @@ class FakeBuild(object):
         self.jobdir = None
         self.uuid = build_request.uuid
         self.parameters = params
+        self.job = model.FrozenJob.fromZK(executor_server.zk_context,
+                                          params["job_ref"])
+        self.parameters["zuul"].update(
+            zuul.executor.server.zuul_params_from_job(self.job))
         # TODOv3(jeblair): self.node is really "the label of the node
         # assigned".  We should rename it (self.node_label?) if we
         # keep using it like this, or we may end up exposing more of
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
         self.node = None
-        if len(self.parameters['nodeset']['nodes']) == 1:
-            self.node = self.parameters['nodeset']['nodes'][0]['label']
+        if len(self.job.nodeset.nodes) == 1:
+            self.node = next(iter(self.job.nodeset.nodes.values())).label
         self.unique = self.parameters['zuul']['build']
         self.pipeline = self.parameters['zuul']['pipeline']
         self.project = self.parameters['zuul']['project']['name']
-        self.name = self.parameters['job']
+        self.name = self.job.name
         self.wait_condition = threading.Condition()
         self.waiting = False
         self.paused = False
@@ -3114,7 +3118,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
             return
         self.executor_server.build_history.append(
             BuildHistory(name=build.name, result=result, changes=build.changes,
-                         node=build.node, uuid=build.unique,
+                         node=build.node, uuid=build.unique, job=build.job,
                          ref=build.parameters['zuul']['ref'],
                          newrev=build.parameters['zuul'].get('newrev'),
                          parameters=build.parameters, jobdir=build.jobdir,
