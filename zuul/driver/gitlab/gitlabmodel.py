@@ -25,6 +25,9 @@ class MergeRequest(Change):
         self.updated_at = None
         self.approved = None
         self.labels = None
+        self.merge_status = None
+        self.mr = None
+        self.title = None
 
     def __repr__(self):
         r = ['<Change 0x%x' % id(self)]
@@ -52,6 +55,9 @@ class MergeRequest(Change):
             "updated_at": self.updated_at,
             "approved": self.approved,
             "labels": self.labels,
+            "merge_status": self.merge_status,
+            "mr": self.mr,
+            "title": self.title,
         })
         return d
 
@@ -60,6 +66,9 @@ class MergeRequest(Change):
         self.updated_at = data.get("updated_at")
         self.approved = data.get("approved")
         self.labels = data.get("labels")
+        self.merge_status = data.get("merge_status")
+        self.mr = data.get("mr")
+        self.title = data.get("title")
 
     def isUpdateOf(self, other):
         if (self.project == other.project and
