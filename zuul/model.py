@@ -3959,7 +3959,8 @@ class QueueItem(zkobject.ZKObject):
         return obj
 
     def getPath(self):
-        return self.itemPath(self.pipeline.state.getPath(), self.uuid)
+        return self.itemPath(PipelineState.pipelinePath(self.pipeline),
+                             self.uuid)
 
     @classmethod
     def itemPath(cls, pipeline_path, item_uuid):

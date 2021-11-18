@@ -724,7 +724,7 @@ class TestBranchVariants(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.builds[0].parameters['pre_playbooks']), 3)
+        self.assertEqual(len(self.builds[0].job.pre_run), 3)
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
