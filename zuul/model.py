@@ -2011,10 +2011,8 @@ class FrozenJob(zkobject.ZKObject):
             v = getattr(self, '_' + k)
             if isinstance(v, JobData):
                 v = {'storage': 'offload', 'path': v.getPath(), 'hash': v.hash}
-            elif isinstance(v, dict):
-                v = {'storage': 'local', 'data': v}
             else:
-                v = None
+                v = {'storage': 'local', 'data': v}
             data[k] = v
 
         # Use json_dumps to strip any ZuulMark entries
@@ -2059,7 +2057,7 @@ class FrozenJob(zkobject.ZKObject):
             if job_data:
                 # This is a dict which tells us where the actual data is.
                 if job_data['storage'] == 'local':
-                    # The data are stored locally in this dict
+                    # The data are stored locally
                     data['_' + job_data_key] = job_data['data']
                 elif job_data['storage'] == 'offload':
                     existing_job_data = getattr(self, job_data_key, None)
