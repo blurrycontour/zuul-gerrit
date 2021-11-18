@@ -27,15 +27,6 @@ from tests.base import ZuulTestCase, FIXTURE_DIR, \
     BaseTestCase, AnsibleZuulTestCase
 
 
-def _get_reporter_from_connection_name(reporters, connection_name):
-    # Reporters are placed into lists for each action they may exist in.
-    # Search through the given list for the correct reporter by its connection
-    # name
-    for r in reporters:
-        if r.connection.connection_name == connection_name:
-            return r
-
-
 class TestConnections(ZuulTestCase):
     config_file = 'zuul-connections-same-gerrit.conf'
     tenant_config_file = 'config/zuul-connections-same-gerrit/main.yaml'
