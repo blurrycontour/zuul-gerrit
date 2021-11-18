@@ -86,6 +86,23 @@
       "parentUuid": "57448a94_1c75cafe",
       "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52d2d8ea_5c9ccf91",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 37
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-18T00:42:16Z",
+      "side": 1,
+      "message": "I\u0027m on board with actions being distinct from properties, but I think location isn\u0027t the only way to do that.  The most important thing is that they are easy to find and identify as actions, and that they don\u0027t get lost in the properties.  The styling we have around the button helps a lot with that.  We may be able to improve it some more, and perhaps we think about putting the actions underneath the props.  Anyway, I think this is quite good for now; the benefits outweigh the drawbacks.  Thanks.  :)",
+      "revId": "ef98926ae7626b5726a9c694087d0c1f1eb02e16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
