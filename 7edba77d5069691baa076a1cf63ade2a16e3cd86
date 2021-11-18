@@ -16,6 +16,24 @@
       "message": "If there is only one tab open, the user info isn\u0027t renewed in the tab.\n\nit needs at least \n\n``this.props.dispatch(userLoggedIn(user))``\n\nBut it isn\u0027t enough; for some reason while the user config modal is updated correctly with the new expiry time after a refresh, pages that have admin commands (buildset, etc) do not display them.",
       "revId": "7edba77d5069691baa076a1cf63ade2a16e3cd86",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d0c28f1_c13fe506",
+        "filename": "web/src/ZuulAuthProvider.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-18T17:56:14Z",
+      "side": 1,
+      "message": "Scratch the last remark, it was an error on my part. +1",
+      "parentUuid": "a01dcc30_a5f81e60",
+      "revId": "7edba77d5069691baa076a1cf63ade2a16e3cd86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
