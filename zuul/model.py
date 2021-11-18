@@ -2011,10 +2011,8 @@ class FrozenJob(zkobject.ZKObject):
             v = getattr(self, '_' + k)
             if isinstance(v, JobData):
                 v = {'storage': 'offload', 'path': v.getPath(), 'hash': v.hash}
-            elif isinstance(v, dict):
-                v = {'storage': 'local', 'data': v}
             else:
-                v = None
+                v = {'storage': 'local', 'data': v}
             data[k] = v
 
         # Use json_dumps to strip any ZuulMark entries
