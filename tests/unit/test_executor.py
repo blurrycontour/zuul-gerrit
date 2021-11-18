@@ -34,9 +34,8 @@ from tests.base import (
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
-from zuul.executor.server import AnsibleJob, JobDir, squash_variables
-from zuul.lib.ansible import AnsibleManager
-from zuul.model import BuildRequest, NodeSet, Group
+from zuul.executor.server import squash_variables
+from zuul.model import NodeSet, Group
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -432,118 +431,79 @@ class TestExecutorRepos(ZuulTestCase):
 
 
 class TestAnsibleJob(ZuulTestCase):
-    tenant_config_file = 'config/ansible/main.yaml'
+    tenant_config_file = 'config/single-tenant/main.yaml'
 
-    def setUp(self):
-        super(TestAnsibleJob, self).setUp()
-        ansible_version = AnsibleManager().default_version
-        params = {
-            "ansible_version": ansible_version,
-            "zuul_event_id": 0,
-            "nodeset": {
-                "name": "dummy-node",
-                "node_request_id": 0,
-                "nodes": [],
-                "groups": [],
-            },
-        }
-        build_request = BuildRequest(
-            "test",
-            state=None,
-            precedence=200,
-            zone=None,
-            job_name=None,
-            build_set_uuid=None,
-            tenant_name=None,
-            pipeline_name=None,
-            event_id='1',
-        )
+    def run_job(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
 
-        self.test_job = AnsibleJob(self.executor_server, build_request, params)
-        self.test_job.jobdir = JobDir(self.executor_server.jobdir_root,
-                                      self.executor_server.keep_jobdir,
-                                      str(build_request.uuid))
+        return list(self.executor_server.job_workers.values())[0]
 
-    def test_prepareNodes_host_keys(self):
-        # Test without connection_port set
-        node = {'name': 'fake-host',
-                'label': 'fake-label',
-                'state': 'ready',
-                'cloud': 'fake',
-                'host_keys': ['fake-host-key'],
-                'interface_ip': 'localhost'}
-        nodeset = {
-            "name": "dummy-node",
-            "node_request_id": 0,
-            "nodes": [node],
-            "groups": [],
-        }
-        self.test_job.nodeset = NodeSet.fromDict(nodeset)
-        self.test_job.prepareNodes({'host_vars': {},
-                                    'vars': {},
-                                    'groups': [],
-                                    })
-        keys = self.test_job.host_list[0]['host_keys']
-        self.assertEqual(keys[0], 'localhost fake-host-key')
+    def test_host_keys(self):
+        self.fake_nodepool.host_keys = ['fake-host-key']
+        job = self.run_job()
+        keys = job.host_list[0]['host_keys']
+        self.assertEqual(keys[0], '127.0.0.1 fake-host-key')
 
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_host_keys_connection_port(self):
         # Test with custom connection_port set
-        node['connection_port'] = 22022
-        self.test_job.nodeset = NodeSet.fromDict(nodeset)
-        self.test_job.prepareNodes({'host_vars': {},
-                                    'vars': {},
-                                    'groups': [],
-                                    })
-        keys = self.test_job.host_list[0]['host_keys']
-        self.assertEqual(keys[0], '[localhost]:22022 fake-host-key')
+        self.fake_nodepool.host_keys = ['fake-host-key']
+        self.fake_nodepool.connection_port = 22022
+        job = self.run_job()
+        keys = job.host_list[0]['host_keys']
+        self.assertEqual(keys[0], '[127.0.0.1]:22022 fake-host-key')
 
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_no_host_keys_connection_port(self):
         # Test with no host keys
-        node['host_keys'] = []
-        self.test_job.nodeset = NodeSet.fromDict(nodeset)
-        self.test_job.prepareNodes({'nodes': [node],
-                                    'host_vars': {},
-                                    'vars': {},
-                                    'groups': [],
-                                    })
-        host = self.test_job.host_list[0]
-        self.assertEqual(host['host_keys'], [])
+        self.fake_nodepool.host_keys = []
+        self.fake_nodepool.connection_port = 22022
+        job = self.run_job()
+        keys = job.host_list[0]['host_keys']
+        self.assertEqual(keys, [])
         self.assertEqual(
-            host['host_vars']['ansible_ssh_common_args'],
+            job.host_list[0]['host_vars']['ansible_ssh_common_args'],
             '-o StrictHostKeyChecking=false')
 
-    def test_prepareNodes_shell_type(self):
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_no_shell_type(self):
         # Test without shell type set
-        node = {'name': 'fake-host',
-                'label': 'fake-label',
-                'state': 'ready',
-                'cloud': 'fake',
-                'host_keys': ['fake-host-key'],
-                'interface_ip': 'localhost'}
-        nodeset = {
-            "name": "dummy-node",
-            "node_request_id": 0,
-            "nodes": [node],
-            "groups": [],
-        }
-        self.test_job.nodeset = NodeSet.fromDict(nodeset)
-        self.test_job.prepareNodes({'host_vars': {},
-                                    'vars': {},
-                                    'groups': [],
-                                    })
-        host = self.test_job.host_list[0]
+        job = self.run_job()
+        host = job.host_list[0]
+
         self.assertNotIn('ansible_shell_type', host['host_vars'])
 
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_custom_shell_type(self):
         # Test with custom shell type set.
-        node['shell_type'] = 'cmd'
-        self.test_job.nodeset = NodeSet.fromDict(nodeset)
-        self.test_job.prepareNodes({'host_vars': {},
-                                    'vars': {},
-                                    'groups': [],
-                                    })
-        host = self.test_job.host_list[0]
+        self.fake_nodepool.shell_type = 'cmd'
+        job = self.run_job()
+        host = job.host_list[0]
+
         self.assertIn('ansible_shell_type', host['host_vars'])
         self.assertEqual(
             host['host_vars']['ansible_shell_type'],
             'cmd')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
 
 
 class TestExecutorHostname(ZuulTestCase):

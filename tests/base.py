@@ -2935,18 +2935,22 @@ class FakeBuild(object):
         self.jobdir = None
         self.uuid = build_request.uuid
         self.parameters = params
+        self.job = model.FrozenJob.fromZK(executor_server.zk_context,
+                                          params["job_ref"])
+        self.parameters["zuul"].update(
+            zuul.executor.server.zuul_params_from_job(self.job))
         # TODOv3(jeblair): self.node is really "the label of the node
         # assigned".  We should rename it (self.node_label?) if we
         # keep using it like this, or we may end up exposing more of
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
         self.node = None
-        if len(self.parameters['nodeset']['nodes']) == 1:
-            self.node = self.parameters['nodeset']['nodes'][0]['label']
+        if len(self.job.nodeset.nodes) == 1:
+            self.node = next(iter(self.job.nodeset.nodes.values())).label
         self.unique = self.parameters['zuul']['build']
         self.pipeline = self.parameters['zuul']['pipeline']
         self.project = self.parameters['zuul']['project']['name']
-        self.name = self.parameters['job']
+        self.name = self.job.name
         self.wait_condition = threading.Condition()
         self.waiting = False
         self.paused = False
@@ -3114,7 +3118,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
             return
         self.executor_server.build_history.append(
             BuildHistory(name=build.name, result=result, changes=build.changes,
-                         node=build.node, uuid=build.unique,
+                         node=build.node, uuid=build.unique, job=build.job,
                          ref=build.parameters['zuul']['ref'],
                          newrev=build.parameters['zuul'].get('newrev'),
                          parameters=build.parameters, jobdir=build.jobdir,
@@ -3316,7 +3320,7 @@ class TestingExecutorApi(HoldableExecutorApi):
             return self._test_build_request_job_map[build_request.uuid]
         d = self.getParams(build_request)
         if d:
-            data = d.get('job', '')
+            data = d.get('job_ref', '').split('/')[-1]
         else:
             data = ''
         self._test_build_request_job_map[build_request.uuid] = data
@@ -3627,6 +3631,7 @@ class FakeNodepool(object):
         self.resources = None
         self.python_path = 'auto'
         self.shell_type = None
+        self.connection_port = None
 
     def stop(self):
         self._running = False
@@ -3711,7 +3716,10 @@ class FakeNodepool(object):
         remote_ip = os.environ.get('ZUUL_REMOTE_IPV4', '127.0.0.1')
         if self.remote_ansible and not self.host_keys:
             self.host_keys = self.keyscan(remote_ip)
-        host_keys = self.host_keys or ["fake-key1", "fake-key2"]
+        if self.host_keys is None:
+            host_keys = ["fake-key1", "fake-key2"]
+        else:
+            host_keys = self.host_keys
         data = dict(type=node_type,
                     cloud='test-cloud',
                     provider='test-provider',
@@ -3745,6 +3753,8 @@ class FakeNodepool(object):
             data['connection_type'] = 'winrm'
         if 'network' in node_type:
             data['connection_type'] = 'network_cli'
+        if self.connection_port:
+            data['connection_port'] = self.connection_port
         if 'kubernetes-namespace' in node_type or 'fedora-pod' in node_type:
             data['connection_type'] = 'namespace'
             data['connection_port'] = {

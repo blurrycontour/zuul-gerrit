@@ -946,6 +946,9 @@ class TestScheduler(ZuulTestCase):
     def test_failed_change_at_head_with_queue(self):
         "Test that if a change at the head fails, queued jobs are canceled"
 
+        def get_name(params):
+            return params.get('job_ref', '').split('/')[-1]
+
         self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
@@ -966,7 +969,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(queue), 1)
         self.assertEqual(queue[0].zone, None)
         params = self.executor_server.executor_api.getParams(queue[0])
-        self.assertEqual(params['job'], 'project-merge')
+        self.assertEqual(get_name(params), 'project-merge')
         self.assertEqual(params['items'][0]['number'], '%d' % A.number)
 
         self.executor_api.release('.*-merge')
@@ -982,12 +985,12 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)
 
-        self.assertEqual(params[0]['job'], 'project-test1')
-        self.assertEqual(params[1]['job'], 'project-test2')
-        self.assertEqual(params[2]['job'], 'project-test1')
-        self.assertEqual(params[3]['job'], 'project-test2')
-        self.assertEqual(params[4]['job'], 'project-test1')
-        self.assertEqual(params[5]['job'], 'project-test2')
+        self.assertEqual(get_name(params[0]), 'project-test1')
+        self.assertEqual(get_name(params[1]), 'project-test2')
+        self.assertEqual(get_name(params[2]), 'project-test1')
+        self.assertEqual(get_name(params[3]), 'project-test2')
+        self.assertEqual(get_name(params[4]), 'project-test1')
+        self.assertEqual(get_name(params[5]), 'project-test2')
 
         self.executor_api.release(queue[0])
         self.waitUntilSettled()
@@ -3330,59 +3333,61 @@ class TestScheduler(ZuulTestCase):
         ], ordered=False)
         j = self.getJobFromHistory('parentjob')
         rp = set([p['name'] for p in j.parameters['projects']])
-        self.assertEqual(j.parameters['vars']['project_var'], 'set_in_project')
-        self.assertEqual(j.parameters['vars']['template_var1'],
-                         'set_in_template1')
-        self.assertEqual(j.parameters['vars']['template_var2'],
-                         'set_in_template2')
-        self.assertEqual(j.parameters['vars']['override'], 0)
-        self.assertEqual(j.parameters['vars']['child1override'], 0)
-        self.assertEqual(j.parameters['vars']['parent'], 0)
-        self.assertEqual(j.parameters['vars']['deep']['override'], 0)
-        self.assertFalse('child1' in j.parameters['vars'])
-        self.assertFalse('child2' in j.parameters['vars'])
-        self.assertFalse('child3' in j.parameters['vars'])
+        job_vars = j.job.combined_variables
+        self.assertEqual(job_vars['project_var'], 'set_in_project')
+        self.assertEqual(job_vars['template_var1'], 'set_in_template1')
+        self.assertEqual(job_vars['template_var2'], 'set_in_template2')
+        self.assertEqual(job_vars['override'], 0)
+        self.assertEqual(job_vars['child1override'], 0)
+        self.assertEqual(job_vars['parent'], 0)
+        self.assertEqual(job_vars['deep']['override'], 0)
+        self.assertFalse('child1' in job_vars)
+        self.assertFalse('child2' in job_vars)
+        self.assertFalse('child3' in job_vars)
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project0']))
         j = self.getJobFromHistory('child1')
         rp = set([p['name'] for p in j.parameters['projects']])
-        self.assertEqual(j.parameters['vars']['project_var'], 'set_in_project')
-        self.assertEqual(j.parameters['vars']['override'], 1)
-        self.assertEqual(j.parameters['vars']['child1override'], 1)
-        self.assertEqual(j.parameters['vars']['parent'], 0)
-        self.assertEqual(j.parameters['vars']['child1'], 1)
-        self.assertEqual(j.parameters['vars']['deep']['override'], 1)
-        self.assertFalse('child2' in j.parameters['vars'])
-        self.assertFalse('child3' in j.parameters['vars'])
+        job_vars = j.job.combined_variables
+        self.assertEqual(job_vars['project_var'], 'set_in_project')
+        self.assertEqual(job_vars['override'], 1)
+        self.assertEqual(job_vars['child1override'], 1)
+        self.assertEqual(job_vars['parent'], 0)
+        self.assertEqual(job_vars['child1'], 1)
+        self.assertEqual(job_vars['deep']['override'], 1)
+        self.assertFalse('child2' in job_vars)
+        self.assertFalse('child3' in job_vars)
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project1']))
         j = self.getJobFromHistory('child2')
-        self.assertEqual(j.parameters['vars']['project_var'], 'set_in_project')
+        job_vars = j.job.combined_variables
+        self.assertEqual(job_vars['project_var'], 'set_in_project')
         rp = set([p['name'] for p in j.parameters['projects']])
-        self.assertEqual(j.parameters['vars']['override'], 2)
-        self.assertEqual(j.parameters['vars']['child1override'], 0)
-        self.assertEqual(j.parameters['vars']['parent'], 0)
-        self.assertEqual(j.parameters['vars']['deep']['override'], 2)
-        self.assertFalse('child1' in j.parameters['vars'])
-        self.assertEqual(j.parameters['vars']['child2'], 2)
-        self.assertFalse('child3' in j.parameters['vars'])
+        self.assertEqual(job_vars['override'], 2)
+        self.assertEqual(job_vars['child1override'], 0)
+        self.assertEqual(job_vars['parent'], 0)
+        self.assertEqual(job_vars['deep']['override'], 2)
+        self.assertFalse('child1' in job_vars)
+        self.assertEqual(job_vars['child2'], 2)
+        self.assertFalse('child3' in job_vars)
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project2']))
         j = self.getJobFromHistory('child3')
-        self.assertEqual(j.parameters['vars']['project_var'], 'set_in_project')
+        job_vars = j.job.combined_variables
+        self.assertEqual(job_vars['project_var'], 'set_in_project')
         rp = set([p['name'] for p in j.parameters['projects']])
-        self.assertEqual(j.parameters['vars']['override'], 3)
-        self.assertEqual(j.parameters['vars']['child1override'], 0)
-        self.assertEqual(j.parameters['vars']['parent'], 0)
-        self.assertEqual(j.parameters['vars']['deep']['override'], 3)
-        self.assertFalse('child1' in j.parameters['vars'])
-        self.assertFalse('child2' in j.parameters['vars'])
-        self.assertEqual(j.parameters['vars']['child3'], 3)
+        self.assertEqual(job_vars['override'], 3)
+        self.assertEqual(job_vars['child1override'], 0)
+        self.assertEqual(job_vars['parent'], 0)
+        self.assertEqual(job_vars['deep']['override'], 3)
+        self.assertFalse('child1' in job_vars)
+        self.assertFalse('child2' in job_vars)
+        self.assertEqual(job_vars['child3'], 3)
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project3']))
         j = self.getJobFromHistory('override_project_var')
-        self.assertEqual(j.parameters['vars']['project_var'],
-                         'override_in_job')
+        job_vars = j.job.combined_variables
+        self.assertEqual(job_vars['project_var'], 'override_in_job')
 
     @simple_layout('layouts/job-variants.yaml')
     def test_job_branch_variants(self):
@@ -3413,39 +3418,39 @@ class TestScheduler(ZuulTestCase):
             dict(name='python27', result='SUCCESS'),
         ])
 
-        p = self.history[0].parameters
-        self.assertEqual(p['timeout'], 40)
-        self.assertEqual(len(p['nodeset']['nodes']), 1)
-        self.assertEqual(p['nodeset']['nodes'][0]['label'], 'new')
-        self.assertEqual([x['path'] for x in p['pre_playbooks']],
+        j = self.history[0].job
+        self.assertEqual(j.timeout, 40)
+        self.assertEqual(len(j.nodeset.nodes), 1)
+        self.assertEqual(next(iter(j.nodeset.nodes.values())).label, 'new')
+        self.assertEqual([x['path'] for x in j.pre_run],
                          ['base-pre', 'py27-pre'])
-        self.assertEqual([x['path'] for x in p['post_playbooks']],
+        self.assertEqual([x['path'] for x in j.post_run],
                          ['py27-post-a', 'py27-post-b', 'base-post'])
-        self.assertEqual([x['path'] for x in p['playbooks']],
+        self.assertEqual([x['path'] for x in j.run],
                          ['playbooks/python27.yaml'])
 
-        p = self.history[1].parameters
-        self.assertEqual(p['timeout'], 50)
-        self.assertEqual(len(p['nodeset']['nodes']), 1)
-        self.assertEqual(p['nodeset']['nodes'][0]['label'], 'old')
-        self.assertEqual([x['path'] for x in p['pre_playbooks']],
+        j = self.history[1].job
+        self.assertEqual(j.timeout, 50)
+        self.assertEqual(len(j.nodeset.nodes), 1)
+        self.assertEqual(next(iter(j.nodeset.nodes.values())).label, 'old')
+        self.assertEqual([x['path'] for x in j.pre_run],
                          ['base-pre', 'py27-pre', 'py27-diablo-pre'])
-        self.assertEqual([x['path'] for x in p['post_playbooks']],
+        self.assertEqual([x['path'] for x in j.post_run],
                          ['py27-diablo-post', 'py27-post-a', 'py27-post-b',
                           'base-post'])
-        self.assertEqual([x['path'] for x in p['playbooks']],
+        self.assertEqual([x['path'] for x in j.run],
                          ['py27-diablo'])
 
-        p = self.history[2].parameters
-        self.assertEqual(p['timeout'], 40)
-        self.assertEqual(len(p['nodeset']['nodes']), 1)
-        self.assertEqual(p['nodeset']['nodes'][0]['label'], 'new')
-        self.assertEqual([x['path'] for x in p['pre_playbooks']],
+        j = self.history[2].job
+        self.assertEqual(j.timeout, 40)
+        self.assertEqual(len(j.nodeset.nodes), 1)
+        self.assertEqual(next(iter(j.nodeset.nodes.values())).label, 'new')
+        self.assertEqual([x['path'] for x in j.pre_run],
                          ['base-pre', 'py27-pre', 'py27-essex-pre'])
-        self.assertEqual([x['path'] for x in p['post_playbooks']],
+        self.assertEqual([x['path'] for x in j.post_run],
                          ['py27-essex-post', 'py27-post-a', 'py27-post-b',
                           'base-post'])
-        self.assertEqual([x['path'] for x in p['playbooks']],
+        self.assertEqual([x['path'] for x in j.run],
                          ['playbooks/python27.yaml'])
 
     @simple_layout("layouts/no-run.yaml")
