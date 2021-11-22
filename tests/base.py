@@ -4684,7 +4684,7 @@ class ZuulTestCase(BaseTestCase):
             self.waitUntilSettled()
 
     def createScheduler(self):
-        self.scheds.create(
+        return self.scheds.create(
             self.log, self.config, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth,
