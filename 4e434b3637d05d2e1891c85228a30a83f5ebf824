@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4eb15c60_7f036daf",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-22T22:30:16Z",
+      "side": 1,
+      "message": "We should be able to hook into the usermanager event for this, so we don\u0027t have to run our own timer.  I\u0027ll push a new PS to do that.",
+      "revId": "4e434b3637d05d2e1891c85228a30a83f5ebf824",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
