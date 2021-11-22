@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38b9da6e_c9473a13",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2060,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-22T22:45:40Z",
+      "side": 1,
+      "message": "Originally I meant \"this dict\" to mean job_data.  I\u0027m going to put this comment back the way it was.",
+      "revId": "0111f4eb63cc59f5d86f86edb9962171a6ab30d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
