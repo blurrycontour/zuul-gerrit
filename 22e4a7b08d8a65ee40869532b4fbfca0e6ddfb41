@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f84eea26_66216d88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-22T22:39:12Z",
+      "side": 1,
+      "message": "I\u0027m confused, is the problem that the pool is exhausted (too many connections in use)?  Or that there are too many connections open to the db (connection pool not being shut down)?  Or that there are too many open sockets( connection pool not being shut down)?",
+      "revId": "22e4a7b08d8a65ee40869532b4fbfca0e6ddfb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "659e87cc_cdc3c319",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-22T22:39:12Z",
+      "side": 1,
+      "message": "The pool is per-process and we would never run more than one scheduler in a process (only in the unit tests will that happen).\n\nThe scheduler now performs db reads and writes synchronously, in the main loop, so it should only ever have one connection at a time active.  If we imagine a unit test with 2 schedulers and one zuul-web, that still only adds up to 3.",
+      "revId": "22e4a7b08d8a65ee40869532b4fbfca0e6ddfb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
