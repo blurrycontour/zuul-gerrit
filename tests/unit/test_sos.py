@@ -17,6 +17,12 @@ from tests.base import iterate_timeout, ZuulTestCase
 
 class TestScaleOutScheduler(ZuulTestCase):
     tenant_config_file = "config/single-tenant/main.yaml"
+    # Those tests are testing specific interactions between multiple
+    # schedulers. They create additional schedulers as necessary and
+    # start or stop them individually to test specific interactions.
+    # Using the scheduler_count in addition to create even more
+    # schedulers doesn't make sense for those tests.
+    scheduler_count = 1
 
     def test_config_priming(self):
         # Wait until scheduler is primed
