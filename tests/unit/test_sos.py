@@ -18,19 +18,6 @@ from tests.base import iterate_timeout, ZuulTestCase
 class TestScaleOutScheduler(ZuulTestCase):
     tenant_config_file = "config/single-tenant/main.yaml"
 
-    def create_scheduler(self):
-        return self.scheds.create(
-            self.log,
-            self.config,
-            self.changes,
-            self.additional_event_queues,
-            self.upstream_root,
-            self.rpcclient,
-            self.poller_events,
-            self.git_url_with_auth,
-            self.addCleanup,
-            self.validate_tenants)
-
     def test_config_priming(self):
         # Wait until scheduler is primed
         self.waitUntilSettled()
@@ -40,7 +27,7 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.assertIsNotNone(layout_state)
 
         # Second scheduler instance
-        second_app = self.create_scheduler()
+        second_app = self.createScheduler()
         # Change a system attribute in order to check that the system config
         # from Zookeeper was used.
         second_app.sched.globals.max_hold_expiration += 1234
@@ -73,7 +60,7 @@ class TestScaleOutScheduler(ZuulTestCase):
 
     def test_reconfigure(self):
         # Create a second scheduler instance
-        app = self.create_scheduler()
+        app = self.createScheduler()
         app.start()
         self.assertEqual(len(self.scheds), 2)
 
@@ -117,7 +104,7 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.waitUntilSettled()
         # This has populated the change cache with our change.
 
-        app = self.create_scheduler()
+        app = self.createScheduler()
         app.start()
         self.assertEqual(len(self.scheds), 2)
 
