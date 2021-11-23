@@ -33,6 +33,23 @@
       "message": "The pool is per-process and we would never run more than one scheduler in a process (only in the unit tests will that happen).\n\nThe scheduler now performs db reads and writes synchronously, in the main loop, so it should only ever have one connection at a time active.  If we imagine a unit test with 2 schedulers and one zuul-web, that still only adds up to 3.",
       "revId": "22e4a7b08d8a65ee40869532b4fbfca0e6ddfb41",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8b3f61c_e323f5d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-23T06:40:40Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3: Code-Review-2\n\u003e \n\u003e I just saw https://review.opendev.org/818773 which addresses the actual problem.\n\u003e \n\u003e I think I\u0027m convinced this change is not necessary.\n\nYes, 818773 addresses the issue. I forgot to abandon this change, sorry for the confusion.",
+      "revId": "22e4a7b08d8a65ee40869532b4fbfca0e6ddfb41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
