@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from zuul.model import MergeRequest
+
 from tests.base import iterate_timeout, ZuulTestCase
 
 
@@ -47,8 +49,14 @@ class TestScaleOutScheduler(ZuulTestCase):
                          second_app.sched.local_layout_state.get("tenant-one"))
 
         # Make sure only the first schedulers issued cat jobs
-        self.assertIsNotNone(first_app.sched.merger.history.get("cat"))
-        self.assertIsNone(second_app.sched.merger.history.get("cat"))
+        first_app_cat_jobs = [
+            job for job in first_app.sched.merger.merger_api.history.values()
+            if job.job_type == MergeRequest.CAT]
+        second_app_cat_jobs = [
+            job for job in second_app.sched.merger.merger_api.history.values()
+            if job.job_type == MergeRequest.CAT]
+        self.assertGreater(len(first_app_cat_jobs), 0)
+        self.assertEqual(len(second_app_cat_jobs), 0)
 
         for _ in iterate_timeout(
                 10, "Wait for all schedulers to have the same system config"):

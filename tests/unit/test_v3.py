@@ -3208,8 +3208,7 @@ class TestNonLiveMerges(ZuulTestCase):
 
         # We expect one merge call per live change, plus one call for
         # each non-live change with a config update (which is all of them).
-        merge_jobs = [job for job in self.merge_job_history.values()
-                      if job.job_type == MergeRequest.MERGE]
+        merge_jobs = self.merge_job_history.get(MergeRequest.MERGE)
         self.assertEqual(len(merge_jobs), 6)
 
     def test_non_live_merges(self):
@@ -3233,8 +3232,7 @@ class TestNonLiveMerges(ZuulTestCase):
         self.waitUntilSettled()
 
         # We expect one merge call per live change.
-        merge_jobs = [job for job in self.merge_job_history.values()
-                      if job.job_type == MergeRequest.MERGE]
+        merge_jobs = self.merge_job_history.get(MergeRequest.MERGE)
         self.assertEqual(len(merge_jobs), 3)
 
 

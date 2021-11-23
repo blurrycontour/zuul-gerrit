@@ -3199,8 +3199,10 @@ class HoldableMergerApi(MergerApi):
 
     def submit(self, request, params, needs_result=False):
         self.log.debug("Appending merge job to history: %s", request.uuid)
-        self.history[request.uuid] = FakeMergeRequest(
-            request.uuid, request.job_type, params)
+        self.history.setdefault(request.job_type, [])
+        self.history[request.job_type].append(
+            FakeMergeRequest(request.uuid, request.job_type, params)
+        )
         return super().submit(request, params, needs_result)
 
     @property
@@ -3253,28 +3255,9 @@ class TestingMergerApi(HoldableMergerApi):
         return self._test_getMergeJobsInState()
 
 
-class RecordingMergeClient(zuul.merger.client.MergeClient):
+class HoldableMergeClient(zuul.merger.client.MergeClient):
 
     _merger_api_class = HoldableMergerApi
-
-    def __init__(self, config, sched):
-        super().__init__(config, sched)
-        self.history = {}
-
-    def submitJob(
-        self,
-        job_type,
-        data,
-        build_set,
-        precedence=PRECEDENCE_NORMAL,
-        needs_result=False,
-        event=None,
-    ):
-        self.history.setdefault(job_type, [])
-        self.history[job_type].append((data, build_set))
-        return super().submitJob(
-            job_type, data, build_set, precedence, needs_result, event=event)
-
 
 class HoldableExecutorApi(ExecutorApi):
     def __init__(self, *args, **kwargs):
@@ -3477,7 +3460,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
 
 class TestScheduler(zuul.scheduler.Scheduler):
-    _merger_client_class = RecordingMergeClient
+    _merger_client_class = HoldableMergeClient
     _executor_client_class = HoldableExecutorClient
 
 
@@ -5201,9 +5184,10 @@ class ZuulTestCase(BaseTestCase):
 
     @property
     def merge_job_history(self):
-        history = {}
+        history = defaultdict(list)
         for app in self.scheds:
-            history.update(app.sched.merger.merger_api.history)
+            for job_type, jobs in app.sched.merger.merger_api.history.items():
+                history[job_type].extend(jobs)
         return history
 
     @merge_job_history.deleter
