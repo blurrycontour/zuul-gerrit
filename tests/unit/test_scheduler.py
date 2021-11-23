@@ -4220,10 +4220,11 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 2)
 
         merge_count_project1 = 0
-        for job in self.merge_job_history.values():
-            if job.job_type == zuul.model.MergeRequest.REF_STATE:
-                if job.payload["items"][0]["project"] == "org/project1":
-                    merge_count_project1 += 1
+        for job in self.merge_job_history.get(
+            zuul.model.MergeRequest.REF_STATE
+        ):
+            if job.payload["items"][0]["project"] == "org/project1":
+                merge_count_project1 += 1
         self.assertEquals(merge_count_project1, 0,
                           "project1 shouldn't have any refstate call")
 
@@ -8942,8 +8943,7 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
 
         # We're only adding two new repos, so we should only need to
         # issue 2 cat jobs.
-        cat_jobs = [job for job in self.merge_job_history.values()
-                    if job.job_type == zuul.model.MergeRequest.CAT]
+        cat_jobs = self.merge_job_history.get(zuul.model.MergeRequest.CAT)
         self.assertEqual(len(cat_jobs), 2)
 
         # Ensure that tenant-one has not been reconfigured
