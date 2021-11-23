@@ -1,4 +1,5 @@
 # Copyright 2021 BMW Group
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -30,6 +31,33 @@ class TestScaleOutScheduler(ZuulTestCase):
             self.git_url_with_auth,
             self.addCleanup,
             self.validate_tenants)
+
+    def test_multi_scheduler(self):
+        # A smoke test that we can enqueue a change with one scheduler
+        # and have another one finish the run.
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        app = self.create_scheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            self.executor_server.hold_jobs_in_build = False
+            self.executor_server.release()
+            self.waitUntilSettled(matcher=[app])
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     def test_config_priming(self):
         # Wait until scheduler is primed
