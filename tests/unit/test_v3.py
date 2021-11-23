@@ -4336,6 +4336,14 @@ class TestValidateAllBroken(ZuulTestCase):
     validate_tenants = []
     tenant_config_file = 'config/broken/main.yaml'
 
+    # This test raises a config error during the startup of the test
+    # case which makes the first scheduler fail during its startup.
+    # The second (or any additional) scheduler won't even run as the
+    # startup is serialized in tests/base.py.
+    # Thus it doesn't make sense to execute this test with multiple
+    # schedulers.
+    scheduler_count = 1
+
     def setUp(self):
         self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
                           super().setUp)
@@ -4351,6 +4359,14 @@ class TestValidateBroken(ZuulTestCase):
 
     validate_tenants = ['tenant-broken']
     tenant_config_file = 'config/broken/main.yaml'
+
+    # This test raises a config error during the startup of the test
+    # case which makes the first scheduler fail during its startup.
+    # The second (or any additional) scheduler won't even run as the
+    # startup is serialized in tests/base.py.
+    # Thus it doesn't make sense to execute this test with multiple
+    # schedulers.
+    scheduler_count = 1
 
     def setUp(self):
         self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
