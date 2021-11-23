@@ -956,6 +956,14 @@ class TestTenantExtra(TenantParserTestCase):
 class TestTenantExtraConfigsInvalidType(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/extra_invalid_type.yaml'
 
+    # This test raises a config error during the startup of the test
+    # case which makes the first scheduler fail during its startup.
+    # The second (or any additional) scheduler won't even run as the
+    # startup is serialized in tests/base.py.
+    # Thus it doesn't make sense to execute this test with multiple
+    # schedulers.
+    scheduler_count = 1
+
     def setUp(self):
         err = "Expected str or list of str for extra-config-paths.*"
         with testtools.ExpectedException(vs.MultipleInvalid, err):
@@ -969,6 +977,14 @@ class TestTenantExtraConfigsInvalidType(TenantParserTestCase):
 class TestTenantExtraConfigsInvalidValue(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/extra_invalid_value.yaml'
 
+    # This test raises a config error during the startup of the test
+    # case which makes the first scheduler fail during its startup.
+    # The second (or any additional) scheduler won't even run as the
+    # startup is serialized in tests/base.py.
+    # Thus it doesn't make sense to execute this test with multiple
+    # schedulers.
+    scheduler_count = 1
+
     def setUp(self):
         err = "Default zuul configs are not allowed in extra-config-paths.*"
         with testtools.ExpectedException(vs.MultipleInvalid, err):
@@ -981,6 +997,13 @@ class TestTenantExtraConfigsInvalidValue(TenantParserTestCase):
 
 class TestTenantDuplicate(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/duplicate.yaml'
+
+    # This test raises a config error during the startup of the test
+    # case which makes the first scheduler fail during its startup.
+    # The second (or any additional) scheduler won't even run as the
+    # startup is serialized in tests/base.py.
+    # Thus it doesn't make sense to execute this test with multiple
+    # schedulers.
     scheduler_count = 1
 
     def setUp(self):
