@@ -1451,7 +1451,27 @@ class ZuulWebAPI(object):
         uuid = "0" * 32
         params = zuul.executor.common.construct_build_params(
             uuid, self.zuulweb.connections, job, item, item.pipeline)
+        params['zuul'].update(zuul.executor.common.zuul_params_from_job(job))
+        del params['job_ref']
+        params['job'] = job.name
         params['zuul']['buildset'] = None
+        params['timeout'] = job.timeout
+        params['post_timeout'] = job.post_timeout
+        params['override_branch'] = job.override_branch
+        params['override_checkout'] = job.override_checkout
+        params['ansible_version'] = job.ansible_version
+        params['workspace_scheme'] = job.workspace_scheme
+        if job.name != 'noop':
+            params['playbooks'] = job.run
+            params['pre_playbooks'] = job.pre_run
+            params['post_playbooks'] = job.post_run
+            params['cleanup_playbooks'] = job.cleanup_run
+        params["nodeset"] = job.nodeset.toDict()
+        params['vars'] = job.combined_variables
+        params['extra_vars'] = job.extra_variables
+        params['host_vars'] = job.host_variables
+        params['group_vars'] = job.group_variables
+        params['secret_vars'] = job.secret_parent_data
 
         ret = params
         resp = cherrypy.response

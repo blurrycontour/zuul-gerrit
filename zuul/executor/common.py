@@ -48,17 +48,11 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         pipeline=pipeline.name,
         post_review=pipeline.post_review,
         job=job.name,
-        voting=job.voting,
         project=project,
         tenant=tenant.name,
-        timeout=job.timeout,
         event_id=item.event.zuul_event_id if item.event else None,
         jobtags=sorted(job.tags),
-        _inheritance_path=list(job.inheritance_path))
-    if job.artifact_data:
-        zuul_params['artifacts'] = job.artifact_data
-    if job.override_checkout:
-        zuul_params['override_checkout'] = job.override_checkout
+    )
     if hasattr(item.change, 'branch'):
         zuul_params['branch'] = item.change.branch
     if hasattr(item.change, 'tag'):
@@ -83,31 +77,18 @@ def construct_build_params(uuid, connections, job, item, pipeline,
                                      getDirectDependentJobs(job.name))
 
     params = dict()
-    params['job'] = job.name
-    params['timeout'] = job.timeout
-    params['post_timeout'] = job.post_timeout
+    params['job_ref'] = job.getPath()
     params['items'] = merger_items
     params['projects'] = []
     if hasattr(item.change, 'branch'):
         params['branch'] = item.change.branch
     else:
         params['branch'] = None
-    params['override_branch'] = job.override_branch
-    params['override_checkout'] = job.override_checkout
     merge_rs = item.current_build_set.merge_repo_state
     params['merge_repo_state_ref'] = merge_rs and merge_rs.getPath()
     extra_rs = item.current_build_set.extra_repo_state
     params['extra_repo_state_ref'] = extra_rs and extra_rs.getPath()
-    params['ansible_version'] = job.ansible_version
-    params['workspace_scheme'] = job.workspace_scheme
 
-    if job.name != 'noop':
-        params['playbooks'] = job.run
-        params['pre_playbooks'] = job.pre_run
-        params['post_playbooks'] = job.post_run
-        params['cleanup_playbooks'] = job.cleanup_run
-
-    params["nodeset"] = job.nodeset.toDict()
     params['ssh_keys'] = []
     if pipeline.post_review:
         if redact_secrets_and_keys:
@@ -116,11 +97,6 @@ def construct_build_params(uuid, connections, job, item, pipeline,
             params['ssh_keys'].append(dict(
                 connection_name=item.change.project.connection_name,
                 project_name=item.change.project.name))
-    params['vars'] = job.combined_variables
-    params['extra_vars'] = job.extra_variables
-    params['host_vars'] = job.host_variables
-    params['group_vars'] = job.group_variables
-    params['secret_vars'] = job.secret_parent_data
     params['zuul'] = zuul_params
     projects = set()
     required_projects = set()
@@ -189,3 +165,18 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     if item.event:
         params['zuul_event_id'] = item.event.zuul_event_id
     return params
+
+
+def zuul_params_from_job(job):
+    zuul_params = {
+        "job": job.name,
+        "voting": job.voting,
+        "timeout": job.timeout,
+        "jobtags": sorted(job.tags),
+        "_inheritance_path": list(job.inheritance_path),
+    }
+    if job.artifact_data:
+        zuul_params['artifacts'] = job.artifact_data
+    if job.override_checkout:
+        zuul_params['override_checkout'] = job.override_checkout
+    return zuul_params
