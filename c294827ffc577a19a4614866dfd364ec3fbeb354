@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f67d6ef3_4f79a9bc",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-24T23:11:10Z",
+      "side": 1,
+      "message": "I\u0027ve analyzed this locally and I\u0027m convinced it\u0027s okay and we can skip this test in the multi-scheduler case.\n\nI thought that we only ran a single fake gerrit webserver, but we actually start the fake webserver in the fake connection, and you\u0027re right that each scheduler gets a new fake connection.  Since the second fake connection/web server doesn\u0027t have the checker added (see line 481), it can\u0027t find the uuid to report.\n\nIf I add the checker to the second fake server, it works as expected, but then fails because it\u0027s actually reporting to a different webserver.  Because of this, I don\u0027t think it\u0027s worth turning my local work into a real patch.\n\nI think the real solution to this is to have a dedicated fake gerrit class with a webserver, and have the base test class set that up for each unique gerrit it sees in the configuration.  All of the fake server-side stuff should move to that class.  That would make our fake gerrit connection subclass much smaller, which will be nice.",
+      "revId": "c294827ffc577a19a4614866dfd364ec3fbeb354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e6cfae0_8907f530",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-24T23:11:10Z",
+      "side": 1,
+      "message": "I think the gitlab webserver is patterned on the gerrit one, so will have a similar problem.  I think the solution should be the same for both.",
+      "revId": "c294827ffc577a19a4614866dfd364ec3fbeb354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
