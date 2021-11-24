@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50313ace_c5aa0b87",
+        "filename": "tests/base.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 4684,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-24T21:45:25Z",
+      "side": 1,
+      "message": "This is what\u0027s causing the timer test to fail; a test that starts with a timer configuration may never settle.\n\nThis doesn\u0027t appear necessary in my local testing, so I\u0027m going to remove it in the next patchset.",
+      "revId": "e1af55fa6c0ad5a391e53464a867e2cd94dfb3ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
