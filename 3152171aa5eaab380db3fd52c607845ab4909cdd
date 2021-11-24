@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bf5c493_90afd66f",
+        "filename": "web/src/containers/status/Change.jsx",
+        "patchSetId": 41
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-24T17:36:15Z",
+      "side": 1,
+      "message": "is that debug leftover?",
+      "revId": "3152171aa5eaab380db3fd52c607845ab4909cdd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
