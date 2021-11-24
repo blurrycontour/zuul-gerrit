@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59dc0008_7e1cf678",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 46
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-24T15:15:50Z",
+      "side": 1,
+      "message": "W-1 because this isn\u0027t meant to be merged as-is in the doc. We may however want to make this available in some form somewhere else if people are interested in deploying a full, usable stack.",
+      "revId": "ef9bc3d75eb28b9ed87ff16cd70e2e86c844e074",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
