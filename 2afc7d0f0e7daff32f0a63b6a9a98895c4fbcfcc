@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0cdabe0_50447348",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-24T17:07:55Z",
+      "side": 1,
+      "message": "typo: under",
+      "range": {
+        "startLine": 324,
+        "startChar": 35,
+        "endLine": 324,
+        "endChar": 41
+      },
+      "revId": "2afc7d0f0e7daff32f0a63b6a9a98895c4fbcfcc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
