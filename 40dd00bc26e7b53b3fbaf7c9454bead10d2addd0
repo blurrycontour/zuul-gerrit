@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3d87895_b19bbbc0",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-24T17:51:17Z",
+      "side": 1,
+      "message": "^",
+      "revId": "40dd00bc26e7b53b3fbaf7c9454bead10d2addd0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca313675_21ef928c",
@@ -14,6 +31,23 @@
       "writtenOn": "2021-11-24T17:49:08Z",
       "side": 1,
       "message": "nice idea to link to the docs, will those links be used somewhere? I didn\u0027t see where they are used.",
+      "revId": "40dd00bc26e7b53b3fbaf7c9454bead10d2addd0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e6d9bc4_459b2514",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 21
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-24T17:51:17Z",
+      "side": 1,
+      "message": "They aren\u0027t used anymore; they were in a previous version, but with the change to the tooltop widget it wasn\u0027t easy to use them.  Matthieu left a comment above about it.",
       "revId": "40dd00bc26e7b53b3fbaf7c9454bead10d2addd0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
