@@ -18,8 +18,12 @@ from unittest import mock
 
 import tests.base
 from tests.base import (
-    BaseTestCase, ZuulTestCase, AnsibleZuulTestCase,
-    simple_layout)
+    AnsibleZuulTestCase,
+    BaseTestCase,
+    simple_layout,
+    skipIfMultiScheduler,
+    ZuulTestCase,
+)
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.gerrit.gerritconnection import GerritConnection
 
@@ -462,6 +466,17 @@ class TestChecksApi(ZuulTestCase):
                          "start and success messages should be reported")
 
     @simple_layout('layouts/gerrit-checks-scheme.yaml')
+    @skipIfMultiScheduler()
+    # This is the only gerrit checks API test which is failing because
+    # it uses a check scheme rather than an UUID. The scheme must first
+    # be evaluated and mapped to an UUID.
+    # This shouldn't be a problem in production as the evaluation takes
+    # place on the gerrit webserver. However, in the tests we get a
+    # dedicated (fake) gerrit webserver for each fake gerrrit
+    # connection. Since each scheduler gets a new connection, only one
+    # of those webservers will be aware of the check. If any other
+    # webserver tries to evaluate the check it will fail with
+    # "Unable to find matching checker".
     def test_check_pipeline_scheme(self):
         self.fake_gerrit.addFakeChecker(uuid='zuul_check:abcd',
                                         repository='org/project',
