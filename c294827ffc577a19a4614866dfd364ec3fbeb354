@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7ef7b053_97674672",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-25T08:16:59Z",
+      "side": 1,
+      "message": "This makes me still thinking why this is working with a single scheduler. I think that the test case (self.fake_gerrit) gets a dedicated fake connection which is different from the one the first scheduler gets, but that would mean that we could still have the problem that the connection that handles the event is not aware of the check. Unless there is something that prevents the fake connection of the first scheduler to handle the event and thus ensures that the test case itself handles it.",
+      "parentUuid": "625cc6d6_928ba5d3",
+      "revId": "c294827ffc577a19a4614866dfd364ec3fbeb354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2e6cfae0_8907f530",
         "filename": "tests/unit/test_gitlab_driver.py",
         "patchSetId": 32
