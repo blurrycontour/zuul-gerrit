@@ -13,34 +13,34 @@
 // under the License.
 
 import {
-  ADD_ERROR,
-  CLEAR_ERROR,
-  CLEAR_ERRORS,
+  ADD_NOTIFICATION,
+  CLEAR_NOTIFICATION,
+  CLEAR_NOTIFICATIONS,
   addApiError,
-} from '../actions/errors'
+} from '../actions/notifications'
 
 
 export default (state = [], action) => {
   // Intercept API failure
-  if (action.error && action.type.match(/.*_FETCH_FAIL$/)) {
-    action = addApiError(action.error)
+  if (action.notification && action.type.match(/.*_FETCH_FAIL$/)) {
+    action = addApiError(action.notification)
   }
   // Intercept Admin API failures
-  if (action.error && action.type.match(/ADMIN_.*_FAIL$/)) {
-    action = addApiError(action.error)
+  if (action.notification && action.type.match(/ADMIN_.*_FAIL$/)) {
+    action = addApiError(action.notification)
   }
   switch (action.type) {
-    case ADD_ERROR:
-      if (state.filter(error => (
-        error.url === action.error.url &&
-        error.status === action.error.status)).length > 0)
+    case ADD_NOTIFICATION:
+      if (state.filter(notification => (
+        notification.url === action.notification.url &&
+        notification.status === action.notification.status)).length > 0)
         return state
       return [
         ...state,
-        { ...action.error, id: action.id, date: Date.now() }]
-    case CLEAR_ERROR:
+        { ...action.notification, id: action.id, date: Date.now() }]
+    case CLEAR_NOTIFICATION:
       return state.filter(item => (item.id !== action.id))
-    case CLEAR_ERRORS:
+    case CLEAR_NOTIFICATIONS:
       return []
     default:
       return state
