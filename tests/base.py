@@ -131,6 +131,17 @@ KEEP_TEMPDIRS = bool(os.environ.get('KEEP_TEMPDIRS', False))
 SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 1))
 
 
+def skipIfMultiScheduler():
+    def decorator(f):
+        def wrapper(self, *args, **kwargs):
+            if self.scheduler_count > 1:
+                self.skipTest("Test is failing with multiple schedulers")
+            else:
+                f(self, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 def repack_repo(path):
     cmd = ['git', '--git-dir=%s/.git' % path, 'repack', '-afd']
     output = subprocess.Popen(cmd, close_fds=True,
