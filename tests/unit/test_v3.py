@@ -37,6 +37,7 @@ from tests.base import (
     FIXTURE_DIR,
     simple_layout,
     iterate_timeout,
+    skipIfMultiScheduler,
 )
 
 
@@ -1238,6 +1239,12 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test3', result='SUCCESS', changes='2,1'),
         ], ordered=False)
 
+    @skipIfMultiScheduler()
+    # See comment in TestInRepoConfigDir.scheduler_count for further
+    # details.
+    # As this is the only test within this test class, that doesn't work
+    # with multi scheduler, we skip it rather than setting the
+    # scheduler_count to 1 for the whole test class.
     def test_cross_scheduler_config_update(self):
         # This is a regression test.  We observed duplicate entries in
         # the TPC config cache when a second scheduler updates its
@@ -2603,6 +2610,12 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Debug information:',
                       A.messages[0], "A should have debug info")
 
+    @skipIfMultiScheduler()
+    # See comment in TestInRepoConfigDir.scheduler_count for further
+    # details.
+    # As this is the only test within this test class, that doesn't work
+    # with multi scheduler, we skip it rather than setting the
+    # scheduler_count to 1 for the whole test class.
     def test_file_move(self):
         # Tests that a zuul config file can be renamed
         in_repo_conf = textwrap.dedent(
@@ -2708,6 +2721,15 @@ class TestInRepoConfig(ZuulTestCase):
 class TestInRepoConfigDir(ZuulTestCase):
     # Like TestInRepoConfig, but the fixture test files are in zuul.d
     tenant_config_file = 'config/in-repo-dir/main.yaml'
+
+    # These tests fiddle around with the list of schedulers used in
+    # the test. They delete the existing scheduler and replace it by
+    # a new one. This wouldn't work with multiple schedulers as the
+    # new scheduler wouldn't replace the one at self.scheds[0], but
+    # any of the other schedulers used within a multi-scheduler setup.
+    # As a result, starting self.scheds[0] would fail because it is
+    # already running an threads can only be started once.
+    scheduler_count = 1
 
     def test_file_move(self):
         # Tests that a zuul config file can be renamed
