@@ -33,6 +33,7 @@ import re
 from collections import defaultdict, namedtuple
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
+from unittest.case import skipIf
 
 import requests
 import select
@@ -129,6 +130,12 @@ FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
 KEEP_TEMPDIRS = bool(os.environ.get('KEEP_TEMPDIRS', False))
 SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 1))
+
+
+def skipIfMultiScheduler(reason=None):
+    if not reason:
+        reason = "Test is failing with multiple schedulers"
+    return skipIf(SCHEDULER_COUNT > 1, reason)
 
 
 def repack_repo(path):
