@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2dbfcdcf_937b2f61",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-11-25T19:24:32Z",
+      "side": 1,
+      "message": "I wonder if we should try to filter the not-found case since that\u0027s likely not a transient error and would delay pipeline processing.",
+      "revId": "0cab6f0caa338a088f0a4742d66421322765d717",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3c57731f_159a303b",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
