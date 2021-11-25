@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "625cc6d6_928ba5d3",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-25T08:12:43Z",
+      "side": 1,
+      "message": "Thanks for investigating. So if I understand this correctly it\u0027s only a testing problem and it\u0027s OK to skip this test. I will update the change accordingly.",
+      "parentUuid": "f67d6ef3_4f79a9bc",
+      "revId": "c294827ffc577a19a4614866dfd364ec3fbeb354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2e6cfae0_8907f530",
         "filename": "tests/unit/test_gitlab_driver.py",
         "patchSetId": 32
@@ -31,6 +49,24 @@
       "writtenOn": "2021-11-24T23:11:10Z",
       "side": 1,
       "message": "I think the gitlab webserver is patterned on the gerrit one, so will have a similar problem.  I think the solution should be the same for both.",
+      "revId": "c294827ffc577a19a4614866dfd364ec3fbeb354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fadb64a9_6ad7d3ab",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-25T08:12:43Z",
+      "side": 1,
+      "message": "OK.",
+      "parentUuid": "2e6cfae0_8907f530",
       "revId": "c294827ffc577a19a4614866dfd364ec3fbeb354",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
