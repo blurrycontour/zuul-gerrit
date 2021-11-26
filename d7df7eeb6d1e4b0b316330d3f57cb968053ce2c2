@@ -16,6 +16,24 @@
       "message": "Can you check if this is still needed with the following changes that just merged?\n- https://review.opendev.org/c/zuul/zuul/+/818116\n- https://review.opendev.org/c/zuul/zuul/+/817869",
       "revId": "d7df7eeb6d1e4b0b316330d3f57cb968053ce2c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6bb5b60_3d13ea22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-11-26T08:52:58Z",
+      "side": 1,
+      "message": "It shouldn\u0027t be needed anymore, I\u0027ll abandon this change.",
+      "parentUuid": "fc9e844f_6a2972fb",
+      "revId": "d7df7eeb6d1e4b0b316330d3f57cb968053ce2c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
