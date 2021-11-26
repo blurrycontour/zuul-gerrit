@@ -2428,6 +2428,11 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='2,1 3,1'),
         ], ordered=False)
 
+    @skipIfMultiScheduler()
+    # This test is failing depending on which scheduler completed the
+    # tenant reconfiguration first. As the assertions are done with the
+    # objects on scheduler-0, they will fail if scheduler-1 completed
+    # the reconfiguration first.
     def test_multi_repo(self):
         downstream_repo_conf = textwrap.dedent(
             """
