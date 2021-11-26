@@ -47,6 +47,7 @@ from tests.base import (
     RecordingExecutorServer,
     TestConnectionRegistry,
     FIXTURE_DIR,
+    skipIfMultiScheduler,
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.layout import LayoutState
@@ -3548,6 +3549,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(q2.name, 'integrated')
 
     @simple_layout("layouts/regex-queue.yaml")
+    @skipIfMultiScheduler()
     def test_regex_queue(self):
         "Test a shared queue can be constructed from a regex project"
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
