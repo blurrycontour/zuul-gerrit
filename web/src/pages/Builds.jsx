@@ -52,36 +52,42 @@ class BuildsPage extends React.Component {
         title: 'Job',
         placeholder: 'Filter by Job...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'project',
         title: 'Project',
         placeholder: 'Filter by Project...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'branch',
         title: 'Branch',
         placeholder: 'Filter by Branch...',
         type: 'search',
+        fuzzy: false
       },
       {
         key: 'pipeline',
         title: 'Pipeline',
         placeholder: 'Filter by Pipeline...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'change',
         title: 'Change',
         placeholder: 'Filter by Change...',
         type: 'search',
+        fuzzy: true,
       },
       {
         key: 'result',
         title: 'Result',
         placeholder: 'Any result',
         type: 'select',
+        fuzzy: false,
         // TODO there should be a single source of truth for this
         options: [
           'SUCCESS',
@@ -109,12 +115,14 @@ class BuildsPage extends React.Component {
         title: 'Build',
         placeholder: 'Filter by Build UUID...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'held',
         title: 'Held',
         placeholder: 'Choose Hold Status...',
         type: 'ternary',
+        fuzzy: false,
         options: [
           'All',
           'Held Builds Only',
@@ -126,6 +134,7 @@ class BuildsPage extends React.Component {
         title: 'Voting',
         placeholder: 'Choose Voting Status...',
         type: 'ternary',
+        fuzzy: false,
         options: [
           'All',
           'Voting Only',
@@ -153,7 +162,7 @@ class BuildsPage extends React.Component {
     // first loaded). Most probably that's the case because the location is
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
-    const queryString = buildQueryString(filters)
+    const queryString = buildQueryString(filters, this.filterCategories)
     this.setState({ fetching: true })
     // TODO (felix): What happens in case of a broken network connection? Is the
     // fetching shows infinitely or can we catch this and show an erro state in
@@ -201,7 +210,7 @@ class BuildsPage extends React.Component {
     // We must update the URL parameters before the state. Otherwise, the URL
     // will always be one filter selection behind the state. But as the URL
     // reflects our state this should be ok.
-    writeFiltersToUrl(filters, location, history)
+    writeFiltersToUrl(filters, location, history, this.filterCategories)
     this.updateData(filters)
     this.setState(() => {
       return {
@@ -212,7 +221,7 @@ class BuildsPage extends React.Component {
 
   handleClearFilters = () => {
     // Delete the values for each filter category
-    const filters = this.state.filterCategories.reduce((filterDict, category) => {
+    const filters = this.filterCategories.reduce((filterDict, category) => {
       filterDict[category.key] = []
       return filterDict
     }, {})

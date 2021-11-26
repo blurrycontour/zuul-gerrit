@@ -291,7 +291,9 @@ function getFiltersFromUrl(location, filterCategories) {
             break
         }
       } else {
-        filterDict[item.key].push(param)
+        let pcRegex = param.match('/%(.*)%/')
+        let _param = pcRegex === null ? param : pcRegex[1]
+        filterDict[item.key].push(_param)
       }
     })
     return filterDict
@@ -314,12 +316,17 @@ function writeFiltersToUrl(filters, location, history) {
   })
 }
 
-function buildQueryString(filters) {
+function buildQueryString(filters, filterCategories) {
+  const fuzzyFields = filterCategories.reduce((fuzzyFieldDict, category) => {
+    fuzzyFieldDict[category.key] = category.fuzzy
+    return fuzzyFieldDict
+  }, {})
   let queryString = '&complete=true'
   if (filters) {
     Object.keys(filters).map((key) => {
       filters[key].forEach((value) => {
-        queryString += '&' + key + '=' + value
+        let _value = fuzzyFields[key] ? '%' + value + '%' : value
+        queryString += '&' + key + '=' + _value
       })
       return queryString
     })

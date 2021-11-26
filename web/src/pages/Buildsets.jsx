@@ -48,24 +48,28 @@ class BuildsetsPage extends React.Component {
         title: 'Project',
         placeholder: 'Filter by Project...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'branch',
         title: 'Branch',
         placeholder: 'Filter by Branch...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'pipeline',
         title: 'Pipeline',
         placeholder: 'Filter by Pipeline...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'change',
         title: 'Change',
         placeholder: 'Filter by Change...',
         type: 'search',
+        fuzzy: true,
       },
       {
         key: 'result',
@@ -81,13 +85,15 @@ class BuildsetsPage extends React.Component {
           'ERROR',
           'MERGER_FAILURE',
           'NO_JOBS'
-        ]
+        ],
+        fuzzy: true,
       },
       {
         key: 'uuid',
         title: 'Buildset',
         placeholder: 'Filter by Buildset UUID...',
         type: 'search',
+        fuzzy: false,
       },
     ]
 
@@ -109,7 +115,7 @@ class BuildsetsPage extends React.Component {
     // first loaded). Most probably that's the case because the location is
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
-    const queryString = buildQueryString(filters)
+    const queryString = buildQueryString(filters, this.filterCategories)
     this.setState({ fetching: true })
     fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(
       (response) => {
