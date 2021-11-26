@@ -13,9 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from tests.base import (
-    ZuulTestCase,
-)
+from tests.base import ZuulTestCase, skipIfMultiScheduler
 
 
 class TestGerritToGithubCRD(ZuulTestCase):
@@ -375,9 +373,11 @@ class TestGerritToGithubCRD(ZuulTestCase):
                          (B.head_sha,))
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
+    @skipIfMultiScheduler()
     def test_crd_check_reconfiguration(self):
         self._test_crd_check_reconfiguration('org/project1', 'org/project2')
 
+    @skipIfMultiScheduler()
     def test_crd_undefined_project(self):
         """Test that undefined projects in dependencies are handled for
         independent pipelines"""
@@ -827,9 +827,11 @@ class TestGithubToGerritCRD(ZuulTestCase):
                          (A.head_sha,))
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
+    @skipIfMultiScheduler()
     def test_crd_check_reconfiguration(self):
         self._test_crd_check_reconfiguration('org/project1', 'org/project2')
 
+    @skipIfMultiScheduler()
     def test_crd_undefined_project(self):
         """Test that undefined projects in dependencies are handled for
         independent pipelines"""

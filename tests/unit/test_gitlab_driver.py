@@ -779,6 +779,13 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-gitlab-driver.conf'
     tenant_config_file = 'config/unprotected-branches-gitlab/main.yaml'
 
+    @skipIfMultiScheduler()
+    # This test is failing with multiple schedulers depending on which
+    # scheduler did the tenant reconfiguration first. As the
+    # assertions are all done on the objects from scheduler-0 they
+    # will fail if scheduler-1 did the reconfig first.
+    # To make this work with multiple schedulers, we might want to wait
+    # until all schedulers completed their tenant reconfiguration.
     def test_unprotected_branches(self):
         tenant = self.scheds.first.sched.abide.tenants\
             .get('tenant-one')
