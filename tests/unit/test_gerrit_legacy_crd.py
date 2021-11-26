@@ -15,6 +15,7 @@
 from tests.base import (
     ZuulTestCase,
     simple_layout,
+    skipIfMultiScheduler,
 )
 
 
@@ -471,9 +472,11 @@ class TestGerritLegacyCRD(ZuulTestCase):
         self.assertEqual(self.history[0].changes, '2,1 1,1')
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
+    @skipIfMultiScheduler()
     def test_crd_check_reconfiguration(self):
         self._test_crd_check_reconfiguration('org/project1', 'org/project2')
 
+    @skipIfMultiScheduler()
     def test_crd_undefined_project(self):
         """Test that undefined projects in dependencies are handled for
         independent pipelines"""
