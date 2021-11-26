@@ -973,6 +973,12 @@ class TestGithubToPagureCRD(ZuulTestCase):
     config_file = 'zuul-crd-pagure.conf'
     tenant_config_file = 'config/cross-source-pagure/github.yaml'
 
+    # Those tests are also using the fake github implementation which
+    # means that every scheduler gets a different fake github instance.
+    # Thus, assertions might fail depending on which scheduler did the
+    # interaction with Github.
+    scheduler_count = 1
+
     def test_crd_gate(self):
         "Test cross-repo dependencies"
         A = self.fake_github.openFakePullRequest('github/project1', 'master',

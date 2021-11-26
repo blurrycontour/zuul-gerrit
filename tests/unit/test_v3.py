@@ -3267,6 +3267,11 @@ class TestJobContamination(AnsibleZuulTestCase):
 
     config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/zuul-job-contamination/main.yaml'
+    # Those tests are also using the fake github implementation which
+    # means that every scheduler gets a different fake github instance.
+    # Thus, assertions might fail depending on which scheduler did the
+    # interaction with Github.
+    scheduler_count = 1
 
     def test_job_contamination_playbooks(self):
         conf = textwrap.dedent(
