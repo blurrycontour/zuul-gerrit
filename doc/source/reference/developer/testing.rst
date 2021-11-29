@@ -18,9 +18,6 @@ the environment being simulated in the test:
    :members:
    :inherited-members:
 
-.. autoclass:: tests.base.FakeGearmanServer
-   :members:
-
 .. autoclass:: tests.base.RecordingExecutorServer
    :members:
 
