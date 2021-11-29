@@ -809,6 +809,7 @@ class PipelineSummary(zkobject.ShardedZKObject):
 
     log = logging.getLogger("zuul.PipelineSummary")
     truncate_on_create = True
+    delete_on_error = False
 
     def __init__(self):
         super().__init__()

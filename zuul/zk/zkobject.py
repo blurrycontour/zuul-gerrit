@@ -255,6 +255,10 @@ class ShardedZKObject(ZKObject):
     # If the node exists when we create we normally error, unless this
     # is set, in which case we proceed and truncate.
     truncate_on_create = False
+    # Normally we delete nodes which have syntax errors, but the
+    # pipeline summary is read without a write lock, so those are
+    # expected.  Don't delete them in that case.
+    delete_on_error = True
 
     def _load(self, context, path=None):
         if path is None:
@@ -282,7 +286,8 @@ class ShardedZKObject(ZKObject):
                 # ourself here so we know what object triggered it.
                 context.log.error(
                     "Exception loading ZKObject %s", self)
-                self.delete(context)
+                if self.delete_on_error:
+                    self.delete(context)
                 raise InvalidObjectError from exc
         raise Exception("ZooKeeper session or lock not valid")
 
