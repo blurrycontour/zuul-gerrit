@@ -16,6 +16,23 @@
       "message": "Wouldn\u0027t it make sense to keep these in the docs a while as \"removed after version X.XX\"? Just so that people can still find the docs?",
       "revId": "35ffde958ad3362b48deadf52061bb212224c251",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ace0f16_432d203d",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-29T23:48:55Z",
+      "side": 0,
+      "message": "We have versioned docs for this purpose.  So someone using 4.10.4 can visit https://zuul-ci.org/docs/zuul/4.10.4/discussion/components.html for their version.",
+      "revId": "35ffde958ad3362b48deadf52061bb212224c251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
