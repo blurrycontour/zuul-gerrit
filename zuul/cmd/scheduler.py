@@ -14,13 +14,10 @@
 # under the License.
 
 import logging
-import os
 import sys
 import signal
 
 import zuul.cmd
-from zuul.lib.config import get_default
-from zuul.lib.statsd import get_statsd_config
 import zuul.scheduler
 
 
@@ -30,7 +27,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
     def __init__(self):
         super(Scheduler, self).__init__()
-        self.gear_server_pid = None
 
     def createParser(self):
         parser = super(Scheduler, self).createParser()
@@ -40,7 +36,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                  ' exit afterwards, indicating success or '
                                  'failure via the exit code. If no tenant is '
                                  'listed, all tenants will be validated. '
-                                 'Note: this requires the gearman server and '
+                                 'Note: this requires ZooKeeper and '
                                  'will distribute work to mergers.')
         parser.add_argument('command',
                             choices=zuul.scheduler.COMMANDS,
@@ -73,64 +69,12 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
     def exit_handler(self, signum, frame):
         self.sched.stop()
         self.sched.join()
-        self.stop_gear_server()
         sys.exit(0)
-
-    def start_gear_server(self):
-        pipe_read, pipe_write = os.pipe()
-        child_pid = os.fork()
-        if child_pid == 0:
-            os.close(pipe_write)
-            self.setup_logging('gearman_server', 'log_config')
-            import gear
-
-            (statsd_host, statsd_port, statsd_prefix) = get_statsd_config(
-                self.config)
-            if statsd_prefix:
-                statsd_prefix += '.zuul.geard'
-            else:
-                statsd_prefix = 'zuul.geard'
-
-            host = get_default(self.config, 'gearman_server', 'listen_address')
-            port = int(get_default(self.config, 'gearman_server', 'port',
-                                   4730))
-            ssl_key = get_default(self.config, 'gearman_server', 'ssl_key')
-            ssl_cert = get_default(self.config, 'gearman_server', 'ssl_cert')
-            ssl_ca = get_default(self.config, 'gearman_server', 'ssl_ca')
-            gear.Server(port,
-                        ssl_key=ssl_key,
-                        ssl_cert=ssl_cert,
-                        ssl_ca=ssl_ca,
-                        host=host,
-                        statsd_host=statsd_host,
-                        statsd_port=statsd_port,
-                        statsd_prefix=statsd_prefix,
-                        keepalive=True,
-                        tcp_keepidle=300,
-                        tcp_keepintvl=60,
-                        tcp_keepcnt=5)
-
-            # Keep running until the parent dies:
-            pipe_read = os.fdopen(pipe_read)
-            pipe_read.read()
-            os._exit(0)
-        else:
-            os.close(pipe_read)
-            self.gear_server_pid = child_pid
-            self.gear_pipe_write = pipe_write
-
-    def stop_gear_server(self):
-        if self.gear_server_pid:
-            os.kill(self.gear_server_pid, signal.SIGKILL)
 
     def run(self):
         if self.args.command in zuul.scheduler.COMMANDS:
             self.send_command(self.args.command)
             sys.exit(0)
-
-        if (self.config.has_option('gearman_server', 'start') and
-            self.config.getboolean('gearman_server', 'start')):
-            self.start_gear_server()
 
         self.setup_logging('scheduler', 'log_config')
         self.setup_prometheus('scheduler')
