@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39c44f02_eb9f7c7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2021-11-29T21:43:18Z",
+      "side": 1,
+      "message": "Hi, sorry to just pop in out of history and -1. I am triggered by gearman stuff. ;)\n\nThe options being removed will be hard to find on the web and even when people look at the docs in the git repo. The release note tells us that gearman was removed, so that\u0027s good.. but.. still seems like it will be confusing for current users reading the docs before they upgrade.",
+      "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
