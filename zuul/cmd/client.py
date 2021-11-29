@@ -28,7 +28,6 @@ import textwrap
 import requests
 import urllib.parse
 
-import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
 from zuul.model import SystemAttributes
@@ -506,18 +505,7 @@ class Client(zuul.cmd.ZuulApp):
                                     self.args.auth_token)
             return client
         conf_sections = self.config.sections()
-        if 'gearman' in conf_sections:
-            self.log.debug('gearman section found in config, using RPC client')
-            server = self.config.get('gearman', 'server')
-            port = get_default(self.config, 'gearman', 'port', 4730)
-            ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-            ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-            ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-            client = zuul.rpcclient.RPCClient(
-                server, port, ssl_key,
-                ssl_cert, ssl_ca,
-                client_id=self.app_description)
-        elif 'webclient' in conf_sections:
+        if 'webclient' in conf_sections:
             self.log.debug('web section found in config, using REST client')
             server = get_default(self.config, 'webclient', 'url', None)
             verify = get_default(self.config, 'webclient', 'verify_ssl',
@@ -525,8 +513,8 @@ class Client(zuul.cmd.ZuulApp):
             client = ZuulRESTClient(server, verify,
                                     self.args.auth_token)
         else:
-            print('Unable to find a way to connect to Zuul, add a "gearman" '
-                  'or "web" section to your configuration file')
+            print('Unable to find a way to connect to Zuul, add a '
+                  '"web" section to your configuration file')
             sys.exit(1)
         if server is None:
             print('Missing "server" configuration value')
