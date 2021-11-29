@@ -128,7 +128,7 @@ class TestComponentRegistry(ZuulTestCase):
         self.useFixture(
             ZuulWebFixture(
                 self.changes, self.config, self.additional_event_queues,
-                self.upstream_root, self.rpcclient, self.poller_events,
+                self.upstream_root, self.poller_events,
                 self.git_url_with_auth, self.addCleanup, self.test_root
             )
         )
