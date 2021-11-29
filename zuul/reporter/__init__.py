@@ -14,8 +14,10 @@
 
 import abc
 import logging
+import time
 from zuul.lib.config import get_default
-
+# Debug only
+import traceback
 
 class BaseReporter(object, metaclass=abc.ABCMeta):
     """Base class for reporters.
@@ -168,10 +170,18 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             change=item.change.getSafeAttributes(),
             status_url=status_url)
 
+
+
     def _formatItemReportSuccess(self, item, with_jobs=True):
+        # Debug only
+        self.log.debug('.....................')
+        for line in traceback.format_stack():
+            self.log.debug(line.strip())
+
         msg = item.pipeline.success_message
         if with_jobs:
             msg += '\n\n' + self._formatItemReportJobs(item)
+        msg += '\n\n' + self._formatTotalDuration(item)
         return msg
 
     def _formatItemReportFailure(self, item, with_jobs=True):
@@ -249,15 +259,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 report_times = True
 
             if report_times and build.end_time and build.start_time:
-                dt = int(build.end_time - build.start_time)
-                m, s = divmod(dt, 60)
-                h, m = divmod(m, 60)
-                if h:
-                    elapsed = ' in %dh %02dm %02ds' % (h, m, s)
-                elif m:
-                    elapsed = ' in %dm %02ds' % (m, s)
-                else:
-                    elapsed = ' in %ds' % (s)
+                elapsed = ' in %s' % self._seconds_2_string(
+                    int(build.end_time - build.start_time))
             else:
                 elapsed = ''
             if build.error_detail:
@@ -285,3 +288,18 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         for job_fields in jobs_fields:
             ret += '- %s%s : %s%s%s%s\n' % job_fields[:6]
         return ret
+
+    def _formatTotalDuration(self, item):
+        return 'Total duration: %s' % self._seconds_2_string(
+            time.time() - item.event.timestamp)
+
+    def _seconds_2_string(self, total_seconds):
+        m, s = divmod(total_seconds, 60)
+        h, m = divmod(m, 60)
+        if h:
+            duration = '%dh %02dm %02ds' % (h, m, s)
+        elif m:
+            duration = '%dm %02ds' % (m, s)
+        else:
+            duration = '%ds' % (s)
+        return duration
