@@ -666,6 +666,12 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
     config_file = 'zuul-elastic-driver.conf'
     tenant_config_file = 'config/elasticsearch-driver/main.yaml'
 
+    # These tests are storing the reported index on the fake
+    # elasticsearch backend which is a different instance for each
+    # scheduler. Thus, depending on which scheduler reports the
+    # item, the assertions in these test might pass or fail.
+    scheduler_count = 1
+
     def _getSecrets(self, job, pbtype):
         secrets = []
         build = self.getJobFromHistory(job)
