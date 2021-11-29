@@ -30,7 +30,6 @@ from apscheduler.triggers.interval import IntervalTrigger
 from kazoo.exceptions import NotEmptyError
 
 from zuul import configloader, exceptions
-from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
@@ -167,8 +166,6 @@ class Scheduler(threading.Thread):
         self.sql = self.connections.getSqlReporter(None)
         self.statsd = get_statsd(config)
         self.times = Times(self.sql, self.statsd)
-        self.rpc = rpclistener.RPCListener(config, self)
-        self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
         self.repl = None
         self.stats_thread = threading.Thread(target=self.runStatsElection)
         self.stats_thread.daemon = True
@@ -271,8 +268,6 @@ class Scheduler(threading.Thread):
         self.command_thread.daemon = True
         self.command_thread.start()
 
-        self.rpc.start()
-        self.rpc_slow.start()
         self.stats_thread.start()
         self.apsched.start()
         self.times.start()
@@ -307,11 +302,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
-        self.log.debug("Stopping RPC thread")
-        self.rpc.stop()
-        self.rpc.join()
-        self.rpc_slow.stop()
-        self.rpc_slow.join()
         self.stop_repl()
         self._command_running = False
         self.log.debug("Stopping command socket")
