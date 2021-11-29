@@ -121,7 +121,7 @@ class GitWatcher(threading.Thread):
     def _poll(self):
         self.log.debug("Walk through projects refs for connection: %s" %
                        self.connection.connection_name)
-        for project in self.connection.projects:
+        for project in list(self.connection.projects)[:]:
             refs = self.lsRemote(project)
             self.log.debug("Read %s refs for project %s",
                            len(refs), project)
