@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cab6c75a_b0b7b14e",
+        "filename": "tests/unit/test_cross_crd.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-29T16:37:47Z",
+      "side": 1,
+      "message": "We\u0027re inspecting the in-memory contents of the scheduler here; to fix this, we\u0027d need to check both, or check the contents of zk.",
+      "revId": "a7f034b013de9110ebc9a469e49ec73a4fa80e58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
