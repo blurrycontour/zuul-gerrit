@@ -224,6 +224,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "bebb0d5a_fcb0a0d1",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-29T21:04:04Z",
+      "side": 1,
+      "message": "I got out the comma shaker for this one.  ;)",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "b00b5531_e2776b69",
         "filename": "doc/source/reference/developer/zookeeper.rst",
         "patchSetId": 2
