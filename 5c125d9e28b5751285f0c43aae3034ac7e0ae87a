@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "501bd774_085bfc8f",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "Officially, it looks like ZooKeeper styles its name in CamelCase.",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62d7304e_8f81e867",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "\"have their own event loops\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f970062a_de8076a6",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "\"is first processed\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6afa48c7_593cb558",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "Capitalizing as \"API\" is preferable.",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3684c6f3_ba5dfa95",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "\"event receiving mechanisms\" maybe?",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f040936_434f47d5",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "It\u0027s probably clearer to subscribe \"to events\" than for them; or perhaps a different action instead of subscribe, like \"filter\" or listen.\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3a06c1e_99045907",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "Throughout, we seem to not be terribly consistent about when \"zuul\" is capitalized as \"Zuul\" in these sorts of contexts. Also, GitHub styles their name in CamelCase from what I can see.",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e99af926_e8101a54",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "\"event gathering needs to be handled\" I know it reads a bit oddly, could reword the sentence a bit more instead, like \"Active event gathering needs to be handled slightly differently from passive event gathering.\" ...or something along those lines.",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "911768c8_799215d3",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "\"..., and that stores them\" at least, or maybe \"..., and it stores the events\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cac440f_38485bc2",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "Could dispense with the \"for example\" since you say \"and other\" anyway.",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f4e413c_0877e51d",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "There\u0027s a bit of sentence fragmentation here. Rather, you could have \"..., but still receive only one event so that we don\u0027t need...\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c7e06cd_cba53d0c",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "It would benefit from a comma after \"From this\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94196c3e_b27347a4",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "and probably commas to set off the phrase \"like the scheduler or zuul-web\" as well.",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b00b5531_e2776b69",
+        "filename": "doc/source/reference/developer/zookeeper.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-11-29T18:31:16Z",
+      "side": 1,
+      "message": "\"those nodes are stored\"",
+      "revId": "5c125d9e28b5751285f0c43aae3034ac7e0ae87a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
