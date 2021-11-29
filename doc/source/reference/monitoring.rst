@@ -501,37 +501,6 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       performance metric of how long the SQL query takes; it is not
       the estimated time value itself.
 
-.. stat:: zuul.geard
-
-   Gearman job distribution statistics.  Gearman jobs encompass the
-   wide variety of distributed jobs running within the scheduler and
-   across mergers and executors.  These stats are emitted by the `gear
-   <https://pypi.org/project/gear/>`__ library.
-
-   .. stat:: running
-      :type: gauge
-
-      Jobs that Gearman has actively running.  The longest running
-      jobs will usually relate to active job execution so you would
-      expect this to have a lower bound around there.  Note this may
-      be lower than active nodes, as a multiple-node job will only
-      have one active Gearman job.
-
-   .. stat:: waiting
-      :type: gauge
-
-      Jobs waiting in the gearman queue.  This would be expected to be
-      around zero; note that this is *not* related to the backlogged
-      queue of jobs waiting for a node allocation (node allocations
-      are via Zookeeper).  If this is unexpectedly high, see
-      :ref:`debug_gearman` for queue debugging tips to find out which
-      particular function calls are waiting.
-
-   .. stat:: total
-      :type: gauge
-
-      The sum of the `running` and `waiting` jobs.
-
 As an example, given a job named `myjob` in `mytenant` triggered by a
 change to `myproject` on the `master` branch in the `gate` pipeline
 which took 40 seconds to build, the Zuul scheduler will emit the
