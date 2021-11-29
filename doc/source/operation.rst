@@ -11,9 +11,6 @@ To start, simply run::
 
     zuul-scheduler
 
-Once run you should have two zuul-scheduler processes (if using the
-built-in gearman server, or one process otherwise).
-
 Before Zuul can run any jobs, it needs to load its configuration, most
 of which is in the git repositories that Zuul operates on.  Start an
 executor to allow zuul to do that::

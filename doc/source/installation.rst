@@ -6,22 +6,6 @@ External Dependencies
 
 Zuul interacts with several other systems described below.
 
-Gearman
-~~~~~~~
-
-Gearman is a job distribution system that Zuul uses to communicate
-with its distributed components.  The Zuul scheduler distributes work
-to Zuul mergers and executors using Gearman.  You may supply your own
-gearman server, but the Zuul scheduler includes a built-in server
-which is recommended.  Ensure that all Zuul hosts can communicate with
-the gearman server.
-
-Zuul distributes secrets to executors via gearman, so be sure to
-secure it with TLS and certificate authentication.  Obtain (or
-generate) a certificate for both the server and the clients (they may
-use the same certificate or have individual certificates).  They must
-be signed by a CA, but it can be your own CA.
-
 Nodepool
 ~~~~~~~~
 
@@ -35,63 +19,12 @@ in given a username and ssh private key.
 ZooKeeper
 ~~~~~~~~~
 
-Nodepool uses ZooKeeper to communicate internally among its
-components, and also to communicate with Zuul.  You can run a simple
-single-node ZooKeeper instance, or a multi-node cluster.  Ensure that
-the host running the Zuul scheduler has access to the cluster.  Zuul
-requires its connections to ZooKeeper be TLS encrypted. ZooKeeper
-TLS connectivity requires ZooKeeper 3.5.1 or newer. See
-:ref:`howto-zookeeper` for recommendations for operating a small
-ZooKeeper cluster that meet these requirements.
+.. TODO: SpamapS any zookeeper config recommendations?
 
-Zuul stores private keys for each project it knows about in ZooKeeper.
-It is recommended that you periodically back up the private keys in
-case the ZooKeeper data store is lost or damaged.  The :title:`Zuul
-Client` provides two sub-commands for use in this case:
-:title:`export-keys` and :title:`import-keys`.  Each takes an argument to
-a filesystem path and will write the keys to, or read the keys from
-that path.  The data in the exported files are still secured with the
-keystore passphrase, so be sure to retain it as well.
-
-Database
-~~~~~~~~
-
-Zuul requires an SQL database; either MariaDB, MySQL, or PostgreSQL.
-
-Installation from PyPI
-----------------------
-
-Zuul is a Python application which can be installed from the Python
-Package Index (PyPI).
-
-To install a Zuul release from PyPI, run::
-
-    pip install zuul
-
-Or from a git checkout, run::
-
-    pip install .
-
-That will also install Zuul's python dependencies.  To minimize
-interaction with other python packages installed on a system, you may
-wish to install Zuul within a Python virtualenv.
-
-Zuul has several system-level dependencies as well.  You can find a
-list of operating system packages in ``bindep.txt`` in Zuul's source
-directory.
-
-It is also required to run ``zuul-manage-ansible`` on the
-zuul-executor in order to install all supported Ansible versions so
-Zuul can use them.  See :ref:`ansible-installation-options` for
-details.
-
-Installation from Containers
-----------------------------
-
-The Zuul project also builds and releases container images on
-DockerHub.  These are available at: https://hub.docker.com/u/zuul
-
-There is a container image for each of the Zuul :ref:`components <components>`.
+Zuul and Nodepool use ZooKeeper to communicate internally among their
+components, and also to communicate with each other.  You can run a
+simple single-node ZooKeeper instance, or a multi-node cluster.
+Ensure that all Zuul and Nodepool hosts have access to the cluster.
 
 .. _ansible-installation-options:
 
