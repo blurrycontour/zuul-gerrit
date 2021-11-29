@@ -77,7 +77,6 @@ services:
   web:
     command: |
       sh -c '/var/playbooks/wait-to-start-certs.sh && \
-             /var/playbooks/wait-to-start-gearman.sh && \
              zuul-web -f'
     depends_on:
       - scheduler
