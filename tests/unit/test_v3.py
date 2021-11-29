@@ -29,7 +29,7 @@ import git
 import paramiko
 
 import zuul.configloader
-from zuul.model import MergeRequest, HoldRequest
+from zuul.model import MergeRequest
 
 from tests.base import (
     AnsibleZuulTestCase,
@@ -3722,18 +3722,6 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
 
     tenant_config_file = 'config/pre-playbook/main.yaml'
 
-    def _autohold(self, tenant_name, project_name, job_name,
-                  ref_filter, reason, count, node_hold_expiration):
-        request = HoldRequest()
-        request.tenant = tenant_name
-        request.project = project_name
-        request.job = job_name
-        request.ref_filter = ref_filter
-        request.reason = reason
-        request.max_count = count
-        request.node_expiration = node_hold_expiration
-        self.sched_zk_nodepool.storeHoldRequest(request)
-
     def test_pre_playbook_fail(self):
         # Test that we run the post playbooks (but not the actual
         # playbook) when a pre-playbook fails.
@@ -3755,8 +3743,8 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
                         "The file %s should exist" % post_flag_path)
 
     def test_post_playbook_fail_autohold(self):
-        self._autohold('tenant-one', 'review.example.com/org/project3',
-                       'python27-node-post', '.*', 'reason text', 1, 600)
+        self.addAutohold('tenant-one', 'review.example.com/org/project3',
+                         'python27-node-post', '.*', 'reason text', 1, 600)
 
         A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -3781,8 +3769,8 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
         self.assertEqual(held_node['comment'], "reason text")
 
     def test_pre_playbook_fail_autohold(self):
-        self._autohold('tenant-one', 'review.example.com/org/project2',
-                       'python27-node', '.*', 'reason text', 1, 600)
+        self.addAutohold('tenant-one', 'review.example.com/org/project2',
+                         'python27-node', '.*', 'reason text', 1, 600)
 
         A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
