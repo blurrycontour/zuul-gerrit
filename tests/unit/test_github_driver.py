@@ -28,9 +28,8 @@ import github3.exceptions
 from tests.fakegithub import FakeGithubEnterpriseClient
 from zuul.driver.github.githubconnection import GithubShaCache
 from zuul.zk.layout import LayoutState
-import zuul.rpcclient
 from zuul.lib import strings
-from zuul.model import MergeRequest
+from zuul.model import MergeRequest, EnqueueEvent, DequeueEvent
 
 from tests.base import (AnsibleZuulTestCase, BaseTestCase,
                         ZuulGithubAppTestCase, ZuulTestCase,
@@ -1146,25 +1145,20 @@ class TestGithubDriver(ZuulTestCase):
                                           modified_files=['README.md'])
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
-    def test_client_dequeue_change_github(self):
-        "Test that the RPC client can dequeue a github pull request"
-
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
+    def test_direct_dequeue_change_github(self):
+        "Test direct dequeue of a github pull request"
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
 
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
-        client.dequeue(
-            tenant='tenant-one',
-            pipeline='check',
-            project='org/project',
-            change='{},{}'.format(A.number, A.head_sha),
-            ref=None)
+        event = DequeueEvent('tenant-one', 'check',
+                             'github.com', 'org/project',
+                             change='{},{}'.format(A.number, A.head_sha),
+                             ref=None, oldrev=None, newrev=None)
+        self.scheds.first.sched.pipeline_management_events['tenant-one'][
+            'check'].put(event)
 
         self.waitUntilSettled()
 
@@ -1178,25 +1172,23 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
-    def test_client_enqueue_change_github(self):
-        "Test that the RPC client can enqueue a pull request"
+    def test_direct_enqueue_change_github(self):
+        "Test direct enqueue of a pull request"
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.enqueue(tenant='tenant-one',
-                           pipeline='check',
-                           project='org/project',
-                           trigger='github',
-                           change='{},{}'.format(A.number, A.head_sha))
+        event = EnqueueEvent('tenant-one', 'check',
+                             'github.com', 'org/project',
+                             change='{},{}'.format(A.number, A.head_sha),
+                             ref=None, oldrev=None, newrev=None)
+        self.scheds.first.sched.pipeline_management_events['tenant-one'][
+            'check'].put(event)
+
         self.waitUntilSettled()
 
         self.assertEqual(self.getJobFromHistory('project-test1').result,
                          'SUCCESS')
         self.assertEqual(self.getJobFromHistory('project-test2').result,
                          'SUCCESS')
-        self.assertEqual(r, True)
 
         # check that change_url is correct
         job1_params = self.getJobFromHistory('project-test1').parameters
@@ -1907,11 +1899,6 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         project = "org/project4"
         github = self.fake_github.getGithubClient(None)
 
-        client = zuul.rpcclient.RPCClient(
-            "127.0.0.1", self.gearman_server.port
-        )
-        self.addCleanup(client.shutdown)
-
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_github.openFakePullRequest(project, "master", "A")
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
@@ -1934,14 +1921,13 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
                 r'.*Starting checks-api-reporting-skipped jobs.*', re.DOTALL)
         )
 
-        # Use the client to dequeue the pending change
-        client.dequeue(
-            tenant="tenant-one",
-            pipeline="checks-api-reporting-skipped",
-            project="org/project4",
-            change="{},{}".format(A.number, A.head_sha),
-            ref=None,
-        )
+        # Dequeue the pending change
+        event = DequeueEvent('tenant-one', 'checks-api-reporting-skipped',
+                             'github.com', 'org/project4',
+                             change='{},{}'.format(A.number, A.head_sha),
+                             ref=None, oldrev=None, newrev=None)
+        self.scheds.first.sched.pipeline_management_events['tenant-one'][
+            'checks-api-reporting-skipped'].put(event)
         self.waitUntilSettled()
 
         # We should now have a skipped check run for the head sha
