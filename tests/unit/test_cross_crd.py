@@ -182,9 +182,10 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(A.reported, 1)
-        self.assertEqual(
-            A.messages[0],
-            "Build failed.\n\n\nWarning:\n  Dependency cycle detected\n")
+        self.assertIn("Build failed.\n\nOverall duration:", A.messages[0])
+        self.assertIn(
+            "\n\n\nWarning:\n  Dependency cycle detected\n",
+            A.messages[0])
         self.assertEqual(len(B.comments), 0)
         self.assertEqual(A.data['status'], 'NEW')
         self.assertFalse(B.is_merged)
