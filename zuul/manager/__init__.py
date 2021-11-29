@@ -1336,8 +1336,13 @@ class PipelineManager(metaclass=ABCMeta):
                     # queue again.
                     changed = changed or any(
                         i.item_ahead is None for i in item.bundle.items)
+
+        log.debug("Begin execute jobs..............")
+
         if ready and self.executeJobs(item):
             changed = True
+
+        log.debug("Finished execute jobs..............")
 
         if item.hasAnyJobFailed():
             failing_reasons.append("at least one job failed")
