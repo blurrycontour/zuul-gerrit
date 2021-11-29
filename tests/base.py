@@ -52,7 +52,6 @@ import http.server
 import urllib.parse
 
 import git
-import gear
 import fixtures
 import kazoo.client
 import kazoo.exceptions
@@ -3444,90 +3443,6 @@ class TestScheduler(zuul.scheduler.Scheduler):
     _executor_client_class = HoldableExecutorClient
 
 
-class FakeGearmanServer(gear.Server):
-    """A Gearman server for use in tests.
-
-    :ivar bool hold_jobs_in_queue: If true, submitted jobs will be
-        added to the queue but will not be distributed to workers
-        until released.  This attribute may be changed at any time and
-        will take effect for subsequently enqueued jobs, but
-        previously held jobs will still need to be explicitly
-        released.
-
-    """
-
-    def __init__(self, use_ssl=False):
-        self.hold_jobs_in_queue = False
-        self.hold_merge_jobs_in_queue = False
-        self.jobs_history = []
-        if use_ssl:
-            ssl_ca = os.path.join(FIXTURE_DIR, 'gearman/root-ca.pem')
-            ssl_cert = os.path.join(FIXTURE_DIR, 'gearman/server.pem')
-            ssl_key = os.path.join(FIXTURE_DIR, 'gearman/server.key')
-        else:
-            ssl_ca = None
-            ssl_cert = None
-            ssl_key = None
-
-        super(FakeGearmanServer, self).__init__(0, ssl_key=ssl_key,
-                                                ssl_cert=ssl_cert,
-                                                ssl_ca=ssl_ca)
-
-    def getJobForConnection(self, connection, peek=False):
-        for job_queue in [self.high_queue, self.normal_queue, self.low_queue]:
-            for job in job_queue:
-                self.jobs_history.append(job)
-                if not hasattr(job, 'waiting'):
-                    if job.name.startswith(b'merger:'):
-                        job.waiting = self.hold_merge_jobs_in_queue
-                    else:
-                        job.waiting = False
-                if job.waiting:
-                    continue
-                if job.name in connection.functions:
-                    if not peek:
-                        job_queue.remove(job)
-                        connection.related_jobs[job.handle] = job
-                        job.worker_connection = connection
-                    job.running = True
-                    return job
-        return None
-
-    def release(self, regex=None):
-        """Release a held job.
-
-        :arg str regex: A regular expression which, if supplied, will
-            cause only jobs with matching names to be released.  If
-            not supplied, all jobs will be released.
-        """
-        released = False
-        qlen = (len(self.high_queue) + len(self.normal_queue) +
-                len(self.low_queue))
-        self.log.debug("releasing queued job %s (%s)" % (regex, qlen))
-        for job in self.getQueue():
-            match = False
-            if job.name.startswith(b'executor:execute'):
-                parameters = json.loads(job.arguments.decode('utf8'))
-                if not regex or re.match(regex, parameters.get('job')):
-                    match = True
-            if job.name.startswith(b'merger:'):
-                if not regex:
-                    match = True
-            if match:
-                self.log.debug("releasing queued job %s" %
-                               job.unique)
-                job.waiting = False
-                released = True
-            else:
-                self.log.debug("not releasing queued job %s" %
-                               job.unique)
-        if released:
-            self.wakeConnections()
-        qlen = (len(self.high_queue) + len(self.normal_queue) +
-                len(self.low_queue))
-        self.log.debug("done releasing queued jobs %s (%s)" % (regex, qlen))
-
-
 class FakeSMTP(object):
     log = logging.getLogger('zuul.FakeSMTP')
 
@@ -4183,10 +4098,10 @@ class BaseTestCase(testtools.TestCase):
         # NOTE(notmorgan): Extract logging overrides for specific
         # libraries from the OS_LOG_DEFAULTS env and create loggers
         # for each. This is used to limit the output during test runs
-        # from libraries that zuul depends on such as gear.
+        # from libraries that zuul depends on.
         log_defaults_from_env = os.environ.get(
             'OS_LOG_DEFAULTS',
-            'git.cmd=INFO,gear=WARNING,'
+            'git.cmd=INFO,'
             'kazoo.client=WARNING,kazoo.recipe=WARNING')
 
         if log_defaults_from_env:
@@ -4434,11 +4349,6 @@ class ZuulTestCase(BaseTestCase):
         and stored here.  For instance, `fake_gerrit` will hold the
         FakeGerritConnection object for a connection named `gerrit`.
 
-    :ivar FakeGearmanServer gearman_server: An instance of
-        :py:class:`~tests.base.FakeGearmanServer` which is the Gearman
-        server that all of the Zuul components in this test use to
-        communicate with each other.
-
     :ivar RecordingExecutorServer executor_server: An instance of
         :py:class:`~tests.base.RecordingExecutorServer` which is the
         Ansible execute server used to run jobs for this test.
@@ -4558,23 +4468,6 @@ class ZuulTestCase(BaseTestCase):
         if self.config.has_section('statsd'):
             self.config.set('statsd', 'port', str(self.statsd.port))
         self.statsd.start()
-
-        self.gearman_server = FakeGearmanServer(self.use_ssl)
-
-        self.config.set('gearman', 'port', str(self.gearman_server.port))
-        self.log.info("Gearman server on port %s" %
-                      (self.gearman_server.port,))
-        if self.use_ssl:
-            self.log.info('SSL enabled for gearman')
-            self.config.set(
-                'gearman', 'ssl_ca',
-                os.path.join(FIXTURE_DIR, 'gearman/root-ca.pem'))
-            self.config.set(
-                'gearman', 'ssl_cert',
-                os.path.join(FIXTURE_DIR, 'gearman/client.pem'))
-            self.config.set(
-                'gearman', 'ssl_key',
-                os.path.join(FIXTURE_DIR, 'gearman/client.key'))
 
         self.config.set('zookeeper', 'hosts', self.zk_chroot_fixture.zk_hosts)
         self.config.set('zookeeper', 'session_timeout', '30')
@@ -5007,7 +4900,6 @@ class ZuulTestCase(BaseTestCase):
         self.scheds.execute(lambda app: app.sched.join())
         self.statsd.stop()
         self.statsd.join()
-        self.gearman_server.shutdown()
         self.fake_nodepool.stop()
         self.zk_client.disconnect()
         self.printHistory()
