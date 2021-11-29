@@ -19,8 +19,6 @@ import subprocess
 import tempfile
 import textwrap
 
-import zuul.web
-import zuul.rpcclient
 from zuul.lib import yamlutil
 
 from tests.base import iterate_timeout
@@ -201,11 +199,11 @@ class TestZuulClientAdmin(BaseTestWeb):
             stdout=subprocess.PIPE)
         output = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        autohold_requests = client.autohold_list()
+        # Check result
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
