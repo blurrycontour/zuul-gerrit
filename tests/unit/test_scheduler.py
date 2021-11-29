@@ -4214,18 +4214,6 @@ class TestScheduler(ZuulTestCase):
             if len(self.builds) > 1:
                 break
 
-        merge_count_project1 = 0
-        for job in self.gearman_server.jobs_history:
-            if job.name == b'merger:refstate':
-                args = job.arguments
-                if isinstance(args, bytes):
-                    args = args.decode('utf-8')
-                args = json.loads(args)
-                if args["items"][0]["project"] == "org/project1":
-                    merge_count_project1 += 1
-        self.assertEquals(merge_count_project1, 0,
-                          "project1 shouldn't have any refstate call")
-
         # Ensure that the status json has the ref so we can render it in the
         # web ui.
         pipeline = self.scheds.first.sched.abide.tenants[
