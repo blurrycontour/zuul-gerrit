@@ -54,7 +54,7 @@ class BaseWithWeb(ZuulTestCase):
         self.web = self.useFixture(
             ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
-                           self.rpcclient, self.poller_events,
+                           self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
                            self.test_root,
                            info=zuul.model.WebInfo.fromConfig(
@@ -2886,7 +2886,7 @@ class TestWebStartup(ZuulTestCase):
         # Start the web server
         self.web = ZuulWebFixture(
             self.changes, self.config, self.additional_event_queues,
-            self.upstream_root, self.rpcclient, self.poller_events,
+            self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup, self.test_root,
             info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config))
         self.useFixture(self.web)
