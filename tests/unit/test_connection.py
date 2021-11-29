@@ -149,7 +149,9 @@ class TestSQLConnectionMysql(ZuulTestCase):
             self.assertEqual(1, buildset0['change'])
             self.assertEqual('1', buildset0['patchset'])
             self.assertEqual('SUCCESS', buildset0['result'])
-            self.assertEqual('Build succeeded.', buildset0['message'])
+            self.assertIn(
+                'Build succeeded.\n\nOverall duration:',
+                buildset0['message'])
             self.assertEqual('tenant-one', buildset0['tenant'])
             self.assertEqual(
                 'https://review.example.com/%d' % buildset0['change'],
@@ -257,7 +259,9 @@ class TestSQLConnectionMysql(ZuulTestCase):
                 self.assertEqual(1, buildset0['change'])
                 self.assertEqual('1', buildset0['patchset'])
                 self.assertEqual('SUCCESS', buildset0['result'])
-                self.assertEqual('Build succeeded.', buildset0['message'])
+                self.assertIn(
+                    'Build succeeded.\n\nOverall duration:',
+                    buildset0['message'])
                 self.assertEqual('tenant-one', buildset0['tenant'])
                 self.assertEqual(
                     'https://review.example.com/%d' % buildset0['change'],
@@ -344,8 +348,9 @@ class TestSQLConnectionMysql(ZuulTestCase):
             self.assertEqual(1, buildsets_resultsdb[0]['change'])
             self.assertEqual('1', buildsets_resultsdb[0]['patchset'])
             self.assertEqual('SUCCESS', buildsets_resultsdb[0]['result'])
-            self.assertEqual(
-                'Build succeeded.', buildsets_resultsdb[0]['message'])
+            self.assertIn(
+                'Build succeeded.\n\nOverall duration:',
+                buildsets_resultsdb[0]['message'])
 
             buildsets_resultsdb_failures = conn.execute(sa.sql.select(
                 [reporter1.connection.zuul_buildset_table])).fetchall()
