@@ -75,7 +75,6 @@ from zuul.model import (
     BuildRequest, Change, MergeRequest, PRECEDENCE_NORMAL, WebInfo,
     HoldRequest
 )
-from zuul.rpcclient import RPCClient
 
 from zuul.driver.zuul import ZuulDriver
 from zuul.driver.git import GitDriver
@@ -120,9 +119,7 @@ import zuul.merger.client
 import zuul.merger.merger
 import zuul.merger.server
 import zuul.nodepool
-import zuul.rpcclient
 import zuul.configloader
-from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 
 import tests.fakegithub
@@ -260,7 +257,7 @@ class GerritDriverMock(GerritDriver):
 class GithubDriverMock(GithubDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
                  config: ConfigParser, upstream_root: str,
-                 additional_event_queues, rpcclient: RPCClient,
+                 additional_event_queues,
                  git_url_with_auth: bool):
         super(GithubDriverMock, self).__init__()
         self.registry = registry
@@ -268,14 +265,13 @@ class GithubDriverMock(GithubDriver):
         self.config = config
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
-        self.rpcclient = rpcclient
         self.git_url_with_auth = git_url_with_auth
 
     def getConnection(self, name, config):
         server = config.get('server', 'github.com')
         db = self.changes.setdefault(server, {})
         connection = FakeGithubConnection(
-            self, name, config, self.rpcclient,
+            self, name, config,
             changes_db=db,
             upstream_root=self.upstream_root,
             git_url_with_auth=self.git_url_with_auth)
@@ -287,20 +283,18 @@ class GithubDriverMock(GithubDriver):
 
 class PagureDriverMock(PagureDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
-                 upstream_root: str, additional_event_queues,
-                 rpcclient: RPCClient):
+                 upstream_root: str, additional_event_queues):
         super(PagureDriverMock, self).__init__()
         self.registry = registry
         self.changes = changes
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
-        self.rpcclient = rpcclient
 
     def getConnection(self, name, config):
         server = config.get('server', 'pagure.io')
         db = self.changes.setdefault(server, {})
         connection = FakePagureConnection(
-            self, name, config, self.rpcclient,
+            self, name, config,
             changes_db=db,
             upstream_root=self.upstream_root)
         setattr(self.registry, 'fake_' + name, connection)
@@ -310,20 +304,19 @@ class PagureDriverMock(PagureDriver):
 class GitlabDriverMock(GitlabDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
                  config: ConfigParser, upstream_root: str,
-                 additional_event_queues, rpcclient: RPCClient):
+                 additional_event_queues):
         super(GitlabDriverMock, self).__init__()
         self.registry = registry
         self.changes = changes
         self.config = config
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
-        self.rpcclient = rpcclient
 
     def getConnection(self, name, config):
         server = config.get('server', 'gitlab.com')
         db = self.changes.setdefault(server, {})
         connection = FakeGitlabConnection(
-            self, name, config, self.rpcclient,
+            self, name, config,
             changes_db=db,
             upstream_root=self.upstream_root)
         setattr(self.registry, 'fake_' + name, connection)
@@ -335,7 +328,7 @@ class GitlabDriverMock(GitlabDriver):
 class TestConnectionRegistry(ConnectionRegistry):
     def __init__(self, changes: Dict[str, Dict[str, Change]],
                  config: ConfigParser, additional_event_queues,
-                 upstream_root: str, rpcclient: RPCClient, poller_events,
+                 upstream_root: str, poller_events,
                  git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None]):
         self.connections = OrderedDict()
@@ -348,7 +341,7 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(GitDriver())
         self.registerDriver(GithubDriverMock(
             self, changes, config, upstream_root, additional_event_queues,
-            rpcclient, git_url_with_auth))
+            git_url_with_auth))
         self.registerDriver(SMTPDriver())
         self.registerDriver(TimerDriver())
         self.registerDriver(SQLDriver())
@@ -356,10 +349,9 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(NullwrapDriver())
         self.registerDriver(MQTTDriver())
         self.registerDriver(PagureDriverMock(
-            self, changes, upstream_root, additional_event_queues, rpcclient))
+            self, changes, upstream_root, additional_event_queues))
         self.registerDriver(GitlabDriverMock(
-            self, changes, config, upstream_root, additional_event_queues,
-            rpcclient))
+            self, changes, config, upstream_root, additional_event_queues))
         self.registerDriver(ElasticsearchDriver())
 
 
@@ -1815,7 +1807,7 @@ class FakePagureAPIClient(pagureconnection.PagureAPIClient):
 class FakePagureConnection(pagureconnection.PagureConnection):
     log = logging.getLogger("zuul.test.FakePagureConnection")
 
-    def __init__(self, driver, connection_name, connection_config, rpcclient,
+    def __init__(self, driver, connection_name, connection_config,
                  changes_db=None, upstream_root=None):
         super(FakePagureConnection, self).__init__(driver, connection_name,
                                                    connection_config)
@@ -1825,7 +1817,6 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         self.statuses = {}
         self.upstream_root = upstream_root
         self.reports = []
-        self.rpcclient = rpcclient
         self.cloneurl = self.upstream_root
 
     def get_project_api_client(self, project):
@@ -1926,10 +1917,9 @@ FakeGitlabBranch = namedtuple('Branch', ('name', 'protected'))
 class FakeGitlabConnection(gitlabconnection.GitlabConnection):
     log = logging.getLogger("zuul.test.FakeGitlabConnection")
 
-    def __init__(self, driver, connection_name, connection_config, rpcclient,
+    def __init__(self, driver, connection_name, connection_config,
                  changes_db=None, upstream_root=None):
         self.merge_requests = changes_db
-        self.rpcclient = rpcclient
         self.upstream_root = upstream_root
         self.mr_number = 0
 
@@ -2756,7 +2746,7 @@ class FakeGithubConnection(githubconnection.GithubConnection):
     log = logging.getLogger("zuul.test.FakeGithubConnection")
     client_manager_class = FakeGithubClientManager
 
-    def __init__(self, driver, connection_name, connection_config, rpcclient,
+    def __init__(self, driver, connection_name, connection_config,
                  changes_db=None, upstream_root=None, git_url_with_auth=False):
         super(FakeGithubConnection, self).__init__(driver, connection_name,
                                                    connection_config)
@@ -2772,7 +2762,6 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self._github_client_manager.github_data = self.github_data
 
         self.git_url_with_auth = git_url_with_auth
-        self.rpcclient = rpcclient
 
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
@@ -4002,13 +3991,13 @@ class ZuulWebFixture(fixtures.Fixture):
     def __init__(self,
                  changes: Dict[str, Dict[str, Change]], config: ConfigParser,
                  additional_event_queues, upstream_root: str,
-                 rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
+                 poller_events, git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None],
                  test_root: str, info: Optional[WebInfo] = None):
         super(ZuulWebFixture, self).__init__()
         self.config = config
         self.connections = TestConnectionRegistry(
-            changes, config, additional_event_queues, upstream_root, rpcclient,
+            changes, config, additional_event_queues, upstream_root,
             poller_events, git_url_with_auth, add_cleanup)
         self.connections.configure(config)
 
@@ -4298,7 +4287,7 @@ class SymLink(object):
 
 class SchedulerTestApp:
     def __init__(self, log, config, changes, additional_event_queues,
-                 upstream_root, rpcclient, poller_events,
+                 upstream_root, poller_events,
                  git_url_with_auth, add_cleanup, validate_tenants,
                  instance_id):
         self.log = log
@@ -4312,7 +4301,6 @@ class SchedulerTestApp:
             self.config,
             additional_event_queues,
             upstream_root,
-            rpcclient,
             poller_events,
             git_url_with_auth,
             add_cleanup,
@@ -4366,7 +4354,7 @@ class SchedulerTestManager:
         self.validate_tenants = validate_tenants
 
     def create(self, log, config, changes, additional_event_queues,
-               upstream_root, rpcclient, poller_events,
+               upstream_root, poller_events,
                git_url_with_auth, add_cleanup, validate_tenants):
         # Since the config contains a regex we cannot use copy.deepcopy()
         # as this will raise an exception with Python <3.7
@@ -4386,7 +4374,7 @@ class SchedulerTestManager:
 
         app = SchedulerTestApp(log, scheduler_config, changes,
                                additional_event_queues, upstream_root,
-                               rpcclient, poller_events,
+                               poller_events,
                                git_url_with_auth, add_cleanup,
                                validate_tenants, instance_id)
         self.instances.append(app)
@@ -4626,13 +4614,6 @@ class ZuulTestCase(BaseTestCase):
         self.config.set('zookeeper', 'tls_ca',
                         self.zk_chroot_fixture.zookeeper_ca)
 
-        self.rpcclient = zuul.rpcclient.RPCClient(
-            self.config.get('gearman', 'server'),
-            self.gearman_server.port,
-            get_default(self.config, 'gearman', 'ssl_key'),
-            get_default(self.config, 'gearman', 'ssl_cert'),
-            get_default(self.config, 'gearman', 'ssl_ca'))
-
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
@@ -4659,7 +4640,7 @@ class ZuulTestCase(BaseTestCase):
 
         executor_connections = TestConnectionRegistry(
             self.changes, self.config, self.additional_event_queues,
-            self.upstream_root, self.rpcclient, self.poller_events,
+            self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup)
         executor_connections.configure(self.config,
                                        source_only=True)
@@ -4694,7 +4675,7 @@ class ZuulTestCase(BaseTestCase):
     def createScheduler(self):
         self.scheds.create(
             self.log, self.config, self.changes,
-            self.additional_event_queues, self.upstream_root, self.rpcclient,
+            self.additional_event_queues, self.upstream_root,
             self.poller_events, self.git_url_with_auth,
             self.addCleanup, self.validate_tenants)
 
@@ -5051,7 +5032,6 @@ class ZuulTestCase(BaseTestCase):
         self.scheds.execute(lambda app: app.sched.join())
         self.statsd.stop()
         self.statsd.join()
-        self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.prometheus_server.stop()
         self.fake_nodepool.stop()

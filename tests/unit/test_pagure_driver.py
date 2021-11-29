@@ -973,7 +973,7 @@ class TestPagureWebhook(ZuulTestCase):
         self.web = self.useFixture(
             ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
-                           self.rpcclient, self.poller_events,
+                           self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
                            self.test_root))
 
@@ -1021,7 +1021,7 @@ class TestPagureWebhookWhitelist(ZuulTestCase):
         self.web = self.useFixture(
             ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
-                           self.rpcclient, self.poller_events,
+                           self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
                            self.test_root))
 
