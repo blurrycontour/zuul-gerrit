@@ -134,6 +134,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         a reporter taking free-form text."""
         action = action or self._action
         ret = self._getFormatter(action)(item, with_jobs)
+        ret += self._formatOverallDuration(item)
 
         if item.current_build_set.warning_messages:
             warning = '\n  '.join(item.current_build_set.warning_messages)
@@ -249,15 +250,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 report_times = True
 
             if report_times and build.end_time and build.start_time:
-                dt = int(build.end_time - build.start_time)
-                m, s = divmod(dt, 60)
-                h, m = divmod(m, 60)
-                if h:
-                    elapsed = ' in %dh %02dm %02ds' % (h, m, s)
-                elif m:
-                    elapsed = ' in %dm %02ds' % (m, s)
-                else:
-                    elapsed = ' in %ds' % (s)
+                elapsed = ' in %s' % self._seconds_2_string(
+                    int(build.end_time - build.start_time))
             else:
                 elapsed = ''
             if build.error_detail:
@@ -285,3 +279,21 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         for job_fields in jobs_fields:
             ret += '- %s%s : %s%s%s%s\n' % job_fields[:6]
         return ret
+
+    def _formatOverallDuration(self, item):
+        if item.report_time and item.event.timestamp:
+            return '\n\nOverall duration: %s' % self._seconds_2_string(
+                item.report_time - item.event.timestamp)
+        else:
+            return ''
+
+    def _seconds_2_string(self, total_seconds):
+        m, s = divmod(total_seconds, 60)
+        h, m = divmod(m, 60)
+        if h:
+            duration = '%dh %02dm %02ds' % (h, m, s)
+        elif m:
+            duration = '%dm %02ds' % (m, s)
+        else:
+            duration = '%ds' % (s)
+        return duration
