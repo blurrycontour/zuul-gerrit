@@ -957,8 +957,7 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
                                      expect_reconfigure=False,
                                      old_sha=None, new_sha=None,
                                      modified_files=None,
-                                     removed_files=None,
-                                     expected_cat_jobs=None):
+                                     removed_files=None):
         pevent = self.fake_gitlab.getPushEvent(
             project=project,
             branch='refs/heads/%s' % branch,
@@ -969,11 +968,6 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         old = self.scheds.first.sched.tenant_layout_state.get(
             'tenant-one', EMPTY_LAYOUT_STATE)
         self.waitUntilSettled()
-
-        if expected_cat_jobs is not None:
-            # clear the gearman jobs history so we can count the cat jobs
-            # issued during reconfiguration
-            self.gearman_server.jobs_history.clear()
 
         self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
@@ -986,13 +980,6 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         else:
             # Timestamps should be equal as no reconfiguration shall happen
             self.assertEqual(old, new)
-
-        if expected_cat_jobs is not None:
-            # Check the expected number of cat jobs here as the (empty) config
-            # of org/project should be cached.
-            cat_jobs = set([job for job in self.gearman_server.jobs_history
-                           if job.name == b'merger:cat'])
-            self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     def test_push_event_reconfigure_complex_branch(self):
 
@@ -1021,8 +1008,7 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
                                           expect_reconfigure=False,
                                           old_sha=old_sha,
                                           new_sha=new_sha,
-                                          modified_files=['zuul.yaml'],
-                                          expected_cat_jobs=0)
+                                          modified_files=['zuul.yaml'])
 
         # branch is not protected: no reconfiguration
         self.fake_gitlab.deleteBranch(*project.split('/'), branch)
