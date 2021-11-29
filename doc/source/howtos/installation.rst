@@ -31,9 +31,7 @@ Zuul provides the following components:
 
     - **zuul-scheduler**: The main Zuul process. Handles receiving
       events, executing jobs, collecting results and posting reports.
-      Coordinates the work of the other components.  It also provides
-      a gearman daemon which the other components use for
-      coordination.
+      Coordinates the work of the other components.
 
     - **zuul-merger**: Scale-out component that performs git merge
       operations.  Zuul performs a large number of git operations in
@@ -62,22 +60,6 @@ External Dependencies
 
 Zuul interacts with several other systems described below.
 
-Gearman
-~~~~~~~
-
-Gearman is a job distribution system that Zuul uses to communicate
-with its distributed components.  The Zuul scheduler distributes work
-to Zuul mergers and executors using Gearman.  You may supply your own
-gearman server, but the Zuul scheduler includes a built-in server
-which is recommended.  Ensure that all Zuul hosts can communicate with
-the gearman server.
-
-Zuul distributes secrets to executors via gearman, so be sure to
-secure it with TLS and certificate authentication.  Obtain (or
-generate) a certificate for both the server and the clients (they may
-use the same certificate or have individual certificates).  They must
-be signed by a CA, but it can be your own CA.
-
 Nodepool
 ~~~~~~~~
 
@@ -93,10 +75,10 @@ ZooKeeper
 
 .. TODO: SpamapS any zookeeper config recommendations?
 
-Nodepool uses ZooKeeper to communicate internally among its
-components, and also to communicate with Zuul.  You can run a simple
-single-node ZooKeeper instance, or a multi-node cluster.  Ensure that
-the host running the Zuul scheduler has access to the cluster.
+Zuul and Nodepool use ZooKeeper to communicate internally among their
+components, and also to communicate with each other.  You can run a
+simple single-node ZooKeeper instance, or a multi-node cluster.
+Ensure that all Zuul and Nodepool hosts have access to the cluster.
 
 .. _ansible-installation-options:
 
@@ -126,8 +108,7 @@ Zuul Setup
 ----------
 
 At minimum you need to provide ``zuul.conf`` and ``main.yaml`` placed
-in ``/etc/zuul/``.  The following example uses the builtin gearman
-service in Zuul, and a connection to Gerrit.
+in ``/etc/zuul/``.  The following example uses a connection to Gerrit.
 
 **zuul.conf**::
 
@@ -136,12 +117,6 @@ service in Zuul, and a connection to Gerrit.
 
     [scheduler]
     tenant_config=/etc/zuul/main.yaml
-
-    [gearman_server]
-    start=true
-
-    [gearman]
-    server=127.0.0.1
 
     [connection my_gerrit]
     driver=gerrit
@@ -178,9 +153,6 @@ your configuration.
 To start, simply run::
 
     zuul-scheduler
-
-Once run you should have two zuul-scheduler processes (if using the
-built-in gearman server, or one process otherwise).
 
 Before Zuul can run any jobs, it needs to load its configuration, most
 of which is in the git repositories that Zuul operates on.  Start an

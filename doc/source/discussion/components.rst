@@ -24,7 +24,6 @@ which is described below.
       Database [fontcolor=grey]
       Executor [href="#executor"]
       Finger [href="#finger-gateway"]
-      Gearman [shape=ellipse]
       Gerrit [fontcolor=grey]
       Merger [href="#merger"]
       Statsd [shape=ellipse fontcolor=grey]
@@ -34,18 +33,14 @@ which is described below.
       GitHub [fontcolor=grey]
       Web [href="#web-server"]
 
-      Merger -- Gearman
       Executor -- Statsd
       Executor -- "Job Node"
       Web -- Database
-      Web -- Gearman
       Web -- GitHub
       Web -- Zookeeper
       Web -- Executor
-      Finger -- Gearman
       Finger -- Executor
 
-      Gearman -- Scheduler;
       Scheduler -- Database;
       Scheduler -- Gerrit;
       Scheduler -- Zookeeper;
@@ -58,31 +53,26 @@ which is described below.
    }
 
 Each of the Zuul processes may run on the same host, or different
-hosts.  Within Zuul, the components communicate with the scheduler via
-the Gearman protocol, so each Zuul component needs to be able to
-connect to the host running the Gearman server (the scheduler has a
-built-in Gearman server which is recommended) on the Gearman port --
-TCP port 4730 by default.
+hosts.
 
-The Zuul scheduler communicates with Nodepool via the ZooKeeper
-protocol.  Nodepool requires an external ZooKeeper cluster, and the
-Zuul scheduler needs to be able to connect to the hosts in that
-cluster on TCP port 2181 or 2281.
+Zuul requires an external ZooKeeper cluster, and all Zuul and Nodepool
+components need to be able to connect to the hosts in that cluster on
+a TLS-encrypted TCP port, typically 2281.
 
 Both the Nodepool launchers and Zuul executors need to be able to
-communicate with the hosts which nodepool provides.  If these are on
-private networks, the Executors will need to be able to route traffic
+communicate with the hosts which Nodepool provides.  If these are on
+private networks, the executors will need to be able to route traffic
 to them.
 
 Only Zuul fingergw and Zuul web need to be publicly accessible;
-executors never do. Executors should be accessible on TCP port 7900
-by fingergw and web.
+executors never do. Executors should be accessible on TCP port 7900 by
+fingergw and web.
 
 A database is required and configured in ``database`` section of
 ``/etc/zuul/zuul.conf``. Both Zuul scheduler and Zuul web will need
 access to it.
 
-If statsd is enabled, the executors and scheduler needs to be able to
+If statsd is enabled, the executors and scheduler need to be able to
 emit data to statsd.  Statsd can be configured to run on each host
 and forward data, or services may emit to a centralized statsd
 collector.  Statsd listens on UDP port 8125 by default.
@@ -100,13 +90,6 @@ as the environment variable named ``ZUUL_HOME``.
 An example ``zuul.conf``:
 
 .. code-block:: ini
-
-   [gearman]
-   server=localhost
-
-   [gearman_server]
-   start=true
-   log_config=/etc/zuul/gearman-logging.yaml
 
    [zookeeper]
    hosts=zk1.example.com,zk2.example.com,zk3.example.com
@@ -144,33 +127,6 @@ Configuration
 
 The following sections of ``zuul.conf`` are used by all Zuul components:
 
-
-.. attr:: gearman
-
-   Client connection information for Gearman.
-
-   .. attr:: server
-      :required:
-
-      Hostname or IP address of the Gearman server.
-
-   .. attr:: port
-      :default: 4730
-
-      Port on which the Gearman server is listening.
-
-   .. attr:: ssl_ca
-
-      An openssl file containing a set of concatenated “certification
-      authority” certificates in PEM formet.
-
-   .. attr:: ssl_cert
-
-      An openssl file containing the client public certificate in PEM format.
-
-   .. attr:: ssl_key
-
-      An openssl file containing the client private key in PEM format.
 
 .. attr:: statsd
 
@@ -228,26 +184,17 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 Scheduler
 ---------
 
-The scheduler is the primary component of Zuul.  The scheduler is not
-a scalable component; one, and only one, scheduler must be running at
-all times for Zuul to be operational.  It receives events from any
+The scheduler is the primary component of Zuul.  The scheduler is a
+scalable component; one or more schedulers must be running at all
+times for Zuul to be operational.  It receives events from any
 connections to remote systems which have been configured, enqueues
 items into pipelines, distributes jobs to executors, and reports
 results.
 
-The scheduler includes a Gearman server which is used to communicate
-with other components of Zuul.  It is possible to use an external
-Gearman server, but the built-in server is well-tested and
-recommended.  If the built-in server is used, other Zuul hosts will
-need to be able to connect to the scheduler on the Gearman port, TCP
-port 4730.  It is also strongly recommended to use SSL certs with
-Gearman, as secrets are transferred from the scheduler to executors
-over this link.
-
-The scheduler must be able to connect to the ZooKeeper cluster used by
-Nodepool in order to request nodes.  It does not need to connect
-directly to the nodes themselves, however -- that function is handled
-by the Executors.
+The scheduler must be able to connect to the ZooKeeper cluster shared
+by Zuul and Nodepool in order to request nodes.  It does not need to
+connect directly to the nodes themselves, however -- that function is
+handled by the Executors.
 
 It must also be able to connect to any services for which connections
 are configured (Gerrit, GitHub, etc).
@@ -257,44 +204,6 @@ Configuration
 
 The following sections of ``zuul.conf`` are used by the scheduler:
 
-
-.. attr:: gearman_server
-
-   The builtin gearman server. Zuul can fork a gearman process from
-   itself rather than connecting to an external one.
-
-   .. attr:: start
-      :default: false
-
-      Whether to start the internal Gearman server.
-
-   .. attr:: listen_address
-      :default: all addresses
-
-      IP address or domain name on which to listen.
-
-   .. attr:: port
-      :default: 4730
-
-      TCP port on which to listen.
-
-   .. attr:: log_config
-
-      Path to log config file for internal Gearman server.
-
-   .. attr:: ssl_ca
-
-      An openssl file containing a set of concatenated “certification
-      authority” certificates in PEM formet.
-
-   .. attr:: ssl_cert
-
-      An openssl file containing the server public certificate in PEM
-      format.
-
-   .. attr:: ssl_key
-
-      An openssl file containing the server private key in PEM format.
 
 .. attr:: web
 
@@ -451,9 +360,9 @@ perform them, large numbers may impact their ability to run jobs.
 Therefore, administrators may wish to run standalone mergers in order
 to reduce the load on executors.
 
-Mergers need to be able to connect to the Gearman server (usually the
-scheduler host) as well as any services for which connections are
-configured (Gerrit, GitHub, etc).
+Mergers need to be able to connect to the ZooKeeper cluster as well as
+any services for which connections are configured (Gerrit, GitHub,
+etc).
 
 Configuration
 ~~~~~~~~~~~~~
@@ -549,10 +458,9 @@ perform any tasks normally performed by standalone mergers.  Because
 the executor performs both roles, small Zuul installations may not
 need to run standalone mergers.
 
-Executors need to be able to connect to the Gearman server (usually
-the scheduler host), any services for which connections are configured
-(Gerrit, GitHub, etc), as well as directly to the hosts which Nodepool
-provides.
+Executors need to be able to connect to the ZooKeeper cluster, any
+services for which connections are configured (Gerrit, GitHub, etc),
+as well as directly to the hosts which Nodepool provides.
 
 Trusted and Untrusted Playbooks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1006,11 +914,10 @@ log streaming, the REST API and the html/javascript dashboard. All three are
 served as a holistic web application. For information on additional supported
 deployment schemes, see :ref:`web-deployment-options`.
 
-Web servers need to be able to connect to the Gearman server (usually
-the scheduler host).  If the SQL reporter is used, they need to be
-able to connect to the database it reports to in order to support the
-dashboard.  If a GitHub connection is configured, they need to be
-reachable by GitHub so they may receive notifications.
+Web servers need to be able to connect to the ZooKeeper cluster and
+the SQL database.  If a GitHub, Gitlab, or Pagure connection is
+configured, they need to be reachable so they may receive
+notifications.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -1289,9 +1196,9 @@ For example::
 
 The above would stream the logs for the build identified by `UUID`.
 
-Finger gateway servers need to be able to connect to the Gearman
-server (usually the scheduler host), as well as the console streaming
-port on the executors (usually 7900).
+Finger gateway servers need to be able to connect to the ZooKeeper
+cluster, as well as the console streaming port on the executors
+(usually 7900).
 
 Finger gateways are optional.  They may be run for either or both of
 the following purposes:

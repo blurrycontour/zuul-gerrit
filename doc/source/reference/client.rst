@@ -4,8 +4,7 @@ Zuul Client
 ===========
 
 Zuul includes a simple command line client that may be used to affect Zuul's
-behavior while running. It must be run on a host that has access to the Gearman
-server (e.g., locally on the Zuul host), or on a host with access to Zuul's web
+behavior while running. It must be run on a host with access to Zuul's web
 server.
 
 Configuration
@@ -14,9 +13,7 @@ Configuration
 The client uses the same zuul.conf file as the server, and will look
 for it in the same locations if not specified on the command line.
 
-If both sections are present, the ``gearman`` section takes precedence over the
-``webclient`` section, meaning the client will execute commands using the Gearman
-server over the REST API.
+The ``webclient`` section is required.
 
 It is also possible to run the client without a configuration file, by using the
 ``--zuul-url`` option to specify the base URL of the Zuul web server.
@@ -162,21 +159,8 @@ may not pass validation if applied on top of the current patch queue in the gate
 If the queue of a dependent pipeline is targeted by the promote, all the ongoing
 jobs in that queue will be canceled and restarted on top of the promoted changes.
 
-Show
-^^^^
-
-.. note:: This command is only available through a Gearman connection.
-
-.. program-output:: zuul show --help
-
-Example::
-
-  zuul show running-jobs
-
 tenant-conf-check
 ^^^^^^^^^^^^^^^^^
-
-.. note:: This command is only available through a Gearman connection.
 
 .. program-output:: zuul tenant-conf-check --help
 

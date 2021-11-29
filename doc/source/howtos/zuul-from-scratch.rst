@@ -53,12 +53,6 @@ to appropriate values for your setup.
    export GIT_USER_EMAIL=change@me.com
    sudo --preserve-env=GIT_USER_NAME,GIT_USER_EMAIL bash -c \
    "cat > /etc/zuul/zuul.conf <<EOF
-   [gearman]
-   server=127.0.0.1
-
-   [gearman_server]
-   start=true
-
    [zookeeper]
    hosts=localhost
 
