@@ -19,7 +19,6 @@ documentation instead.
    tenant-scoped-admin-web-API
    kubernetes-operator
    circular-dependencies
-   scale-out-scheduler
    zuul-runner
    enhanced-regional-executors
    tenant-resource-quota

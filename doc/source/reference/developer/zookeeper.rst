@@ -1,5 +1,107 @@
+ZooKeeper
+=========
+
+Overview
+--------
+
+Zuul has a microservices architecture with the goal of no single point of
+failure in mind.
+
+Zuul is an event driven system with several event loops that interact
+with each other:
+
+* Driver event loop: Drivers like GitHub or Gerrit have their own event loops.
+  They perform preprocessing of the received events and add events into the
+  scheduler event loop.
+
+* Scheduler event loop: This event loop processes the pipelines and
+  reconfigurations.
+
+Each of these event loops persists data in ZooKeeper so that other
+components can share or resume processing.
+
+A key aspect of scalability is maintaining an event queue per
+pipeline. This makes it easy to process several pipelines in
+parallel. A new driver event is first processed in the driver event
+queue. This adds a new event into the scheduler event queue. The
+scheduler event queue then checks which pipeline may be interested in
+this event according to the tenant configuration and layout. Based on
+this the event is dispatched to all matching pipeline queues.
+
+In order to make reconfigurations efficient we store the parsed branch
+config in Zookeeper. This makes it possible to create the current
+layout without the need to ask the mergers multiple times for the
+configuration. This is used by zuul-web to keep an up-to-date layout
+for API requests.
+
+We store the pipeline state in Zookeeper.  This contains the complete
+information about queue items, jobs and builds, as well as a separate
+abbreviated state for quick access by zuul-web for the status page.
+
+Driver Event Ingestion
+----------------------
+
+There are three types of event receiving mechanisms in Zuul:
+
+* Active event gathering: The connection actively listens to events (Gerrit)
+  or generates them itself (git, timer, zuul)
+
+* Passive event gathering: The events are sent to Zuul from outside (GitHub
+  webhooks)
+
+* Internal event generation: The events are generated within Zuul itself and
+  typically get injected directly into the scheduler event loop.
+
+The active event gathering needs to be handled differently from
+passive event gathering.
+
+Active Event Gathering
+~~~~~~~~~~~~~~~~~~~~~~
+
+This is mainly done by the Gerrit driver. We actively maintain a
+connection to the target and receive events. We utilize a leader
+election to make sure there is exactly one instance receiving the
+events.
+
+Passive Event Gathering
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In case of passive event gathering the events are sent to Zuul
+typically via webhooks. These types of events are received in zuul-web
+which then stores them in Zookeeper. This type of event gathering is
+used by GitHub and other drivers. In this case we can have multiple
+instances but still receive only one event so that we don't need to
+take special care of event deduplication or leader election.  Multiple
+instances behind a load balancer are safe to use and recommended for
+such passive event gathering.
+
+Configuration Storage
+---------------------
+
+Zookeeper is not designed as a database with a large amount of data,
+so we should store as little as possible in zookeeper. Thus we only
+store the per project-branch unparsed config in zookeeper. From this,
+every part of Zuul, like the scheduler or zuul-web, can quickly
+recalculate the layout of each tenant and keep it up to date by
+watching for changes in the unparsed project-branch-config.
+
+We store the actual config sharded in multiple nodes, and those nodes
+are stored under per project and branch znodes. This is needed because
+of the 1MB limit per znode in zookeeper. It further makes it less
+expensive to cache the global config in each component as this cache
+is updated incrementally.
+
+Executor and Merger Queues
+--------------------------
+
+The executors and mergers each have an execution queue (and in the
+case of executors, optionally per-zone queues).  This makes it easy
+for executors and mergers to simply pick the next job to run without
+needing to inspect the entire pipeline state.  The scheduler is
+responsible for submitting job requests as the state changes.
+
 Zookeeper Map
-=============
+-------------
 
 This is a reference for object layout in Zookeeper.
 
