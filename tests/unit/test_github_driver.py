@@ -996,8 +996,7 @@ class TestGithubDriver(ZuulTestCase):
         if expected_cat_jobs is not None:
             # Check the expected number of cat jobs here as the (empty) config
             # of org/project should be cached.
-            cat_jobs = [job for job in self.merge_job_history.values()
-                        if job.job_type == MergeRequest.CAT]
+            cat_jobs = self.merge_job_history.get(MergeRequest.CAT)
             self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
@@ -1607,8 +1606,7 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         if expected_cat_jobs is not None:
             # Check the expected number of cat jobs here as the (empty) config
             # of org/project should be cached.
-            cat_jobs = [job for job in self.merge_job_history.values()
-                        if job.job_type == MergeRequest.CAT]
+            cat_jobs = self.merge_job_history.get(MergeRequest.CAT, [])
             self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     def test_push_event_reconfigure_complex_branch(self):

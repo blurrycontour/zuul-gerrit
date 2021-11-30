@@ -363,9 +363,7 @@ class TestTenantGroups4(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.merge_job_history.values()
-                    if job.job_type == MergeRequest.CAT]
-        self.assertEqual(1, len(cat_jobs))
+        self.assertEqual(1, len(self.merge_job_history.get(MergeRequest.CAT)))
         old_layout = tenant.layout
 
         # Check that creating a change in project1 doesn't cause a
@@ -398,9 +396,7 @@ class TestTenantGroups5(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.merge_job_history.values()
-                    if job.job_type == MergeRequest.CAT]
-        self.assertEqual(1, len(cat_jobs))
+        self.assertEqual(1, len(self.merge_job_history.get(MergeRequest.CAT)))
 
 
 class TestTenantFromScript(TestTenantSimple):
@@ -677,9 +673,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
 
         # As the cache should be valid (cache ltime of org/project2 newer than
         # event ltime) we don't expect any cat jobs.
-        cat_jobs = [job for job in self.merge_job_history.values()
-                    if job.job_type == MergeRequest.CAT]
-        self.assertEqual(len(cat_jobs), 0)
+        self.assertIsNone(self.merge_job_history.get(MergeRequest.CAT))
 
         # Set canary value so we can detect if the configloader used
         # the cache in Zookeeper (it shouldn't).
@@ -703,9 +697,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
 
         # As the cache should be valid (cache ltime of org/project2 newer than
         # event ltime) we don't expect any cat jobs.
-        cat_jobs = [job for job in self.merge_job_history.values()
-                    if job.job_type == MergeRequest.CAT]
-        self.assertEqual(len(cat_jobs), 0)
+        self.assertIsNone(self.merge_job_history.get(MergeRequest.CAT))
         sched.apsched.start()
 
 

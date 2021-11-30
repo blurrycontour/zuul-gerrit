@@ -77,8 +77,10 @@ class TestScaleOutScheduler(ZuulTestCase):
                          second_app.sched.local_layout_state.get("tenant-one"))
 
         # Make sure only the first schedulers issued cat jobs
-        self.assertIsNotNone(first_app.sched.merger.history.get("cat"))
-        self.assertIsNone(second_app.sched.merger.history.get("cat"))
+        self.assertIsNotNone(
+            first_app.sched.merger.merger_api.history.get("cat"))
+        self.assertIsNone(
+            second_app.sched.merger.merger_api.history.get("cat"))
 
         for _ in iterate_timeout(
                 10, "Wait for all schedulers to have the same system config"):
