@@ -26,6 +26,7 @@ import signal
 import shlex
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -1025,8 +1026,14 @@ class AnsibleJob(object):
         self._resume_event.set()
 
     def wait(self):
+        self.log.debug("FE: self.thread %s", self.thread)
+
         if self.thread:
+            # Make the linter happy about traceback import
+            if False:
+                traceback.print_stack(sys._current_frames()[self.thread.ident])
             self.thread.join()
+        self.log.debug("FE: thread joined")
 
     def execute(self):
         try:
