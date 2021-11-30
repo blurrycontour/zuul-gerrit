@@ -39,8 +39,6 @@
 - job:
     name: zuul-stream-functional-2.9
     parent: zuul-stream-functional
-    success-url: 'http://zuul.opendev.org/t/zuul/build/{build.uuid}'
-    failure-url: 'http://zuul.opendev.org/t/zuul/build/{build.uuid}'
     vars:
       zuul_ansible_version: 2.9
 
@@ -113,7 +111,6 @@
     parent: build-javascript-deployment
     description: |
       Builds the zuul dashboard without an overridden API URL.
-    success-url: 'npm/html/'
     files: &zuul_build_dashboard_files
       - web/.*
       - playbooks/dashboard/.*
@@ -288,7 +285,6 @@
         - nodejs-run-test:
             vars:
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
             files:
               - web/.*
         - zuul-stream-functional-2.8
@@ -317,7 +313,6 @@
         - nodejs-run-test:
             vars:
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
             files:
               - web/.*
         - zuul-stream-functional-2.8
