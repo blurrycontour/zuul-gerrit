@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98b9759d_931eeff1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-30T21:16:59Z",
+      "side": 1,
+      "message": "Er meant to +2 and let corvus decide if this needed a followup or a new patchset (or maybe neither).",
+      "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ee4a284_b61c7488",
