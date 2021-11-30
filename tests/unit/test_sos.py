@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import zuul.model
+
 from tests.base import iterate_timeout, ZuulTestCase
 
 
@@ -167,3 +169,48 @@ class TestScaleOutScheduler(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
+
+    def test_pipeline_summary(self):
+        # Test that we can deal with a truncated pipeline summary
+        self.executor_server.hold_jobs_in_build = True
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['check']
+        context = self.createZKContext()
+
+        def new_summary():
+            summary = zuul.model.PipelineSummary()
+            summary._set(pipeline=pipeline)
+            summary.refresh(context)
+            return summary
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Check we have a good summary
+        summary1 = new_summary()
+        self.assertNotEqual(summary1.status, {})
+        self.assertTrue(context.client.exists(summary1.getPath()))
+
+        # Make a syntax error in the status summary json
+        summary = new_summary()
+        summary._save(context, b'{"foo')
+
+        # With the corrupt data, we should get an empty status but the
+        # path should still exist.
+        summary2 = new_summary()
+        self.assertEqual(summary2.status, {})
+        self.assertTrue(context.client.exists(summary2.getPath()))
+
+        # Our earlier summary object should use its cached data
+        summary1.refresh(context)
+        self.assertNotEqual(summary1.status, {})
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The scheduler should have written a new summary that our
+        # second object can read now.
+        summary2.refresh(context)
+        self.assertNotEqual(summary2.status, {})
