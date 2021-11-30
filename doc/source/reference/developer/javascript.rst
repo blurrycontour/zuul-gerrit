@@ -202,6 +202,15 @@ To run eslint tests locally:
 
   yarn lint
 
+Authentication
+~~~~~~~~~~~~~~
+
+The docker-compose file in ``doc/source/examples/keycloak`` can be
+used to run a Keycloak server for use with a development build of the
+web app.  The default values in that file are already set up for the
+web app running on localhost.  See the Keycloak tutorial for details.
+
+
 Deploying
 ---------
 
