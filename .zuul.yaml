@@ -109,6 +109,14 @@
       python_version: 3.8
 
 - job:
+    name: zuul-tox-py38-multi-scheduler
+    parent: zuul-tox-py38
+    voting: false
+    vars:
+      tox_environment:
+        ZUUL_SCHEDULER_COUNT: 2
+
+- job:
     name: zuul-build-dashboard
     parent: build-javascript-deployment
     description: |
@@ -279,6 +287,7 @@
               tox_install_bindep: false
         - zuul-tox-py36
         - zuul-tox-py38
+        - zuul-tox-py38-multi-scheduler
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
