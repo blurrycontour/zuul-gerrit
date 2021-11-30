@@ -37,6 +37,7 @@ from tests.base import (
     FIXTURE_DIR,
     simple_layout,
     iterate_timeout,
+    skipIfMultiScheduler,
 )
 
 
@@ -1236,75 +1237,6 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test3', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='2,1'),
             dict(name='project-test3', result='SUCCESS', changes='2,1'),
-        ], ordered=False)
-
-    def test_cross_scheduler_config_update(self):
-        # This is a regression test.  We observed duplicate entries in
-        # the TPC config cache when a second scheduler updates its
-        # layout.  This test performs a reconfiguration on one
-        # scheduler, then allows the second scheduler to process the
-        # change.
-
-        # Create the second scheduler.
-        self.waitUntilSettled()
-        self.createScheduler()
-        self.scheds[1].start()
-        self.waitUntilSettled()
-
-        # Create a change which will trigger a tenant configuration
-        # update.
-        in_repo_conf = textwrap.dedent(
-            """
-            - nodeset:
-                name: test-nodeset
-                nodes: []
-            """)
-        file_dict = {'.zuul.yaml': in_repo_conf}
-        X = self.fake_gerrit.addFakeChange('org/project1', 'master', 'X',
-                                           files=file_dict)
-        X.setMerged()
-
-        # Let the first scheduler process the reconfiguration.
-        with self.scheds[1].sched.run_handler_lock:
-            self.fake_gerrit.addEvent(X.getChangeMergedEvent())
-            self.waitUntilSettled(matcher=[self.scheds[0]])
-
-        # Wait for the second scheduler to update its config to match.
-        self.waitUntilSettled()
-
-        # Do the same process again.
-        X = self.fake_gerrit.addFakeChange('org/project1', 'master', 'X',
-                                           files=file_dict)
-        X.setMerged()
-        with self.scheds[1].sched.run_handler_lock:
-            self.fake_gerrit.addEvent(X.getChangeMergedEvent())
-            self.waitUntilSettled(matcher=[self.scheds[0]])
-
-        # And wait for the second scheduler again.  If we're re-using
-        # cache objects, we will have created duplicates at this
-        # point.
-        self.waitUntilSettled()
-
-        # Create a change which will perform a dynamic config update.
-        in_repo_conf = textwrap.dedent(
-            """
-            - job:
-                name: project-testx
-                parent: common-config-test
-            - project:
-                check:
-                  jobs:
-                    - project-testx
-            """)
-        file_dict = {'.zuul.yaml': in_repo_conf}
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
-                                           files=file_dict)
-        with self.scheds[0].sched.run_handler_lock:
-            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-            self.waitUntilSettled(matcher=[self.scheds[1]])
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='project-testx', result='SUCCESS', changes='3,1'),
         ], ordered=False)
 
     def test_dynamic_template(self):
@@ -2603,6 +2535,12 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Debug information:',
                       A.messages[0], "A should have debug info")
 
+    @skipIfMultiScheduler()
+    # See comment in TestInRepoConfigDir.scheduler_count for further
+    # details.
+    # As this is the only test within this test class, that doesn't work
+    # with multi scheduler, we skip it rather than setting the
+    # scheduler_count to 1 for the whole test class.
     def test_file_move(self):
         # Tests that a zuul config file can be renamed
         in_repo_conf = textwrap.dedent(
@@ -2705,9 +2643,98 @@ class TestInRepoConfig(ZuulTestCase):
         ], ordered=True)
 
 
+class TestInRepoConfigSOS(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+    tenant_config_file = 'config/in-repo/main.yaml'
+    # Those tests are testing specific interactions between multiple
+    # schedulers. They create additional schedulers as necessary and
+    # start or stop them individually to test specific interactions.
+    # Using the scheduler_count in addition to create even more
+    # schedulers doesn't make sense for those tests.
+    scheduler_count = 1
+
+    def test_cross_scheduler_config_update(self):
+        # This is a regression test.  We observed duplicate entries in
+        # the TPC config cache when a second scheduler updates its
+        # layout.  This test performs a reconfiguration on one
+        # scheduler, then allows the second scheduler to process the
+        # change.
+
+        # Create the second scheduler.
+        self.waitUntilSettled()
+        self.createScheduler()
+        self.scheds[1].start()
+        self.waitUntilSettled()
+
+        # Create a change which will trigger a tenant configuration
+        # update.
+        in_repo_conf = textwrap.dedent(
+            """
+            - nodeset:
+                name: test-nodeset
+                nodes: []
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        X = self.fake_gerrit.addFakeChange('org/project1', 'master', 'X',
+                                           files=file_dict)
+        X.setMerged()
+
+        # Let the first scheduler process the reconfiguration.
+        with self.scheds[1].sched.run_handler_lock:
+            self.fake_gerrit.addEvent(X.getChangeMergedEvent())
+            self.waitUntilSettled(matcher=[self.scheds[0]])
+
+        # Wait for the second scheduler to update its config to match.
+        self.waitUntilSettled()
+
+        # Do the same process again.
+        X = self.fake_gerrit.addFakeChange('org/project1', 'master', 'X',
+                                           files=file_dict)
+        X.setMerged()
+        with self.scheds[1].sched.run_handler_lock:
+            self.fake_gerrit.addEvent(X.getChangeMergedEvent())
+            self.waitUntilSettled(matcher=[self.scheds[0]])
+
+        # And wait for the second scheduler again.  If we're re-using
+        # cache objects, we will have created duplicates at this
+        # point.
+        self.waitUntilSettled()
+
+        # Create a change which will perform a dynamic config update.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-testx
+                parent: common-config-test
+            - project:
+                check:
+                  jobs:
+                    - project-testx
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        with self.scheds[0].sched.run_handler_lock:
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[self.scheds[1]])
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-testx', result='SUCCESS', changes='3,1'),
+        ], ordered=False)
+
+
 class TestInRepoConfigDir(ZuulTestCase):
     # Like TestInRepoConfig, but the fixture test files are in zuul.d
     tenant_config_file = 'config/in-repo-dir/main.yaml'
+
+    # These tests fiddle around with the list of schedulers used in
+    # the test. They delete the existing scheduler and replace it by
+    # a new one. This wouldn't work with multiple schedulers as the
+    # new scheduler wouldn't replace the one at self.scheds[0], but
+    # any of the other schedulers used within a multi-scheduler setup.
+    # As a result, starting self.scheds[0] would fail because it is
+    # already running an threads can only be started once.
+    scheduler_count = 1
 
     def test_file_move(self):
         # Tests that a zuul config file can be renamed
