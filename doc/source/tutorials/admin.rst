@@ -5,3 +5,4 @@ Admin Tutorials
    :maxdepth: 1
 
    quick-start
+   keycloak
