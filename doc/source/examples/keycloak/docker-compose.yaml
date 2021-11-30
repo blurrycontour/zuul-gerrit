@@ -1,0 +1,31 @@
+# Start the quickstart tutorial with `docker-compose -p zuul-tutorial
+# up` (as directed in the instructions) in order for the network to
+# have the expected name so that it can be shared with keycloak.
+
+# Version 2.1 is required to specify the network name
+version: '2.1'
+
+services:
+  keycloak:
+    image: docker.io/jboss/keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=kcadmin
+      - DB_VENDOR=h2
+      - KEYCLOAK_IMPORT=/var/keycloak_import/zuul-demo-data.json
+      - JAVA_OPTS_APPEND="-Djboss.socket.binding.port-offset=2"
+    ports:
+      - "8082:8082"
+    volumes:
+      - "./keycloak/:/var/keycloak_import/:z"
+    entrypoint: |
+      /bin/sh -c '\
+      /opt/jboss/tools/docker-entrypoint.sh -b 0.0.0.0'
+    command: []
+    networks:
+      - zuul
+
+networks:
+  zuul:
+    external: true
+    name: zuul-tutorial_zuul
