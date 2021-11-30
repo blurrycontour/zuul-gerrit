@@ -1,6 +1,4 @@
-# Version 2 is the latest that is supported by docker-compose in
-# Ubuntu Xenial.
-version: '2'
+version: '2.1'
 
 services:
   gerrit:
@@ -10,6 +8,8 @@ services:
       - "29418:29418"
     environment:
       - CANONICAL_WEB_URL=http://localhost:8080/
+    networks:
+      - zuul
   gerritconfig:
     image: docker.io/zuul/zuul-executor
     environment:
@@ -27,6 +27,8 @@ services:
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
     command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
+    networks:
+      - zuul
   zk:
     image: docker.io/zookeeper
     hostname: examples_zk_1.examples_default
@@ -35,6 +37,8 @@ services:
       - "certs:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zkServer.sh start-foreground'"
+    networks:
+      - zuul
   mysql:
     image: docker.io/mariadb
     environment:
@@ -44,6 +48,8 @@ services:
       MYSQL_PASSWORD: secret
       # Work around slow db startup when writing TZINFO data.
       MYSQL_INITDB_SKIP_TZINFO: 1
+    networks:
+      - zuul
   scheduler:
     depends_on:
       - gerritconfig
@@ -62,10 +68,12 @@ services:
     #        This needs to be changes such that ansible is not required for startup.
     image: docker.io/zuul/zuul-scheduler
     volumes:
-      - "./etc_zuul/:/etc/zuul/:z"
+      - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "certs:/var/certs:z"
+    networks:
+      - zuul
   web:
     command: |
       sh -c '/var/playbooks/wait-to-start-certs.sh && \
@@ -80,9 +88,11 @@ services:
     environment:
       ZUUL_MYSQL_PASSWORD: secret
     volumes:
-      - "./etc_zuul/:/etc/zuul/:z"
+      - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
+    networks:
+      - zuul
   executor:
     privileged: true
     environment:
@@ -94,12 +104,14 @@ services:
       - scheduler
     image: docker.io/zuul/zuul-executor
     volumes:
-      - "./etc_zuul/:/etc/zuul/:z"
+      - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
       - "certs:/var/certs:z"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f'"
+    networks:
+      - zuul
   node:
     build:
       dockerfile: node-Dockerfile
@@ -110,6 +122,8 @@ services:
         no_proxy: "${no_proxy},gerrit"
     volumes:
       - "nodessh:/root/.ssh:z"
+    networks:
+      - zuul
   launcher:
     depends_on:
       - zk
@@ -121,6 +135,8 @@ services:
     ports:
       - "8022:8022"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && nodepool-launcher -f'"
+    networks:
+      - zuul
   logs:
     build:
       dockerfile: logs-Dockerfile
@@ -133,9 +149,14 @@ services:
       - "8000:80"
     volumes:
       - "logs:/usr/local/apache2/htdocs:z"
+    networks:
+      - zuul
 
 volumes:
   sshkey:
   nodessh:
   logs:
   certs:
+
+networks:
+  zuul:

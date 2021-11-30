@@ -10,3 +10,6 @@
 
 - name: Run quick-start tutorial
   include_tasks: quick-start.yaml
+
+- name: Run admin tutorial
+  include_tasks: admin.yaml

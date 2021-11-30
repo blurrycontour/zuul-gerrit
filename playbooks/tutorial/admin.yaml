@@ -1,0 +1,57 @@
+# Stop the basic tutorial
+- name: Run docker-compose down
+  when: not local
+  shell:
+    cmd: docker-compose -p zuul-tutorial down
+    chdir: src/opendev.org/zuul/zuul/doc/source/examples
+
+- name: Run docker-compose down
+  when: local
+  shell:
+    cmd: docker-compose -p zuul-tutorial down
+    chdir: ../../doc/source/examples
+
+# Restart with the new config
+- name: Run docker-compose up
+  when: not local
+  shell:
+    cmd: docker-compose -p zuul-tutorial up -d
+    chdir: src/opendev.org/zuul/zuul/doc/source/examples
+  environment:
+    ZUUL_TUTORIAL_CONFIG: "./keycloak/etc_zuul/"
+
+- name: Run docker-compose up
+  when: local
+  shell:
+    cmd: docker-compose -p zuul-tutorial up -d
+    chdir: ../../doc/source/examples
+  environment:
+    ZUUL_TUTORIAL_CONFIG: "./keycloak/etc_zuul/"
+
+# Start keycloak
+- name: Run docker-compose up
+  when: not local
+  shell:
+    cmd: docker-compose -p zuul-tutorial-keycloak up -d
+    chdir: src/opendev.org/zuul/zuul/doc/source/examples/keycloak
+
+- name: Run docker-compose up
+  when: local
+  shell:
+    cmd: docker-compose -p zuul-tutorial-keycloak up -d
+    chdir: ../../doc/source/examples/keycloak
+
+# Verify that Zuul runs with the new config
+- name: Wait for Zuul
+  uri:
+    url: http://localhost:9000/api/tenant/example-tenant/status
+    method: GET
+    return_content: true
+    status_code: 200
+    body_format: json
+  register: result
+  retries: 30
+  delay: 10
+  until: result.status == 200 and result.json["zuul_version"] is defined
+  changed_when: false
+
