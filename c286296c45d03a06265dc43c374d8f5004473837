@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "c286296c45d03a06265dc43c374d8f5004473837",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f3f9a8c_140a8d80",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-11-30T12:08:15Z",
+      "side": 1,
+      "message": "tests.unit.test_scheduler.TestScheduler.test_scheduler_disconnect seems to be failing quite frequently since a few changes. The other failed tests seem to be a fallout of this (\"more than one thread is running\"). I don\u0027t think it\u0027s related to the changes in this stack, but should we investigate this first before we continue to merge this stack?",
+      "revId": "c286296c45d03a06265dc43c374d8f5004473837",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
