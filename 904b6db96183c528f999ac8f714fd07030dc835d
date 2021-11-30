@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ee4a284_b61c7488",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-30T21:16:33Z",
+      "side": 1,
+      "message": "This is a little confusing to me. We appear to construct data like:\n\n  { \u0027path\u0027: {\u0027name\u0027: \u0027foo\u0027, \u0027checkout\u0027: \u0027bar\u0027, \u0027commit\u0027: \u0027123467\u0027} }\n\nbut the statement above doesn\u0027t really convey that. Maybe update this line to say:\n\n  The key is the path and each value is another dict with the following key value pairs.",
+      "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c96cdc6_8fdce062",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-30T21:16:33Z",
+      "side": 1,
+      "message": "I feel like this paragraph may need a bit more detail now that we are exposing these underlying details to users. I know I personally have to go dig in and figure it all out again when it comes up.\n\nIn particular I think it is important to note that we only add these aliases to the role_path to avoid conflicts.",
+      "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26c2d15_22178e63",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2453,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-30T21:16:33Z",
+      "side": 1,
+      "message": "Note to myself (and other reviewers wondering about this). The toDict() method doesn\u0027t include the root value. Therefore we don\u0027t expose the full root path here after stripping it above.",
+      "range": {
+        "startLine": 2453,
+        "startChar": 24,
+        "endLine": 2453,
+        "endChar": 33
+      },
+      "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
