@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce0d41eb_c50a13ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-11-30T21:33:55Z",
+      "side": 1,
+      "message": "recheck kazoo connection timeouts when testing started and yarn/dockerhub problems",
+      "revId": "c924435f1e6763f08bcf8cdc8586ac13afec0ac0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
