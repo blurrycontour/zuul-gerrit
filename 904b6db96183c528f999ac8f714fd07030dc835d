@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1912e328_f9daf027",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-30T21:33:58Z",
+      "side": 1,
+      "message": "Will do.",
+      "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c96cdc6_8fdce062",
@@ -48,6 +65,23 @@
       "writtenOn": "2021-11-30T21:16:33Z",
       "side": 1,
       "message": "I feel like this paragraph may need a bit more detail now that we are exposing these underlying details to users. I know I personally have to go dig in and figure it all out again when it comes up.\n\nIn particular I think it is important to note that we only add these aliases to the role_path to avoid conflicts.",
+      "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d3cbf23_d0f09dcc",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-11-30T21:33:58Z",
+      "side": 1,
+      "message": "We actually don\u0027t take a position on conflicts.  Since we\u0027re adding things to the role path, we can add as many \"foo\" roles as we want, and ansible will just take the first one in the path.  The symlinks allow us to either avoid or create conflicts (we can rename our second \"foo\" to \"bar\" or our \"bar\" to be a second \"foo\").  But mostly, they let us say that the bare role repo \"ansible-role-foo\" is \"foo\".\n\nI\u0027ll add a sentence saying that the symlinks allow us to provide the role path to ansible with the correct name.\n\nReally it all comes down to this sentence: https://zuul-ci.org/docs/zuul/reference/job_def.html#attr-job.roles.name",
       "revId": "904b6db96183c528f999ac8f714fd07030dc835d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
