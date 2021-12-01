@@ -58,7 +58,7 @@ class SupercedentPipelineManager(PipelineManager):
         # between.  This is what causes the last item to "supercede"
         # any previously enqueued items (which we know aren't running
         # jobs because the window size is 1).
-        for queue in self.pipeline.queues:
+        for queue in self.pipeline.queues[:]:
             remove = queue.queue[1:-1]
             for item in remove:
                 self.log.debug("Item %s is superceded by %s, removing" %

@@ -1483,7 +1483,7 @@ class PipelineManager(metaclass=ABCMeta):
         self.log.debug("Starting queue processor: %s" % self.pipeline.name)
         changed = False
         change_keys = set()
-        for queue in self.pipeline.queues:
+        for queue in self.pipeline.queues[:]:
             queue_changed = False
             nnfi = None  # Nearest non-failing item
             for item in queue.queue[:]:
