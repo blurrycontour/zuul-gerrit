@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae35670c_be97cc11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-01T19:51:19Z",
+      "side": 1,
+      "message": "Just a few thoughts, still a +1",
+      "revId": "15cd1b38fc3487a3b3d7dfe534f8442128840981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdd7757c_2b7c3c98",
+        "filename": "doc/source/examples/keycloak/keycloak/zuul-demo-data.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-01T19:51:19Z",
+      "side": 1,
+      "message": "NIT: Since this isn\u0027t integrated with Gerrit, that first name is irrelevant",
+      "range": {
+        "startLine": 405,
+        "startChar": 6,
+        "endLine": 405,
+        "endChar": 28
+      },
+      "revId": "15cd1b38fc3487a3b3d7dfe534f8442128840981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf0e90fb_ef3d6709",
+        "filename": "doc/source/examples/keycloak/keycloak/zuul-demo-data.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-01T19:51:19Z",
+      "side": 1,
+      "message": "You can remove the gerrit client, it isn\u0027t used. I\u0027m not sure about side effects of removing this by hand in the json file, worst case scenario you can re-export the file from a running keycloak.",
+      "range": {
+        "startLine": 702,
+        "startChar": 0,
+        "endLine": 761,
+        "endChar": 6
+      },
+      "revId": "15cd1b38fc3487a3b3d7dfe534f8442128840981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbfe947b_2e58451e",
+        "filename": "doc/source/examples/keycloak/keycloak/zuul-demo-data.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 880,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-01T19:51:19Z",
+      "side": 1,
+      "message": "With these values in and the corresponding web origins below, this compose can be used with a development build of the GUI to have authentication set up out of the box. I think it\u0027s worth mentioning in the doc somewhere, maybe in doc/source/reference/developer/javascript.rst",
+      "range": {
+        "startLine": 879,
+        "startChar": 0,
+        "endLine": 880,
+        "endChar": 33
+      },
+      "revId": "15cd1b38fc3487a3b3d7dfe534f8442128840981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08c17f64_113eb692",
+        "filename": "doc/source/tutorials/keycloak.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-01T19:51:19Z",
+      "side": 1,
+      "message": "NIT: admin status can also be checked on the user info modal. If there\u0027s a little wizard hat by the user\u0027s name, abracadabra! they\u0027re an admin.",
+      "range": {
+        "startLine": 77,
+        "startChar": 25,
+        "endLine": 78,
+        "endChar": 33
+      },
+      "revId": "15cd1b38fc3487a3b3d7dfe534f8442128840981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
