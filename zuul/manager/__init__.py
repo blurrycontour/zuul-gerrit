@@ -1492,10 +1492,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if item_changed:
                     queue_changed = True
                 self.reportStats(item)
-                if len(change_keys) < 1024:
-                    # Only keep 1024 of these so we don't have to deal
-                    # with sharding.
-                    change_keys.add(item.change.cache_stat.key)
+                change_keys.add(item.change.cache_stat.key)
             if queue_changed:
                 changed = True
                 status = ''
