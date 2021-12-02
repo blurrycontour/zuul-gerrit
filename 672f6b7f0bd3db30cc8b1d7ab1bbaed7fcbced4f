@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87853af0_6b8f112d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-02T19:30:09Z",
+      "side": 1,
+      "message": "That was the original design so I don\u0027t have a problem with it.",
+      "revId": "672f6b7f0bd3db30cc8b1d7ab1bbaed7fcbced4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
