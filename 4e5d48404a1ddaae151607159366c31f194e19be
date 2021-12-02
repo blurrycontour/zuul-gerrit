@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2c57881_ede88535",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-02T00:09:19Z",
+      "side": 1,
+      "message": "Though we only shard when necessary iirc. Whcih means you\u0027d need a small number of changes that is large enough to trigger sharding?",
+      "revId": "4e5d48404a1ddaae151607159366c31f194e19be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
