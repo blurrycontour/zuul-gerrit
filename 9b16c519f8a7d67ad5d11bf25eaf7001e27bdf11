@@ -39,6 +39,30 @@
       "message": "Yep, looks like I changed the wrong docs section.",
       "revId": "9b16c519f8a7d67ad5d11bf25eaf7001e27bdf11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cfc6417_6de5d214",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2021-12-02T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81891bf9_00ec2410",
+      "range": {
+        "startLine": 211,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 22
+      },
+      "revId": "9b16c519f8a7d67ad5d11bf25eaf7001e27bdf11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
