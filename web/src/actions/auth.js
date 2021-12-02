@@ -43,7 +43,7 @@ function createAuthParamsFromJson(json) {
   }
   const realm = auth_info.default_realm
   const client_config = auth_info.realms[realm]
-  if (client_config.driver === 'OpenIDConnect') {
+  if (client_config && client_config.driver === 'OpenIDConnect') {
     auth_params.client_id = client_config.client_id
     auth_params.scope = client_config.scope
     auth_params.authority = client_config.authority
@@ -79,7 +79,11 @@ export const configureAuthFromTenant = (tenantName) => (dispatch) => {
 }
 
 export const configureAuthFromInfo = (info) => (dispatch) => {
-  dispatch(authConfigSuccess(
-    {info: info},
-    createAuthParamsFromJson({info: info})))
+  try {
+    dispatch(authConfigSuccess(
+      {info: info},
+      createAuthParamsFromJson({info: info})))
+  } catch(error) {
+      dispatch(authConfigFail(error))
+  }
 }
