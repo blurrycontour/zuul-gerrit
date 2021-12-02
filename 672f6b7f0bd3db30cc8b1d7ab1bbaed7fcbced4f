@@ -16,6 +16,23 @@
       "message": "That was the original design so I don\u0027t have a problem with it.",
       "revId": "672f6b7f0bd3db30cc8b1d7ab1bbaed7fcbced4f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b76ee47a_d5027b6a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-02T19:34:30Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1:\n\u003e \n\u003e Oh, was it changed for a reason?  I didn\u0027t recall that...\n\nPurely arbitrarily. I thought having all the icons on the same side would be more pleasant, but that is very debatable!",
+      "revId": "672f6b7f0bd3db30cc8b1d7ab1bbaed7fcbced4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
