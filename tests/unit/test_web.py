@@ -1438,6 +1438,21 @@ class TestBuildInfo(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/builds")
         self.assertEqual(404, resp.status_code)
 
+        idx_min = int(builds[0]['_id'])
+        idx_max = int(builds[-1]['_id'])
+        builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "idx_max=%i" % idx_min).json()
+        self.assertEqual(len(builds_query), 0)
+        builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "idx_min=%i" % idx_min).json()
+        self.assertEqual(len(builds_query), len(builds))
+        builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "idx_max=%i" % idx_max).json()
+        self.assertEqual(len(builds_query), len(builds))
+        builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "idx_min=%i" % idx_max).json()
+        self.assertEqual(len(builds_query), 0)
+
     def test_web_badge(self):
         # Generate some build records in the db.
         self.add_base_changes()
@@ -1497,6 +1512,21 @@ class TestBuildInfo(BaseTestWeb):
         project_merge_build = [x for x in buildset["builds"]
                                if x["job_name"] == "project-merge"][0]
         self.assertEqual('SUCCESS', project_merge_build['result'])
+
+        idx_min = int(buildsets[0]['_id'])
+        idx_max = int(buildsets[-1]['_id'])
+        buildsets_query = self.get_url("api/tenant/tenant-one/buildsets?"
+                                    "idx_max=%i" % idx_min).json()
+        self.assertEqual(len(buildsets_query), 0)
+        buildsets_query = self.get_url("api/tenant/tenant-one/buildsets?"
+                                    "idx_min=%i" % idx_min).json()
+        self.assertEqual(len(buildsets_query), len(buildsets))
+        buildsets_query = self.get_url("api/tenant/tenant-one/buildsets?"
+                                    "idx_max=%i" % idx_max).json()
+        self.assertEqual(len(buildsets_query), len(buildsets))
+        buildsets_query = self.get_url("api/tenant/tenant-one/buildsets?"
+                                    "idx_min=%i" % idx_max).json()
+        self.assertEqual(len(buildsets_query), 0)
 
     @simple_layout('layouts/empty-check.yaml')
     def test_build_error(self):
