@@ -173,6 +173,8 @@ class ZKObject:
                 # These errors come from the server and are not
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
+                context.log.error(
+                    "Exception deleting ZKObject %s at %s", self, path)
                 raise
             except KazooException:
                 context.log.exception(
@@ -201,16 +203,19 @@ class ZKObject:
                 # These errors come from the server and are not
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
+                context.log.error(
+                    "Exception loading ZKObject %s at %s", self, path)
                 raise
             except KazooException:
                 context.log.exception(
-                    "Exception loading ZKObject %s, will retry", self)
+                    "Exception loading ZKObject %s at %s, will retry",
+                    self, path)
                 time.sleep(5)
             except Exception:
                 # A higher level must handle this exception, but log
                 # ourself here so we know what object triggered it.
                 context.log.error(
-                    "Exception loading ZKObject %s", self)
+                    "Exception loading ZKObject %s at %s", self, path)
                 raise
         raise Exception("ZooKeeper session or lock not valid")
 
@@ -232,10 +237,13 @@ class ZKObject:
                 # These errors come from the server and are not
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
+                context.log.error(
+                    "Exception saving ZKObject %s at %s", self, path)
                 raise
             except KazooException:
                 context.log.exception(
-                    "Exception saving ZKObject %s, will retry", self)
+                    "Exception saving ZKObject %s at %s, will retry",
+                    self, path)
                 time.sleep(self._retry_interval)
         raise Exception("ZooKeeper session or lock not valid")
 
@@ -276,16 +284,19 @@ class ShardedZKObject(ZKObject):
                 # These errors come from the server and are not
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
+                context.log.error(
+                    "Exception loading ZKObject %s at %s", self, path)
                 raise
             except KazooException:
                 context.log.exception(
-                    "Exception loading ZKObject %s, will retry", self)
+                    "Exception loading ZKObject %s at %s, will retry",
+                    self, path)
                 time.sleep(5)
             except Exception as exc:
                 # A higher level must handle this exception, but log
                 # ourself here so we know what object triggered it.
                 context.log.error(
-                    "Exception loading ZKObject %s", self)
+                    "Exception loading ZKObject %s at %s", self, path)
                 if self.delete_on_error:
                     self.delete(context)
                 raise InvalidObjectError from exc
@@ -310,9 +321,12 @@ class ShardedZKObject(ZKObject):
                 # These errors come from the server and are not
                 # retryable.  Connection errors are KazooExceptions so
                 # they aren't caught here and we will retry.
+                context.log.error(
+                    "Exception saving ZKObject %s at %s", self, path)
                 raise
             except KazooException:
                 context.log.exception(
-                    "Exception saving ZKObject %s, will retry", self)
+                    "Exception saving ZKObject %s at %s, will retry",
+                    self, path)
                 time.sleep(self._retry_interval)
         raise Exception("ZooKeeper session or lock not valid")
