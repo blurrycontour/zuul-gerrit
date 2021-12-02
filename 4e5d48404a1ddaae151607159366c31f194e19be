@@ -16,6 +16,23 @@
       "message": "Though we only shard when necessary iirc. Whcih means you\u0027d need a small number of changes that is large enough to trigger sharding?",
       "revId": "4e5d48404a1ddaae151607159366c31f194e19be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d73acea_055b88cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-02T00:29:54Z",
+      "side": 1,
+      "message": "ShardedZKObject always shards; some of the pipeline objects selectively shard their attributes, but that\u0027s not easy to do here (we\u0027d have to load a second object to tell us whether or not the actual data are sharded).",
+      "revId": "4e5d48404a1ddaae151607159366c31f194e19be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
