@@ -33,6 +33,23 @@
       "message": "Is this where we\u0027re side effecting in a problematic way?",
       "revId": "2987546cacee1466e352b7c68fcfc7c5d43c39cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ad1de10_646be424",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1400,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-02T00:26:13Z",
+      "side": 1,
+      "message": "One of many places.  Any dequeue would trigger it.  OpenDev hit the successful job, report item path.",
+      "revId": "2987546cacee1466e352b7c68fcfc7c5d43c39cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
