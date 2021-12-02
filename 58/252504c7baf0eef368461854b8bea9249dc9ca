@@ -1,0 +1,10 @@
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+1: Matthieu Huin <mhuin@redhat.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: James E. Blair <jim@acmegating.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 02 Dec 2021 18:15:41 +0000
+Reviewed-on: https://review.opendev.org/c/zuul/zuul/+/820184
+Project: zuul/zuul
+Branch: refs/heads/master
