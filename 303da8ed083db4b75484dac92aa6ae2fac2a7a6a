@@ -16,6 +16,23 @@
       "message": "Hi, sorry to just pop in out of history and -1. I am triggered by gearman stuff. ;)\n\nThe options being removed will be hard to find on the web and even when people look at the docs in the git repo. The release note tells us that gearman was removed, so that\u0027s good.. but.. still seems like it will be confusing for current users reading the docs before they upgrade.",
       "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c57f690c_6b8fa1db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2021-12-03T17:59:55Z",
+      "side": 1,
+      "message": "Spoke with Jim offline. I see that there are versioned docs available and that this is normal practice. It would be very helpful if somebody could add a version index to the zuul-ci.org website at some point. Until then, lists and reminders are what we have. Thanks for working on this!",
+      "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
