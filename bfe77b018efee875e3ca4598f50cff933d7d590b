@@ -16,6 +16,23 @@
       "message": "What causes this to only be scoped to tags?",
       "revId": "bfe77b018efee875e3ca4598f50cff933d7d590b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efbfeb95_ddd4646f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-03T15:23:35Z",
+      "side": 1,
+      "message": "Looks like this is left over from last patchset.",
+      "revId": "bfe77b018efee875e3ca4598f50cff933d7d590b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
