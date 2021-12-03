@@ -167,8 +167,6 @@ class Pipeline extends React.Component {
     const Icon = pl_config.icon
     return (
       <>
-        {pipeline.name}
-        &nbsp;
         <Tooltip
           position="bottom"
           content={<div><strong>{pl_config.help_title}</strong><p>{pl_config.help}</p></div>}
@@ -176,6 +174,7 @@ class Pipeline extends React.Component {
           <Icon />
         </Tooltip>
         &nbsp;
+        {pipeline.name}
       </>
     )
   }
