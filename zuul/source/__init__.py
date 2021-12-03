@@ -13,6 +13,7 @@
 # under the License.
 
 import abc
+import time
 
 
 class BaseSource(object, metaclass=abc.ABCMeta):
@@ -75,6 +76,27 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         or there is no change at that URL, return None.
 
         """
+
+    def getChangeByURLWithRetry(self, url, event):
+        for x in range(3):
+            # We retry this as we are unlikely to be able to report back
+            # failures if our source is broken, but if we can get the
+            # info on subsequent requests we can continue to do the
+            # requested job work.
+            try:
+                dep = self.getChangeByURL(url, event)
+            except Exception:
+                # Note that if the change isn't found dep is None.
+                # We do not raise in that case and do not need to handle it
+                # here.
+                retry = x != 2 and " Retrying" or ""
+                self.log.exception("Failed to retrieve dependency %s.%s",
+                                   url, retry)
+                if retry:
+                    time.sleep(1)
+                else:
+                    raise
+        return dep
 
     def getChangeByKey(self, key):
         """Get the change corresponding to the supplied cache key.
