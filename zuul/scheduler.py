@@ -1705,7 +1705,6 @@ class Scheduler(threading.Thread):
                 ) as lock:
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
-                        pipeline.change_list.refresh(ctx)
                         pipeline.state.refresh(ctx)
                         if pipeline.state.old_queues:
                             self._reenqueuePipeline(tenant, pipeline, ctx)
