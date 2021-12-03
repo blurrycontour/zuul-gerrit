@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd144755_8cb7fac3",
+        "filename": "doc/source/tutorials/keycloak.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-12-03T18:20:47Z",
+      "side": 1,
+      "message": "Nit: Might be good to include a :ref: to it from here.",
+      "revId": "d4e9b66fa0b47f03f12260b39ecb2d2ee6bbea38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
