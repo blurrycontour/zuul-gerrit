@@ -33,6 +33,23 @@
       "message": "Looks like this is left over from last patchset.",
       "revId": "bfe77b018efee875e3ca4598f50cff933d7d590b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac32d77f_18027d07",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-12-03T15:24:12Z",
+      "side": 1,
+      "message": "Shouldn\u0027t packed_refs already contain all refs? In this case we could change getPackedRefs to a generator yielding a ref, commit, type tuple and iterate directly over this here.",
+      "revId": "bfe77b018efee875e3ca4598f50cff933d7d590b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
