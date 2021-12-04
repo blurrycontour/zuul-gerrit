@@ -1252,7 +1252,8 @@ class TestScheduler(ZuulTestCase):
         # already (without approvals), we need to clear the cache
         # first.
         for connection in self.scheds.first.connections.connections.values():
-            connection.maintainCache([], max_age=0)
+            if hasattr(connection, '_change_cache'):
+                connection.maintainCache([], max_age=0)
 
         self.executor_server.hold_jobs_in_build = True
         A.addApproval('Approved', 1)
@@ -1364,7 +1365,7 @@ class TestScheduler(ZuulTestCase):
         # cache keys of the correct type, since we don't do run-time
         # validation.
         relevant = sched._gatherConnectionCacheKeys()
-        self.assertEqual(len(relevant), 3)
+        self.assertEqual(len(relevant), 2)
         for k in relevant:
             if not isinstance(k, ChangeKey):
                 raise RuntimeError("Cache key %s is not a ChangeKey" % repr(k))
@@ -1380,9 +1381,39 @@ class TestScheduler(ZuulTestCase):
         # Test that outdated but still relevant changes are not cleaned up
         for connection in sched.connections.connections.values():
             connection.maintainCache(
-                [c.cache_stat.key for c in _getCachedChanges()], max_age=0)
+                set([c.cache_stat.key for c in _getCachedChanges()]),
+                max_age=0)
         self.assertEqual(len(_getCachedChanges()), 3)
 
+        change1 = None
+        change2 = None
+        for c in _getCachedChanges():
+            if c.cache_stat.key.stable_id == '1':
+                change1 = c
+            if c.cache_stat.key.stable_id == '2':
+                change2 = c
+        # Make change1 eligible for cleanup, but not change2
+        change1.cache_stat = zuul.model.CacheStat(change1.cache_stat.key,
+                                                  change1.cache_stat.uuid,
+                                                  change1.cache_stat.version,
+                                                  0.0)
+        # We should not delete change1 since it's needed by change2
+        # which we want to keep.
+        for connection in sched.connections.connections.values():
+            connection.maintainCache([], max_age=7200)
+        self.assertEqual(len(_getCachedChanges()), 3)
+
+        # Make both changes eligible for deletion
+        change2.cache_stat = zuul.model.CacheStat(change2.cache_stat.key,
+                                                  change2.cache_stat.uuid,
+                                                  change2.cache_stat.version,
+                                                  0.0)
+        for connection in sched.connections.connections.values():
+            connection.maintainCache([], max_age=7200)
+        # The master branch change remains
+        self.assertEqual(len(_getCachedChanges()), 1)
+
+        # Test that we can remove changes once max_age has expired
         for connection in sched.connections.connections.values():
             connection.maintainCache([], max_age=0)
         self.assertEqual(len(_getCachedChanges()), 0)
