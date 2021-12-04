@@ -206,6 +206,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         return key, data['data_uuid']
 
     def prune(self, relevant, max_age=3600):  # 1h
+        # Relevant is the list of changes directly in a pipeline.
+        # This method will take care of expanding that out to each
+        # change's network of related changes.
         self.log.debug("Pruning cache")
         cutoff_time = time.time() - max_age
         outdated_versions = dict()
@@ -220,7 +223,17 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             # Save the version we examined so we can make sure to only
             # delete that version.
             outdated_versions[cache_stat.key] = cache_stat.version
-        to_prune = set(outdated_versions.keys()) - set(relevant)
+        to_prune = set(outdated_versions.keys()) - relevant
+        sched = self.connection.sched
+        # Related changes may have localized networks; keep them
+        # together even if one member hasn't been updated in a while.
+        # Only when the entire network hasn't been modified in max_age
+        # will any change in it be removed.
+        for key in to_prune:
+            source = sched.connections.getSource(key.connection_name)
+            change = source.getChangeByKey(key)
+            change.getRelatedChanges(sched, relevant)
+        to_prune = to_prune - relevant
         for key in to_prune:
             self.delete(key, outdated_versions[key])
         self.log.debug("Done pruning cache")
