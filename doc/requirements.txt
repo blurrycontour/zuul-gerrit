@@ -10,3 +10,7 @@ sphinxcontrib-openapi>=0.4.0
 reno>=2.8.0 # Apache-2.0
 zuul-client
 zuul-sphinx
+# mistune is a transitive requirement of sphinxcontrib-openapi
+# remove this requirement once this issue is fixed:
+# https://github.com/sphinx-contrib/openapi/issues/121
+mistune<2.0
