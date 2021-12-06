@@ -13,41 +13,36 @@ If you are looking for the Javascript testing tool named Zuul, it
 can be found here:
 https://github.com/defunctzombie/zuul
 
-Documentation
--------------
 
-Zuul Users
-**********
+How To Use This Manual
+----------------------
 
-.. toctree::
-   :maxdepth: 2
+If you have access to a Zuul system operated by someone else, then you
+may be interested in :ref:`About Zuul` and the following reference
+sections: :ref:`Job Configuration` and :ref:`Job Content`.
 
-   tutorials/user
-   howtos/user
-   reference/user
+If you would like to learn how to run Zuul, try the :ref:`Quick-Start
+and Tutorial`.
 
-Zuul Admins
-***********
+If you are or will be responsible for installing and operating a Zuul
+System, the remainder of the sections will be useful.
 
 .. toctree::
-   :maxdepth: 2
+   :includehidden:
+   :maxdepth: 1
 
-   tutorials/admin
-   howtos/admin
-   reference/admin
-
-Digging Deeper
-**************
-
-.. toctree::
-   :maxdepth: 2
-
-   discussion/index
-
-.. toctree::
-   :maxdepth: 2
-
-   reference/index
+   about
+   tutorials/quick-start
+   project-config
+   job-content
+   admin
+   rest-api
+   howtos
+   developer
+   governance
+   vulnerabilities
+   releasenotes
+   glossary
 
 Indices and tables
 ------------------

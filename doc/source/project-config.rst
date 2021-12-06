@@ -1,9 +1,7 @@
-:title: Configuration Syntax
+:title: Project Configuration
 
-.. _project-config:
-
-Configuration Syntax
-====================
+Project Configuration
+=====================
 
 The following sections describe the main part of Zuul's configuration.
 All of what follows is found within files inside of the repositories
@@ -103,11 +101,11 @@ the YAML files:
 .. toctree::
    :maxdepth: 1
 
-   pipeline_def
-   job_def
-   project_def
-   queue_def
-   secret_def
-   nodeset_def
-   semaphore_def
-   pragma_def
+   config/pipeline
+   config/job
+   config/project
+   config/queue
+   config/secret
+   config/nodeset
+   config/semaphore
+   config/pragma
