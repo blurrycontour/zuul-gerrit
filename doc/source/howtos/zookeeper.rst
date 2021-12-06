@@ -1,3 +1,5 @@
+.. _howto-zookeeper:
+
 ZooKeeper Administration
 ========================
 

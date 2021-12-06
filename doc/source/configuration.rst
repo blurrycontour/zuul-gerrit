@@ -1,101 +1,17 @@
-:title: Components
+:title: Configuration
 
-.. _components:
-
-Components
-==========
-
-.. contents::
-   :depth: 1
-   :local:
-   :backlinks: none
-
-Overview
---------
-
-Zuul is a distributed system consisting of several components, each of
-which is described below.
-
-.. graphviz::
-   :align: center
-
-   graph  {
-      node [shape=box]
-      Database [fontcolor=grey]
-      Executor [href="#executor"]
-      Finger [href="#finger-gateway"]
-      Gearman [shape=ellipse]
-      Gerrit [fontcolor=grey]
-      Merger [href="#merger"]
-      Statsd [shape=ellipse fontcolor=grey]
-      Scheduler [href="#scheduler"]
-      Zookeeper [shape=ellipse]
-      Nodepool
-      GitHub [fontcolor=grey]
-      Web [href="#web-server"]
-
-      Merger -- Gearman
-      Executor -- Statsd
-      Executor -- "Job Node"
-      Web -- Database
-      Web -- Gearman
-      Web -- GitHub
-      Web -- Zookeeper
-      Web -- Executor
-      Finger -- Gearman
-      Finger -- Executor
-
-      Gearman -- Scheduler;
-      Scheduler -- Database;
-      Scheduler -- Gerrit;
-      Scheduler -- Zookeeper;
-      Zookeeper -- Executor;
-      Zookeeper -- Finger;
-      Zookeeper -- Merger
-      Zookeeper -- Nodepool;
-      Scheduler -- GitHub;
-      Scheduler -- Statsd;
-   }
-
-Each of the Zuul processes may run on the same host, or different
-hosts.  Within Zuul, the components communicate with the scheduler via
-the Gearman protocol, so each Zuul component needs to be able to
-connect to the host running the Gearman server (the scheduler has a
-built-in Gearman server which is recommended) on the Gearman port --
-TCP port 4730 by default.
-
-The Zuul scheduler communicates with Nodepool via the ZooKeeper
-protocol.  Nodepool requires an external ZooKeeper cluster, and the
-Zuul scheduler needs to be able to connect to the hosts in that
-cluster on TCP port 2181 or 2281.
-
-Both the Nodepool launchers and Zuul executors need to be able to
-communicate with the hosts which nodepool provides.  If these are on
-private networks, the Executors will need to be able to route traffic
-to them.
-
-Only Zuul fingergw and Zuul web need to be publicly accessible;
-executors never do. Executors should be accessible on TCP port 7900
-by fingergw and web.
-
-A database is required and configured in ``database`` section of
-``/etc/zuul/zuul.conf``. Both Zuul scheduler and Zuul web will need
-access to it.
-
-If statsd is enabled, the executors and scheduler needs to be able to
-emit data to statsd.  Statsd can be configured to run on each host
-and forward data, or services may emit to a centralized statsd
-collector.  Statsd listens on UDP port 8125 by default.
+Configuration
+=============
 
 All Zuul processes read the ``/etc/zuul/zuul.conf`` file (an alternate
 location may be supplied on the command line) which uses an INI file
 syntax.  Each component may have its own configuration file, though
 you may find it simpler to use the same file for all components.
 
-Zuul will interpolate environment variables starting with the ``ZUUL_``
-prefix given in the config file escaped as python string expansion.
-``foo=%(ZUUL_HOME)s`` will set the value of ``foo`` to the same value
-as the environment variable named ``ZUUL_HOME``.
+Zuul will interpolate environment variables starting with the
+``ZUUL_`` prefix given in the config file escaped as python string
+expansion.  ``foo=%(ZUUL_HOME)s`` will set the value of ``foo`` to the
+same value as the environment variable named ``ZUUL_HOME``.
 
 An example ``zuul.conf``:
 
@@ -111,6 +27,9 @@ An example ``zuul.conf``:
    [zookeeper]
    hosts=zk1.example.com,zk2.example.com,zk3.example.com
 
+   [database]
+   dburi=<URI>
+
    [keystore]
    password=MY_SECRET_PASSWORD
 
@@ -120,30 +39,13 @@ An example ``zuul.conf``:
    [scheduler]
    log_config=/etc/zuul/scheduler-logging.yaml
 
-A minimal Zuul system may consist of a :ref:`scheduler` and
-:ref:`executor` both running on the same host.  Larger installations
-should consider running multiple executors, each on a dedicated host,
-and running mergers on dedicated hosts as well.
-
-Zuul stores private keys for each project it knows about in ZooKeeper.
-It is recommended that you periodically back up the private keys in
-case the ZooKeeper data store is lost or damaged.  The :title:`Zuul
-Client` provides two sub-commands for use in this case:
-:title:`export-keys` and :title:`import-keys`.  Each takes an argument to
-a filesystem path and will write the keys to, or read the keys from
-that path.  The data in the exported files are still secured with the
-keystore passphrase, so be sure to retain it as well.
-
-Common
-------
-
-The following applies to all Zuul components.
-
-Configuration
-~~~~~~~~~~~~~
+Common Options
+--------------
 
 The following sections of ``zuul.conf`` are used by all Zuul components:
 
+Gearman
+~~~~~~~
 
 .. attr:: gearman
 
@@ -172,6 +74,10 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
       An openssl file containing the client private key in PEM format.
 
+
+Statsd
+~~~~~~
+
 .. attr:: statsd
 
    Information about the optional statsd server.  If the ``statsd``
@@ -192,6 +98,9 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
       If present, this will be prefixed to all of the keys before
       transmitting to the statsd server.
+
+ZooKeeper
+~~~~~~~~~
 
 .. attr:: zookeeper
 
@@ -223,6 +132,45 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
       The ZooKeeper session timeout, in seconds.
 
+
+.. _database:
+
+Database
+~~~~~~~~
+
+.. attr:: database
+
+   .. attr:: dburi
+      :required:
+
+      Database connection information in the form of a URI understood
+      by SQLAlchemy.  See `The SQLAlchemy manual
+      <https://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_
+      for more information.
+
+      The driver will automatically set up the database creating and managing
+      the necessary tables. Therefore the provided user should have sufficient
+      permissions to manage the database. For example:
+
+      .. code-block:: sql
+
+        GRANT ALL ON my_database TO 'my_user'@'%';
+
+   .. attr:: pool_recycle
+      :default: 1
+
+      Tune the pool_recycle value. See `The SQLAlchemy manual on pooling
+      <http://docs.sqlalchemy.org/en/latest/core/pooling.html#setting-pool-recycle>`_
+      for more information.
+
+   .. attr:: table_prefix
+      :default: ''
+
+      The string to prefix the table names. This makes it possible to run
+      several zuul deployments against the same database. This can be useful
+      if you rely on external databases which are not under your control.
+      The default is to have no prefix.
+
 .. _scheduler:
 
 Scheduler
@@ -251,9 +199,6 @@ by the Executors.
 
 It must also be able to connect to any services for which connections
 are configured (Gerrit, GitHub, etc).
-
-Configuration
-~~~~~~~~~~~~~
 
 The following sections of ``zuul.conf`` are used by the scheduler:
 
@@ -412,31 +357,6 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       To use IPv6, python>3.8 is required `issue24209 <https://bugs.python.org/issue24209>`_.
 
 
-Operation
-~~~~~~~~~
-
-To start the scheduler, run ``zuul-scheduler``.  To stop it, run
-``zuul-scheduler stop``.
-
-Reconfiguration
-~~~~~~~~~~~~~~~
-
-Most of Zuul's configuration is automatically updated as changes to
-the repositories which contain it are merged.  However, Zuul must be
-explicitly notified of changes to the tenant config file, since it is
-not read from a git repository. Zuul supports two kinds of reconfigurations.
-
-The full reconfiguration refetches and reloads the configuration of
-all tenants. To do so, run ``zuul-scheduler full-reconfigure``. For
-example this can be used to fix eventual configuration inconsistencies
-after connection problems to Gerrit/Github.
-
-The smart reconfiguration reloads only the tenants that changed their
-configuration in the tenant config file. To do so, run
-``zuul-scheduler smart-reconfigure``. In multi tenant systems this can
-be much faster than the full reconfiguration so it is recommended to
-use the smart reconfiguration after changing the tenant configuration
-file.
 
 Merger
 ------
@@ -460,9 +380,6 @@ to reduce the load on executors.
 Mergers need to be able to connect to the Gearman server (usually the
 scheduler host) as well as any services for which connections are
 configured (Gerrit, GitHub, etc).
-
-Configuration
-~~~~~~~~~~~~~
 
 The following section of ``zuul.conf`` is used by the merger:
 
@@ -522,17 +439,6 @@ The following section of ``zuul.conf`` is used by the merger:
       :default: /var/run/zuul/merger.pid
 
       Path to PID lock file for the merger process.
-
-Operation
-~~~~~~~~~
-
-To start the merger, run ``zuul-merger``.
-
-In order to stop the merger and under normal circumstances it is
-best to pause and wait for all currently running tasks to finish
-before stopping it. To do so run ``zuul-merger pause``.
-
-To stop the merger immediately, run ``zuul-merger stop``.
 
 .. _executor:
 
@@ -935,70 +841,6 @@ The following sections of ``zuul.conf`` are used by the executor:
       to = user@example.org
       sender = zuul@example.org
 
-Operation
-~~~~~~~~~
-
-To start the executor, run ``zuul-executor``.
-
-There are several commands which can be run to control the executor's
-behavior once it is running.
-
-To pause the executor and prevent it from running new jobs you can
-run ``zuul-executor pause``.
-
-To cause the executor to stop accepting new jobs and exit when all running
-jobs have finished you can run ``zuul-executor graceful``. Under most
-circumstances this will be the best way to stop Zuul.
-
-To stop the executor immediately, run ``zuul-executor stop``. Jobs that were
-running on the stopped executor will be rescheduled on other executors.
-
-The executor normally responds to a ``SIGTERM`` signal in the same way
-as the ``graceful`` command, however you can change this behavior to match
-``stop`` with the :attr:`executor.sigterm_method` setting.
-
-To enable or disable running Ansible in verbose mode (with the
-``-vvv`` argument to ansible-playbook) run ``zuul-executor verbose``
-and ``zuul-executor unverbose``.
-
-.. _ansible-and-python-3:
-
-Ansible and Python 3
-~~~~~~~~~~~~~~~~~~~~
-
-As noted above, the executor runs Ansible playbooks against the remote
-node(s) allocated for the job.  Since part of executing playbooks on
-remote hosts is running Python scripts on them, Ansible needs to know
-what Python interpreter to use on the remote host.  With older
-distributions, ``/usr/bin/python2`` was a generally sensible choice.
-However, over time a heterogeneous Python ecosystem has evolved where
-older distributions may only provide Python 2, most provide a mixed
-2/3 environment and newer distributions may only provide Python 3 (and
-then others like RHEL8 may even have separate "system" Python versions
-to add to confusion!).
-
-Ansible's ``ansible_python_interpreter`` variable configures the path
-to the remote Python interpreter to use during playbook execution.
-This value is set by Zuul from the ``python-path`` specified for the
-node by Nodepool; see the `nodepool configuration documentation
-<https://zuul-ci.org/docs/nodepool/configuration.html>`__.
-
-This defaults to ``auto``, where Ansible will automatically discover
-the interpreter available on the remote host.  However, this setting
-only became available in Ansible >=2.8, so Zuul will translate
-``auto`` into the old default of ``/usr/bin/python2`` when configured
-to use older Ansible versions.
-
-Thus for modern Python 3-only hosts no further configuration is needed
-when using Ansible >=2.8 (e.g. Fedora, Bionic onwards).  If using
-earlier Ansible versions you may need to explicitly set the
-``python-path`` if ``/usr/bin/python2`` is not available on the node.
-
-Ansible roles/modules which include Python code are generally Python 3
-safe now, but there is still a small possibility of incompatibility.
-See also the Ansible `Python 3 support page
-<https://docs.ansible.com/ansible/latest/reference_appendices/python_3_support.html>`__.
-
 .. _web-server:
 
 Web Server
@@ -1017,9 +859,6 @@ the scheduler host).  If the SQL reporter is used, they need to be
 able to connect to the database it reports to in order to support the
 dashboard.  If a GitHub connection is configured, they need to be
 reachable by GitHub so they may receive notifications.
-
-Configuration
-~~~~~~~~~~~~~
 
 In addition to the common configuration sections, the following
 sections of ``zuul.conf`` are used by the web server:
@@ -1087,10 +926,9 @@ sections of ``zuul.conf`` are used by the web server:
 
       If this is used the finger gateways should be configured accordingly.
 
-.. _web-server-tenant-scoped-api:
 
-Enabling tenant-scoped access to privileged actions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Authentication
+~~~~~~~~~~~~~~
 
 A user can be granted access to protected REST API endpoints by providing a
 valid JWT (JSON Web Token) as a bearer token when querying the API endpoints.
@@ -1235,21 +1073,12 @@ authentication on Zuul's web user interface.
    under the key "jwks_uri", therefore this attribute is usually not necessary.
 
 
-Operation
-~~~~~~~~~
-
-To start the web server, run ``zuul-web``.  To stop it, kill the
-PID which was saved in the pidfile specified in the configuration.
-
-Web Client
-----------
+Client
+------
 
 Zuul's command line client may be configured to make calls to Zuul's web
 server. The client will then look for a ``zuul.conf`` file with a ``webclient``
 section to set up the connection over HTTP.
-
-Configuration
-~~~~~~~~~~~~~
 
 .. attr:: webclient
 
@@ -1263,22 +1092,6 @@ Configuration
       Enforce SSL verification when sending requests over to Zuul's web server.
       This should only be disabled when working with test servers.
 
-Configuration
-~~~~~~~~~~~~~
-
-In addition to the common configuration sections, the following
-sections of ``zuul.conf`` are used by the web server:
-
-.. attr:: web
-
-   .. attr:: listen_address
-      :default: 127.0.0.1
-
-      IP address or domain name on which to listen.
-
-   .. attr:: log_config
-
-      Path to log config file for the web server process.
 
 Finger Gateway
 --------------
@@ -1310,9 +1123,6 @@ the following purposes:
   In this case, log streaming requests from finger gateways or
   zuul-web will route to the executors via finger gateways in the same
   zone.
-
-Configuration
-~~~~~~~~~~~~~
 
 In addition to the common configuration sections, the following
 sections of ``zuul.conf`` are used by the finger gateway:
@@ -1417,8 +1227,39 @@ sections of ``zuul.conf`` are used by the finger gateway:
       but will still use the supplied certificate to make remote TLS
       connections.
 
-Operation
-~~~~~~~~~
+.. _connections:
 
-To start the finger gateway, run ``zuul-fingergw``.  To stop it, kill the
-PID which was saved in the pidfile specified in the configuration.
+Connections
+===========
+
+Most of Zuul's configuration is contained in the git repositories upon
+which Zuul operates, however, some configuration outside of git
+repositories is still required to bootstrap the system.  This includes
+information on connections between Zuul and other systems, as well as
+identifying the projects Zuul uses.
+
+In order to interact with external systems, Zuul must have a
+*connection* to that system configured.  Zuul includes a number of
+:ref:`drivers <drivers>`, each of which implements the functionality
+necessary to connect to a system.  Each connection in Zuul is
+associated with a driver.
+
+To configure a connection in Zuul, select a unique name for the
+connection and add a section to ``zuul.conf`` with the form
+``[connection NAME]``.  For example, a connection to a gerrit server
+may appear as:
+
+.. code-block:: ini
+
+  [connection mygerritserver]
+  driver=gerrit
+  server=review.example.com
+
+Zuul needs to use a single connection to look up information about
+changes hosted by a given system.  When it looks up changes, it will
+do so using the first connection it finds that matches the server name
+it's looking for.  It's generally best to use only a single connection
+for a given server, however, if you need more than one (for example,
+to satisfy unique reporting requirements) be sure to list the primary
+connection first as that is what Zuul will use to look up all changes
+for that server.

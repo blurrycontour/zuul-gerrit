@@ -1,9 +1,9 @@
-:title: Tenant Scoped REST API
+:title: Authenticated Actions
 
-.. _tenant-scoped-rest-api:
+.. _authentication:
 
-Tenant Scoped REST API
-======================
+Authenticated Actions
+=====================
 
 Users can perform some privileged actions at the tenant level through protected
 endpoints of the REST API, if these endpoints are activated.
@@ -129,3 +129,26 @@ For example, in Python, and for an authenticator using the ``HS256`` algorithm:
 
 Online resources like https://jwt.io are also available to generate, decode and
 debug JWTs.
+
+Debugging
+---------
+
+If problems appear:
+
+* Make sure your configuration is correct, especially callback URIs.
+* More information can be found in Zuul's web service logs.
+* From the user's side, activating the web console in the browser can be helpful
+  to debug API calls.
+
+Interfacing with Other Systems
+------------------------------
+
+Here are some how-tos to help administrators enable OpenID Connect
+authentication in Zuul and Zuul's Web UI.
+
+.. toctree::
+   :maxdepth: 1
+
+   howtos/openid-with-google
+   howtos/openid-with-keycloak
+   tutorials/keycloak
