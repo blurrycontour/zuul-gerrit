@@ -298,7 +298,14 @@ function getFiltersFromUrl(location, filterCategories) {
     skip: urlParams.getAll('skip') ? urlParams.getAll('skip') : [0,],
     limit: urlParams.getAll('limit') ? urlParams.getAll('limit') : [50,],
   }
-  const filters = { ..._filters, ...pagination_options }
+  let idx_options = {}
+  if (urlParams.getAll('idx_min')) {
+    idx_options.idx_min = urlParams.getAll('idx_min')
+  }
+  if (urlParams.getAll('idx_max')) {
+    idx_options.idx_max = urlParams.getAll('idx_min')
+  }
+  const filters = { ..._filters, ...pagination_options, ...idx_options }
   return filters
 }
 

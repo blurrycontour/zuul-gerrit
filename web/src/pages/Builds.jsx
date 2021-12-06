@@ -151,9 +151,8 @@ class BuildsPage extends React.Component {
     // first loaded). Most probably that's the case because the location is
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
-    const { itemCount } = this.state
+    const { itemCount, currentPage } = this.state
     let paginationOptions = {
-      skip: filters.skip.length > 0 ? filters.skip : [0,],
       limit: filters.limit.length > 0 ? filters.limit : [50,]
     }
     let _filters = { ...filters, ...paginationOptions }
@@ -168,7 +167,11 @@ class BuildsPage extends React.Component {
       let finalItemCount = itemCount
         ? itemCount
         : (response.data.length < paginationOptions.limit[0]
-          ? parseInt(paginationOptions.skip[0]) + response.data.length
+          // Without the offset, this value may end up wrong if the results per page param is changed
+          // before reaching the last value. This is why the total result display was changed to
+          // "about XXX". A possible workaround is to reset the filters, currentPage and itemCount if the user
+          // changes the results per page param, but this might be counter-intuitive to users. 
+          ? parseInt(paginationOptions.limit[0]) * (currentPage - 1) + response.data.length
           : null)
       this.setState({
         builds: response.data,
@@ -199,12 +202,12 @@ class BuildsPage extends React.Component {
     const { location, history } = this.props
     const { filters, itemCount } = this.state
     /*eslint no-unused-vars: ["error", { "ignoreRestSiblings": true }]*/
-    let { 'skip': x1, 'limit': y1, ..._oldFilters } = filters
-    let { 'skip': x2, 'limit': y2, ..._newFilters } = newFilters
+    let { 'skip': x1, 'limit': y1, 'idx_min': z1, 'idx_max': a1, ..._oldFilters } = filters
+    let { skip, limit, 'idx_min': idxMin, 'idx_max': idxMax, ..._newFilters } = newFilters
 
-    // If filters have changed, reinitialize skip
+    // If filters have changed, reinitialize pagination params
     let equalTest = isEqual(_oldFilters, _newFilters)
-    let finalFilters = equalTest ? newFilters : { ...newFilters, skip: [0,] }
+    let finalFilters = equalTest ? newFilters : { ...newFilters, skip: [0,], limit: [limit,] }
 
     // We must update the URL parameters before the state. Otherwise, the URL
     // will always be one filter selection behind the state. But as the URL
@@ -242,13 +245,37 @@ class BuildsPage extends React.Component {
   }
 
   handleSetPage = (event, pageNumber) => {
-    const { filters, resultsPerPage } = this.state
+    const { currentPage } = this.state
+    console.log('Current Page: ', currentPage)
+    console.log('Next Page: ', pageNumber)
+  }
+
+  onNextClick = (event, pageNumber) => {
+    const { filters, builds } = this.state
     this.setState({ currentPage: pageNumber })
-    let offset = resultsPerPage * (pageNumber - 1)
-    const newFilters = { ...filters, skip: [offset,] }
+    let currentMinIdx = builds.reduce((acc, build) => {
+      acc = (acc === null || acc > parseInt(build._id)) ? parseInt(build._id) : acc
+      return acc
+    }, null)
+    let { skip, idx_min, idx_max, ..._filters } = filters
+    const newFilters = { ..._filters, idx_max: [currentMinIdx - 1,] }
+    console.log('going forward', newFilters)
     this.handleFilterChange(newFilters)
   }
 
+  onPreviousClick = (event, pageNumber) => {
+    const { filters, resultsPerPage, builds } = this.state
+    this.setState({ currentPage: pageNumber })
+    let offset = resultsPerPage * (pageNumber - 1)
+    let currentMaxIdx = builds.reduce((acc, build) => {
+      acc = (acc === null || acc < parseInt(build._id)) ? parseInt(build._id) : acc
+      return acc
+    }, null)
+    let { skip, idx_min, idx_max, ..._filters } = filters
+    const newFilters = { ..._filters, skip: [offset,], idx_min: [parseInt(currentMaxIdx) + 1,] }
+    console.log('going back', newFilters)
+    this.handleFilterChange(newFilters)
+  }
 
   render() {
     const { history } = this.props
@@ -270,7 +297,7 @@ class BuildsPage extends React.Component {
               &nbsp;
               of
               &nbsp;
-              <b>{itemCount ? itemCount : 'many'}</b>
+              <b>{itemCount ? 'about ' + itemCount : 'many'}</b>
             </React.Fragment>
           )}
           itemCount={itemCount}
@@ -278,7 +305,9 @@ class BuildsPage extends React.Component {
           page={currentPage}
           widgetId="pagination-menu"
           onPerPageSelect={this.handlePerPageSelect}
-          onSetPage={this.handleSetPage}
+          // onSetPage={this.handleSetPage}
+          onNextClick={this.onNextClick}
+          onPreviousClick={this.onPreviousClick}
           isCompact
         />
         <BuildTable
