@@ -27,13 +27,13 @@ Usage
 -----
 The general options that apply to all subcommands are:
 
-.. program-output:: zuul --help
+... program-output:: zuul --help
 
 The following subcommands are supported:
 
 Autohold
 ^^^^^^^^
-.. program-output:: zuul autohold --help
+... program-output:: zuul autohold --help
 
 Example::
 
@@ -41,7 +41,7 @@ Example::
 
 Autohold Delete
 ^^^^^^^^^^^^^^^
-.. program-output:: zuul autohold-delete --help
+... program-output:: zuul autohold-delete --help
 
 Example::
 
@@ -49,7 +49,7 @@ Example::
 
 Autohold Info
 ^^^^^^^^^^^^^
-.. program-output:: zuul autohold-info --help
+... program-output:: zuul autohold-info --help
 
 Example::
 
@@ -57,7 +57,7 @@ Example::
 
 Autohold List
 ^^^^^^^^^^^^^
-.. program-output:: zuul autohold-list --help
+... program-output:: zuul autohold-list --help
 
 Example::
 
@@ -65,7 +65,7 @@ Example::
 
 Dequeue
 ^^^^^^^
-.. program-output:: zuul dequeue --help
+... program-output:: zuul dequeue --help
 
 Examples::
 
@@ -74,7 +74,7 @@ Examples::
 
 Enqueue
 ^^^^^^^
-.. program-output:: zuul enqueue --help
+... program-output:: zuul enqueue --help
 
 Example::
 
@@ -85,7 +85,7 @@ Note that the format of change id is <number>,<patchset>.
 Enqueue-ref
 ^^^^^^^^^^^
 
-.. program-output:: zuul enqueue-ref --help
+... program-output:: zuul enqueue-ref --help
 
 This command is provided to manually simulate a trigger from an
 external source.  It can be useful for testing or replaying a trigger
@@ -141,7 +141,7 @@ for these more advanced operations.
 Promote
 ^^^^^^^
 
-.. program-output:: zuul promote --help
+... program-output:: zuul promote --help
 
 Example::
 
@@ -167,7 +167,7 @@ Show
 
 .. note:: This command is only available through a Gearman connection.
 
-.. program-output:: zuul show --help
+... program-output:: zuul show --help
 
 Example::
 
@@ -178,7 +178,7 @@ tenant-conf-check
 
 .. note:: This command is only available through a Gearman connection.
 
-.. program-output:: zuul tenant-conf-check --help
+... program-output:: zuul tenant-conf-check --help
 
 Example::
 
@@ -194,7 +194,7 @@ create-auth-token
           ``zuul.conf``. Furthermore the authenticator's configuration must
           include a signing secret.
 
-.. program-output:: zuul create-auth-token --help
+... program-output:: zuul create-auth-token --help
 
 Example::
 
@@ -210,7 +210,7 @@ Example::
 export-keys
 ^^^^^^^^^^^
 
-.. program-output:: zuul export-keys --help
+... program-output:: zuul export-keys --help
 
 Example::
 
@@ -219,7 +219,7 @@ Example::
 import-keys
 ^^^^^^^^^^^
 
-.. program-output:: zuul import-keys --help
+... program-output:: zuul import-keys --help
 
 Example::
 
@@ -228,7 +228,7 @@ Example::
 copy-keys
 ^^^^^^^^^
 
-.. program-output:: zuul copy-keys --help
+... program-output:: zuul copy-keys --help
 
 Example::
 
@@ -237,7 +237,7 @@ Example::
 delete-keys
 ^^^^^^^^^^^
 
-.. program-output:: zuul delete-keys --help
+... program-output:: zuul delete-keys --help
 
 Example::
 
@@ -246,7 +246,7 @@ Example::
 delete-state
 ^^^^^^^^^^^^
 
-.. program-output:: zuul delete-state --help
+... program-output:: zuul delete-state --help
 
 Example::
 

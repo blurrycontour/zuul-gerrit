@@ -3,14 +3,14 @@
 Zuul Concepts
 =============
 
-Zuul's configuration is organized around the concept of a *pipeline*.
-In Zuul, a pipeline encompasses a workflow process which can be
-applied to one or more projects.  For instance, a "check" pipeline
-might describe the actions which should cause newly proposed changes
-to projects to be tested.  A "gate" pipeline might implement
-:ref:`project_gating` to automate merging changes to projects only if
-their tests pass.  A "post" pipeline might update published
-documentation for a project when changes land.
+Zuul is organized around the concept of a *pipeline*.  In Zuul, a
+pipeline encompasses a workflow process which can be applied to one or
+more projects.  For instance, a "check" pipeline might describe the
+actions which should cause newly proposed changes to projects to be
+tested.  A "gate" pipeline might implement :ref:`project_gating` to
+automate merging changes to projects only if their tests pass.  A
+"post" pipeline might update published documentation for a project
+when changes land.
 
 The names "check", "gate", and "post" are arbitrary -- these are not
 concepts built into Zuul, but rather they are just a few common
