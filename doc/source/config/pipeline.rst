@@ -116,7 +116,7 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
          appear in the repository when merged.
 
          For more detail on the theory and operation of Zuul's
-         dependent pipeline manager, see: :doc:`/discussion/gating`.
+         dependent pipeline manager, see: :doc:`/gating`.
 
       .. value:: serial
 

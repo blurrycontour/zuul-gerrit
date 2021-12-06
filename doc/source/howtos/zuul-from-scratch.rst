@@ -7,7 +7,7 @@ install Zuul without the aid of any existing installation tools, you
 may find this a useful reference.
 
 If, instead, you want to get Zuul running quickly, see the
-:ref:`quick_start` which runs all of the Zuul services in containers
+:ref:`quick-start` which runs all of the Zuul services in containers
 with a single command.
 
 Environment Setup

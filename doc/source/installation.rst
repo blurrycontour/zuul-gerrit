@@ -1,61 +1,5 @@
-Installation Reference
-======================
-
-Install Zuul
-------------
-
-To install a Zuul release from PyPI, run::
-
-    pip install zuul
-
-Or from a git checkout, run::
-
-    pip install .
-
-That will also install Zuul's python dependencies.  To minimize
-interaction with other python packages installed on a system, you may
-wish to install Zuul within a Python virtualenv.
-
-Zuul has several system-level dependencies as well.  You can find a
-list of operating system packages in ``bindep.txt`` in Zuul's source
-directory.
-
-It is further required to run ``zuul-manage-ansible`` on the zuul-executor
-in order to install all supported ansible versions so zuul can use them.
-See :ref:`ansible-installation-options` for details.
-
-Zuul Components
----------------
-
-Zuul provides the following components:
-
-    - **zuul-scheduler**: The main Zuul process. Handles receiving
-      events, executing jobs, collecting results and posting reports.
-      Coordinates the work of the other components.  It also provides
-      a gearman daemon which the other components use for
-      coordination.
-
-    - **zuul-merger**: Scale-out component that performs git merge
-      operations.  Zuul performs a large number of git operations in
-      the course of its work.  Adding merger processes can help speed
-      Zuul's processing.  This component is optional (zero or more of
-      these can be run).
-
-    - **zuul-executor**: Scale-out component for executing jobs.  At
-      least one of these is required.  Depending on system
-      configuration, you can expect a single executor to handle up to
-      about 100 simultaneous jobs.  Can handle the functions of a
-      merger if dedicated mergers are not provided.  One or more of
-      these must be run.
-
-    - **zuul-web**: A web server that receives "webhook" events from
-      external providers, supplies a web dashboard, and provides
-      websocket access to live streaming of logs.
-
-    - **zuul-fingergw**: A gateway which provides finger protocol
-      access to live streaming of logs.
-
-For more detailed information about these, see :ref:`components`.
+Installation
+============
 
 External Dependencies
 ---------------------
@@ -91,19 +35,69 @@ in given a username and ssh private key.
 ZooKeeper
 ~~~~~~~~~
 
-.. TODO: SpamapS any zookeeper config recommendations?
-
 Nodepool uses ZooKeeper to communicate internally among its
 components, and also to communicate with Zuul.  You can run a simple
 single-node ZooKeeper instance, or a multi-node cluster.  Ensure that
-the host running the Zuul scheduler has access to the cluster.
+the host running the Zuul scheduler has access to the cluster.  See
+:ref:`howto-zookeeper` for recommendations for operating a small
+ZooKeeper cluster.
+
+Zuul stores private keys for each project it knows about in ZooKeeper.
+It is recommended that you periodically back up the private keys in
+case the ZooKeeper data store is lost or damaged.  The :title:`Zuul
+Client` provides two sub-commands for use in this case:
+:title:`export-keys` and :title:`import-keys`.  Each takes an argument to
+a filesystem path and will write the keys to, or read the keys from
+that path.  The data in the exported files are still secured with the
+keystore passphrase, so be sure to retain it as well.
+
+Database
+~~~~~~~~
+
+Zuul requires an SQL database; either MariaDB, MySQL, or PostgreSQL.
+
+Installation from PyPI
+----------------------
+
+Zuul is a Python application which can be installed from the Python
+Package Index (PyPI).
+
+To install a Zuul release from PyPI, run::
+
+    pip install zuul
+
+Or from a git checkout, run::
+
+    pip install .
+
+That will also install Zuul's python dependencies.  To minimize
+interaction with other python packages installed on a system, you may
+wish to install Zuul within a Python virtualenv.
+
+Zuul has several system-level dependencies as well.  You can find a
+list of operating system packages in ``bindep.txt`` in Zuul's source
+directory.
+
+It is also required to run ``zuul-manage-ansible`` on the
+zuul-executor in order to install all supported Ansible versions so
+Zuul can use them.  See :ref:`ansible-installation-options` for
+details.
+
+Installation from Containers
+----------------------------
+
+The Zuul project also builds and releases container images on
+DockerHub.  These are available at: https://hub.docker.com/u/zuul
+
+There is a container image for each of the Zuul :ref:`components <components>`.
 
 .. _ansible-installation-options:
 
-Ansible
-~~~~~~~
+Executor Deployment
+-------------------
 
-There are two approaches that can be used to install Ansible for Zuul.
+The Zuul executor requires Ansible to run jobs.  There are two
+approaches that can be used to install Ansible for Zuul.
 
 First you may set ``manage_ansible`` to True in the executor config. If you
 do this Zuul will install all supported Ansible versions on zuul-executor
@@ -122,79 +116,10 @@ state dirs).
 In both cases if using a non default path you will want to set
 ``ansible_root`` in the executor config file.
 
-Zuul Setup
-----------
-
-At minimum you need to provide ``zuul.conf`` and ``main.yaml`` placed
-in ``/etc/zuul/``.  The following example uses the builtin gearman
-service in Zuul, and a connection to Gerrit.
-
-**zuul.conf**::
-
-    [keystore]
-    password=secret
-
-    [scheduler]
-    tenant_config=/etc/zuul/main.yaml
-
-    [gearman_server]
-    start=true
-
-    [gearman]
-    server=127.0.0.1
-
-    [connection my_gerrit]
-    driver=gerrit
-    server=git.example.com
-    port=29418
-    baseurl=https://git.example.com/gerrit/
-    user=zuul
-    sshkey=/home/zuul/.ssh/id_rsa
-
-    [database]
-    dburi=mysql+pymysql://zuul:secret@mysql/zuul
-
-See :ref:`components` and :ref:`connections` for more details.
-
-The following tells Zuul to read its configuration from and operate on
-the *example-project* project:
-
-**main.yaml**::
-
-    - tenant:
-        name: example-tenant
-        source:
-          my_gerrit:
-            untrusted-projects:
-              - example-project
-
-Starting Zuul
--------------
-
-You can run any zuul process with the **-d** option to make it not
-daemonize. It's a good idea at first to confirm there's no issues with
-your configuration.
-
-To start, simply run::
-
-    zuul-scheduler
-
-Once run you should have two zuul-scheduler processes (if using the
-built-in gearman server, or one process otherwise).
-
-Before Zuul can run any jobs, it needs to load its configuration, most
-of which is in the git repositories that Zuul operates on.  Start an
-executor to allow zuul to do that::
-
-    zuul-executor
-
-Zuul should now be able to read its configuration from the configured
-repo and process any jobs defined therein.
-
 .. _web-deployment-options:
 
-Web Deployment Options
-----------------------
+Web Deployment
+--------------
 
 The ``zuul-web`` service provides a web dashboard, a REST API and a websocket
 log streaming service as a single holistic web application. For production use

@@ -337,8 +337,7 @@ configuration. Some examples of tenant definitions are:
       privileged action.
 
       More information on tenant-scoped actions can be found in
-      :ref:`tenant-scoped-rest-api`.
-
+      :ref:`authentication`.
 
    .. attr:: authentication-realm
 
@@ -371,8 +370,7 @@ The protected actions available at tenant level are **autohold**, **enqueue**,
 
    Rules can be overridden by the ``zuul.admin`` claim in a token if if matches
    an authenticator configuration where `allow_authz_override` is set to true.
-   See :ref:`Zuul web server's configuration <web-server-tenant-scoped-api>` for
-   more details.
+   See :ref:`authentication` for more details.
 
 Below are some examples of how access rules can be defined:
 
@@ -437,8 +435,7 @@ Below are some examples of how access rules can be defined:
 
       The special ``zuul_uid`` claim refers to the ``uid_claim`` setting in an
       authenticator's configuration. By default it refers to the ``sub`` claim
-      of a token. For more details see the :ref:`configuration section
-      <web-server-tenant-scoped-api>` for Zuul web server.
+      of a token. For more details see the :ref:`authentication`.
 
       Under the above example, the following token would match rules
       ``affiliate_or_admin`` and ``alice_or_bob``:
