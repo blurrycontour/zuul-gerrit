@@ -373,6 +373,12 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       faster for projects with fewer changes in a system dominated by
       projects with more changes.
 
+      After the first 10 changes, the relative priority becomes more
+      coarse (batching groups of 10 changes at the same priority).
+      Likewise, after 100 changes they are batchen in groups of 100.
+      This is to avoid causing additional load with unecessary
+      priority changes if queues are long.
+
       If this value is ``False`` (the default), then node requests are
       sorted by pipeline precedence followed by the order in which
       they were submitted.  If this is ``True``, they are sorted by
