@@ -12,6 +12,9 @@
 # serve to show the default.
 
 import sys, os
+import subprocess
+import re
+import zuul.version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -103,6 +106,34 @@ pygments_style = 'sphinx'
 #html_theme = 'alabaster'
 html_theme = "sphinx_rtd_theme"
 
+if zuul.version.is_release:
+    version = release_string
+    current_version = release_string
+    versions = [('latest', '../')]
+else:
+    # Uncomment this if we want to use the in-development version
+    # number (eg 4.10.5.dev4 887cf31e4 )
+    # version = zuul.version.get_version_string()
+    version = 'latest'
+    current_version = 'latest'
+    versions = [('latest', '')]
+
+try:
+    output = subprocess.check_output(['git', 'tag']).decode('utf8')
+except subprocess.CalledProcessError:
+    output = ''
+
+interesting_tags = []
+for tag in output.splitlines():
+    if re.match('^\d+\.\d+\.\d+$', tag):
+        parts = tuple(map(int, tag.split('.')))
+        # No published versions before this one
+        if parts < (3, 1, 0):
+            continue
+        interesting_tags.append((parts, tag))
+for parts, tag in reversed(sorted(interesting_tags, key=lambda x: x[0])):
+    versions.append((tag, tag+'/'))
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -110,6 +141,16 @@ html_theme_options = {
     'collapse_navigation': False,
     'navigation_depth': -1,
     'logo_only': True,
+}
+print(version, current_version)
+html_context = {
+    # This controls what is displayed at the top of the navbar.
+    'version': version,
+    # This controls what the caret selection displays at the bottom of
+    # the navbar.
+    'current_version': current_version,
+    # A tuple of (slug, url)
+    'versions': versions,
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
