@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9c88fe2_ceb06691",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-06T21:51:16Z",
+      "side": 1,
+      "message": "++ This is one thing I notice immediately. You have a much better sense of where you are in the docs and if you need to look at something else it doesn\u0027t jump you to a random url location that you can\u0027t find via navigation later.",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8c5a143_64bcdf54",
+        "filename": "doc/source/about.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-06T21:51:16Z",
+      "side": 1,
+      "message": "Should probably link to Nodepool here.",
+      "range": {
+        "startLine": 32,
+        "startChar": 38,
+        "endLine": 32,
+        "endChar": 46
+      },
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2f650e6_cf8c2e8f",
+        "filename": "doc/source/about.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-06T21:51:16Z",
+      "side": 1,
+      "message": "It feels like we\u0027re just jumping in to assuming the reader already knows Zuul uses Ansible to describe job content. Might want to introduce that a bit more? Also links to Ansible docs might be a good idea?",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d60970aa_5d22553c",
+        "filename": "doc/source/about.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-06T21:51:16Z",
+      "side": 1,
+      "message": "Might want to link to the Zuul website somewhere on this page and that has contact info for getting involved?",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96d29817_30d8cb98",
+        "filename": "doc/source/configuration.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1221,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-06T21:51:16Z",
+      "side": 1,
+      "message": "The left panel navigation refers to these things as Drivers. We should try to coalesce these two in the docs so that readers can find the drivers they need for their connections?",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c555d4e6_ae99c237",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-06T21:51:16Z",
+      "side": 1,
+      "message": "Is this meant to be Project Configuration?",
+      "range": {
+        "startLine": 22,
+        "startChar": 16,
+        "endLine": 22,
+        "endChar": 19
+      },
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
