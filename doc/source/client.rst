@@ -109,7 +109,7 @@ the jobs, pass the failed tag as the ``ref`` argument and set
 ``newrev`` to the change associated with the tag in the project
 repository (i.e. what you see from ``git show X.Y.Z``)::
 
-  zuul enqueue-ref --tenant openstack --trigger gerrit --pipeline release --project openstack/example_project --ref refs/tags/X.Y.Z --newrev abc123...
+  zuul enqueue-ref --tenant openstack --trigger gerrit --pipeline release --project openstack/example_project --ref refs/tags/X.Y.Z --newrev abc123..
 
 The command can also be used asynchronosly trigger a job in a
 ``periodic`` pipeline that would usually be run at a specific time by
