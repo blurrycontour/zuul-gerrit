@@ -41,6 +41,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c7859a8_364a2119",
+        "filename": "doc/source/about.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-06T21:58:45Z",
+      "side": 1,
+      "message": "++",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2f650e6_cf8c2e8f",
@@ -54,6 +71,23 @@
       "writtenOn": "2021-12-06T21:51:16Z",
       "side": 1,
       "message": "It feels like we\u0027re just jumping in to assuming the reader already knows Zuul uses Ansible to describe job content. Might want to introduce that a bit more? Also links to Ansible docs might be a good idea?",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dda73e20_858ff330",
+        "filename": "doc/source/about.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-06T21:58:45Z",
+      "side": 1,
+      "message": "Ha, yes!  I was literally trying to do what you are suggesting in this paragraph, but I see that I completely failed.  In my mind, there was another sentence like \"That\u0027s why Zuul uses Ansible as its job language.\"  I\u0027ll try to work that in better.  :)",
       "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -75,6 +109,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdece7c1_e766707a",
+        "filename": "doc/source/about.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-06T21:58:45Z",
+      "side": 1,
+      "message": "++",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96d29817_30d8cb98",
@@ -88,6 +139,23 @@
       "writtenOn": "2021-12-06T21:51:16Z",
       "side": 1,
       "message": "The left panel navigation refers to these things as Drivers. We should try to coalesce these two in the docs so that readers can find the drivers they need for their connections?",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "030e7cf7_3061b0a8",
+        "filename": "doc/source/configuration.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1221,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-06T21:58:45Z",
+      "side": 1,
+      "message": "Er... well... this is the \"connection\" configuration; when configuring a connection you need to select a driver.  I think the second pgraph addresses that best.\n\nIf you\u0027re reading through the docs on how to put together a zuul.conf, then this is good explanatory material.  If you skip this and just click on \"github\" on the left, you\u0027ll probably still be okay.",
       "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -111,6 +179,23 @@
         "endLine": 22,
         "endChar": 19
       },
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44ba3ace_8b05a760",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-06T21:58:45Z",
+      "side": 1,
+      "message": "Yep.",
       "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
