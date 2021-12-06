@@ -1753,7 +1753,7 @@ class Scheduler(threading.Thread):
                     relevant_changes = pipeline.manager.resolveChangeKeys(
                         change_keys)
                     for change in relevant_changes:
-                        change.getRelatedChanges(self, relevant)
+                        relevant.add(change.cache_stat.key)
         return relevant
 
     def maintainConnectionCache(self):

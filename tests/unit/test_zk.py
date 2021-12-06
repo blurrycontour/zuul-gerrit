@@ -1268,25 +1268,39 @@ class DummyChange:
     def deserialize(self, data):
         self.__dict__.update(data)
 
+    def getRelatedChanges(self, sched, relevant):
+        return
+
 
 class DummyChangeCache(AbstractChangeCache):
-
     CHANGE_TYPE_MAP = {
         "DummyChange": DummyChange,
     }
 
 
 class DummySource:
-
     def getProject(self, project_name):
         return project_name
 
+    def getChangeByKey(self, key):
+        return DummyChange('project')
+
+
+class DummyConnections:
+    def getSource(self, name):
+        return DummySource()
+
+
+class DummyScheduler:
+    def __init__(self):
+        self.connections = DummyConnections()
+
 
 class DummyConnection:
-
     def __init__(self):
         self.connection_name = "DummyConnection"
         self.source = DummySource()
+        self.sched = DummyScheduler()
 
 
 class TestChangeCache(ZooKeeperBaseTestCase):
