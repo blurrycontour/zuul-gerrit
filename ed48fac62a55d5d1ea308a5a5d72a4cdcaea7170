@@ -221,6 +221,29 @@
       "message": "Yep.",
       "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c5ce014_07f42f17",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-12-07T14:32:02Z",
+      "side": 1,
+      "message": "In the build artifact, this doesn\u0027t render as a link. Was that lost in the overhaul?",
+      "range": {
+        "startLine": 340,
+        "startChar": 6,
+        "endLine": 340,
+        "endChar": 36
+      },
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
