@@ -5,7 +5,6 @@ How-To Guides
    :maxdepth: 1
 
    zuul-from-scratch
-   cross-project-gating
    pti
    badges
    matrix
