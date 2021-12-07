@@ -149,6 +149,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4629557_95cd5e1f",
+        "filename": "doc/source/admin.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-07T14:42:28Z",
+      "side": 1,
+      "message": "Probably so.",
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96d29817_30d8cb98",
@@ -242,6 +259,23 @@
         "endLine": 340,
         "endChar": 36
       },
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fb9ddc5_c581bae3",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-07T14:42:28Z",
+      "side": 1,
+      "message": "Yeah, there are something like 20 broken references that will need to be fixed if we want to go with this approach.  I moved that to Server Administration / Authenticated Actions to pull it all together.\n\nhttps://storage.gra.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_f88/820585/2/check/zuul-tox-docs/f883583/docs/authentication.html",
       "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
