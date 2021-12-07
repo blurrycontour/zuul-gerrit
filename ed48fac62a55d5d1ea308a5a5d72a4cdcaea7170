@@ -128,6 +128,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1c256ebc_97f3ecb8",
+        "filename": "doc/source/admin.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-12-07T11:39:42Z",
+      "side": 1,
+      "message": "Should this be `Service Administration` or `System Administration` instead of referring to a zuul \u0027Server\u0027?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 21
+      },
+      "revId": "ed48fac62a55d5d1ea308a5a5d72a4cdcaea7170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "96d29817_30d8cb98",
         "filename": "doc/source/configuration.rst",
         "patchSetId": 2
