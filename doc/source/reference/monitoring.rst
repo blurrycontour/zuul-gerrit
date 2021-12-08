@@ -554,10 +554,6 @@ prometheus's target.
 Configuration
 ~~~~~~~~~~~~~
 
-Prometheus support uses the ``prometheus_client`` python module.
-Note that support is optional and Zuul will start without
-the prometheus python module present.
-
 To enable the service, set the ``prometheus_port`` in a service section of
 ``zuul.conf``. For example setting :attr:`scheduler.prometheus_port` to 9091
 starts a HTTP server to expose metrics to a prometheus services at:
@@ -583,3 +579,27 @@ These metrics are exposed by default:
 
 .. stat:: process_cpu_seconds_total
    :type: counter
+
+.. _prometheus_liveness:
+
+Liveness Probes
+~~~~~~~~~~~~~~~
+
+The Prometheus server also supports liveness and ready probes at the
+following URIS:
+
+.. path:: /health/live
+
+   Returns 200 as long as the process is running.
+
+.. path:: /health/ready
+
+   Returns 200 if the process is in `RUNNING` or `PAUSED` states.
+   Otherwise, returns 503.  Note that 503 is returned for
+   `INITIALIZED`, so this may be used to determine when a component
+   has completely finished loading configuration.
+
+.. path:: /health/status
+
+   This always returns 200, but includes the component status as the
+   text body of the response.

@@ -39,6 +39,7 @@ from zuul.lib import commandsocket, encryption, streamer_utils
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.jsonutil import ZuulJSONEncoder
 from zuul.lib.keystorage import KeyStorage
+from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.model import (
     Abide,
@@ -1618,6 +1619,10 @@ class ZuulWeb(object):
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
 
+        self.monitoring_server = MonitoringServer(self.config, 'web',
+                                                  self.component_info)
+        self.monitoring_server.start()
+
         self.component_registry = ComponentRegistry(self.zk_client)
 
         self.system_config_cache_wake_event = threading.Event()
@@ -1870,10 +1875,11 @@ class ZuulWeb(object):
         self.stop_repl()
         self._command_running = False
         self.command_socket.stop()
-        self.command_thread.join()
+        self.monitoring_server.stop()
 
     def join(self):
         self.command_thread.join()
+        self.monitoring_server.join()
 
     def runCommand(self):
         while self._command_running:

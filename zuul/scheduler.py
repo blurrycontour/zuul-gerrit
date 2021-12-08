@@ -36,6 +36,7 @@ from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.queue import NamedQueue
 from zuul.lib.times import Times
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
@@ -197,6 +198,10 @@ class Scheduler(threading.Thread):
                                                      self.wake_event.set)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
+        self.monitoring_server = MonitoringServer(self.config, 'scheduler',
+                                                  self.component_info)
+        self.monitoring_server.start()
+
         # TODO (swestphahl): Remove after we've refactored reconfigurations
         # to be performed on the tenant level.
         self.reconfigure_event_queue = NamedQueue("ReconfigureEventQueue")
@@ -319,6 +324,9 @@ class Scheduler(threading.Thread):
         self.command_thread.join()
         self.log.debug("Stopping timedb thread")
         self.times.join()
+        self.log.debug("Stopping monitoring server")
+        self.monitoring_server.stop()
+        self.monitoring_server.join()
         self.zk_client.disconnect()
 
     def runCommand(self):

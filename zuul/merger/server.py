@@ -32,6 +32,7 @@ from zuul.merger.merger import nullcontext
 from zuul.model import (
     FilesChangesCompletedEvent, MergeCompletedEvent, MergeRequest
 )
+from zuul.lib.monitoring import MonitoringServer
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import MergerComponent
@@ -470,6 +471,10 @@ class MergeServer(BaseMergeServer):
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
 
+        self.monitoring_server = MonitoringServer(self.config, 'merger',
+                                                  self.component_info)
+        self.monitoring_server.start()
+
         self.command_map = dict(
             stop=self.stop,
             pause=self.pause,
@@ -499,10 +504,12 @@ class MergeServer(BaseMergeServer):
         super().stop()
         self._command_running = False
         self.command_socket.stop()
+        self.monitoring_server.stop()
         self.log.debug("Stopped")
 
     def join(self):
         super().join()
+        self.monitoring_server.join()
 
     def pause(self):
         self.log.debug('Pausing')

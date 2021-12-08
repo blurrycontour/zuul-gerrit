@@ -41,6 +41,7 @@ from zuul.lib.result_data import get_warnings_from_result_data
 from zuul.lib import yamlutil as yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.statsd import get_statsd
 from zuul.lib import filecomments
 from zuul.lib.keystorage import KeyStorage
@@ -3162,6 +3163,9 @@ class ExecutorServer(BaseMergeServer):
         self.component_info = ExecutorComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
+        self.monitoring_server = MonitoringServer(self.config, 'executor',
+                                                  self.component_info)
+        self.monitoring_server.start()
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -3450,6 +3454,7 @@ class ExecutorServer(BaseMergeServer):
         # that all ZK related components can be stopped first.
         super().stop()
         self.stop_repl()
+        self.monitoring_server.stop()
         self.log.debug("Stopped")
 
     def join(self):
@@ -3461,6 +3466,7 @@ class ExecutorServer(BaseMergeServer):
         self.build_loop_wake_event.set()
         self.build_worker.join()
         self.command_thread.join()
+        self.monitoring_server.join()
 
     def pause(self):
         self.log.debug('Pausing')
