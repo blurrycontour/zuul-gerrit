@@ -24,6 +24,7 @@ from zuul.exceptions import StreamingError
 from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
+from zuul.lib.monitoring import MonitoringServer
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ComponentRegistry, FingerGatewayComponent
@@ -187,6 +188,10 @@ class FingerGateway(object):
             self.component_info.use_ssl = True
         self.component_info.register()
 
+        self.monitoring_server = MonitoringServer(config, 'fingergw',
+                                                  self.component_info)
+        self.monitoring_server.start()
+
         self.component_registry = ComponentRegistry(self.zk_client)
 
         self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
@@ -271,6 +276,7 @@ class FingerGateway(object):
                 self.log.exception("Error stopping command socket:")
 
         self.zk_client.disconnect()
+        self.monitoring_server.stop()
 
         self.log.info("Finger gateway is stopped")
 
@@ -282,3 +288,4 @@ class FingerGateway(object):
 
         if self.command_thread:
             self.command_thread.join()
+        self.monitoring_server.join()

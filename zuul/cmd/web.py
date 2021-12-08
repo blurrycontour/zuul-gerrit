@@ -85,7 +85,6 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             sys.exit(0)
 
         self.setup_logging('web', 'log_config')
-        self.setup_prometheus('web')
         self.log = logging.getLogger("zuul.WebServer")
 
         try:
