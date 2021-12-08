@@ -54,6 +54,8 @@ class ElasticsearchReporter(BaseReporter):
         }
 
         for job in item.getJobs():
+            if job.name == "noop":
+                continue
             build = item.current_build_set.getBuild(job.name)
             if not build:
                 continue
