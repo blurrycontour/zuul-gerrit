@@ -353,6 +353,33 @@ class TestMergerRepo(ZuulTestCase):
 
         self.assertEqual(['README'], changed_files)
 
+    def test_files_changes_add_and_remove_files(self):
+        """
+        If the changed files in previous commits are reverted in later commits,
+        they should not be considered as changed in the PR.
+        """
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        self.create_branch('org/project1', 'feature1')
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # Add a file in first commit
+        files = {'to-be-deleted.txt': 'test'}
+        self.create_commit('org/project1', files=files, head='feature1',
+                           message='Add file')
+        changed_files = work_repo.getFilesChanges('feature1', 'master')
+        self.assertEqual(sorted(['README', 'to-be-deleted.txt']),
+                         sorted(changed_files))
+
+        # Delete the file in second commit
+        delete_files = ['to-be-deleted.txt']
+        self.create_commit('org/project1', files={},
+                           delete_files=delete_files, head='feature1',
+                           message='Delete file')
+        changed_files = work_repo.getFilesChanges('feature1', 'master')
+        self.assertEqual(['README'], changed_files)
+
     def test_files_changes_master_fork_merges(self):
         """Regression test for getFilesChanges()
 
