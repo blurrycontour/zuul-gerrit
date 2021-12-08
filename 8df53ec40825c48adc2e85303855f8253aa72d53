@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "30911c87_f347b530",
         "filename": "web/src/containers/build/Build.jsx",
@@ -20,10 +21,10 @@
         "endChar": 28
       },
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
       "key": {
         "uuid": "cd610c42_5b40a4c5",
         "filename": "web/src/containers/build/Build.jsx",
@@ -38,10 +39,34 @@
       "message": "i think Is an old attribue, i remove it",
       "parentUuid": "",
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": false
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d708464a_4035166f",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 31
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-12-08T14:34:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30911c87_f347b530",
+      "range": {
+        "startLine": 236,
+        "startChar": 0,
+        "endLine": 236,
+        "endChar": 28
+      },
+      "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "bcca9dbc_0e3e5212",
         "filename": "web/src/containers/config/Config.jsx",
@@ -61,10 +86,10 @@
         "endChar": 20
       },
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
       "key": {
         "uuid": "727ad22d_f9c63c7a",
         "filename": "web/src/containers/config/Config.jsx",
@@ -79,10 +104,10 @@
       "message": "this state is updated by config redux",
       "parentUuid": "bcca9dbc_0e3e5212",
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": false
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "814c9fe4_bb09637a",
         "filename": "web/src/containers/config/Timezone.jsx",
@@ -96,10 +121,10 @@
       "side": 1,
       "message": "Ah, nevermind my previous comment, this seems to be set here",
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
       "key": {
         "uuid": "a98177d9_94076143",
         "filename": "web/src/containers/config/Timezone.jsx",
@@ -114,10 +139,10 @@
       "message": "this part is just an order to add \"UTC\" on top of list with spécial Key -1",
       "parentUuid": "814c9fe4_bb09637a",
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": false
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "05e62e56_a5040695",
         "filename": "web/src/reducers/preferences.js",
@@ -131,8 +156,7 @@
       "side": 1,
       "message": "the default value \"UTC\" us here",
       "revId": "8df53ec40825c48adc2e85303855f8253aa72d53",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
