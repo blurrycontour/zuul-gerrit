@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5195d3c8_3e0d218d",
+        "filename": "doc/source/conf.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-09T18:57:26Z",
+      "side": 1,
+      "message": "3.2.0 also appears to be missing. Maybe do \u003c 3.3.0 for simplicity?",
+      "revId": "8ae4cf5568ba27fa716cad312b5a62487aadd04f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
