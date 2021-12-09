@@ -16,6 +16,23 @@
       "message": "I guess this was removed because prometheus client is a hard requirement now.",
       "revId": "9dba1af7a93cfdcd20590f360f2c1de634a831d1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8043b4e2_788a306a",
+        "filename": "doc/source/reference/monitoring.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 559,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-09T01:12:48Z",
+      "side": 0,
+      "message": "Yeah, and it\u0027s been in requirements.txt for some time; I think we can legitimately expect it to be present.",
+      "revId": "9dba1af7a93cfdcd20590f360f2c1de634a831d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
