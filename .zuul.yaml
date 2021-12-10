@@ -201,6 +201,15 @@
         - admin.yaml
         - tracing.yaml
 - job:
+    name: zuul-tutorial-quick-start
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    vars:
+      run_playbooks:
+        - admin.yaml
+        - tracing.yaml
+
+- job:
     name: zuul-tutorial-gate-your-first-patch
     parent: zuul-tutorial
     description: Run the commands in the Zuul tutorial gate your first patch documentation.
@@ -379,6 +388,9 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-build-image
@@ -420,6 +432,9 @@
         - zuul-stream-functional-6
         - zuul-nox-remote
         - zuul-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+        - zuul-tutorial-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
         - zuul-tutorial-gate-your-first-patch:
