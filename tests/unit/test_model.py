@@ -18,6 +18,7 @@ import os
 import random
 import types
 from unittest import mock
+import voluptuous
 
 import fixtures
 import testtools
@@ -120,6 +121,125 @@ class TestJob(BaseTestCase):
 
     def test_job_sets_defaults_for_boolean_attributes(self):
         self.assertIsNotNone(self.job.voting)
+
+    @property
+    def job_with_empty_fileset(self):
+        return self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'job',
+            'parent': None,
+            'fileset': {
+            }
+        })
+
+    def test_change_empty_fileset_not_allowed(self):
+        change = model.Change('project')
+        with self.assertRaisesRegex(
+                voluptuous.error.MultipleInvalid,
+                "Must specify either 'includes' or 'excludes' or both .*"):
+            self.job_with_empty_fileset.changeMatchesFiles(change)
+
+    @property
+    def job_with_includes(self):
+        return self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'job',
+            'parent': None,
+            'fileset': {
+                'includes': [
+                    'A/.*'
+                ]
+            }
+        })
+
+    def test_change_matches_returns_true_for_included_file(self):
+        change = model.Change('project')
+        change.files = ['A/foo']
+        self.assertTrue(self.job_with_includes.changeMatchesFiles(change))
+
+    def test_change_matches_returns_false_for_fileset_not_included_file(self):
+        change = model.Change('project')
+        change.files = ['foo']
+        self.assertFalse(self.job_with_includes.changeMatchesFiles(change))
+
+    @property
+    def job_with_excludes(self):
+        return self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'job',
+            'parent': None,
+            'fileset': {
+                'excludes': [
+                    'docs/.*$'
+                ]
+            }
+        })
+
+    def test_change_matches_returns_false_for_matched_excludes(self):
+        change = model.Change('project')
+        change.files = ['/COMMIT_MSG', 'docs/foo']
+        self.assertFalse(self.job_with_excludes.changeMatchesFiles(change))
+
+    def test_change_matches_returns_false_for_single_matched_exclude(self):
+        change = model.Change('project')
+        change.files = ['docs/foo']
+        self.assertFalse(self.job_with_excludes.changeMatchesFiles(change))
+
+    def test_change_matches_returns_true_for_unmatched_excludes(self):
+        change = model.Change('project')
+        change.files = ['/COMMIT_MSG', 'foo']
+        self.assertTrue(self.job_with_excludes.changeMatchesFiles(change))
+
+    def test_change_matches_returns_true_for_single_unmatched_exclude(self):
+        change = model.Change('project')
+        change.files = ['foo']
+        self.assertTrue(self.job_with_excludes.changeMatchesFiles(change))
+
+    @property
+    def job_with_includes_and_excludes(self):
+        return self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'job',
+            'parent': None,
+            'fileset': {
+                'includes': 'A/foo.*',
+                'excludes': 'A/docs/.*$'
+            }
+        })
+
+    def test_change_matches_returns_true_for_included_not_excluded_file(self):
+        change = model.Change('project')
+        change.files = ['A/foo']
+        self.assertTrue(self.job_with_includes_and_excludes
+                            .changeMatchesFiles(change))
+
+    def test_change_matches_returns_false_for_included_and_excluded_file(self):
+        change = model.Change('project')
+        change.files = ['A/docs/doc.rst']
+        self.assertFalse(self.job_with_includes_and_excludes
+                             .changeMatchesFiles(change))
+
+    @property
+    def job_with_negative_lookahead(self):
+        return self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'job',
+            'parent': None,
+            'fileset': {
+                'includes': 'A/(?!bar)foo.*'
+            }
+        })
+
+    def test_change_matches_returns_false_for_negative_lookahead_include(self):
+        change = model.Change('project')
+        change.files = ['A/bar']
+        self.assertFalse(self.job_with_negative_lookahead
+                             .changeMatchesFiles(change))
 
     def test_job_variants(self):
         # This simulates freezing a job.

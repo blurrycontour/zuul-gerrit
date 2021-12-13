@@ -26,7 +26,7 @@ cachetools
 pyjwt>=2.0.0,<3.0
 iso8601
 psutil
-fb-re2>=1.0.6
+pyre2
 paho-mqtt
 cherrypy
 ws4py

@@ -164,3 +164,29 @@ class TestMatchAny(BaseTestMatcher):
     def test_matches_returns_false(self):
         matcher = cm.MatchAny([cm.ProjectMatcher('not_project')])
         self.assertFalse(matcher.matches(self.change))
+
+
+class TestFilesetMatcher(BaseTestFilesMatcher):
+
+    def setUp(self):
+        super(TestFilesetMatcher, self).setUp()
+        self.matcher = cm.FilesetMatcher({"includes": '^docs/.*$'})
+
+    def test_matches_returns_true_when_files_attr_missing(self):
+        delattr(self.change, 'files')
+        self._test_matches(True)
+
+    def test_matches_returns_true_when_no_files(self):
+        self._test_matches(True)
+
+    def test_matches_returns_true_when_only_commit_message(self):
+        self._test_matches(True, files=['/COMMIT_MSG'])
+
+    def test_matches_returns_true_when_some_files_match(self):
+        self._test_matches(True, files=['/COMMIT_MSG', 'docs/foo', 'foo/bar'])
+
+    def test_matches_returns_true_when_single_file_matches(self):
+        self._test_matches(True, files=['docs/foo'])
+
+    def test_matches_returns_false_when_no_matching_files(self):
+        self._test_matches(False, files=['/COMMIT_MSG', 'foo/bar'])

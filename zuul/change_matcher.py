@@ -19,6 +19,8 @@ configuration.
 
 import re
 
+from zuul.include_exclude_filter import IncludeExcludeFilter
+
 
 class AbstractChangeMatcher(object):
 
@@ -186,3 +188,33 @@ class MatchAny(AbstractMatcherCollection):
             if matcher.matches(change):
                 return True
         return False
+
+
+def to_list(string_or_list):
+    if isinstance(string_or_list, str):
+        return [string_or_list]
+    return string_or_list
+
+
+class FilesetMatcher(AbstractChangeMatcher):
+
+    commit_message_regex = '^/COMMIT_MSG$'
+    commit_message_matcher = re.compile(commit_message_regex)
+
+    def __init__(self, fileset):
+        self.include_exclude_filter = IncludeExcludeFilter(
+            includes=to_list(fileset.get("includes", ['.*'])),
+            excludes=to_list(fileset.get("excludes", [])) +
+            [self.commit_message_regex]
+        )
+
+    def matches(self, change):
+        if not (hasattr(change, 'files') and change.files):
+            return True
+        if len(change.files) == 1 and self.commit_message_matcher.match(
+            change.files[0]):
+            return True
+        return any(
+            self.include_exclude_filter.is_included(file_)
+            for file_ in change.files
+        )

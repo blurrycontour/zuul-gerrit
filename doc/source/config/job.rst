@@ -928,14 +928,42 @@ Here is an example of two job definitions:
       value is used to determine if the job should run. This is a
       :ref:`regular expression <regex>` or list of regular expressions.
 
+      This attribute is deprecated in favor of :attr:`job.fileset`.
+      TBD: Add a reference to conversion scripts.
+
    .. attr:: irrelevant-files
 
       This is a negative complement of **files**.  It indicates that
       the job should run unless *all* of the files changed match this
       list.  In other words, if the regular expression ``docs/.*`` is
       supplied, then this job will not run if the only files changed
-      are in the docs directory.  A :ref:`regular expression <regex>`
+      are in the docs directory. A :ref:`regular expression <regex>`
       or list of regular expressions.
+
+      This attribute is deprecated in favor of :attr:`job.fileset`.
+      TBD: Add a reference to conversion scripts.
+
+   .. attr:: fileset
+
+      This indicates that the job should only run on changes where the
+      specified set of files are modified. The set of relevant files for
+      the job is the set of :attr:`job.fileset.includes` minus the set of
+      :attr:`job.fileset.excludes`. The job is run if any modified file
+      is included and not excluded. Unlike **branches**, this value is
+      subject to inheritance and overriding, so only the final value is
+      used to determine if the job should run.
+
+      .. attr:: includes
+
+         Matches files to be included in the job's set of relevant files.
+         A :ref:`regular expression <regex>` or list of regular expressions.
+         If not given, then all files are included.
+
+      .. attr:: excludes
+
+         Matches files to be excluded from the job's set of relevant files.
+         A :ref:`regular expression <regex>` or list of regular expressions.
+         If not given, then no files are excluded.
 
    .. attr:: match-on-config-updates
       :default: true
