@@ -1,0 +1,14 @@
+---
+features:
+  - |
+    A new job option :attr:`job.fileset` is introduced to specify relevant
+    files for a job.
+upgrade:
+  - |
+    In order to convert existing job configurations to the new fileset option
+    there are conversion scripts provided in TBD: Add reference to conversion
+    scripts.
+deprecations:
+  - |
+    The original :attr:`job.files` and :attr:`job.irrelevant-files` options are
+    deprecated.
