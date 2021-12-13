@@ -551,6 +551,9 @@ class SecretParser(object):
 class JobParser(object):
     ANSIBLE_ROLE_RE = re.compile(r'^(ansible[-_.+]*)*(role[-_.+]*)*')
 
+    fileset = {vs.Required('includes'): to_list(str),
+               'excludes': to_list(str)}
+
     zuul_role = {vs.Required('zuul'): str,
                  'name': str}
 
@@ -596,6 +599,7 @@ class JobParser(object):
                       'files': to_list(str),
                       'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
+                      'fileset': fileset,
                       # validation happens in NodeSetParser
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
@@ -920,6 +924,8 @@ class JobParser(object):
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
             job.setIrrelevantFileMatcher(as_list(conf['irrelevant-files']))
+        if 'fileset' in conf:
+            job.setFilesetMatcher(conf['fileset'])
         job.freeze()
         return job
 
