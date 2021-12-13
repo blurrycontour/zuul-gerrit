@@ -20,6 +20,10 @@
     name: project-test-irrelevant-files
     run: playbooks/project-test-irrelevant-files.yaml
 
+- job:
+    name: project-test-files-and-irrelevant-files
+    run: playbooks/project-test-irrelevant-files.yaml
+
 - project:
     name: org/project
     check:
@@ -28,3 +32,8 @@
             irrelevant-files:
               - ^README$
               - ^ignoreme$
+        - project-test-files-and-irrelevant-files:
+            files:
+              - ^A/.*
+            irrelevant-files:
+              - .*/excludeme
