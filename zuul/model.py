@@ -2332,6 +2332,7 @@ class Job(ConfigObject):
         d['name'] = self.name
         d['branches'] = self._branches
         d['override_checkout'] = self.override_checkout
+        d['fileset'] = self._fileset
         d['files'] = self._files
         d['irrelevant_files'] = self._irrelevant_files
         d['variant_description'] = self.variant_description
@@ -2399,6 +2400,8 @@ class Job(ConfigObject):
             success_message=None,
             branch_matcher=None,
             _branches=(),
+            fileset_matcher=None,
+            _fileset=None,
             file_matcher=None,
             _files=(),
             irrelevant_file_matcher=None,  # skip-if
@@ -2729,6 +2732,11 @@ class Job(ConfigObject):
             matchers.append(change_matcher.FileMatcher(fn))
         self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
 
+    def setFilesetMatcher(self, fileset):
+        # Set the fileset matcher to match any of the change files
+        self._fileset = fileset
+        self.fileset_matcher = change_matcher.FilesetMatcher(fileset)
+
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
                         other_group_vars):
         if other_vars is not None:
@@ -2959,6 +2967,9 @@ class Job(ConfigObject):
         return True
 
     def changeMatchesFiles(self, change):
+        if self.fileset_matcher:
+            return self.fileset_matcher.matches(change)
+
         if self.file_matcher and not self.file_matcher.matches(change):
             return False
 
