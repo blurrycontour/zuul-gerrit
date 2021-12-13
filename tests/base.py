@@ -4023,7 +4023,9 @@ class MySQLSchemaFixture(fixtures.Fixture):
         self.name = '%s_%s' % (random_bits, os.getpid())
         self.passwd = uuid.uuid4().hex
         self.host = os.environ.get('ZUUL_MYSQL_HOST', '127.0.0.1')
+        self.port = int(os.environ.get('ZUUL_MYSQL_PORT', 3306))
         db = pymysql.connect(host=self.host,
+                             port=self.port,
                              user="openstack_citest",
                              passwd="openstack_citest",
                              db="openstack_citest")
@@ -4039,13 +4041,14 @@ class MySQLSchemaFixture(fixtures.Fixture):
         finally:
             db.close()
 
-        self.dburi = 'mysql+pymysql://{name}:{passwd}@{host}/{name}'.format(
-            name=self.name, passwd=self.passwd, host=self.host)
+        self.dburi = 'mysql+pymysql://{name}:{passwd}@{host}:{port}/{name}'.format(
+            name=self.name, passwd=self.passwd, host=self.host, port=self.port)
         self.addDetail('dburi', testtools.content.text_content(self.dburi))
         self.addCleanup(self.cleanup)
 
     def cleanup(self):
         db = pymysql.connect(host=self.host,
+                             port=self.port,
                              user="openstack_citest",
                              passwd="openstack_citest",
                              db="openstack_citest")
