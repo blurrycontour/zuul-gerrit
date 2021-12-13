@@ -561,6 +561,18 @@ class SecretParser(object):
 class JobParser(object):
     ANSIBLE_ROLE_RE = re.compile(r'^(ansible[-_.+]*)*(role[-_.+]*)*')
 
+    fileset_key_schema = vs.Schema({
+        vs.Required(
+            vs.Any("includes", "excludes"),
+            msg="Must specify either 'includes' or 'excludes' or both"
+        ): object
+    })
+    fileset_data_schema = vs.Schema({
+        vs.Optional('includes'): to_list(str),
+        vs.Optional('excludes'): to_list(str)
+    })
+    fileset = vs.All(fileset_key_schema, fileset_data_schema)
+
     zuul_role = {vs.Required('zuul'): str,
                  'name': str}
 
@@ -603,9 +615,12 @@ class JobParser(object):
                       'semaphores': to_list(vs.Any(semaphore, str)),
                       'tags': to_list(str),
                       'branches': to_list(str),
+                      # TODO(d-j-j) Remove files after deprecation
                       'files': to_list(str),
                       'secrets': to_list(vs.Any(secret, str)),
+                      # TODO(d-j-j) Remove irrelevant-files after deprecation
                       'irrelevant-files': to_list(str),
+                      'fileset': fileset,
                       # validation happens in NodeSetParser
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
@@ -925,10 +940,14 @@ class JobParser(object):
             branches = self.pcontext.getImpliedBranches(job.source_context)
         if branches:
             job.setBranchMatcher(branches)
+        # TODO(d-j-j) Remove files after deprecation
         if 'files' in conf:
             job.setFileMatcher(as_list(conf['files']))
+        # TODO(d-j-j) Remove irrelevant-files after deprecation
         if 'irrelevant-files' in conf:
             job.setIrrelevantFileMatcher(as_list(conf['irrelevant-files']))
+        if 'fileset' in conf:
+            job.setFilesetMatcher(conf['fileset'])
         job.freeze()
         return job
 
