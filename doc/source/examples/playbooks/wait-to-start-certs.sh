@@ -4,11 +4,12 @@
 # starts.
 
 wait_for_certs() {
+    # Introduced for 3.7.0: zookeeper shall wait for certificates to be available
+    # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
+    local LAST_CERT_FILE="${1:-/var/certs/keystores/examples_zk_1.examples_default.pem}"
     echo `date -Iseconds` "Wait for certs to be present"
     for i in $(seq 1 120); do
-        # Introduced for 3.7.0: zookeeper shall wait for certificates to be available
-        # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
-        [ -f /var/certs/keystores/examples_zk_1.examples_default.pem ] && return
+        [ -f "${LAST_CERT_FILE}" ] && return
         sleep 1
     done;
 
@@ -16,4 +17,4 @@ wait_for_certs() {
     exit 1
 }
 
-wait_for_certs
+wait_for_certs "$1"
