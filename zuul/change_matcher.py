@@ -19,6 +19,8 @@ configuration.
 
 import re
 
+from zuul.include_exclude_filter import IncludeExcludeFilter
+
 
 class AbstractChangeMatcher(object):
 
@@ -171,3 +173,18 @@ class MatchAny(AbstractMatcherCollection):
             if matcher.matches(change):
                 return True
         return False
+
+
+class FilesetMatcher(AbstractChangeMatcher):
+
+    def __init__(self, fileset):
+        self.include_exclude_filter = IncludeExcludeFilter(
+            includes=fileset.get("includes", ['.*']),
+            excludes=fileset.get("excludes", None)
+        )
+
+    def matches(self, change):
+        return any(
+            self.include_exclude_filter.is_included(file_)
+            for file_ in change.files
+        )

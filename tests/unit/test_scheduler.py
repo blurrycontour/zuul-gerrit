@@ -3300,13 +3300,8 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
-    def _test_irrelevant_files_jobs(self, should_skip):
+    def _test_irrelevant_files_jobs(self, files, project_name, should_skip):
         "Test that jobs with irrelevant-files filter run only when appropriate"
-        if should_skip:
-            files = {'ignoreme': 'ignored\n'}
-        else:
-            files = {'respectme': 'please!\n'}
-
         change = self.fake_gerrit.addFakeChange('org/project',
                                                 'master',
                                                 'test irrelevant-files',
@@ -3315,7 +3310,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         tested_change_ids = [x.changes[0] for x in self.history
-                             if x.name == 'project-test-irrelevant-files']
+                             if x.name == project_name]
 
         if should_skip:
             self.assertEqual([], tested_change_ids)
@@ -3324,11 +3319,63 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/irrelevant-files.yaml')
     def test_irrelevant_files_match_skips_job(self):
-        self._test_irrelevant_files_jobs(should_skip=True)
+        self._test_irrelevant_files_jobs(
+            {'ignoreme': 'ignored\n'},
+            'project-test-irrelevant-files',
+            should_skip=True
+        )
 
     @simple_layout('layouts/irrelevant-files.yaml')
     def test_irrelevant_files_no_match_runs_job(self):
-        self._test_irrelevant_files_jobs(should_skip=False)
+        self._test_irrelevant_files_jobs(
+            {'respectme': 'please!\n'},
+            'project-test-irrelevant-files',
+            should_skip=False
+        )
+
+    @simple_layout('layouts/fileset.yaml')
+    def test_fileset_included_runs_job(self):
+        self._test_irrelevant_files_jobs({
+            'A/includeme': 'please!\n'
+        }, 'project-test-fileset', should_skip=False)
+
+    @simple_layout('layouts/fileset.yaml')
+    def test_fileset_one_included_one_excluded_runs_job(self):
+        self._test_irrelevant_files_jobs({
+            'A/includeme': 'please!\n',
+            'A/excludeme': 'excluded\n'
+        }, 'project-test-fileset', should_skip=False)
+
+    @simple_layout('layouts/fileset.yaml')
+    def test_fileset_all_excluded_skips_job(self):
+        self._test_irrelevant_files_jobs({
+            'A/excludeme': 'excluded\n'
+        }, 'project-test-fileset', should_skip=True)
+
+    @simple_layout('layouts/fileset.yaml')
+    def test_fileset_all_excluded_skips_job2(self):
+        self._test_irrelevant_files_jobs({
+            'A/excludeme': 'excluded\n'
+        }, 'project-test-fileset2', should_skip=True)
+
+    @simple_layout('layouts/irrelevant-files.yaml')
+    def test_irrelevant_files_one_not_included_one_excluded_runs_job(self):
+        """Neither file is really relevant for the job but the job is NOT
+           skipped."""
+        self._test_irrelevant_files_jobs({
+            'B/includeme': 'not!\n',
+            'A/excludeme': 'excluded\n'
+        }, 'project-test-files-and-irrelevant-files', should_skip=False)
+
+    @simple_layout('layouts/fileset.yaml')
+    def test_fileset_one_not_included_one_excluded_skips_job(self):
+        """Same changed files as in
+           test_irrelevant_files_one_not_included_one_excluded_runs_job
+           but job is skipped."""
+        self._test_irrelevant_files_jobs({
+            'B/includeme': 'not!\n',
+            'A/excludeme': 'excluded\n'
+        }, 'project-test-fileset', should_skip=True)
 
     @simple_layout('layouts/inheritance.yaml')
     def test_inherited_jobs_keep_matchers(self):

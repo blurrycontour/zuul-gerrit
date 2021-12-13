@@ -1,0 +1,43 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-test-fileset-includes-only
+    run: playbooks/project-test-fileset.yaml
+
+- job:
+    name: project-test-fileset
+    run: playbooks/project-test-fileset.yaml
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - project-test-fileset-includes-only:
+            fileset:
+              includes:
+                - ^A/.*
+        - project-test-fileset:
+            fileset:
+              includes:
+                - ^A/.*
+              excludes:
+                - .*/excludeme
+        - project-test-fileset2:
+            fileset:
+              foo: "bar"
