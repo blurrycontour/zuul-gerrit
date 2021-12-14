@@ -560,8 +560,11 @@ class ManagementEventQueue(ZooKeeperEventQueue):
             if event.zuul_event_ltime is None:
                 event.zuul_event_ltime = zstat.creation_transaction_id
 
-            with suppress(ValueError):
+            try:
                 other_event = event_list[event_list.index(event)]
+            except ValueError:
+                other_event = None
+            if other_event:
                 if isinstance(other_event, model.TenantReconfigureEvent):
                     other_event.merge(event)
                     continue

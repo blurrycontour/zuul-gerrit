@@ -3631,35 +3631,28 @@ class TestScheduler(ZuulTestCase):
 
     def test_reconfigure_merge(self):
         """Test that two reconfigure events are merged"""
+        # Wrap the recofiguration handler so we can count how many
+        # times it runs.
+        with mock.patch.object(
+                zuul.scheduler.Scheduler, '_doTenantReconfigureEvent',
+                wraps=self.scheds.first.sched._doTenantReconfigureEvent
+        ) as mymock:
+            with self.scheds.first.sched.run_handler_lock:
+                self.create_branch('org/project', 'stable/diablo')
+                self.fake_gerrit.addEvent(
+                    self.fake_gerrit.getFakeBranchCreatedEvent(
+                        'org/project', 'stable/diablo'))
+                self.create_branch('org/project', 'stable/essex')
+                self.fake_gerrit.addEvent(
+                    self.fake_gerrit.getFakeBranchCreatedEvent(
+                        'org/project', 'stable/essex'))
+                for _ in iterate_timeout(60, 'jobs started'):
+                    if len(self.scheds.first.sched.trigger_events[
+                            'tenant-one']) == 2:
+                        break
 
-        tenant = self.scheds.first.sched.abide.tenants['tenant-one']
-        (trusted, project) = tenant.getProject('org/project')
-
-        management_queue = self.scheds.first.sched.management_events[
-            'tenant-one']
-
-        with self.scheds.first.sched.run_handler_lock:
-            mgmt_queue_size = len(management_queue)
-            self.assertEqual(mgmt_queue_size, 0)
-
-            self.scheds.first.sched.reconfigureTenant(tenant, project, None)
-            mgmt_queue_size = len(management_queue)
-            self.assertEqual(mgmt_queue_size, 1)
-
-            self.scheds.first.sched.reconfigureTenant(tenant, project, None)
-            mgmt_queue_size = len(management_queue)
-            self.assertEqual(mgmt_queue_size, 2)
-
-            # The second event should be combined with the first so we should
-            # only see the merged entry when consuming from the queue.
-            mgmt_events = list(management_queue)
-            self.assertEqual(len(mgmt_events), 1)
-            self.assertEqual(len(mgmt_events[0].merged_events), 1)
-
-        self.waitUntilSettled()
-
-        mgmt_queue_size = len(management_queue)
-        self.assertEqual(mgmt_queue_size, 0)
+            self.waitUntilSettled()
+            mymock.assert_called_once()
 
     def test_live_reconfiguration(self):
         "Test that live reconfiguration works"
