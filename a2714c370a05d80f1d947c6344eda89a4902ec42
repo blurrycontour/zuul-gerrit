@@ -16,6 +16,24 @@
       "message": "The commit message says that this was too broad. I probably overlooked it but I don\u0027t see any semantic difference here.",
       "revId": "a2714c370a05d80f1d947c6344eda89a4902ec42",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78a6881d_88d27d08",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-14T19:31:29Z",
+      "side": 1,
+      "message": "Its the scope of the catching. other_event.merge() was part of the suppression previously but now is not.",
+      "parentUuid": "40eb0c38_f54f2acc",
+      "revId": "a2714c370a05d80f1d947c6344eda89a4902ec42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
