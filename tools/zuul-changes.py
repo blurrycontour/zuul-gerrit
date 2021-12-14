@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013 OpenStack Foundation
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
 #
@@ -26,7 +26,14 @@ parser.add_argument('url', help='The URL of the running Zuul instance')
 parser.add_argument('tenant', help='The Zuul tenant', nargs='?')
 parser.add_argument('pipeline', help='The name of the Zuul pipeline',
                     nargs='?')
+parser.add_argument('--use-config',
+                    metavar='CONFIG',
+                    help='The name of the zuul-client config to use')
 options = parser.parse_args()
+
+command = 'zuul-client'
+if options.use_config:
+    command += f' --use-config {options.use_config}'
 
 # Check if tenant is white label
 info = json.loads(urlopen('%s/api/info' % options.url).read())
@@ -65,20 +72,22 @@ for tenant in tenants:
                     if change['id'] and ',' in change['id']:
                         # change triggered
                         cid, cps = change['id'].split(',')
-                        print("zuul enqueue"
+                        print("%s enqueue"
                               " --tenant %s"
                               " --pipeline %s"
                               " --project %s"
-                              " --change %s,%s" % (tenant, pipeline['name'],
+                              " --change %s,%s" % (command, tenant,
+                                                   pipeline['name'],
                                                    change['project_canonical'],
                                                    cid, cps))
                     else:
                         # ref triggered
-                        cmd = 'zuul enqueue-ref' \
+                        cmd = '%s enqueue-ref' \
                               ' --tenant %s' \
                               ' --pipeline %s' \
                               ' --project %s' \
-                              ' --ref %s' % (tenant, pipeline['name'],
+                              ' --ref %s' % (command, tenant,
+                                             pipeline['name'],
                                              change['project_canonical'],
                                              change['ref'])
                         if change['id']:
