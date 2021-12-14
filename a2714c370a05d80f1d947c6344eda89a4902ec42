@@ -34,6 +34,23 @@
       "parentUuid": "40eb0c38_f54f2acc",
       "revId": "a2714c370a05d80f1d947c6344eda89a4902ec42",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef4ea50f_507e150d",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-14T19:51:49Z",
+      "side": 1,
+      "message": "Correct.",
+      "revId": "a2714c370a05d80f1d947c6344eda89a4902ec42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
