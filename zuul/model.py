@@ -5548,7 +5548,7 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
-        for connection_name, ltime in other.branch_cache_ltimes:
+        for connection_name, ltime in other.branch_cache_ltimes.items():
             self.branch_cache_ltimes[connection_name] = max(
                 self.branch_cache_ltimes.get(connection_name, ltime), ltime)
         self.zuul_event_ltime = max(self.zuul_event_ltime,
