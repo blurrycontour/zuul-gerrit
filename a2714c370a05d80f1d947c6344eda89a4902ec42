@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40eb0c38_f54f2acc",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-12-14T19:24:22Z",
+      "side": 1,
+      "message": "The commit message says that this was too broad. I probably overlooked it but I don\u0027t see any semantic difference here.",
+      "revId": "a2714c370a05d80f1d947c6344eda89a4902ec42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
