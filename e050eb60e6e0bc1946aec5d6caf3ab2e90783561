@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d576b6d_454352b5",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 6387,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-15T16:57:15Z",
+      "side": 1,
+      "message": "Nit might want to set the subject to str(x) to distinguish them a bit more. But not strictly necessary.",
+      "range": {
+        "startLine": 6387,
+        "startChar": 41,
+        "endLine": 6387,
+        "endChar": 44
+      },
+      "revId": "e050eb60e6e0bc1946aec5d6caf3ab2e90783561",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
