@@ -15,7 +15,7 @@
 
 import zuul.model
 
-from tests.base import iterate_timeout, ZuulTestCase
+from tests.base import iterate_timeout, ZuulTestCase, simple_layout
 
 
 class TestScaleOutScheduler(ZuulTestCase):
@@ -209,3 +209,55 @@ class TestScaleOutScheduler(ZuulTestCase):
         # second object can read now.
         summary2.refresh(context)
         self.assertNotEqual(summary2.status, {})
+
+    @simple_layout('layouts/semaphore.yaml')
+    def test_semaphore(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'test1')
+        self.assertHistory([])
+
+        tenant = self.scheds.first.sched.abide.tenants['tenant-one']
+        semaphore = tenant.semaphore_handler.getSemaphores()[0]
+        holders = tenant.semaphore_handler.semaphoreHolders(semaphore)
+        self.assertEqual(len(holders), 1)
+
+        # Start a second scheduler so that it runs through the initial
+        # cleanup processes.
+        app = self.createScheduler()
+        # Hold the lock on the second scheduler so that if any events
+        # happen, they are processed by the first scheduler (this lets
+        # them be as out of sync as possible).
+        with app.sched.run_handler_lock:
+            app.start()
+            self.assertEqual(len(self.scheds), 2)
+            self.waitUntilSettled(matcher=[self.scheds.first])
+            # Wait until initial cleanup is run
+            app.sched.start_cleanup_thread.join()
+            # We should not have released the semaphore
+            holders = tenant.semaphore_handler.semaphoreHolders(semaphore)
+            self.assertEqual(len(holders), 1)
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'test2')
+        self.assertHistory([
+            dict(name='test1', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        holders = tenant.semaphore_handler.semaphoreHolders(semaphore)
+        self.assertEqual(len(holders), 1)
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 0)
+        self.assertHistory([
+            dict(name='test1', result='SUCCESS', changes='1,1'),
+            dict(name='test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        holders = tenant.semaphore_handler.semaphoreHolders(semaphore)
+        self.assertEqual(len(holders), 0)
