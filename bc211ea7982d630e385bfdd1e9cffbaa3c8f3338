@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d858cf69_cddecb45",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1311,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-12-15T18:07:30Z",
+      "side": 1,
+      "message": "nit: a `def int_or_none(param)` helper function could be useful here.",
+      "revId": "bc211ea7982d630e385bfdd1e9cffbaa3c8f3338",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
