@@ -36,6 +36,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cde22c83_871ad979",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-15T19:03:45Z",
+      "side": 1,
+      "message": "The commit message didn\u0027t mention that.  Using this without the offset does make a difference in query time.  Times remain about the same at page 1, but offset times increase with more pages and min/max times stay constant.\n\nI still have questions about how that will actually work (what happens when you\u0027re on page 2 and you hit back and there are more than 1 page worth of new builds on page 1?).  But we can address those later.",
+      "revId": "bc211ea7982d630e385bfdd1e9cffbaa3c8f3338",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d858cf69_cddecb45",
