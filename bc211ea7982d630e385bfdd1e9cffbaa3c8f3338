@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd5c29b0_cba3f6af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-12-15T18:46:35Z",
+      "side": 1,
+      "message": "At least with mysql, we may be splitting hairs here, and to be honest, I\u0027m not sure it\u0027s worth the complexity.\n\nLooking at the query plan in mysql for both the openstack and zuul tenants, mysql always says it\u0027s going to examine more rows if I add a minimum.  In the best case, it\u0027s about 2x the number of rows.  In some cases, it\u0027s much more.\n\nSince the query is already sorted descending, both the estimated and actual runtimes should be very close for page 1, then theoretically adding the minimum should gain an advantage as we go to more and more pages, as we don\u0027t need to gather as many items past our limit.  However, the database is already smart enough not to gather more items past our limit, so there really isn\u0027t an optimization to be made there.  They both run in a range of 0.00 to 0.02 seconds; effectively immeasurable under these conditions.\n\nAnd indeed, if I run the query with an offset of 20000, it takes 2.5 seconds with the minimum, and 1.86 seconds without -- confirming what the query planner estimates -- it\u0027s more work to add the minimum check.\n\nBut there are a lot of variables; is there a situation where you have confirmed better performance?",
+      "revId": "bc211ea7982d630e385bfdd1e9cffbaa3c8f3338",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d858cf69_cddecb45",
