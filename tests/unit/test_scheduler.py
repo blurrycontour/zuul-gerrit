@@ -6399,6 +6399,48 @@ For CI problems and help debugging, contact ci@example.org"""
         self.waitUntilSettled()
 
     @simple_layout('layouts/two-projects-integrated.yaml')
+    def test_nodepool_relative_priority_long(self):
+        "Test that nodes are requested at the relative priority"
+
+        self.fake_nodepool.pause()
+
+        count = 13
+        changes = []
+        for x in range(count):
+            change = self.fake_gerrit.addFakeChange(
+                'org/project', 'master', 'A')
+            self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled()
+            changes.append(change)
+
+        reqs = self.fake_nodepool.getNodeRequests()
+        self.assertEqual(len(reqs), 13)
+        # The requests come back sorted by priority.
+        for x in range(10):
+            self.assertEqual(reqs[x]['relative_priority'], x)
+        self.assertEqual(reqs[10]['relative_priority'], 10)
+        self.assertEqual(reqs[11]['relative_priority'], 10)
+        self.assertEqual(reqs[12]['relative_priority'], 10)
+
+        # Fulfill only the first request
+        self.fake_nodepool.fulfillRequest(reqs[0])
+        for x in iterate_timeout(30, 'fulfill request'):
+            reqs = list(self.scheds.first.sched.nodepool.getNodeRequests())
+            if len(reqs) < count:
+                break
+        self.waitUntilSettled()
+
+        reqs = self.fake_nodepool.getNodeRequests()
+        self.assertEqual(len(reqs), 12)
+        for x in range(10):
+            self.assertEqual(reqs[x]['relative_priority'], x)
+        self.assertEqual(reqs[10]['relative_priority'], 10)
+        self.assertEqual(reqs[11]['relative_priority'], 10)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+    @simple_layout('layouts/two-projects-integrated.yaml')
     def test_nodepool_relative_priority_gate(self):
         "Test that nodes are requested at the relative priority"
 

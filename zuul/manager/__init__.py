@@ -182,7 +182,18 @@ class PipelineManager(metaclass=ABCMeta):
         items = [i for i in items
                  if i.change.project in queue and
                  i.live]
-        return items.index(item)
+        index = items.index(item)
+        # Quantize on a logarithmic scale so that we don't constantly
+        # needlessly adjust thousands of node requests.
+        # If we're in the top 10 changes, return the accurate number.
+        if index < 10:
+            return index
+        # After 10, batch then in groups of 10 (so items 10-19 are all
+        # at node priority 10, 20-29 at 20, etc).
+        if index < 100:
+            return index // 10 * 10
+        # After 100, batch in groups of 100.
+        return index // 100 * 100
 
     def resolveChangeReferences(self, change_references):
         return self.resolveChangeKeys(
