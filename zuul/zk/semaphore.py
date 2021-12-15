@@ -203,7 +203,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
         running_handles = set()
         for pipeline in self.layout.pipelines.values():
-            for item in pipeline.getAllItems():
+            for item in pipeline.getAllItems(include_old=True):
                 for job in item.getJobs():
                     running_handles.add(f"{item.uuid}-{job.name}")
 

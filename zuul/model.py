@@ -656,6 +656,7 @@ class PipelineState(zkobject.ZKObject):
             "disabled": self.disabled,
             "queues": [q.getPath() for q in self.queues],
             "old_queues": [q.getPath() for q in self.old_queues],
+            "layout_uuid": self.layout_uuid,
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
