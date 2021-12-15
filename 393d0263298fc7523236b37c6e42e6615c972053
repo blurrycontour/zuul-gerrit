@@ -16,6 +16,24 @@
       "message": "oh cool, I wasn\u0027t aware the dependencies had changed. Thanks for the follow-up!",
       "revId": "393d0263298fc7523236b37c6e42e6615c972053",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74f7bc42_6b7fba85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 23851
+      },
+      "writtenOn": "2021-12-15T15:18:24Z",
+      "side": 1,
+      "message": "no problem! I\u0027m very interested in this, thanks for your work :)",
+      "parentUuid": "48b2ac61_2c750c26",
+      "revId": "393d0263298fc7523236b37c6e42e6615c972053",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
