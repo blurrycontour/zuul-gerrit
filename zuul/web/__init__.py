@@ -1238,6 +1238,7 @@ class ZuulWebAPI(object):
             duration = None
 
         ret = {
+            '_id': build.id,
             'uuid': build.uuid,
             'job_name': build.job_name,
             'result': build.result,
@@ -1294,7 +1295,7 @@ class ZuulWebAPI(object):
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
-               limit=50, skip=0):
+               limit=50, skip=0, idx_min=None, idx_max=None):
         connection = self._get_connection()
 
         if tenant not in self.zuulweb.abide.tenants.keys():
@@ -1307,12 +1308,18 @@ class ZuulWebAPI(object):
         if complete is not None:
             complete = complete.lower() == 'true'
 
+        try:
+            _idx_max = idx_max is not None and int(idx_max) or idx_max
+            _idx_min = idx_min is not None and int(idx_min) or idx_min
+        except ValueError:
+            raise cherrypy.HTTPError(400, 'idx_min, idx_max must be integers')
+
         builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
             result=result, final=final, held=held, complete=complete,
-            limit=limit, offset=skip)
+            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -1334,6 +1341,7 @@ class ZuulWebAPI(object):
 
     def buildsetToDict(self, buildset, builds=[]):
         ret = {
+            '_id': buildset.id,
             'uuid': buildset.uuid,
             'result': buildset.result,
             'message': buildset.message,
@@ -1381,17 +1389,24 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def buildsets(self, tenant, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
-                  uuid=None, result=None, complete=None, limit=50, skip=0):
+                  uuid=None, result=None, complete=None, limit=50, skip=0,
+                  idx_min=None, idx_max=None):
         connection = self._get_connection()
 
         if complete:
             complete = complete.lower() == 'true'
 
+        try:
+            _idx_max = idx_max is not None and int(idx_max) or idx_max
+            _idx_min = idx_min is not None and int(idx_min) or idx_min
+        except ValueError:
+            raise cherrypy.HTTPError(400, 'idx_min, idx_max must be integers')
+
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, result=result, complete=complete,
-            limit=limit, offset=skip)
+            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
