@@ -1,5 +1,7 @@
 :title: Job Content
 
+.. _job-content:
+
 Job Content
 ===========
 

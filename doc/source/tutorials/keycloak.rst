@@ -3,7 +3,7 @@ Keycloak Tutorial
 
 Zuul supports an authenticated API accessible via its web app which
 can be used to perform some administrative actions.  To see this in
-action, first run the :ref:`quick_start` and then follow the steps in
+action, first run the :ref:`quick-start` and then follow the steps in
 this tutorial to add a Keycloak server.
 
 Zuul supports any identity provider that can supply a JWT using OpenID
