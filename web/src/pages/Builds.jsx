@@ -13,10 +13,11 @@
 // under the License.
 
 import * as React from 'react'
+import { isEqual } from 'lodash'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import 'moment-duration-format'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { PageSection, PageSectionVariants, Pagination } from '@patternfly/react-core'
 
 import { fetchBuilds } from '../api'
 import {
@@ -125,10 +126,21 @@ class BuildsPage extends React.Component {
       },
     ]
 
+    const _filters = getFiltersFromUrl(props.location, this.filterCategories)
+    const perPage = _filters.limit[0]
+      ? parseInt(_filters.limit[0])
+      : 50
+    const currentPage = _filters.skip[0]
+      ? Math.floor(parseInt(_filters.skip[0] / perPage)) + 1
+      : 1
+
     this.state = {
       builds: [],
       fetching: false,
-      filters: getFiltersFromUrl(props.location, this.filterCategories),
+      filters: _filters,
+      resultsPerPage: perPage,
+      currentPage: currentPage,
+      itemCount: null,
     }
   }
 
@@ -139,15 +151,29 @@ class BuildsPage extends React.Component {
     // first loaded). Most probably that's the case because the location is
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
-    const queryString = buildQueryString(filters)
+    const { itemCount } = this.state
+    let paginationOptions = {
+      skip: filters.skip.length > 0 ? filters.skip : [0,],
+      limit: filters.limit.length > 0 ? filters.limit : [50,]
+    }
+    let _filters = { ...filters, ...paginationOptions }
+    const queryString = buildQueryString(_filters)
     this.setState({ fetching: true })
     // TODO (felix): What happens in case of a broken network connection? Is the
     // fetching shows infinitely or can we catch this and show an erro state in
     // the table instead?
     fetchBuilds(this.props.tenant.apiPrefix, queryString).then((response) => {
+      // if we have already an itemCount for this query (ie we're scrolling backwards through results)
+      // keep this value. Otherwise, check if we've got all the results.
+      let finalItemCount = itemCount
+        ? itemCount
+        : (response.data.length < paginationOptions.limit[0]
+          ? parseInt(paginationOptions.skip[0]) + response.data.length
+          : null)
       this.setState({
         builds: response.data,
         fetching: false,
+        itemCount: finalItemCount,
       })
     })
   }
@@ -169,18 +195,34 @@ class BuildsPage extends React.Component {
     }
   }
 
-  handleFilterChange = (filters) => {
+  handleFilterChange = (newFilters) => {
     const { location, history } = this.props
+    const { filters, itemCount } = this.state
+    /*eslint no-unused-vars: ["error", { "ignoreRestSiblings": true }]*/
+    let { 'skip': x1, 'limit': y1, ..._oldFilters } = filters
+    let { 'skip': x2, 'limit': y2, ..._newFilters } = newFilters
+
+    // If filters have changed, reinitialize skip
+    let equalTest = isEqual(_oldFilters, _newFilters)
+    let finalFilters = equalTest ? newFilters : { ...newFilters, skip: [0,] }
+
     // We must update the URL parameters before the state. Otherwise, the URL
     // will always be one filter selection behind the state. But as the URL
     // reflects our state this should be ok.
-    writeFiltersToUrl(filters, location, history)
-    this.updateData(filters)
-    this.setState(() => {
-      return {
-        filters: filters,
-      }
-    })
+    writeFiltersToUrl(finalFilters, location, history)
+    let newState = {
+      filters: finalFilters,
+      // if filters haven't changed besides skip or limit, keep our itemCount and currentPage
+      itemCount: equalTest ? itemCount : null,
+    }
+    if (!equalTest) {
+      newState.currentPage = 1
+    }
+    this.setState(
+      newState,
+      () => {
+        this.updateData(finalFilters)
+      })
   }
 
   handleClearFilters = () => {
@@ -192,15 +234,52 @@ class BuildsPage extends React.Component {
     this.handleFilterChange(filters)
   }
 
+  handlePerPageSelect = (event, perPage) => {
+    const { filters } = this.state
+    this.setState({ resultsPerPage: perPage })
+    const newFilters = { ...filters, limit: [perPage,] }
+    this.handleFilterChange(newFilters)
+  }
+
+  handleSetPage = (event, pageNumber) => {
+    const { filters, resultsPerPage } = this.state
+    this.setState({ currentPage: pageNumber })
+    let offset = resultsPerPage * (pageNumber - 1)
+    const newFilters = { ...filters, skip: [offset,] }
+    this.handleFilterChange(newFilters)
+  }
+
+
   render() {
     const { history } = this.props
-    const { builds, fetching, filters } = this.state
+    const { builds, fetching, filters, resultsPerPage, currentPage, itemCount } = this.state
+
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
           filterCategories={this.filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
+        />
+        <Pagination
+          toggleTemplate={({ firstIndex, lastIndex, itemCount }) => (
+            <React.Fragment>
+              <b>
+                {firstIndex} - {lastIndex}
+              </b>
+              &nbsp;
+              of
+              &nbsp;
+              <b>{itemCount ? itemCount : 'many'}</b>
+            </React.Fragment>
+          )}
+          itemCount={itemCount}
+          perPage={resultsPerPage}
+          page={currentPage}
+          widgetId="pagination-menu"
+          onPerPageSelect={this.handlePerPageSelect}
+          onSetPage={this.handleSetPage}
+          isCompact
         />
         <BuildTable
           builds={builds}
