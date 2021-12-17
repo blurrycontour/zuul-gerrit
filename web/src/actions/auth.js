@@ -56,7 +56,7 @@ function createAuthParamsFromJson(json) {
 
 const authConfigSuccess = (json, auth_params) => ({
   type: AUTH_CONFIG_SUCCESS,
-  info: json.info,
+  info: json.info.capabilities.auth,
   auth_params: auth_params,
 })
 
