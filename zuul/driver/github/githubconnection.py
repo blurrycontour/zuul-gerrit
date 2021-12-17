@@ -1960,15 +1960,25 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             else:
                 result = data["merged"]
         except Exception as e:
+            msg = None
             if hasattr(e, 'response'):
                 response = e.response
                 try:
-                    raise MergeFailure('Pull request merge failed: '
-                                       '%s' % response.json().get('message'))
+                    api_message = response.json().get('message')
                 except ValueError:
                     # There was no json body so use the generic message below.
-                    pass
-            raise MergeFailure('Pull request merge failed: %s' % e)
+                    api_message = None
+
+            if api_message == "Resource not accessible by integration"
+                    msg = (
+                            f'Pull request merge failed: {api_message}, '
+                            'You may need to manually rebase your PR and '
+                            'retry.')
+            elif api_message:
+                    msg = f'Pull request merge failed: {api_message}'
+            else:
+                    msg = 'Pull request merge failed: %s' % e
+            raise MergeFailure(msg)
 
         if not result:
             raise MergeFailure('Pull request was not merged')
