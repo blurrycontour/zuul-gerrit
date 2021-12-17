@@ -16,6 +16,24 @@
       "message": "The line is missing the trailing \u0027:\u0027",
       "revId": "c3825bd3bcf8757b90e741cb02c89765ace3cc95",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62ce22f2_1721ab71",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1972,
+      "author": {
+        "id": 9268
+      },
+      "writtenOn": "2021-12-17T19:12:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a183da7d_e221f8c1",
+      "revId": "c3825bd3bcf8757b90e741cb02c89765ace3cc95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
