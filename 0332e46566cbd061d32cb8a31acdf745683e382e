@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcad2eb9_4fbbbdee",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-12-17T17:44:32Z",
+      "side": 1,
+      "message": "These parameters are the project_canonical_name and the project_connection_name.",
+      "revId": "0332e46566cbd061d32cb8a31acdf745683e382e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
