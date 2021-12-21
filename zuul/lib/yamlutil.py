@@ -22,7 +22,14 @@ try:
     # Explicit type ignore to deal with provisional import failure
     # Details at https://github.com/python/mypy/issues/1153
     from yaml import cyaml
-    import _yaml
+
+    # Usage of _yaml is deprecated since PyYAML 5.4
+    # https://github.com/yaml/pyyaml/pull/407
+    try:
+        from yaml import _yaml as _yaml
+    except ImportError:
+        import _yaml
+
     SafeLoader = cyaml.CSafeLoader
     SafeDumper = cyaml.CSafeDumper
     Mark = _yaml.Mark
