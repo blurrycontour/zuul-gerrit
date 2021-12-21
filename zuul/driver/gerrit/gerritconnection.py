@@ -210,6 +210,13 @@ class GerritEventConnector(threading.Thread):
         timestamp = connection_event["timestamp"]
         data = connection_event["payload"]
 
+        # NOTE(mnaser): Certain plugins fire events which end up causing
+        #               an unrecognized event log *and* a traceback if they
+        #               do not contain full project information, we skip them
+        #               here to keep logs clean.
+        if data.get('type') in GerritEventConnector.IGNORED_EVENTS:
+            return
+
         # Gerrit can produce inconsistent data immediately after an
         # event, So ensure that we do not deliver the event to Zuul
         # until at least a certain amount of time has passed.  Note
@@ -229,13 +236,6 @@ class GerritEventConnector(threading.Thread):
 
         event.type = data.get('type')
         event.uuid = data.get('uuid')
-
-        # NOTE(mnaser): Certain plugins fire events which end up causing
-        #               an unrecognized event log *and* a traceback if they
-        #               do not contain full project information, we skip them
-        #               here to keep logs clean.
-        if event.type in GerritEventConnector.IGNORED_EVENTS:
-            return
 
         # This catches when a change is merged, as it could potentially
         # have merged layout info which will need to be read in.
