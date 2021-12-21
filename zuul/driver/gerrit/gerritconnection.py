@@ -1126,6 +1126,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             "timestamp": time.time(),
             "payload": data
         }
+        if event.payload.get('type') in GerritEventConnector.IGNORED_EVENTS:
+            return
         self.event_queue.put(event)
 
     def review(self, item, message, submit, labels, checks_api,
