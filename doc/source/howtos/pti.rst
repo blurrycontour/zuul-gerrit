@@ -210,5 +210,5 @@ test projects as they are prepared by Zuul. For example, the
 org-integration-test playbook need to ensure the client and server are installed
 from the zuul src_root.
 
-This is called sibbling installation, and it is critical piece to ensure cross
-project gating. Check out the recommended practices :ref:`cross-project-gating`.
+This is called sibling installation, and it is a critical piece to ensure cross
+project gating.
