@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c42e6fd_c2fee8f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-01-03T15:01:16Z",
+      "side": 1,
+      "message": "Hello Clark, I added you as reviewer for this as you created the wait-scripts in commit 3b7cf3dbaa8b95904cfb8e7eca91cf3325e178e0. I\u0027d appreciate your review 😊",
+      "revId": "273af63cdf5378e768f3786650a60b4809d9d8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
