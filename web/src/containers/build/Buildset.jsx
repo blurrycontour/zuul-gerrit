@@ -62,6 +62,13 @@ function Buildset({ buildset, timezone, tenant, user }) {
       (moment.utc(lastEndBuild.end_time).tz(timezone) -
         moment.utc(firstStartBuild.start_time).tz(timezone)) /
       1000
+    const overallDuration =
+      (moment.utc(lastEndBuild.end_time).tz(timezone) -
+        moment.utc(
+          buildset.event_timestamp!=null
+          ? buildset.event_timestamp : firstStartBuild.start_time
+        ).tz(timezone)
+      ) / 1000
 
     const buildLink = (build) => (
       <Link to={`${tenant.linkPrefix}/build/${build.uuid}`}>
@@ -109,7 +116,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
               icon={<OutlinedClockIcon />}
               value={
                 <>
-                  <strong>Total duration </strong>
+                  <strong>Total build duration </strong>
                   {moment
                     .duration(totalDuration, 'seconds')
                     .format('h [hr] m [min] s [sec]')}{' '}
@@ -123,6 +130,18 @@ function Buildset({ buildset, timezone, tenant, user }) {
                   >
                     Show timeline
                   </Button>
+                </>
+              }
+            />
+            <IconProperty
+              WrapElement={ListItem}
+              icon={<OutlinedClockIcon />}
+              value={
+                <>
+                  <strong>Overall duration </strong>
+                  {moment
+                    .duration(overallDuration, 'seconds')
+                    .format('h [hr] m [min] s [sec]')}
                 </>
               }
             />
