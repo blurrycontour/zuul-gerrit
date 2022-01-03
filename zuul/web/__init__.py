@@ -959,15 +959,16 @@ class ZuulWebAPI(object):
         resp.headers['Content-Type'] = 'text/plain'
         return job.data[0] + '\n'
 
+    def _datetime_to_string(self, my_datetime):
+        return my_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+
     def buildToDict(self, build, buildset=None):
         start_time = build.start_time
         if build.start_time:
-            start_time = start_time.strftime(
-                '%Y-%m-%dT%H:%M:%S')
+            start_time = self._datetime_to_string(start_time)
         end_time = build.end_time
         if build.end_time:
-            end_time = end_time.strftime(
-                '%Y-%m-%dT%H:%M:%S')
+            end_time = self._datetime_to_string(end_time)
         if build.start_time and build.end_time:
             duration = (build.end_time -
                         build.start_time).total_seconds()
@@ -992,6 +993,9 @@ class ZuulWebAPI(object):
         }
 
         if buildset:
+            event_timestamp = buildset.event_timestamp
+            if event_timestamp:
+                event_timestamp = self._datetime_to_string(event_timestamp)
             ret.update({
                 'project': buildset.project,
                 'branch': buildset.branch,
@@ -1002,6 +1006,7 @@ class ZuulWebAPI(object):
                 'newrev': buildset.newrev,
                 'ref_url': buildset.ref_url,
                 'event_id': buildset.event_id,
+                'event_timestamp': event_timestamp,
                 'buildset': {
                     'uuid': buildset.uuid,
                 },
@@ -1070,6 +1075,9 @@ class ZuulWebAPI(object):
         return data
 
     def buildsetToDict(self, buildset, builds=[]):
+        event_timestamp = buildset.event_timestamp
+        if event_timestamp:
+            event_timestamp = self._datetime_to_string(event_timestamp)
         ret = {
             'uuid': buildset.uuid,
             'result': buildset.result,
@@ -1083,6 +1091,7 @@ class ZuulWebAPI(object):
             'newrev': buildset.newrev,
             'ref_url': buildset.ref_url,
             'event_id': buildset.event_id,
+            'event_timestamp': event_timestamp,
         }
         if builds:
             ret['builds'] = []
