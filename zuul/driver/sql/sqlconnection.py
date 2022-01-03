@@ -322,6 +322,7 @@ class SQLConnection(BaseConnection):
             branch = sa.Column(sa.String(255))
             uuid = sa.Column(sa.String(36))
             event_id = sa.Column(sa.String(255), nullable=True)
+            event_timestamp = sa.Column(sa.DateTime, nullable=True)
 
             sa.Index(self.table_prefix + 'project_pipeline_idx',
                      project, pipeline)
