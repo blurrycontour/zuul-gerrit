@@ -46,9 +46,11 @@ class SQLReporter(BaseReporter):
         if not buildset.uuid:
             return
         event_id = None
+        event_timestamp = None
         item = buildset.item
         if item.event is not None:
             event_id = getattr(item.event, "zuul_event_id", None)
+            event_timestamp = item.event.timestamp
 
         with self.connection.getSession() as db:
             db_buildset = db.createBuildSet(
@@ -65,6 +67,7 @@ class SQLReporter(BaseReporter):
                 zuul_ref=buildset.ref,
                 ref_url=item.change.url,
                 event_id=event_id,
+                event_timestamp=event_timestamp,
             )
             return db_buildset
 
