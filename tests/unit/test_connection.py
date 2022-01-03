@@ -73,7 +73,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         buildset_table = table_prefix + 'zuul_buildset'
         build_table = table_prefix + 'zuul_build'
 
-        self.assertEqual(16, len(insp.get_columns(buildset_table)))
+        self.assertEqual(17, len(insp.get_columns(buildset_table)))
         self.assertEqual(13, len(insp.get_columns(build_table)))
 
     def test_sql_tables_created(self):
@@ -146,6 +146,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
                 'https://review.example.com/%d' % buildset0['change'],
                 buildset0['ref_url'])
             self.assertNotEqual(None, buildset0['event_id'])
+            self.assertNotEqual(None, buildset0['event_timestamp'])
 
             buildset0_builds = conn.execute(
                 sa.sql.select([reporter.connection.zuul_build_table]).where(
