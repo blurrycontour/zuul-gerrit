@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d3a02c0_5adc53a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-01-05T02:25:30Z",
+      "side": 1,
+      "message": "The UI looks like this: \nhttps://i.ibb.co/Lk39Hqg/Bildschirmfoto-2022-01-05-um-10-21-39.png",
+      "revId": "d6ee69bd5c45602a37b10dd1b353e603eab6314e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
