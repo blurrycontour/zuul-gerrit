@@ -102,6 +102,14 @@ The supported options in ``zuul.conf`` connections are:
       messages).  Retrieve this password from the ``HTTP Password``
       section of the ``Settings`` page in Gerrit.
 
+   .. attr:: git_over_ssh
+      :default: false
+
+      This forces git operation over SSH even if the ``password``
+      attribute is set.  This allow REST API access to the Gerrit
+      server even when git-over-http operation is disabled on the
+      server.
+
    .. attr:: auth_type
       :default: basic
 
