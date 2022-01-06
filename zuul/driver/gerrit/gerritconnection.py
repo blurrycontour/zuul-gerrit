@@ -618,6 +618,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         self.session = None
         self.password = self.connection_config.get('password', None)
+        self.git_over_ssh = self.connection_config.get('git_over_ssh', False)
         self.auth_type = self.connection_config.get('auth_type', None)
         self.anonymous_git = False
         if self.password or self.auth_type == 'gcloud_service':
@@ -1430,7 +1431,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     for data in alldata]
 
     def _uploadPack(self, project: Project) -> str:
-        if self.session:
+        if self.session and not self.git_over_ssh:
             url = ('%s/%s/info/refs?service=git-upload-pack' %
                    (self.baseurl, project.name))
             r = self.session.get(
@@ -1537,7 +1538,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def getGitUrl(self, project: Project) -> str:
         if self.anonymous_git:
             url = ('%s/%s' % (self.baseurl, project.name))
-        elif self.session:
+        elif self.session and not self.git_over_ssh:
             baseurl = list(urllib.parse.urlparse(self.baseurl))
             # Make sure we escape '/' symbols, otherwise git's url
             # parser will think the username is a hostname.
