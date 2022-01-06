@@ -1969,6 +1969,7 @@ class FrozenJob(zkobject.ZKObject):
                            'secret_parent_data',
                            'variables',
                            'parent_data',
+                           'secrets',
                            )
 
     def __repr__(self):
@@ -2139,6 +2140,10 @@ class FrozenJob(zkobject.ZKObject):
     @property
     def variables(self):
         return self._getJobData('_variables')
+
+    @property
+    def secrets(self):
+        return self._getJobData('_secrets')
 
     @property
     def combined_variables(self):
@@ -2444,12 +2449,28 @@ class Job(ConfigObject):
             role['project'] = role_project.name
         return d
 
+    def _deduplicateSecrets(self, secrets, playbook):
+        # secrets is a list of secrets accumulated so far
+        # playbook is a frozen playbook from _freezePlaybook
+
+        # Cast to list so we can modify in place
+        for secret_key, secret_value in list(playbook['secrets'].items()):
+            if secret_value in secrets:
+                playbook['secrets'][secret_key] = secrets.index(secret_value)
+            else:
+                secrets.append(secret_value)
+                playbook['secrets'][secret_key] = len(secrets) - 1
+
     def freezeJob(self, context, tenant, layout, item,
                   redact_secrets_and_keys):
         buildset = item.current_build_set
         kw = {}
         attributes = (set(FrozenJob.attributes) |
                       set(FrozenJob.job_data_attributes))
+        # De-duplicate the secrets across all playbooks, store them in
+        # this array, and then refer to them by index.
+        attributes.discard('secrets')
+        secrets = []
         for k in attributes:
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
@@ -2467,7 +2488,14 @@ class Job(ConfigObject):
                 v = [self._freezePlaybook(layout, item, pb,
                                           redact_secrets_and_keys)
                      for pb in v if pb.source_context]
+                if not redact_secrets_and_keys:
+                    # If we're redacting, don't de-duplicate so that
+                    # it's clear that the value ("REDACTED") is
+                    # redacted.
+                    for pb in v:
+                        self._deduplicateSecrets(secrets, pb)
             kw[k] = v
+        kw['secrets'] = secrets
         kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
         # Don't add buildset to attributes since it's not serialized
