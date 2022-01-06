@@ -2075,14 +2075,15 @@ class AnsibleJob(object):
 
         The output dictionary simply has decrypted data as its value.
 
-        :param dict secrets: The encrypted secrets dictionary from the
+        :param dict secrets: The playbook secrets dictionary from the
             scheduler
 
         :returns: A decrypted secrets dictionary
 
         """
         ret = {}
-        for secret_name, frozen_secret in secrets.items():
+        for secret_name, secret_index in secrets.items():
+            frozen_secret = self.job.secrets[secret_index]
             secret = zuul.model.Secret(secret_name, None)
             secret.secret_data = yaml.encrypted_load(
                 frozen_secret['encrypted_data'])
