@@ -4,3 +4,10 @@
     - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
+  tasks:
+    # This is needed to run opendev unit test jobs under focal, but
+    # may not be necessary in later releases
+    - name: Increase open file limit
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: '* soft nofile 4096'
