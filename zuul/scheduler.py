@@ -2391,4 +2391,5 @@ class Scheduler(threading.Thread):
             tenant.semaphore_handler.release(item, job)
 
     def createZKContext(self, lock, log):
-        return ZKContext(self.zk_client, lock, self.stop_event, log)
+        return ZKContext(self.zk_client, lock, self.stop_event, log,
+                         self.component_registry)

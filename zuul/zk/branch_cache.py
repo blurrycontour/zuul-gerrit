@@ -59,7 +59,7 @@ class BranchCacheZKObject(ShardedZKObject):
         self._set(protected={},
                   remainder={})
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "protected": self.protected,
             "remainder": self.remainder,
@@ -94,7 +94,8 @@ class BranchCache:
 
         # TODO: standardize on a stop event for connections and add it
         # to the context.
-        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log)
+        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log,
+                                    connection.sched.component_registry)
 
         with locked(self.wlock):
             try:
