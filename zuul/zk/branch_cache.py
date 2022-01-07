@@ -59,7 +59,7 @@ class BranchCacheZKObject(ShardedZKObject):
         self._set(protected={},
                   remainder={})
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "protected": self.protected,
             "remainder": self.remainder,
@@ -78,7 +78,7 @@ class BranchCacheZKObject(ShardedZKObject):
 
 
 class BranchCache:
-    def __init__(self, zk_client, connection):
+    def __init__(self, zk_client, connection, component_registry):
         self.log = logging.getLogger(
             f"zuul.BranchCache.{connection.connection_name}")
 
@@ -94,7 +94,8 @@ class BranchCache:
 
         # TODO: standardize on a stop event for connections and add it
         # to the context.
-        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log)
+        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log,
+                                    component_registry)
 
         with locked(self.wlock):
             try:

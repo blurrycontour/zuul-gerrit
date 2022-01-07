@@ -62,7 +62,7 @@ class MQTTConnection(BaseConnection):
     def _on_disconnect(self, client, userdata, rc):
         self.connected = False
 
-    def onLoad(self, zk_client):
+    def onLoad(self, zk_client, component_registry):
         self.log.debug("Starting MQTT Connection")
         try:
             self.client.connect(

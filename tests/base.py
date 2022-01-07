@@ -34,6 +34,7 @@ from collections import defaultdict, namedtuple
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
 from unittest.case import skipIf
+import zlib
 
 import requests
 import select
@@ -91,6 +92,7 @@ from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import zkobject, ZooKeeperClient
+from zuul.zk.components import SchedulerComponent
 from zuul.zk.event_queues import ConnectionEventQueue
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.locks import tenant_read_lock, pipeline_lock, SessionAwareLock
@@ -3994,7 +3996,7 @@ class ZuulWebFixture(fixtures.Fixture):
             info=self.info,
             connections=self.connections,
             authenticators=self.authenticators)
-        self.connections.load(self.web.zk_client)
+        self.connections.load(self.web.zk_client, self.web.component_registry)
         self.web.start()
         self.addCleanup(self.stop)
 
@@ -4257,6 +4259,15 @@ class BaseTestCase(testtools.TestCase):
     def getZKPaths(self, path):
         return list(self.getZKTree(path).keys())
 
+    def getZKObject(self, path):
+        compressed_data, zstat = self.zk_client.client.get(path)
+        try:
+            data = zlib.decompress(compressed_data)
+        except zlib.error:
+            # Fallback for old, uncompressed data
+            data = compressed_data
+        return data
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -4292,7 +4303,8 @@ class SchedulerTestApp:
 
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
-            self.connections.load(self.sched.zk_client)
+            self.connections.load(self.sched.zk_client,
+                                  self.sched.component_registry)
 
         # TODO (swestphahl): Can be removed when we no longer use global
         # management events.
@@ -4485,6 +4497,18 @@ class ZuulTestCase(BaseTestCase):
         )
         self.merge_server.start()
 
+    def _setupModelPin(self):
+        # Add a fake scheduler to the system that is on the old model
+        # version.
+        test_name = self.id().split('.')[-1]
+        test = getattr(self, test_name)
+        if hasattr(test, '__model_version__'):
+            version = getattr(test, '__model_version__')
+            self.model_test_component_info = SchedulerComponent(
+                self.zk_client, 'test_component')
+            self.model_test_component_info.model_api = version
+            self.model_test_component_info.register()
+
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
@@ -4604,6 +4628,8 @@ class ZuulTestCase(BaseTestCase):
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
+        self._setupModelPin()
+
         self._context_lock = SessionAwareLock(
             self.zk_client.client, f"/test/{uuid.uuid4().hex}")
 
@@ -4665,7 +4691,8 @@ class ZuulTestCase(BaseTestCase):
             self._context_lock.acquire(blocking=False)
             lock = self._context_lock
         return zkobject.ZKContext(self.zk_client, lock,
-                                  stop_event=None, log=self.log)
+                                  None, self.log,
+                                  self.scheds.first.sched.component_registry)
 
     def __event_queues(self, matcher) -> List[Queue]:
         # TODO (swestphahl): Can be removed when we no longer use global
