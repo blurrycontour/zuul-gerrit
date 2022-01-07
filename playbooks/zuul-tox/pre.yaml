@@ -4,3 +4,8 @@
     - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
+  tasks:
+    - name: Increase open file limit
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: '* soft nofile 4096'
