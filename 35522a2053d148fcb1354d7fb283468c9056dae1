@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "677d9724_a493b387",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31760
+      },
+      "writtenOn": "2022-01-07T23:43:33Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e I want to clarify something: does your system prohibit git over http, or does it have the \"login-redirect\" plugin installed, which prohibits authenticated git-over-http access without \"a/\" in the url?\n\nI think it\u0027s the first case.  It\u0027s been awhile since I last admin Gerrit but I think we disabled git over http by limiting download.scheme to ssh and repo only: https://gerrit-review.googlesource.com/Documentation/config-gerrit.html#download",
+      "revId": "35522a2053d148fcb1354d7fb283468c9056dae1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
