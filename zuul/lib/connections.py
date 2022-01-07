@@ -94,6 +94,10 @@ class ConnectionRegistry(object):
         # Register connections from the config
         connections = OrderedDict()
 
+        log.info("............ConnectionRegistry")
+        log.info(config.sections)
+        log.info(type(config))
+        
         if 'database' in config.sections() and not source_only:
             driver = self.drivers['sql']
             con_config = dict(config.items('database'))

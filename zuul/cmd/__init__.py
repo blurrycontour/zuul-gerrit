@@ -131,7 +131,12 @@ class ZuulApp(object):
             k: v for k, v in os.environ.items()
             if k.startswith('ZUUL_')
         }
+
+        log = logging.getLogger("zuulApp")
+
         self.config = configparser.ConfigParser(safe_env)
+        log.info("...........zuulApp1")
+        log.info(self.config)
         if self.args.config:
             locations = [self.args.config]
         else:
@@ -140,6 +145,8 @@ class ZuulApp(object):
         for fp in locations:
             if os.path.exists(os.path.expanduser(fp)):
                 self.config.read(os.path.expanduser(fp))
+                log.info("...........zuulApp2")
+                log.info(self.config)
                 return
         raise Exception("Unable to locate config file in %s" % locations)
 
