@@ -232,9 +232,12 @@ class SQLConnection(BaseConnection):
         self.table_prefix = self.connection_config.get('table_prefix', '')
         self.log.info("Initializing SQL connection {} (prefix: {})".format(
             connection_name, self.table_prefix))
+        self.log.info("Debug.........")
+        self.log.info(self.connection_config)
 
         try:
             self.dburi = self.connection_config.get('dburi')
+            self.log.info(self.dburi)
             self.metadata = sa.MetaData()
             self._setup_models()
 
