@@ -301,7 +301,7 @@ class SQLConnection(BaseConnection):
             else:
                 alembic.command.upgrade(config, 'head', tag=tag)
 
-    def onLoad(self, zk_client):
+    def onLoad(self, zk_client, component_registry=None):
         safe_connection = quote_plus(self.connection_name)
         while True:
             try:

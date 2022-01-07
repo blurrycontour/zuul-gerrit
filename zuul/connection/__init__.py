@@ -68,7 +68,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         except Exception:
             self.log.exception("Exception reporting event stats")
 
-    def onLoad(self, zk_client):
+    def onLoad(self, zk_client, component_registry):
         pass
 
     def onStop(self):
