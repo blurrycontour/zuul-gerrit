@@ -25,6 +25,8 @@ import sqlalchemy.pool
 
 from zuul.connection import BaseConnection
 
+import traceback
+
 BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
 ARTIFACT_TABLE = 'zuul_artifact'
@@ -232,9 +234,15 @@ class SQLConnection(BaseConnection):
         self.table_prefix = self.connection_config.get('table_prefix', '')
         self.log.info("Initializing SQL connection {} (prefix: {})".format(
             connection_name, self.table_prefix))
+        self.log.info("Debug.........")
+        #self.log.info(self.connection_config)
+
+        for line in traceback.format_stack():
+            self.log.info(line.strip())
 
         try:
             self.dburi = self.connection_config.get('dburi')
+            #self.log.info(self.dburi)
             self.metadata = sa.MetaData()
             self._setup_models()
 
