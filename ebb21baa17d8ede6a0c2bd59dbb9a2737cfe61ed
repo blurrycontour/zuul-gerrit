@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da33602c_69d37f46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-01-07T11:15:42Z",
+      "side": 1,
+      "message": "I like this. Depending on wether this is useful and how expensive it is to do the analysis we could think about exporting this in zuul as a metric (maybe running every 15 or 30min)",
+      "revId": "ebb21baa17d8ede6a0c2bd59dbb9a2737cfe61ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b5f77f7_f25e4813",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-01-07T11:15:42Z",
+      "side": 1,
+      "message": "What\u0027s the primary goal of the analysis? Is it \u0027how much data is in zk\u0027 or \u0027how much data is in the model\u0027? In case of the first we probably don\u0027t want to decompress here. Maybe we even want both?",
+      "revId": "ebb21baa17d8ede6a0c2bd59dbb9a2737cfe61ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
