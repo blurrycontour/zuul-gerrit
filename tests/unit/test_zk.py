@@ -70,6 +70,7 @@ class ZooKeeperBaseTestCase(BaseTestCase):
             tls_ca=self.zk_chroot_fixture.zookeeper_ca)
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
+        self.component_registry = ComponentRegistry(self.zk_client)
 
 
 class TestZookeeperClient(ZooKeeperBaseTestCase):
@@ -295,7 +296,8 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
         )
         self.addCleanup(self.second_zk_client.disconnect)
         self.second_zk_client.connect()
-        self.component_registry = ComponentRegistry(self.second_zk_client)
+        self.second_component_registry = ComponentRegistry(
+            self.second_zk_client)
 
     def assertComponentAttr(self, component_name, attr_name,
                             attr_value, timeout=10):
@@ -303,7 +305,8 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
             timeout,
             f"{component_name} in cache has {attr_name} set to {attr_value}",
         ):
-            components = list(self.component_registry.all(component_name))
+            components = list(self.second_component_registry.all(
+                component_name))
             if (
                 len(components) > 0 and
                 getattr(components[0], attr_name) == attr_value
@@ -319,7 +322,8 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
         for _ in iterate_timeout(
             timeout, f"{component_name} in cache is stopped"
         ):
-            components = list(self.component_registry.all(component_name))
+            components = list(self.second_component_registry.all(
+                component_name))
             if len(components) == 0:
                 break
 
@@ -346,7 +350,7 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
 
         # Make sure the registry didn't create any read/write
         # component objects that re-registered themselves.
-        components = list(self.component_registry.all('executor'))
+        components = list(self.second_component_registry.all('executor'))
         self.assertEqual(len(components), 1)
 
         self.component_info.state = self.component_info.RUNNING
@@ -1476,7 +1480,7 @@ class DummyZKObjectMixin:
     def getPath(self):
         return f'/zuul/pipeline/{self.name}'
 
-    def serialize(self):
+    def serialize(self, context):
         d = {'name': self.name,
              'foo': self.foo}
         return json.dumps(d).encode('utf-8')
@@ -1497,7 +1501,8 @@ class TestZKObject(ZooKeeperBaseTestCase):
         # Create a new object
         tenant_name = 'fake_tenant'
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='bar')
@@ -1505,7 +1510,8 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Load an object from ZK (that we don't already have)
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             pipeline2 = zkobject_class.fromZK(context,
                                               '/zuul/pipeline/fake_tenant')
             self.assertEqual(pipeline2.foo, 'bar')
@@ -1516,7 +1522,8 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Update an object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             ltime1 = get_ltime(pipeline1)
             pipeline1.updateAttributes(context, foo='qux')
             self.assertEqual(pipeline1.foo, 'qux')
@@ -1530,7 +1537,8 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Update an object using an active context
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             ltime1 = get_ltime(pipeline1)
             with pipeline1.activeContext(context):
                 pipeline1.foo = 'baz'
@@ -1551,13 +1559,15 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Refresh an existing object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             pipeline2.refresh(context)
             self.assertEqual(pipeline2.foo, 'baz')
 
         # Delete an object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             self.assertIsNotNone(self.zk_client.client.exists(
                 '/zuul/pipeline/fake_tenant'))
             pipeline2.delete(context)
@@ -1600,7 +1610,8 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Fail an update
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='one')
@@ -1649,7 +1660,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 class TestBranchCache(ZooKeeperBaseTestCase):
     def test_branch_cache_protected_then_all(self):
         conn = DummyConnection()
-        cache = BranchCache(self.zk_client, conn)
+        cache = BranchCache(self.zk_client, conn, self.component_registry)
 
         test_data = {
             'project1': {
@@ -1684,7 +1695,7 @@ class TestBranchCache(ZooKeeperBaseTestCase):
 
     def test_branch_cache_all_then_protected(self):
         conn = DummyConnection()
-        cache = BranchCache(self.zk_client, conn)
+        cache = BranchCache(self.zk_client, conn, self.component_registry)
 
         test_data = {
             'project1': {
@@ -1728,7 +1739,7 @@ class TestBranchCache(ZooKeeperBaseTestCase):
 
     def test_branch_cache_change_protected(self):
         conn = DummyConnection()
-        cache = BranchCache(self.zk_client, conn)
+        cache = BranchCache(self.zk_client, conn, self.component_registry)
 
         data1 = {
             'project1': {
@@ -1794,7 +1805,8 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
 
         # Create a new object
         with tenant_write_lock(self.zk_client, 'test') as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log,
+                                self.component_registry)
             pipeline = DummyZKObject.new(context, name="test", foo="bar")
             e1 = model.ConfigurationError(
                 source_context, start_mark, "Test error1")

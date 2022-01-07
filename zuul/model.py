@@ -47,6 +47,10 @@ from zuul.lib.jsonutil import json_dumps
 from zuul.zk import zkobject
 from zuul.zk.change_cache import ChangeKey
 
+# When making ZK schema changes, increment this and add a record to
+# docs/developer/model-changelog.rst
+MODEL_API = 1
+
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
 MERGER_CHERRY_PICK = 3    # "git cherry-pick"
@@ -270,7 +274,7 @@ class ConfigurationErrorList(zkobject.ShardedZKObject):
     def getPath(self):
         return self._path
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "errors": [e.serialize() for e in self.errors],
         }
@@ -650,7 +654,7 @@ class PipelineState(zkobject.ZKObject):
             with self.activeContext(context):
                 self.old_queues.remove(queue)
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "state": self.state,
             "consecutive_failures": self.consecutive_failures,
@@ -803,7 +807,7 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         except NoNodeError:
             return cls.new(ctx, pipeline=pipeline)
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "changes": self.changes,
         }
@@ -850,7 +854,7 @@ class PipelineSummary(zkobject.ShardedZKObject):
         status = self.pipeline.formatStatusJSON(zuul_globals.websocket_url)
         self.updateAttributes(context, status=status)
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "status": self.status,
         }
@@ -906,7 +910,7 @@ class ChangeQueue(zkobject.ZKObject):
             dynamic=False,
         )
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "uuid": self.uuid,
             "name": self.name,
@@ -1911,7 +1915,7 @@ class JobData(zkobject.ShardedZKObject):
         hasher.update(json_dumps(data, sort_keys=True).encode('utf8'))
         return hasher.hexdigest()
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "data": self.data,
             "hash": self.hash,
@@ -2017,7 +2021,7 @@ class FrozenJob(zkobject.ZKObject):
     def getPath(self):
         return self.jobPath(self.name, self.buildset.getPath())
 
-    def serialize(self):
+    def serialize(self, context):
         data = {}
         for k in self.attributes:
             # TODO: Backwards compat handling, remove after 5.0
@@ -3327,7 +3331,7 @@ class ResultData(zkobject.ShardedZKObject):
     def getPath(self):
         return self._path
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "data": self.data,
             "_path": self._path,
@@ -3368,7 +3372,7 @@ class Build(zkobject.ZKObject):
             build_request_ref=None,
         )
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "uuid": self.uuid,
             "url": self.url,
@@ -3492,7 +3496,7 @@ class RepoFiles(zkobject.ShardedZKObject):
     def getPath(self):
         return f"{self._buildset_path}/files"
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "connections": self.connections,
             "_buildset_path": self._buildset_path,
@@ -3528,7 +3532,7 @@ class BaseRepoState(zkobject.ShardedZKObject):
         super().__init__()
         self._set(state={})
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             "state": self.state,
             "_buildset_path": self._buildset_path,
@@ -3673,7 +3677,7 @@ class BuildSet(zkobject.ZKObject):
     def getPath(self):
         return f"{self.item.getPath()}/buildset/{self.uuid}"
 
-    def serialize(self):
+    def serialize(self, context):
         data = {
             # "item": self.item,
             "builds": {j: b.getPath() for j, b in self.builds.items()},
@@ -4033,7 +4037,7 @@ class QueueItem(zkobject.ZKObject):
     def itemPath(cls, pipeline_path, item_uuid):
         return f"{pipeline_path}/item/{item_uuid}"
 
-    def serialize(self):
+    def serialize(self, context):
         if isinstance(self.event, TriggerEvent):
             event_type = "TriggerEvent"
         else:

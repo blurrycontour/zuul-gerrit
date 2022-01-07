@@ -484,7 +484,7 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.gitlab_event_connector.stop()
             self.gitlab_event_connector.join()
 
-    def onLoad(self, zk_client):
+    def onLoad(self, zk_client, component_registry):
         self.log.info('Starting Gitlab connection: %s', self.connection_name)
 
         # Set the project branch cache to read only if no scheduler is
@@ -492,7 +492,7 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.read_only = not self.sched
 
         self.log.debug('Creating Zookeeper branch cache')
-        self._branch_cache = BranchCache(zk_client, self)
+        self._branch_cache = BranchCache(zk_client, self, component_registry)
 
         self.log.info('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(

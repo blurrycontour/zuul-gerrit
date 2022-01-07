@@ -61,7 +61,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 connections=self.connections,
                 authenticators=self.authenticators,
             )
-            self.connections.load(self.web.zk_client)
+            self.connections.load(self.web.zk_client,
+                                  self.web.component_registry)
         except Exception:
             self.log.exception("Error creating ZuulWeb:")
             sys.exit(1)
