@@ -68,6 +68,23 @@
       "message": "\u003e Patch Set 2:\n\u003e \n\u003e I thought that section only applied to the \"download-commands\" plugin (which is a core plugin), and it only controls what is shown to the user and doesn\u0027t actually disable any methods.\n\u003e \n\u003e I\u0027d appreciate it if you would double check that.  I\u0027m working on an issue with someone who has the login-redirect plugin installed.  I suspect the solution to that issue may be to use \"a/\" in all HTTP git remotes for gerrit in zuul since that works in all cases.  If your site is actually in the same situation, then using \"a/\" may be a single solution to both problems.  And due to the way gerrit allocates connections, it may be more efficient.\n\u003e \n\u003e Maybe we should still merge this change, but in general, I\u0027d prefer to keep the number of permutations of how we connect to different systems as small as possible, and gerrit already has far more than any other driver.\n\u003e \n\u003e If you could try cloning a repo with authenticated http and an \"a/\" prefix (like: git clone http://gerrit/a/project) that would be great.\n\nok I will double check and report back.",
       "revId": "35522a2053d148fcb1354d7fb283468c9056dae1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2805fc76_12b5dc4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31760
+      },
+      "writtenOn": "2022-01-08T01:18:35Z",
+      "side": 1,
+      "message": "\u003e I\u0027d appreciate it if you would double check that.  I\u0027m working on an issue with someone who has the login-redirect plugin installed.  I suspect the solution to that issue may be to use \"a/\" in all HTTP git remotes for gerrit in zuul since that works in all cases.  If your site is actually in the same situation, then using \"a/\" may be a single solution to both problems.  And due to the way gerrit allocates connections, it may be more efficient.\n\u003e \n\u003e Maybe we should still merge this change, but in general, I\u0027d prefer to keep the number of permutations of how we connect to different systems as small as possible, and gerrit already has far more than any other driver.\n\u003e \n\u003e If you could try cloning a repo with authenticated http and an \"a/\" prefix (like: git clone http://gerrit/a/project) that would be great.\n\nI tried cloning with authenticated http and it did not work.  I got \"remote: Not Found\".  And just to make sure my authentication works, I tried cloning with a bad http password and I got \"remote: Unauthorized\" so the first result should be valid.",
+      "revId": "35522a2053d148fcb1354d7fb283468c9056dae1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
