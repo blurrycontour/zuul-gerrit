@@ -33,6 +33,23 @@
       "message": "What\u0027s the primary goal of the analysis? Is it \u0027how much data is in zk\u0027 or \u0027how much data is in the model\u0027? In case of the first we probably don\u0027t want to decompress here. Maybe we even want both?",
       "revId": "ebb21baa17d8ede6a0c2bd59dbb9a2737cfe61ed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd008622_4868ff21",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-08T01:11:15Z",
+      "side": 1,
+      "message": "I think we probably do want both.",
+      "revId": "ebb21baa17d8ede6a0c2bd59dbb9a2737cfe61ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
