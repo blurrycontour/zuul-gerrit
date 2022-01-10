@@ -102,7 +102,7 @@ The Project Lead is elected to a term of one year.  The election
 process shall be a Condorcet election and the candidates shall be
 self-nominated from among the existing Maintainers.
 
-The Project Lead is James E. Blair (term expires 2022-01-14).
+The Project Lead is James E. Blair (term expires 2023-01-13).
 
 Zuul-Jobs Maintainers
 ---------------------
