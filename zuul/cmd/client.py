@@ -831,11 +831,9 @@ class Client(zuul.cmd.ZuulApp):
                 self.connections = connections
                 self.unparsed_config_cache = None
 
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
         zuul_globals = SystemAttributes.fromConfig(self.config)
         loader = configloader.ConfigLoader(
-            self.connections, zk_client, zuul_globals)
+            self.connections, None, zuul_globals)
         sched = SchedulerConfig(self.config, self.connections)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
         try:
