@@ -170,6 +170,23 @@
       "message": "Good idea, but we should either make that an option, or another script.  That way we can still use this as a way to debug exactly what we have in ZK (basically, if something goes wrong, run this to dump the data, then reset ZK to get production going, then debug with this).",
       "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb267e6_248898e4",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-11T21:27:30Z",
+      "side": 1,
+      "message": "Added an option for this.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
