@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77c31e5c_b48a7c1d",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-11T14:50:22Z",
+      "side": 1,
+      "message": "There is a small bug in the above snipped related to the zk_size. This should be:\n\n            zk_size \u003d 0\n            for shard in shards:\n                with open(os.path.join(fullpath, shard, \u0027ZKDATA\u0027), \u0027rb\u0027) as f:\n                    compressed_data \u003d f.read()\n                    data +\u003d zlib.decompress(compressed_data)\n                    zk_size +\u003d len(compressed_data)\n            return Data(path, data, zk_size\u003dzk_size)",
+      "parentUuid": "b50ef2d0_51811708",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7152011e_aa733332",
         "filename": "tools/zk-analyze.py",
         "patchSetId": 3
