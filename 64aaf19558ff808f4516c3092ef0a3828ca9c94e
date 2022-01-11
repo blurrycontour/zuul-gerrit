@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b50ef2d0_51811708",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-11T09:14:23Z",
+      "side": 1,
+      "message": "The decompression needs to be done here on the node data and not on the concatenated byte string below.\n\n            zk_size \u003d 0\n            for shard in shards:\n                with open(os.path.join(fullpath, shard, \u0027ZKDATA\u0027), \u0027rb\u0027) as f:\n                    compressed_data \u003d f.read()\n                    data +\u003d zlib.decompress(compressed_data)\n                    zk_size \u003d len(compressed_data)\n            return Data(path, data, zk_size\u003dzk_size)",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7152011e_aa733332",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-11T09:14:23Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we use the zk size for the attribute size if the `use_zk_size` flag is set? Same question for the other summary items below that also have \u0027attributes\u0027.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09616435_1c285f41",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-11T09:14:23Z",
+      "side": 1,
+      "message": "I think we should not add the size of the children to the size of the parent as this is already reflected in the tree size. But then we need to include the attribute sizes in the tree_size/zk_tree_size properties.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "518234fa_6966c56e",
         "filename": "tools/zk-dump.py",
         "patchSetId": 3
