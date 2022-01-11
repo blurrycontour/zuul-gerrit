@@ -36,6 +36,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf3d1f19_bd046dff",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-11T18:06:39Z",
+      "side": 1,
+      "message": "Yes and yes.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7152011e_aa733332",
@@ -66,6 +83,23 @@
       "writtenOn": "2022-01-11T09:14:23Z",
       "side": 1,
       "message": "I think we should not add the size of the children to the size of the parent as this is already reflected in the tree size. But then we need to include the attribute sizes in the tree_size/zk_tree_size properties.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "811fd878_3cf734f1",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-11T18:06:39Z",
+      "side": 1,
+      "message": "Yes and yes.",
       "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
