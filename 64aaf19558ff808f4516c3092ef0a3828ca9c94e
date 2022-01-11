@@ -70,6 +70,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "310f8a53_174b93d9",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-11T21:17:29Z",
+      "side": 1,
+      "message": "Yes to this.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09616435_1c285f41",
@@ -100,6 +117,23 @@
       "writtenOn": "2022-01-11T18:06:39Z",
       "side": 1,
       "message": "Yes and yes.",
+      "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6063d49d_a6678953",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-11T21:17:29Z",
+      "side": 1,
+      "message": "Actually, no, it\u0027s not reflected in the tree size because this is treating offloaded attributes as part of the object.\n\nBecause offloaded attributes may or may not be offloaded (they are only offloaded if they reach a certain size), this treats them all as if they were part of the object.  For example, a \"Job\" may have its \"vars\" attribute inline in the Job JSON, or it may be offloaded to a different znode.  For the purpose of us finding out whether \"vars\" is really big, we don\u0027t care whether it\u0027s offloaded or not.  If we did this naively, we wight use the \"depth\" option which would end up excluding Job vars if they are large and offloaded but including them if they were small and inline, and that would be weird.\n\nAnd to put this another way, since the vars are not included in the tree_size, we should continue to add them to the size.",
       "revId": "64aaf19558ff808f4516c3092ef0a3828ca9c94e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
