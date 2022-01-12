@@ -25,6 +25,7 @@ will avoid filling the disk.
 Encrypted Connections
 ---------------------
 
+Zuul requires its connections to ZooKeeper are TLS encrypted.
 ZooKeeper version 3.5.1 or greater is required for TLS support.
 ZooKeeper performs hostname validation for all ZooKeeper servers
 ("quorum members"), therefore each member of the ZooKeeper cluster
