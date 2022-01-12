@@ -16,6 +16,23 @@
       "message": "Just to double check to you intent to limit this to 3.0 inclusive or is the intention to pin to 2.x?",
       "revId": "b72ea9d4e550db7df7a0aa19d36517730c6c7d4c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8f6e0c7_b52c1016",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-12T17:56:39Z",
+      "side": 1,
+      "message": "Nope the other thing, thanks.",
+      "revId": "b72ea9d4e550db7df7a0aa19d36517730c6c7d4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
