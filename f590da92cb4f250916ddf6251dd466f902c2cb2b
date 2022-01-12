@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc2d38f0_ea9796a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:25:34Z",
+      "side": 1,
+      "message": "Left some thoughts. Note I didn\u0027t do a complete line for line review of the larger script, but read it for general understanding of how it works and it seems reasonable.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69baafbb_a360c3c8",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:25:34Z",
+      "side": 1,
+      "message": "Any concerns around races when either dumping from zk or reading it directly from zk here? Looks like we iterate over shards and just mark them as failed if they don\u0027t exist which is probably good enough for most analysis.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e96c371_b95258b5",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:25:34Z",
+      "side": 1,
+      "message": "See comment on the dump script. I think this one will be a bit more clear if the other command is updated. But maybe consider noting this is in lieu of talking to Zk directly?",
+      "range": {
+        "startLine": 449,
+        "startChar": 40,
+        "endLine": 449,
+        "endChar": 55
+      },
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06fc6188_7c9e26a9",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:25:34Z",
+      "side": 1,
+      "message": "Any reason to not use os.path.join here and below with the recursive getTree call arg?",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf69f847_267f3fb2",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:25:34Z",
+      "side": 1,
+      "message": "Nit this help text is a bit ambiguous. On my first read I read it was the path in ZK to dump. But rereading this is the path on the local disk to write the entire Zuul db to.",
+      "range": {
+        "startLine": 47,
+        "startChar": 37,
+        "endLine": 47,
+        "endChar": 54
+      },
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
