@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf531c13_416a75ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:43:19Z",
+      "side": 1,
+      "message": "I think I found a bug handling sharded data.",
+      "revId": "781620c73a430ce51cd0ffe9b72804887dbe60ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c85f8dc6_011cd828",
+        "filename": "tools/zk-shell.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-12T23:43:19Z",
+      "side": 1,
+      "message": "This should be compressed_data",
+      "range": {
+        "startLine": 126,
+        "startChar": 11,
+        "endLine": 126,
+        "endChar": 15
+      },
+      "revId": "781620c73a430ce51cd0ffe9b72804887dbe60ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
