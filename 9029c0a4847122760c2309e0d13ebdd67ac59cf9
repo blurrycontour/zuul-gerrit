@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bf1abde_c651d199",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-12T09:27:35Z",
+      "side": 1,
+      "message": "We need to forward the `zk` flag here.",
+      "revId": "9029c0a4847122760c2309e0d13ebdd67ac59cf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
