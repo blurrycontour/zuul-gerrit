@@ -31,9 +31,11 @@ import urllib.parse
 import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
-from zuul.model import SystemAttributes
+from zuul.model import SystemAttributes, PipelineState
 from zuul.zk import ZooKeeperClient
 from zuul.lib.keystorage import KeyStorage
+from zuul.zk.locks import pipeline_lock
+from zuul.zk.zkobject import ZKContext
 
 
 # todo This should probably live somewhere else
@@ -456,6 +458,31 @@ class Client(zuul.cmd.ZuulApp):
         cmd_delete_state.set_defaults(command='delete-state')
         cmd_delete_state.set_defaults(func=self.delete_state)
 
+        cmd_delete_pipeline_state = subparsers.add_parser(
+            'delete-pipeline-state',
+            help='delete single pipeline ZooKeeper state',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Delete a single pipeline state stored in ZooKeeper
+
+            In the unlikely event that a bug in Zuul or ZooKeeper data
+            corruption occurs in such a way that it only affects a
+            single pipeline, this command might be useful in
+            attempting to recover.
+
+            The circumstances under which this command will be able to
+            effect a recovery are very rare and even so it may not be
+            sufficient.  In general, if an error occurs it is better
+            to shut Zuul down and run "zuul delete-state".
+
+            This command will lock the specified tenant-pipeline and
+            then completely delete the pipeline state.'''))
+        cmd_delete_pipeline_state.set_defaults(command='delete-pipeline-state')
+        cmd_delete_pipeline_state.set_defaults(func=self.delete_pipeline_state)
+        cmd_delete_pipeline_state.add_argument('tenant', type=str,
+                                               help='tenant name')
+        cmd_delete_pipeline_state.add_argument('pipeline', type=str,
+                                               help='pipeline name')
         return parser
 
     def parseArguments(self, args=None):
@@ -936,6 +963,26 @@ class Client(zuul.cmd.ZuulApp):
                         "all ephemeral data from ZooKeeper? (yes/no) ")
         if confirm.strip().lower() == 'yes':
             zk_client.client.delete('/zuul', recursive=True)
+        sys.exit(0)
+
+    def delete_pipeline_state(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+
+        args = self.args
+        safe_tenant = urllib.parse.quote_plus(args.tenant)
+        safe_pipeline = urllib.parse.quote_plus(args.pipeline)
+        with pipeline_lock(zk_client, args.tenant, args.pipeline) as lock:
+            path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
+            layout_uuid = '0'
+            zk_client.client.delete(
+                f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}',
+                recursive=True)
+            context = ZKContext(zk_client, lock, None, self.log)
+            PipelineState.new(context, _path=path, layout_uuid=layout_uuid)
+
         sys.exit(0)
 
 
