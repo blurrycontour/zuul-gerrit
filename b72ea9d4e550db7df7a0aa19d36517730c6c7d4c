@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d25c6b5_0da63eef",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-01-12T17:45:22Z",
+      "side": 1,
+      "message": "Just to double check to you intent to limit this to 3.0 inclusive or is the intention to pin to 2.x?",
+      "revId": "b72ea9d4e550db7df7a0aa19d36517730c6c7d4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
