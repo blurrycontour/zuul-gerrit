@@ -3977,7 +3977,7 @@ class ZuulWebFixture(fixtures.Fixture):
         self.connections = TestConnectionRegistry(
             changes, config, additional_event_queues, upstream_root, rpcclient,
             poller_events, git_url_with_auth, add_cleanup)
-        self.connections.configure(config)
+        self.connections.configure(config, source_only=True, require_sql=True)
 
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)
@@ -4284,7 +4284,7 @@ class SchedulerTestApp:
             git_url_with_auth,
             add_cleanup,
         )
-        self.connections.configure(self.config)
+        self.connections.configure(self.config, require_sql=True)
 
         self.sched = TestScheduler(self.config, self.connections, self)
         self.sched.log = logging.getLogger(f"zuul.Scheduler-{instance_id}")

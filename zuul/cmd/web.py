@@ -88,7 +88,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.log = logging.getLogger("zuul.WebServer")
 
         try:
-            self.configure_connections(require_sql=True)
+            self.configure_connections(source_only=True, require_sql=True)
             self.configure_authenticators()
             self._run()
         except Exception:
