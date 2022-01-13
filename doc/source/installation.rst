@@ -38,9 +38,11 @@ ZooKeeper
 Nodepool uses ZooKeeper to communicate internally among its
 components, and also to communicate with Zuul.  You can run a simple
 single-node ZooKeeper instance, or a multi-node cluster.  Ensure that
-the host running the Zuul scheduler has access to the cluster.  See
+the host running the Zuul scheduler has access to the cluster.  Zuul
+requires its connections to ZooKeeper be TLS encrypted. ZooKeeper
+TLS connectivity requires ZooKeeper 3.5.1 or newer. See
 :ref:`howto-zookeeper` for recommendations for operating a small
-ZooKeeper cluster.
+ZooKeeper cluster that meet these requirements.
 
 Zuul stores private keys for each project it knows about in ZooKeeper.
 It is recommended that you periodically back up the private keys in
