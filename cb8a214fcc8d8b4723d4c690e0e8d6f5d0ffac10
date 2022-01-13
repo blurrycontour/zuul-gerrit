@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d7911fe_ec7945d5",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-13T19:05:45Z",
+      "side": 1,
+      "message": "Should there be an elif require_sql: block here to raise an error? If we require_sql and there is no database in the config we should error I think.",
+      "revId": "cb8a214fcc8d8b4723d4c690e0e8d6f5d0ffac10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
