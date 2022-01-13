@@ -91,10 +91,15 @@ class ConnectionRegistry(object):
             driver.stop()
 
     def configure(self, config, source_only=False, require_sql=False):
+        # Everyone gets source drivers (schedulers, web, mergers, and
+        # executors all need them).
+        # Schedulers and web need sql.
+        # Schedulers need everything else.
+
         # Register connections from the config
         connections = OrderedDict()
 
-        if 'database' in config.sections() and not source_only:
+        if 'database' in config.sections() and require_sql:
             driver = self.drivers['sql']
             con_config = dict(config.items('database'))
 
@@ -120,11 +125,12 @@ class ConnectionRegistry(object):
 
             driver = self.drivers[con_driver]
 
-            # The merger and the reporter only needs source driver.
-            # This makes sure Reporter like the SQLDriver are only created by
-            # the scheduler process
-            if source_only and not isinstance(driver, SourceInterface):
-                continue
+            if con_driver == 'sql':
+                if not require_sql:
+                    continue
+            else:
+                if source_only and not isinstance(driver, SourceInterface):
+                    continue
 
             connection = driver.getConnection(con_name, con_config)
             connections[con_name] = connection
