@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9d4c072a_95826a26",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-13T13:01:56Z",
+      "side": 1,
+      "message": "It might be that the dump script is a little faster than the analyzer, but at least I did not encounter any issues when dumping our production ZK during peak hours.",
+      "parentUuid": "69baafbb_a360c3c8",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90f230ac_d6717966",
         "filename": "tools/zk-analyze.py",
         "patchSetId": 5
