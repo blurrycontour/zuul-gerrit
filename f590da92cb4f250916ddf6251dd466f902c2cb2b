@@ -55,6 +55,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dabb822d_a155f57c",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-13T14:06:35Z",
+      "side": 1,
+      "message": "I think if we are using the ZK size option we should also limit matches by the ZK size.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90f230ac_d6717966",
         "filename": "tools/zk-analyze.py",
         "patchSetId": 5
