@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7195d261_0eba6f6b",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-13T00:35:40Z",
+      "side": 1,
+      "message": "Nit maybe call out it needs to be ZK \u003e\u003d 3.5.1. This is related to some feedback we got via storyboard saying ubuntu packages are older and this has tripped people up.",
+      "range": {
+        "startLine": 58,
+        "startChar": 26,
+        "endLine": 58,
+        "endChar": 43
+      },
+      "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "da2b8d5e_2f754540",
         "filename": "releasenotes/notes/gearmanectomy-ecec32b3764eafc1.yaml",
         "patchSetId": 2
