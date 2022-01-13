@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0aa14169_edde3aa5",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-13T00:22:26Z",
+      "side": 0,
+      "message": "I guess this import was unused. Any idea why linting didn\u0027t complain about it?",
+      "revId": "f333726575895be451d64c22e78e3528551abd04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
