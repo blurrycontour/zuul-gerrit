@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1c8985b_46db8488",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1837,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-13T00:15:48Z",
+      "side": 1,
+      "message": "And in this next test we\u0027ve tested deletes for that coverage noted in the previous comment.",
+      "revId": "a9660ac49c1c8e9f45920e66b4697b3de86f0025",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
