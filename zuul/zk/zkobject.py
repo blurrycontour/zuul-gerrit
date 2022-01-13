@@ -15,6 +15,7 @@
 import json
 import time
 import contextlib
+import zlib
 
 from kazoo.exceptions import (
     KazooException, NodeExistsError, NoNodeError, ZookeeperError)
@@ -195,7 +196,12 @@ class ZKObject:
             path = self.getPath()
         while context.sessionIsValid():
             try:
-                data, zstat = context.client.get(path)
+                compressed_data, zstat = context.client.get(path)
+                try:
+                    data = zlib.decompress(compressed_data)
+                except zlib.error:
+                    # Fallback for old, uncompressed data
+                    data = compressed_data
                 self._set(**self.deserialize(data, context))
                 self._set(_zstat=zstat)
                 return
@@ -225,11 +231,13 @@ class ZKObject:
         path = self.getPath()
         while context.sessionIsValid():
             try:
+                compressed_data = zlib.compress(data)
                 if create:
                     real_path, zstat = context.client.create(
-                        path, data, makepath=True, include_data=True)
+                        path, compressed_data, makepath=True,
+                        include_data=True)
                 else:
-                    zstat = context.client.set(path, data,
+                    zstat = context.client.set(path, compressed_data,
                                                version=self._zstat.version)
                 self._set(_zstat=zstat)
                 return
