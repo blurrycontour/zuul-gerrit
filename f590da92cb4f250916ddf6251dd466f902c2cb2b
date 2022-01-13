@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "90f230ac_d6717966",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-13T12:59:49Z",
+      "side": 1,
+      "message": "Sorry to -1 this once more, but now that the data in ZK is compressed we need to open this file \u0027rb\u0027.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2e96c371_b95258b5",
         "filename": "tools/zk-analyze.py",
         "patchSetId": 5
