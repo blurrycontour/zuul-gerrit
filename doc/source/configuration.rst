@@ -926,6 +926,13 @@ sections of ``zuul.conf`` are used by the web server:
 
       If this is used the finger gateways should be configured accordingly.
 
+.. attr:: keystore
+
+   .. attr:: password
+      :required:
+
+      Encryption password for private data stored in Zookeeper.
+
 
 Authentication
 ~~~~~~~~~~~~~~
