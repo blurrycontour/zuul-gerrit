@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "8b95b64b_a9d742af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2022-01-14T18:22:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ed98a50_8ac5473a",
+      "revId": "78ad3a8ec0fc1c1572f8b0e67021f235ba07d770",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "65b2f481_d62b78ad",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2022-01-14T18:02:54Z",
       "side": 1,
       "message": "Since the change that introduced this is still in review, we should fix it there.",
+      "revId": "78ad3a8ec0fc1c1572f8b0e67021f235ba07d770",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b560d81d_478c4971",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2022-01-14T18:22:08Z",
+      "side": 1,
+      "message": "Removed from this commit.",
+      "parentUuid": "65b2f481_d62b78ad",
       "revId": "78ad3a8ec0fc1c1572f8b0e67021f235ba07d770",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
