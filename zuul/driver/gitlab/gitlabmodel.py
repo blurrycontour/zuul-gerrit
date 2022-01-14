@@ -255,7 +255,7 @@ class GitlabRefFilter(RefFilter):
                 return False
 
         if self.labels:
-            if not set(change.labels).intersection(set(self.labels)):
+            if not set(self.labels).issubset(set(change.labels)):
                 return False
 
         return True

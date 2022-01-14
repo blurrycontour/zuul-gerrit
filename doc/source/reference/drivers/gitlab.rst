@@ -289,7 +289,7 @@ in the *opened* state (not merged yet).
       A boolean value (``true`` or ``false``) that indicates whether
       the Merge Request must be approved or not in order to be enqueued.
 
-   .. attr:: label
+   .. attr:: labels
 
       A list of labels a Merge Request must have in order to be enqueued.
 
