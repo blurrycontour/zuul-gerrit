@@ -321,7 +321,9 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.log.debug("Stopping command socket")
         self.command_socket.stop()
-        self.command_thread.join()
+        # If we stop from the command socket we cannot join the command thread.
+        if threading.current_thread() is not self.command_thread:
+            self.command_thread.join()
         self.log.debug("Stopping timedb thread")
         self.times.join()
         self.log.debug("Stopping monitoring server")
