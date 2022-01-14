@@ -999,7 +999,7 @@ class GithubClientManager:
         return headers
 
     def get_installation_key(self, project_name, inst_id=None,
-                             reprime=False):
+                             reprime=True):
         installation_id = inst_id
         if project_name is not None:
             installation_id = self.installation_map.get(project_name)
