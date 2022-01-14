@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ed98a50_8ac5473a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-14T18:02:54Z",
+      "side": 1,
+      "message": "Since we\u0027re changing behavior here (even though we\u0027re changing it to match the documentation and other drivers), we should add a release note.  I would recommend adding it to the \"bugfix\" section and say something like:\n\n  The `labels` pipeline requirement in the `gitlab` driver erroneously treated the labels as a boolean `or` but should have treated them as a boolean `and` (i.e., all listed labels are required).  The behavior has been updated to match the documentation and other drivers.",
+      "revId": "78ad3a8ec0fc1c1572f8b0e67021f235ba07d770",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65b2f481_d62b78ad",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-14T18:02:54Z",
+      "side": 1,
+      "message": "Since the change that introduced this is still in review, we should fix it there.",
+      "revId": "78ad3a8ec0fc1c1572f8b0e67021f235ba07d770",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
