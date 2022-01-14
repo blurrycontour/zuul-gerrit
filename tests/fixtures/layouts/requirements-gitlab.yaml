@@ -38,11 +38,13 @@
         comment: true
 
 - pipeline:
-    name: label-check
+    name: labels-check
     manager: independent
     require:
       gitlab:
-        labels: gateit
+        labels:
+          - gateit
+          - another_label
     trigger:
       gitlab:
         - event: gl_merge_request
