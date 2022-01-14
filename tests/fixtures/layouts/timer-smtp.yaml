@@ -3,7 +3,7 @@
     manager: independent
     trigger:
       timer:
-        - time: '* * * * * */1'
+        time: '* * * * * */1'
     success:
       smtp:
         to: alternative_me@example.com
