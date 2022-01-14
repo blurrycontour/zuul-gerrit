@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e Test looks good; -1 since this needs to be rebased on the current parent and could use a release note.\n\nRebased the parent commit and fixed the documentation typo there instead.",
       "revId": "3970a96f3f54e093232d817cd9b019f8ca445e79",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18530ecf_9eca9453",
+        "filename": "tests/fixtures/layouts/requirements-gitlab.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-14T18:52:29Z",
+      "side": 1,
+      "message": "Since you\u0027ve changed the pipeline name here, the project definition below doesn\u0027t have any jobs in this pipeline, so the test will fail.\n\nI would suggest leaving the pipeline name alone.",
+      "revId": "3970a96f3f54e093232d817cd9b019f8ca445e79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
