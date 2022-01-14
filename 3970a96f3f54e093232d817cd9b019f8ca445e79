@@ -33,6 +33,24 @@
       "message": "Since you\u0027ve changed the pipeline name here, the project definition below doesn\u0027t have any jobs in this pipeline, so the test will fail.\n\nI would suggest leaving the pipeline name alone.",
       "revId": "3970a96f3f54e093232d817cd9b019f8ca445e79",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b79ff49_853402e6",
+        "filename": "tests/fixtures/layouts/requirements-gitlab.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2022-01-14T18:55:02Z",
+      "side": 1,
+      "message": "Done.\n\nWanted to reflect the labels in plural to match the documentation.\nLeaving the name alone to not have to change it elsewhere.",
+      "parentUuid": "18530ecf_9eca9453",
+      "revId": "3970a96f3f54e093232d817cd9b019f8ca445e79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
