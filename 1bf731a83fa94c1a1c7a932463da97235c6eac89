@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3236376c_c4113de8",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-14T18:04:38Z",
+      "side": 1,
+      "message": "This should remain plural.",
+      "revId": "1bf731a83fa94c1a1c7a932463da97235c6eac89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
