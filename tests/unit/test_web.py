@@ -46,13 +46,10 @@ class FakeConfig(object):
         return self.config.get(section, {}).get(option)
 
 
-class BaseTestWeb(ZuulTestCase):
-    tenant_config_file = 'config/single-tenant/main.yaml'
+class BaseWithWeb(ZuulTestCase):
     config_ini_data = {}
 
-    def setUp(self):
-        super(BaseTestWeb, self).setUp()
-
+    def startWebServer(self):
         self.zuul_ini_config = FakeConfig(self.config_ini_data)
         # Start the web server
         self.web = self.useFixture(
@@ -78,15 +75,6 @@ class BaseTestWeb(ZuulTestCase):
         self.base_url = "http://{host}:{port}".format(
             host=self.host, port=self.port)
 
-    def add_base_changes(self):
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.waitUntilSettled()
-
     def get_url(self, url, *args, **kwargs):
         return requests.get(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
@@ -102,6 +90,23 @@ class BaseTestWeb(ZuulTestCase):
     def options_url(self, url, *args, **kwargs):
         return requests.options(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
+
+class BaseTestWeb(BaseWithWeb):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def setUp(self):
+        super(BaseTestWeb, self).setUp()
+        self.startWebServer()
+
+    def add_base_changes(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
 
     def tearDown(self):
         self.executor_server.hold_jobs_in_build = False
@@ -1385,6 +1390,22 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
 
         resp = self.get_url("api/tenant/non-tenant/config-errors")
         self.assertEqual(404, resp.status_code)
+
+
+class TestBrokenConfigCache(BaseWithWeb):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_broken_config_cache(self):
+        # Delete the cached config files from ZK to simulate a
+        # scheduler encountering an error in reconfiguration.
+        path = '/zuul/config/cache/review.example.com%2Forg%2Fproject'
+        self.assertIsNotNone(self.zk_client.client.exists(path))
+        self.zk_client.client.delete(path, recursive=True)
+        self.startWebServer()
+        config_errors = self.get_url(
+            "api/tenant/tenant-one/config-errors").json()
+        self.assertIn('Configuration files missing',
+                      config_errors[0]['error'])
 
 
 class TestWebSocketInfo(TestInfo):

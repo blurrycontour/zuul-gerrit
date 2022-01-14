@@ -1827,8 +1827,12 @@ class TenantParser(object):
                 extra_config_files = abide.getExtraConfigFiles(project.name)
                 extra_config_dirs = abide.getExtraConfigDirs(project.name)
                 if not self.merger:
-                    raise RuntimeError(
-                        "Cannot load config files without a merger client.")
+                    with project_configuration_exceptions(source_context,
+                                                          loading_errors):
+                        raise Exception(
+                            "Configuration files missing from cache. "
+                            "Check Zuul scheduler logs for more information.")
+                    continue
                 ltime = self.zk_client.getCurrentLtime()
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
