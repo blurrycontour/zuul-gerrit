@@ -151,8 +151,15 @@ class Scheduler(threading.Thread):
         self.daemon = True
         self.hostname = socket.getfqdn()
         self.primed_event = threading.Event()
+        # Wake up the main run loop
         self.wake_event = threading.Event()
+        # Wake up the update loop
+        self.layout_update_event = threading.Event()
+        # Only used by tests in order to quiesce the layout update loop
+        self.layout_update_lock = threading.Lock()
+        # Don't change the abide without holding this lock
         self.layout_lock = threading.Lock()
+        # Only used by tests in order to quiesce the main run loop
         self.run_handler_lock = threading.Lock()
         self.command_map = {
             'stop': self.stop,
@@ -238,8 +245,9 @@ class Scheduler(threading.Thread):
 
         self.abide = Abide()
         self.unparsed_abide = UnparsedAbideConfig()
-        self.tenant_layout_state = LayoutStateStore(self.zk_client,
-                                                    self.wake_event.set)
+        self.tenant_layout_state = LayoutStateStore(
+            self.zk_client,
+            self.layout_update_event.set)
         self.local_layout_state = {}
 
         command_socket = get_default(
@@ -289,6 +297,12 @@ class Scheduler(threading.Thread):
         self.start_cleanup_thread.start()
         self.component_info.state = self.component_info.INITIALIZING
 
+        # Start a thread to perform background tenant layout updates
+        self.layout_update_thread = threading.Thread(
+            target=self.runTenantLayoutUpdates, name='layout updates')
+        self.layout_update_thread.daemon = True
+        self.layout_update_thread.start()
+
     def stop(self):
         self.log.debug("Stopping scheduler")
         self._stopped = True
@@ -312,6 +326,9 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
+        self.log.debug("Waiting for layout update thread")
+        self.layout_update_event.set()
+        self.layout_update_thread.join()
         self.log.debug("Stopping RPC thread")
         self.rpc.stop()
         self.rpc.join()
@@ -1010,8 +1027,45 @@ class Scheduler(threading.Thread):
         except KeyError:
             raise RuntimeError("No key store password configured!")
 
-    def updateTenantLayout(self, tenant_name):
-        self.log.debug("Updating layout of tenant %s", tenant_name)
+    def runTenantLayoutUpdates(self):
+        log = logging.getLogger("zuul.Scheduler.LayoutUpdate")
+        # Only run this after config priming is complete
+        self.primed_event.wait()
+        while not self._stopped:
+            self.layout_update_event.wait()
+            self.layout_update_event.clear()
+            if self._stopped:
+                break
+            with self.layout_update_lock:
+                for tenant_name in list(self.unparsed_abide.tenants):
+                    if self._stopped:
+                        break
+                    try:
+                        with tenant_read_lock(self.zk_client, tenant_name,
+                                              blocking=False):
+                            if (self.tenant_layout_state[tenant_name]
+                                > self.local_layout_state[tenant_name]):
+                                log.debug(
+                                    "Local layout of tenant %s not up to date",
+                                    tenant_name)
+                                self.updateTenantLayout(log, tenant_name)
+                                # Wake up the main thread to process any
+                                # events for this tenant.
+                                self.wake_event.set()
+                    except LockException:
+                        log.debug(
+                            "Skipping layout update of locked tenant %s",
+                            tenant_name)
+                        self.layout_update_event.set()
+                    except Exception:
+                        log.exception("Error updating layout of tenant %s",
+                                      tenant_name)
+                        self.layout_update_event.set()
+                # In case something is locked, don't busy-loop.
+                time.sleep(0.1)
+
+    def updateTenantLayout(self, log, tenant_name):
+        log.debug("Updating layout of tenant %s", tenant_name)
         if self.unparsed_abide.ltime < self.system_config_cache.ltime:
             self.updateSystemConfig()
 
@@ -1021,7 +1075,7 @@ class Scheduler(threading.Thread):
             self.connections, self.zk_client, self.globals, self.statsd, self,
             self.merger, self.keystore)
         with self.layout_lock:
-            self.log.debug("Updating local layout of tenant %s ", tenant_name)
+            log.debug("Updating local layout of tenant %s ", tenant_name)
             layout_state = self.tenant_layout_state.get(tenant_name)
             layout_uuid = layout_state and layout_state.uuid
             if layout_state:
@@ -1650,11 +1704,12 @@ class Scheduler(threading.Thread):
                             self.zk_client, tenant_name, blocking=False
                         ):
                             if (self.tenant_layout_state[tenant_name]
-                                    > self.local_layout_state[tenant_name]):
+                                > self.local_layout_state[tenant_name]):
                                 self.log.debug(
                                     "Local layout of tenant %s not up to date",
                                     tenant.name)
-                                self.updateTenantLayout(tenant_name)
+                                self.layout_update_event.set()
+                                continue
 
                             # Get tenant again, as it might have been updated
                             # by a tenant reconfig or layout change.
