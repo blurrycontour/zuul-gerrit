@@ -58,6 +58,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a9b23cd_866a6a0b",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-17T20:58:10Z",
+      "side": 1,
+      "message": "Agreed; I think you fixed this in a different patch so doesn\u0027t need to be updated here, just rebased.",
+      "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da2b8d5e_2f754540",
