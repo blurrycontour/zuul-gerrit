@@ -1960,6 +1960,8 @@ class FrozenJob(zkobject.ZKObject):
                   'provides',
                   'requires',
                   'workspace_scheme',
+                  'affected_projects',
+                  'config_hash',
                   )
 
     job_data_attributes = ('artifact_data',
