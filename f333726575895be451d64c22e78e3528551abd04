@@ -16,6 +16,23 @@
       "message": "I guess this import was unused. Any idea why linting didn\u0027t complain about it?",
       "revId": "f333726575895be451d64c22e78e3528551abd04",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e76a2727_670f409d",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-17T20:52:18Z",
+      "side": 0,
+      "message": "I don\u0027t know, but I do know that import checking works in general.\n\n\"import serial\" fails linting; \"import zuul.foo\" passes.  Must be something about importing things in zuul.* ?",
+      "revId": "f333726575895be451d64c22e78e3528551abd04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
