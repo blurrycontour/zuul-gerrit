@@ -31,3 +31,17 @@ Version 1
 :Prior Zuul version: 4.11.0
 :Description: No change since Version 0.  This explicitly records the
               component versions in ZooKeeper.
+
+Version 2
+---------
+:Prior Zuul version: 4.12.0
+:Description: Store secrets under the FrozenJob attribute `frank`
+              instead of `secrets`.
+
+              This is a sample model upgrade change.  It is nonsensical and
+              is only to demonstrate a model upgrade.
+:Components: Scheduler, Executor
+:Upgrade strategy: Components will read old/new schema.  Components
+                   will write old schema until system is
+                   upgraded. FrozenJobs cycle frequently and old data
+                   will be naturally purged quickly.

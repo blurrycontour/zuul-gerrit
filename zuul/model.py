@@ -49,7 +49,7 @@ from zuul.zk.change_cache import ChangeKey
 
 # When making ZK schema changes, increment this and add a record to
 # docs/developer/model-changelog.rst
-MODEL_API = 1
+MODEL_API = 2
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -2044,6 +2044,9 @@ class FrozenJob(zkobject.ZKObject):
                 v = {'storage': 'offload', 'path': v.getPath(), 'hash': v.hash}
             else:
                 v = {'storage': 'local', 'data': v}
+            if context.model_api >= 2:
+                if k == 'secrets':
+                    k = 'frank'
             data[k] = v
 
         # Use json_dumps to strip any ZuulMark entries
@@ -2082,6 +2085,10 @@ class FrozenJob(zkobject.ZKObject):
 
         data['provides'] = frozenset(data['provides'])
         data['requires'] = frozenset(data['requires'])
+
+        # MODEL_API: > 2
+        if 'secrets' in data:
+            data['frank'] = data.pop('secrets')
 
         for job_data_key in self.job_data_attributes:
             job_data = data.pop(job_data_key, None)
