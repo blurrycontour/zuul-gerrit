@@ -2042,6 +2042,9 @@ class FrozenJob(zkobject.ZKObject):
                 v = {'storage': 'local', 'data': v}
             data[k] = v
 
+        data['affected_projects'] = self.affected_projects
+        data['config_hash'] = self.config_hash
+
         # Use json_dumps to strip any ZuulMark entries
         return json_dumps(data, sort_keys=True).encode("utf8")
 
