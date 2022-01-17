@@ -16,6 +16,24 @@
       "message": "Shouldn\u0027t this be PENDING?",
       "revId": "140d85409ae3a7710a1ad00b73343857c07c7879",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9f0a703_2efb28ca",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1218,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-17T14:13:13Z",
+      "side": 1,
+      "message": "Whoops, yes this should be PENDING.",
+      "parentUuid": "7c8b22d1_90c501b7",
+      "revId": "140d85409ae3a7710a1ad00b73343857c07c7879",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
