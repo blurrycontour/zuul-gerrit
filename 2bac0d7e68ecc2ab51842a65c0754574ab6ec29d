@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b7925de_28cdc065",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-17T10:52:05Z",
+      "side": 1,
+      "message": "We might want to pass this as the callback to the LayoutStateStore instead of the run handler wake event. This way we can already update a tenant in the background without waiting for the run handler to detect the outdated layout first.",
+      "revId": "2bac0d7e68ecc2ab51842a65c0754574ab6ec29d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
