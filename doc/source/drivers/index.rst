@@ -26,6 +26,5 @@ Zuul includes the following drivers:
    mqtt
    elasticsearch
    smtp
-   sql
    timer
    zuul

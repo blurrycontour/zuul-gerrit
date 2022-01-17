@@ -10,7 +10,6 @@
     failure:
       gerrit:
         Verified: -1
-      resultsdb_failures: null
 
 - pipeline:
     name: gate
@@ -28,7 +27,6 @@
     failure:
       gerrit:
         Verified: -2
-      resultsdb_failures: null
     start:
       gerrit:
         Verified: 0
@@ -41,8 +39,6 @@
       gerrit:
         - event: ref-updated
           ref: ^refs/tags/.*$
-    failure:
-      resultsdb_failures: null
 
 - nodeset:
     name: test-nodeset

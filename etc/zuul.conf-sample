@@ -1,3 +1,6 @@
+[database]
+dburi=mysql+pymysql://user@localhost/zuul
+
 [statsd]
 server=127.0.0.1
 
@@ -69,7 +72,3 @@ server=localhost
 user=zuul
 password=zuul
 ;keepalive=60
-
-[connection mydatabase]
-driver=sql
-dburi=mysql+pymysql://user@localhost/zuul
