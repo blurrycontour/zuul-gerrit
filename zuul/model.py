@@ -1960,6 +1960,7 @@ class FrozenJob(zkobject.ZKObject):
                   'provides',
                   'requires',
                   'workspace_scheme',
+                  'config_hash',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -1970,6 +1971,7 @@ class FrozenJob(zkobject.ZKObject):
                            'variables',
                            'parent_data',
                            'secrets',
+                           'affected_projects',
                            )
 
     def __repr__(self):
@@ -2144,6 +2146,10 @@ class FrozenJob(zkobject.ZKObject):
     @property
     def secrets(self):
         return self._getJobData('_secrets')
+
+    @property
+    def affected_projects(self):
+        return self._getJobData('_affected_projects')
 
     @property
     def combined_variables(self):
@@ -2470,6 +2476,8 @@ class Job(ConfigObject):
         # De-duplicate the secrets across all playbooks, store them in
         # this array, and then refer to them by index.
         attributes.discard('secrets')
+        attributes.discard('affected_projects')
+        attributes.discard('config_hash')
         secrets = []
         for k in attributes:
             # If this is a config object, it's frozen, so it's
