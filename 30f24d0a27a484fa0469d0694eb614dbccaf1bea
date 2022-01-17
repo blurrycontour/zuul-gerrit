@@ -16,6 +16,23 @@
       "message": "Should we continue to cleanup as before? When the test ends the ZK state for that test goes away, but if we were relying on that coverage maybe we should keep it?",
       "revId": "30f24d0a27a484fa0469d0694eb614dbccaf1bea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16974973_3ea90123",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1833,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-17T20:45:24Z",
+      "side": 0,
+      "message": "As you noted later, we do have coverage of this.",
+      "revId": "30f24d0a27a484fa0469d0694eb614dbccaf1bea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
