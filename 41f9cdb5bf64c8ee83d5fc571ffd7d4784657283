@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7e3bd46_fb2b55d1",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2045,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-17T16:54:11Z",
+      "side": 1,
+      "message": "Should this be a JobData?  The list of affected projects could be quite large.",
+      "revId": "41f9cdb5bf64c8ee83d5fc571ffd7d4784657283",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
