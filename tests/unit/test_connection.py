@@ -300,64 +300,6 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
         check_results()
 
-    def test_multiple_sql_connections(self):
-        "Test putting results in different databases"
-        # Add a successful result
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        # Add a failed result
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.executor_server.failJob('project-test1', B)
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        def check_results(connection_name_1, connection_name_2):
-            # Grab the sa tables for resultsdb
-            tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-            pipeline = tenant.layout.pipelines['check']
-            reporter1 = self.scheds.first.connections.getSqlReporter(
-                pipeline)
-
-            conn = self.scheds.first.connections.getSqlConnection().\
-                engine.connect()
-            buildsets_resultsdb = conn.execute(sa.sql.select(
-                [reporter1.connection.zuul_buildset_table])).fetchall()
-            # Should have been 2 buildset reported to the resultsdb (both
-            # success and failure report)
-            self.assertEqual(2, len(buildsets_resultsdb))
-
-            # The first one should have passed
-            self.assertEqual('check', buildsets_resultsdb[0]['pipeline'])
-            self.assertEqual(
-                'org/project', buildsets_resultsdb[0]['project'])
-            self.assertEqual(1, buildsets_resultsdb[0]['change'])
-            self.assertEqual('1', buildsets_resultsdb[0]['patchset'])
-            self.assertEqual('SUCCESS', buildsets_resultsdb[0]['result'])
-            self.assertEqual(
-                'Build succeeded.', buildsets_resultsdb[0]['message'])
-
-            buildsets_resultsdb_failures = conn.execute(sa.sql.select(
-                [reporter1.connection.zuul_buildset_table])).fetchall()
-            # The failure db should only have 1 buildset failed
-            self.assertEqual(2, len(buildsets_resultsdb_failures))
-
-            self.assertEqual(
-                'check', buildsets_resultsdb_failures[1]['pipeline'])
-            self.assertEqual('org/project',
-                             buildsets_resultsdb_failures[1]['project'])
-            self.assertEqual(2,
-                             buildsets_resultsdb_failures[1]['change'])
-            self.assertEqual(
-                '1', buildsets_resultsdb_failures[1]['patchset'])
-            self.assertEqual(
-                'FAILURE', buildsets_resultsdb_failures[1]['result'])
-            self.assertEqual('Build failed.',
-                             buildsets_resultsdb_failures[1]['message'])
-
-        check_results('database', 'resultsdb_failures')
-
 
 class TestSQLConnectionPostgres(TestSQLConnectionMysql):
     config_file = 'zuul-sql-driver-postgres.conf'

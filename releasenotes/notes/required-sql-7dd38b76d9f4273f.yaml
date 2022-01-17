@@ -8,5 +8,5 @@ upgrade:
 
 deprecations:
   - |
-    Defining database connections using :attr:`<sql connection>` is now
+    Defining database connections using sql connection is now
     deprecated. Refer to :ref:`database` how to configure the database now.
