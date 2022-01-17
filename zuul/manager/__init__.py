@@ -1122,8 +1122,6 @@ class PipelineManager(metaclass=ABCMeta):
         log.debug("Scheduling merge for item %s (files: %s, dirs: %s)" %
                   (item, files, dirs))
         build_set = item.current_build_set
-        build_set.updateAttributes(self.current_context,
-                                   merge_state=build_set.PENDING)
 
         # If the involved projects exclude unprotected branches we should also
         # exclude them from the merge and repo state except the branch of the
@@ -1151,20 +1149,22 @@ class PipelineManager(metaclass=ABCMeta):
                                            precedence=self.pipeline.precedence,
                                            event=item.event,
                                            branches=branches)
+        build_set.updateAttributes(self.current_context,
+                                   merge_state=build_set.PENDING)
         return False
 
     def scheduleFilesChanges(self, item):
         log = item.annotateLogger(self.log)
         log.debug("Scheduling fileschanged for item %s", item)
         build_set = item.current_build_set
-        build_set.updateAttributes(self.current_context,
-                                   files_state=build_set.PENDING)
 
         to_sha = getattr(item.change, "branch", None)
         self.sched.merger.getFilesChanges(
             item.change.project.connection_name, item.change.project.name,
             item.change.ref, to_sha, build_set=build_set,
             event=item.event)
+        build_set.updateAttributes(self.current_context,
+                                   files_state=build_set.PENDING)
         return False
 
     def scheduleGlobalRepoState(self, item: QueueItem) -> bool:
@@ -1213,6 +1213,9 @@ class PipelineManager(metaclass=ABCMeta):
                                        build_set=item.current_build_set,
                                        event=item.event,
                                        branches=branches)
+        item.current_build_set.updateAttributes(
+            self.current_context,
+            repo_state_state=item.current_build_set.PENDING)
         return True
 
     def prepareItem(self, item: QueueItem) -> bool:
@@ -1317,8 +1320,6 @@ class PipelineManager(metaclass=ABCMeta):
         # At this point we know all frozen jobs and their repos so update the
         # repo state with all missing repos.
         if build_set.repo_state_state == build_set.NEW:
-            build_set.updateAttributes(self.current_context,
-                                       repo_state_state=build_set.PENDING)
             self.scheduleGlobalRepoState(item)
         if build_set.repo_state_state == build_set.PENDING:
             return False
