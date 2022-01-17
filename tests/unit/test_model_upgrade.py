@@ -53,3 +53,46 @@ class TestModelUpgrade(ZuulTestCase):
     @simple_layout('layouts/simple.yaml')
     def test_model_upgrade_0_1(self):
         pass
+
+    @model_version(1)
+    @simple_layout('layouts/simple.yaml')
+    def test_model_upgrade_1_2(self):
+        # Test the upgrade from version 1 to 2
+        self.executor_server.hold_jobs_in_build = True
+
+        # Run once with the old API
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        for data in self.getJobData('tenant-one', 'check'):
+            self.assertTrue('secrets' in data)
+            self.assertFalse('frank' in data)
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 2
+
+        # Run again with the new version
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        for data in self.getJobData('tenant-one', 'check'):
+            # The assertions are reversed
+            self.assertFalse('secrets' in data)
+            self.assertTrue('frank' in data)
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
