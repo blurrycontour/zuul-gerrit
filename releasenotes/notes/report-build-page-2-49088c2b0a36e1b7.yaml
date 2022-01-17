@@ -3,7 +3,7 @@ features:
   - |
     An option to use the URL of the Zuul build page when reporting has
     been added.  This feature requires that all the pipelines in the
-    tenant have a :ref:`SQL reporter<sql_reporter>` configured, and at
+    tenant have a SQL reporter configured, and at
     least one of :attr:`tenant.web-root` or :attr:`web.root` must be
     defined.
 

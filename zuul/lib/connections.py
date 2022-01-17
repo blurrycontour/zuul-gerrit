@@ -114,7 +114,7 @@ class ConnectionRegistry(object):
                                 % con_name)
 
             con_driver = con_config['driver']
-            if con_driver not in self.drivers:
+            if (con_driver not in self.drivers) or con_driver == 'sql':
                 raise Exception("Unknown driver, %s, for connection %s"
                                 % (con_config['driver'], con_name))
 
@@ -128,12 +128,6 @@ class ConnectionRegistry(object):
 
             connection = driver.getConnection(con_name, con_config)
             connections[con_name] = connection
-            if con_driver == 'sql' and 'database' not in connections:
-                # The [database] section was missing. To stay backwards
-                # compatible duplicate the first database connection to the
-                # connection named 'database'
-                connections['database'] = driver.getConnection(
-                    'database', con_config)
 
         # If the [gerrit] or [smtp] sections still exist, load them in as a
         # connection named 'gerrit' or 'smtp' respectfully
