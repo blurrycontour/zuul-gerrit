@@ -14,6 +14,7 @@
 
 import logging
 import time
+from urllib.parse import quote_plus
 
 import alembic
 import alembic.command
@@ -24,6 +25,7 @@ from sqlalchemy import orm
 import sqlalchemy.pool
 
 from zuul.connection import BaseConnection
+from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 
 BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
@@ -299,10 +301,16 @@ class SQLConnection(BaseConnection):
             else:
                 alembic.command.upgrade(config, 'head', tag=tag)
 
-    def onLoad(self, zk_client=None):
+    def onLoad(self, zk_client):
+        safe_connection = quote_plus(self.connection_name)
         while True:
             try:
-                self._migrate()
+                with locked(
+                    SessionAwareLock(
+                        zk_client.client,
+                        f"{CONNECTION_LOCK_ROOT}/{safe_connection}/migration")
+                ):
+                    self._migrate()
                 break
             except sa.exc.OperationalError:
                 self.log.error(
