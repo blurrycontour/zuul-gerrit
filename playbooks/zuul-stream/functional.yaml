@@ -2,7 +2,10 @@
   tasks:
     - name: Set python path fact
       set_fact:
-        python_path: "/usr/local/lib/python3.6/dist-packages"
+        # This value is used by Ansible to find the zuul.ansible code
+        # that Zuul's ansible plugins consume. It must be updated when
+        # the python version of the platform is changed.
+        python_path: "/usr/local/lib/python3.8/dist-packages"
 
     - name: Run ansible that should succeed
       command: >
