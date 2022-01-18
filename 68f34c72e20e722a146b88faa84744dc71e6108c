@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "68f34c72e20e722a146b88faa84744dc71e6108c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d815d0b_ebd021a2",
+        "filename": "zuul/zk/locks.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-18T17:55:11Z",
+      "side": 1,
+      "message": "We should update the zookeeper map documentation.",
+      "revId": "68f34c72e20e722a146b88faa84744dc71e6108c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
