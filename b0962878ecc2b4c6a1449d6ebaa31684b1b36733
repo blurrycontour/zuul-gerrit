@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c4e20cd_748e171c",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2480,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-18T15:17:08Z",
+      "side": 1,
+      "message": "Note to reviewers, these are added below.",
+      "revId": "b0962878ecc2b4c6a1449d6ebaa31684b1b36733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9df5b0e_15f7c455",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2508,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-18T15:17:08Z",
+      "side": 1,
+      "message": "^ here.",
+      "revId": "b0962878ecc2b4c6a1449d6ebaa31684b1b36733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
