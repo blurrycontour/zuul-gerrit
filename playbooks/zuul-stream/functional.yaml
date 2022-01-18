@@ -2,11 +2,11 @@
   tasks:
     - name: Set python path fact
       set_fact:
-        python_path: "/usr/local/lib/python3.6/dist-packages"
+        python_path: "/usr/local/lib/python3.8/dist-packages"
 
     - name: Run ansible that should succeed
       command: >
-        /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
+        /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook -vvv
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
@@ -16,7 +16,7 @@
 
     - name: Run ansible playbook that should fail
       command: >
-        /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
+        /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook -vvv
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream-failure.yaml
       register: failed_results
       failed_when: "failed_results.rc != 2"
