@@ -68,6 +68,23 @@
       },
       "revId": "3a1cc6ac7c2c6ce7635742aeef29832cfef0dc04",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eed90f99_11f6dc32",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-18T22:39:25Z",
+      "side": 1,
+      "message": "The database connection is already hard-coded to have a name of \u0027database\u0027.  I don\u0027t think we have to change this here.",
+      "revId": "3a1cc6ac7c2c6ce7635742aeef29832cfef0dc04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
