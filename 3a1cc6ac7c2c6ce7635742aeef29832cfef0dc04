@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dea5231b_0dfb64eb",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-18T22:34:28Z",
+      "side": 1,
+      "message": "I think this is unnecessary due to the super call on line 42?",
+      "range": {
+        "startLine": 43,
+        "startChar": 8,
+        "endLine": 43,
+        "endChar": 22
+      },
+      "revId": "3a1cc6ac7c2c6ce7635742aeef29832cfef0dc04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce2eac3b_a517b286",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-18T22:34:28Z",
+      "side": 1,
+      "message": "I think this is unnecessary due to the super call on line 42?",
+      "range": {
+        "startLine": 54,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 32
+      },
+      "revId": "3a1cc6ac7c2c6ce7635742aeef29832cfef0dc04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89537866_9ebd9b92",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-18T22:34:28Z",
+      "side": 1,
+      "message": "The docs have this listed as \"database\" and is a hard coded value. Can/should we hardcode this here? Or does that have to wait for after the database config clean that will happen in v5?",
+      "range": {
+        "startLine": 311,
+        "startChar": 49,
+        "endLine": 311,
+        "endChar": 66
+      },
+      "revId": "3a1cc6ac7c2c6ce7635742aeef29832cfef0dc04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
