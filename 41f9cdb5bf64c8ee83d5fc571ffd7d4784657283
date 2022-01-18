@@ -16,6 +16,24 @@
       "message": "Should this be a JobData?  The list of affected projects could be quite large.",
       "revId": "41f9cdb5bf64c8ee83d5fc571ffd7d4784657283",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c37a69a6_8fcd1113",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2045,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-01-18T06:20:43Z",
+      "side": 1,
+      "message": "Thanks for the comment. I haven\u0027t thought about the list being that large. But if you say so, it makes sense to make it a JobData attribute. I will update the change.",
+      "parentUuid": "c7e3bd46_fb2b55d1",
+      "revId": "41f9cdb5bf64c8ee83d5fc571ffd7d4784657283",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
