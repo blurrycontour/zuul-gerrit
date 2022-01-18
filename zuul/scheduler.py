@@ -1075,6 +1075,7 @@ class Scheduler(threading.Thread):
             self.connections, self.zk_client, self.globals, self.statsd, self,
             self.merger, self.keystore)
         with self.layout_lock:
+            start = time.monotonic()
             log.debug("Updating local layout of tenant %s ", tenant_name)
             layout_state = self.tenant_layout_state.get(tenant_name)
             layout_uuid = layout_state and layout_state.uuid
@@ -1096,6 +1097,10 @@ class Scheduler(threading.Thread):
             else:
                 with suppress(KeyError):
                     del self.local_layout_state[tenant_name]
+
+        duration = round(time.monotonic() - start, 3)
+        self.log.info("Local layout update complete for %s (duration: %s "
+                      "seconds)", tenant_name, duration)
 
     def _checkTenantSourceConf(self, config):
         tenant_config = None
