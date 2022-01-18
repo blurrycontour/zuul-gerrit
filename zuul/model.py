@@ -617,6 +617,7 @@ class PipelineState(zkobject.ZKObject):
             if state.layout_uuid != layout_uuid:
                 reset_state = {
                     **cls.defaultState(),
+                    "layout_uuid": layout_uuid,
                     "pipeline": pipeline,
                     "old_queues": state.old_queues + state.queues,
                 }
