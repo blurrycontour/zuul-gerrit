@@ -16,14 +16,31 @@ import re
 import subprocess
 
 from zuul.driver.sql import SQLDriver
+from zuul.zk import ZooKeeperClient
 from tests.base import (
     BaseTestCase, MySQLSchemaFixture, PostgresqlSchemaFixture
 )
 
 
-class TestMysqlDatabase(BaseTestCase):
+class DBBaseTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
+        self.setupZK()
+
+        self.zk_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca
+        )
+        self.addCleanup(self.zk_client.disconnect)
+        self.zk_client.connect()
+
+
+class TestMysqlDatabase(DBBaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.setupZK()
 
         f = MySQLSchemaFixture()
         self.useFixture(f)
@@ -31,8 +48,17 @@ class TestMysqlDatabase(BaseTestCase):
         config = dict(dburi=f.dburi)
         driver = SQLDriver()
         self.connection = driver.getConnection('database', config)
-        self.connection.onLoad()
+        self.connection.onLoad(self.zk_client)
         self.addCleanup(self._cleanup)
+
+        self.zk_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca
+        )
+        self.addCleanup(self.zk_client.disconnect)
+        self.zk_client.connect()
 
     def _cleanup(self):
         self.connection.onStop()
@@ -74,7 +100,7 @@ class TestMysqlDatabase(BaseTestCase):
             connection.exec_driver_sql("set foreign_key_checks=1")
 
         self.connection.force_migrations = True
-        self.connection.onLoad()
+        self.connection.onLoad(self.zk_client)
         with self.connection.engine.begin() as connection:
             for table in connection.exec_driver_sql("show tables"):
                 table = table[0]
@@ -122,7 +148,7 @@ class TestMysqlDatabase(BaseTestCase):
         self.assertEqual(db_buildset.result, 'SUCCESS')
 
 
-class TestPostgresqlDatabase(BaseTestCase):
+class TestPostgresqlDatabase(DBBaseTestCase):
     def setUp(self):
         super().setUp()
 
@@ -133,7 +159,7 @@ class TestPostgresqlDatabase(BaseTestCase):
         config = dict(dburi=f.dburi)
         driver = SQLDriver()
         self.connection = driver.getConnection('database', config)
-        self.connection.onLoad()
+        self.connection.onLoad(self.zk_client)
         self.addCleanup(self._cleanup)
 
     def _cleanup(self):
@@ -159,7 +185,7 @@ class TestPostgresqlDatabase(BaseTestCase):
                 connection.exec_driver_sql(f"drop table {table} cascade")
 
         self.connection.force_migrations = True
-        self.connection.onLoad()
+        self.connection.onLoad(self.zk_client)
 
         alembic_out = subprocess.check_output(
             f"pg_dump -h {self.db.host} -U {self.db.name} -s {self.db.name}",

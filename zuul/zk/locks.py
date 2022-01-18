@@ -23,6 +23,7 @@ from zuul.zk.vendor.lock import Lock, ReadLock, WriteLock
 
 LOCK_ROOT = "/zuul/locks"
 TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"
+CONNECTION_LOCK_ROOT = f"{LOCK_ROOT}/connection"
 
 
 class SessionAwareMixin:
