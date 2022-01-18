@@ -12,6 +12,7 @@
 
     - name: Rename job-output.txt
       command: mv job-output.txt stream-job-output.txt
+      failed_when: false
 
     - name: Fetch files
       synchronize:
