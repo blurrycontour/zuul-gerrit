@@ -304,6 +304,20 @@ This is a reference for object layout in Zookeeper.
 
    Holds various types of locks so that multiple components can coordinate.
 
+.. path:: zuul/locks/connection
+
+   Locks related to connections.
+
+.. path:: zuul/locks/connection/<connection>
+
+   Locks related to a single connection.
+
+.. path:: zuul/locks/connection/database/migration
+   :type: Lock
+
+   Only one component should run a database migration; this lock
+   ensures that.
+
 .. path:: zuul/locks/events
 
    Locks related to tenant event queues.
