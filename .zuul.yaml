@@ -1,12 +1,16 @@
 - nodeset:
     name: zuul-functional-temp-master
     nodes:
+      # python_path in playbooks/zuul-stream/functional.yaml and
+      # callback_plugins in playbooks/zuul-stream/templates/ansible.cfg.j2
+      # need their python versions updated when these labels change to
+      # a platform that uses a different python version.
       - name: controller
-        label: ubuntu-bionic
+        label: ubuntu-focal
       - name: node1
-        label: ubuntu-bionic
+        label: ubuntu-focal
       - name: node2
-        label: ubuntu-bionic
+        label: ubuntu-focal
     groups:
       - name: node
         nodes:
@@ -48,7 +52,7 @@
     description: |
       Zuul unit tests with ZooKeeper running
     parent: tox
-    nodeset: ubuntu-bionic
+    nodeset: ubuntu-focal
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
@@ -91,7 +95,6 @@
     vars:
       zuul_work_dir: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}"
       tox_envlist: zuul_client
-    nodeset: ubuntu-bionic
 
 - job:
     name: zuul-tox-py36
@@ -101,6 +104,7 @@
     vars:
       tox_envlist: py36
       python_version: 3.6
+    nodeset: ubuntu-bionic
 
 - job:
     name: zuul-tox-py38
