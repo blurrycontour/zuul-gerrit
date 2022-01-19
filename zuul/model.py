@@ -2020,6 +2020,10 @@ class FrozenJob(zkobject.ZKObject):
     def serialize(self):
         data = {}
         for k in self.attributes:
+            # TODO: Backwards compat handling, remove after 5.0
+            if k == 'config_hash':
+                if not hasattr(self, k):
+                    continue
             v = getattr(self, k)
             if k == 'nodeset':
                 v = v.toDict()
