@@ -7,7 +7,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=insecure_worker
     ports:
-      - "3306:3306"
+      - "${ZUUL_MYSQL_PORT:-3306}:3306"
     tmpfs:
       - /var/lib/mysql
     volumes:
