@@ -2020,6 +2020,10 @@ class FrozenJob(zkobject.ZKObject):
     def serialize(self):
         data = {}
         for k in self.attributes:
+            # TODO: Backwards compat handling, remove after 5.0
+            if k == 'config_hash':
+                if not hasattr(self, k):
+                    continue
             v = getattr(self, k)
             if k == 'nodeset':
                 v = v.toDict()
@@ -2038,6 +2042,10 @@ class FrozenJob(zkobject.ZKObject):
             data[k] = v
 
         for k in self.job_data_attributes:
+            # TODO: Backwards compat handling, remove after 5.0
+            if k == 'affected_projects':
+                if not hasattr(self, '_' + k):
+                    continue
             v = getattr(self, '_' + k)
             if isinstance(v, JobData):
                 v = {'storage': 'offload', 'path': v.getPath(), 'hash': v.hash}
