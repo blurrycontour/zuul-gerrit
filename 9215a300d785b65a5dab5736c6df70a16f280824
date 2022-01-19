@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5ccaf8e_60ad505c",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-19T17:20:24Z",
+      "side": 1,
+      "message": "This means that the affected_project check shouldn\u0027t be required.",
+      "revId": "9215a300d785b65a5dab5736c6df70a16f280824",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
