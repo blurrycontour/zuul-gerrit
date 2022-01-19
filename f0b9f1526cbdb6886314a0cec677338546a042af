@@ -16,6 +16,24 @@
       "message": "I missed this while it was in review but +2 from me.",
       "revId": "f0b9f1526cbdb6886314a0cec677338546a042af",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5dee6d2_d990e796",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-01-19T23:49:36Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "6091198a_2a48aac8",
+      "revId": "f0b9f1526cbdb6886314a0cec677338546a042af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
