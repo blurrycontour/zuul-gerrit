@@ -1828,7 +1828,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
         self.assertEqual('tenant-one', request['tenant'])
-        self.assertIn('org/project', request['project'])
+        # The matcher expects a canonical project name
+        self.assertEqual('review.example.com/org/project', request['project'])
         self.assertEqual('project-test2', request['job'])
         self.assertEqual(".*", request['ref_filter'])
         self.assertEqual("some reason", request['reason'])

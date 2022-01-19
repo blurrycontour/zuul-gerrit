@@ -561,6 +561,8 @@ class ZuulWebAPI(object):
             tenant = self._getTenantOrRaise(tenant_name)
             project = self._getProjectOrRaise(tenant, project_name)
 
+            project_name = project.canonical_name
+
             if jbody['change']:
                 ref_filter = project.source.getRefForChange(jbody['change'])
             if jbody['ref']:
