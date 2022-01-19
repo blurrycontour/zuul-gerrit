@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af970f6a_2a97c563",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-19T19:43:38Z",
+      "side": 1,
+      "message": "recheck this should be unrelated to the focal change as python3.6 testing remains on bionic.",
+      "revId": "250177b07b2d0215087973f285f8bfc03970467b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
