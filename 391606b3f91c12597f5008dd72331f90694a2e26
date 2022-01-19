@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1eb886b1_fe046945",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-19T17:54:25Z",
+      "side": 1,
+      "message": "Is it worth adding a note here reminding us to update the playbooks if the python version changes?",
+      "revId": "391606b3f91c12597f5008dd72331f90694a2e26",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
