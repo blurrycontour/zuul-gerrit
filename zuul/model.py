@@ -1917,7 +1917,7 @@ class JobData(zkobject.ShardedZKObject):
             "hash": self.hash,
             "_path": self._path,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
 
 class FrozenJob(zkobject.ZKObject):
