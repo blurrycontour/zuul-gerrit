@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "366daeff_eeb7a4f5",
+        "filename": "doc/source/conf.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-01-20T19:18:33Z",
+      "side": 1,
+      "message": "Not blocking, but according to https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-html_baseurl we should up our Sphinx minimum to 1.8 when using this. I\u0027ll push a trivial change as a followup.",
+      "revId": "7aea6bcc870a8eaa38f76adb7f6a04de4ba2516c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
