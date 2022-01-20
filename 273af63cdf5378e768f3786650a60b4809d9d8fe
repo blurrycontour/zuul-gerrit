@@ -33,6 +33,24 @@
       "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e I think it would be better to keep the tools directory and the tutorial examples separate.  The tools directory is a bit informal and not tested.  The tutorial examples should be as minimal as possible.\n\nSure, I just wanted to avoid duplicating the script. My first version was actually separate and I can restore it in next PS.\n\n\u003e \n\u003e Given that the tools/test-setup-docker.sh script runs zk-ca.sh before docker-compose, how is this necessary?  Are you running docker-compose without using test-setup-docker.sh?  Maybe you can just add the wait into whatever script you are running.\n\nI\u0027m not really sure why it happens but with ZooKeeper 3.7 it just hangs and doesn\u0027t come up if this waiting is not done. It\u0027s not about generating the certs before docker-compose but something related with the order of mount availability and ZooKeeper service start. Probably the author of the related change in the tutorial version knows more.\n",
       "revId": "273af63cdf5378e768f3786650a60b4809d9d8fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57b2d20d_42e8acb5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-01-20T10:43:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56d26bea_d5b73501",
+      "revId": "273af63cdf5378e768f3786650a60b4809d9d8fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

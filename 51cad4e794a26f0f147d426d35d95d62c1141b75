@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cf99fce_78338c78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-01-20T10:43:45Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e I think it would be better to keep the tools directory and the tutorial examples separate.  The tools directory is a bit informal and not tested.  The tutorial examples should be as minimal as possible.\n\u003e \n\u003e Given that the tools/test-setup-docker.sh script runs zk-ca.sh before docker-compose, how is this necessary?  Are you running docker-compose without using test-setup-docker.sh?  Maybe you can just add the wait into whatever script you are running.\n\n",
+      "revId": "51cad4e794a26f0f147d426d35d95d62c1141b75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
