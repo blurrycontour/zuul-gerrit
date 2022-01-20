@@ -75,14 +75,14 @@ html_theme = "sphinx_rtd_theme"
 if version.is_release:
     version = version.release_string
     current_version = version.release_string
-    versions = [('latest', f'{doc_root}/')]
+    versions = [('latest', f'{doc_root}/latest/')]
 else:
     # Uncomment this if we want to use the in-development version
     # number (eg 4.10.5.dev4 887cf31e4 )
     # version = version.get_version_string()
     version = 'latest'
     current_version = 'latest'
-    versions = [('latest', f'{doc_root}/')]
+    versions = [('latest', f'{doc_root}/latest/')]
 
 try:
     output = subprocess.check_output(['git', 'tag']).decode('utf8')
