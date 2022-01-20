@@ -4126,9 +4126,12 @@ class QueueItem(zkobject.ZKObject):
     def resetAllBuilds(self):
         context = self.pipeline.manager.current_context
         old_build_set = self.current_build_set
+        files_state = (BuildSet.COMPLETE if self.change.files is not None
+                       else BuildSet.NEW)
         self.updateAttributes(
             context,
-            current_build_set=BuildSet.new(context, item=self),
+            current_build_set=BuildSet.new(context, item=self,
+                                           files_state=files_state),
             layout_uuid=None)
         old_build_set.delete(context)
 

@@ -678,6 +678,13 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
 
+        # Make sure that after a reset of the buildset the files state is
+        # updated correctly and the schedulers is not resolving the list
+        # of changed files via the merger.
+        self.assertIsNone(
+            self.scheds.first.sched.merger.merger_api.history.get(
+                "fileschanges"))
+
     def test_independent_queues(self):
         "Test that changes end up in the right queues"
 
