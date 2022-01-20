@@ -16,6 +16,23 @@
       "message": "Do we want to append latest to this so that it avoids treating all releases as canonical? Or maybe this is sufficient to find the root.",
       "revId": "d7fd6ca8e90c4861c9f8e0b98919aea9d1bd105a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be731e44_c5c306ad",
+        "filename": "doc/source/conf.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-20T17:38:58Z",
+      "side": 1,
+      "message": "Yes we want latest, thanks :)",
+      "revId": "d7fd6ca8e90c4861c9f8e0b98919aea9d1bd105a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
