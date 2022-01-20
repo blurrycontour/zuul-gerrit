@@ -16,6 +16,24 @@
       "message": "This means that the affected_project check shouldn\u0027t be required.",
       "revId": "9215a300d785b65a5dab5736c6df70a16f280824",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55bfe75e_f6084600",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2111,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-01-20T06:19:18Z",
+      "side": 1,
+      "message": "I think the check for the affected_projects (PS1) is needed. This check is only for the deserialization, or?. But if we want to re-serialize the object, we will still loop over all job_data_attributes which contains the affected_projects key. That would lead to https://review.opendev.org/c/zuul/zuul/+/825349/2/zuul/model.py#b2041 throwing an AttributeError.\nOr am I missing something here?",
+      "parentUuid": "b5ccaf8e_60ad505c",
+      "revId": "9215a300d785b65a5dab5736c6df70a16f280824",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
