@@ -71,6 +71,8 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 html_theme = "sphinx_rtd_theme"
+# This adds a <link rel=canonical> tag
+html_baseurl = f'https://zuul-ci.org{doc_root}'
 
 if version.is_release:
     version = version.release_string
