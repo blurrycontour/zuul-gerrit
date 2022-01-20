@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19855acc_df1f5709",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-20T16:09:14Z",
+      "side": 1,
+      "message": "This matches the QueueItem.new method",
+      "revId": "577f621901244cd71987535dd09a375e8abd9370",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
