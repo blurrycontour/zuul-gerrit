@@ -19,6 +19,7 @@
     nodeset: zuul-functional-temp-master
     pre-run: playbooks/zuul-stream/pre.yaml
     run: playbooks/zuul-stream/functional.yaml
+    irrelevant-files: '^docs/.*'
     post-run:
       - playbooks/zuul-stream/post.yaml
       - playbooks/zuul-stream/post-ara.yaml
@@ -67,6 +68,7 @@
     timeout: 2700  # 45 minutes
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
+    irrelevant-files: '^docs/.*'
     vars:
       tox_envlist: remote
       tox_environment:
@@ -85,6 +87,7 @@
     required-projects:
       - zuul/zuul
       - zuul/zuul-client
+    irrelevant-files: '^docs/.*'
     vars:
       zuul_work_dir: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}"
       tox_envlist: zuul_client
@@ -94,6 +97,7 @@
     name: zuul-tox-py36
     parent: zuul-tox
     timeout: 5400  # 90 minutes
+    irrelevant-files: '^docs/.*'
     vars:
       tox_envlist: py36
       python_version: 3.6
@@ -102,6 +106,7 @@
     name: zuul-tox-py38
     parent: zuul-tox
     timeout: 5400  # 90 minutes
+    irrelevant-files: '^docs/.*'
     vars:
       tox_envlist: py38
       python_version: 3.8
@@ -110,6 +115,7 @@
     name: zuul-tox-py38-multi-scheduler
     parent: zuul-tox-py38
     voting: false
+    irrelevant-files: '^docs/.*'
     vars:
       tox_environment:
         ZUUL_SCHEDULER_COUNT: 2
@@ -173,6 +179,7 @@
     pre-run: playbooks/tutorial/pre.yaml
     run: playbooks/tutorial/run.yaml
     post-run: playbooks/tutorial/post.yaml
+    irrelevant-files: '^docs/.*'
     required-projects:
       - zuul/zuul
 
@@ -203,6 +210,7 @@
       - python-builder-3.8-bullseye-container-image
       - python-base-3.8-bullseye-container-image
     provides: zuul-container-image
+    irrelevant-files: '^docs/.*'
     vars: &zuul_image_vars
       docker_images:
         - context: .
@@ -238,6 +246,7 @@
     parent: opendev-upload-docker-image
     description: Build Docker images and upload to Docker Hub.
     allowed-projects: zuul/zuul
+    irrelevant-files: '^docs/.*'
     requires:
       - python-builder-3.8-bullseye-container-image
       - python-base-3.8-bullseye-container-image
@@ -253,6 +262,7 @@
     parent: opendev-promote-docker-image
     description: Promote previously uploaded Docker images.
     allowed-projects: zuul/zuul
+    irrelevant-files: '^docs/.*'
     secrets:
       name: docker_credentials
       secret: zuul-dockerhub
@@ -264,11 +274,13 @@
 - job:
     name: zuul-build-python-release
     parent: build-python-release
+    irrelevant-files: '^docs/.*'
     pre-run: playbooks/release/pre.yaml
 
 - job:
     name: zuul-release-python
     parent: opendev-release-python
+    irrelevant-files: '^docs/.*'
     pre-run: playbooks/release/pre.yaml
 
 - project:
