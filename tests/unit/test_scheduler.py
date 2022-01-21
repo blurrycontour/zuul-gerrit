@@ -6131,6 +6131,10 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    # TODO: There seems to be a race condition in the kazoo election
+    # recipe that can cause the stats election thread to hang after
+    # reconnecting.
+    @skip("This is unstable in the gate")
     def test_scheduler_disconnect(self):
         "Test that jobs are completed after a scheduler disconnect"
 
@@ -6157,6 +6161,8 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    # TODO: See comment for test_scheduler_disconnect.
+    @skip("This is unstable in the gate")
     def test_zookeeper_disconnect(self):
         "Test that jobs are executed after a zookeeper disconnect"
 
