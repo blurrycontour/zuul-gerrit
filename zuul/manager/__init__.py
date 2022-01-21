@@ -106,7 +106,7 @@ class PipelineManager(metaclass=ABCMeta):
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")
-        change_queues = self.pipeline.relative_priority_queues
+        change_queues = self.pipeline.relative_priority_queues.copy()
         tenant = self.pipeline.tenant
         layout_project_configs = layout.project_configs
 
@@ -638,7 +638,7 @@ class PipelineManager(metaclass=ABCMeta):
             return
 
         log = get_annotated_logger(self.log, item.event)
-        item.updateAttributes(self.current_context, bundle=model.Bundle())
+        item._set(bundle=model.Bundle())
 
         # Try to find already enqueued items of this cycle, so we use
         # the same bundle
@@ -647,12 +647,20 @@ class PipelineManager(metaclass=ABCMeta):
             if not needed_item:
                 continue
             # Use a common bundle for the cycle
-            item.updateAttributes(self.current_context,
-                                  bundle=needed_item.bundle)
+            item._set(bundle=needed_item.bundle)
             break
 
         log.info("Adding cycle item %s to bundle %s", item, item.bundle)
-        item.bundle.add_item(item)
+        bundle = item.bundle
+        bundle.add_item(item)
+
+        # Write out the updated bundle info to Zookeeper for all items
+        for bundle_item in bundle.items:
+            # FIXME (swestphahl): This is a hack to satisfy the old vs. new
+            # state check in the ZKObject that is used to determine if the
+            # item has changed and needs to be saved.
+            bundle_item._set(bundle=None)
+            bundle_item.updateAttributes(self.current_context, bundle=bundle)
 
     def dequeueIncompleteCycle(self, change, dependency_graph, event,
                                change_queue):
