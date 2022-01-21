@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c055136c_e6869710",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-01-21T21:43:00Z",
+      "side": 1,
+      "message": "Technically I think this is unneeded with the hash now.",
+      "revId": "c7245814553a4ab259c4e24b5c2d74fe4af8a591",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
