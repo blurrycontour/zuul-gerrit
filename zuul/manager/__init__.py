@@ -106,7 +106,9 @@ class PipelineManager(metaclass=ABCMeta):
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")
-        change_queues = self.pipeline.relative_priority_queues
+        # Note: change_queues is serialized to ZK, so mutate a copy
+        # and then update the attribute when we finish.
+        change_queues = self.pipeline.relative_priority_queues.copy()
         tenant = self.pipeline.tenant
         layout_project_configs = layout.project_configs
 
@@ -652,7 +654,14 @@ class PipelineManager(metaclass=ABCMeta):
             break
 
         log.info("Adding cycle item %s to bundle %s", item, item.bundle)
-        item.bundle.add_item(item)
+        bundle = item.bundle
+        bundle.add_item(item)
+
+        # Write out the updated bundle info to Zookeeper for all items
+        # since it may have mutated since our last write.
+        for bundle_item in bundle.items:
+            bundle_item.updateAttributes(self.current_context,
+                                         bundle=bundle)
 
     def dequeueIncompleteCycle(self, change, dependency_graph, event,
                                change_queue):

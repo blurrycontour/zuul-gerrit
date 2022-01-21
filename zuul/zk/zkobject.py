@@ -99,12 +99,11 @@ class ZKObject:
         call as possible for efficient network use.
         """
         old = self.__dict__.copy()
-        oldserial = self._trySerialize(context)
         self._set(**kw)
-        newserial = self._trySerialize(context)
-        if oldserial != newserial:
+        serial = self._trySerialize(context)
+        if hash(serial) != getattr(self, '_zkobject_hash', None):
             try:
-                self._save(context, newserial)
+                self._save(context, serial)
             except Exception:
                 # Roll back our old values if we aren't able to update ZK.
                 self._set(**old)
@@ -117,13 +116,12 @@ class ZKObject:
                 f"Another context is already active {self._active_context}")
         try:
             old = self.__dict__.copy()
-            oldserial = self._trySerialize(context)
             self._set(_active_context=context)
             yield
-            newserial = self._trySerialize(context)
-            if oldserial != newserial:
+            serial = self._trySerialize(context)
+            if hash(serial) != getattr(self, '_zkobject_hash', None):
                 try:
-                    self._save(context, newserial)
+                    self._save(context, serial)
                 except Exception:
                     # Roll back our old values if we aren't able to update ZK.
                     self._set(**old)
@@ -197,13 +195,15 @@ class ZKObject:
         while context.sessionIsValid():
             try:
                 compressed_data, zstat = context.client.get(path)
+                self._set(_zkobject_hash=None)
                 try:
                     data = zlib.decompress(compressed_data)
                 except zlib.error:
                     # Fallback for old, uncompressed data
                     data = compressed_data
                 self._set(**self.deserialize(data, context))
-                self._set(_zstat=zstat)
+                self._set(_zstat=zstat,
+                          _zkobject_hash=hash(data))
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
@@ -239,7 +239,8 @@ class ZKObject:
                 else:
                     zstat = context.client.set(path, compressed_data,
                                                version=self._zstat.version)
-                self._set(_zstat=zstat)
+                self._set(_zstat=zstat,
+                          _zkobject_hash=hash(data))
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
@@ -281,12 +282,14 @@ class ShardedZKObject(ZKObject):
             path = self.getPath()
         while context.sessionIsValid():
             try:
+                self._set(_zkobject_hash=None)
                 with sharding.BufferedShardReader(
                         context.client, path) as stream:
                     data = stream.read()
                 if not data and context.client.exists(path) is None:
                     raise NoNodeError
                 self._set(**self.deserialize(data, context))
+                self._set(_zkobject_hash=hash(data))
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
@@ -324,6 +327,7 @@ class ShardedZKObject(ZKObject):
                         context.client, path) as stream:
                     stream.truncate(0)
                     stream.write(data)
+                self._set(_zkobject_hash=hash(data))
                 return
             except ZookeeperError:
                 # These errors come from the server and are not

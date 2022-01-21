@@ -261,3 +261,60 @@ class TestScaleOutScheduler(ZuulTestCase):
 
         holders = tenant.semaphore_handler.semaphoreHolders(semaphore)
         self.assertEqual(len(holders), 0)
+
+
+class TestSOSCircularDependencies(ZuulTestCase):
+    # Those tests are testing specific interactions between multiple
+    # schedulers. They create additional schedulers as necessary and
+    # start or stop them individually to test specific interactions.
+    # Using the scheduler_count in addition to create even more
+    # schedulers doesn't make sense for those tests.
+    scheduler_count = 1
+
+    @simple_layout('layouts/sos-circular.yaml')
+    def test_simple_cycle(self):
+        self.executor_server.hold_jobs_in_build = True
+        Z = self.fake_gerrit.addFakeChange('org/project', "master", "Z")
+        A = self.fake_gerrit.addFakeChange('org/project', "master", "A")
+        B = self.fake_gerrit.addFakeChange('org/project', "master", "B")
+
+        # Z, A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+        Z.addApproval("Code-Review", 2)
+        self.fake_gerrit.addEvent(Z.addApproval("Approved", 1))
+        self.waitUntilSettled()
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        # Start a second scheduler
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+        self.waitUntilSettled()
+
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            # Release the first item so the second moves into the
+            # active window.
+            self.assertEqual(len(self.builds), 2)
+            builds = self.builds[:]
+            builds[0].release()
+            builds[1].release()
+            self.waitUntilSettled(matcher=[app])
+            self.assertEqual(len(self.builds), 4)
+            builds = self.builds[:]
+            self.executor_server.failJob('job1', A)
+            builds[0].release()
+            app.sched.wake_event.set()
+            self.waitUntilSettled(matcher=[app])
+            self.assertEqual(A.reported, 2)
+            self.assertEqual(B.reported, 2)
