@@ -129,6 +129,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f285a2c7_aecfbe3e",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-21T09:50:41Z",
+      "side": 1,
+      "message": "We need to forward the decompress flag here.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cf69f847_267f3fb2",
         "filename": "tools/zk-dump.py",
         "patchSetId": 5
