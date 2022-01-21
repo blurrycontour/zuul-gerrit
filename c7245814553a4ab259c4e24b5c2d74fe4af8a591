@@ -16,6 +16,23 @@
       "message": "Technically I think this is unneeded with the hash now.",
       "revId": "c7245814553a4ab259c4e24b5c2d74fe4af8a591",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0468785a_958f09bd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-21T21:55:42Z",
+      "side": 1,
+      "message": "I agree, I almost omitted it.  But just in case an error causes a rollback or something, and in general, to try to maintain the pattern of not mutating items outside of our context manager for clarity.",
+      "revId": "c7245814553a4ab259c4e24b5c2d74fe4af8a591",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
