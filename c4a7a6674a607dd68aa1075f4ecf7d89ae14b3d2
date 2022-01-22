@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8420372_17cd5c19",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-22T00:12:45Z",
+      "side": 1,
+      "message": "Yes it should.",
+      "revId": "c4a7a6674a607dd68aa1075f4ecf7d89ae14b3d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1996b531_f71c3e4a",
@@ -48,6 +65,23 @@
       "writtenOn": "2022-01-22T00:06:14Z",
       "side": 1,
       "message": "It is a little confusing that we call them first and second as variables but then the log messages call them scheduler-1 and scheduler-0.\n\nAlso maybe indicate we are freezing its updates. Below we use a similar message to indicate scheduler-0\u0027s run loop is frozen.",
+      "revId": "c4a7a6674a607dd68aa1075f4ecf7d89ae14b3d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c033715_754073c9",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-22T00:12:45Z",
+      "side": 1,
+      "message": "Yes it\u0027s confusing!  But this matches the automatically generated debug logs like this:\n2022-01-21 13:53:14,410 zuul.Scheduler-0                 DEBUG    Run handler awake\n\nSo... maybe we should change those to increment by one.  :)",
       "revId": "c4a7a6674a607dd68aa1075f4ecf7d89ae14b3d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
