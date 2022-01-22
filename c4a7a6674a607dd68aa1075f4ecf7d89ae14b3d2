@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "faaec965_3398b549",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-22T00:06:14Z",
+      "side": 1,
+      "message": "Couple of small things inline. Not approving as this conflicts with the bug fix in https://review.opendev.org/c/zuul/zuul/+/825880",
+      "revId": "c4a7a6674a607dd68aa1075f4ecf7d89ae14b3d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45577efa_215c99a7",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-22T00:06:14Z",
+      "side": 1,
+      "message": "Should this set scheduler_count to 1?",
+      "revId": "c4a7a6674a607dd68aa1075f4ecf7d89ae14b3d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1996b531_f71c3e4a",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-22T00:06:14Z",
+      "side": 1,
+      "message": "It is a little confusing that we call them first and second as variables but then the log messages call them scheduler-1 and scheduler-0.\n\nAlso maybe indicate we are freezing its updates. Below we use a similar message to indicate scheduler-0\u0027s run loop is frozen.",
+      "revId": "c4a7a6674a607dd68aa1075f4ecf7d89ae14b3d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
