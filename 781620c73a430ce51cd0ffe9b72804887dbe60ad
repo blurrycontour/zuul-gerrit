@@ -39,6 +39,23 @@
       },
       "revId": "781620c73a430ce51cd0ffe9b72804887dbe60ad",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b1c3732_e8e8bddd",
+        "filename": "tools/zk-shell.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-25T14:53:13Z",
+      "side": 1,
+      "message": "Fixed.",
+      "revId": "781620c73a430ce51cd0ffe9b72804887dbe60ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
