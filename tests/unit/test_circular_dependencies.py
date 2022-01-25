@@ -15,7 +15,7 @@
 
 import textwrap
 
-import zuul.rpcclient
+from zuul.model import PromoteEvent
 
 from tests.base import ZuulTestCase
 
@@ -1261,14 +1261,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        client = zuul.rpcclient.RPCClient("127.0.0.1",
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        client.promote(
-            tenant="tenant-one",
-            pipeline="gate",
-            change_ids=["2,1"]
-        )
+        event = PromoteEvent('tenant-one', 'gate', ["2,1"])
+        self.scheds.first.sched.pipeline_management_events['tenant-one'][
+            'gate'].put(event)
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 4)
