@@ -71,7 +71,9 @@ import requests_mock
 from kazoo.exceptions import NoNodeError
 
 from zuul import model
-from zuul.model import BuildRequest, Change, MergeRequest, WebInfo
+from zuul.model import (
+    BuildRequest, Change, MergeRequest, WebInfo, HoldRequest
+)
 from zuul.rpcclient import RPCClient
 
 from zuul.driver.zuul import ZuulDriver
@@ -5888,6 +5890,18 @@ class ZuulTestCase(BaseTestCase):
             repo = git.Repo(path)
             repos[project] = repo
         return repos
+
+    def addAutohold(self, tenant_name, project_name, job_name,
+                    ref_filter, reason, count, node_hold_expiration):
+        request = HoldRequest()
+        request.tenant = tenant_name
+        request.project = project_name
+        request.job = job_name
+        request.ref_filter = ref_filter
+        request.reason = reason
+        request.max_count = count
+        request.node_expiration = node_hold_expiration
+        self.sched_zk_nodepool.storeHoldRequest(request)
 
 
 class AnsibleZuulTestCase(ZuulTestCase):

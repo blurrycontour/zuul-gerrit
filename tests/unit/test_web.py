@@ -27,7 +27,6 @@ from unittest import skip
 import requests
 
 import zuul.web
-import zuul.rpcclient
 
 from tests.base import ZuulTestCase, AnsibleZuulTestCase
 from tests.base import ZuulWebFixture, FIXTURE_DIR, iterate_timeout
@@ -842,12 +841,8 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_info(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.addAutohold('tenant-one', 'review.example.com/org/project',
+                         'project-test2', '.*', 'reason text', 1, 600)
 
         # Use autohold-list API to retrieve request ID
         resp = self.get_url(
@@ -879,12 +874,8 @@ class TestWeb(BaseTestWeb):
 
     def test_autohold_list(self):
         """test listing autoholds through zuul-web"""
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.addAutohold('tenant-one', 'review.example.com/org/project',
+                         'project-test2', '.*', 'reason text', 1, 600)
         resp = self.get_url(
             "api/tenant/tenant-one/autohold")
         self.assertEqual(200, resp.status_code, resp.text)
@@ -1782,10 +1773,10 @@ class TestTenantScopedWebApi(BaseTestWeb):
             headers={'Authorization': 'Bearer %s' % good_token},
             json=args)
         self.assertEqual(200, req.status_code, req.text)
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        autohold_requests = client.autohold_list()
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
@@ -1819,11 +1810,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
         data = req.json()
         self.assertEqual(True, data)
 
-        # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        autohold_requests = client.autohold_list()
+        # Check result
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
@@ -1839,12 +1830,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.addAutohold('tenant-one', 'review.example.com/org/project',
+                         'project-test2', '.*', 'reason text', 1, 600)
 
         # Use autohold-list API to retrieve request ID
         resp = self.get_url(
@@ -1854,7 +1841,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request_id = autohold_requests[0]['id']
-        return client, request_id, token
+        return request_id, token
 
     def test_autohold_delete_wrong_tenant(self):
         """Make sure authorization rules are applied"""
@@ -1865,7 +1852,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                      'admin': ['tenant-one', ]
                  },
                  'exp': time.time() + 3600}
-        client, request_id, _ = self._init_autohold_delete(authz)
+        request_id, _ = self._init_autohold_delete(authz)
         # now try the autohold-delete API
         bad_authz = {'iss': 'zuul_operator',
                      'aud': 'zuul.example.com',
@@ -1882,9 +1869,6 @@ class TestTenantScopedWebApi(BaseTestWeb):
         # Throw a "Forbidden" error, because user is authenticated but not
         # authorized for tenant-one
         self.assertEqual(403, resp.status_code, resp.text)
-        # clean up
-        r = client.autohold_delete(request_id)
-        self.assertTrue(r)
 
     def test_autohold_delete(self):
         authz = {'iss': 'zuul_operator',
@@ -1894,7 +1878,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                      'admin': ['tenant-one', ]
                  },
                  'exp': time.time() + 3600}
-        client, request_id, token = self._init_autohold_delete(authz)
+        request_id, token = self._init_autohold_delete(authz)
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request_id,
             headers={'Authorization': 'Bearer %s' % token})
@@ -2592,12 +2576,11 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
         data = req.json()
         self.assertEqual(True, data)
 
-        # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
-        autohold_requests = client.autohold_list()
+        # Check result
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
 
@@ -2615,12 +2598,8 @@ class TestHeldAttributeInBuildInfo(BaseTestWeb):
 
     def test_autohold_and_retrieve_held_build_info(self):
         """Ensure the "held" attribute can be used to filter builds"""
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.addAutohold('tenant-one', 'review.example.com/org/project',
+                         'project-test2', '.*', 'reason text', 1, 600)
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         self.executor_server.failJob('project-test2', B)
@@ -2672,8 +2651,7 @@ class TestWebMulti(BaseTestWeb):
         self.assertEqual([gerrit_connection, github_connection], data)
 
 
-# TODO Remove this class once REST support is removed from Zuul CLI, or
-# switch to the gearman client
+# TODO Remove this class once REST support is removed from Zuul CLI
 class TestCLIViaWebApi(BaseTestWeb):
     config_file = 'zuul-admin-web.conf'
 
@@ -2697,11 +2675,11 @@ class TestCLIViaWebApi(BaseTestWeb):
             stdout=subprocess.PIPE)
         output = p.communicate()
         self.assertEqual(p.returncode, 0, output[0])
-        # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        autohold_requests = client.autohold_list()
+        # Check result
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
