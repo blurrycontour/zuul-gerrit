@@ -20,7 +20,6 @@ import socket
 
 from testtools.matchers import MatchesRegex
 
-import zuul.rpcclient
 from zuul.lib import strings
 from zuul.zk.layout import LayoutState
 
@@ -332,80 +331,6 @@ class TestPagureDriver(ZuulTestCase):
         self.assertEqual('tag', zuulvars['pipeline'])
         self.assertEqual('project-tag-job', zuulvars['job'])
         self.assertEqual(tagsha, zuulvars['newrev'])
-
-    @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
-    def test_client_dequeue_change_pagure(self):
-
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_pagure.openFakePullRequest('org/project', 'master', 'A')
-
-        self.fake_pagure.emitEvent(A.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
-
-        client.dequeue(
-            tenant='tenant-one',
-            pipeline='check',
-            project='org/project',
-            change='%s,%s' % (A.number, A.commit_stop),
-            ref=None)
-
-        self.waitUntilSettled()
-
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-        check_pipeline = tenant.layout.pipelines['check']
-        self.assertEqual(check_pipeline.getAllItems(), [])
-        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 2)
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-    @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
-    def test_client_enqueue_change_pagure(self):
-
-        A = self.fake_pagure.openFakePullRequest('org/project', 'master', 'A')
-
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.enqueue(tenant='tenant-one',
-                           pipeline='check',
-                           project='org/project',
-                           trigger='pagure',
-                           change='%s,%s' % (A.number, A.commit_stop))
-        self.waitUntilSettled()
-
-        self.assertEqual(self.getJobFromHistory('project-test1').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test2').result,
-                         'SUCCESS')
-        self.assertEqual(r, True)
-
-    @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
-    def test_client_enqueue_ref_pagure(self):
-        repo_path = os.path.join(self.upstream_root, 'org/project')
-        repo = git.Repo(repo_path)
-        headsha = repo.head.commit.hexsha
-
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.enqueue_ref(
-            tenant='tenant-one',
-            pipeline='post',
-            project='org/project',
-            trigger='pagure',
-            ref='master',
-            oldrev='90f173846e3af9154517b88543ffbd1691f31366',
-            newrev=headsha)
-        self.waitUntilSettled()
-        self.assertEqual(self.getJobFromHistory('project-post-job').result,
-                         'SUCCESS')
-        self.assertEqual(r, True)
 
     @simple_layout('layouts/requirements-pagure.yaml', driver='pagure')
     def test_pr_score_require_1_vote(self):
