@@ -107,6 +107,24 @@
       "message": "... no longer required ... ?",
       "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d38e7ae6_578a0fb9",
+        "filename": "releasenotes/notes/gearmanectomy-ecec32b3764eafc1.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-25T23:54:07Z",
+      "side": 1,
+      "message": "Yes \"no longer required\" would be correct. I think it is worth fixing this since this is a major part of the zuulv5 upgrade.",
+      "parentUuid": "da2b8d5e_2f754540",
+      "revId": "303da8ed083db4b75484dac92aa6ae2fac2a7a6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
