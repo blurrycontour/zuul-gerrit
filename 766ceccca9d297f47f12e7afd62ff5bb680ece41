@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "591181a5_a895bb57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-25T23:47:27Z",
+      "side": 1,
+      "message": "Seems releasenotes/notes/last3x-8682ada4910fa750.yaml depends on the _sql-driver docs tag that is removed in this change. I think you can just update that release note.",
+      "revId": "766ceccca9d297f47f12e7afd62ff5bb680ece41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
