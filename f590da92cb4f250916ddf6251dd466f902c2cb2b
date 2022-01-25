@@ -110,6 +110,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "296ac77c_255c0457",
+        "filename": "tools/zk-analyze.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-25T14:52:28Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06fc6188_7c9e26a9",
@@ -127,6 +144,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dabf2291_b17ceb5e",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-25T14:52:28Z",
+      "side": 1,
+      "message": "That would work, but given the tight control of input values it\u0027s not necessary.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f285a2c7_aecfbe3e",
@@ -140,6 +174,23 @@
       "writtenOn": "2022-01-21T09:50:41Z",
       "side": 1,
       "message": "We need to forward the decompress flag here.",
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22240531_4f605f1b",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-25T14:52:28Z",
+      "side": 1,
+      "message": "Done.",
       "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -163,6 +214,23 @@
         "endLine": 47,
         "endChar": 54
       },
+      "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7dbf3c0_078f694e",
+        "filename": "tools/zk-dump.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-25T14:52:28Z",
+      "side": 1,
+      "message": "Will reword.",
       "revId": "f590da92cb4f250916ddf6251dd466f902c2cb2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
