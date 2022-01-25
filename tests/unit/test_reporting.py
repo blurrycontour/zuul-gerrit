@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import zuul.rpcclient
+from zuul.model import DequeueEvent
 
 from tests.base import ZuulTestCase, simple_layout
 
@@ -24,25 +24,18 @@ class TestReporting(ZuulTestCase):
     def test_dequeue_reporting(self):
         """Check that explicitly dequeued items are reported as dequeued"""
 
-        # We use the rpcclient to explicitly dequeue the item
-        client = zuul.rpcclient.RPCClient(
-            "127.0.0.1", self.gearman_server.port
-        )
-        self.addCleanup(client.shutdown)
-
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         A.addApproval("Code-Review", 2)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        client.dequeue(
-            tenant="tenant-one",
-            pipeline="check",
-            project="org/project",
-            change="1,1",
-            ref=None,
-        )
+        event = DequeueEvent('tenant-one', 'check',
+                             'review.example.com', 'org/project',
+                             change='1,1',
+                             ref=None, oldrev=None, newrev=None)
+        self.scheds.first.sched.pipeline_management_events['tenant-one'][
+            'check'].put(event)
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
