@@ -32,7 +32,6 @@ import fixtures
 import zuul.change_matcher
 from zuul.driver.gerrit import gerritreporter
 import zuul.scheduler
-import zuul.rpcclient
 import zuul.model
 import zuul.merger.merger
 
@@ -91,7 +90,7 @@ class TestSchedulerZone(ZuulTestCase):
                    os.path.join(self.test_root, 'executor2.socket'))
         executor_connections = TestConnectionRegistry(
             self.changes, self.config, self.additional_event_queues,
-            self.upstream_root, self.rpcclient, self.poller_events,
+            self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup)
         executor_connections.configure(self.config,
                                        source_only=True)
