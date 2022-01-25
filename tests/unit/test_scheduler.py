@@ -268,14 +268,10 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         Test that the hold request node expiration will default to the
         value specified in the configuration file.
         '''
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
         # Add a autohold with no hold expiration.
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
 
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
@@ -299,14 +295,10 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         Test that the hold request node expiration will be set to the custom
         value specified in the request.
         '''
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
         # Add a autohold with a custom hold expiration.
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1, 500)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, 500)
 
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
@@ -330,15 +322,11 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         Test that if the custom hold request node expiration is higher than our
         configured max, it will be lowered to the max.
         '''
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
         # Add a autohold with a custom hold expiration that is higher than our
         # configured max.
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1, 10000)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, 10000)
 
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
@@ -1962,12 +1950,9 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
 
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
@@ -2133,18 +2118,9 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_info(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
-        # Empty dict should be returned for "not found"
-        request = client.autohold_info("XxXxX")
-        self.assertEqual({}, request)
-
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
-
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
         self.assertEqual(1, len(request_list))
@@ -2152,7 +2128,7 @@ class TestScheduler(ZuulTestCase):
             request_list[0])
         self.assertIsNotNone(request)
 
-        request = client.autohold_info(request.id)
+        request = self.scheds.first.sched.autohold_info(request.id)
         self.assertNotEqual({}, request)
         self.assertEqual('tenant-one', request['tenant'])
         self.assertEqual('review.example.com/org/project', request['project'])
@@ -2163,12 +2139,9 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_delete(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
 
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
@@ -2178,17 +2151,14 @@ class TestScheduler(ZuulTestCase):
         self.assertIsNotNone(request)
 
         # Delete and verify no more requests
-        self.assertTrue(client.autohold_delete(request.id))
+        self.scheds.first.sched.autohold_delete(request.id)
         request_list = self.sched_zk_nodepool.getHoldRequests()
         self.assertEqual([], request_list)
 
     def test_autohold_padding(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
 
         # There should be a record in ZooKeeper
         request_list = self.sched_zk_nodepool.getHoldRequests()
@@ -2203,24 +2173,24 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(request.id[0:5], '00000')
         trimmed_request = request.id[5:]
         # Delete and verify no more requests
-        self.assertTrue(client.autohold_delete(trimmed_request))
+        self.scheds.first.sched.autohold_delete(trimmed_request)
         request_list = self.sched_zk_nodepool.getHoldRequests()
         self.assertEqual([], request_list)
 
     def _test_autohold_scoped(self, change_obj, change, ref):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
         # create two changes on the same project, and autohold request
         # for one of them.
         other = self.fake_gerrit.addFakeChange(
             'org/project', 'master', 'other'
         )
 
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            str(change), ref, "reason text", 1)
-        self.assertTrue(r)
+        if change != "":
+            ref = "refs/changes/%s/%s/.*" % (
+                str(change_obj.number).zfill(2)[-2:], str(change_obj.number)
+            )
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ref, "reason text", 1, None)
 
         # First, check that an unrelated job does not trigger autohold, even
         # when it failed
@@ -2264,11 +2234,6 @@ class TestScheduler(ZuulTestCase):
         self.assertIsNotNone(held_node)
 
         # Validate node has recorded the failed job
-        if change != "":
-            ref = "refs/changes/%s/%s/.*" % (
-                str(change_obj.number).zfill(2)[-2:], str(change_obj.number)
-            )
-
         self.assertEqual(
             held_node['hold_job'],
             " ".join(['tenant-one',
@@ -2291,25 +2256,24 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_scoping(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
 
         # create three autohold requests, scoped to job, change and
         # a specific ref
         change = str(A.number)
+        change_ref = "refs/changes/%s/%s/.*" % (
+            str(change).zfill(2)[-2:], str(change)
+        )
         ref = A.data['currentPatchSet']['ref']
-        r1 = client.autohold('tenant-one', 'org/project', 'project-test2',
-                             "", "", "reason text", 1)
-        self.assertTrue(r1)
-        r2 = client.autohold('tenant-one', 'org/project', 'project-test2',
-                             change, "", "reason text", 1)
-        self.assertTrue(r2)
-        r3 = client.autohold('tenant-one', 'org/project', 'project-test2',
-                             "", ref, "reason text", 1)
-        self.assertTrue(r3)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            change_ref, "reason text", 1, None)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ref, "reason text", 1, None)
 
         # Fail 3 jobs for the same change, and verify that the autohold
         # requests are fullfilled in the expected order: from the most
@@ -2348,12 +2312,9 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_ignores_aborted_jobs(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
 
         self.executor_server.hold_jobs_in_build = True
 
@@ -2391,12 +2352,9 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_hold_expiration(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1, node_hold_expiration=30)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, 30)
 
         # Hold a failed job
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
@@ -2423,15 +2381,11 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_list(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
 
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1)
-        self.assertTrue(r)
-
-        autohold_requests = client.autohold_list()
+        autohold_requests = self.scheds.first.sched.autohold_list()
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
 
@@ -2451,16 +2405,12 @@ class TestScheduler(ZuulTestCase):
 
         self.addCleanup(reset_exp)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
-        self.addCleanup(client.shutdown)
-
         # Temporarily shorten the hold request expiration time
-        r = client.autohold('tenant-one', 'org/project', 'project-test2',
-                            "", "", "reason text", 1, 1)
-        self.assertTrue(r)
+        self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, 1)
 
-        autohold_requests = client.autohold_list()
+        autohold_requests = self.scheds.first.sched.autohold_list()
         self.assertEqual(1, len(autohold_requests))
         req = autohold_requests[0]
         self.assertIsNone(req['expired'])
@@ -2470,7 +2420,7 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        autohold_requests = client.autohold_list()
+        autohold_requests = self.scheds.first.sched.autohold_list()
         self.assertEqual(1, len(autohold_requests))
         req = autohold_requests[0]
         self.assertIsNotNone(req['expired'])
@@ -2487,7 +2437,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         for _ in iterate_timeout(10, 'hold request expiration'):
-            if len(client.autohold_list()) == 0:
+            if len(self.scheds.first.sched.autohold_list()) == 0:
                 break
 
     @simple_layout('layouts/three-projects.yaml')
