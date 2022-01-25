@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a07052f_cca12bf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2022-01-25T14:40:41Z",
+      "side": 1,
+      "message": "My apologies for the mistake, we work to remove unnecessary noop in our side",
+      "revId": "4294e63c5a1bc90aeab540037abb06ac25b6206c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
