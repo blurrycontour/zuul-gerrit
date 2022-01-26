@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,6 +20,7 @@ import configparser
 import daemon
 import extras
 import io
+import json
 import logging
 import logging.config
 import os
@@ -100,6 +102,7 @@ class ZuulApp(object):
         self.args = None
         self.config = None
         self.connections = {}
+        self.commands = {}
 
     def _get_version(self):
         from zuul.version import version_info as zuul_version_info
@@ -116,14 +119,47 @@ class ZuulApp(object):
                             help='show zuul version')
         return parser
 
+    def addSubCommands(self, parser, commands):
+        # Add a list of commandsocket.Command items to the parser
+        subparsers = parser.add_subparsers(
+            title='Online commands',
+            description=('The following commands may be used to affect '
+                         'the running process.'),
+        )
+        for command in commands:
+            self.commands[command.name] = command
+            cmd = subparsers.add_parser(
+                command.name, help=command.help)
+            cmd.set_defaults(command=command.name)
+            for arg in command.args:
+                cmd.add_argument(arg.name,
+                                 help=arg.help,
+                                 default=arg.default)
+
+    def handleCommands(self):
+        command_name = getattr(self.args, 'command', None)
+        if command_name in self.commands:
+            command = self.commands[self.args.command]
+            command_str = command.name
+            command_args = [getattr(self.args, arg.name)
+                            for arg in command.args]
+            if command_args:
+                command_str += ' ' + json.dumps(command_args)
+            self.sendCommand(command_str)
+            sys.exit(0)
+
     def parseArguments(self, args=None):
         parser = self.createParser()
         self.args = parser.parse_args(args)
 
-        if hasattr(self.args, 'foreground') and self.args.foreground:
+        if getattr(self.args, 'foreground', False):
             self.args.nodaemon = True
         else:
             self.args.nodaemon = False
+
+        if getattr(self.args, 'command', None):
+            self.args.nodaemon = True
+
         return parser
 
     def readConfig(self):
@@ -219,7 +255,7 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
             with daemon.DaemonContext(pidfile=pid, umask=0o022):
                 self.run()
 
-    def send_command(self, cmd):
+    def sendCommand(self, cmd):
         command_socket = get_default(
             self.config, self.app_name, 'command_socket',
             '/var/lib/zuul/%s.socket' % self.app_name)

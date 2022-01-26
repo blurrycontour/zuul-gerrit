@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013-2014 OpenStack Foundation
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -18,7 +19,7 @@ import signal
 import sys
 
 import zuul.cmd
-from zuul.merger.server import COMMANDS, MergeServer
+import zuul.merger.server
 
 
 class Merger(zuul.cmd.ZuulDaemonApp):
@@ -27,15 +28,8 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
     def createParser(self):
         parser = super(Merger, self).createParser()
-        parser.add_argument('command',
-                            choices=COMMANDS,
-                            nargs='?')
+        self.addSubCommands(parser, zuul.merger.server.COMMANDS)
         return parser
-
-    def parseArguments(self, args=None):
-        super(Merger, self).parseArguments()
-        if self.args.command:
-            self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
         self.merger.stop()
@@ -43,15 +37,14 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         sys.exit(0)
 
     def run(self):
-        if self.args.command in COMMANDS:
-            self.send_command(self.args.command)
-            sys.exit(0)
+        self.handleCommands()
 
         self.configure_connections(source_only=True)
 
         self.setup_logging('merger', 'log_config')
 
-        self.merger = MergeServer(self.config, self.connections)
+        self.merger = zuul.merger.server.MergeServer(
+            self.config, self.connections)
         self.merger.start()
 
         if self.args.nodaemon:

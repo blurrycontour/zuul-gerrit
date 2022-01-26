@@ -1,5 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -5555,18 +5555,21 @@ class ReconfigureEvent(ManagementEvent):
     """Reconfigure the scheduler.  The layout will be (re-)loaded from
     the path specified in the configuration."""
 
-    def __init__(self, smart=False):
+    def __init__(self, smart=False, tenants=None):
         super(ReconfigureEvent, self).__init__()
         self.smart = smart
+        self.tenants = tenants
 
     def toDict(self):
         d = super().toDict()
         d["smart"] = self.smart
+        d["tenants"] = self.tenants
         return d
 
     @classmethod
     def fromDict(cls, data):
-        event = cls(data.get("smart", False))
+        event = cls(data.get("smart", False),
+                    data.get("tenants", None))
         event.updateFromDict(data)
         return event
 

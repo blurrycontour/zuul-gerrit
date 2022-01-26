@@ -1,4 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -3782,6 +3783,34 @@ class TestScheduler(ZuulTestCase):
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
             s.connect(command_socket)
             s.sendall('full-reconfigure\n'.encode('utf8'))
+
+        # Wait for full reconfiguration. Note that waitUntilSettled is not
+        # reliable here because the reconfigure event may arrive in the
+        # event queue after waitUntilSettled.
+        start = time.time()
+        while True:
+            if time.time() - start > 15:
+                raise Exception("Timeout waiting for full reconfiguration")
+            new = self.scheds.first.sched.tenant_layout_state.get(
+                'tenant-one', EMPTY_LAYOUT_STATE)
+            if old < new:
+                break
+            else:
+                time.sleep(0)
+
+    def test_tenant_reconfiguration_command_socket(self):
+        "Test that single-tenant reconfiguration via command socket works"
+
+        # record previous tenant reconfiguration state, which may not be set
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.waitUntilSettled()
+
+        command_socket = self.scheds.first.config.get(
+            'scheduler', 'command_socket')
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall('tenant-reconfigure ["tenant-one"]\n'.encode('utf8'))
 
         # Wait for full reconfiguration. Note that waitUntilSettled is not
         # reliable here because the reconfigure event may arrive in the
