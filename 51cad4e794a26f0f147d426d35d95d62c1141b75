@@ -33,6 +33,24 @@
       "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e Can you confirm that you are just running \"./test-setup-docker.sh\" from the tools directory?\n\u003e \n\u003e I do that quite often, and it works fine with the ZK 3.7.0 docker images.\n\u003e \n\u003e Docker mounts all of the volumes before starting the process, and the certs are already created, so I don\u0027t see how that can be causing the problem.\n\u003e \n\u003e The reason this is needed in the tutorial is that docker-compose starts all the containers first, and one of the containers is responsible for creating the certificates.  Therefore the ZK container starts without any certs available.  That\u0027s not the case with test-setup-docker.\n\nYes I confirm that I\u0027m running ./test-setup-docker.sh and then tox command from root dir.\nwithout this change I always get:\n\n    Traceback (most recent call last):\n\n      File \".tox/py3/lib/python3.6/site-packages/fixtures/fixture.py\", line 197, in setUp\n    self._setUp()\n\n      File \"tests/base.py\", line 3904, in _setUp\n    _tmp_client.start()\n\n      File \"zuul/.tox/py3/lib/python3.6/site-packages/kazoo/client.py\", line 635, in start\n    raise self.handler.timeout_exception(\"Connection time-out\")\n\n    kazoo.handlers.threading.KazooTimeoutError: Connection time-out\n\nI can also reproduce this with a minimal ZK client script using kazoo.\n\nWith this change the error goes away.\n\nMaybe it could be related to docker version or my environment?\n\nDocker version 18.09.0, build 4d60db4",
       "revId": "51cad4e794a26f0f147d426d35d95d62c1141b75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dca27692_ff0370d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-01-26T15:01:11Z",
+      "side": 1,
+      "message": "Also this SSL warning is visible before above exception:\n2022-01-26 15:54:11,305 kazoo.client                     WARNING  Connection dropped: socket connection error: EOF occurred in violation of protocol (_ssl.c:748",
+      "parentUuid": "85efec9a_e36c3cb6",
+      "revId": "51cad4e794a26f0f147d426d35d95d62c1141b75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
