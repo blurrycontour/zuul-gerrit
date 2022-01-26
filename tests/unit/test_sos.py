@@ -385,50 +385,60 @@ class TestScaleOutSchedulerMultiTenant(ZuulTestCase):
         self.log.debug("Thaw scheduler-1")
         self.log.debug("Freeze scheduler-0")
         with first.sched.run_handler_lock:
-            self.log.debug("Open change in tenant-one")
-            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            try:
+                self.log.debug("Open change in tenant-one")
+                self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
-            for _ in iterate_timeout(10, "trigger event appears"):
-                if second.sched.trigger_events['tenant-one'].hasEvents():
-                    break
+                for _ in iterate_timeout(30, "trigger event appears"):
+                    if second.sched.trigger_events['tenant-one'].hasEvents():
+                        break
 
-            for _ in iterate_timeout(
-                    10, "tenant-two to be updated on scheduler-1"):
-                if (first.sched.local_layout_state["tenant-two"] ==
-                    second.sched.local_layout_state.get("tenant-two")):
-                    break
-            # Tenant two should be up to date, but tenant one should
-            # still be out of date on scheduler two.
-            self.assertEqual(first.sched.local_layout_state["tenant-two"],
-                             second.sched.local_layout_state["tenant-two"])
-            self.assertNotEqual(first.sched.local_layout_state["tenant-one"],
-                                second.sched.local_layout_state["tenant-one"])
-            self.log.debug("Verify tenant-one change is unprocessed")
-            # If we have updated tenant-two's configuration without
-            # processing the tenant-one change, then we know we've
-            # completed at least one run loop.
-            self.assertHistory([])
+                for _ in iterate_timeout(
+                        30, "tenant-two to be updated on scheduler-1"):
+                    if (first.sched.local_layout_state["tenant-two"] ==
+                        second.sched.local_layout_state.get("tenant-two")):
+                        break
+                # Tenant two should be up to date, but tenant one should
+                # still be out of date on scheduler two.
+                self.assertEqual(
+                    first.sched.local_layout_state["tenant-two"],
+                    second.sched.local_layout_state["tenant-two"])
+                self.assertNotEqual(
+                    first.sched.local_layout_state["tenant-one"],
+                    second.sched.local_layout_state["tenant-one"])
+                self.log.debug("Verify tenant-one change is unprocessed")
+                # If we have updated tenant-two's configuration without
+                # processing the tenant-one change, then we know we've
+                # completed at least one run loop.
+                self.assertHistory([])
 
-            self.log.debug("Open change in tenant-two")
-            self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-            self.log.debug("Wait for scheduler-1 to process tenant-two change")
-            for _ in iterate_timeout(10, "tenant-two build finish"):
-                if len(self.history):
-                    break
+                self.log.debug("Open change in tenant-two")
+                self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+                self.log.debug(
+                    "Wait for scheduler-1 to process tenant-two change")
 
-            self.assertHistory([
-                dict(name='test', result='SUCCESS', changes='2,1'),
-            ], ordered=False)
+                for _ in iterate_timeout(30, "tenant-two build finish"):
+                    if len(self.history):
+                        break
 
-            # Tenant two should be up to date, but tenant one should
-            # still be out of date on scheduler two.
-            self.assertEqual(first.sched.local_layout_state["tenant-two"],
-                             second.sched.local_layout_state["tenant-two"])
-            self.assertNotEqual(first.sched.local_layout_state["tenant-one"],
-                                second.sched.local_layout_state["tenant-one"])
+                self.assertHistory([
+                    dict(name='test', result='SUCCESS', changes='2,1'),
+                ], ordered=False)
 
-            self.log.debug("Release tenant-one write lock")
-            tenant_one_lock.release()
+                # Tenant two should be up to date, but tenant one should
+                # still be out of date on scheduler two.
+                self.assertEqual(
+                    first.sched.local_layout_state["tenant-two"],
+                    second.sched.local_layout_state["tenant-two"])
+                self.assertNotEqual(
+                    first.sched.local_layout_state["tenant-one"],
+                    second.sched.local_layout_state["tenant-one"])
+
+                self.log.debug("Release tenant-one write lock")
+            finally:
+                # Release this in a finally clause so that the test
+                # doesn't hang if we fail an assertion.
+                tenant_one_lock.release()
 
             self.log.debug("Wait for both changes to be processed")
             self.waitUntilSettled(matcher=[second])

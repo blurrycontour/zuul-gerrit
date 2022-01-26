@@ -93,6 +93,7 @@ from zuul.zk.event_queues import (
 from zuul.zk.exceptions import LockException
 from zuul.zk.layout import LayoutState, LayoutStateStore
 from zuul.zk.locks import (
+    locked,
     tenant_read_lock,
     tenant_write_lock,
     pipeline_lock,
@@ -1031,6 +1032,10 @@ class Scheduler(threading.Thread):
                     if self._stopped:
                         break
                     try:
+                        if (self.unparsed_abide.ltime
+                                < self.system_config_cache.ltime):
+                            self.updateSystemConfig()
+
                         with tenant_read_lock(self.zk_client, tenant_name,
                                               blocking=False):
                             if (self.tenant_layout_state[tenant_name]
@@ -1056,15 +1061,15 @@ class Scheduler(threading.Thread):
 
     def updateTenantLayout(self, log, tenant_name):
         log.debug("Updating layout of tenant %s", tenant_name)
-        if self.unparsed_abide.ltime < self.system_config_cache.ltime:
-            self.updateSystemConfig()
-
         # Consider all caches valid (min. ltime -1)
         min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals, self.statsd, self,
             self.merger, self.keystore)
-        with self.layout_lock:
+        # Since we are using the ZK 'locked' context manager with a threading
+        # lock, we need to pass -1 as the timeout value here as the default
+        # value for ZK locks is None.
+        with locked(self.layout_lock, blocking=False, timeout=-1):
             start = time.monotonic()
             log.debug("Updating local layout of tenant %s ", tenant_name)
             layout_state = self.tenant_layout_state.get(tenant_name)
