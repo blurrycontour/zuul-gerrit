@@ -2,6 +2,7 @@
 # Copyright 2013 OpenStack Foundation
 # Copyright 2013 Antoine "hashar" Musso
 # Copyright 2013 Wikimedia Foundation Inc.
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -104,7 +105,36 @@ from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
 from zuul.zk.election import SessionAwareElection
 
-COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
+
+class FullReconfigureCommand(commandsocket.Command):
+    name = 'full-reconfigure'
+    help = 'Perform a reconfiguration of all tenants'
+
+
+class SmartReconfigureCommand(commandsocket.Command):
+    name = 'smart-reconfigure'
+    help = 'Perform a reconfiguration of updated tenants'
+
+
+class TenantArgument(commandsocket.Argument):
+    name = 'tenant'
+    help = 'The name of the tenant'
+
+
+class TenantReconfigureCommand(commandsocket.Command):
+    name = 'tenant-reconfigure'
+    help = 'Perform a reconfiguration of a specific tenant'
+    args = [TenantArgument]
+
+
+COMMANDS = [
+    FullReconfigureCommand,
+    SmartReconfigureCommand,
+    TenantReconfigureCommand,
+    commandsocket.StopCommand,
+    commandsocket.ReplCommand,
+    commandsocket.NoReplCommand,
+]
 
 
 class SchedulerStatsElection(SessionAwareElection):
@@ -162,11 +192,13 @@ class Scheduler(threading.Thread):
         # Only used by tests in order to quiesce the main run loop
         self.run_handler_lock = threading.Lock()
         self.command_map = {
-            'stop': self.stop,
-            'full-reconfigure': self.fullReconfigureCommandHandler,
-            'smart-reconfigure': self.smartReconfigureCommandHandler,
-            'repl': self.start_repl,
-            'norepl': self.stop_repl,
+            FullReconfigureCommand.name: self.fullReconfigureCommandHandler,
+            SmartReconfigureCommand.name: self.smartReconfigureCommandHandler,
+            TenantReconfigureCommand.name:
+                self.tenantReconfigureCommandHandler,
+            commandsocket.StopCommand.name: self.stop,
+            commandsocket.ReplCommand.name: self.startRepl,
+            commandsocket.NoReplCommand.name: self.stopRepl,
         }
         self._stopped = False
 
@@ -334,7 +366,7 @@ class Scheduler(threading.Thread):
         self.rpc.join()
         self.rpc_slow.stop()
         self.rpc_slow.join()
-        self.stop_repl()
+        self.stopRepl()
         self._command_running = False
         self.log.debug("Stopping command socket")
         self.command_socket.stop()
@@ -351,9 +383,9 @@ class Scheduler(threading.Thread):
     def runCommand(self):
         while self._command_running:
             try:
-                command = self.command_socket.get().decode('utf8')
+                command, args = self.command_socket.get()
                 if command != '_stop':
-                    self.command_map[command]()
+                    self.command_map[command](*args)
             except Exception:
                 self.log.exception("Exception while processing command")
 
@@ -781,13 +813,16 @@ class Scheduler(threading.Thread):
     def smartReconfigureCommandHandler(self):
         self._zuul_app.smartReconfigure()
 
-    def start_repl(self):
+    def tenantReconfigureCommandHandler(self, tenant_name):
+        self._zuul_app.tenantReconfigure([tenant_name])
+
+    def startRepl(self):
         if self.repl:
             return
         self.repl = zuul.lib.repl.REPLServer(self)
         self.repl.start()
 
-    def stop_repl(self):
+    def stopRepl(self):
         if not self.repl:
             return
         self.repl.stop()
@@ -876,10 +911,10 @@ class Scheduler(threading.Thread):
         self.wake_event.set()
         self.component_info.state = self.component_info.RUNNING
 
-    def reconfigure(self, config, smart=False):
+    def reconfigure(self, config, smart=False, tenants=None):
         self.log.debug("Submitting reconfiguration event")
 
-        event = ReconfigureEvent(smart=smart)
+        event = ReconfigureEvent(smart=smart, tenants=tenants)
         event.zuul_event_ltime = self.zk_client.getCurrentLtime()
         event.ack_ref = threading.Event()
         self.reconfigure_event_queue.put(event)
@@ -1174,7 +1209,8 @@ class Scheduler(threading.Thread):
         # a request
         reconfigured_tenants = []
         with self.layout_lock:
-            self.log.info("Reconfiguration beginning (smart=%s)", event.smart)
+            self.log.info("Reconfiguration beginning (smart=%s, tenants=%s)",
+                          event.smart, event.tenants)
             start = time.monotonic()
 
             # Update runtime related system attributes from config
@@ -1213,6 +1249,8 @@ class Scheduler(threading.Thread):
                     new_tenant = self.unparsed_abide.tenants.get(tenant_name)
                     if old_tenant == new_tenant:
                         continue
+                if event.tenants and tenant_name not in event.tenants:
+                    continue
 
                 old_tenant = self.abide.tenants.get(tenant_name)
                 if event.smart:
@@ -1240,8 +1278,9 @@ class Scheduler(threading.Thread):
                         self._reconfigureDeleteTenant(ctx, old_tenant)
 
         duration = round(time.monotonic() - start, 3)
-        self.log.info("Reconfiguration complete (smart: %s, "
-                      "duration: %s seconds)", event.smart, duration)
+        self.log.info("Reconfiguration complete (smart: %s, tenants: %s, "
+                      "duration: %s seconds)", event.smart, event.tenants,
+                      duration)
         if event.smart:
             self.log.info("Reconfigured tenants: %s", reconfigured_tenants)
 

@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -42,15 +43,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                  'listed, all tenants will be validated. '
                                  'Note: this requires the gearman server and '
                                  'will distribute work to mergers.')
-        parser.add_argument('command',
-                            choices=zuul.scheduler.COMMANDS,
-                            nargs='?')
+        self.addSubCommands(parser, zuul.scheduler.COMMANDS)
         return parser
-
-    def parseArguments(self, args=None):
-        super(Scheduler, self).parseArguments()
-        if self.args.command:
-            self.args.nodaemon = True
 
     def fullReconfigure(self):
         self.log.debug("Reconfiguration triggered")
@@ -67,6 +61,15 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
         try:
             self.sched.reconfigure(self.config, smart=True)
+        except Exception:
+            self.log.exception("Reconfiguration failed:")
+
+    def tenantReconfigure(self, tenants):
+        self.log.debug("Tenant reconfiguration triggered")
+        self.readConfig()
+        self.setup_logging('scheduler', 'log_config')
+        try:
+            self.sched.reconfigure(self.config, smart=False, tenants=tenants)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
@@ -124,9 +127,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             os.kill(self.gear_server_pid, signal.SIGKILL)
 
     def run(self):
-        if self.args.command in zuul.scheduler.COMMANDS:
-            self.send_command(self.args.command)
-            sys.exit(0)
+        self.handleCommands()
 
         if (self.config.has_option('gearman_server', 'start') and
             self.config.getboolean('gearman_server', 'start')):

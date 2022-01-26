@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013-2014 OpenStack Foundation
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -33,15 +34,11 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         parser.add_argument('--keep-jobdir', dest='keep_jobdir',
                             action='store_true',
                             help='keep local jobdirs after run completes')
-        parser.add_argument('command',
-                            choices=zuul.executor.server.COMMANDS,
-                            nargs='?')
+        self.addSubCommands(parser, zuul.executor.server.COMMANDS)
         return parser
 
     def parseArguments(self, args=None):
         super(Executor, self).parseArguments()
-        if self.args.command:
-            self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
         if self.config.has_option('executor', 'sigterm_method'):
@@ -79,9 +76,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.log_streamer_pid = child_pid
 
     def run(self):
-        if self.args.command in zuul.executor.server.COMMANDS:
-            self.send_command(self.args.command)
-            sys.exit(0)
+        self.handleCommands()
 
         self.configure_connections(source_only=True)
 
