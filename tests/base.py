@@ -1,6 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2016 Red Hat, Inc.
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -4236,6 +4236,12 @@ class SchedulerTestApp:
                     s.sendall('smart-reconfigure\n'.encode('utf8'))
             else:
                 self.sched.reconfigure(self.config, smart=True)
+        except Exception:
+            self.log.exception("Reconfiguration failed:")
+
+    def tenantReconfigure(self, tenants):
+        try:
+            self.sched.reconfigure(self.config, smart=False, tenants=tenants)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 

@@ -1,4 +1,5 @@
 # Copyright (c) 2017 Red Hat
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,7 +78,11 @@ from zuul.lib.config import get_default
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
 
-COMMANDS = ['stop', 'repl', 'norepl']
+COMMANDS = [
+    commandsocket.StopCommand,
+    commandsocket.ReplCommand,
+    commandsocket.NoReplCommand,
+]
 
 
 class SaveParamsTool(cherrypy.Tool):
@@ -1692,9 +1697,9 @@ class ZuulWeb(object):
         self.repl = None
 
         self.command_map = {
-            'stop': self.stop,
-            'repl': self.start_repl,
-            'norepl': self.stop_repl,
+            commandsocket.StopCommand.name: self.stop,
+            commandsocket.ReplCommand.name: self.startRepl,
+            commandsocket.NoReplCommand.name: self.stopRepl,
         }
 
         self.finger_tls_key = get_default(
@@ -1889,7 +1894,7 @@ class ZuulWeb(object):
         self.system_config_cache_wake_event.set()
         self.system_config_thread.join()
         self.zk_client.disconnect()
-        self.stop_repl()
+        self.stopRepl()
         self._command_running = False
         self.command_socket.stop()
         self.monitoring_server.stop()
@@ -1901,19 +1906,19 @@ class ZuulWeb(object):
     def runCommand(self):
         while self._command_running:
             try:
-                command = self.command_socket.get().decode('utf8')
+                command, args = self.command_socket.get()
                 if command != '_stop':
                     self.command_map[command]()
             except Exception:
                 self.log.exception("Exception while processing command")
 
-    def start_repl(self):
+    def startRepl(self):
         if self.repl:
             return
         self.repl = zuul.lib.repl.REPLServer(self)
         self.repl.start()
 
-    def stop_repl(self):
+    def stopRepl(self):
         if not self.repl:
             return
         self.repl.stop()

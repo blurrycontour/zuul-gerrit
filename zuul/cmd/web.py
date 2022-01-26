@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -30,15 +31,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
     def createParser(self):
         parser = super().createParser()
-        parser.add_argument('command',
-                            choices=zuul.web.COMMANDS,
-                            nargs='?')
+        self.addSubCommands(parser, zuul.web.COMMANDS)
         return parser
-
-    def parseArguments(self, args=None):
-        super().parseArguments()
-        if self.args.command:
-            self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
         self.web.stop()

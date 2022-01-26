@@ -1,4 +1,5 @@
 # Copyright 2014 OpenStack Foundation
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -39,7 +40,11 @@ from zuul.zk.components import MergerComponent
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.merger import MergerApi
 
-COMMANDS = ['stop', 'pause', 'unpause']
+COMMANDS = [
+    commandsocket.StopCommand,
+    commandsocket.PauseCommand,
+    commandsocket.UnPauseCommand,
+]
 
 
 class BaseRepoLocks(metaclass=ABCMeta):
@@ -475,11 +480,11 @@ class MergeServer(BaseMergeServer):
                                                   self.component_info)
         self.monitoring_server.start()
 
-        self.command_map = dict(
-            stop=self.stop,
-            pause=self.pause,
-            unpause=self.unpause,
-        )
+        self.command_map = {
+            commandsocket.StopCommand.name: self.stop,
+            commandsocket.PauseCommand.name: self.pause,
+            commandsocket.UnPauseCommand.name: self.unpause,
+        }
         command_socket = get_default(
             self.config, 'merger', 'command_socket',
             '/var/lib/zuul/merger.socket')
@@ -524,8 +529,8 @@ class MergeServer(BaseMergeServer):
     def runCommand(self):
         while self._command_running:
             try:
-                command = self.command_socket.get().decode('utf8')
+                command, args = self.command_socket.get()
                 if command != '_stop':
-                    self.command_map[command]()
+                    self.command_map[command](*args)
             except Exception:
                 self.log.exception("Exception while processing command")
