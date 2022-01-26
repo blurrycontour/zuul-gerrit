@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37bff6d0_63497a31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T23:36:44Z",
+      "side": 1,
+      "message": "I guess the tests fail because the secrets attribute is now called frank but none of the secrets tooling knows to look for frank :)",
+      "revId": "4f5a9ba72dd6b806bf455d5377010aac71ba198f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
