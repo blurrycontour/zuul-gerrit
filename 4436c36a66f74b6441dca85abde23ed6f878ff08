@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec37c431_fddaf7dd",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-26T23:41:36Z",
+      "side": 1,
+      "message": "Maybe, but I don\u0027t expect it to be used outside of here.  We can always move it.",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20e91098_a1a1bd1d",
@@ -41,6 +58,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cb74f9a_dc9a48e8",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-26T23:41:36Z",
+      "side": 1,
+      "message": "Theres a usage of this in the unit tests without a registry.  I could have passed in None from there.  I set it to none here because the change is more minimal (and it\u0027s not actually used or required).",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ddae3f9_10e341be",
@@ -58,6 +92,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "702bfb12_1f3eeec4",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-26T23:41:36Z",
+      "side": 1,
+      "message": "Yes, we can\u0027t operate; better to just stop now.",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "082bd6a2_1be48825",
@@ -71,6 +122,23 @@
       "writtenOn": "2022-01-26T23:32:06Z",
       "side": 1,
       "message": "I\u0027m having a hard time understanding how this case is possible. If we have:\n\n  version \u003d 1\n  model_api \u003d 1\n  MODEL_API \u003d 1\n\nThen this case would never be hit? I think the intent may have been to dedent this case so that it is an elif to the version \u003e self.model_api check?",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90e3d277_dc001a33",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-26T23:41:36Z",
+      "side": 1,
+      "message": "If our version is 2 and we join a cluster where everyone else is 1, then we have\nversion\u003d1, model_api\u003d1, MODEL_API\u003d2.\n\nThen when the last old component is upgraded, we have:\nversion\u003d2, model_api\u003d1, MODEL_API\u003d2.\n\nThe check on line 348 is True, 349 is False, 356 is True.\n\nThis catches the exact moment the cluster upgrades.  At the bottom of this we update model_api to be version and this won\u0027t hit the next time through.",
       "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
