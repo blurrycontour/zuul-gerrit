@@ -51,6 +51,24 @@
       "parentUuid": "85efec9a_e36c3cb6",
       "revId": "51cad4e794a26f0f147d426d35d95d62c1141b75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "915170f8_2733bbff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-01-26T15:21:23Z",
+      "side": 1,
+      "message": "I played around a bit more after your comments and now realized that just adding the start command (without the waiting script) \"zkServer.sh start-foreground\" also fixes the timeout issue for me.\nNot sure yet why that is.",
+      "parentUuid": "dca27692_ff0370d5",
+      "revId": "51cad4e794a26f0f147d426d35d95d62c1141b75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
