@@ -95,3 +95,7 @@ class ManageAnsible(zuul.cmd.ZuulApp):
 
 def main():
     ManageAnsible().main()
+
+
+if __name__ == '__main__':
+    main()

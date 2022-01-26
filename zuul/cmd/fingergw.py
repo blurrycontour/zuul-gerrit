@@ -95,3 +95,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
 def main():
     FingerGatewayApp().main()
+
+
+if __name__ == '__main__':
+    main()

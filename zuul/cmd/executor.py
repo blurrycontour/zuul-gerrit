@@ -123,3 +123,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
 def main():
     Executor().main()
+
+
+if __name__ == '__main__':
+    main()

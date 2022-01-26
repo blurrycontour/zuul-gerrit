@@ -97,3 +97,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
 def main():
     WebServer().main()
+
+
+if __name__ == '__main__':
+    main()

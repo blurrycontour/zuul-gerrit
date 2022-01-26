@@ -119,3 +119,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
 def main():
     Scheduler().main()
+
+
+if __name__ == '__main__':
+    main()
