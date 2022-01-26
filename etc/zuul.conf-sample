@@ -1,22 +1,8 @@
-[gearman]
-server=127.0.0.1
-;port=4730
-;ssl_ca=/path/to/ca.pem
-;ssl_cert=/path/to/client.pem
-;ssl_key=/path/to/client.key
-
 [statsd]
 server=127.0.0.1
 
 [zookeeper]
 hosts=127.0.0.1:2181
-
-[gearman_server]
-start=true
-;ssl_ca=/path/to/ca.pem
-;ssl_cert=/path/to/server.pem
-;ssl_key=/path/to/server.key
-;port=4730
 
 [keystore]
 password=secret
