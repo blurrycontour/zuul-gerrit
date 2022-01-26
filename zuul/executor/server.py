@@ -1,5 +1,5 @@
 # Copyright 2014 OpenStack Foundation
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -80,8 +80,6 @@ from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
 
 BUFFER_LINES_FOR_SYNTAX = 200
-COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
-            'unverbose', 'keep', 'nokeep', 'repl', 'norepl']
 DEFAULT_FINGER_PORT = 7900
 DEFAULT_STREAM_PORT = 19885
 BLACKLISTED_ANSIBLE_CONNECTION_TYPES = [
@@ -93,6 +91,40 @@ BLACKLISTED_VARS = dict(
     ansible_scp_extra_args='-o PermitLocalCommand=no',
     ansible_ssh_extra_args='-o PermitLocalCommand=no',
 )
+
+
+class VerboseCommand(commandsocket.Command):
+    name = 'verbose'
+    help = 'Enable Ansible verbose mode'
+
+
+class UnVerboseCommand(commandsocket.Command):
+    name = 'unverbose'
+    help = 'Disable Ansible verbose mode'
+
+
+class KeepCommand(commandsocket.Command):
+    name = 'keep'
+    help = 'Keep build directories after completion'
+
+
+class NoKeepCommand(commandsocket.Command):
+    name = 'nokeep'
+    help = 'Remove build directories after completion'
+
+
+COMMANDS = [
+    commandsocket.StopCommand,
+    commandsocket.PauseCommand,
+    commandsocket.UnPauseCommand,
+    commandsocket.GracefulCommand,
+    VerboseCommand,
+    UnVerboseCommand,
+    KeepCommand,
+    NoKeepCommand,
+    commandsocket.ReplCommand,
+    commandsocket.NoReplCommand,
+]
 
 
 class NodeRequestError(Exception):
@@ -3171,18 +3203,18 @@ class ExecutorServer(BaseMergeServer):
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
         self.verbose = False
-        self.command_map = dict(
-            stop=self.stop,
-            pause=self.pause,
-            unpause=self.unpause,
-            graceful=self.graceful,
-            verbose=self.verboseOn,
-            unverbose=self.verboseOff,
-            keep=self.keep,
-            nokeep=self.nokeep,
-            repl=self.start_repl,
-            norepl=self.stop_repl,
-        )
+        self.command_map = {
+            commandsocket.StopCommand.name: self.stop,
+            commandsocket.PauseCommand.name: self.pause,
+            commandsocket.UnPauseCommand.name: self.unpause,
+            commandsocket.GracefulCommand.name: self.graceful,
+            VerboseCommand.name: self.verboseOn,
+            UnVerboseCommand.name: self.verboseOff,
+            KeepCommand.name: self.keep,
+            NoKeepCommand.name: self.nokeep,
+            commandsocket.ReplCommand.name: self.startRepl,
+            commandsocket.NoReplCommand.name: self.stopRepl,
+        }
         self.log_console_port = log_console_port
         self.repl = None
 
@@ -3454,7 +3486,7 @@ class ExecutorServer(BaseMergeServer):
         # ZooKeeper.  We do this as one of the last steps to ensure
         # that all ZK related components can be stopped first.
         super().stop()
-        self.stop_repl()
+        self.stopRepl()
         self.monitoring_server.stop()
         self.log.debug("Stopped")
 
@@ -3508,13 +3540,13 @@ class ExecutorServer(BaseMergeServer):
     def nokeep(self):
         self.keep_jobdir = False
 
-    def start_repl(self):
+    def startRepl(self):
         if self.repl:
             return
         self.repl = zuul.lib.repl.REPLServer(self)
         self.repl.start()
 
-    def stop_repl(self):
+    def stopRepl(self):
         if not self.repl:
             # not running
             return
@@ -3524,9 +3556,9 @@ class ExecutorServer(BaseMergeServer):
     def runCommand(self):
         while self._command_running:
             try:
-                command = self.command_socket.get().decode('utf8')
+                command, args = self.command_socket.get()
                 if command != '_stop':
-                    self.command_map[command]()
+                    self.command_map[command](*args)
             except Exception:
                 self.log.exception("Exception while processing command")
 
