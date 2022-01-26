@@ -3,7 +3,7 @@
 Operation
 =========
 
-You can run any zuul process with the **-d** option to make it not
+You can run any zuul process with the **-f** option to make it not
 daemonize. It's a good idea at first to confirm there's no issues with
 your configuration.
 
