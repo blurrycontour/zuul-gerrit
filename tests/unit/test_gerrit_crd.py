@@ -431,7 +431,6 @@ class TestGerritCRD(ZuulTestCase):
 
     def test_crd_check_git_depends(self):
         "Test single-repo dependencies in independent pipelines"
-        self.gearman_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
 
@@ -441,10 +440,6 @@ class TestGerritCRD(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        self.orderedRelease()
-        self.gearman_server.hold_jobs_in_build = False
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'NEW')
