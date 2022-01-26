@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26dcc10_e07f465e",
+        "filename": "tools/zk-shell.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T22:54:01Z",
+      "side": 1,
+      "message": "I think this is meant to be znode?",
+      "range": {
+        "startLine": 135,
+        "startChar": 16,
+        "endLine": 135,
+        "endChar": 21
+      },
+      "revId": "fbca95c91c214dee4c6ffeb434cf708e14712372",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
