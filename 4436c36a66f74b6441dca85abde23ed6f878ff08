@@ -141,6 +141,24 @@
       "message": "If our version is 2 and we join a cluster where everyone else is 1, then we have\nversion\u003d1, model_api\u003d1, MODEL_API\u003d2.\n\nThen when the last old component is upgraded, we have:\nversion\u003d2, model_api\u003d1, MODEL_API\u003d2.\n\nThe check on line 348 is True, 349 is False, 356 is True.\n\nThis catches the exact moment the cluster upgrades.  At the bottom of this we update model_api to be version and this won\u0027t hit the next time through.",
       "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "604c978c_2c3ec441",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T23:53:32Z",
+      "side": 1,
+      "message": "Thank you for the explanation. I guess we only want to log the point when all components are up to date and don\u0027t need to log that they are currently up to date each time through.",
+      "parentUuid": "90e3d277_dc001a33",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
