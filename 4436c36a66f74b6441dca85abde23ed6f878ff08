@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32dc4b62_aa13a15d",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T23:32:06Z",
+      "side": 1,
+      "message": "This sort of method seems like it might be useful in the base test class?",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20e91098_a1a1bd1d",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T23:32:06Z",
+      "side": 1,
+      "message": "The connection management seems to pass this in always. Is there a reason to default to None? (does this somehow trick defined but unused variable lint checks?)",
+      "range": {
+        "startLine": 304,
+        "startChar": 32,
+        "endLine": 304,
+        "endChar": 55
+      },
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ddae3f9_10e341be",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T23:32:06Z",
+      "side": 1,
+      "message": "I guess this ensures we don\u0027t accidentally roll backwards?",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "082bd6a2_1be48825",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-26T23:32:06Z",
+      "side": 1,
+      "message": "I\u0027m having a hard time understanding how this case is possible. If we have:\n\n  version \u003d 1\n  model_api \u003d 1\n  MODEL_API \u003d 1\n\nThen this case would never be hit? I think the intent may have been to dedent this case so that it is an elif to the version \u003e self.model_api check?",
+      "revId": "4436c36a66f74b6441dca85abde23ed6f878ff08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
