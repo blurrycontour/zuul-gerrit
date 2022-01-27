@@ -23,6 +23,7 @@ import threading
 import time
 from collections import namedtuple
 from unittest import mock, skip
+from uuid import uuid4
 from kazoo.exceptions import NoNodeError
 
 import git
@@ -4241,6 +4242,17 @@ class TestScheduler(ZuulTestCase):
         self.commitConfigUpdate('common-config', config_file)
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
 
+        # Collect the currently cached branches in order to later check,
+        # that the timer driver refreshes the cache.
+        cached_versions = {}
+        tenant = self.scheds.first.sched.abide.tenants['tenant-one']
+        for project_name in tenant.layout.project_configs:
+            _, project = tenant.getProject('org/project')
+            for branch in project.source.getProjectBranches(project, tenant):
+                event = self._create_dummy_event(project, branch)
+                change = project.source.getChange(event)
+                cached_versions[branch] = change.cache_version
+
         # The pipeline triggers every second, so we should have seen
         # several by now.
         for _ in iterate_timeout(60, 'jobs started'):
@@ -4281,6 +4293,26 @@ class TestScheduler(ZuulTestCase):
             self.assertEqual(job.result, 'SUCCESS')
             self.assertEqual(job.name, 'project-bitrot')
             self.assertIn(job.ref, ('refs/heads/stable', 'refs/heads/master'))
+
+        for project_name in tenant.layout.project_configs:
+            _, project = tenant.getProject('org/project')
+            for branch in project.source.getProjectBranches(project, tenant):
+                event = self._create_dummy_event(project, branch)
+                change = project.source.getChange(event)
+                # Make sure the timer driver refreshed the cache
+                self.assertGreater(change.cache_version,
+                                   cached_versions[branch])
+
+    def _create_dummy_event(self, project, branch):
+        event = zuul.model.TriggerEvent()
+        event.type = 'test'
+        event.project_hostname = project.canonical_hostname
+        event.project_name = project.name
+        event.ref = f'refs/heads/{branch}'
+        event.branch = branch
+        event.zuul_event_id = str(uuid4().hex)
+        event.timestamp = time.time()
+        return event
 
     def test_timer(self):
         "Test that a periodic job is triggered"

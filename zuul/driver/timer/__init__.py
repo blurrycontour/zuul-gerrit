@@ -173,6 +173,9 @@ class TimerDriver(Driver, TriggerInterface):
                 event.branch = branch
                 event.zuul_event_id = str(uuid4().hex)
                 event.timestamp = time.time()
+                # Refresh the branch in order to update the item in the
+                # change cache.
+                project.source.getChange(event, refresh=True)
                 log = get_annotated_logger(self.log, event)
                 log.debug("Adding event")
                 self.sched.addTriggerEvent(self.name, event)

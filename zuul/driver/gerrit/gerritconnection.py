@@ -748,19 +748,20 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = self._getChange(event.change_number, event.patch_number,
                                      refresh=refresh)
         elif event.ref and event.ref.startswith('refs/tags/'):
-            change = self._getTag(event)
+            change = self._getTag(event, refresh=refresh)
         elif event.ref and not event.ref.startswith('refs/'):
             # Pre 2.13 Gerrit ref-updated events don't have branch prefixes.
             change = self._getBranch(event, branch=event.ref,
-                                     ref=f'refs/heads/{event.ref}')
+                                     ref=f'refs/heads/{event.ref}',
+                                     refresh=refresh)
         elif event.ref and event.ref.startswith('refs/heads/'):
             # From the timer trigger or Post 2.13 Gerrit
             change = self._getBranch(event,
                                      branch=event.ref[len('refs/heads/'):],
-                                     ref=event.ref)
+                                     ref=event.ref, refresh=refresh)
         elif event.ref:
             # catch-all ref (ie, not a branch or head)
-            change = self._getRef(event)
+            change = self._getRef(event, refresh=refresh)
         else:
             self.log.warning("Unable to get change for %s" % (event,))
             change = None
@@ -782,12 +783,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change.patchset = patchset
         return self._updateChange(key, change, event, history)
 
-    def _getTag(self, event):
+    def _getTag(self, event, refresh=False):
         tag = event.ref[len('refs/tags/'):]
         key = ChangeKey(self.connection_name, event.project_name,
                         'Tag', tag, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda c: None)
             return change
         project = self.source.getProject(event.project_name)
         change = Tag(project)
@@ -802,11 +806,14 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = self._change_cache.get(key)
         return change
 
-    def _getBranch(self, event, branch, ref):
+    def _getBranch(self, event, branch, ref, refresh=False):
         key = ChangeKey(self.connection_name, event.project_name,
                         'Branch', branch, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda c: None)
             return change
         project = self.source.getProject(event.project_name)
         change = Branch(project)
@@ -821,11 +828,14 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = self._change_cache.get(key)
         return change
 
-    def _getRef(self, event):
+    def _getRef(self, event, refresh=False):
         key = ChangeKey(self.connection_name, event.project_name,
                         'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda c: None)
             return change
         project = self.source.getProject(event.project_name)
         change = Ref(project)
