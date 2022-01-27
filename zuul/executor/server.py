@@ -72,7 +72,7 @@ import zuul.model
 from zuul.nodepool import Nodepool
 from zuul.version import get_version_string
 from zuul.zk.event_queues import PipelineResultEventQueue
-from zuul.zk.components import ExecutorComponent
+from zuul.zk.components import ExecutorComponent, ComponentRegistry
 from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
@@ -3154,7 +3154,6 @@ class ExecutorServer(BaseMergeServer):
         self.keystore = KeyStorage(
             self.zk_client,
             password=self._get_key_store_password())
-        self.zk_context = ZKContext(self.zk_client, None, None, self.log)
         self._running = False
         self._command_running = False
         # TODOv3(mordred): make the executor name more unique --
@@ -3164,6 +3163,9 @@ class ExecutorServer(BaseMergeServer):
         self.component_info = ExecutorComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
+        self.component_registry = ComponentRegistry(self.zk_client)
+        self.zk_context = ZKContext(self.zk_client, None, None, self.log,
+                                    self.component_registry)
         self.monitoring_server = MonitoringServer(self.config, 'executor',
                                                   self.component_info)
         self.monitoring_server.start()

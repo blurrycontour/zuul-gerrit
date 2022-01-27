@@ -1234,7 +1234,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         })
         return d
 
-    def onLoad(self, zk_client):
+    def onLoad(self, zk_client, component_registry):
         self.log.info('Starting GitHub connection: %s', self.connection_name)
         self._github_client_manager.initialize()
 
@@ -1243,7 +1243,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.read_only = not self.sched
 
         self.log.debug('Creating Zookeeper branch cache')
-        self._branch_cache = BranchCache(zk_client, self)
+        self._branch_cache = BranchCache(zk_client, self, component_registry)
 
         self.log.debug('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(

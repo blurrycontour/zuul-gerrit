@@ -166,7 +166,7 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         # Pass the event to the scheduler
         self.sched.addTriggerEvent(self.driver_name, event)
 
-    def onLoad(self, zk_client):
+    def onLoad(self, zk_client, component_registry):
         self.log.debug("Creating Zookeeper change cache")
         self._change_cache = GitChangeCache(zk_client, self)
 

@@ -19,4 +19,5 @@ Zuul, though advanced users may find it interesting.
    javascript
    specs/index
    zookeeper
+   model-changelog
    releasenotes

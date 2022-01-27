@@ -75,9 +75,9 @@ class ConnectionRegistry(object):
         for connection_name, connection in self.connections.items():
             connection.registerScheduler(sched)
 
-    def load(self, zk_client):
+    def load(self, zk_client, component_registry):
         for connection in self.connections.values():
-            connection.onLoad(zk_client)
+            connection.onLoad(zk_client, component_registry)
 
     def reconfigureDrivers(self, tenant):
         for driver in self.drivers.values():

@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import sys
 import json
 import logging
 import threading
@@ -20,6 +21,7 @@ from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import EventType
 
 from zuul.zk import ZooKeeperBase
+from zuul import model
 
 
 COMPONENTS_ROOT = "/zuul/components"
@@ -60,6 +62,7 @@ class BaseComponent(ZooKeeperBase):
             "state": self.STOPPED,
             "kind": self.kind,
             "version": version,
+            "model_api": model.MODEL_API,
         }
         super().__init__(client)
 
@@ -206,6 +209,7 @@ class ComponentRegistry(ZooKeeperBase):
         # kind -> hostname -> component
         self._cached_components = defaultdict(dict)
 
+        self.model_api = None
         # If we are already connected when the class is instantiated, directly
         # call the onConnect callback.
         if self.client.connected:
@@ -223,6 +227,7 @@ class ComponentRegistry(ZooKeeperBase):
             self.kazoo_client.ensure_path(root)
             self.kazoo_client.ChildrenWatch(
                 root, self._makeComponentRootWatcher(kind))
+        self._updateMinimumModelApi()
 
     def _makeComponentRootWatcher(self, kind):
         def watch(children, event=None):
@@ -280,6 +285,7 @@ class ComponentRegistry(ZooKeeperBase):
                 component._zstat = stat
 
             self._cached_components[kind][hostname] = component
+            self._updateMinimumModelApi()
         elif (etype == EventType.DELETED or data is None):
             self.log.info(
                 "Noticed %s component %s disappeared",
@@ -289,6 +295,7 @@ class ComponentRegistry(ZooKeeperBase):
             except KeyError:
                 # If it's already gone, don't care
                 pass
+            self._updateMinimumModelApi()
             # Return False to stop the datawatch
             return False
 
@@ -308,3 +315,51 @@ class ComponentRegistry(ZooKeeperBase):
 
         # Filter the cached components for the given kind
         return self._cached_components.get(kind, {}).values()
+
+    def getMinimumModelApi(self):
+        """Get the minimum model API version of all currently connected
+        components"""
+
+        # Start with our own version in case we're the only component
+        # and we haven't registered.
+        version = model.MODEL_API
+        for kind, components in self.all():
+            for component in components:
+                version = min(version, component.content.get('model_api', 0))
+        return version
+
+    def _updateMinimumModelApi(self):
+        version = self.getMinimumModelApi()
+        if version != self.model_api:
+            self.log.info(f"System minimum data model version {version}; "
+                          f"this component {model.MODEL_API}")
+        if self.model_api is None:
+            if version < model.MODEL_API:
+                self.log.info("The data model version of this component is "
+                              "newer than the rest of the system; this "
+                              "component will operate in compatability mode "
+                              "until the system is upgraded")
+            elif version > model.MODEL_API:
+                self.log.error("The data model version of this component is "
+                               "older than the rest of the system; "
+                               "exiting to prevent data corruption")
+                sys.exit(1)
+        else:
+            if version > self.model_api:
+                if version > model.MODEL_API:
+                    self.log.info("The data model version of this component "
+                                  "is older than other components in the "
+                                  "system, so other components will operate "
+                                  "in a compability mode; upgrade this "
+                                  "component as soon as possible to complete "
+                                  "the system upgrade")
+                elif version == model.MODEL_API:
+                    self.log.info("The rest of the system has been upgraded "
+                                  "to the data model version of this "
+                                  "component")
+            elif version < self.model_api:
+                self.log.error("A component with a data model version older "
+                               "than the rest of the system has been started; "
+                               "data corruption is very likely to occur.")
+                # Should we exit here as well?
+        self.model_api = version
