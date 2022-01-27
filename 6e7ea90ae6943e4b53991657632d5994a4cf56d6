@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "880fdc0d_9e791401",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-27T00:19:14Z",
+      "side": 1,
+      "message": "You might want to add an assert near this location that checks the pipeline state is actually gone?",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7155fbf_a9ee3208",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-27T00:19:14Z",
+      "side": 1,
+      "message": "Same suggestion as above.",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b49dd2d_6bb40b8a",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 984,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-27T00:19:14Z",
+      "side": 1,
+      "message": "The description of the command above says it will lock the tenant-pipeline and then completely delete the pipeline state. Here we are only locking the tenant but with a write lock. I think that means we have exclusive lock over all pipelines for the tenant thus this is ok?\n\nIn the scheduler we lock pipelines separately while holding a tenant read lock.",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08ed264d_5ed37bf2",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 630,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-01-27T00:19:14Z",
+      "side": 1,
+      "message": "I guess this allows us to avoid needing to create a pipeline object too when creating the state for deletion. It does seem a bit hacky to tack on some additional attributes just for this use case though.\n\nIt looks like creating a pipeline only needs a name and a tenant and with that pipelinePath() below is ablow to return a proper path. Is there another reason to avoid creating the extra object?",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
