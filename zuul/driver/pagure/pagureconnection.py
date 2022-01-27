@@ -611,7 +611,7 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         else:
             self.log.info("Getting change for %s ref:%s" % (
                 project, event.ref))
-            change = self._getNonPRRef(project, event)
+            change = self._getNonPRRef(project, event, refresh=refresh)
         return change
 
     def _getChange(self, project, number, patchset=None,
@@ -646,11 +646,14 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                                           _update_change)
         return change
 
-    def _getNonPRRef(self, project, event):
+    def _getNonPRRef(self, project, event, refresh=False):
         key = ChangeKey(self.connection_name, project.name,
                         'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda: None)
             return change
         if event.ref and event.ref.startswith('refs/tags/'):
             change = Tag(project)

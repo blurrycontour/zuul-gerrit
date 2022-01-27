@@ -1306,11 +1306,11 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                      event=event)
         else:
             if event.ref and event.ref.startswith('refs/tags/'):
-                change = self._getTag(project, event)
+                change = self._getTag(project, event, refresh=refresh)
             elif event.ref and event.ref.startswith('refs/heads/'):
-                change = self._getBranch(project, event)
+                change = self._getBranch(project, event, refresh=refresh)
             else:
-                change = self._getRef(project, event)
+                change = self._getRef(project, event, refresh=refresh)
         return change
 
     def _getChange(self, project, number, patchset=None, refresh=False,
@@ -1363,12 +1363,15 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 log.debug('Finished updating change %s', change)
         return change
 
-    def _getTag(self, project, event):
+    def _getTag(self, project, event, refresh=False):
         tag = event.ref[len('refs/tags/'):]
         key = ChangeKey(self.connection_name, project.name,
                         'Tag', tag, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda c: None)
             return change
         change = Tag(project)
         change.tag = tag
@@ -1385,12 +1388,15 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = self._change_cache.get(key)
         return change
 
-    def _getBranch(self, project, event):
+    def _getBranch(self, project, event, refresh=False):
         branch = event.ref[len('refs/heads/'):]
         key = ChangeKey(self.connection_name, project.name,
                         'Branch', branch, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda c: None)
             return change
         change = Branch(project)
         change.branch = branch
@@ -1406,11 +1412,14 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = self._change_cache.get(key)
         return change
 
-    def _getRef(self, project, event):
+    def _getRef(self, project, event, refresh=False):
         key = ChangeKey(self.connection_name, project.name,
                         'Ref', event.ref, event.newrev)
         change = self._change_cache.get(key)
         if change:
+            if refresh:
+                self._change_cache.updateChangeWithRetry(
+                    key, change, lambda c: None)
             return change
         change = Ref(project)
         change.ref = event.ref
