@@ -16,6 +16,40 @@
       "message": "The UI looks like this: \nhttps://i.ibb.co/Lk39Hqg/Bildschirmfoto-2022-01-05-um-10-21-39.png",
       "revId": "d6ee69bd5c45602a37b10dd1b353e603eab6314e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a43bf203_e92436aa",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-27T01:17:48Z",
+      "side": 1,
+      "message": "Not a minus 1, just some suggestions:\n\nIt would be great if we could have a tooltip here that explained what this was.\n\nI think \"Overall duration\" is good, but I also wonder if we should consider some other terms which could potentially be more specific.  Like \"Feedback cycle time\" or \"Resident time\" (this is actually a term we already use in the stats we emit -- it\u0027s the time a change spends residing in a pipeline, which is pretty close to what this is except this includes event processing time).",
+      "revId": "d6ee69bd5c45602a37b10dd1b353e603eab6314e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af50ea09_bd610cc1",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1225,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-27T01:17:48Z",
+      "side": 1,
+      "message": "-1: Use camelcase for consistency: _datetimeToString",
+      "revId": "d6ee69bd5c45602a37b10dd1b353e603eab6314e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
