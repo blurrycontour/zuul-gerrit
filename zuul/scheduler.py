@@ -23,6 +23,7 @@ import time
 import traceback
 import uuid
 from contextlib import suppress
+from zuul.vendor.contextlib import nullcontext
 from collections import defaultdict
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -174,6 +175,10 @@ class Scheduler(threading.Thread):
         self.connections = connections
         self.sql = self.connections.getSqlReporter(None)
         self.statsd = get_statsd(config)
+        if self.statsd:
+            self.statsd_timer = self.statsd.timer
+        else:
+            self.statsd_timer = nullcontext
         self.times = Times(self.sql, self.statsd)
         self.repl = None
         self.stats_thread = threading.Thread(target=self.runStatsElection)
@@ -1762,6 +1767,7 @@ class Scheduler(threading.Thread):
 
     def process_pipelines(self, tenant):
         for pipeline in tenant.layout.pipelines.values():
+            stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             if self._stopped:
                 return
             try:
@@ -1770,7 +1776,8 @@ class Scheduler(threading.Thread):
                 ) as lock:
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
-                        pipeline.state.refresh(ctx)
+                        with self.statsd_timer(f'{stats_key}.refresh'):
+                            pipeline.state.refresh(ctx)
                         if pipeline.state.old_queues:
                             self._reenqueuePipeline(tenant, pipeline, ctx)
                         pipeline.state.cleanup(ctx)
@@ -1786,14 +1793,16 @@ class Scheduler(threading.Thread):
                     pipeline.name, tenant.name)
 
     def _process_pipeline(self, tenant, pipeline):
+        stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         self.process_pipeline_management_queue(tenant, pipeline)
         # Give result events priority -- they let us stop builds, whereas
         # trigger events cause us to execute builds.
         self.process_pipeline_result_queue(tenant, pipeline)
         self.process_pipeline_trigger_queue(tenant, pipeline)
         try:
-            while not self._stopped and pipeline.manager.processQueue():
-                pass
+            with self.statsd_timer(f'{stats_key}.process'):
+                while not self._stopped and pipeline.manager.processQueue():
+                    pass
         except Exception:
             self.log.exception("Exception in pipeline processing:")
             pipeline.state.updateAttributes(
