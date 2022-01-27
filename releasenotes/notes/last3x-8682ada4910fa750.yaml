@@ -13,7 +13,7 @@ prelude: |
   These features are supported now, so it is important that you take
   this time to :ref:`switch your ZooKeeper connection to use
   TLS<zk-encrypted-connections>`, and :ref:`configure a SQL
-  connection<sql-driver>`.  Even though only some Zuul components
+  connection<database>`.  Even though only some Zuul components
   connect to ZooKeeper today, you should ensure that the
   ``[zookeeper]`` section is present in ``zuul.conf`` for all
   components, and that they have network connectivity to the ZooKeeper
