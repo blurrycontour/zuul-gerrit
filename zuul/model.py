@@ -627,6 +627,8 @@ class PipelineState(zkobject.ZKObject):
             return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
 
     def getPath(self):
+        if hasattr(self, '_path'):
+            return self._path
         return self.pipelinePath(self.pipeline)
 
     @classmethod

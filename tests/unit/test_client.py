@@ -301,7 +301,7 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org'))
 
 
-class TestZKOperations(ZuulTestCase):
+class TestOfflineZKOperations(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     def shutdown(self):
@@ -346,3 +346,86 @@ class TestZKOperations(ZuulTestCase):
             self.getZKTree('/zuul')
 
         self.zk_client.disconnect()
+
+
+class TestOnlineZKOperations(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def assertSQLState(self):
+        pass
+
+    def test_delete_pipeline_check(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        # Make sure the pipeline exists
+        self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-pipeline-state',
+             'tenant-one', 'check',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        # Make sure it's deleted
+        with testtools.ExpectedException(NoNodeError):
+            self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_delete_pipeline_gate(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        # Make sure the pipeline exists
+        self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', config_file,
+             'delete-pipeline-state',
+             'tenant-one', 'gate',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        # Make sure it's deleted
+        with testtools.ExpectedException(NoNodeError):
+            self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+        ], ordered=False)

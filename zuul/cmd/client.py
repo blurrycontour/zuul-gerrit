@@ -27,12 +27,16 @@ import time
 import textwrap
 import requests
 import urllib.parse
+from uuid import uuid4
 
 import zuul.cmd
 from zuul.lib.config import get_default
-from zuul.model import SystemAttributes
+from zuul.model import SystemAttributes, PipelineState
 from zuul.zk import ZooKeeperClient
 from zuul.lib.keystorage import KeyStorage
+from zuul.zk.locks import tenant_write_lock
+from zuul.zk.zkobject import ZKContext
+from zuul.zk.layout import LayoutState, LayoutStateStore
 
 
 # todo This should probably live somewhere else
@@ -455,6 +459,31 @@ class Client(zuul.cmd.ZuulApp):
         cmd_delete_state.set_defaults(command='delete-state')
         cmd_delete_state.set_defaults(func=self.delete_state)
 
+        cmd_delete_pipeline_state = subparsers.add_parser(
+            'delete-pipeline-state',
+            help='delete single pipeline ZooKeeper state',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Delete a single pipeline state stored in ZooKeeper
+
+            In the unlikely event that a bug in Zuul or ZooKeeper data
+            corruption occurs in such a way that it only affects a
+            single pipeline, this command might be useful in
+            attempting to recover.
+
+            The circumstances under which this command will be able to
+            effect a recovery are very rare and even so it may not be
+            sufficient.  In general, if an error occurs it is better
+            to shut Zuul down and run "zuul delete-state".
+
+            This command will lock the specified tenant and
+            then completely delete the pipeline state.'''))
+        cmd_delete_pipeline_state.set_defaults(command='delete-pipeline-state')
+        cmd_delete_pipeline_state.set_defaults(func=self.delete_pipeline_state)
+        cmd_delete_pipeline_state.add_argument('tenant', type=str,
+                                               help='tenant name')
+        cmd_delete_pipeline_state.add_argument('pipeline', type=str,
+                                               help='pipeline name')
         return parser
 
     def parseArguments(self, args=None):
@@ -922,6 +951,39 @@ class Client(zuul.cmd.ZuulApp):
                         "all ephemeral data from ZooKeeper? (yes/no) ")
         if confirm.strip().lower() == 'yes':
             zk_client.client.delete('/zuul', recursive=True)
+        sys.exit(0)
+
+    def delete_pipeline_state(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+
+        args = self.args
+        safe_tenant = urllib.parse.quote_plus(args.tenant)
+        safe_pipeline = urllib.parse.quote_plus(args.pipeline)
+        with tenant_write_lock(zk_client, args.tenant) as lock:
+            path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
+            layout_uuid = None
+            zk_client.client.delete(
+                f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}',
+                recursive=True)
+            context = ZKContext(zk_client, lock, None, self.log)
+            ps = PipelineState.new(context, _path=path,
+                                   layout_uuid=layout_uuid)
+            # Force everyone to make a new layout for this tenant in
+            # order to rebuild the shared change queues.
+            layout_state = LayoutState(
+                tenant_name=args.tenant,
+                hostname='admin command',
+                last_reconfigured=int(time.time()),
+                uuid=uuid4().hex,
+                branch_cache_min_ltimes={},
+                ltime=ps._zstat.last_modified_transaction_id,
+            )
+            tenant_layout_state = LayoutStateStore(zk_client, lambda: None)
+            tenant_layout_state[args.tenant] = layout_state
+
         sys.exit(0)
 
 

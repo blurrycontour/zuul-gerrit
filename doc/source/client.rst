@@ -235,3 +235,12 @@ delete-state
 Example::
 
   zuul delete-state
+
+delete-pipeline-state
+^^^^^^^^^^^^^^^^^^^^^
+
+.. program-output:: zuul delete-pipeline-state --help
+
+Example::
+
+  zuul delete-pipeline-state tenant pipeline
