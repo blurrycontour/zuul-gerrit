@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04ead64e_696e68e5",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-27T00:29:13Z",
+      "side": 1,
+      "message": "Can do.",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7155fbf_a9ee3208",
@@ -52,6 +69,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6242bc5c_e0867083",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 984,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-27T00:29:13Z",
+      "side": 1,
+      "message": "Ah yep.  That was a late change in implementation; I\u0027ll update the docs to say \"lock tenant\".  And that\u0027s correct re: locks.\n\nThe change is mostly because we touch the layout state for the tenant.",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08ed264d_5ed37bf2",
@@ -65,6 +99,23 @@
       "writtenOn": "2022-01-27T00:19:14Z",
       "side": 1,
       "message": "I guess this allows us to avoid needing to create a pipeline object too when creating the state for deletion. It does seem a bit hacky to tack on some additional attributes just for this use case though.\n\nIt looks like creating a pipeline only needs a name and a tenant and with that pipelinePath() below is ablow to return a proper path. Is there another reason to avoid creating the extra object?",
+      "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bc3d0de_eef1b078",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 630,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-27T00:29:13Z",
+      "side": 1,
+      "message": "Pipelines are created by the configloader and are really messy to create.  The _path pattern is actually already in use for several other model zkobjects in the load method, and I\u0027d like to make it standard for all of them.  The novelty here is using it in .new.  Given the complete spaghetti that is creating a pipeline object, I think this is preferable.",
       "revId": "6e7ea90ae6943e4b53991657632d5994a4cf56d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
