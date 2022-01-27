@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee76d424_0af2f7d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-01-27T06:09:57Z",
+      "side": 1,
+      "message": "Can we somehow avoid dropping out of the shell when e.g. a NoNodeError is raised because of a typo in a ZK path?",
+      "revId": "5013807da25291697e9e521933c3dbca8ac3e06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
