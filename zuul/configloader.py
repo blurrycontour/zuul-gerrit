@@ -36,6 +36,7 @@ from zuul.lib.varnames import check_varnames
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.semaphore import SemaphoreHandler
 
+import traceback
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
@@ -1784,6 +1785,10 @@ class TenantParser(object):
         return config_projects, untrusted_projects
 
     def _cacheTenantYAML(self, abide, tenant, loading_errors, min_ltimes):
+        self.log.info("dong debug ..................")
+        for line in traceback.format_stack():
+            self.log.info(line.strip())
+
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
