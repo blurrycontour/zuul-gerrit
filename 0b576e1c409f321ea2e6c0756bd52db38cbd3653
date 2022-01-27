@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e26fc5bd_e6fc9f7f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2022-01-27T07:18:37Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e We intentionally removed these earlier; is there a reason you want to add them back?\n\nWas it the intention to remove the entrypoints also and not just the shebangs? cf. https://review.opendev.org/c/zuul/zuul/+/728951\n\nThe intention here is to invoke zuul-* processes as python modules (``python3 -m zuul.cmd.scheduler``). This doesn\u0027t work if no such entry point is available.\n\nMy specific use case is hooking in with a remote python debugger (``python3 -m debugpy [...] -m zuul.cmd.scheduler [...]``).",
+      "revId": "0b576e1c409f321ea2e6c0756bd52db38cbd3653",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
