@@ -32,6 +32,22 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
    Zuul will report counters for each type of event it receives from
    each of its configured drivers.
 
+.. stat:: zuul.connection.<connection>
+
+   Holds metrics specific to connections. This hierarchy includes:
+
+   .. stat:: cache.data_size_compressed
+      :type: gauge
+
+      The number of bytes stored in ZooKeeper for all items in this
+      connection's change cache.
+
+   .. stat:: cache.data_size_uncompressed
+      :type: gauge
+
+      The number of bytes required to for the change cache (the
+      decompressed value of ``data_size_compressed``).
+
 .. stat:: zuul.tenant.<tenant>.event_enqueue_processing_time
    :type: timer
 
@@ -83,6 +99,19 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          :type: timer
 
          The time taken to process the pipeline.
+
+      .. stat:: data_size_compressed
+         :type: gauge
+
+         The number of bytes stored in ZooKeeper to represent the
+         serialized state of the pipeline.
+
+      .. stat:: data_size_uncompressed
+         :type: gauge
+
+         The number of bytes required to represent the serialized
+         state of the pipeline (the decompressed value of
+         ``data_size_compressed``).
 
       .. stat:: project
 

@@ -1324,6 +1324,9 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         self.assertEqual(self.cache.get(key_foo), change_foo)
         self.assertEqual(self.cache.get(key_bar), change_bar)
 
+        compressed_size, uncompressed_size = self.cache.estimateDataSize()
+        self.assertTrue(compressed_size != uncompressed_size != 0)
+
     def test_update(self):
         change = DummyChange("project", {"foo": "bar"})
         key = ChangeKey('conn', 'project', 'change', 'foo', '1')
@@ -1400,7 +1403,7 @@ class TestChangeCache(ZooKeeperBaseTestCase):
                                             uuid.uuid4().hex,
                                             change.cache_version - 1,
                                             change.cache_stat.mzxid - 1,
-                                            0)
+                                            0, 0, 0)
         updated_change = self.cache.updateChangeWithRetry(
             key, change, updater)
         self.assertEqual(updated_change.foobar, 2)
@@ -1509,6 +1512,9 @@ class TestZKObject(ZooKeeperBaseTestCase):
                                            foo='bar')
             self.assertEqual(pipeline1.foo, 'bar')
 
+        compressed_size, uncompressed_size = pipeline1.estimateDataSize()
+        self.assertTrue(compressed_size != uncompressed_size != 0)
+
         # Load an object from ZK (that we don't already have)
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
             context = ZKContext(self.zk_client, lock, stop_event, self.log,
@@ -1516,6 +1522,9 @@ class TestZKObject(ZooKeeperBaseTestCase):
             pipeline2 = zkobject_class.fromZK(context,
                                               '/zuul/pipeline/fake_tenant')
             self.assertEqual(pipeline2.foo, 'bar')
+
+        compressed_size, uncompressed_size = pipeline1.estimateDataSize()
+        self.assertTrue(compressed_size != uncompressed_size != 0)
 
         def get_ltime(obj):
             zstat = self.zk_client.client.exists(obj.getPath())
