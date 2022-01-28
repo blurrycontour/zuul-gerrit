@@ -12,9 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import contextlib
 import json
 import time
-import contextlib
+import types
 import zlib
 
 from kazoo.exceptions import (
@@ -51,6 +52,8 @@ class LocalZKContext:
 
 class ZKObject:
     _retry_interval = 5
+    _zkobject_compressed_size = 0
+    _zkobject_uncompressed_size = 0
 
     # Implementations of these two methods are required
     def getPath(self):
@@ -181,6 +184,46 @@ class ZKObject:
                 time.sleep(self._retry_interval)
         raise Exception("ZooKeeper session or lock not valid")
 
+    def estimateDataSize(self, seen=None):
+        """Attempt to find all ZKObjects below this one and sum their
+        compressed and uncompressed sizes.
+
+        :returns: (compressed_size, uncompressed_size)
+        """
+        compressed_size = self._zkobject_compressed_size
+        uncompressed_size = self._zkobject_uncompressed_size
+
+        if seen is None:
+            seen = {self}
+
+        def walk(obj):
+            compressed = 0
+            uncompressed = 0
+            if isinstance(obj, ZKObject):
+                if obj in seen:
+                    return 0, 0
+                seen.add(obj)
+                compress, uncompressed = obj.estimateDataSize(seen)
+            elif (isinstance(obj, dict) or
+                  isinstance(obj, types.MappingProxyType)):
+                for sub in obj.values():
+                    c, u = walk(sub)
+                    compressed += c
+                    uncompressed += u
+            elif (isinstance(obj, list) or
+                  isinstance(obj, tuple)):
+                for sub in obj:
+                    c, u = walk(sub)
+                    compressed += c
+                    uncompressed += u
+            return compressed, uncompressed
+
+        c, u = walk(self.__dict__)
+        compressed_size += c
+        uncompressed_size += u
+
+        return (compressed_size, uncompressed_size)
+
     # Private methods below
 
     def __init__(self):
@@ -203,7 +246,10 @@ class ZKObject:
                     data = compressed_data
                 self._set(**self.deserialize(data, context))
                 self._set(_zstat=zstat,
-                          _zkobject_hash=hash(data))
+                          _zkobject_hash=hash(data),
+                          _zkobject_compressed_size=len(compressed_data),
+                          _zkobject_uncompressed_size=len(data),
+                          )
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
@@ -240,7 +286,10 @@ class ZKObject:
                     zstat = context.client.set(path, compressed_data,
                                                version=self._zstat.version)
                 self._set(_zstat=zstat,
-                          _zkobject_hash=hash(data))
+                          _zkobject_hash=hash(data),
+                          _zkobject_compressed_size=len(compressed_data),
+                          _zkobject_uncompressed_size=len(data),
+                          )
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
@@ -286,10 +335,14 @@ class ShardedZKObject(ZKObject):
                 with sharding.BufferedShardReader(
                         context.client, path) as stream:
                     data = stream.read()
+                    compressed_size = stream.compressed_bytes_read
                 if not data and context.client.exists(path) is None:
                     raise NoNodeError
                 self._set(**self.deserialize(data, context))
-                self._set(_zkobject_hash=hash(data))
+                self._set(_zkobject_hash=hash(data),
+                          _zkobject_compressed_size=compressed_size,
+                          _zkobject_uncompressed_size=len(data),
+                          )
                 return
             except ZookeeperError:
                 # These errors come from the server and are not
@@ -327,7 +380,12 @@ class ShardedZKObject(ZKObject):
                         context.client, path) as stream:
                     stream.truncate(0)
                     stream.write(data)
-                self._set(_zkobject_hash=hash(data))
+                    stream.flush()
+                    compressed_size = stream.compressed_bytes_written
+                self._set(_zkobject_hash=hash(data),
+                          _zkobject_compressed_size=compressed_size,
+                          _zkobject_uncompressed_size=len(data),
+                          )
                 return
             except ZookeeperError:
                 # These errors come from the server and are not

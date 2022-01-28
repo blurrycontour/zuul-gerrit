@@ -205,6 +205,20 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         key = ChangeKey.fromReference(data['key_reference'])
         return key, data['data_uuid']
 
+    def estimateDataSize(self):
+        """Return the data size of the changes in the cache.
+
+        :returns: (compressed_size, uncompressed_size)
+        """
+        compressed_size = 0
+        uncompressed_size = 0
+
+        for c in list(self._change_cache.values()):
+            compressed_size += c.cache_stat.compressed_size
+            uncompressed_size += c.cache_stat.uncompressed_size
+
+        return (compressed_size, uncompressed_size)
+
     def prune(self, relevant, max_age=3600):  # 1h
         # Relevant is the list of changes directly in a pipeline.
         # This method will take care of expanding that out to each
@@ -289,8 +303,15 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             # Change in our local cache is up-to-date
             return change
 
+        compressed_size = 0
+        uncompressed_size = 0
         try:
-            raw_data = self._getData(data_uuid)
+            with sharding.BufferedShardReader(
+                self.kazoo_client, self._dataPath(data_uuid)
+            ) as stream:
+                raw_data = stream.read()
+                compressed_size = stream.compressed_bytes_read
+                uncompressed_size = len(raw_data)
         except NoNodeError:
             cache_path = self._cachePath(key._hash)
             self.log.error("Removing cache key %s with no data node uuid %s",
@@ -320,22 +341,28 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                 change = self._changeFromData(data)
 
             change.cache_stat = model.CacheStat(key, data_uuid, zstat.version,
-                                                zstat.last_modified)
+                                                zstat.last_modified,
+                                                compressed_size,
+                                                uncompressed_size)
             # Use setdefault here so we only have a single instance of a change
             # around. In case of a concurrent get this might return a different
             # change instance than the one we just created.
             return self._change_cache.setdefault(key._hash, change)
 
-    def _getData(self, data_uuid):
-        with sharding.BufferedShardReader(
-                self.kazoo_client, self._dataPath(data_uuid)) as stream:
-            return stream.read()
-
     def set(self, key, change, version=-1):
         data = self._dataFromChange(change)
         raw_data = json.dumps(data, sort_keys=True).encode("utf8")
 
-        data_uuid = self._setData(raw_data)
+        compressed_size = 0
+        uncompressed_size = 0
+        data_uuid = uuid.uuid4().hex
+        with sharding.BufferedShardWriter(
+                self.kazoo_client, self._dataPath(data_uuid)) as stream:
+            stream.write(raw_data)
+            stream.flush()
+            compressed_size = stream.compressed_bytes_written
+            uncompressed_size = len(raw_data)
+
         # Add the change_key info here mostly for debugging since the
         # hash is non-reversible.
         cache_data = json.dumps(dict(
@@ -371,15 +398,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                 raise ConcurrentUpdateError from exc
 
             change.cache_stat = model.CacheStat(
-                key, data_uuid, zstat.version, zstat.last_modified)
+                key, data_uuid, zstat.version, zstat.last_modified,
+                compressed_size, uncompressed_size)
             self._change_cache[key._hash] = change
-
-    def _setData(self, data):
-        data_uuid = uuid.uuid4().hex
-        with sharding.BufferedShardWriter(
-                self.kazoo_client, self._dataPath(data_uuid)) as stream:
-            stream.write(data)
-        return data_uuid
 
     def updateChangeWithRetry(self, key, change, update_func, retry_count=5):
         for attempt in range(1, retry_count + 1):

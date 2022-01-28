@@ -5154,7 +5154,8 @@ class Bundle:
 
 # Cache info of a ref
 CacheStat = namedtuple("CacheStat",
-                       ["key", "uuid", "version", "last_modified"])
+                       ["key", "uuid", "version", "last_modified",
+                        "compressed_size", "uncompressed_size"])
 
 
 class Ref(object):

@@ -336,3 +336,6 @@ class ZKChangeCacheMixin:
 
     def getChangeByKey(self, key):
         return self._change_cache.get(key)
+
+    def estimateCacheDataSize(self):
+        return self._change_cache.estimateDataSize()

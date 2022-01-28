@@ -28,6 +28,8 @@ class RawShardIO(io.RawIOBase):
     def __init__(self, client, path):
         self.client = client
         self.shard_base = path
+        self.compressed_bytes_read = 0
+        self.compressed_bytes_written = 0
 
     def readable(self):
         return True
@@ -50,6 +52,7 @@ class RawShardIO(io.RawIOBase):
 
     def _getData(self, path):
         data, _ = self.client.get(path)
+        self.compressed_bytes_read += len(data)
         return zlib.decompress(data)
 
     def readall(self):
@@ -72,14 +75,25 @@ class RawShardIO(io.RawIOBase):
             sequence=True,
             makepath=True,
         )
+        self.compressed_bytes_written += len(shard_bytes)
         return min(byte_count, NODE_BYTE_SIZE_LIMIT)
 
 
 class BufferedShardWriter(io.BufferedWriter):
     def __init__(self, client, path):
-        super().__init__(RawShardIO(client, path), NODE_BYTE_SIZE_LIMIT)
+        self.__raw = RawShardIO(client, path)
+        super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
+
+    @property
+    def compressed_bytes_written(self):
+        return self.__raw.compressed_bytes_written
 
 
 class BufferedShardReader(io.BufferedReader):
     def __init__(self, client, path):
-        super().__init__(RawShardIO(client, path), NODE_BYTE_SIZE_LIMIT)
+        self.__raw = RawShardIO(client, path)
+        super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
+
+    @property
+    def compressed_bytes_read(self):
+        return self.__raw.compressed_bytes_read
