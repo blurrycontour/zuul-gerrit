@@ -4414,8 +4414,7 @@ class ZuulTestCase(BaseTestCase):
             version = getattr(test, '__model_version__')
             self.model_test_component_info = SchedulerComponent(
                 self.zk_client, 'test_component')
-            self.model_test_component_info.model_api = version
-            self.model_test_component_info.register()
+            self.model_test_component_info.register(version)
 
     def setUp(self):
         super(ZuulTestCase, self).setUp()

@@ -14,7 +14,9 @@
 
 import json
 
-from tests.base import ZuulTestCase, simple_layout
+from zuul.zk.components import ComponentRegistry
+
+from tests.base import ZuulTestCase, simple_layout, iterate_timeout
 
 
 def model_version(version):
@@ -52,4 +54,12 @@ class TestModelUpgrade(ZuulTestCase):
     @model_version(0)
     @simple_layout('layouts/simple.yaml')
     def test_model_upgrade_0_1(self):
-        pass
+        component_registry = ComponentRegistry(self.zk_client)
+        self.assertEqual(component_registry.model_api, 0)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 1
+
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 1:
+                break

@@ -62,7 +62,7 @@ class BaseComponent(ZooKeeperBase):
             "state": self.STOPPED,
             "kind": self.kind,
             "version": version,
-            "model_api": model.MODEL_API,
+            "model_api": 0,
         }
         super().__init__(client)
 
@@ -103,7 +103,8 @@ class BaseComponent(ZooKeeperBase):
             except NoNodeError:
                 self.log.error("Could not update %s in ZooKeeper", self)
 
-    def register(self):
+    def register(self, model_api=model.MODEL_API):
+        self.content['model_api'] = model_api
         with self.register_lock:
             path = "/".join([COMPONENTS_ROOT, self.kind, self.hostname])
             self.log.info("Registering component in ZooKeeper %s", path)
@@ -210,6 +211,8 @@ class ComponentRegistry(ZooKeeperBase):
         self._cached_components = defaultdict(dict)
 
         self.model_api = None
+        # Have we initialized enough to trust the model_api
+        self._init = False
         # If we are already connected when the class is instantiated, directly
         # call the onConnect callback.
         if self.client.connected:
@@ -227,6 +230,7 @@ class ComponentRegistry(ZooKeeperBase):
             self.kazoo_client.ensure_path(root)
             self.kazoo_client.ChildrenWatch(
                 root, self._makeComponentRootWatcher(kind))
+        self._init = True
         self._updateMinimumModelApi()
 
     def _makeComponentRootWatcher(self, kind):
@@ -325,10 +329,12 @@ class ComponentRegistry(ZooKeeperBase):
         version = model.MODEL_API
         for kind, components in self.all():
             for component in components:
-                version = min(version, component.content.get('model_api', 0))
+                version = min(version, component.model_api)
         return version
 
     def _updateMinimumModelApi(self):
+        if not self._init:
+            return
         version = self.getMinimumModelApi()
         if version != self.model_api:
             self.log.info(f"System minimum data model version {version}; "
