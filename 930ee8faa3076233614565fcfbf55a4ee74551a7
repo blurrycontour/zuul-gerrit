@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec14c4bf_c7195125",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-01-28T15:24:30Z",
+      "side": 1,
+      "message": "Note to reviewers: the initialization all happens synchronously, so the only fix we really need is not to trust the minimum version until we get to this point.  Thus the change from PS1 to PS2.",
+      "revId": "930ee8faa3076233614565fcfbf55a4ee74551a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
