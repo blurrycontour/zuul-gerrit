@@ -91,21 +91,8 @@ class SQLReporter(BaseReporter):
                                f"{buildset.uuid} in DB")
 
     def reportBuildStart(self, build):
-        buildset = build.build_set
-        start_time = build.start_time or time.time()
-        start = datetime.datetime.fromtimestamp(start_time,
-                                                tz=datetime.timezone.utc)
         with self.connection.getSession() as db:
-            db_buildset = db.getBuildset(
-                tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
-
-            db_build = db_buildset.createBuild(
-                uuid=build.uuid,
-                job_name=build.job.name,
-                start_time=start,
-                voting=build.job.voting,
-                nodeset=build.job.nodeset.name,
-            )
+            db_build = self._createBuild(db, build)
         return db_build
 
     def reportBuildEnd(self, build, tenant, final):
@@ -115,7 +102,7 @@ class SQLReporter(BaseReporter):
         with self.connection.getSession() as db:
             db_build = db.getBuild(tenant=tenant, uuid=build.uuid)
             if not db_build:
-                return None
+                db_build = self._createBuild(db, build)
 
             db_build.result = build.result
             db_build.end_time = end
@@ -134,6 +121,23 @@ class SQLReporter(BaseReporter):
                     artifact['metadata'] = json.dumps(artifact['metadata'])
                 db_build.createArtifact(**artifact)
 
+        return db_build
+
+    def _createBuild(self, db, build):
+        start_time = build.start_time or time.time()
+        start = datetime.datetime.fromtimestamp(start_time,
+                                                tz=datetime.timezone.utc)
+        buildset = build.build_set
+        db_buildset = db.getBuildset(
+            tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
+
+        db_build = db_buildset.createBuild(
+            uuid=build.uuid,
+            job_name=build.job.name,
+            start_time=start,
+            voting=build.job.voting,
+            nodeset=build.job.nodeset.name,
+        )
         return db_build
 
     def getBuilds(self, *args, **kw):
