@@ -130,10 +130,11 @@ class TestSQLConnectionMysql(ZuulTestCase):
                     sa.sql.select([reporter.connection.zuul_buildset_table]))
 
                 buildsets = result.fetchall()
-                self.assertEqual(3, len(buildsets))
+                self.assertEqual(4, len(buildsets))
                 buildset0 = buildsets[0]
                 buildset1 = buildsets[1]
                 buildset2 = buildsets[2]
+                buildset3 = buildsets[3]
 
                 self.assertEqual('check', buildset0['pipeline'])
                 self.assertEqual('org/project', buildset0['project'])
@@ -201,6 +202,25 @@ class TestSQLConnectionMysql(ZuulTestCase):
                                  buildset2_builds[0]['job_name'])
                 self.assertEqual("SUCCESS", buildset2_builds[0]['result'])
 
+                buildset3_builds = conn.execute(
+                    sa.sql.select([
+                        reporter.connection.zuul_build_table
+                    ]).where(
+                        reporter.connection.zuul_build_table.c.buildset_id ==
+                        buildset3['id']
+                    )
+                ).fetchall()
+
+                self.assertEqual(
+                    'project-test1', buildset3_builds[1]['job_name'])
+                self.assertEqual('NODE_FAILURE', buildset3_builds[1]['result'])
+                self.assertEqual(None, buildset3_builds[1]['log_url'])
+                self.assertIsNotNone(buildset3_builds[1]['start_time'])
+                self.assertIsNotNone(buildset3_builds[1]['end_time'])
+                self.assertGreaterEqual(
+                    buildset3_builds[1]['end_time'],
+                    buildset3_builds[1]['start_time'])
+
         self.executor_server.hold_jobs_in_build = True
 
         # Add a success result
@@ -225,6 +245,21 @@ class TestSQLConnectionMysql(ZuulTestCase):
         self.log.debug("Adding FakeTag event")
         C = self.fake_gerrit.addFakeTag('org/project', 'master', 'foo')
         self.fake_gerrit.addEvent(C)
+        self.waitUntilSettled()
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        # Add a node_failure result
+        self.fake_nodepool.pause()
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.orderedRelease()
+        self.waitUntilSettled()
+        req = self.fake_nodepool.getNodeRequests()[0]
+        self.fake_nodepool.addFailRequest(req)
+        self.fake_nodepool.unpause()
         self.waitUntilSettled()
         self.orderedRelease()
         self.waitUntilSettled()

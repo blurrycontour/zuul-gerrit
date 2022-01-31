@@ -4772,6 +4772,7 @@ class QueueItem(zkobject.ZKObject):
         )
         self.addBuild(fakebuild)
         self.setResult(fakebuild)
+        return fakebuild
 
     def setDequeuedNeedingChange(self):
         self.updateAttributes(
