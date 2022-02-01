@@ -319,8 +319,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             else:
                 change = self._changeFromData(data)
 
-            change.cache_stat = model.CacheStat(key, data_uuid, zstat.version,
-                                                zstat.last_modified)
+            change.cache_stat = model.CacheStat(
+                key, data_uuid, zstat.last_modified_transaction_id,
+                zstat.last_modified)
             # Use setdefault here so we only have a single instance of a change
             # around. In case of a concurrent get this might return a different
             # change instance than the one we just created.
@@ -371,7 +372,8 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                 raise ConcurrentUpdateError from exc
 
             change.cache_stat = model.CacheStat(
-                key, data_uuid, zstat.version, zstat.last_modified)
+                key, data_uuid, zstat.last_modified_transaction_id,
+                zstat.last_modified)
             self._change_cache[key._hash] = change
 
     def _setData(self, data):
