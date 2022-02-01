@@ -114,9 +114,13 @@ class ZuulDriver(Driver, TriggerInterface):
         needed_by_changes = set(
             pipeline.manager.resolveChangeReferences(change.needed_by_changes))
         for source in self.sched.connections.getSources():
-            log.debug("  Checking source: %s", source)
-            needed_by_changes.update(
-                source.getChangesDependingOn(change, None, tenant))
+            log.debug("  Checking source: %s",
+                      source.connection.connection_name)
+            new_changes = source.getChangesDependingOn(change, None, tenant)
+            log.debug("  Source %s found %s changes",
+                      source.connection.connection_name,
+                      len(new_changes))
+            needed_by_changes.update(new_changes)
         log.debug("  Following changes: %s", needed_by_changes)
 
         for needs in needed_by_changes:
