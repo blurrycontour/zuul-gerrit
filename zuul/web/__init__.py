@@ -271,7 +271,16 @@ class LogStreamer(object):
         return '<LogStreamer %s uuid:%s>' % (self.websocket, self.uuid)
 
     def errorClose(self):
-        self.websocket.logClose(4011, "Unknown error")
+        try:
+            self.websocket.logClose(4011, "Unknown error")
+        except Exception:
+            self.log.exception("Error closing web:")
+
+    def closeSocket(self):
+        try:
+            self.finger_socket.close()
+        except Exception:
+            self.log.exception("Error closing streamer socket:")
 
     def handle(self, event):
         if event & select.POLLIN:
@@ -286,11 +295,9 @@ class LogStreamer(object):
                 if data:
                     self.websocket.send(data, False)
                 self.zuulweb.stream_manager.unregisterStreamer(self)
-                self.finger_socket.close()
                 return self.websocket.logClose(1000, "No more data")
         else:
             self.zuulweb.stream_manager.unregisterStreamer(self)
-            self.finger_socket.close()
             return self.websocket.logClose(1000, "Remote error")
 
 
@@ -1601,6 +1608,7 @@ class StreamManager(object):
             del self.streamers[streamer.finger_socket.fileno()]
         except KeyError:
             pass
+        streamer.closeSocket()
 
 
 class ZuulWeb(object):
