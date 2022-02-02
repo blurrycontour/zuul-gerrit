@@ -1399,6 +1399,7 @@ class TestChangeCache(ZooKeeperBaseTestCase):
         change.cache_stat = model.CacheStat(change.cache_stat.key,
                                             uuid.uuid4().hex,
                                             change.cache_version - 1,
+                                            change.cache_stat.mzxid - 1,
                                             0)
         updated_change = self.cache.updateChangeWithRetry(
             key, change, updater)

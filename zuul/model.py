@@ -5158,7 +5158,7 @@ class Bundle:
 
 # Cache info of a ref
 CacheStat = namedtuple("CacheStat",
-                       ["key", "uuid", "version", "last_modified"])
+                       ["key", "uuid", "version", "mzxid", "last_modified"])
 
 
 class Ref(object):
@@ -5173,7 +5173,7 @@ class Ref(object):
         # The url for browsing the ref/tag/branch/change
         self.url = None
         # Cache info about this ref:
-        # CacheStat(cache key, uuid, version, last_modified)
+        # CacheStat(cache key, uuid, version, mzxid, last_modified)
         self.cache_stat = None
 
     @property

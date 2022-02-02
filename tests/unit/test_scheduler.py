@@ -1389,6 +1389,7 @@ class TestScheduler(ZuulTestCase):
         change1.cache_stat = zuul.model.CacheStat(change1.cache_stat.key,
                                                   change1.cache_stat.uuid,
                                                   change1.cache_stat.version,
+                                                  change1.cache_stat.mzxid,
                                                   0.0)
         # We should not delete change1 since it's needed by change2
         # which we want to keep.
@@ -1400,6 +1401,7 @@ class TestScheduler(ZuulTestCase):
         change2.cache_stat = zuul.model.CacheStat(change2.cache_stat.key,
                                                   change2.cache_stat.uuid,
                                                   change2.cache_stat.version,
+                                                  change1.cache_stat.mzxid,
                                                   0.0)
         for connection in sched.connections.connections.values():
             connection.maintainCache([], max_age=7200)
