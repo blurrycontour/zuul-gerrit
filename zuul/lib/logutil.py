@@ -1,4 +1,5 @@
 # Copyright 2019 BMW Group
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -15,7 +16,7 @@
 import logging
 
 
-def get_annotated_logger(logger, event, build=None):
+def get_annotated_logger(logger, event, build=None, request=None):
     # Note(tobiash): When running with python 3.5 log adapters cannot be
     # stacked. We need to detect this case and modify the original one.
     if isinstance(logger, EventIdLogAdapter):
@@ -32,6 +33,9 @@ def get_annotated_logger(logger, event, build=None):
     if build is not None:
         extra['build'] = build
 
+    if request is not None:
+        extra['request'] = request
+
     if isinstance(logger, EventIdLogAdapter):
         return logger
 
@@ -44,14 +48,20 @@ class EventIdLogAdapter(logging.LoggerAdapter):
         extra = kwargs.get('extra', {})
         event_id = extra.get('event_id')
         build = extra.get('build')
+        request = extra.get('request')
         new_msg = []
         if event_id is not None:
             new_msg.append('[e: %s]' % event_id)
         if build is not None:
             new_msg.append('[build: %s]' % build)
+        if request is not None:
+            new_msg.append('[req: %s]' % request)
         new_msg.append(msg)
         msg = ' '.join(new_msg)
         return msg, kwargs
+
+    def addHandler(self, *args, **kw):
+        return self.logger.addHandler(*args, **kw)
 
 
 class MultiLineFormatter(logging.Formatter):

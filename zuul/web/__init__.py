@@ -1,4 +1,5 @@
 # Copyright (c) 2017 Red Hat
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +30,7 @@ import time
 import select
 import ssl
 import threading
+import uuid
 
 import zuul.executor.common
 from zuul import exceptions
@@ -73,11 +75,22 @@ from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import LocalZKContext, ZKContext
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
+from zuul.lib.logutil import get_annotated_logger
+from zuul.web.logutil import ZuulCherrypyLogManager
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
 
 COMMANDS = ['stop', 'repl', 'norepl']
+
+
+def get_request_logger(logger=None):
+    if logger is None:
+        logger = logging.getLogger("zuul.web")
+    request = cherrypy.serving.request
+    if not hasattr(request, 'zuul_request_id'):
+        request.zuul_request_id = uuid.uuid4().hex
+    return get_annotated_logger(logger, None, request=request.zuul_request_id)
 
 
 class SaveParamsTool(cherrypy.Tool):
@@ -168,10 +181,9 @@ class ChangeFilter(object):
 
 
 class LogStreamHandler(WebSocket):
-    log = logging.getLogger("zuul.web")
-
     def __init__(self, *args, **kw):
         kw['heartbeat_freq'] = 20
+        self.log = get_request_logger()
         super(LogStreamHandler, self).__init__(*args, **kw)
         self.streamer = None
 
@@ -235,8 +247,6 @@ class LogStreamHandler(WebSocket):
 
 
 class LogStreamer(object):
-    log = logging.getLogger("zuul.web")
-
     def __init__(self, zuulweb, websocket, server, port, build_uuid, use_ssl):
         """
         Create a client to connect to the finger streamer and pull results.
@@ -245,6 +255,7 @@ class LogStreamer(object):
         :param str port: The executor server port.
         :param str build_uuid: The build UUID to stream.
         """
+        self.log = websocket.log
         self.log.debug("Connecting to finger server %s:%s", server, port)
         Decoder = codecs.getincrementaldecoder('utf8')
         self.decoder = Decoder()
@@ -306,19 +317,21 @@ class LogStreamer(object):
 
 
 class ZuulWebAPI(object):
-    log = logging.getLogger("zuul.web")
-
     def __init__(self, zuulweb):
+        self.zuulweb = zuulweb
         self.zk_client = zuulweb.zk_client
         self.system = ZuulSystem(self.zk_client)
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client,
                                              enable_node_cache=True)
-        self.zuulweb = zuulweb
         self.cache = {}
         self.cache_time = {}
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
         self.status_lock = threading.Lock()
+
+    @property
+    def log(self):
+        return get_request_logger()
 
     def _basic_auth_header_check(self):
         """make sure protected endpoints have a Authorization header with the
@@ -1615,7 +1628,7 @@ class StreamManager(object):
 
 
 class ZuulWeb(object):
-    log = logging.getLogger("zuul.web.ZuulWeb")
+    log = logging.getLogger("zuul.web")
 
     def __init__(self,
                  config,
@@ -1839,7 +1852,8 @@ class ZuulWeb(object):
             },
         })
 
-        cherrypy.tree.mount(api, '/', config=conf)
+        app = cherrypy.tree.mount(api, '/', config=conf)
+        app.log = ZuulCherrypyLogManager(appid=app.log.appid)
 
     @property
     def port(self):
