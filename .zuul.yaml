@@ -306,8 +306,6 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
         - zuul-tox-zuul-client
         - zuul-build-python-release
     gate:
