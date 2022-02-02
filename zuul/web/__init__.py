@@ -191,6 +191,7 @@ class LogStreamHandler(WebSocket):
     def closed(self, code, reason=None):
         self.log.debug("Websocket closed: %s %s", code, reason)
         if self.streamer:
+            streamer.closeSocket()
             try:
                 self.streamer.zuulweb.stream_manager.unregisterStreamer(
                     self.streamer)
@@ -271,7 +272,17 @@ class LogStreamer(object):
         return '<LogStreamer %s uuid:%s>' % (self.websocket, self.uuid)
 
     def errorClose(self):
-        self.websocket.logClose(4011, "Unknown error")
+        try:
+            self.websocket.logClose(4011, "Unknown error")
+        except Exception:
+            self.log.exception("Error closing web:")
+        self.closeSocket()
+
+    def closeSocket(self):
+        try:
+            self.finger_socket.close()
+        except Exception:
+            self.log.exception("Error closing streamer socket:")
 
     def handle(self, event):
         if event & select.POLLIN:
