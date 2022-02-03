@@ -23,7 +23,6 @@ from zuul.model import Change, TriggerEvent
 from zuul.driver.util import time_to_seconds
 from zuul import exceptions
 
-
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 

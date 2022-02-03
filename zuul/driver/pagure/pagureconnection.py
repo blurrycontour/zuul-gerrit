@@ -33,7 +33,6 @@ from zuul.lib import dependson
 from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
-    ChangeKey,
     ConcurrentUpdateError,
 )
 from zuul.zk.event_queues import ConnectionEventQueue
@@ -212,12 +211,8 @@ class PagureEventConnector(threading.Thread):
         if event:
             event.timestamp = timestamp
             if event.change_number:
-                project = self.connection.source.getProject(event.project_name)
-                self.connection._getChange(project,
-                                           event.change_number,
-                                           event.patch_number,
-                                           refresh=True,
-                                           url=event.change_url,
+                change_key = self.connection.source.getChangeKey(event)
+                self.connection._getChange(change_key, refresh=True,
                                            event=event)
             event.project_hostname = self.connection.canonical_hostname
             self.connection.logEvent(event)
@@ -600,81 +595,91 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def getGitUrl(self, project):
         return '%s/%s' % (self.cloneurl, project.name)
 
-    def getChange(self, event, refresh=False):
-        project = self.source.getProject(event.project_name)
-        if event.change_number:
+    def getChange(self, change_key, refresh=False, event=None):
+        if change_key.connection_name != self.connection_name:
+            return None
+        if change_key.change_type == 'PullRequest':
             self.log.info("Getting change for %s#%s" % (
-                project, event.change_number))
-            change = self._getChange(
-                project, event.change_number, event.patch_number,
-                refresh=refresh, event=event)
+                change_key.project_name, change_key.stable_id))
+            change = self._getChange(change_key,
+                                     refresh=refresh, event=event)
         else:
             self.log.info("Getting change for %s ref:%s" % (
-                project, event.ref))
-            change = self._getNonPRRef(project, event, refresh=refresh)
+                change_key.project_name, change_key.stable_id))
+            change = self._getNonPRRef(change_key, event=event)
         return change
 
-    def _getChange(self, project, number, patchset=None,
-                   refresh=False, url=None, event=None):
-        key = ChangeKey(self.connection_name, project.name,
-                        'PullRequest', str(number),
-                        str(patchset))
-        change = self._change_cache.get(key)
+    def _getChange(self, change_key, refresh=False, event=None):
+        log = get_annotated_logger(self.log, event)
+        number = int(change_key.stable_id)
+        change = self._change_cache.get(change_key)
         if change and not refresh:
-            self.log.debug("Getting change from cache %s" % str(key))
+            log.debug("Getting change from cache %s" % str(change_key))
             return change
+        project = self.source.getProject(change_key.project_name)
         if not change:
+            if not event:
+                self.log.error("Change %s not found in cache and no event",
+                               change_key)
+            if event:
+                url = event.change_url
             change = PullRequest(project.name)
             change.project = project
             change.number = number
             # patchset is the tips commit of the PR
-            change.patchset = patchset
-            change.url = url
+            change.patchset = change_key.revision
+            change.url = url or self.getPullUrl(project.name, number)
             change.uris = [
-                '%s/%s/pull/%s' % (self.baseurl, project, number),
+                '%s/%s/pull/%s' % (self.baseurl, project.name, number),
             ]
 
-        self.log.debug("Getting change pr#%s from project %s" % (
+        log.debug("Getting change pr#%s from project %s" % (
             number, project.name))
-        self.log.info("Updating change from pagure %s" % change)
+        log.info("Updating change from pagure %s" % change)
         pull = self.getPull(change.project.name, change.number)
 
         def _update_change(c):
             self._updateChange(c, event, pull)
 
-        change = self._change_cache.updateChangeWithRetry(key, change,
+        change = self._change_cache.updateChangeWithRetry(change_key, change,
                                                           _update_change)
         return change
 
-    def _getNonPRRef(self, project, event, refresh=False):
-        key = ChangeKey(self.connection_name, project.name,
-                        'Ref', event.ref, event.newrev)
-        change = self._change_cache.get(key)
+    def _getNonPRRef(self, change_key, refresh=False, event=None):
+        change = self._change_cache.get(change_key)
         if change:
             if refresh:
                 self._change_cache.updateChangeWithRetry(
-                    key, change, lambda: None)
+                    change_key, change, lambda: None)
             return change
-        if event.ref and event.ref.startswith('refs/tags/'):
+        if not event:
+            self.log.error("Change %s not found in cache and no event",
+                           change_key)
+        project = self.source.getProject(change_key.project_name)
+        if change_key.change_type == 'Tag':
             change = Tag(project)
-            change.tag = event.tag
-        elif event.ref and event.ref.startswith('refs/heads/'):
+            tag = change_key.stable_id
+            change.tag = tag
+            change.ref = f'refs/tags/{tag}'
+        elif change_key.change_type == 'Branch':
+            branch = change_key.stable_id
             change = Branch(project)
-            change.branch = event.branch
+            change.branch = branch
+            change.ref = f'refs/heads/{branch}'
         else:
             change = Ref(project)
-        change.ref = event.ref
-        change.oldrev = event.oldrev
-        change.newrev = event.newrev
-        change.url = self.getGitwebUrl(project, sha=event.newrev)
+            change.ref = change_key.stable_id
+        change.oldrev = change_key.oldrev
+        change.newrev = change_key.newrev
+        change.url = self.getGitwebUrl(project, sha=change.newrev)
         # Pagure does not send files details in the git-receive event.
         # Explicitly set files to None and let the pipelines processor
         # call the merger asynchronuously
         change.files = None
         try:
-            self._change_cache.set(key, change)
+            self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
-            change = self._change_cache.get(key)
+            change = self._change_cache.get(change_key)
         return change
 
     def _hasRequiredStatusChecks(self, change):

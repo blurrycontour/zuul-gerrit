@@ -18,9 +18,9 @@ import logging
 
 from zuul.source import BaseSource
 from zuul.model import Project
-
 from zuul.driver.pagure.paguremodel import PagureRefFilter
 from zuul.driver.util import scalar_or_list, to_list
+from zuul.zk.change_cache import ChangeKey
 
 
 class PagureSource(BaseSource):
@@ -61,8 +61,30 @@ class PagureSource(BaseSource):
         """Called after configuration has been processed."""
         raise NotImplementedError()
 
-    def getChange(self, event, refresh=False):
-        return self.connection.getChange(event, refresh)
+    def getChangeKey(self, event):
+        connection_name = self.connection.connection_name
+        if event.change_number:
+            return ChangeKey(connection_name, event.project_name,
+                             'PullRequest',
+                             str(event.change_number),
+                             str(event.patch_number))
+        revision = f'{event.oldrev}..{event.newrev}'
+        if event.ref and event.ref.startswith('refs/tags/'):
+            tag = event.ref[len('refs/tags/'):]
+            return ChangeKey(connection_name, event.project_name,
+                             'Tag', tag, revision)
+        if event.ref and event.ref.startswith('refs/heads/'):
+            branch = event.ref[len('refs/heads/'):]
+            return ChangeKey(connection_name, event.project_name,
+                             'Branch', branch, revision)
+        if event.ref:
+            return ChangeKey(connection_name, event.project_name,
+                             'Ref', event.ref, revision)
+        self.log.warning("Unable to format change key for %s" % (self,))
+
+    def getChange(self, change_key, refresh=False, event=None):
+        return self.connection.getChange(change_key, refresh=refresh,
+                                         event=event)
 
     def getChangeByURL(self, url, event):
         try:
@@ -80,16 +102,11 @@ class PagureSource(BaseSource):
         pull = self.connection.getPull(project_name, num, event=event)
         if not pull:
             return None
-        project = self.getProject(project_name)
-        change = self.connection._getChange(
-            project, num,
-            patchset=pull.get('commit_stop'),
-            url=url,
-            event=event)
+        change_key = ChangeKey(self.connection.connection_name, project_name,
+                               'PullRequest',
+                               str(num), pull.get('commit_stop'))
+        change = self.connection._getChange(change_key, event=event)
         return change
-
-    def getChangeByKey(self, key):
-        return self.connection.getChangeByKey(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         return self.connection.getChangesDependingOn(
