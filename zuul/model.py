@@ -1046,7 +1046,8 @@ class ChangeQueue(zkobject.ZKObject):
                                          item_ahead=item.item_ahead)
 
         if item.bundle:
-            if any([i in self.queue for i in item.bundle.items]):
+            items_in_pipeline = self.pipeline.getAllItems()
+            if any([i in items_in_pipeline for i in item.bundle.items]):
                 item.updateAttributes(
                     self.zk_context, item_ahead=None, items_behind=[],
                     dequeue_time=time.time())
