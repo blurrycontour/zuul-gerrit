@@ -16,6 +16,24 @@
       "message": "I think the close before the unregister may be causing the tracebacks in the failed tests of the child change: https://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_fa1/827564/1/check/zuul-tox-py38/fa18359/testr_results.html\n\nI don\u0027t know that those tracebacks are causing the test to fail, but we might want to address them anyway to avoid confusing errors in the logs.",
       "revId": "4e5b1ceec1f23832539b5bef9fd43632e2851eeb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bd5ccae_5503cc00",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-03T00:28:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5e23692_7656fb8d",
+      "revId": "4e5b1ceec1f23832539b5bef9fd43632e2851eeb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
