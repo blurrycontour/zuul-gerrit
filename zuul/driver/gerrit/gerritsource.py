@@ -22,6 +22,7 @@ from zuul.model import Project
 from zuul.driver.gerrit.gerritmodel import GerritRefFilter
 from zuul.driver.util import scalar_or_list, to_list
 from zuul.lib.dependson import find_dependency_headers
+from zuul.zk.change_cache import ChangeKey
 
 
 class GerritSource(BaseSource):
@@ -54,8 +55,36 @@ class GerritSource(BaseSource):
     def postConfig(self):
         pass
 
-    def getChange(self, event, refresh=False):
-        return self.connection.getChange(event, refresh)
+    def getChangeKey(self, event):
+        connection_name = self.connection.connection_name
+        if event.change_number:
+            return ChangeKey(connection_name, None,
+                             'GerritChange',
+                             str(event.change_number),
+                             str(event.patch_number))
+        revision = f'{event.oldrev}..{event.newrev}'
+        if event.ref and event.ref.startswith('refs/tags/'):
+            tag = event.ref[len('refs/tags/'):]
+            return ChangeKey(connection_name, event.project_name,
+                             'Tag', tag, revision)
+        if event.ref and not event.ref.startswith('refs/'):
+            # Pre 2.13 Gerrit ref-updated events don't have branch prefixes.
+            return ChangeKey(connection_name, event.project_name,
+                             'Branch', event.ref, revision)
+        if event.ref and event.ref.startswith('refs/heads/'):
+            # From the timer trigger or Post 2.13 Gerrit
+            branch = event.ref[len('refs/heads/'):]
+            return ChangeKey(connection_name, event.project_name,
+                             'Branch', branch, revision)
+        if event.ref:
+            # catch-all ref (ie, not a branch or head)
+            return ChangeKey(connection_name, event.project_name,
+                             'Ref', event.ref, revision)
+        self.log.warning("Unable to format change key for %s" % (event,))
+
+    def getChange(self, change_key, refresh=False, event=None):
+        return self.connection.getChange(change_key, refresh=refresh,
+                                         event=event)
 
     def getChangeByURL(self, url, event):
         try:
@@ -76,13 +105,12 @@ class GerritSource(BaseSource):
         results = self.connection.simpleQuery(query, event=event)
         if not results:
             return None
-        change = self.connection._getChange(
-            results[0].number, results[0].current_patchset,
-            event=event)
+        change_key = ChangeKey(self.connection.connection_name, None,
+                               'GerritChange',
+                               str(results[0].number),
+                               str(results[0].current_patchset))
+        change = self.connection._getChange(change_key, event=event)
         return change
-
-    def getChangeByKey(self, key):
-        return self.connection.getChangeByKey(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         changes = []
@@ -107,8 +135,11 @@ class GerritSource(BaseSource):
                 if key in seen:
                     continue
                 seen.add(key)
-                change = self.connection._getChange(
-                    result.number, result.current_patchset)
+                change_key = ChangeKey(self.connection.connection_name, None,
+                                       'GerritChange',
+                                       str(result.number),
+                                       str(result.current_patchset))
+                change = self.connection._getChange(change_key)
                 changes.append(change)
         return changes
 

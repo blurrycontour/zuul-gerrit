@@ -5479,7 +5479,7 @@ class Change(Branch):
             key = ChangeKey.fromReference(reference)
             if key not in related:
                 source = sched.connections.getSource(key.connection_name)
-                change = source.getChangeByKey(key)
+                change = source.getChange(key)
                 change.getRelatedChanges(sched, related)
 
     def getSafeAttributes(self):

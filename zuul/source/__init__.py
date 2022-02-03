@@ -58,13 +58,24 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """Called after configuration has been processed."""
 
     @abc.abstractmethod
-    def getChange(self, event):
-        """Get the change representing an event.
+    def getChangeKey(self, event):
+        """Get a ChangeKey from a ChangeManagementEvent or TriggerEvent"""
+
+    @abc.abstractmethod
+    def getChange(self, change_key, refresh=False, event=None):
+        """Get the change represented by a change_key
 
         This method is called very frequently, and should generally
         return quickly.  The connection is expected to cache change
         objects and automatically update them as related events are
         received.
+
+        The event is optional, and if present may be used to annotate
+        log entries and supply additional information about the change
+        if a refresh is necessary.
+
+        If the change key does not correspond to this source, return
+        None.
 
         """
 
@@ -97,14 +108,6 @@ class BaseSource(object, metaclass=abc.ABCMeta):
                 else:
                     raise
         return dep
-
-    def getChangeByKey(self, key):
-        """Get the change corresponding to the supplied cache key.
-
-        The key may not correspond to this source. Return None if it
-        doesn't.
-        """
-        raise NotImplementedError
 
     @abc.abstractmethod
     def getChangesDependingOn(self, change, projects, tenant):

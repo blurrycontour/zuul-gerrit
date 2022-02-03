@@ -1442,20 +1442,23 @@ class TestScheduler(ZuulTestCase):
         event.change_number = '1'
         event.patch_number = '2'
 
-        a = source.getChange(event)
+        a = source.getChange(source.getChangeKey(event), event=event)
         mgr = tenant.layout.pipelines['gate'].manager
         self.assertFalse(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
         A.addApproval('Code-Review', 2)
-        a = source.getChange(event, refresh=True)
+        a = source.getChange(source.getChangeKey(event),
+                             refresh=True, event=event)
         self.assertFalse(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
         A.addApproval('Approved', 1)
-        a = source.getChange(event, refresh=True)
+        a = source.getChange(source.getChangeKey(event),
+                             refresh=True, event=event)
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
         A.setWorkInProgress(True)
-        a = source.getChange(event, refresh=True)
+        a = source.getChange(source.getChangeKey(event),
+                             refresh=True, event=event)
         self.assertFalse(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
     def test_project_merge_conflict(self):
@@ -4294,7 +4297,8 @@ class TestScheduler(ZuulTestCase):
             _, project = tenant.getProject('org/project')
             for branch in project.source.getProjectBranches(project, tenant):
                 event = self._create_dummy_event(project, branch)
-                change = project.source.getChange(event)
+                change_key = project.source.getChangeKey(event)
+                change = project.source.getChange(change_key, event=event)
                 cached_versions[branch] = change.cache_version
 
         # The pipeline triggers every second, so we should have seen
@@ -4342,7 +4346,8 @@ class TestScheduler(ZuulTestCase):
             _, project = tenant.getProject('org/project')
             for branch in project.source.getProjectBranches(project, tenant):
                 event = self._create_dummy_event(project, branch)
-                change = project.source.getChange(event)
+                change_key = project.source.getChangeKey(event)
+                change = project.source.getChange(change_key, event=event)
                 # Make sure the timer driver refreshed the cache
                 self.assertGreater(change.cache_version,
                                    cached_versions[branch])
