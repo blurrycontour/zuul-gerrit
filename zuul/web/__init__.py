@@ -31,6 +31,7 @@ import select
 import ssl
 import threading
 import uuid
+import prometheus_client
 
 import zuul.executor.common
 from zuul import exceptions
@@ -76,6 +77,7 @@ from zuul.zk.zkobject import LocalZKContext, ZKContext
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.statsd import get_statsd, normalize_statsd_name
 from zuul.web.logutil import ZuulCherrypyLogManager
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
@@ -141,6 +143,38 @@ def handle_options(allowed_methods=None):
 
 cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
                                               handle_options)
+
+
+class StatsTool(cherrypy.Tool):
+    def __init__(self, statsd, metrics):
+        self.statsd = statsd
+        self.metrics = metrics
+        self.hostname = normalize_statsd_name(socket.getfqdn())
+        cherrypy.Tool.__init__(self, 'on_start_resource',
+                               self.emitStats)
+
+    def emitStats(self):
+        idle = cherrypy.server.httpserver.requests.idle
+        qsize = cherrypy.server.httpserver.requests.qsize
+        self.metrics.threadpool_idle.set(idle)
+        self.metrics.threadpool_queue.set(idle)
+        if self.statsd:
+            self.statsd.gauge(
+                f'zuul.web.server.{self.hostname}.threadpool.idle',
+                idle)
+            self.statsd.gauge(
+                f'zuul.web.server.{self.hostname}.threadpool.queue',
+                qsize)
+
+
+class WebMetrics:
+    def __init__(self):
+        self.threadpool_idle = prometheus_client.Gauge(
+            'web_threadpool_idle', 'The number of idle worker threads')
+        self.threadpool_queue = prometheus_client.Gauge(
+            'web_threadpool_queue', 'The number of queued requests')
+        self.streamers = prometheus_client.Gauge(
+            'web_streamers', 'The number of log streamers currently operating')
 
 
 # Custom JSONEncoder that combines the ZuulJSONEncoder with cherrypy's
@@ -1563,7 +1597,10 @@ class StaticHandler(object):
 class StreamManager(object):
     log = logging.getLogger("zuul.web")
 
-    def __init__(self):
+    def __init__(self, statsd, metrics):
+        self.statsd = statsd
+        self.metrics = metrics
+        self.hostname = normalize_statsd_name(socket.getfqdn())
         self.streamers = {}
         self.poll = select.poll()
         self.bitmask = (select.POLLIN | select.POLLERR |
@@ -1605,11 +1642,19 @@ class StreamManager(object):
                     except KeyError:
                         pass
 
+    def emitStats(self):
+        streamers = len(self.streamers)
+        self.metrics.streamers.set(streamers)
+        if self.statsd:
+            self.statsd.gauge(f'zuul.web.server.{self.hostname}.streamers',
+                              streamers)
+
     def registerStreamer(self, streamer):
         self.log.debug("Registering streamer %s", streamer)
         self.streamers[streamer.finger_socket.fileno()] = streamer
         self.poll.register(streamer.finger_socket.fileno(), self.bitmask)
         os.write(self.wake_write, b'\n')
+        self.emitStats()
 
     def unregisterStreamer(self, streamer):
         self.log.debug("Unregistering streamer %s", streamer)
@@ -1622,6 +1667,7 @@ class StreamManager(object):
         except KeyError:
             pass
         streamer.closeSocket()
+        self.emitStats()
 
 
 class ZuulWeb(object):
@@ -1634,6 +1680,9 @@ class ZuulWeb(object):
                  info: WebInfo = None):
         self.start_time = time.time()
         self.config = config
+        self.metrics = WebMetrics()
+        self.statsd = get_statsd(config)
+
         self.listen_address = get_default(self.config,
                                           'web', 'listen_address',
                                           '127.0.0.1')
@@ -1681,7 +1730,7 @@ class ZuulWeb(object):
 
         self.connections = connections
         self.authenticators = authenticators
-        self.stream_manager = StreamManager()
+        self.stream_manager = StreamManager(self.statsd, self.metrics)
         self.zone = get_default(self.config, 'web', 'zone')
 
         self.management_events = TenantManagementEventQueue.createRegistry(
@@ -1836,9 +1885,12 @@ class ZuulWeb(object):
             controller=StaticHandler(self.static_path),
             action='default')
 
+        cherrypy.tools.stats = StatsTool(self.statsd, self.metrics)
+
         conf = {
             '/': {
-                'request.dispatch': route_map
+                'request.dispatch': route_map,
+                'tools.stats.on': True,
             }
         }
         cherrypy.config.update({

@@ -1,5 +1,6 @@
 # Copyright 2014 Hewlett-Packard Development Company, L.P.
 # Copyright 2014 Rackspace Australia
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -26,6 +27,7 @@ from unittest import skip
 
 import requests
 
+from zuul.lib.statsd import normalize_statsd_name
 import zuul.web
 
 from tests.base import ZuulTestCase, AnsibleZuulTestCase
@@ -232,6 +234,11 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(len(status_jobs[2]['dependencies']), 1)
         self.assertIn('project-merge', status_jobs[1]['dependencies'])
         self.assertIn('project-merge', status_jobs[2]['dependencies'])
+        hostname = normalize_statsd_name(socket.getfqdn())
+        self.assertReportedStat(
+            f'zuul.web.server.{hostname}.threadpool.idle', kind='g')
+        self.assertReportedStat(
+            f'zuul.web.server.{hostname}.threadpool.queue', kind='g')
 
     def test_web_components(self):
         "Test that we can retrieve the list of connected components"
