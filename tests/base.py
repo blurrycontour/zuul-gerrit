@@ -36,6 +36,7 @@ from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
 from unittest.case import skipIf
 import zlib
 
+import prometheus_client
 import requests
 import select
 import shutil
@@ -4013,6 +4014,24 @@ class PostgresqlSchemaFixture(fixtures.Fixture):
         cur.execute("drop user %s" % self.name)
 
 
+class PrometheusFixture(fixtures.Fixture):
+    def _setUp(self):
+        # Save a list of collectors which exist at the start of the
+        # test (ie, the standard prometheus_client collectors)
+        self.collectors = list(
+            prometheus_client.registry.REGISTRY._collector_to_names.keys())
+        self.addCleanup(self._cleanup)
+
+    def _cleanup(self):
+        # Avoid the "Duplicated timeseries in CollectorRegistry" error
+        # by removing any collectors added during the test.
+        collectors = list(
+            prometheus_client.registry.REGISTRY._collector_to_names.keys())
+        for collector in collectors:
+            if collector not in self.collectors:
+                prometheus_client.registry.REGISTRY.unregister(collector)
+
+
 class FakeCPUTimes:
     def __init__(self):
         self.user = 0
@@ -4052,6 +4071,7 @@ class BaseTestCase(testtools.TestCase):
 
     def setUp(self):
         super(BaseTestCase, self).setUp()
+        self.useFixture(PrometheusFixture())
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
         try:
             test_timeout = int(test_timeout)
