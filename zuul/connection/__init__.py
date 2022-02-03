@@ -334,8 +334,5 @@ class ZKChangeCacheMixin:
         self._change_cache.updateChangeWithRetry(change.cache_stat.key,
                                                  change, _update_attrs)
 
-    def getChangeByKey(self, key):
-        return self._change_cache.get(key)
-
     def estimateCacheDataSize(self):
         return self._change_cache.estimateDataSize()

@@ -1664,7 +1664,8 @@ class Scheduler(threading.Thread):
         (trusted, project) = tenant.getProject(canonical_name)
         if project is None:
             raise ValueError('Unknown project %s' % event.project_name)
-        change = project.source.getChange(event)
+        change_key = project.source.getChangeKey(event)
+        change = project.source.getChange(change_key, event=event)
         if change.project.name != project.name:
             if event.change:
                 item = 'Change %s' % event.change
@@ -1698,7 +1699,9 @@ class Scheduler(threading.Thread):
         if project is None:
             raise ValueError(f'Unknown project {event.project_name}')
         try:
-            change = project.source.getChange(event, refresh=True)
+            change_key = project.source.getChangeKey(event)
+            change = project.source.getChange(change_key,
+                                              event=event, refresh=True)
         except Exception as exc:
             raise ValueError('Unknown change') from exc
 
@@ -1961,7 +1964,8 @@ class Scheduler(threading.Thread):
             return
 
         try:
-            change = project.source.getChange(event)
+            change_key = project.source.getChangeKey(event)
+            change = project.source.getChange(change_key, event=event)
         except exceptions.ChangeNotFound as e:
             log.debug("Unable to get change %s from source %s",
                       e.change, project.source)
@@ -2039,7 +2043,8 @@ class Scheduler(threading.Thread):
         if project is None:
             return
         try:
-            change = project.source.getChange(event)
+            change_key = project.source.getChangeKey(event)
+            change = project.source.getChange(change_key, event=event)
         except exceptions.ChangeNotFound as e:
             log.debug("Unable to get change %s from source %s",
                       e.change, project.source)
