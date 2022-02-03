@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cbe334a_29ea3805",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1049,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-03T15:25:12Z",
+      "side": 1,
+      "message": "It\u0027s probably safer to set include_old\u003dTrue here -- it doesn\u0027t matter for the case we know about (there should never be old pipelines during queue processing) but if we ever call this method outside of queue processing, it could help avoid errors.",
+      "revId": "f42a72525f1be4366c5953443bbdd7f78794f55d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
