@@ -17,7 +17,6 @@ import re
 from zuul.model import TriggerEvent
 from zuul.model import EventFilter
 
-
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 

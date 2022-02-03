@@ -111,6 +111,26 @@ class ChangeKey:
             self.stable_id == str_or_none(other.stable_id),
         ])
 
+    # Convenience methods for drivers that encode old/newrev in
+    # revision.  Revision is not guaranteed to use this format.
+    @property
+    def oldrev(self):
+        if '..' in self.revision:
+            old = self.revision.split('..')[0]
+            if old == 'None':
+                return None
+            return old
+        return None
+
+    @property
+    def newrev(self):
+        if '..' in self.revision:
+            new = self.revision.split('..')[1]
+            if new == 'None':
+                return None
+            return new
+        return self.revision
+
 
 class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
@@ -232,7 +252,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         # max_age will any change in it be removed.
         for key in to_keep.copy():
             source = sched.connections.getSource(key.connection_name)
-            change = source.getChangeByKey(key)
+            change = source.getChange(key)
             change.getRelatedChanges(sched, to_keep)
         to_prune = set(outdated_versions.keys()) - to_keep
         for key in to_prune:

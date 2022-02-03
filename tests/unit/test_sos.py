@@ -166,6 +166,32 @@ class TestScaleOutScheduler(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
+    def test_change_cache_error(self):
+        # Test that if a change is deleted from the change cache,
+        # pipeline processing can continue
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Delete the change cache
+        for connection in self.scheds.first.connections.connections.values():
+            if hasattr(connection, '_change_cache'):
+                connection.maintainCache([], max_age=0)
+
+        # Release
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
     def test_pipeline_summary(self):
         # Test that we can deal with a truncated pipeline summary
         self.executor_server.hold_jobs_in_build = True

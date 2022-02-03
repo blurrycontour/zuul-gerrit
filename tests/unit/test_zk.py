@@ -1286,7 +1286,7 @@ class DummySource:
     def getProject(self, project_name):
         return project_name
 
-    def getChangeByKey(self, key):
+    def getChange(self, change_key):
         return DummyChange('project')
 
 
