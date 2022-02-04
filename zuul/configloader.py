@@ -1854,12 +1854,13 @@ class TenantParser(object):
                     self.merger.cancel(job)
                 except Exception:
                     self.log.exception("Unable to cancel job %s", job)
+            raise
 
     def _processCatJobs(self, abide, tenant, loading_errors, jobs):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
-            job.wait(self.merger.git_timeout)
-            if not hasattr(job, 'updated'):
+            res = job.wait(self.merger.git_timeout)
+            if not res:
                 # We timed out
                 raise Exception("Cat job %s timed out; consider setting "
                                 "merger.git_timeout in zuul.conf" % (job,))
