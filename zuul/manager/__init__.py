@@ -90,25 +90,37 @@ class PipelineManager(metaclass=ABCMeta):
             self.current_context = None
 
     def _postConfig(self, layout):
-        # All pipelines support shared queues for setting
-        # relative_priority; only the dependent pipeline uses them for
-        # pipeline queing.
+        # If our layout UUID already matches the UUID in ZK, we don't
+        # need to make any changes in ZK.  But we do still need to
+        # update our local object pointers.  Note that our local queue
+        # state may still be out of date after this because we skip
+        # the refresh.
+        self.buildChangeQueues(layout)
+        ctx = self.sched.createZKContext(None, self.log)
+        with self.currentContext(ctx):
+            if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
+                self.pipeline.state = PipelineState()
+                self.pipeline.state._set(pipeline=self.pipeline)
+                self.pipeline.change_list = PipelineChangeList.create(
+                    self.pipeline)
+                return
+
         with pipeline_lock(
             self.sched.zk_client, self.pipeline.tenant.name, self.pipeline.name
         ) as lock:
             ctx = self.sched.createZKContext(lock, self.log)
             with self.currentContext(ctx):
+                # Since the layout UUID is new, this will move queues
+                # to "old_queues" and refresh the pipeline state as a
+                # side effect.
                 self.pipeline.state = PipelineState.resetOrCreate(
                     self.pipeline, layout.uuid)
                 self.pipeline.change_list = PipelineChangeList.create(
                     self.pipeline)
-                self.buildChangeQueues(layout)
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")
-        # Note: change_queues is serialized to ZK, so mutate a copy
-        # and then update the attribute when we finish.
-        change_queues = self.pipeline.relative_priority_queues.copy()
+        change_queues = self.pipeline.relative_priority_queues
         tenant = self.pipeline.tenant
         layout_project_configs = layout.project_configs
 
@@ -145,7 +157,6 @@ class PipelineManager(metaclass=ABCMeta):
             change_queue.append(project)
             self.log.debug("Added project %s to queue: %s" %
                            (project, queue_name))
-        self.pipeline.setRelativePriorityQueues(change_queues)
 
     def getSubmitAllowNeeds(self):
         # Get a list of code review labels that are allowed to be
