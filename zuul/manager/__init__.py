@@ -90,6 +90,15 @@ class PipelineManager(metaclass=ABCMeta):
             self.current_context = None
 
     def _postConfig(self, layout):
+        ctx = self.sched.createZKContext(None, self.log)
+        with self.currentContext(ctx):
+            if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
+                self.pipeline.state = PipelineState()
+                self.pipeline.state._set(pipeline=self.pipeline)
+                self.pipeline.change_list = PipelineChangeList.create(
+                    self.pipeline)
+                return
+
         # All pipelines support shared queues for setting
         # relative_priority; only the dependent pipeline uses them for
         # pipeline queing.
