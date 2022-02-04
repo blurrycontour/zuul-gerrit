@@ -814,13 +814,13 @@ class Scheduler(threading.Thread):
                 # In case we don't have a cached layout state we need to
                 # acquire the write lock since we load a new tenant.
                 if layout_state is None:
-                    tlock = tenant_write_lock(self.zk_client, tenant_name)
+                    lock_ctx = tenant_write_lock(self.zk_client, tenant_name)
                 else:
-                    tlock = tenant_read_lock(self.zk_client, tenant_name)
+                    lock_ctx = tenant_read_lock(self.zk_client, tenant_name)
 
                 # Consider all caches valid (min. ltime -1)
                 min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
-                with tlock:
+                with lock_ctx as tlock:
                     # Refresh the layout state now that we are holding the lock
                     # and we can be sure it won't be changed concurrently.
                     layout_state = self.tenant_layout_state.get(tenant_name)
@@ -1484,7 +1484,12 @@ class Scheduler(threading.Thread):
         if self.statsd:
             try:
                 for pipeline in tenant.layout.pipelines.values():
-                    items = len([x for x in pipeline.getAllItems() if x.live])
+                    with pipeline.manager.currentContext(context):
+                        pipeline.state.refresh(context)
+                    items = len([
+                        x for x in pipeline.getAllItems(include_old=True)
+                        if x.live
+                    ])
                     # stats.gauges.zuul.tenant.<tenant>.pipeline.
                     #    <pipeline>.current_changes
                     key = 'zuul.tenant.%s.pipeline.%s' % (
