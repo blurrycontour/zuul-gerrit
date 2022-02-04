@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "62bc9c3a_2ee7f76a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1861,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-04T17:26:15Z",
+      "side": 1,
+      "message": "Does the inner exception for the cancel failure need to be raised too? I wonder if we need to raise at all at this scope if the cancellation handles the downstream eventing. Basically we cancel and downstream of us should notice that. Or we fail to cancel and raise then.",
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5cebf8b5_a58b244a",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -14,6 +31,30 @@
       "writtenOn": "2022-02-04T04:09:39Z",
       "side": 1,
       "message": "Explanation: checking the wait function, it will return false when it times out. We can not check timeout depends on the availability of \"updated\" attribute, it would also be set even it times out.",
+      "range": {
+        "startLine": 1866,
+        "startChar": 12,
+        "endLine": 1866,
+        "endChar": 15
+      },
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04030be1_af8fa744",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-04T17:26:15Z",
+      "side": 1,
+      "message": "https://opendev.org/zuul/zuul/src/branch/master/zuul/zk/event_queues.py#L456 shows the updated attribute is always there. This change makes sense to me.",
+      "parentUuid": "5cebf8b5_a58b244a",
       "range": {
         "startLine": 1866,
         "startChar": 12,
