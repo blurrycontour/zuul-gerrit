@@ -20,6 +20,7 @@ import json
 import hashlib
 import logging
 import os
+import zlib
 from functools import total_ordering
 
 import re2
@@ -611,6 +612,22 @@ class PipelineState(zkobject.ZKObject):
         pipeline.state = obj
         obj._load(context, path=path)
         return obj
+
+    @classmethod
+    def peekLayoutUUID(cls, pipeline):
+        ctx = pipeline.manager.current_context
+        try:
+            path = cls.pipelinePath(pipeline)
+            compressed_data, zstat = ctx.client.get(path)
+            try:
+                raw = zlib.decompress(compressed_data)
+            except zlib.error:
+                # Fallback for old, uncompressed data
+                raw = compressed_data
+            data = json.loads(raw.decode("utf8"))
+            return data["layout_uuid"]
+        except NoNodeError:
+            return None
 
     @classmethod
     def resetOrCreate(cls, pipeline, layout_uuid):
