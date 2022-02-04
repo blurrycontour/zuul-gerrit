@@ -20,6 +20,7 @@ import json
 import hashlib
 import logging
 import os
+import zlib
 from functools import total_ordering
 
 import re2
@@ -439,6 +440,7 @@ class Pipeline(object):
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
         self.manager = None
+        self.relative_priority_queues = {}
         self.precedence = PRECEDENCE_NORMAL
         self.supercedes = []
         self.triggers = []
@@ -463,10 +465,6 @@ class Pipeline(object):
     @property
     def queues(self):
         return self.state.queues
-
-    @property
-    def relative_priority_queues(self):
-        return self.state.relative_priority_queues
 
     @property
     def actions(self):
@@ -595,7 +593,6 @@ class PipelineState(zkobject.ZKObject):
             state=Pipeline.STATE_NORMAL,
             queues=[],
             old_queues=[],
-            relative_priority_queues={},
             consecutive_failures=0,
             disabled=False,
             pipeline=None,
@@ -611,6 +608,22 @@ class PipelineState(zkobject.ZKObject):
         pipeline.state = obj
         obj._load(context, path=path)
         return obj
+
+    @classmethod
+    def peekLayoutUUID(cls, pipeline):
+        ctx = pipeline.manager.current_context
+        try:
+            path = cls.pipelinePath(pipeline)
+            compressed_data, zstat = ctx.client.get(path)
+            try:
+                raw = zlib.decompress(compressed_data)
+            except zlib.error:
+                # Fallback for old, uncompressed data
+                raw = compressed_data
+            data = json.loads(raw.decode("utf8"))
+            return data["layout_uuid"]
+        except NoNodeError:
+            return None
 
     @classmethod
     def resetOrCreate(cls, pipeline, layout_uuid):
