@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cebf8b5_a58b244a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-02-04T04:09:39Z",
+      "side": 1,
+      "message": "Explanation: checking the wait function, it will return false when it times out. We can not check timeout depends on the availability of \"updated\" attribute, it would also be set even it times out.",
+      "range": {
+        "startLine": 1866,
+        "startChar": 12,
+        "endLine": 1866,
+        "endChar": 15
+      },
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
