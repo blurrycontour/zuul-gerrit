@@ -263,6 +263,131 @@ class TestScaleOutScheduler(ZuulTestCase):
         holders = tenant.semaphore_handler.semaphoreHolders(semaphore)
         self.assertEqual(len(holders), 0)
 
+    @simple_layout('layouts/two-projects-integrated.yaml')
+    def test_nodepool_relative_priority_check(self):
+        "Test that nodes are requested at the relative priority"
+        self.fake_nodepool.pause()
+
+        # Start a second scheduler that uses the existing layout
+        app = self.createScheduler()
+        app.start()
+
+        # Hold the lock on the first scheduler so that if any events
+        # happen, they are processed by the second scheduler.
+        with self.scheds.first.sched.run_handler_lock:
+            A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[app])
+
+            B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+            self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[app])
+
+            C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
+            self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[app])
+
+            D = self.fake_gerrit.addFakeChange('org/project2', 'master', 'D')
+            self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[app])
+
+            reqs = self.fake_nodepool.getNodeRequests()
+
+            # The requests come back sorted by priority.
+
+            # Change A, first change for project, high relative priority.
+            self.assertEqual(reqs[0]['_oid'], '200-0000000000')
+            self.assertEqual(reqs[0]['relative_priority'], 0)
+
+            # Change C, first change for project1, high relative priority.
+            self.assertEqual(reqs[1]['_oid'], '200-0000000002')
+            self.assertEqual(reqs[1]['relative_priority'], 0)
+
+            # Change B, second change for project, lower relative priority.
+            self.assertEqual(reqs[2]['_oid'], '200-0000000001')
+            self.assertEqual(reqs[2]['relative_priority'], 1)
+
+            # Change D, first change for project2 shared with project1,
+            # lower relative priority than project1.
+            self.assertEqual(reqs[3]['_oid'], '200-0000000003')
+            self.assertEqual(reqs[3]['relative_priority'], 1)
+
+            # Fulfill only the first request
+            self.fake_nodepool.fulfillRequest(reqs[0])
+            for x in iterate_timeout(30, 'fulfill request'):
+                reqs = list(self.scheds.first.sched.nodepool.getNodeRequests())
+                if len(reqs) < 4:
+                    break
+            self.waitUntilSettled(matcher=[app])
+
+            reqs = self.fake_nodepool.getNodeRequests()
+
+            # Change B, now first change for project, equal priority.
+            self.assertEqual(reqs[0]['_oid'], '200-0000000001')
+            self.assertEqual(reqs[0]['relative_priority'], 0)
+
+            # Change C, now first change for project1, equal priority.
+            self.assertEqual(reqs[1]['_oid'], '200-0000000002')
+            self.assertEqual(reqs[1]['relative_priority'], 0)
+
+            # Change D, first change for project2 shared with project1,
+            # still lower relative priority than project1.
+            self.assertEqual(reqs[2]['_oid'], '200-0000000003')
+            self.assertEqual(reqs[2]['relative_priority'], 1)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+    @simple_layout('layouts/two-projects-integrated.yaml')
+    def test_nodepool_relative_priority_gate(self):
+        "Test that nodes are requested at the relative priority"
+        self.fake_nodepool.pause()
+
+        # Start a second scheduler that uses the existing layout
+        app = self.createScheduler()
+        app.start()
+
+        # Hold the lock on the first scheduler so that if any events
+        # happen, they are processed by the second scheduler.
+        with self.scheds.first.sched.run_handler_lock:
+            A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+            A.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            self.waitUntilSettled(matcher=[app])
+
+            B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+            B.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.waitUntilSettled(matcher=[app])
+
+            # project does not share a queue with project1 and project2.
+            C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+            C.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+            self.waitUntilSettled(matcher=[app])
+
+            reqs = self.fake_nodepool.getNodeRequests()
+
+            # The requests come back sorted by priority.
+
+            # Change A, first change for shared queue, high relative
+            # priority.
+            self.assertEqual(reqs[0]['_oid'], '100-0000000000')
+            self.assertEqual(reqs[0]['relative_priority'], 0)
+
+            # Change C, first change for independent project, high
+            # relative priority.
+            self.assertEqual(reqs[1]['_oid'], '100-0000000002')
+            self.assertEqual(reqs[1]['relative_priority'], 0)
+
+            # Change B, second change for shared queue, lower relative
+            # priority.
+            self.assertEqual(reqs[2]['_oid'], '100-0000000001')
+            self.assertEqual(reqs[2]['relative_priority'], 1)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
 
 class TestSOSCircularDependencies(ZuulTestCase):
     # Those tests are testing specific interactions between multiple
