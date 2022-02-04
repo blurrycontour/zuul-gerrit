@@ -2034,12 +2034,12 @@ class FrozenJob(zkobject.ZKObject):
             if k == 'nodeset':
                 v = v.toDict()
             elif k == 'dependencies':
-                # list of JobDependency
+                # frozenset of JobDependency
                 v = [dep.toDict() for dep in v]
             elif k == 'semaphores':
                 # list of JobSemaphores
                 v = [sem.toDict() for sem in v]
-            elif k in ('provides', 'requires'):
+            elif k in ('provides', 'requires', 'tags'):
                 v = list(v)
             elif k == 'required_projects':
                 # dict of name->JobProject
@@ -2072,8 +2072,8 @@ class FrozenJob(zkobject.ZKObject):
         if hasattr(self, 'dependencies'):
             data['dependencies'] = self.dependencies
         else:
-            data['dependencies'] = [JobDependency.fromDict(dep)
-                                    for dep in data['dependencies']]
+            data['dependencies'] = frozenset(JobDependency.fromDict(dep)
+                                             for dep in data['dependencies'])
 
         if hasattr(self, 'semaphores'):
             data['semaphores'] = self.semaphores
@@ -2091,6 +2091,7 @@ class FrozenJob(zkobject.ZKObject):
 
         data['provides'] = frozenset(data['provides'])
         data['requires'] = frozenset(data['requires'])
+        data['tags'] = frozenset(data['tags'])
 
         for job_data_key in self.job_data_attributes:
             job_data = data.pop(job_data_key, None)
@@ -2494,8 +2495,6 @@ class Job(ConfigObject):
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
             v = getattr(self, k)
-            if isinstance(v, frozenset):
-                v = list(v)
             if isinstance(v, (dict, types.MappingProxyType)):
                 v = Freezable.thaw(v)
             # On a frozen job, parent=None means a base job
