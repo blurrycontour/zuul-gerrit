@@ -2494,8 +2494,6 @@ class Job(ConfigObject):
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
             v = getattr(self, k)
-            if isinstance(v, frozenset):
-                v = list(v)
             if isinstance(v, (dict, types.MappingProxyType)):
                 v = Freezable.thaw(v)
             # On a frozen job, parent=None means a base job
