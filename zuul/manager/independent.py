@@ -21,9 +21,6 @@ class IndependentPipelineManager(PipelineManager):
     changes_merge = False
     type = 'independent'
 
-    def _postConfig(self, layout):
-        super(IndependentPipelineManager, self)._postConfig(layout)
-
     def getChangeQueue(self, change, event, existing=None):
         log = get_annotated_logger(self.log, event)
 
