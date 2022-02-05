@@ -722,6 +722,9 @@ class PipelineState(zkobject.ZKObject):
         items = []
         for queue in (*self.old_queues, *self.queues):
             items.extend(queue.queue)
+            for item in queue.queue:
+                if item.bundle:
+                    items.extend(item.bundle.items)
         return items
 
     def cleanup(self, context):
