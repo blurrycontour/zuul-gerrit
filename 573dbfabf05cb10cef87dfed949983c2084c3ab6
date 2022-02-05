@@ -67,6 +67,24 @@
       "message": "Shouldn\u0027t this take into account if the project settings enforce this?",
       "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33492cc1_04e1d5cc",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-02-05T16:47:44Z",
+      "side": 1,
+      "message": "This behaves like you expect already. In fact gitlab only sets this to false only if project requires this and there are open discussions. Otherwise it is reported as True",
+      "parentUuid": "a9fc6ef2_d4b00a9d",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
