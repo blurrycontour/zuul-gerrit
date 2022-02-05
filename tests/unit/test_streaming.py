@@ -28,6 +28,7 @@ import time
 import zuul.web
 import zuul.lib.log_streamer
 from zuul.lib.fingergw import FingerGateway
+from zuul.lib.statsd import normalize_statsd_name
 import tests.base
 from tests.base import iterate_timeout, ZuulWebFixture, FIXTURE_DIR
 
@@ -390,6 +391,10 @@ class TestStreaming(TestStreamingBase):
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
         self.log.debug("\n\nStreamed: %s\n\n", client1.results)
         self.assertEqual(file_contents, client1.results)
+
+        hostname = normalize_statsd_name(socket.getfqdn())
+        self.assertReportedStat(
+            f'zuul.web.server.{hostname}.streamers', kind='g')
 
     def test_websocket_streaming(self):
         # Start the web server

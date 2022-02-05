@@ -511,6 +511,34 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       performance metric of how long the SQL query takes; it is not
       the estimated time value itself.
 
+.. stat:: zuul.web
+
+   Holds metrics related to the Zuul web component.
+
+   .. stat:: server.<hostname>
+
+      Holds metrics from a specific zuul-web server.
+
+      .. stat:: threadpool
+
+         Metrics related to the web server thread pool.
+
+         .. stat:: idle
+            :type: gauge
+
+            The number of idle workers.
+
+         .. stat:: queue
+            :type: gauge
+
+            The number of requests queued for workers.
+
+      .. stat:: streamers
+         :type: gauge
+
+         The number of log streamers currently in operation.
+
+
 As an example, given a job named `myjob` in `mytenant` triggered by a
 change to `myproject` on the `master` branch in the `gate` pipeline
 which took 40 seconds to build, the Zuul scheduler will emit the
@@ -558,6 +586,23 @@ These metrics are exposed by default:
 
 .. stat:: process_cpu_seconds_total
    :type: counter
+
+On web servers the following additional metrics are exposed:
+
+.. stat:: web_threadpool_idle
+   :type: gauge
+
+   The number of idle workers in the thread pool.
+
+.. stat:: web_threadpool_queue
+   :type: gauge
+
+   The number of requests queued for thread pool workers.
+
+.. stat:: web_streamers
+   :type: gauge
+
+   The number of log streamers currently in operation.
 
 .. _prometheus_liveness:
 
