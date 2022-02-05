@@ -50,6 +50,23 @@
       "message": "recheck",
       "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9fc6ef2_d4b00a9d",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-05T16:45:21Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this take into account if the project settings enforce this?",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
