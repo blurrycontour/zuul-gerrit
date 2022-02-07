@@ -247,6 +247,18 @@ class PipelineManager(metaclass=ABCMeta):
                 return True
         return False
 
+    def isChangeInSupercedingPipeline(self, change):
+        for other_name in self.pipeline.superceded_by:
+            other_pipeline = self.pipeline.tenant.layout.pipelines.get(
+                other_name)
+            if not other_pipeline:
+                continue
+            other_pipeline.change_list.refresh(self.current_context)
+            for change_key in self.pipeline.change_list.getChangeKeys():
+                if change.cache_stat.key.isSameChange(change_key):
+                    return True
+        return False
+
     def isAnyVersionOfChangeInPipeline(self, change):
         # Checks any items in the pipeline
         for change_key in self.pipeline.change_list.getChangeKeys():
@@ -472,9 +484,15 @@ class PipelineManager(metaclass=ABCMeta):
         # If we are adding a live change, check if it's a live item
         # anywhere in the pipeline.  Otherwise, we will perform the
         # duplicate check below on the specific change_queue.
-        if live and self.isChangeAlreadyInPipeline(change):
-            log.debug("Change %s is already in pipeline, ignoring" % change)
-            return True
+        if live:
+            if self.isChangeAlreadyInPipeline(change):
+                log.debug("Change %s is already in pipeline, ignoring", change)
+                return True
+
+            if self.isChangeInSupercedingPipeline(change):
+                log.debug("Change %s is already in superceding pipeline, "
+                          "ignoring", change)
+                return False
 
         if not ignore_requirements:
             for f in self.ref_filters:
