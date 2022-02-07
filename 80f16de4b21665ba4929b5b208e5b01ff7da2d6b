@@ -33,6 +33,23 @@
       "message": "This creates the potential for endtime to be less than start time in _createBuild() since they query time.time() independently.\n\nI think you should move the setting of the end value to after _createBuild is called to avoid this.",
       "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56cb18a8_b47c0497",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-07T18:04:10Z",
+      "side": 1,
+      "message": "I think this is worth a -1 and fix.",
+      "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
