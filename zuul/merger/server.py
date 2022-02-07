@@ -39,7 +39,7 @@ from zuul.zk.components import MergerComponent
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.merger import MergerApi
 
-COMMANDS = ['stop', 'pause', 'unpause']
+COMMANDS = ['stop', 'pause', 'unpause', 'graceful']
 
 
 class BaseRepoLocks(metaclass=ABCMeta):
@@ -477,6 +477,9 @@ class MergeServer(BaseMergeServer):
 
         self.command_map = dict(
             stop=self.stop,
+            # Stop for the mergers is always graceful. We add this alias
+            # to make it clearer to users that they can gracefully stop.
+            graceful=self.stop,
             pause=self.pause,
             unpause=self.unpause,
         )

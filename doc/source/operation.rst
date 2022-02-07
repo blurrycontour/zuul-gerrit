@@ -62,7 +62,11 @@ In order to stop the merger and under normal circumstances it is
 best to pause and wait for all currently running tasks to finish
 before stopping it. To do so run ``zuul-merger pause``.
 
-To stop the merger immediately, run ``zuul-merger stop``.
+To stop the merger, run ``zuul-merger stop``. This will wait for any
+currently running merge task to complete before exiting. As a result
+this is always a graceful way to stop the merger.
+``zuul-merger graceful`` is an alias for ``zuul-merger stop`` to make
+this consistent with the executor.
 
 Executor
 --------
