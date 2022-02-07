@@ -157,7 +157,7 @@ class StatsTool(cherrypy.Tool):
         idle = cherrypy.server.httpserver.requests.idle
         qsize = cherrypy.server.httpserver.requests.qsize
         self.metrics.threadpool_idle.set(idle)
-        self.metrics.threadpool_queue.set(idle)
+        self.metrics.threadpool_queue.set(qsize)
         if self.statsd:
             self.statsd.gauge(
                 f'zuul.web.server.{self.hostname}.threadpool.idle',
