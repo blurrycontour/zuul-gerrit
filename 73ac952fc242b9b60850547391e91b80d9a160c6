@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0429245_a4d7876a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-07T17:58:23Z",
+      "side": 1,
+      "message": "The code seems to use a 30 second timeout.",
+      "range": {
+        "startLine": 21,
+        "startChar": 50,
+        "endLine": 21,
+        "endChar": 52
+      },
+      "revId": "73ac952fc242b9b60850547391e91b80d9a160c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f6d41c_ad71ace7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-07T17:58:23Z",
+      "side": 1,
+      "message": "recheck the test failures are in the streaming tests?",
+      "revId": "73ac952fc242b9b60850547391e91b80d9a160c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
