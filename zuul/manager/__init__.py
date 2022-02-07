@@ -715,28 +715,20 @@ class PipelineManager(metaclass=ABCMeta):
             if not other_pipeline:
                 continue
 
-            found = None
-            for other_item in other_pipeline.getAllItems():
-                if other_item.live and other_item.change.equals(item.change):
-                    found = other_item
-                    break
-            if found:
-                self.log.info("Item %s is superceded by %s, dequeuing",
-                              found, item)
-                change_id = (
-                    item.change._id() if isinstance(item.change, Change)
-                    else None
-                )
-                event = DequeueEvent(
-                    other_pipeline.tenant.name,
-                    other_pipeline.name,
-                    item.change.project.canonical_hostname,
-                    item.change.project.name,
-                    change_id,
-                    item.change.ref)
-                self.sched.pipeline_management_events[
-                    self.pipeline.tenant.name][other_pipeline.name].put(
-                        event, needs_result=False)
+            change_id = (
+                item.change._id() if isinstance(item.change, Change)
+                else None
+            )
+            event = DequeueEvent(
+                other_pipeline.tenant.name,
+                other_pipeline.name,
+                item.change.project.canonical_hostname,
+                item.change.project.name,
+                change_id,
+                item.change.ref)
+            self.sched.pipeline_management_events[
+                self.pipeline.tenant.name][other_pipeline.name].put(
+                    event, needs_result=False)
 
     def updateCommitDependencies(self, change, change_queue, event):
         log = get_annotated_logger(self.log, event)
