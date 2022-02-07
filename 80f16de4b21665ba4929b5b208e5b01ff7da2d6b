@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0361ade_7b4b51bf",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-07T17:56:08Z",
+      "side": 1,
+      "message": "You might consider checking that start_time is \u003e\u003d end_time here. This is related to my other comment.",
+      "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc6bc9b9_3ad3954f",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-07T17:56:08Z",
+      "side": 1,
+      "message": "This creates the potential for endtime to be less than start time in _createBuild() since they query time.time() independently.\n\nI think you should move the setting of the end value to after _createBuild is called to avoid this.",
+      "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
