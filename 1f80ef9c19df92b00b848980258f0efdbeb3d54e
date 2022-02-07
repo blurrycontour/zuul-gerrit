@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d82c52b9_c7c6c4fa",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1861,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-02-07T07:50:22Z",
+      "side": 1,
+      "message": "Checking the scheduler startup process, it seems the this is the only place where the exception is swallowed.\nIf we want to explicitly ignore the exception here for the scheduler, we may want to treat the config validation and scheduler startup/cache refresh differently.\nOne solution would be:\npass a parameter \"ignore_cat_job_exception\" with default true to the loadTenant(). And set it to false when it is called in validateTenants() function.\nHow about that?",
+      "parentUuid": "417cb41f_ee0f4a4c",
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5cebf8b5_a58b244a",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
