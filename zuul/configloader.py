@@ -2252,6 +2252,12 @@ class TenantParser(object):
         # we don't want to do that.
         if self.scheduler:
             for pipeline in layout.pipelines.values():
+                if pipeline.supercedes:
+                    for other_name in pipeline.supercedes:
+                        other_pipeline = layout.pipelines.get(other_name)
+                        if not other_pipeline:
+                            continue
+                        other_pipeline.superceded_by.append(pipeline.name)
                 pipeline.manager._postConfig(layout)
 
         return layout

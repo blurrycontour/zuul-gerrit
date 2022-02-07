@@ -441,6 +441,7 @@ class Pipeline(object):
         self.manager = None
         self.precedence = PRECEDENCE_NORMAL
         self.supercedes = []
+        self.superceded_by = []
         self.triggers = []
         self.enqueue_actions = []
         self.start_actions = []
