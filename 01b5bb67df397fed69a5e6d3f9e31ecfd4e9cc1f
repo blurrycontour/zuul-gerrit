@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b86a187f_5f052743",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-08T21:25:20Z",
+      "side": 1,
+      "message": "Is there any concern that this model_api value can shift from 1 to 2 while we have semaphore_holders in the old format? I suppose if that happens we are ok because we continue to check the lock using both formats and release using both formats.\n\nMaybe we need a release note indicating people should update to the new model api version and sit there a bit to let things cycle out before doing another model update? Though I think we\u0027re trying to make this transparent? But I think they may want to avoid updating straight to whatever change ends up removing the checks and removals using both handles. And instead get to this version, then sit a bit, then update to the cleanup version.\n\nAlso this doesn\u0027t touch on what will happen if there are leaks and sitting for a bit doesn\u0027t clear out the old data. I guess manual intervention would be required in that case before updating to a version that cannot handle the legacy format?",
+      "revId": "01b5bb67df397fed69a5e6d3f9e31ecfd4e9cc1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
