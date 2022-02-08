@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "48e99115_e44bb6f8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-08T18:44:19Z",
+      "side": 1,
+      "message": "Yep, will do.",
+      "parentUuid": "7e79b59a_87ab8c65",
+      "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1814eadd_dd4124f8",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-08T18:03:34Z",
       "side": 1,
       "message": "I worry about refreshing the pipeline state, but only if statsd is configured.  Especially with a change like this where we\u0027re trying to reduce locking/refreshing/etc based on the idea that it\u0027s handled elsewhere, it seems that being consistent would be good.  Maybe we should move the refresh to outside the statsd check?  (Or, more likely, move the statsd check to below this point.)",
+      "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "084e2d3a_f87da847",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1488,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-08T18:44:19Z",
+      "side": 1,
+      "message": "The thing is that we don\u0027t really need to refresh the pipelines if statsd is not configured. So the consistency I was after is to only refresh when necessary, which is not the case without statsd.\n\nBut what makes me thinking is that we are executing this only as part of a reconfig, which should refresh the pipeline in the post config hook when resetting the state. So the refresh here shouldn\u0027t be necessary, but we should at least have a comment describing that behavior.",
+      "parentUuid": "1814eadd_dd4124f8",
       "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
