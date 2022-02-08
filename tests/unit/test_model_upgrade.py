@@ -63,3 +63,39 @@ class TestModelUpgrade(ZuulTestCase):
         for _ in iterate_timeout(30, "model api to update"):
             if component_registry.model_api == 1:
                 break
+
+    @model_version(1)
+    @simple_layout('layouts/pipeline-supercedes.yaml')
+    def test_supercedes(self):
+        """
+        Test that pipeline supsercedes still work with model API 1,
+        which uses deqeueue events.
+        """
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'test-job')
+
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'test-job')
+        self.assertEqual(self.builds[0].pipeline, 'gate')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertHistory([
+            dict(name='test-job', result='ABORTED', changes='1,1'),
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)

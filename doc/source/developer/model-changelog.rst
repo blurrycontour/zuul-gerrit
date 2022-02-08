@@ -31,3 +31,11 @@ Version 1
 :Prior Zuul version: 4.11.0
 :Description: No change since Version 0.  This explicitly records the
               component versions in ZooKeeper.
+
+Version 2
+---------
+
+:Prior Zuul version: 5.0.0
+:Description: Add a new `SupercedeEvent` and use that for dequeuing of
+              superceded items from other pipelines. This only affects the
+              schedulers.
