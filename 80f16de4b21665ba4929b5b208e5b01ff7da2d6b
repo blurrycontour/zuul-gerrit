@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1e295cf_6cb9e093",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-02-08T06:43:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0361ade_7b4b51bf",
+      "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc6bc9b9_3ad3954f",
@@ -48,6 +66,42 @@
       "writtenOn": "2022-02-07T18:04:10Z",
       "side": 1,
       "message": "I think this is worth a -1 and fix.",
+      "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f7a9a51_3ebd8a96",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-02-08T06:43:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56cb18a8_b47c0497",
+      "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f1a03bb_efff737e",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-02-08T06:43:16Z",
+      "side": 1,
+      "message": "Thanks for the hint, done.",
+      "parentUuid": "fc6bc9b9_3ad3954f",
       "revId": "80f16de4b21665ba4929b5b208e5b01ff7da2d6b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
