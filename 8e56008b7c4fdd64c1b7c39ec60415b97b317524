@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc4d0ac6_04d44e4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-08T23:13:03Z",
+      "side": 1,
+      "message": "recheck this failed in the sos test_semaphore test. Not sure if related yet, but figure a recheck might give us more data.",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
