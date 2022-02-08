@@ -49,7 +49,7 @@ from zuul.zk.change_cache import ChangeKey
 
 # When making ZK schema changes, increment this and add a record to
 # docs/developer/model-changelog.rst
-MODEL_API = 1
+MODEL_API = 2
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
