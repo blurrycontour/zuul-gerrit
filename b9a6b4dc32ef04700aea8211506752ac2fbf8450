@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "375cf429_2206e4ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-08T21:40:03Z",
+      "side": 1,
+      "message": "I think this change has the same general concern of the parent change. We need some way of communicating the upgrade path so that people don\u0027t jump too far ahead and avoid compatibility code that they may need. However, in this case we may be able to work around that more gracefully simply ignoring events we don\u0027t understand in the manager event queue?",
+      "revId": "b9a6b4dc32ef04700aea8211506752ac2fbf8450",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d4579e2_97316f47",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-08T21:40:03Z",
+      "side": 1,
+      "message": "Why not assert the build pipeline is check here before the approval? I think that may be good if we need to assert the gate pipeline below.",
+      "revId": "b9a6b4dc32ef04700aea8211506752ac2fbf8450",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
