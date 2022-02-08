@@ -26,6 +26,7 @@ from zuul.model import (
     Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
 )
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk.locks import pipeline_lock
 
 
@@ -720,7 +721,7 @@ class PipelineManager(metaclass=ABCMeta):
                 continue
 
             # MODEL_API: >2
-            if self.sched.component_registry.model_api > 2:
+            if COMPONENT_REGISTRY.model_api > 2:
                 event = model.SupercedeEvent(
                     other_pipeline.tenant.name,
                     other_pipeline.name,

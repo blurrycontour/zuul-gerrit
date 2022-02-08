@@ -1640,8 +1640,7 @@ class TenantParser(object):
             tenant, parsed_config, loading_errors, layout_uuid)
         if self.scheduler:
             tenant.semaphore_handler = SemaphoreHandler(
-                self.zk_client, self.statsd, tenant.name, tenant.layout,
-                self.scheduler.component_registry
+                self.zk_client, self.statsd, tenant.name, tenant.layout
             )
 
         return tenant

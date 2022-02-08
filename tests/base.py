@@ -93,7 +93,7 @@ from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import zkobject, ZooKeeperClient
-from zuul.zk.components import SchedulerComponent
+from zuul.zk.components import SchedulerComponent, COMPONENT_REGISTRY
 from zuul.zk.event_queues import ConnectionEventQueue
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.locks import tenant_read_lock, pipeline_lock, SessionAwareLock
@@ -4032,6 +4032,12 @@ class PrometheusFixture(fixtures.Fixture):
                 prometheus_client.registry.REGISTRY.unregister(collector)
 
 
+class GlobalRegistryFixture(fixtures.Fixture):
+    def _cleanup(self):
+        # Remove our component registry from the global
+        COMPONENT_REGISTRY.clearRegistry()
+
+
 class FakeCPUTimes:
     def __init__(self):
         self.user = 0
@@ -4072,6 +4078,7 @@ class BaseTestCase(testtools.TestCase):
     def setUp(self):
         super(BaseTestCase, self).setUp()
         self.useFixture(PrometheusFixture())
+        self.useFixture(GlobalRegistryFixture())
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
         try:
             test_timeout = int(test_timeout)
@@ -4594,8 +4601,7 @@ class ZuulTestCase(BaseTestCase):
             self._context_lock.acquire(blocking=False)
             lock = self._context_lock
         return zkobject.ZKContext(self.zk_client, lock,
-                                  None, self.log,
-                                  self.scheds.first.sched.component_registry)
+                                  None, self.log)
 
     def __event_queues(self, matcher) -> List[Queue]:
         # TODO (swestphahl): Can be removed when we no longer use global

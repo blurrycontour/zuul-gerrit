@@ -27,6 +27,25 @@ from zuul import model
 COMPONENTS_ROOT = "/zuul/components"
 
 
+class GlobalRegistry:
+    def __init__(self):
+        self.registry = None
+
+    def setRegistry(self, registry):
+        if self.registry is None:
+            self.registry = registry
+
+    def clearRegistry(self, registry):
+        self.registry = None
+
+    @property
+    def model_api(self):
+        return self.registry.model_api
+
+
+COMPONENT_REGISTRY = GlobalRegistry()
+
+
 class BaseComponent(ZooKeeperBase):
     """
     Read/write component object.
@@ -217,6 +236,9 @@ class ComponentRegistry(ZooKeeperBase):
         # call the onConnect callback.
         if self.client.connected:
             self._onConnect()
+        # Register this object as the global registry if there isn't
+        # one already.
+        COMPONENT_REGISTRY.setRegistry(self)
 
     def _getComponentRoot(self, kind):
         return '/'.join([COMPONENTS_ROOT, kind])
