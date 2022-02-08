@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "872b0e7d_cbe96ec6",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-08T08:39:27Z",
+      "side": 1,
+      "message": "Any ideas how we could also take care of cleaning up leaked legacy handles?",
+      "revId": "3c72303cd706448670e260249755c684ddda15d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
