@@ -16,6 +16,40 @@
       "message": "recheck this failed in the sos test_semaphore test. Not sure if related yet, but figure a recheck might give us more data.",
       "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "072e4c55_bbb77ffd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T23:18:49Z",
+      "side": 1,
+      "message": "Let\u0027s clarify this a bit.\n\nWe call this after loading a tenant.  If we are the first to reconfigure a tenant, then the pipeline state layout uuid will be the old value, and layout.uuit will be the new one.  In that case, we need to call the pipeline state reset method in order to move the queues currently in zk to \"old_queues\" so that the next processing pass will re-enqueue them.\n\nOtherwise, we\u0027re note the first to reconfigure the tenant, meaning that some other scheduler has already done that, so we can skip it.  We only need to update our local object pointers.\n\nThere\u0027s one more case: we\u0027re a scheduler that\u0027s starting up and joining an existing system.  Now, there\u0027s a side effect of calling the reset method in the first case: it also refreshes the objects from ZK.  That\u0027s important in this case because that\u0027s going to initially load the queue items and all the places in our code which are \"best-effort\", like stats, will have a chance of having something accurate.\n\nIn other words, by making this optimization, we\u0027re reducing the accuracy of our best-effort routines, especially in the case of scheduler startup.  Maybe that\u0027s okay, but it\u0027s worth noting.",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bd985d9_aa70e707",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1488,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T23:18:49Z",
+      "side": 1,
+      "message": "This is not true anymore.  This change removes the refresh that happens on loading a tenant, so now we can enter this clause with an out of date pipeline state.  When a scheduler starts and joins an existing system, it will have no items in its queues until it manages to process them.\n\nSee the other comment about the side effect of refresh on startup.\n\nI think we need to do one of the following here:\n\n1) Remove this stats emission altogether.  In \u003cv5 it\u0027s purpose was to reset gauges on startup.  Now the gauges aren\u0027t likely to be wrong for very long after a reconfiguration (if they\u0027re wrong at all).  And as written, it can zero out the gauges when a scheduler comes online.\n\n2) Add a refresh to this location (as in the earlier patchset).\n\n3) Add a refresh to the end of the config priming method so that we load some data in on scheduler startup for best-effort methods like this.\n\nMy preference is #1.",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
