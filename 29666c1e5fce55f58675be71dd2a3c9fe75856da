@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e79b59a_87ab8c65",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T18:03:34Z",
+      "side": 1,
+      "message": "This could probably use a note from the commit message.  Maybe:\n\nIf our layout UUID already matches the UUID in ZK, we don\u0027t need to refresh the pipeline state.  But we do still need to update our local change queue objects.",
+      "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1814eadd_dd4124f8",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1488,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T18:03:34Z",
+      "side": 1,
+      "message": "I worry about refreshing the pipeline state, but only if statsd is configured.  Especially with a change like this where we\u0027re trying to reduce locking/refreshing/etc based on the idea that it\u0027s handled elsewhere, it seems that being consistent would be good.  Maybe we should move the refresh to outside the statsd check?  (Or, more likely, move the statsd check to below this point.)",
+      "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
