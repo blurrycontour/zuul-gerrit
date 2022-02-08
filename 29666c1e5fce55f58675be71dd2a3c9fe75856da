@@ -69,6 +69,23 @@
       "parentUuid": "1814eadd_dd4124f8",
       "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2ff0fe8_e96b6dd1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1488,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T19:39:58Z",
+      "side": 1,
+      "message": "Agree, I think we can remove this.",
+      "revId": "29666c1e5fce55f58675be71dd2a3c9fe75856da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
