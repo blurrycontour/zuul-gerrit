@@ -37,6 +37,41 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ad536a04_ce1a3671",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-08T23:44:12Z",
+      "side": 1,
+      "message": "\u003e Let\u0027s clarify this a bit.\n\u003e \n\u003e We call this after loading a tenant.  If we are the first to reconfigure a tenant, then the pipeline state layout uuid will be the old value, and layout.uuit will be the new one.  In that case, we need to call the pipeline state reset method in order to move the queues currently in zk to \"old_queues\" so that the next processing pass will re-enqueue them.\n\nJust making sure I understand this properly. The change as proposed doesn\u0027t affect this scenario right? We\u0027ll fall through since the uuid values won\u0027t match and then we call resetOrCreate()?\n\n\u003e \n\u003e Otherwise, we\u0027re note the first to reconfigure the tenant, meaning that some other scheduler has already done that, so we can skip it.  We only need to update our local object pointers.\n\u003e \n\u003e There\u0027s one more case: we\u0027re a scheduler that\u0027s starting up and joining an existing system.  Now, there\u0027s a side effect of calling the reset method in the first case: it also refreshes the objects from ZK.  That\u0027s important in this case because that\u0027s going to initially load the queue items and all the places in our code which are \"best-effort\", like stats, will have a chance of having something accurate.\n\nThe failing test_semaphore test case is failing due to the new scheduler not having done this and the build being unable to run because the scheduler that does have this info is not holding the lock?\n\n\u003e \n\u003e In other words, by making this optimization, we\u0027re reducing the accuracy of our best-effort routines, especially in the case of scheduler startup.  Maybe that\u0027s okay, but it\u0027s worth noting.",
+      "parentUuid": "072e4c55_bbb77ffd",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df23088c_e2565d9a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-08T23:44:12Z",
+      "side": 1,
+      "message": "Is this a functional change?",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2bd985d9_aa70e707",
         "filename": "zuul/scheduler.py",
         "patchSetId": 9
