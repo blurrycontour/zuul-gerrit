@@ -65,6 +65,7 @@ from zuul.model import (
     ReconfigureEvent,
     TenantReconfigureEvent,
     UnparsedAbideConfig,
+    SupercedeEvent,
     SystemAttributes,
     STATE_FAILED,
 )
@@ -1651,6 +1652,28 @@ class Scheduler(threading.Thread):
                        "to pipeline %s", event, change, self)
         pipeline.manager.addChange(change, event, ignore_requirements=True)
 
+    def _doSupercedeEvent(self, event):
+        tenant = self.abide.tenants[event.tenant_name]
+        pipeline = tenant.layout.pipelines[event.pipeline_name]
+        canonical_name = f"{event.project_hostname}/{event.project_name}"
+        trusted, project = tenant.getProject(canonical_name)
+        if project is None:
+            return
+        change = project.source.getChange(event)
+        for shared_queue in pipeline.queues:
+            for item in shared_queue.queue:
+                if item.change.project != change.project:
+                    continue
+                if not item.live:
+                    continue
+                if ((isinstance(item.change, Change)
+                     and item.change.number == change.number
+                     and item.change.patchset == change.patchset
+                    ) or (item.change.ref == change.ref)):
+                    self.log.info("Item %s is superceded, dequeuing", item)
+                    pipeline.manager.removeItem(item)
+                    return
+
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")
         waiting = False
@@ -1941,7 +1964,10 @@ class Scheduler(threading.Thread):
             log = get_annotated_logger(self.log, event.zuul_event_id)
             log.debug("Processing trigger event %s", event)
             try:
-                self._process_trigger_event(tenant, pipeline, event)
+                if isinstance(event, SupercedeEvent):
+                    self._doSupercedeEvent(event)
+                else:
+                    self._process_trigger_event(tenant, pipeline, event)
             finally:
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
