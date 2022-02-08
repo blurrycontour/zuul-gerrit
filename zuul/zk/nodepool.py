@@ -625,7 +625,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
                 self._node_cache[node_id] = node
 
         elif event.event_type == TreeEvent.NODE_REMOVED:
-            node = self._node_cache.pop(node_id)
+            node = self._node_cache.pop(node_id, None)
 
     def storeNode(self, node):
         """
