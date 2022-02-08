@@ -16,6 +16,23 @@
       "message": "Is there any concern that this model_api value can shift from 1 to 2 while we have semaphore_holders in the old format? I suppose if that happens we are ok because we continue to check the lock using both formats and release using both formats.\n\nMaybe we need a release note indicating people should update to the new model api version and sit there a bit to let things cycle out before doing another model update? Though I think we\u0027re trying to make this transparent? But I think they may want to avoid updating straight to whatever change ends up removing the checks and removals using both handles. And instead get to this version, then sit a bit, then update to the cleanup version.\n\nAlso this doesn\u0027t touch on what will happen if there are leaks and sitting for a bit doesn\u0027t clear out the old data. I guess manual intervention would be required in that case before updating to a version that cannot handle the legacy format?",
       "revId": "01b5bb67df397fed69a5e6d3f9e31ecfd4e9cc1f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a161257_43968fc5",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T22:04:03Z",
+      "side": 1,
+      "message": "I think your analysis in the first paragraph is correct.  It can switch in the middle of this loop, but it\u0027s fine because we read both formats.\n\nBasically, the world starts on version 1 with legacy data.  One scheduler restarts with the ability to support the new format but does not use it, it only writes the legacy format for now.  Once the entire cluster is able to read the new format, schedulers start writing the new format for new data.  Eventually old data ages out, ideally.\n\nI\u0027m not in a rush to remove backwards compat handling.  The model api log has release version numbers in it so we can determine that in this case, we can\u0027t remove backwards compat until at after the version after 5.0.0  (ie, this code ends up in 5.1.0, then in 5.2.0 at minimum we could remove the backwards compat, with a release note indicating that running on at least 5.1.0 for some time is needed).\n\nWe could attempt to migrate the data format en-masse like alembic... we could probably iterate over all the semaphore holders and upgrade them.  That would be non-trivial (would require locking and loading in all the pipeline states and doing a lookup), but possible.\n\nSo yeah, in short, I think we either have to add a bunch of extra code here to migrate data, or assume that people will run intermediate versions long enough for the data to age out.  \"zuul delete-state\" is the alternative if that doesn\u0027t work.  And yes, that would be necessary too if there\u0027s some kind of leak.",
+      "revId": "01b5bb67df397fed69a5e6d3f9e31ecfd4e9cc1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
