@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9786d70f_c0f0a893",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-08T13:25:59Z",
+      "side": 1,
+      "message": "TODO: use the \"kind\"-filter here that is introduced in https://review.opendev.org/c/zuul/zuul/+/828292/1/zuul/zk/components.py",
+      "revId": "19909b78147bf592fe22cd5369fc504c73f92cf6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05e2844d_0eebc3e5",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-08T13:25:59Z",
+      "side": 1,
+      "message": "TODO: use the \"kind\"-filter here that is introduced in https://review.opendev.org/c/zuul/zuul/+/828292/1/zuul/zk/components.py",
+      "revId": "19909b78147bf592fe22cd5369fc504c73f92cf6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
