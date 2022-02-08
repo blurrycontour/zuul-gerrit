@@ -728,12 +728,24 @@ class TriggerEventQueue(ZooKeeperEventQueue):
         }
         self._put(data)
 
+    def put_supercede(self, event):
+        data = {
+            "event_type": "SupercedeEvent",
+            "event_data": event.toDict(),
+            "driver_name": None,
+        }
+        self._put(data)
+
     def __iter__(self):
         for data, ack_ref, _ in self._iterEvents():
             try:
-                event_class = self.connections.getTriggerEventClass(
-                    data["driver_name"]
-                )
+                if (data["driver_name"] is None and
+                        data["event_type"] == "SupercedeEvent"):
+                    event_class = model.SupercedeEvent
+                else:
+                    event_class = self.connections.getTriggerEventClass(
+                        data["driver_name"]
+                    )
                 event_data = data["event_data"]
             except KeyError:
                 self.log.warning("Malformed event found: %s", data)

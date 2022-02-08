@@ -49,7 +49,7 @@ from zuul.zk.change_cache import ChangeKey
 
 # When making ZK schema changes, increment this and add a record to
 # docs/developer/model-changelog.rst
-MODEL_API = 2
+MODEL_API = 3
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -5740,6 +5740,11 @@ class DequeueEvent(ChangeManagementEvent):
 class EnqueueEvent(ChangeManagementEvent):
     """Enqueue a change into a pipeline"""
     type = "enqueue"
+
+
+class SupercedeEvent(ChangeManagementEvent):
+    """Supercede a change in a pipeline"""
+    type = "supercede"
 
 
 class ResultEvent(AbstractEvent):
