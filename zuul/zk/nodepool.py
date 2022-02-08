@@ -576,6 +576,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
                 event)
 
     def _nodeCacheListener(self, event):
+        # Ignore events without data
+        if event.event_data is None:
+            # This seems to be the case for some NODE_REMOVED events.
+            # Without the data we are not able to pop() the correct node
+            # from our cache dict. As we can't do much else, ignore the
+            # event.
+            return
+
         if hasattr(event.event_data, 'path'):
             # Ignore root node
             path = event.event_data.path
