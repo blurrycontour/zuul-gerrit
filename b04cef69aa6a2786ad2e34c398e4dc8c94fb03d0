@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "55c548ec_9abf67f8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 722,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-08T18:18:02Z",
+      "side": 1,
+      "message": "makes sense. thanks for fixing that!",
+      "parentUuid": "d4c1eebd_4005a891",
+      "revId": "b04cef69aa6a2786ad2e34c398e4dc8c94fb03d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ed967f92_9b777f70",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 2
