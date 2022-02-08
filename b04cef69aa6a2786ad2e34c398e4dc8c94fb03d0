@@ -33,6 +33,23 @@
       "message": "Another way of doing this would be to use the Zuul driver.  We\u0027d still need the change in scheduler.py, but we may be able to avoid special casing anything here.",
       "revId": "b04cef69aa6a2786ad2e34c398e4dc8c94fb03d0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15054e69_6299ddc5",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T17:34:33Z",
+      "side": 1,
+      "message": "On further inspection, it looks like drivers can only have one trigger event class, so that\u0027s not any easier than this.  We might want to polish this API at some point in the future, but this seems good for now.",
+      "revId": "b04cef69aa6a2786ad2e34c398e4dc8c94fb03d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
