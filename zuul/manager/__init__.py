@@ -26,6 +26,7 @@ from zuul.model import (
     Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
 )
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.components import SchedulerComponent
 from zuul.zk.locks import pipeline_lock
 
 
@@ -709,31 +710,37 @@ class PipelineManager(metaclass=ABCMeta):
             self.reportStats(bundle_item)
 
     def dequeueSupercededItems(self, item):
+        change_id = (
+            item.change._id() if isinstance(item.change, Change)
+            else None
+        )
         for other_name in self.pipeline.supercedes:
             other_pipeline = self.pipeline.tenant.layout.pipelines.get(
                 other_name)
             if not other_pipeline:
                 continue
 
-            found = None
-            for other_item in other_pipeline.getAllItems():
-                if other_item.live and other_item.change.equals(item.change):
-                    found = other_item
-                    break
-            if found:
-                self.log.info("Item %s is superceded by %s, dequeuing",
-                              found, item)
-                change_id = (
-                    item.change._id() if isinstance(item.change, Change)
-                    else None
-                )
-                event = DequeueEvent(
-                    other_pipeline.tenant.name,
-                    other_pipeline.name,
-                    item.change.project.canonical_hostname,
-                    item.change.project.name,
-                    change_id,
-                    item.change.ref)
+            model_api = self.sched.component_registry.getMinimumModelApi(
+                SchedulerComponent.kind)
+            # MODEL_API: >1
+            if model_api > 1:
+                event_class = model.SupercedeEvent
+            else:
+                event_class = DequeueEvent
+
+            event = event_class(
+                other_pipeline.tenant.name,
+                other_pipeline.name,
+                item.change.project.canonical_hostname,
+                item.change.project.name,
+                change_id,
+                item.change.ref)
+
+            if model_api > 1:
+                self.sched.pipeline_trigger_events[
+                    self.pipeline.tenant.name][other_pipeline.name
+                        ].put_supercede(event)
+            else:
                 self.sched.pipeline_management_events[
                     self.pipeline.tenant.name][other_pipeline.name].put(
                         event, needs_result=False)
