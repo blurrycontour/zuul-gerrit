@@ -63,3 +63,90 @@ class TestModelUpgrade(ZuulTestCase):
         for _ in iterate_timeout(30, "model api to update"):
             if component_registry.model_api == 1:
                 break
+
+
+class TestSemaphoreModelUpgrade(ZuulTestCase):
+    tenant_config_file = 'config/semaphore/main.yaml'
+
+    @model_version(1)
+    def test_semaphore_handler_cleanup(self):
+        self.executor_server.hold_jobs_in_build = True
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        semaphore_holders = tenant.semaphore_handler.semaphoreHolders(
+            "test-semaphore")
+        self.assertEqual(len(semaphore_holders), 1)
+        # Assert that we are still using the old-style handler format
+        self.assertTrue(all(isinstance(h, str) for h in semaphore_holders))
+
+        # Save some variables for later use while the job is running
+        check_pipeline = tenant.layout.pipelines['check']
+        item = check_pipeline.getAllItems()[0]
+        job = item.getJob('semaphore-one-test1')
+
+        tenant.semaphore_handler.cleanupLeaks()
+        # Nothing has leaked; our handle should be present.
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Make sure the semaphore is released normally
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        # Use our previously saved data to simulate a leaked semaphore
+        # with the OLD handler format.
+        tenant.semaphore_handler.acquire(item, job, False)
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        tenant.semaphore_handler.cleanupLeaks()
+        # Make sure the semaphore is NOT cleaned up as the model version
+        # is still < 2
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 2
+
+        tenant.semaphore_handler.cleanupLeaks()
+        # Make sure we are not touching old-style handlers during cleanup.
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        # Try to release the old-style semaphore after the model API upgrade.
+        tenant.semaphore_handler.release(item, job)
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        # Use our previously saved data to simulate a leaked semaphore
+        # with the NEW handler format.
+        tenant.semaphore_handler.acquire(item, job, False)
+        semaphore_holders = tenant.semaphore_handler.semaphoreHolders(
+            "test-semaphore")
+        self.assertEqual(len(semaphore_holders), 1)
+        # Assert that we are now using the new-style handler format
+        self.assertTrue(all(isinstance(h, dict) for h in semaphore_holders))
+
+        tenant.semaphore_handler.cleanupLeaks()
+        # Make sure the leaked semaphore is cleaned up
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
