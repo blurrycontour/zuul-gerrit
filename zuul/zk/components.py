@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import sys
+import itertools
 import json
 import logging
 import threading
@@ -320,16 +321,26 @@ class ComponentRegistry(ZooKeeperBase):
         # Filter the cached components for the given kind
         return self._cached_components.get(kind, {}).values()
 
-    def getMinimumModelApi(self):
-        """Get the minimum model API version of all currently connected
-        components"""
+    def getMinimumModelApi(self, kind=None):
+        """Get the minimum model API version.
+
+        If kind is not None, then only components of that kind are considered
+        when calculating the minimum API version.
+
+        :arg kind str: The type of component to look up in the registry, or
+            None to consider all kinds
+        """
+        if kind is None:
+            components = list(itertools.chain.from_iterable(
+                kc[1] for kc in self.all()))
+        else:
+            components = self.all(kind)
 
         # Start with our own version in case we're the only component
         # and we haven't registered.
         version = model.MODEL_API
-        for kind, components in self.all():
-            for component in components:
-                version = min(version, component.model_api)
+        for component in components:
+            version = min(version, component.model_api)
         return version
 
     def _updateMinimumModelApi(self):
