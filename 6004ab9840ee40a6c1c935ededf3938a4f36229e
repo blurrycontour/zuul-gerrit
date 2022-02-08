@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1590aa03_fd3acd5c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-08T16:15:19Z",
+      "side": 1,
+      "message": "I would rather not do this.  I think there is a significant risk of error by setting this, and it will be very hard for developers and operators to follow.  We will be emitting log lines saying that the cluster is at a certain API level but the behavior of individual components will not be at that API level because they aren\u0027t looking at the whole cluster.  There may be dependencies between some of our migrations which would get even more complicated if we can\u0027t assume the whole cluster is behaving consistently.",
+      "revId": "6004ab9840ee40a6c1c935ededf3938a4f36229e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
