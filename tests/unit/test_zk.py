@@ -1502,8 +1502,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
         # Create a new object
         tenant_name = 'fake_tenant'
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='bar')
@@ -1511,8 +1510,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Load an object from ZK (that we don't already have)
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             pipeline2 = zkobject_class.fromZK(context,
                                               '/zuul/pipeline/fake_tenant')
             self.assertEqual(pipeline2.foo, 'bar')
@@ -1523,8 +1521,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Update an object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             ltime1 = get_ltime(pipeline1)
             pipeline1.updateAttributes(context, foo='qux')
             self.assertEqual(pipeline1.foo, 'qux')
@@ -1538,8 +1535,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Update an object using an active context
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             ltime1 = get_ltime(pipeline1)
             with pipeline1.activeContext(context):
                 pipeline1.foo = 'baz'
@@ -1560,15 +1556,13 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Refresh an existing object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             pipeline2.refresh(context)
             self.assertEqual(pipeline2.foo, 'baz')
 
         # Delete an object
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             self.assertIsNotNone(self.zk_client.client.exists(
                 '/zuul/pipeline/fake_tenant'))
             pipeline2.delete(context)
@@ -1611,8 +1605,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Fail an update
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='one')
@@ -1806,8 +1799,7 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
 
         # Create a new object
         with tenant_write_lock(self.zk_client, 'test') as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log,
-                                self.component_registry)
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
             pipeline = DummyZKObject.new(context, name="test", foo="bar")
             e1 = model.ConfigurationError(
                 source_context, start_mark, "Test error1")

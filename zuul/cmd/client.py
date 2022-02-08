@@ -963,15 +963,16 @@ class Client(zuul.cmd.ZuulApp):
         args = self.args
         safe_tenant = urllib.parse.quote_plus(args.tenant)
         safe_pipeline = urllib.parse.quote_plus(args.pipeline)
-        component_registry = ComponentRegistry(zk_client)
+        # Create a component registry to register it with the global
+        # singleton.
+        ComponentRegistry(zk_client)
         with tenant_write_lock(zk_client, args.tenant) as lock:
             path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
             layout_uuid = None
             zk_client.client.delete(
                 f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}',
                 recursive=True)
-            context = ZKContext(zk_client, lock, None, self.log,
-                                component_registry)
+            context = ZKContext(zk_client, lock, None, self.log)
             ps = PipelineState.new(context, _path=path,
                                    layout_uuid=layout_uuid)
             # Force everyone to make a new layout for this tenant in

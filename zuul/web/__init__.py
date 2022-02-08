@@ -1763,8 +1763,7 @@ class ZuulWeb(object):
             self.zk_client
         )
 
-        self.zk_context = ZKContext(self.zk_client, None, None, self.log,
-                                    self.component_registry)
+        self.zk_context = ZKContext(self.zk_client, None, None, self.log)
 
         command_socket = get_default(
             self.config, 'web', 'command_socket',
