@@ -30,6 +30,7 @@ import threading
 import time
 
 from zuul.exceptions import StreamingError
+from zuul.zk.components import COMPONENT_REGISTRY
 
 
 log = logging.getLogger("zuul.lib.streamer_utils")
@@ -175,8 +176,7 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
         return sock, addr
 
 
-def getJobLogStreamAddress(executor_api, component_registry, uuid,
-                           source_zone):
+def getJobLogStreamAddress(executor_api, uuid, source_zone):
     """
     Looks up the log stream address for the given build UUID.
 
@@ -199,7 +199,7 @@ def getJobLogStreamAddress(executor_api, component_registry, uuid,
 
     job_log_stream_address = {}
     if worker_zone and source_zone != worker_zone:
-        info = _getFingerGatewayInZone(component_registry, worker_zone)
+        info = _getFingerGatewayInZone(worker_zone)
         if info:
             job_log_stream_address['server'] = info.hostname
             job_log_stream_address['port'] = info.public_port
@@ -225,8 +225,9 @@ def getJobLogStreamAddress(executor_api, component_registry, uuid,
     return job_log_stream_address
 
 
-def _getFingerGatewayInZone(component_registry, zone):
-    gws = [gw for gw in component_registry.all('fingergw') if gw.zone == zone]
+def _getFingerGatewayInZone(zone):
+    registry = COMPONENT_REGISTRY.registry
+    gws = [gw for gw in registry.all('fingergw') if gw.zone == zone]
     if gws:
         return random.choice(gws)
     return None

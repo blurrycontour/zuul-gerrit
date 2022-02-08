@@ -23,24 +23,18 @@ from kazoo.exceptions import (
 
 from zuul.zk import sharding
 from zuul.zk.exceptions import InvalidObjectError
-from zuul import model
 
 
 class ZKContext:
-    def __init__(self, zk_client, lock, stop_event, log, registry):
+    def __init__(self, zk_client, lock, stop_event, log):
         self.client = zk_client.client
         self.lock = lock
         self.stop_event = stop_event
         self.log = log
-        self.registry = registry
 
     def sessionIsValid(self):
         return ((not self.lock or self.lock.is_still_valid()) and
                 (not self.stop_event or not self.stop_event.is_set()))
-
-    @property
-    def model_api(self):
-        return self.registry.model_api
 
 
 class LocalZKContext:
@@ -51,14 +45,9 @@ class LocalZKContext:
         self.lock = None
         self.stop_event = None
         self.log = log
-        self.registry = None
 
     def sessionIsValid(self):
         return True
-
-    @property
-    def model_api(self):
-        return model.MODEL_API
 
 
 class ZKObject:

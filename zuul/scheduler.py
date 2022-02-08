@@ -81,7 +81,7 @@ from zuul.zk.cleanup import (
     NodeRequestCleanupLock,
 )
 from zuul.zk.components import (
-    BaseComponent, ComponentRegistry, SchedulerComponent
+    BaseComponent, COMPONENT_REGISTRY, SchedulerComponent
 )
 from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.event_queues import (
@@ -236,7 +236,7 @@ class Scheduler(threading.Thread):
         self.component_info = SchedulerComponent(
             self.zk_client, self.hostname, version=self.zuul_version)
         self.component_info.register()
-        self.component_registry = ComponentRegistry(self.zk_client)
+        self.component_registry = COMPONENT_REGISTRY.create(self.zk_client)
         self.system_config_cache = SystemConfigCache(self.zk_client,
                                                      self.wake_event.set)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
@@ -2538,5 +2538,4 @@ class Scheduler(threading.Thread):
             tenant.semaphore_handler.release(item, job)
 
     def createZKContext(self, lock, log):
-        return ZKContext(self.zk_client, lock, self.stop_event, log,
-                         self.component_registry)
+        return ZKContext(self.zk_client, lock, self.stop_event, log)

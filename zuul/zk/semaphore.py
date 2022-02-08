@@ -21,6 +21,7 @@ from kazoo.exceptions import BadVersionError, NoNodeError
 
 from zuul.lib.logutil import get_annotated_logger
 from zuul.zk import ZooKeeperSimpleBase
+from zuul.zk.components import COMPONENT_REGISTRY
 
 
 def holdersFromData(data):
@@ -38,12 +39,10 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
     semaphore_root = "/zuul/semaphores"
 
-    def __init__(self, client, statsd, tenant_name, layout,
-                 component_registry):
+    def __init__(self, client, statsd, tenant_name, layout):
         super().__init__(client)
         self.layout = layout
         self.statsd = statsd
-        self.component_registry = component_registry
         self.tenant_name = tenant_name
         self.tenant_root = f"{self.semaphore_root}/{tenant_name}"
 
@@ -110,7 +109,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         # semaphore is there, check max
         while len(semaphore_holders) < self._max_count(semaphore.name):
             # MODEL_API: >1
-            if self.component_registry.model_api > 1:
+            if COMPONENT_REGISTRY.model_api > 1:
                 semaphore_holders.append(semaphore_handle)
             else:
                 semaphore_holders.append(legacy_handle)
@@ -212,10 +211,10 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
     def cleanupLeaks(self):
         # MODEL_API: >1
-        if self.component_registry.model_api < 2:
+        if COMPONENT_REGISTRY.model_api < 2:
             self.log.warning("Skipping semaphore cleanup since minimum model "
                              "API is %s (needs >= 2)",
-                             self.component_registry.model_api)
+                             COMPONENT_REGISTRY.model_api)
             return
 
         for semaphore_name in self.getSemaphores():
