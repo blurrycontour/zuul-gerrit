@@ -38,10 +38,12 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
     semaphore_root = "/zuul/semaphores"
 
-    def __init__(self, client, statsd, tenant_name, layout):
+    def __init__(self, client, statsd, tenant_name, layout,
+                 component_registry):
         super().__init__(client)
         self.layout = layout
         self.statsd = statsd
+        self.component_registry = component_registry
         self.tenant_name = tenant_name
         self.tenant_root = f"{self.semaphore_root}/{tenant_name}"
 
@@ -92,17 +94,26 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
         semaphore_key = quote_plus(semaphore.name)
         semaphore_path = f"{self.tenant_root}/{semaphore_key}"
-        semaphore_handle = f"{item.uuid}-{job.name}"
+        semaphore_handle = {
+            "buildset_path": item.current_build_set.getPath(),
+            "job_name": job.name,
+        }
+        legacy_handle = f"{item.uuid}-{job.name}"
 
         self.kazoo_client.ensure_path(semaphore_path)
         semaphore_holders, zstat = self.getHolders(semaphore_path)
 
-        if semaphore_handle in semaphore_holders:
+        if (semaphore_handle in semaphore_holders
+                or legacy_handle in semaphore_holders):
             return True
 
         # semaphore is there, check max
         while len(semaphore_holders) < self._max_count(semaphore.name):
-            semaphore_holders.append(semaphore_handle)
+            # MODEL_API: >1
+            if self.component_registry.model_api > 1:
+                semaphore_holders.append(semaphore_handle)
+            else:
+                semaphore_holders.append(legacy_handle)
 
             try:
                 self.kazoo_client.set(semaphore_path,
@@ -133,11 +144,17 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         except NoNodeError:
             return []
 
-    def _release(self, log, semaphore_path, semaphore_handle, quiet):
+    def _release(self, log, semaphore_path, semaphore_handle, quiet,
+                 legacy_handle=None):
         while True:
             try:
                 semaphore_holders, zstat = self.getHolders(semaphore_path)
-                semaphore_holders.remove(semaphore_handle)
+                try:
+                    semaphore_holders.remove(semaphore_handle)
+                except ValueError:
+                    if legacy_handle is None:
+                        raise
+                    semaphore_holders.remove(legacy_handle)
             except (ValueError, NoNodeError):
                 if not quiet:
                     log.error("Semaphore %s can not be released for %s "
@@ -172,9 +189,13 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
     def _release_one(self, log, item, job, semaphore, quiet):
         semaphore_key = quote_plus(semaphore.name)
         semaphore_path = f"{self.tenant_root}/{semaphore_key}"
-        semaphore_handle = f"{item.uuid}-{job.name}"
-
-        self._release(log, semaphore_path, semaphore_handle, quiet)
+        semaphore_handle = {
+            "buildset_path": item.current_build_set.getPath(),
+            "job_name": job.name,
+        }
+        legacy_handle = f"{item.uuid}-{job.name}"
+        self._release(log, semaphore_path, semaphore_handle, quiet,
+                      legacy_handle)
 
     def semaphoreHolders(self, semaphore_name):
         semaphore_key = quote_plus(semaphore_name)
@@ -190,38 +211,23 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         return 1 if semaphore is None else semaphore.max
 
     def cleanupLeaks(self):
-        # This is designed to account for jobs starting and stopping
-        # while this runs, and should therefore be safe to run outside
-        # of the scheduler main loop (and accross multiple
-        # schedulers).
+        # MODEL_API: >1
+        if self.component_registry.model_api < 2:
+            self.log.warning("Skipping semaphore cleanup since minimum model "
+                             "API is %s (needs >= 2)", model_api)
+            return
 
-        first_semaphores_by_holder = {}
-        for semaphore in self.getSemaphores():
-            for holder in self.semaphoreHolders(semaphore):
-                first_semaphores_by_holder[holder] = semaphore
-        first_holders = set(first_semaphores_by_holder.keys())
+        for semaphore_name in self.getSemaphores():
+            for holder in self.semaphoreHolders(semaphore_name):
+                if isinstance(holder, str):
+                    self.log.warning(
+                        "Ignoring legacy semaphore holder %s for semaphore %s",
+                        holder, semaphore_name)
+                    continue
+                if (self.kazoo_client.exists(holder["buildset_path"])
+                        is not None):
+                    continue
 
-        running_handles = set()
-        for pipeline in self.layout.pipelines.values():
-            for item in pipeline.getAllItems(include_old=True):
-                for job in item.getJobs():
-                    running_handles.add(f"{item.uuid}-{job.name}")
-
-        second_semaphores_by_holder = {}
-        for semaphore in self.getSemaphores():
-            for holder in self.semaphoreHolders(semaphore):
-                second_semaphores_by_holder[holder] = semaphore
-        second_holders = set(second_semaphores_by_holder.keys())
-
-        # The stable set of holders; avoids race conditions with
-        # scheduler(s) starting jobs.
-        holders = first_holders.intersection(second_holders)
-        semaphores_by_holder = first_semaphores_by_holder
-        semaphores_by_holder.update(second_semaphores_by_holder)
-
-        for holder in holders:
-            if holder not in running_handles:
-                semaphore_name = semaphores_by_holder[holder]
                 semaphore_key = quote_plus(semaphore_name)
                 semaphore_path = f"{self.tenant_root}/{semaphore_key}"
                 self.log.error("Releasing leaked semaphore %s held by %s",
