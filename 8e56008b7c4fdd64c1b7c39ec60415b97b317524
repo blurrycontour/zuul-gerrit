@@ -53,6 +53,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "197418b5_67ff21af",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T00:00:19Z",
+      "side": 1,
+      "message": "\u003e Just making sure I understand this properly. The change as proposed doesn\u0027t affect this scenario right? We\u0027ll fall through since the uuid values won\u0027t match and then we call resetOrCreate()?\n\nYep.  Just exposition.  :)\n\n\u003e The failing test_semaphore test case is failing due to the new scheduler not having done this and the build\nbeing unable to run because the scheduler that does have this info is not holding the lock?\n\nAlmost -- it\u0027s failing due to the new scheduler not having done this and then running the semaphore cleanup method and detecting it as a leaked semaphore since it doesn\u0027t have the build info.  The semaphore fix change corrects this by explicitly doing a lookup in ZK in the cleanup method.",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df23088c_e2565d9a",
@@ -66,6 +83,40 @@
       "writtenOn": "2022-02-08T23:44:12Z",
       "side": 1,
       "message": "Is this a functional change?",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef297599_730dbafc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 822,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T00:00:19Z",
+      "side": 1,
+      "message": "Yes, as it turns out.  lock_ctx is a generator, and tlock is the actual lock...",
+      "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8658872_84023c63",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 845,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T00:00:19Z",
+      "side": 1,
+      "message": "...that we pass in here.  Apparently this is untested code, because it does fail if I stick a refresh here.  Ideally, we would move this into its own change and add a test.",
       "revId": "8e56008b7c4fdd64c1b7c39ec60415b97b317524",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
