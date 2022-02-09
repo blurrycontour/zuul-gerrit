@@ -109,13 +109,12 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
-            while True:
-                try:
-                    signal.pause()
-                except KeyboardInterrupt:
-                    print("Ctrl + C: asking scheduler to exit nicely...\n")
-                    self.exit_handler(signal.SIGINT, None)
-        else:
+
+        try:
+            self.sched.join()
+        except KeyboardInterrupt:
+            print("Ctrl + C: asking process to exit nicely...\n")
+            self.exit_handler(signal.SIGINT, None)
             self.sched.join()
 
 

@@ -1611,6 +1611,7 @@ class StreamManager(object):
     log = logging.getLogger("zuul.web")
 
     def __init__(self, statsd, metrics):
+        self.thread = None
         self.statsd = statsd
         self.metrics = metrics
         self.hostname = normalize_statsd_name(socket.getfqdn())
@@ -1629,9 +1630,10 @@ class StreamManager(object):
         self.thread.start()
 
     def stop(self):
-        self._stopped = True
-        os.write(self.wake_write, b'\n')
-        self.thread.join()
+        if self.thread:
+            self._stopped = True
+            os.write(self.wake_write, b'\n')
+            self.thread.join()
 
     def run(self):
         while True:
@@ -1691,10 +1693,12 @@ class ZuulWeb(object):
                  connections,
                  authenticators: AuthenticatorRegistry,
                  info: WebInfo = None):
+        self._running = False
         self.start_time = time.time()
         self.config = config
         self.metrics = WebMetrics()
         self.statsd = get_statsd(config)
+        self.wsplugin = None
 
         self.listen_address = get_default(self.config,
                                           'web', 'listen_address',
@@ -1725,6 +1729,7 @@ class ZuulWeb(object):
 
         self.component_registry = ComponentRegistry(self.zk_client)
 
+        self.system_config_thread = None
         self.system_config_cache_wake_event = threading.Event()
         self.system_config_cache = SystemConfigCache(
             self.zk_client,
@@ -1924,28 +1929,8 @@ class ZuulWeb(object):
     def start(self):
         self.log.debug("ZuulWeb starting")
 
+        self._running = True
         self.component_info.state = self.component_info.INITIALIZING
-        # Wait for system config and layouts to be loaded
-        while not self.system_config_cache.is_valid:
-            self.system_config_cache_wake_event.wait()
-
-        # Initialize the system config
-        self.updateSystemConfig()
-
-        # Wait until all layouts/tenants are loaded
-        while True:
-            self.system_config_cache_wake_event.clear()
-            self.updateLayout()
-            if (set(self.unparsed_abide.tenants.keys())
-                != set(self.abide.tenants.keys())):
-                self.system_config_cache_wake_event.wait()
-            else:
-                break
-
-        self.stream_manager.start()
-        self.wsplugin = WebSocketPlugin(cherrypy.engine)
-        self.wsplugin.subscribe()
-        cherrypy.engine.start()
 
         self.log.debug("Starting command processor")
         self._command_running = True
@@ -1954,6 +1939,38 @@ class ZuulWeb(object):
                                                name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+
+        # Wait for system config and layouts to be loaded
+        self.log.debug("Waiting for system config from scheduler")
+        while not self.system_config_cache.is_valid:
+            self.system_config_cache_wake_event.wait(1)
+            if not self._running:
+                return
+
+        # Initialize the system config
+        self.updateSystemConfig()
+
+        # Wait until all layouts/tenants are loaded
+        self.log.debug("Waiting for all tenants to load")
+        while True:
+            self.system_config_cache_wake_event.clear()
+            self.updateLayout()
+            if (set(self.unparsed_abide.tenants.keys())
+                != set(self.abide.tenants.keys())):
+                while True:
+                    self.system_config_cache_wake_event.wait(1)
+                    if not self._running:
+                        return
+                    if not self.system_config_cache_wake_event.is_set():
+                        continue
+            else:
+                break
+
+        self.stream_manager.start()
+        self.wsplugin = WebSocketPlugin(cherrypy.engine)
+        self.wsplugin.subscribe()
+        cherrypy.engine.start()
+
         self.component_info.state = self.component_info.RUNNING
 
         self.system_config_thread = threading.Thread(
@@ -1965,22 +1982,25 @@ class ZuulWeb(object):
 
     def stop(self):
         self.log.debug("ZuulWeb stopping")
+        self._running = False
         self.component_info.state = self.component_info.STOPPED
         cherrypy.engine.exit()
         # Not strictly necessary, but without this, if the server is
         # started again (e.g., in the unit tests) it will reuse the
         # same host/port settings.
         cherrypy.server.httpserver = None
-        self.wsplugin.unsubscribe()
+        if self.wsplugin:
+            self.wsplugin.unsubscribe()
         self.stream_manager.stop()
         self._system_config_running = False
         self.system_config_cache_wake_event.set()
-        self.system_config_thread.join()
-        self.zk_client.disconnect()
+        if self.system_config_thread:
+            self.system_config_thread.join()
         self.stopRepl()
         self._command_running = False
         self.command_socket.stop()
         self.monitoring_server.stop()
+        self.zk_client.disconnect()
 
     def join(self):
         self.command_thread.join()

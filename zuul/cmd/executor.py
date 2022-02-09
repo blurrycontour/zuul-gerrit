@@ -113,7 +113,12 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
 
-        self.executor.join()
+        try:
+            self.executor.join()
+        except KeyboardInterrupt:
+            print("Ctrl + C: asking process to exit nicely...\n")
+            self.exit_handler(signal.SIGINT, None)
+            self.executor.join()
 
 
 def main():

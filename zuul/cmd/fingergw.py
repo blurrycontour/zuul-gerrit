@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import sys
 import logging
 import signal
 
@@ -37,6 +38,11 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         parser = super(FingerGatewayApp, self).createParser()
         self.addSubCommands(parser, fingergw.COMMANDS)
         return parser
+
+    def exit_handler(self, signum, frame):
+        self.gateway.stop()
+        self.gateway.join()
+        sys.exit(0)
 
     def run(self):
         '''
@@ -63,24 +69,14 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         self.gateway.start()
 
         if self.args.nodaemon:
-            # NOTE(Shrews): When running in non-daemon mode, although sending
-            # the 'stop' command via the command socket will shutdown the
-            # gateway, it's still necessary to Ctrl+C to stop the app.
-            while True:
-                try:
-                    signal.pause()
-                except KeyboardInterrupt:
-                    print("Ctrl + C: asking gateway to exit nicely...\n")
-                    self.stop()
-                    break
-        else:
-            self.gateway.wait()
+            signal.signal(signal.SIGTERM, self.exit_handler)
 
-        self.log.info('Stopped Zuul finger gateway app')
-
-    def stop(self):
-        if self.gateway:
-            self.gateway.stop()
+        try:
+            self.gateway.join()
+        except KeyboardInterrupt:
+            print("Ctrl + C: asking process to exit nicely...\n")
+            self.exit_handler(signal.SIGINT, None)
+            self.gateway.join()
 
 
 def main():
