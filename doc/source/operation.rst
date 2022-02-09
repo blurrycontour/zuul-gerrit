@@ -4,8 +4,10 @@ Operation
 =========
 
 You can run any zuul process with the **-f** option to make it not
-daemonize. It's a good idea at first to confirm there's no issues with
-your configuration.
+daemonize and stay in the foreground, logging to your terminal. It's a
+good idea at first to check for issues with your configuration.
+There's also a **-d** option to engage verbose debug logging, but be
+careful in busy deployments as this can generate very large logs.
 
 To start, simply run::
 

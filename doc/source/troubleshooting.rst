@@ -1,7 +1,8 @@
 Troubleshooting
 ---------------
 
-Some advanced troubleshooting options are provided below.  These are
+In addition to inspecting `service debug logs <operation>`_, some
+advanced troubleshooting options are provided below.  These are
 generally very low-level and are not normally required.
 
 Thread Dumps and Profiling
