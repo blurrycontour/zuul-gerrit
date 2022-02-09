@@ -110,7 +110,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         # semaphore is there, check max
         while len(semaphore_holders) < self._max_count(semaphore.name):
             # MODEL_API: >1
-            if self.component_registry.model_api > 1:
+            if self.component_registry.getMinimumModelApi(
+                    kind="scheduler") > 1:
                 semaphore_holders.append(semaphore_handle)
             else:
                 semaphore_holders.append(legacy_handle)
@@ -212,7 +213,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
     def cleanupLeaks(self):
         # MODEL_API: >1
-        if self.component_registry.model_api < 2:
+        if self.component_registry.getMinimumModelApi(kind="scheduler") < 2:
             self.log.warning("Skipping semaphore cleanup since minimum model "
                              "API is %s (needs >= 2)",
                              self.component_registry.model_api)

@@ -720,7 +720,8 @@ class PipelineManager(metaclass=ABCMeta):
                 continue
 
             # MODEL_API: >2
-            if self.sched.component_registry.model_api > 2:
+            if self.sched.component_registry.getMinimumModelApi(
+                    kind="scheduler") > 2:
                 event = model.SupercedeEvent(
                     other_pipeline.tenant.name,
                     other_pipeline.name,
