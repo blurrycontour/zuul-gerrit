@@ -16,7 +16,6 @@
 # under the License.
 
 import signal
-import sys
 
 import zuul.cmd
 import zuul.merger.server
@@ -34,7 +33,6 @@ class Merger(zuul.cmd.ZuulDaemonApp):
     def exit_handler(self, signum, frame):
         self.merger.stop()
         self.merger.join()
-        sys.exit(0)
 
     def run(self):
         self.handleCommands()
@@ -49,19 +47,14 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
-            while True:
-                try:
-                    signal.pause()
-                except KeyboardInterrupt:
-                    print("Ctrl + C: asking merger to exit nicely...\n")
-                    self.exit_handler(signal.SIGINT, None)
-        else:
+
+        try:
+            self.merger.join()
+        except KeyboardInterrupt:
+            print("Ctrl + C: asking process to exit nicely...\n")
+            self.exit_handler(signal.SIGINT, None)
             self.merger.join()
 
 
 def main():
     Merger().main()
-
-
-if __name__ == "__main__":
-    main()
