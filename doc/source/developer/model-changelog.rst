@@ -31,3 +31,10 @@ Version 1
 :Prior Zuul version: 4.11.0
 :Description: No change since Version 0.  This explicitly records the
               component versions in ZooKeeper.
+
+Version 2
+---------
+
+:Prior Zuul version: 5.0.0
+:Description: Changes the sempahore handle format from `<item_uuid>-<job_name>`
+              to a dictionary with buildset path and job name.
