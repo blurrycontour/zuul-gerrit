@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4de10c35_d845aec4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T01:14:16Z",
+      "side": 1,
+      "message": "It\u0027s a subclass for connections with change caches; so potentially not MQTT connections, etc.",
+      "revId": "e4460b2b463a3859be0ef7a852b164d209d51028",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45ff266a_f65c60fb",
@@ -37,6 +54,40 @@
         "endLine": 84,
         "endChar": 18
       },
+      "revId": "e4460b2b463a3859be0ef7a852b164d209d51028",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "152ecd4e_462ce3eb",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T01:14:16Z",
+      "side": 1,
+      "message": "Mostly to avoid any unexpected interactions with io.BufferedWriter.",
+      "revId": "e4460b2b463a3859be0ef7a852b164d209d51028",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95f7029c_80a3d6a3",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T01:14:16Z",
+      "side": 1,
+      "message": "This could walk *up* a zkobject tree, though we really only use this on pipelines, so it works for our use at the moment.  We might want to either note that or see if we can fix it.",
       "revId": "e4460b2b463a3859be0ef7a852b164d209d51028",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
