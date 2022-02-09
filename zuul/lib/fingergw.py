@@ -284,7 +284,7 @@ class FingerGateway(object):
 
         self.log.info("Finger gateway is stopped")
 
-    def wait(self):
+    def join(self):
         '''
         Wait on the gateway to shutdown.
         '''
