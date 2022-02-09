@@ -38,3 +38,11 @@ Version 2
 :Prior Zuul version: 5.0.0
 :Description: Changes the sempahore handle format from `<item_uuid>-<job_name>`
               to a dictionary with buildset path and job name.
+
+Version 3
+---------
+
+:Prior Zuul version: 5.0.0
+:Description: Add a new `SupercedeEvent` and use that for dequeuing of
+              superceded items from other pipelines. This only affects the
+              schedulers.
