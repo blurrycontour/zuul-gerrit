@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e799c928_ea85036b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T00:15:56Z",
+      "side": 1,
+      "message": "Nothing critical inline hence the +2 but may be worth a look for potential respin or follups.",
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83c0b9a0_a8ce9dd3",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T00:15:56Z",
+      "side": 1,
+      "message": "I think the rest of this method can be removed.",
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "437aec1a_ba753b26",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T00:15:56Z",
+      "side": 1,
+      "message": "We accept a single arg here because it seems we don\u0027t have a way to indicate to argparse that we can accept multiples on the command line. But then internals accept a list. I guess this way if we update the command parsing tooling to handle a list we don\u0027t have to rewrite the internals.",
+      "range": {
+        "startLine": 812,
+        "startChar": 46,
+        "endLine": 812,
+        "endChar": 57
+      },
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "359bae1d_2049865c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T00:15:56Z",
+      "side": 1,
+      "message": "This is the way the code was written before but it is a bit odd to do this indirection back out to the scheduler command class. Which then emits an event which will ultimately end up calling back into this class. Any reason to not short circuit that a bit and just call directly from here? Definitely a followup activity if we want to do that.",
+      "range": {
+        "startLine": 813,
+        "startChar": 8,
+        "endLine": 813,
+        "endChar": 23
+      },
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
