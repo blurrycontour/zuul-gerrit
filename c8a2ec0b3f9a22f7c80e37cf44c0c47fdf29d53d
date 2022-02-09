@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b11d4367_2887e02e",
+        "filename": "zuul/cmd/fingergw.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T23:38:47Z",
+      "side": 1,
+      "message": "Why do we join and exit in the exit_handler. Isn\u0027t it enough to stop() here then join in run and have an implicit exit like the other daemons?",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 19
+      },
+      "revId": "c8a2ec0b3f9a22f7c80e37cf44c0c47fdf29d53d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
