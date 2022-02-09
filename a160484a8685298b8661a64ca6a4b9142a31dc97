@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e124e90_2b071d7d",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T00:32:22Z",
+      "side": 1,
+      "message": "Ayup.",
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "437aec1a_ba753b26",
@@ -58,6 +75,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6dec7325_81a519c1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T00:32:22Z",
+      "side": 1,
+      "message": "Exactly; there are other tenant reconfigure related methods that accept a list, so I wanted to keep the internals flexible in case we wanted to expand the argparse stuff to support more later.",
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "359bae1d_2049865c",
@@ -77,6 +111,23 @@
         "endLine": 813,
         "endChar": 23
       },
+      "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91668415_4b4e254b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-09T00:32:22Z",
+      "side": 1,
+      "message": "There\u0027s a readConfig method in the app.  I agree it\u0027s awkward and could be revisited.",
       "revId": "a160484a8685298b8661a64ca6a4b9142a31dc97",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
