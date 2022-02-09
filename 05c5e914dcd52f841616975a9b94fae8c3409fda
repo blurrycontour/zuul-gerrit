@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea257553_0c12a4b0",
+        "filename": "doc/source/troubleshooting.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-02-09T20:48:50Z",
+      "side": 1,
+      "message": "Oops, looks like implicit targets only work for links, not for the :ref: directive.",
+      "revId": "05c5e914dcd52f841616975a9b94fae8c3409fda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
