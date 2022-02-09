@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d82d2850_eb00d4ee",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T01:05:03Z",
+      "side": 1,
+      "message": "This seems to be in the base connection class? Should we ever expect the attribute to not exist?",
+      "revId": "e4460b2b463a3859be0ef7a852b164d209d51028",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45ff266a_f65c60fb",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-09T01:05:03Z",
+      "side": 1,
+      "message": "Are we hiding away the raw interface to be sure nothing accesses it outside of these wrappers?",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 18
+      },
+      "revId": "e4460b2b463a3859be0ef7a852b164d209d51028",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
