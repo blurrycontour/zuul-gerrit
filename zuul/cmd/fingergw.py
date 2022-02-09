@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,12 +15,10 @@
 
 import logging
 import signal
-import sys
-from typing import Optional
 
 import zuul.cmd
 from zuul.lib.config import get_default
-from zuul.lib.fingergw import COMMANDS, FingerGateway
+from zuul.lib import fingergw
 
 
 class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
@@ -32,19 +31,12 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
     def __init__(self):
         super(FingerGatewayApp, self).__init__()
-        self.gateway: Optional[FingerGateway] = None
+        self.gateway = None
 
     def createParser(self):
         parser = super(FingerGatewayApp, self).createParser()
-        parser.add_argument('command',
-                            choices=COMMANDS,
-                            nargs='?')
+        self.addSubCommands(parser, fingergw.COMMANDS)
         return parser
-
-    def parseArguments(self, args=None):
-        super(FingerGatewayApp, self).parseArguments()
-        if self.args.command:
-            self.args.nodaemon = True
 
     def run(self):
         '''
@@ -52,9 +44,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
         Called by the main() method of the parent class.
         '''
-        if self.args.command in COMMANDS:
-            self.send_command(self.args.command)
-            sys.exit(0)
+        self.handleCommands()
 
         self.setup_logging('fingergw', 'log_config')
         self.log = logging.getLogger('zuul.fingergw')
@@ -63,7 +53,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
             self.config, 'fingergw', 'command_socket',
             '/var/lib/zuul/%s.socket' % self.app_name)
 
-        self.gateway = FingerGateway(
+        self.gateway = fingergw.FingerGateway(
             self.config,
             cmdsock,
             self.getPidFile(),
