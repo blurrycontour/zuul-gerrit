@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "054f5cfa_6c80802e",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-02-10T23:28:56Z",
+      "side": 1,
+      "message": "If there can only be one component registry, shouldn\u0027t we use a `COMPONENT_REGISTRY.create(zk_client)` method instead?",
+      "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32c07f5a_5d1f8b94",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-02-10T23:28:56Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this raise an exception if there is already a registry registered?",
+      "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
