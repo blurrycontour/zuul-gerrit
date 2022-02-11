@@ -151,6 +151,18 @@ class JobVariant extends React.Component {
       if (label === 'semaphores') {
         if (value.length === 0) {
           value = (<i>none</i>)
+        } else {
+          value = (
+            <span style={{whiteSpace: 'pre-wrap'}}>
+              <ReactJson
+                src={value}
+                name={null}
+                collapsed={true}
+                sortKeys={true}
+                enableClipboard={false}
+                displayDataTypes={false}/>
+            </span>
+          )
         }
         nice_label = (<span><LockIcon /> Semaphores</span>)
       }
