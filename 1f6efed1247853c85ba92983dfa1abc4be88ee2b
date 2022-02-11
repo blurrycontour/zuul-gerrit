@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca089a15_d567b488",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-11T21:57:46Z",
+      "side": 1,
+      "message": "There can be more than one (and there may be more than one now).  It\u0027s harmless -- they\u0027ll see the same data.  With this change, there probably doesn\u0027t need to be, so I think we could enhance this to work as you suggest.",
+      "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32c07f5a_5d1f8b94",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-02-10T23:28:56Z",
       "side": 1,
       "message": "Shouldn\u0027t this raise an exception if there is already a registry registered?",
+      "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b339408d_d6cd32f2",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-11T21:57:46Z",
+      "side": 1,
+      "message": "As above, it\u0027s harmless to have more than one and the current code doesn\u0027t prohibit it.",
       "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
