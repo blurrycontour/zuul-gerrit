@@ -370,6 +370,14 @@ class TestMergerRepo(ZuulTestCase):
         """
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         self.create_branch('org/project1', 'feature1')
+
+        # Let the file that is also changed in the feature branch diverge
+        # in master. This change should NOT be considered in the changed
+        # files list.
+        files = {'to-be-deleted.txt': 'FAIL'}
+        self.create_commit('org/project1', files=files, head='master',
+                           message='Add master file')
+
         work_repo = Repo(parent_path, self.workspace_root,
                          'none@example.org', 'User Name', '0', '0')
         # Add a file in first commit
