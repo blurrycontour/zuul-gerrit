@@ -673,11 +673,27 @@ class Repo(object):
         files = set()
 
         if tosha:
+            # The result of diff() does not include the files whose changes are
+            # reverted between the commits. But it may also include the files
+            # that are not changed in the referenced commit(s). This can e.g.
+            # happen if the base branch has diverged from the feature branch.
+            # The idea is to use this result to filter out the files whose
+            # changes are reverted between the commits.
+            diff_files = set()
+            head_commit = repo.commit(head.hexsha)
+            diff_index = head_commit.diff(tosha)
+            diff_files.update((item.a_path for item in diff_index))
+
             commit_diff = "{}..{}".format(tosha, head.hexsha)
             for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+                files.update(
+                    filter(
+                        lambda file: file in diff_files, cmt.stats.files.keys()
+                    )
+                )
         else:
             files.update(head.stats.files.keys())
+
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
