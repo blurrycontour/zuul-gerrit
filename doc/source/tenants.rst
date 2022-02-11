@@ -30,6 +30,14 @@ can be the path to an executable that will be executed and its stdout
 used as the tenant configuration. The executable must return a valid
 tenant YAML formatted output.
 
+Tenant configuration is checked for updates any time a scheduler is
+started, and changes to it are read automatically. If the tenant
+configuration is altered during operation, you can signal a scheduler
+to read and apply the updated state in order to avoid restarting. See
+the section on :ref:`reconfiguration` for instructions. Ideally,
+tenant configuration deployment via configuration management should
+also be made to trigger a smart-reconfigure once the file is replaced.
+
 Tenant
 ------
 
