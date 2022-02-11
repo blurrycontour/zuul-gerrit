@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c25bbd29_78669fca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-11T10:06:54Z",
+      "side": 1,
+      "message": "I pushed https://review.opendev.org/c/zuul/zuul/+/828851 to demonstrate the issue.",
+      "parentUuid": "7d90e9b6_4362e039",
+      "revId": "dc6ef47353a2d0473b12826e465151605125afe1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6103c55c_579c7a31",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 2
