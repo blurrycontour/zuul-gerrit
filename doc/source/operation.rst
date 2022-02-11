@@ -29,6 +29,8 @@ Operation
 To start the scheduler, run ``zuul-scheduler``.  To stop it, run
 ``zuul-scheduler stop``.
 
+.. _reconfiguration:
+
 Reconfiguration
 ~~~~~~~~~~~~~~~
 

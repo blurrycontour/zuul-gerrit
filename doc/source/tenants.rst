@@ -30,6 +30,12 @@ can be the path to an executable that will be executed and its stdout
 used as the tenant configuration. The executable must return a valid
 tenant YAML formatted output.
 
+Tenant configuration is persisted between service restarts, and
+changes to it are not read automatically. When the tenant
+configuration changes, it is necessary to signal a scheduler to read
+and apply the updated state. See the section on :ref:`reconfiguration`
+for instructions.
+
 Tenant
 ------
 
