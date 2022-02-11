@@ -520,12 +520,22 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           self.reconfigure_event_queue.qsize())
-        base = 'zuul.scheduler.eventqueues.connection'
+        queue_base = 'zuul.scheduler.eventqueues.connection'
+        conn_base = 'zuul.connection'
         for connection in self.connections.connections.values():
             queue = connection.getEventQueue()
             if queue is not None:
-                self.statsd.gauge(f'{base}.{connection.connection_name}',
+                self.statsd.gauge(f'{queue_base}.{connection.connection_name}',
                                   len(queue))
+            if hasattr(connection, 'estimateCacheDataSize'):
+                compressed_size, uncompressed_size =\
+                    connection.estimateCacheDataSize()
+                self.statsd.gauge(f'{conn_base}.{connection.connection_name}.'
+                                  'cache.data_size_compressed',
+                                  compressed_size)
+                self.statsd.gauge(f'{conn_base}.{connection.connection_name}.'
+                                  'cache.data_size_uncompressed',
+                                  uncompressed_size)
 
         for tenant in self.abide.tenants.values():
             self.statsd.gauge(f"zuul.tenant.{tenant.name}.management_events",
@@ -545,6 +555,12 @@ class Scheduler(threading.Thread):
                                   len(result_event_queues[pipeline.name]))
                 self.statsd.gauge(f"{base}.management_events",
                                   len(management_event_queues[pipeline.name]))
+                compressed_size, uncompressed_size =\
+                    pipeline.state.estimateDataSize()
+                self.statsd.gauge(f'{base}.data_size_compressed',
+                                  compressed_size)
+                self.statsd.gauge(f'{base}.data_size_uncompressed',
+                                  uncompressed_size)
 
         self.nodepool.emitStatsTotals(self.abide)
 

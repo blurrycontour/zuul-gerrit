@@ -448,6 +448,19 @@ class TestScheduler(ZuulTestCase):
             'zuul.tenant.tenant-one.event_enqueue_time', kind='ms')
         self.assertTrue(0.0 < float(val) < 60000.0)
 
+        self.assertReportedStat('zuul.tenant.tenant-one.pipeline.gate.'
+                                'data_size_compressed',
+                                kind='g')
+        self.assertReportedStat('zuul.tenant.tenant-one.pipeline.gate.'
+                                'data_size_uncompressed',
+                                kind='g')
+        self.assertReportedStat('zuul.connection.gerrit.cache.'
+                                'data_size_compressed',
+                                kind='g')
+        self.assertReportedStat('zuul.connection.gerrit.cache.'
+                                'data_size_uncompressed',
+                                kind='g')
+
         for build in self.history:
             self.assertTrue(build.parameters['zuul']['voting'])
 
@@ -1391,7 +1404,7 @@ class TestScheduler(ZuulTestCase):
                                                   change1.cache_stat.uuid,
                                                   change1.cache_stat.version,
                                                   change1.cache_stat.mzxid,
-                                                  0.0)
+                                                  0.0, 0, 0)
         # We should not delete change1 since it's needed by change2
         # which we want to keep.
         for connection in sched.connections.connections.values():
@@ -1403,7 +1416,7 @@ class TestScheduler(ZuulTestCase):
                                                   change2.cache_stat.uuid,
                                                   change2.cache_stat.version,
                                                   change1.cache_stat.mzxid,
-                                                  0.0)
+                                                  0.0, 0, 0)
         for connection in sched.connections.connections.values():
             connection.maintainCache([], max_age=7200)
         # The master branch change remains
