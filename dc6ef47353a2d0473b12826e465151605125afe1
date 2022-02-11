@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d90e9b6_4362e039",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-11T09:30:10Z",
+      "side": 1,
+      "message": "This sounds to me like the filter of changed/reverted files is not 100% correct. E.g. given a file X that was changed and the change reverted in the same PR could still show up as change when the target branch diverged in a way that also affected file X.",
+      "revId": "dc6ef47353a2d0473b12826e465151605125afe1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6103c55c_579c7a31",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 693,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-11T09:30:10Z",
+      "side": 1,
+      "message": "I think this could be written in a more readable way:\n\n                files.update(f for f in cmd.stats.files.keys()\n                             if f in diff_files)",
+      "revId": "dc6ef47353a2d0473b12826e465151605125afe1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
