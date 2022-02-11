@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e36a47a_bc7ec1e4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1963,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-11T07:59:32Z",
+      "side": 1,
+      "message": "Just wondering if it would make sense to already send the change key with the trigger events so we don\u0027t have to call into the driver again here. It\u0027s not an expensive operation, though.",
+      "revId": "3d393c76a8ae54be2130eef00bba13f46f6b4dc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
