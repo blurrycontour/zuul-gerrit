@@ -1312,6 +1312,7 @@ class TestWebCapabilitiesInfo(TestInfo):
                     'type': 'JWT',
                     'scope': 'openid profile',
                     'driver': 'OpenIDConnect',
+                    'load_user_info': True,
                 },
                 'myOIDC2': {
                     'authority': 'http://oidc2',
@@ -1319,6 +1320,7 @@ class TestWebCapabilitiesInfo(TestInfo):
                     'type': 'JWT',
                     'scope': 'openid profile email special-scope',
                     'driver': 'OpenIDConnect',
+                    'load_user_info': True,
                 },
                 'zuul.example.com': {
                     'authority': 'zuul_operator',

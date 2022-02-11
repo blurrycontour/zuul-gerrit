@@ -26,6 +26,7 @@ let auth_params = {
   authority: '',
   client_id: '',
   scope: '',
+  loadUserInfo: true,
 }
 if (stored_params !== null) {
   auth_params = JSON.parse(stored_params)

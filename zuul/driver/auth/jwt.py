@@ -22,9 +22,33 @@ from urllib.parse import urljoin
 
 from zuul import exceptions
 from zuul.driver import AuthenticatorInterface
+from zuul.lib.config import any_to_bool
 
 
 logger = logging.getLogger("zuul.auth.jwt")
+
+# A few notes on differences between the OpenID Connect specification
+# and OIDC as implemented by Microsoft, which necessitates several
+# extra configuration options:
+#
+# 1) The issuer (iss) returned in the JWT is not the authority, but
+# rather a URL referring to the AD instance, therefore authority must
+# be specified separately.
+# 2) The audience (aud) returned in the JWT is not the client_id, but
+# rather a URL constructed from the client_id, therefore must also be
+# specified separately.
+# 3) By default, the JWT is simply a forwarded copy of a token from
+# the Microsoft Graph service.  It is signed by the graph service and
+# not the authority as requested, it therefore fails signature
+# validation.  In order to cause the authority to generate its own
+# token signed by the expected keys, we must create a new scope
+# (api://.../zuul) and request that scope with the token.
+# 4) The userinfo service referred to by the JWT is the Microsoft
+# Graph service, which means that once our token is signed by the
+# Microsoft login keys (see item #3) the graph service is then unable
+# to validate the token.  Therefore we must configure the javascript
+# oidc library not to request userinfo and rely only on what is
+# supplied in the token.
 
 
 class JWTAuthenticator(AuthenticatorInterface):
@@ -34,19 +58,17 @@ class JWTAuthenticator(AuthenticatorInterface):
         # Common configuration for all authenticators
         self.uid_claim = conf.get('uid_claim', 'sub')
         self.issuer_id = conf.get('issuer_id')
-        self.audience = conf.get('client_id')
+        self.authority = conf.get('authority', self.issuer_id)
+        self.client_id = conf.get('client_id')
+        self.audience = conf.get('audience', self.client_id)
         self.realm = conf.get('realm')
-        self.allow_authz_override = conf.get('allow_authz_override', False)
+        self.allow_authz_override = any_to_bool(
+            conf.get('allow_authz_override', False))
         try:
             self.skew = int(conf.get('skew', 0))
         except Exception:
             raise ValueError(
                 'skew must be an integer, got %s' % conf.get('skew'))
-        if isinstance(self.allow_authz_override, str):
-            if self.allow_authz_override.lower() == 'true':
-                self.allow_authz_override = True
-            else:
-                self.allow_authz_override = False
         try:
             self.max_validity_time = float(conf.get('max_validity_time',
                                                     math.inf))
@@ -56,8 +78,8 @@ class JWTAuthenticator(AuthenticatorInterface):
     def get_capabilities(self):
         return {
             self.realm: {
-                'authority': self.issuer_id,
-                'client_id': self.audience,
+                'authority': self.authority,
+                'client_id': self.client_id,
                 'type': 'JWT',
                 'driver': getattr(self, 'name', 'N/A'),
             }
@@ -190,6 +212,8 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
         super(OpenIDConnectAuthenticator, self).__init__(**conf)
         self.keys_url = conf.get('keys_url', None)
         self.scope = conf.get('scope', 'openid profile')
+        self.load_user_info = any_to_bool(
+            conf.get('load_user_info', True))
 
     def get_key(self, key_id):
         keys_url = self.keys_url
@@ -235,6 +259,7 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
     def get_capabilities(self):
         d = super(OpenIDConnectAuthenticator, self).get_capabilities()
         d[self.realm]['scope'] = self.scope
+        d[self.realm]['load_user_info'] = self.load_user_info
         return d
 
     def _decode(self, rawToken):
