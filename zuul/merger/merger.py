@@ -673,11 +673,18 @@ class Repo(object):
         files = set()
 
         if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+            # If the base branch has new commits since creation of the feature
+            # branch, we need to findout the base commit as new "tosha"
+            base_commits = repo.merge_base(tosha, head.hexsha)
+            if len(base_commits) == 1:
+                tosha = base_commits[0].hexsha
+
+            head_commit = repo.commit(head.hexsha)
+            diff_index = head_commit.diff(tosha)
+            files.update((item.a_path for item in diff_index))
         else:
             files.update(head.stats.files.keys())
+
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
