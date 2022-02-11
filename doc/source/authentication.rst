@@ -151,4 +151,5 @@ authentication in Zuul and Zuul's Web UI.
 
    howtos/openid-with-google
    howtos/openid-with-keycloak
+   howtos/openid-with-microsoft
    tutorials/keycloak
