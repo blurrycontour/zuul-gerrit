@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33ed278e_799a8135",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1954,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-02-12T00:27:26Z",
+      "side": 1,
+      "message": "Seems from the log, the quickstart is getting at least this far.",
+      "revId": "c0c78d3942406ddd218b70ec96ee0ed7862f0239",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6093ee2c_e8770aa0",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1969,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-02-12T00:27:26Z",
+      "side": 1,
+      "message": "It does not appear to reach this point. Perhaps we\u0027re not waiting long enough?",
+      "revId": "c0c78d3942406ddd218b70ec96ee0ed7862f0239",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
