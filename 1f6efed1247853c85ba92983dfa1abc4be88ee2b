@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e7c5731_c02ffba4",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-14T18:58:29Z",
+      "side": 1,
+      "message": "I\u0027ve revised this to add a create method.",
+      "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32c07f5a_5d1f8b94",
@@ -65,6 +82,23 @@
       "writtenOn": "2022-02-11T21:57:46Z",
       "side": 1,
       "message": "As above, it\u0027s harmless to have more than one and the current code doesn\u0027t prohibit it.",
+      "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c52cb55c_04d7c0a7",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-14T18:58:29Z",
+      "side": 1,
+      "message": "I\u0027ve revised this to be a create method.  Normally that shouldn\u0027t be called more than once, but it will be in the tests because we run multiple components in the same process.  So it doesn\u0027t raise an exception if it\u0027s called twice (but it also doesn\u0027t create a second registry).",
       "revId": "1f6efed1247853c85ba92983dfa1abc4be88ee2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
