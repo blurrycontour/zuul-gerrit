@@ -23,7 +23,6 @@ import subprocess
 
 import voluptuous as vs
 
-from zuul.driver.sql.sqlconnection import SQLConnection
 from zuul import model
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
@@ -1269,12 +1268,6 @@ class PipelineParser(object):
                     if allowed_reporters is not None and \
                        reporter_name not in allowed_reporters:
                         raise UnknownConnection(reporter_name)
-                    if type(self.pcontext.connections
-                                .connections[reporter_name]) == SQLConnection:
-                        # (1)... explicit SQL reporters are ignored)
-                        self.log.warning("Ignoring SQL reporter configured in"
-                                         " pipeline %s" % pipeline.name)
-                        continue
                     reporter = self.pcontext.connections.getReporter(
                         reporter_name, pipeline, params)
                     reporter.setAction(conf_key)
