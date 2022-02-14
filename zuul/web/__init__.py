@@ -945,7 +945,7 @@ class ZuulWebAPI(object):
             queue_size = 0
             for pipeline in tenant.layout.pipelines.values():
                 status = pipeline.summary.refresh(self.zuulweb.zk_context)
-                for queue in status["change_queues"]:
+                for queue in status.get("change_queues", []):
                     for head in queue["heads"]:
                         for item in head:
                             if item["live"]:
