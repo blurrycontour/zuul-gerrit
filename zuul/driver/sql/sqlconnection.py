@@ -61,8 +61,9 @@ class DatabaseSession(object):
 
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
-                  newrev=None, event_id=None, event_timestamp=None, uuid=None,
-                  job_name=None, voting=None, nodeset=None,
+                  newrev=None, event_id=None, event_timestamp=None,
+                  first_build_start_time=None, last_build_end_time=None,
+                  uuid=None, job_name=None, voting=None, nodeset=None,
                   result=None, provides=None, final=None, held=None,
                   complete=None, sort_by_buildset=False, limit=50,
                   offset=0, idx_min=None, idx_max=None):
@@ -104,6 +105,10 @@ class DatabaseSession(object):
         q = self.listFilter(q, buildset_table.c.event_id, event_id)
         q = self.listFilter(
             q, buildset_table.c.event_timestamp, event_timestamp)
+        q = self.listFilter(
+            q, buildset_table.c.first_build_start_time, first_build_start_time)
+        q = self.listFilter(
+            q, buildset_table.c.last_build_end_time, last_build_end_time)
         q = self.listFilter(q, build_table.c.uuid, uuid)
         q = self.listFilter(q, build_table.c.job_name, job_name)
         q = self.listFilter(q, build_table.c.voting, voting)
@@ -342,6 +347,8 @@ class SQLConnection(BaseConnection):
             uuid = sa.Column(sa.String(36))
             event_id = sa.Column(sa.String(255), nullable=True)
             event_timestamp = sa.Column(sa.DateTime, nullable=True)
+            first_build_start_time = sa.Column(sa.DateTime, nullable=True)
+            last_build_end_time = sa.Column(sa.DateTime, nullable=True)
 
             sa.Index(self.table_prefix + 'project_pipeline_idx',
                      project, pipeline)
