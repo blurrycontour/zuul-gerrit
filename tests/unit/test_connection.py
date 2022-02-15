@@ -73,7 +73,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         buildset_table = table_prefix + 'zuul_buildset'
         build_table = table_prefix + 'zuul_build'
 
-        self.assertEqual(17, len(insp.get_columns(buildset_table)))
+        self.assertEqual(19, len(insp.get_columns(buildset_table)))
         self.assertEqual(13, len(insp.get_columns(build_table)))
 
     def test_sql_tables_created(self):

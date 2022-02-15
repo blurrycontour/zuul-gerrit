@@ -1286,15 +1286,13 @@ class ZuulWebAPI(object):
         return key
 
     def _datetimeToString(self, my_datetime):
-        return my_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+        if my_datetime:
+            return my_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+        return None
 
     def buildToDict(self, build, buildset=None):
-        start_time = build.start_time
-        if build.start_time:
-            start_time = self._datetimeToString(start_time)
-        end_time = build.end_time
-        if build.end_time:
-            end_time = self._datetimeToString(end_time)
+        start_time = self._datetimeToString(build.start_time)
+        end_time = self._datetimeToString(build.end_time)
         if build.start_time and build.end_time:
             duration = (build.end_time -
                         build.start_time).total_seconds()
@@ -1320,9 +1318,7 @@ class ZuulWebAPI(object):
         }
 
         if buildset:
-            event_timestamp = buildset.event_timestamp
-            if event_timestamp:
-                event_timestamp = self._datetimeToString(event_timestamp)
+            event_timestamp = self._datetimeToString(buildset.event_timestamp)
             ret.update({
                 'project': buildset.project,
                 'branch': buildset.branch,
@@ -1408,9 +1404,9 @@ class ZuulWebAPI(object):
         return data
 
     def buildsetToDict(self, buildset, builds=[]):
-        event_timestamp = buildset.event_timestamp
-        if event_timestamp:
-            event_timestamp = self._datetimeToString(event_timestamp)
+        event_timestamp = self._datetimeToString(buildset.event_timestamp)
+        start = self._datetimeToString(buildset.first_build_start_time)
+        end = self._datetimeToString(buildset.last_build_end_time)
         ret = {
             '_id': buildset.id,
             'uuid': buildset.uuid,
@@ -1426,6 +1422,8 @@ class ZuulWebAPI(object):
             'ref_url': buildset.ref_url,
             'event_id': buildset.event_id,
             'event_timestamp': event_timestamp,
+            'first_build_start_time': start,
+            'last_build_end_time': end,
         }
         if builds:
             ret['builds'] = []

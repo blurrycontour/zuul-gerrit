@@ -86,6 +86,11 @@ class SQLReporter(BaseReporter):
             if db_buildset:
                 db_buildset.result = buildset.result or result
                 db_buildset.message = message
+                end_time = db_buildset.first_build_start_time
+                for build in db_buildset.builds:
+                    if build.end_time and build.end_time > end_time:
+                        end_time = build.end_time
+                db_buildset.last_build_end_time = end_time
             elif buildset.builds:
                 self.log.error("Unable to find buildset "
                                f"{buildset.uuid} in DB")
@@ -131,6 +136,8 @@ class SQLReporter(BaseReporter):
         buildset = build.build_set
         db_buildset = db.getBuildset(
             tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
+        if db_buildset.first_build_start_time is None:
+            db_buildset.first_build_start_time = start
 
         db_build = db_buildset.createBuild(
             uuid=build.uuid,
