@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf4cb1ad_055c7dad",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-15T18:45:05Z",
+      "side": 1,
+      "message": "We actually perform a smart reconfiguration event on startup of schedulers[1].  If there is a change to the tenant configuration (adding/removing projects/tenants), then those tenants should be reconfigured automatically.  However, if a change to in-repo zuul config was merged while all schedulers were offline, then a full or tenant reconfiguration would be needed in order for that to take effect.\n\nIt\u0027s not clear which thing you\u0027re trying to address here; if you have observed the first behavior in contradiction to what I wrote, we should look into that since it sounds like a bug.  If it\u0027s the second thing you want to communicate, then maybe we should elaborate a bit on this to make that clear.\n\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/scheduler.py#L918-L925",
+      "revId": "1dda5d7414dfae097846207a8bae503ce57a4ead",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
