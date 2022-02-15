@@ -1601,9 +1601,11 @@ class Scheduler(threading.Thread):
             project, branch = shared_queue.project_branches[0]
             new_queue = new_pipeline.getQueue(project, branch)
             if new_queue and shared_queue.window and (not static_window):
+                window = max(shared_queue.window, new_queue.window_floor)
+                if new_queue.window_ceiling > 0:
+                    window = min(window, new_queue.window_ceiling)
                 new_queue.updateAttributes(
-                    context, window=max(shared_queue.window,
-                                        new_queue.window_floor))
+                    context, window=window)
             new_pipeline.state.removeOldQueue(context, shared_queue)
         for item in items_to_remove:
             self.log.info(

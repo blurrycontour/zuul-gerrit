@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added window-ceiling to Zuul Pipeline and ChangeQueue which makes window count won't exceed a set value.
+

@@ -1214,6 +1214,7 @@ class PipelineParser(object):
 
         window = vs.All(int, vs.Range(min=0))
         window_floor = vs.All(int, vs.Range(min=1))
+        window_ceiling = vs.All(int, vs.Range(min=0))
         window_type = vs.Any('linear', 'exponential')
         window_factor = vs.All(int, vs.Range(min=1))
 
@@ -1238,6 +1239,7 @@ class PipelineParser(object):
                         vs.All(int, vs.Range(min=1)),
                     'window': window,
                     'window-floor': window_floor,
+                    'window-ceiling': window_ceiling,
                     'window-increase-type': window_type,
                     'window-increase-factor': window_factor,
                     'window-decrease-type': window_type,
@@ -1323,6 +1325,7 @@ class PipelineParser(object):
 
         pipeline.window = conf.get('window', 20)
         pipeline.window_floor = conf.get('window-floor', 3)
+        pipeline.window_ceiling = conf.get('window-ceiling', 0)
         pipeline.window_increase_type = conf.get(
             'window-increase-type', 'linear')
         pipeline.window_increase_factor = conf.get(

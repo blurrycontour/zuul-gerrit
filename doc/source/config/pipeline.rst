@@ -400,6 +400,13 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       the window described above. Should be a positive non zero
       integer value.
 
+   .. attr:: window-ceiling
+      :default: 0
+
+      Dependent pipeline managers only. This is the maximum value for
+      the window described above. Should be a positive non zero
+      integer value to work. If it is zero, then it won't take effect.
+
    .. attr:: window-increase-type
       :default: linear
 

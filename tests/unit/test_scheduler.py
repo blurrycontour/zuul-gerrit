@@ -4911,6 +4911,126 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release('project-.*')
         self.waitUntilSettled()
 
+    @simple_layout('layouts/window-ceiling.yaml')
+    def test_queue_window_ceiling(self):
+        "Test whether window ceiling is working. "
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+        E = self.fake_gerrit.addFakeChange('org/project', 'master', 'E')
+        F = self.fake_gerrit.addFakeChange('org/project', 'master', 'F')
+        G = self.fake_gerrit.addFakeChange('org/project', 'master', 'G')
+        H = self.fake_gerrit.addFakeChange('org/project', 'master', 'H')
+
+        C.setDependsOn(B, 1)
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+        D.addApproval('Code-Review', 2)
+        E.addApproval('Code-Review', 2)
+        F.addApproval('Code-Review', 2)
+        G.addApproval('Code-Review', 2)
+        H.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(E.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(F.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(G.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(H.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Only A and B will have their merge jobs queued because
+        # window is 2.
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(self.builds[0].name, 'project-merge')
+        self.assertEqual(self.builds[1].name, 'project-merge')
+
+        # Release the merge jobs one at a time.
+        self.builds[0].release()
+        self.waitUntilSettled()
+        self.builds[0].release()
+        self.waitUntilSettled()
+
+        # Only A and B will have their test jobs queued because
+        # window is 2.
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test2')
+        self.assertEqual(self.builds[2].name, 'project-test1')
+        self.assertEqual(self.builds[3].name, 'project-test2')
+
+        self.executor_server.release('project-.*')
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        queue = tenant.layout.pipelines['gate'].queues[0]
+        # A successful so window is increase but limit at 3.
+        self.assertEqual(queue.window, 3)
+        self.assertEqual(queue.window_floor, 1)
+        self.assertEqual(queue.window_ceiling, 3)
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+
+        # Gate is reset and C, D, E's merge joba are queued
+        self.assertEqual(len(self.builds), 3)
+        self.assertEqual(self.builds[0].name, 'project-merge')
+        self.assertEqual(self.builds[1].name, 'project-merge')
+        self.assertEqual(self.builds[2].name, 'project-merge')
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        # C, D, E's test jobs are queued because window is still 1.
+        self.assertEqual(len(self.builds), 6)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test2')
+        self.assertEqual(self.builds[2].name, 'project-test1')
+        self.assertEqual(self.builds[3].name, 'project-test2')
+        self.assertEqual(self.builds[4].name, 'project-test1')
+        self.assertEqual(self.builds[5].name, 'project-test2')
+
+        self.executor_server.release('project-.*')
+        self.waitUntilSettled()
+
+        # C, D, E was successfully merged so window is increased and limited to 3.
+        self.assertEqual(queue.window, 3)
+        self.assertEqual(queue.window_floor, 1)
+        self.assertEqual(queue.window_ceiling, 3)
+        self.assertEqual(C.data['status'], 'MERGED')
+        self.assertEqual(D.data['status'], 'MERGED')
+        self.assertEqual(E.data['status'], 'MERGED')
+
+        self.waitUntilSettled()
+        # test if no window ceiling is set
+        self.commitConfigUpdate('org/common-config',
+                                'layouts/window-ceiling2.yaml')
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        queue = tenant.layout.pipelines['gate'].queues[0]
+
+        self.assertEqual(queue.window, 3)
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.executor_server.release('project-.*')
+        self.waitUntilSettled()
+
+        self.assertEqual(queue.window, 24)
+        self.assertEqual(queue.window_floor, 1)
+        self.assertEqual(queue.window_ceiling, 0)
+        self.assertEqual(F.data['status'], 'MERGED')
+        self.assertEqual(G.data['status'], 'MERGED')
+        self.assertEqual(H.data['status'], 'MERGED')
+
     @simple_layout('layouts/reconfigure-window.yaml')
     def test_reconfigure_window_shrink(self):
         # Test the active window shrinking during reconfiguration

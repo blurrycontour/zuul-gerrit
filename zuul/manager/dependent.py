@@ -36,6 +36,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             pipeline=p,
             window=p.window,
             window_floor=p.window_floor,
+            window_ceiling=p.window_ceiling,
             window_increase_type=p.window_increase_type,
             window_increase_factor=p.window_increase_factor,
             window_decrease_type=p.window_decrease_type,

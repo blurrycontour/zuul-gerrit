@@ -26,6 +26,7 @@ class SerialPipelineManager(SharedQueuePipelineManager):
             pipeline=self.pipeline,
             window=1,
             window_floor=1,
+            window_ceiling=0,
             window_increase_type='none',
             window_decrease_type='none',
             name=queue_name)
