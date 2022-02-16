@@ -1224,6 +1224,7 @@ class Node(ConfigObject):
         self.resources = None
         self.allocated_to = None
         self.attributes = {}
+        self.tenant_name = None
 
     @property
     def state(self):
@@ -1256,6 +1257,7 @@ class Node(ConfigObject):
         d['hold_job'] = self.hold_job
         d['comment'] = self.comment
         d['user_data'] = self.user_data
+        d['tenant_name'] = self.tenant_name
         for k in self._keys:
             d[k] = getattr(self, k)
         if internal_attributes:
