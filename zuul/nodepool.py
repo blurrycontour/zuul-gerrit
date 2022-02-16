@@ -194,12 +194,10 @@ class Nodepool(object):
             log.info("Submitted node request %s", req)
             self.emitStats(req)
         else:
-            # Directly fulfill the node request before submitting it to ZK, so
-            # nodepool doesn't have to deal with it.
+            # Directly fulfill the node request without submitting it to ZK,
+            # so nodepool doesn't have to deal with it.
+            log.info("Fulfilling empty node request %s", req)
             req.state = model.STATE_FULFILLED
-            self.zk_nodepool.submitNodeRequest(req, priority)
-            # Logged after submission so that we have the request id
-            log.info("Submitted empty node request %s", req)
         return req
 
     def cancelRequest(self, request):
