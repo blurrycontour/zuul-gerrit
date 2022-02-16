@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c26b6e6b_45d38b2c",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1682,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-02-16T18:18:15Z",
+      "side": 1,
+      "message": "In the commit message, it seems like this can raise ValueError, should we catch any exception to ensure the del self.streamers happen?",
+      "revId": "53ec81afcaf7801137147cbd9e9857b323732385",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
