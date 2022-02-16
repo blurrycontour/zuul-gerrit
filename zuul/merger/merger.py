@@ -452,10 +452,20 @@ class Repo(object):
     @staticmethod
     def _setRef(path, hexsha, repo):
         binsha = gitdb.util.to_bin_sha(hexsha)
-        obj = git.objects.Object.new_from_sha(repo, binsha)
-        git.refs.Reference.create(repo, path, obj, force=True)
-        return 'Created reference %s at %s in %s' % (
-            path, hexsha, repo.git_dir)
+        try:
+            obj = git.objects.Object.new_from_sha(repo, binsha)
+        except ValueError:
+            # It is possible that this ref was deleted; e.g. some
+            # github projects use a rebase model for pull requests and
+            # then delete the PR branch.  Log the error, if we are
+            # checking out to this branch we will get a better error
+            # later, if not, we don't care.
+            return 'Object %s disappeared for reference %s; ignoring' % (
+                hexsha, repo.git_dir)
+        else:
+            git.refs.Reference.create(repo, path, obj, force=True)
+            return 'Created reference %s at %s in %s' % (
+                path, hexsha, repo.git_dir)
 
     def setRefs(self, refs, keep_remotes=False, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
