@@ -444,10 +444,14 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       reported as ``unknown``. This relates to
       ``zuul.nodepool.current_requests``.
 
-   .. stat:: resources
+.. stat:: zuul.nodepool.resources
 
-      Holds metrics about resource usage by tenant or project if resources
-      of nodes are reported by nodepool.
+   Holds metrics about resource usage by tenant or project if resources
+   of nodes are reported by nodepool.
+
+   .. stat:: in_use
+
+      Holds metrics about resources currently in use by a build.
 
       .. stat:: tenant
 
@@ -457,7 +461,7 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
             :type: counter, gauge
 
             Counter with the summed usage by tenant as <resource> seconds and
-            gauge with the currently used resources by tenant.
+            gauge with the currently in use resources by tenant.
 
       .. stat:: project
 
@@ -468,6 +472,21 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
             Counter with the summed usage by project as <resource> seconds and
             gauge with the currently used resources by project.
+
+   .. stat:: total
+
+      Holds metrics about resources allocated in total. This includes
+      resources that are currently in use, allocated but not yet in use, and
+      scheduled to be deleted.
+
+      .. stat:: tenant
+
+         Holds resource usage metrics by tenant.
+
+         .. stat:: <tenant>.<resource>
+            :type: gauge
+
+            Gauge with the currently used resources by tenant.
 
 
 .. stat:: zuul.mergers
