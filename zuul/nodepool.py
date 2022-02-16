@@ -167,11 +167,11 @@ class Nodepool(object):
             return
 
         for resource, value in resources.items():
-            key = 'zuul.nodepool.resources.tenant.{tenant}.{resource}'
+            key = 'zuul.nodepool.resources.in_use.tenant.{tenant}.{resource}'
             self.statsd.incr(
                 key, value * duration, tenant=tenant, resource=resource)
         for resource, value in resources.items():
-            key = 'zuul.nodepool.resources.project.' \
+            key = 'zuul.nodepool.resources.in_use.project.' \
                   '{project}.{resource}'
             self.statsd.incr(
                 key, value * duration, project=project, resource=resource)
@@ -317,7 +317,6 @@ class Nodepool(object):
         log.info("Setting nodeset %s in use", nodeset)
         user_data = dict(
             zuul_system=self.system_id,
-            tenant_name=tenant_name,
             project_name=project_name,
         )
         for node in nodeset.getNodes():
@@ -325,6 +324,10 @@ class Nodepool(object):
                 raise Exception("Node %s is not locked", node)
             node.state = model.STATE_IN_USE
             node.user_data = user_data
+            # this is set by nodepool usually, but update it here also for the
+            # sake of compatibility in case we run a nodepool version that
+            # doesn't have this attribute
+            node.tenant_name = tenant_name
             self.zk_nodepool.storeNode(node)
 
     def returnNodeSet(self, nodeset, build, tenant_name, project_name,
@@ -484,16 +487,19 @@ class Nodepool(object):
 
         total_requests = 0
         tenant_requests = defaultdict(int)
-        resources_by_tenant = {}
-        resources_by_project = {}
+        in_use_resources_by_project = {}
+        in_use_resources_by_tenant = {}
+        total_resources_by_tenant = {}
         empty_resource_dict = dict([(k, 0) for k in self.resource_types])
 
         # Initialize zero values for gauges
         for tenant in abide.tenants.values():
             tenant_requests[tenant.name] = 0
-            resources_by_tenant[tenant.name] = empty_resource_dict.copy()
+            in_use_resources_by_tenant[tenant.name] =\
+                empty_resource_dict.copy()
+            total_resources_by_tenant[tenant.name] = empty_resource_dict.copy()
             for project in tenant.all_projects:
-                resources_by_project[project.canonical_name] =\
+                in_use_resources_by_project[project.canonical_name] =\
                     empty_resource_dict.copy()
 
         # Count node requests
@@ -516,30 +522,38 @@ class Nodepool(object):
             if not node.resources:
                 continue
             project_name = node.user_data.get('project_name')
-            tenant_name = node.user_data.get('tenant_name')
-            if not (project_name and tenant_name):
-                continue
-            if node.state not in {model.STATE_IN_USE,
-                                  model.STATE_USED,
-                                  model.STATE_HOLD}:
-                continue
-            if tenant_name not in resources_by_tenant:
-                continue
-            self.addResources(resources_by_tenant[tenant_name],
-                              node.resources)
-            if project_name not in resources_by_project:
-                continue
-            self.addResources(resources_by_project[project_name],
-                              node.resources)
+            tenant_name = node.tenant_name
 
-        for tenant, resources in resources_by_tenant.items():
+            if tenant_name in total_resources_by_tenant:
+                self.addResources(
+                    total_resources_by_tenant[tenant_name],
+                    node.resources)
+
+            if node.state in {model.STATE_IN_USE,
+                              model.STATE_USED,
+                              model.STATE_HOLD}:
+                if tenant_name in in_use_resources_by_tenant:
+                    self.addResources(
+                        in_use_resources_by_tenant[tenant_name],
+                        node.resources)
+                if project_name in in_use_resources_by_project:
+                    self.addResources(
+                        in_use_resources_by_project[project_name],
+                        node.resources)
+
+        for tenant, resources in total_resources_by_tenant.items():
             for resource, value in resources.items():
-                key = 'zuul.nodepool.resources.tenant.' \
+                key = 'zuul.nodepool.resources.total.tenant.' \
                       '{tenant}.{resource}'
                 self.statsd.gauge(key, value, tenant=tenant, resource=resource)
-        for project, resources in resources_by_project.items():
+        for tenant, resources in in_use_resources_by_tenant.items():
             for resource, value in resources.items():
-                key = 'zuul.nodepool.resources.project.' \
+                key = 'zuul.nodepool.resources.in_use.tenant.' \
+                      '{tenant}.{resource}'
+                self.statsd.gauge(key, value, tenant=tenant, resource=resource)
+        for project, resources in in_use_resources_by_project.items():
+            for resource, value in resources.items():
+                key = 'zuul.nodepool.resources.in_use.project.' \
                       '{project}.{resource}'
                 self.statsd.gauge(
                     key, value, project=project, resource=resource)
