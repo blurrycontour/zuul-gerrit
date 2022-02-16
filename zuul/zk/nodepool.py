@@ -193,11 +193,11 @@ class ZooKeeperNodepool(ZooKeeperBase):
         node.stat = stat
         return node
 
-    def nodeIterator(self):
+    def nodeIterator(self, cached=False):
         """
         Utility generator method for iterating through all nodes.
         """
-        for node_id in self.getNodes():
+        for node_id in self.getNodes(cached):
             node = self.getNode(node_id)
             if node:
                 yield node
