@@ -314,6 +314,7 @@ class LogStreamer(object):
         self.uuid = build_uuid
         msg = "%s\n" % build_uuid    # Must have a trailing newline!
         self.finger_socket.sendall(msg.encode('utf-8'))
+        self.fileno = self.finger_socket.fileno()
         self.zuulweb.stream_manager.registerStreamer(self)
 
     def __repr__(self):
@@ -1635,25 +1636,31 @@ class StreamManager(object):
 
     def run(self):
         while True:
-            for fd, event in self.poll.poll():
-                if self._stopped:
-                    return
-                if fd == self.wake_read:
-                    os.read(self.wake_read, 1024)
-                    continue
-                streamer = self.streamers.get(fd)
-                if streamer:
-                    try:
-                        streamer.handle(event)
-                    except Exception:
-                        self.log.exception("Error in streamer:")
-                        streamer.errorClose()
-                        self.unregisterStreamer(streamer)
-                else:
-                    try:
-                        self.poll.unregister(fd)
-                    except KeyError:
-                        pass
+            try:
+                self._run()
+            except Exception:
+                self.log.exception("Error in StreamManager run method")
+
+    def _run(self):
+        for fd, event in self.poll.poll():
+            if self._stopped:
+                return
+            if fd == self.wake_read:
+                os.read(self.wake_read, 1024)
+                continue
+            streamer = self.streamers.get(fd)
+            if streamer:
+                try:
+                    streamer.handle(event)
+                except Exception:
+                    self.log.exception("Error in streamer:")
+                    streamer.errorClose()
+                    self.unregisterStreamer(streamer)
+            else:
+                try:
+                    self.poll.unregister(fd)
+                except KeyError:
+                    pass
 
     def emitStats(self):
         streamers = len(self.streamers)
@@ -1664,19 +1671,19 @@ class StreamManager(object):
 
     def registerStreamer(self, streamer):
         self.log.debug("Registering streamer %s", streamer)
-        self.streamers[streamer.finger_socket.fileno()] = streamer
-        self.poll.register(streamer.finger_socket.fileno(), self.bitmask)
+        self.streamers[streamer.fileno] = streamer
+        self.poll.register(streamer.fileno, self.bitmask)
         os.write(self.wake_write, b'\n')
         self.emitStats()
 
     def unregisterStreamer(self, streamer):
         self.log.debug("Unregistering streamer %s", streamer)
         try:
-            self.poll.unregister(streamer.finger_socket)
+            self.poll.unregister(streamer.fileno)
         except KeyError:
             pass
         try:
-            del self.streamers[streamer.finger_socket.fileno()]
+            del self.streamers[streamer.fileno]
         except KeyError:
             pass
         streamer.closeSocket()
