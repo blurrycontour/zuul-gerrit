@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16ee738a_342fb82b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1666,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-16T18:56:35Z",
+      "side": 1,
+      "message": "We should probably double check there still isn\u0027t a streamer here.",
+      "revId": "880031ca7ccd826ed9b7a389f483b2f82b220dab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
