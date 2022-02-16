@@ -1400,9 +1400,19 @@ class AnsibleJob(object):
         for project in args['projects']:
             if (project['connection'], project['name']) in restored_repos:
                 continue
-            merger.setRepoState(
-                project['connection'], project['name'], self.repo_state,
-                process_worker=self.executor_server.process_worker)
+            try:
+                merger.setRepoState(
+                    project['connection'], project['name'], self.repo_state,
+                    process_worker=self.executor_server.process_worker)
+            except zuul.merger.merger.MissingObjectException as e:
+                self.log.exception(e)
+                raise ExecutorError(str(e))
+            except Exception as e:
+                # since we're not 100% sure what is in this traceback,
+                # just log something generic and put the traceback in
+                # the logs.
+                self.log.exception(e)
+                raise ExecutorError("Error merging repo state.")
 
         # Early abort if abort requested
         if self.aborted:
