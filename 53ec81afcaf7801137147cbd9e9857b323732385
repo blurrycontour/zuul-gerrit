@@ -33,6 +33,23 @@
       "message": "Is there any possibility for a race where a new stream is opened after this one is closed but before we unregister it here and then remove it from the dict below? If so then I think the fd number can be reused and we might unregister and remove a valid stream?\n\nWe might be able to guard against this by checking that streamer \u003d\u003d self.streams[streamer.fileno] though even then we might need a lock?",
       "revId": "53ec81afcaf7801137147cbd9e9857b323732385",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9485a2d0_8fbea693",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1682,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-16T18:32:37Z",
+      "side": 1,
+      "message": "Tristan, on second thought, I think you\u0027re right -- we should catch and suppress KeyError here and then log any other errors and proceed so that we can reach the del statement below.\nClark, oof.  Lemme think about that.",
+      "revId": "53ec81afcaf7801137147cbd9e9857b323732385",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
