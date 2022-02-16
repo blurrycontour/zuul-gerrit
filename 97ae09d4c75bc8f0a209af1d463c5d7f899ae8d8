@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d719ae9_1cd0ca06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-16T23:55:33Z",
+      "side": 1,
+      "message": "For reference, \n\nhttps://paste.opendev.org/show/bz0PcBh3lo8EE88XRRwD/\n\nis the full exception we saw from this error",
+      "revId": "97ae09d4c75bc8f0a209af1d463c5d7f899ae8d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
