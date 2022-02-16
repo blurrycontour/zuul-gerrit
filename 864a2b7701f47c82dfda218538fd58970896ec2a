@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa3a5fa6_8ac186f4",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-16T13:18:25Z",
+      "side": 1,
+      "message": "Just wondering if instead of using a module global registry we could make the ComponentRegistry a singleton based on the passed zk client instance:\n\n  class ComponentRegistry:\n\n      _registries \u003d {}\n\n      @classmethod\n      def create(cls, zk_client):\n          zk_id \u003d id(zk_client)\n          if zk_id not in self._registries:\n              self._registries[zk_id] \u003d ComponentRegistry(zk_client)\n          return self._registries[zk_id]\n\nThen in other parts of the code we could get the component registry with:\n\n  component_registry \u003d ComponentRegistry.create(zk_client)\n\nIt\u0027s mainly my (unfounded?) distaste for module global objects that makes me suggest that, but I\u0027m also fine if you go ahead with this approach.",
+      "revId": "864a2b7701f47c82dfda218538fd58970896ec2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
