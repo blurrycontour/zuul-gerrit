@@ -292,6 +292,7 @@ class LogStreamer(object):
         :param str port: The executor server port.
         :param str build_uuid: The build UUID to stream.
         """
+        self.fileno = None
         self.log = websocket.log
         self.log.debug("Connecting to finger server %s:%s", server, port)
         Decoder = codecs.getincrementaldecoder('utf8')
@@ -314,10 +315,12 @@ class LogStreamer(object):
         self.uuid = build_uuid
         msg = "%s\n" % build_uuid    # Must have a trailing newline!
         self.finger_socket.sendall(msg.encode('utf-8'))
+        self.fileno = self.finger_socket.fileno()
         self.zuulweb.stream_manager.registerStreamer(self)
 
     def __repr__(self):
-        return '<LogStreamer %s uuid:%s>' % (self.websocket, self.uuid)
+        return '<LogStreamer %s uuid:%s fd:%s>' % (
+            self.websocket, self.uuid, self.fileno)
 
     def errorClose(self):
         try:
@@ -1620,6 +1623,7 @@ class StreamManager(object):
                         select.POLLHUP | select.POLLNVAL)
         self.wake_read, self.wake_write = os.pipe()
         self.poll.register(self.wake_read, self.bitmask)
+        self.poll_lock = threading.Lock()
 
     def start(self):
         self._stopped = False
@@ -1635,25 +1639,34 @@ class StreamManager(object):
 
     def run(self):
         while True:
-            for fd, event in self.poll.poll():
-                if self._stopped:
-                    return
-                if fd == self.wake_read:
-                    os.read(self.wake_read, 1024)
-                    continue
-                streamer = self.streamers.get(fd)
-                if streamer:
-                    try:
-                        streamer.handle(event)
-                    except Exception:
-                        self.log.exception("Error in streamer:")
-                        streamer.errorClose()
-                        self.unregisterStreamer(streamer)
-                else:
-                    try:
+            try:
+                self._run()
+            except Exception:
+                self.log.exception("Error in StreamManager run method")
+
+    def _run(self):
+        for fd, event in self.poll.poll():
+            if self._stopped:
+                return
+            if fd == self.wake_read:
+                os.read(self.wake_read, 1024)
+                continue
+            streamer = self.streamers.get(fd)
+            if streamer:
+                try:
+                    streamer.handle(event)
+                except Exception:
+                    self.log.exception("Error in streamer:")
+                    streamer.errorClose()
+                    self.unregisterStreamer(streamer)
+            else:
+                try:
+                    with self.poll_lock:
+                        self.log.error(
+                            "Unregistering missing streamer fd: %s", streamer)
                         self.poll.unregister(fd)
-                    except KeyError:
-                        pass
+                except KeyError:
+                    pass
 
     def emitStats(self):
         streamers = len(self.streamers)
@@ -1663,23 +1676,28 @@ class StreamManager(object):
                               streamers)
 
     def registerStreamer(self, streamer):
-        self.log.debug("Registering streamer %s", streamer)
-        self.streamers[streamer.finger_socket.fileno()] = streamer
-        self.poll.register(streamer.finger_socket.fileno(), self.bitmask)
-        os.write(self.wake_write, b'\n')
+        with self.poll_lock:
+            self.log.debug("Registering streamer %s", streamer)
+            self.streamers[streamer.fileno] = streamer
+            self.poll.register(streamer.fileno, self.bitmask)
+            os.write(self.wake_write, b'\n')
         self.emitStats()
 
     def unregisterStreamer(self, streamer):
-        self.log.debug("Unregistering streamer %s", streamer)
-        try:
-            self.poll.unregister(streamer.finger_socket)
-        except KeyError:
-            pass
-        try:
-            del self.streamers[streamer.finger_socket.fileno()]
-        except KeyError:
-            pass
-        streamer.closeSocket()
+        with self.poll_lock:
+            self.log.debug("Unregistering streamer %s", streamer)
+            old_streamer = self.streamers.get(streamer.fileno)
+            if old_streamer and old_streamer is streamer:
+                # Otherwise, we may have a new streamer which reused
+                # the fileno, so leave the poll registration in place.
+                del self.streamers[streamer.fileno]
+                try:
+                    self.poll.unregister(streamer.fileno)
+                except KeyError:
+                    pass
+                except Exception:
+                    self.log.exception("Error unregistering streamer:")
+            streamer.closeSocket()
         self.emitStats()
 
 
