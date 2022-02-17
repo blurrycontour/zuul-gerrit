@@ -3,6 +3,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5d8c0c87_68d86ac0",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T18:39:13Z",
+      "side": 1,
+      "message": "Did this file need to be added? I see a main.yaml and a git/ dir in the two-tenant directory but no three-tenant.yaml.",
+      "range": {
+        "startLine": 614,
+        "startChar": 52,
+        "endLine": 614,
+        "endChar": 69
+      },
+      "revId": "4c5287c0d4f7527f8bf61bf1d971d74b9aec9d0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eabbd09f_9432daa7",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T18:39:13Z",
+      "side": 1,
+      "message": "This doesn\u0027t appear to be done anymore (I assume this came from another test or was here for debugging).",
+      "range": {
+        "startLine": 621,
+        "startChar": 12,
+        "endLine": 621,
+        "endChar": 56
+      },
+      "revId": "4c5287c0d4f7527f8bf61bf1d971d74b9aec9d0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5f539d59_2c372778",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
