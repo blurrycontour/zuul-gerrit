@@ -16,6 +16,24 @@
       "message": "This seems fragile. Is there a consistent error code or maybe http return code we can check instead?",
       "revId": "66413b17cd9be8430a24f068c653f90d3702152b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3dcb1ac_cf3e173a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1972,
+      "author": {
+        "id": 9268
+      },
+      "writtenOn": "2022-02-17T19:52:50Z",
+      "side": 1,
+      "message": "Sadly no. And right now there no clear error message for the user. We\u0027ve got questions from puzzled users pretty much everytime they want to gate a PR with a change in the .github directory.",
+      "parentUuid": "fef5c497_350be271",
+      "revId": "66413b17cd9be8430a24f068c653f90d3702152b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
