@@ -1978,7 +1978,15 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
 
     def getPushEvent(
             self, project, before=None, after=None,
-            branch='refs/heads/master'):
+            branch='refs/heads/master',
+            added_files=None, removed_files=None,
+            modified_files=None):
+        if added_files is None:
+            added_files = []
+        if removed_files is None:
+            removed_files = []
+        if modified_files is None:
+            modified_files = []
         name = 'gl_push'
         if not after:
             repo_path = os.path.join(self.upstream_root, project)
@@ -1992,6 +2000,14 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
             'project': {
                 'path_with_namespace': project
             },
+            'commits': [
+                {
+                    'added': added_files,
+                    'removed': removed_files,
+                    'modified': modified_files
+                }
+            ],
+            'total_commits_count': 1,
         }
         return (name, data)
 
@@ -2160,6 +2176,18 @@ class FakeGitlabMergeRequest(object):
     def getMergeRequestMergedEvent(self):
         self.mergeMergeRequest()
         return self.getMergeRequestEvent(action='merge')
+
+    def getMergeRequestMergedPushEvent(self, added_files=None,
+                                       removed_files=None,
+                                       modified_files=None):
+        return self.gitlab.getPushEvent(
+            project=self.project,
+            branch='refs/heads/%s' % self.branch,
+            before=random_sha1(),
+            after=self.sha,
+            added_files=added_files,
+            removed_files=removed_files,
+            modified_files=modified_files)
 
     def getMergeRequestApprovedEvent(self):
         self.approved = True
