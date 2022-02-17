@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef5c497_350be271",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1972,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T18:10:34Z",
+      "side": 1,
+      "message": "This seems fragile. Is there a consistent error code or maybe http return code we can check instead?",
+      "revId": "66413b17cd9be8430a24f068c653f90d3702152b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
