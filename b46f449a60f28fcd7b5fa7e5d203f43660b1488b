@@ -16,6 +16,69 @@
       "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e This looks good, but it would be good to have a test for this.\n\u003e \n\u003e I think this process should work:\n\u003e * hold jobs in queue\n\u003e * create a branch\n\u003e * open a fake PR\n\u003e * release jobs\n\u003e * wait to settle\n\u003e * delete branch from upstream repo\n\u003e * release jobs\n\u003e \n\u003e Then check that we get the desired outcome.\n\nI\u0027ve tried to implement that with https://review.opendev.org/c/zuul/zuul/+/829617/3/tests/unit/test_cross_crd.py but it is not failing, and I think I\u0027m misunderstanding how to do this.\n\nI\u0027ll need a little more help to get that going because I\u0027m at about the extent of my knowledge on how the merging, scheduling and unit-tests all come together here",
       "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35470432_fdd72911",
+        "filename": "tests/unit/test_cross_crd.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T17:21:17Z",
+      "side": 1,
+      "message": "This _create_branch() method and the _delete_branch() method below seem to only operate on a github api level and not a git repo level. There are no objects with shas created from what I can tell which is part of the reason why this test fails as is.\n\nThe other reason (which may be related to the above issue) is that repo_state is empty when merging:\n\n\u003e 2022-02-17 07:01:31,440 zuul.MergeClient                 DEBUG    [e: 548e182f1ea3466f9cef6d02369c2aa3] Submitting job 4bf09d50d04a4626b8680266042770e7 with data {\u0027items\u0027: [{\u0027project\u0027: \u0027github/project2\u0027, \u0027connection\u0027: \u0027github\u0027, \u0027merge_mode\u0027: 2, \u0027ref\u0027: \u0027refs/pull/1/head\u0027, \u0027branch\u0027: \u0027master\u0027, \u0027buildset_uuid\u0027: \u002723fe2bb1ffa247ba911b3261025cd081\u0027, \u0027number\u0027: 1, \u0027patchset\u0027: \u0027c18b757348272bb5b4d73ddf60b53a598fb03d83\u0027, \u0027oldrev\u0027: None, \u0027newrev\u0027: None}, {\u0027project\u0027: \u0027gerrit/project1\u0027, \u0027connection\u0027: \u0027gerrit\u0027, \u0027merge_mode\u0027: 2, \u0027ref\u0027: \u0027refs/changes/01/1/1\u0027, \u0027branch\u0027: \u0027master\u0027, \u0027buildset_uuid\u0027: \u0027937f5e64e0664cae9cca7c888b42d9ec\u0027, \u0027number\u0027: \u00271\u0027, \u0027patchset\u0027: \u00271\u0027, \u0027oldrev\u0027: None, \u0027newrev\u0027: None}], \u0027files\u0027: [\u0027zuul.yaml\u0027, \u0027.zuul.yaml\u0027], \u0027dirs\u0027: [\u0027zuul.d\u0027, \u0027.zuul.d\u0027], \u0027repo_state\u0027: None, \u0027branches\u0027: None}\n\nThe repo_state not being none is how we tripped this before. We need that to contain the branch that is being deleted so that it tries to configure that branch on the repo to the sha that is no longer valid.",
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeb7f246_b3dfa194",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T17:21:17Z",
+      "side": 1,
+      "message": "Should this be \u0027repo\u0027 ?",
+      "range": {
+        "startLine": 466,
+        "startChar": 43,
+        "endLine": 466,
+        "endChar": 52
+      },
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "843a7322_7bc27988",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T17:21:17Z",
+      "side": 1,
+      "message": "This else doesn\u0027t seem necessary as we don\u0027t fall through when the exception is raised.",
+      "range": {
+        "startLine": 470,
+        "startChar": 8,
+        "endLine": 470,
+        "endChar": 13
+      },
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
