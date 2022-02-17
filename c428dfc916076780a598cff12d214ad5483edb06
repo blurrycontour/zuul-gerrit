@@ -16,6 +16,24 @@
       "message": "This could be f\"Error setting repo state for {project[\u0027name\u0027]}\"",
       "revId": "c428dfc916076780a598cff12d214ad5483edb06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d21e318_5825c850",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1415,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-17T00:56:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7289e57_c2dcea2e",
+      "revId": "c428dfc916076780a598cff12d214ad5483edb06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
