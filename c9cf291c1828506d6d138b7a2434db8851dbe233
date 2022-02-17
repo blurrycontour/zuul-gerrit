@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f30bf246_8a9e4904",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:29:48Z",
+      "side": 1,
+      "message": "I don\u0027t think we have an existing way to make that distinction (and in an open source project, I\u0027m not entirely sure it is a distinction).  The current code is intentionally designed to crash because this case is so severe; I think it\u0027s still severe and we absolutely need to track it down.  The system is not operating as designed and may be malfunctioning.  I think \"error\" is appropriate in that case.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0a6cd40_9b499f8e",
@@ -54,6 +71,23 @@
         "endLine": 779,
         "endChar": 34
       },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17ffaef1_5e5ecb99",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:29:48Z",
+      "side": 1,
+      "message": "Well, it\u0027s a change cache... I admit the terminology is a little weird, but the actual change/ref/object should be obvious from the log.  If we were to change anything, we should probably rename it to the \u0027RefCache\u0027 and say the \"Ref\" wasn\u0027t found here.",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -127,6 +161,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05f97de2_4f1dd5f6",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:29:48Z",
+      "side": 1,
+      "message": "Gerrit change keys don\u0027t have projects because yes, the project name isn\u0027t always available, but moreover, they\u0027re not necessary since the number (or maybe eventually someday the change-id-thingy-with-lots-of-tildes) is sufficiently unique.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6a7dfd1_b60974cb",
@@ -140,6 +191,23 @@
       "writtenOn": "2022-02-17T01:09:07Z",
       "side": 1,
       "message": "Unlike Gerrit we do seem to set the project name for github.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab6ab7c4_b20a9a72",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:29:48Z",
+      "side": 1,
+      "message": "It\u0027s required since every project starts at issue #1.",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -161,6 +229,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f39e0818_e4b2f690",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:29:48Z",
+      "side": 1,
+      "message": "In general, these values are all intended to be opaque and driver-specific.  I can add that comment, but that isn\u0027t something new that\u0027s introduced in this change.  The exception is the two new methods below where we centralize knowledge of driver-specific data just because all the drivers use the same format for that data and we can save some duplication.  But those are convenince methods and not required for this class\u0027s operation, and I did add a comment there.\n\nRe backwards compat: ChangeKey instances are in-memory python objects.  But they are serialized to json in the reference attribute.  Whenever an object in zk refers to a change, it should use the reference (see comment above).  The reference includes the revision, so this is a change to the serialized format of the change key reference which is written to zk.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43e1d8a2_dea548d0",
@@ -174,6 +259,23 @@
       "writtenOn": "2022-02-17T01:09:07Z",
       "side": 1,
       "message": "We seem to lookup the newrev (and oldrev potentially) properties multiple times in a row in places that deal with the change keys. Would it make sense to store these values as private attributes on the change key object to avoid doing unnecessary string splits?",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6a7af1d_72ce30d5",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:29:48Z",
+      "side": 1,
+      "message": "I tried to be mindful of this and avoid that.  In most of the code I used the pattern:\n\nchange.newrew \u003d change_key.newrev\ndo something with change.newrev\n\nSo the change_key.newrev property is only accessed once.",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
