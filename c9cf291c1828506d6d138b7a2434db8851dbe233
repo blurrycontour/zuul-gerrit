@@ -1,0 +1,181 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1be4f8d3_5b888185",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "I left a number of notes. Some of which were only against the Gerrit driver, but I think they apply to the other drivers too.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8581c9f0_906ffe8f",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "Slight nit that logging this at error level may indicate to operators that these are errors they need to handle. Maybe it should be warning instead or we should indicate \"this is a zuul bug please report to the zuul developers\" ?",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0a6cd40_9b499f8e",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "Should this be tag?",
+      "range": {
+        "startLine": 779,
+        "startChar": 28,
+        "endLine": 779,
+        "endChar": 34
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "290b3e78_4aca7249",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 803,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "Should this be branch?",
+      "range": {
+        "startLine": 803,
+        "startChar": 28,
+        "endLine": 803,
+        "endChar": 34
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68b7cacf_766e1643",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "Should this be ref?",
+      "range": {
+        "startLine": 826,
+        "startChar": 28,
+        "endLine": 826,
+        "endChar": 34
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df30216b_2662d88b",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "Why not set the project name here? Is it not available in the change events?",
+      "range": {
+        "startLine": 61,
+        "startChar": 46,
+        "endLine": 61,
+        "endChar": 50
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6a7dfd1_b60974cb",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "Unlike Gerrit we do seem to set the project name for github.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59f5e10a_71a286ae",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "It might be worth a comment or docstring update here to indicate that the stable_id and revision avlues may be overloaded by specific implementations. For example Gerrit changes use stable_id for the change number and revision for the patchset number. And revision has the new format for oldrev..newrev.\n\nI\u0027m also wondering how this impacts backward compatibility. The change keys never leave memory right? They belong to a single running process instance? If so maybe we can just change the attributes entirely? I know the commit message indicates this is difficult, but I\u0027m having a hard time understanding why.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43e1d8a2_dea548d0",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T01:09:07Z",
+      "side": 1,
+      "message": "We seem to lookup the newrev (and oldrev potentially) properties multiple times in a row in places that deal with the change keys. Would it make sense to store these values as private attributes on the change key object to avoid doing unnecessary string splits?",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
