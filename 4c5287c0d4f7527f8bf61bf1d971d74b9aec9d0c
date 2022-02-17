@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f539d59_2c372778",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1115,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-17T18:33:14Z",
+      "side": 1,
+      "message": "I think we should also use get for the ZK tenant layout state as that might not be there as well for a new tenant when the system config was already updated but the tenant is not yet loaded.",
+      "revId": "4c5287c0d4f7527f8bf61bf1d971d74b9aec9d0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
