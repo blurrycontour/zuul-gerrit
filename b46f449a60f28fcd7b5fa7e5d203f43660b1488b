@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2a575ac8_20c5e0ba",
+        "filename": "tests/unit/test_cross_crd.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T17:32:12Z",
+      "side": 1,
+      "message": "I suspect that ZuulTestCase\u0027s create_branch() and delete_branch() may impart the necessary repository state for this. I\u0027m not sure if that will impact the repo_state value that is passed to the merger though. It may if it depends on the branches actually existing in the repository and not just in the API.",
+      "parentUuid": "35470432_fdd72911",
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eeb7f246_b3dfa194",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 3
