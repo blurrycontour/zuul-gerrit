@@ -16,6 +16,23 @@
       "message": "This isn\u0027t a regression but we no longer hold the tenant_read_lock here. Does that matter?",
       "revId": "fc9353efd8de13d0b56544b76632d6620083f2b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17110048_22963e0c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1832,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T19:00:35Z",
+      "side": 1,
+      "message": "Nope, we don\u0027t need the read lock to read the tenant_layout_state; it\u0027s a single atomic replacement znode.",
+      "revId": "fc9353efd8de13d0b56544b76632d6620083f2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
