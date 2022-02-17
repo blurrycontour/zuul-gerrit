@@ -16,6 +16,23 @@
       "message": "Just wondering if instead of using a module global registry we could make the ComponentRegistry a singleton based on the passed zk client instance:\n\n  class ComponentRegistry:\n\n      _registries \u003d {}\n\n      @classmethod\n      def create(cls, zk_client):\n          zk_id \u003d id(zk_client)\n          if zk_id not in self._registries:\n              self._registries[zk_id] \u003d ComponentRegistry(zk_client)\n          return self._registries[zk_id]\n\nThen in other parts of the code we could get the component registry with:\n\n  component_registry \u003d ComponentRegistry.create(zk_client)\n\nIt\u0027s mainly my (unfounded?) distaste for module global objects that makes me suggest that, but I\u0027m also fine if you go ahead with this approach.",
       "revId": "864a2b7701f47c82dfda218538fd58970896ec2a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7441317_e31a4e1e",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:15:17Z",
+      "side": 1,
+      "message": "I\u0027m intrigued by the idea because I also dislike module global variables.  But one of the goals here is to make this work even if we don\u0027t have a zk_client.  Example use case: https://review.opendev.org/827935  where if we were to use this, we would change the serialization of the changekey reference based on the cluster model api version.  But the ChangeKey class doesn\u0027t interact with zk directly.\n\nWe could decide that\u0027s a bad idea and drop that goal (and/or pass zk_client around to more objects, but that\u0027s about the same as passing around the zkcontext objects this removes).\n\nOr we could merge the two and use my approach with your class method.\n\nBut really at the end of the day, it\u0027s still a global variable no matter which way we go right?  It\u0027s just called COMPONENT_REGISTRY in one version and ComponentRegistry._registries in the other?  Or is there another advantage to storring the registry as a class attribute?\n\n(Also, I\u0027m assuming you meant \u0027cls._registries\u0027 in your example instead of \u0027self._registries\u0027.)",
+      "revId": "864a2b7701f47c82dfda218538fd58970896ec2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
