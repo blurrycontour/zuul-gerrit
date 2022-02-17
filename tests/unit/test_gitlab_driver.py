@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -221,6 +222,43 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertHistory([{'name': 'project-promote'}])
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_push_does_not_reconfigure(self):
+        # Test that the push event that follows a merge doesn't
+        # needlessly trigger reconfiguration.
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+
+        state1 = self.scheds.first.sched.local_layout_state.get("tenant-one")
+        self.fake_gitlab.emitEvent(A.getMergeRequestMergedEvent())
+        self.fake_gitlab.emitEvent(A.getMergeRequestMergedPushEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+        self.assertHistory([{'name': 'project-post-job'},
+                            {'name': 'project-promote'}
+                            ], ordered=False)
+        state2 = self.scheds.first.sched.local_layout_state.get("tenant-one")
+        self.assertEqual(state1, state2)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_push_does_reconfigure(self):
+        # Test that the push event that follows a merge does
+        # trigger reconfiguration if .zuul.yaml is changed.
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+
+        state1 = self.scheds.first.sched.local_layout_state.get("tenant-one")
+        self.fake_gitlab.emitEvent(A.getMergeRequestMergedEvent())
+        self.fake_gitlab.emitEvent(A.getMergeRequestMergedPushEvent(
+            modified_files=['.zuul.yaml']))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+        self.assertHistory([{'name': 'project-post-job'},
+                            {'name': 'project-promote'}
+                            ], ordered=False)
+        state2 = self.scheds.first.sched.local_layout_state.get("tenant-one")
+        self.assertNotEqual(state1, state2)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated_builds_aborted(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
@@ -427,7 +465,8 @@ class TestGitlabDriver(ZuulTestCase):
              'job.yaml': playbook},
             message='Add InRepo configuration'
         )
-        event = self.fake_gitlab.getPushEvent('org/project')
+        event = self.fake_gitlab.getPushEvent('org/project',
+                                              modified_files=['.zuul.yaml'])
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
 

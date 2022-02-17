@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -90,6 +91,8 @@ class GitlabTriggerEvent(TriggerEvent):
         self.change_number = None
         self.merge_request_description_changed = None
         self.tag = None
+        self.commits = []
+        self.total_commits_count = 0
 
     def toDict(self):
         d = super().toDict()
@@ -102,6 +105,8 @@ class GitlabTriggerEvent(TriggerEvent):
         d["merge_request_description_changed"] = \
             self.merge_request_description_changed
         d["tag"] = self.tag
+        d["commits"] = self.commits
+        d["total_commits_count"] = self.total_commits_count
         return d
 
     def updateFromDict(self, d):
@@ -115,6 +120,9 @@ class GitlabTriggerEvent(TriggerEvent):
         self.merge_request_description_changed = \
             d["merge_request_description_changed"]
         self.tag = d["tag"]
+        self.commits = d.get("commits", [])
+        self.total_commits_count = d.get("total_commits_count",
+                                         len(self.commits))
 
     def _repr(self):
         r = [super(GitlabTriggerEvent, self)._repr()]
