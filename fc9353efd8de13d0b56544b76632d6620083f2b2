@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d00504c_9b337087",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1832,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T18:59:05Z",
+      "side": 1,
+      "message": "This isn\u0027t a regression but we no longer hold the tenant_read_lock here. Does that matter?",
+      "revId": "fc9353efd8de13d0b56544b76632d6620083f2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
