@@ -1107,11 +1107,19 @@ class Scheduler(threading.Thread):
                         if (self.unparsed_abide.ltime
                                 < self.system_config_cache.ltime):
                             self.updateSystemConfig()
-
                         with tenant_read_lock(self.zk_client, tenant_name,
                                               blocking=False):
-                            if (self.tenant_layout_state[tenant_name]
-                                > self.local_layout_state[tenant_name]):
+                            remote_state = self.tenant_layout_state.get(
+                                tenant_name)
+                            if remote_state is None:
+                                # The tenant may still be in the
+                                # process of initial configuration
+                                self.layout_update_event.set()
+                                continue
+                            local_state = self.local_layout_state.get(
+                                tenant_name)
+                            if (local_state is None or
+                                remote_state > local_state):
                                 log.debug(
                                     "Local layout of tenant %s not up to date",
                                     tenant_name)
@@ -1788,8 +1796,17 @@ class Scheduler(threading.Thread):
                         with tenant_read_lock(
                             self.zk_client, tenant_name, blocking=False
                         ):
-                            if (self.tenant_layout_state[tenant_name]
-                                > self.local_layout_state[tenant_name]):
+                            remote_state = self.tenant_layout_state.get(
+                                tenant_name)
+                            if remote_state is None:
+                                # The tenant may still be in the
+                                # process of initial configuration
+                                self.wake_event.set()
+                                continue
+                            local_state = self.local_layout_state.get(
+                                tenant_name)
+                            if (local_state is None or
+                                remote_state > local_state):
                                 self.log.debug(
                                     "Local layout of tenant %s not up to date",
                                     tenant.name)
@@ -1809,11 +1826,21 @@ class Scheduler(threading.Thread):
                     except LockException:
                         self.log.debug("Skipping locked tenant %s",
                                        tenant.name)
-                        if (self.tenant_layout_state[tenant_name]
-                                > self.local_layout_state[tenant_name]):
+                        remote_state = self.tenant_layout_state.get(
+                            tenant_name)
+                        local_state = self.local_layout_state.get(
+                            tenant_name)
+                        if (remote_state is None or
+                            local_state is None or
+                            remote_state > local_state):
                             # Let's keep looping until we've updated to the
                             # latest tenant layout.
                             self.wake_event.set()
+                    except Exception:
+                        self.log.exception("Exception processing tenant %s:",
+                                           tenant_name)
+                        # There may still be more events to process
+                        self.wake_event.set()
             except Exception:
                 self.log.exception("Exception in run handler:")
                 # There may still be more events to process
