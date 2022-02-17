@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7289e57_c2dcea2e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1415,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T00:54:29Z",
+      "side": 1,
+      "message": "This could be f\"Error setting repo state for {project[\u0027name\u0027]}\"",
+      "revId": "c428dfc916076780a598cff12d214ad5483edb06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
