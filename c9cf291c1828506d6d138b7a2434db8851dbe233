@@ -70,6 +70,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8377155_1844a313",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T17:01:20Z",
+      "side": 1,
+      "message": "Yes, I believe we are still finding these bugs (and we may make more of them in the future).",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0a6cd40_9b499f8e",
@@ -124,6 +141,23 @@
       "side": 1,
       "message": "I called it out because I\u0027m not sure log.error will give you code context. And if you end up in this file there are multiple places which could generate this log line. That said you are right that the stringified change_key should give enough context to determine what tripped it.",
       "parentUuid": "17ffaef1_5e5ecb99",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "215aeb05_6f47f9ac",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T17:01:20Z",
+      "side": 1,
+      "message": "Yeah, it was the change_key I was thinking of.  Like \"Change \u003cChangeKey something that looks like a branch\u003e not found\"",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -268,6 +302,23 @@
         "endLine": 1378,
         "endChar": 69
       },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3ffb742_1cb7e48d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T17:01:20Z",
+      "side": 1,
+      "message": "Whoops.  Happy to fix that.",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
