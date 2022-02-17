@@ -33,6 +33,24 @@
       "message": "I\u0027m intrigued by the idea because I also dislike module global variables.  But one of the goals here is to make this work even if we don\u0027t have a zk_client.  Example use case: https://review.opendev.org/827935  where if we were to use this, we would change the serialization of the changekey reference based on the cluster model api version.  But the ChangeKey class doesn\u0027t interact with zk directly.\n\nWe could decide that\u0027s a bad idea and drop that goal (and/or pass zk_client around to more objects, but that\u0027s about the same as passing around the zkcontext objects this removes).\n\nOr we could merge the two and use my approach with your class method.\n\nBut really at the end of the day, it\u0027s still a global variable no matter which way we go right?  It\u0027s just called COMPONENT_REGISTRY in one version and ComponentRegistry._registries in the other?  Or is there another advantage to storring the registry as a class attribute?\n\n(Also, I\u0027m assuming you meant \u0027cls._registries\u0027 in your example instead of \u0027self._registries\u0027.)",
       "revId": "864a2b7701f47c82dfda218538fd58970896ec2a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81dbc83c_be300ee9",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-17T17:56:12Z",
+      "side": 1,
+      "message": "Yes, it would still be a global state, so fine for me to go ahead with this approach. Yep, that should be `cls._registries`.",
+      "parentUuid": "f7441317_e31a4e1e",
+      "revId": "864a2b7701f47c82dfda218538fd58970896ec2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
