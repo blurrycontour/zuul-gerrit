@@ -1107,11 +1107,13 @@ class Scheduler(threading.Thread):
                         if (self.unparsed_abide.ltime
                                 < self.system_config_cache.ltime):
                             self.updateSystemConfig()
-
                         with tenant_read_lock(self.zk_client, tenant_name,
                                               blocking=False):
-                            if (self.tenant_layout_state[tenant_name]
-                                > self.local_layout_state[tenant_name]):
+                            local_state = self.local_layout_state.get(
+                                tenant_name)
+                            if (local_state is None or
+                                (self.tenant_layout_state[tenant_name]
+                                 > local_state)):
                                 log.debug(
                                     "Local layout of tenant %s not up to date",
                                     tenant_name)
