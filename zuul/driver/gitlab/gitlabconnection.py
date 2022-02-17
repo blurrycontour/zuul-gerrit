@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -189,6 +190,7 @@ class GitlabEventConnector(threading.Thread):
         event.newrev = body['after']
         event.oldrev = body['before']
         event.type = 'gl_push'
+        event.commits = body.get('commits')
 
         self.connection.clearConnectionCacheOnBranchEvent(event)
 
@@ -653,14 +655,25 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.oldrev = event.oldrev
         change.newrev = event.newrev
         change.url = self.getGitwebUrl(project, sha=event.newrev)
-        # Explicitly set files to None and let the pipelines processor
-        # call the merger asynchronuously
-        change.files = None
+        change.files = self.getPushedFileNames(event)
         try:
             self._change_cache.set(key, change)
         except ConcurrentUpdateError:
             change = self._change_cache.get(key)
         return change
+
+    def getPushedFileNames(self, event):
+        if event.total_commits_count > 20:
+            # Gitlab only includes files for the most recent 20
+            # commits.  If we have more than that, set files to None
+            # so that mergers will perform lookups if necessary, and
+            # the scheduler will assume a reconfiguration is required.
+            return None
+        files = set()
+        for c in event.commits:
+            for f in c.get('added') + c.get('modified') + c.get('removed'):
+                files.add(f)
+        return list(files)
 
     def canMerge(self, change, allow_needs, event=None):
         log = get_annotated_logger(self.log, event)
