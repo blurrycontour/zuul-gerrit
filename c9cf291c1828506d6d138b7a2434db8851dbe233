@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9d42c5c_e047c84f",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "Got it. I think I may have misunderstood the severity due to no longer crashing. In that case it isn\u0027t just noise in the logs but something that does need to be addressed (one way or another).",
+      "parentUuid": "f30bf246_8a9e4904",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0a6cd40_9b499f8e",
@@ -88,6 +106,24 @@
       "writtenOn": "2022-02-17T01:29:48Z",
       "side": 1,
       "message": "Well, it\u0027s a change cache... I admit the terminology is a little weird, but the actual change/ref/object should be obvious from the log.  If we were to change anything, we should probably rename it to the \u0027RefCache\u0027 and say the \"Ref\" wasn\u0027t found here.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f0e04e2_9bbfd672",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "I called it out because I\u0027m not sure log.error will give you code context. And if you end up in this file there are multiple places which could generate this log line. That said you are right that the stringified change_key should give enough context to determine what tripped it.",
+      "parentUuid": "17ffaef1_5e5ecb99",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -195,6 +231,93 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c5bc6cc_6ce8eaf1",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "511de26e_4ad39dac",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e830360_cf4756a0",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "This is an instance where change_key.newrev and not change.newrev is used.",
+      "range": {
+        "startLine": 1378,
+        "startChar": 52,
+        "endLine": 1378,
+        "endChar": 69
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62a24eb3_e1c8f22c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 1404,
+        "startChar": 52,
+        "endLine": 1404,
+        "endChar": 62
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfcdb223_ce7418bb",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1428,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 1428,
+        "startChar": 52,
+        "endLine": 1428,
+        "endChar": 62
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6a7dfd1_b60974cb",
@@ -225,6 +348,52 @@
       "writtenOn": "2022-02-17T01:29:48Z",
       "side": 1,
       "message": "It\u0027s required since every project starts at issue #1.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c35abd1_760efcd1",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 634,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "This is an instance where change_key.newrev is used and not change.newrev.",
+      "range": {
+        "startLine": 634,
+        "startChar": 52,
+        "endLine": 634,
+        "endChar": 62
+      },
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4ee83fc_ec14a363",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "This is an instance where change_key.newrev is used and not change.newrev.",
+      "range": {
+        "startLine": 674,
+        "startChar": 52,
+        "endLine": 674,
+        "endChar": 62
+      },
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -263,6 +432,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42c2189d_59ce9fc1",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "Aha that was the piece I was missing (the reference attribute serialization). Maybe a note that these names need to be stable and as a result drivers can overload them as necessary would be worthwile? It isn\u0027t critical to have that though.",
+      "parentUuid": "f39e0818_e4b2f690",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43e1d8a2_dea548d0",
@@ -293,6 +480,24 @@
       "writtenOn": "2022-02-17T01:29:48Z",
       "side": 1,
       "message": "I tried to be mindful of this and avoid that.  In most of the code I used the pattern:\n\nchange.newrew \u003d change_key.newrev\ndo something with change.newrev\n\nSo the change_key.newrev property is only accessed once.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e6d89bb_8c318388",
+        "filename": "zuul/zk/change_cache.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-17T16:53:54Z",
+      "side": 1,
+      "message": "The gerrit and git drivers look fine but I noted where github, gitlab, and pagure seem to call this method multiple times.\n\nI\u0027m happy to address this by being specific in the drivers rather than carrying around extra attributes in this object.",
+      "parentUuid": "e6a7af1d_72ce30d5",
       "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
