@@ -178,6 +178,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "511de26e_4ad39dac",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-17T01:38:00Z",
+      "side": 1,
+      "message": "Clarification: Gerrit projects don\u0027t have projects *for changes*; the other types of entries do use the project name.",
+      "revId": "c9cf291c1828506d6d138b7a2434db8851dbe233",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6a7dfd1_b60974cb",
