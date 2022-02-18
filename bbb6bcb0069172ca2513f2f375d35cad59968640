@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "928d0a00_67232c29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-18T00:17:48Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e This looks good, but it would be good to have a test for this.\n\u003e \n\u003e I think this process should work:\n\u003e * hold jobs in queue\n\u003e * create a branch\n\u003e * open a fake PR\n\u003e * release jobs\n\u003e * wait to settle\n\u003e * delete branch from upstream repo\n\u003e * release jobs\n\u003e \n\u003e Then check that we get the desired outcome.\n\nI\u0027ve split this into https://review.opendev.org/c/zuul/zuul/+/829842 , but it\u0027s not yet working",
+      "revId": "bbb6bcb0069172ca2513f2f375d35cad59968640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
