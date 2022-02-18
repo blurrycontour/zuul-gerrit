@@ -33,6 +33,24 @@
       "message": "The log.exception method will log the traceback and the exception. I guess what the comment is trying to say is we don\u0027t let that return to the end user in the code review system?",
       "revId": "5d62adc5a401dc29c274bc6a31edad0ce3d23f3c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be6b6c63_c1ca0fef",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1414,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-18T00:36:07Z",
+      "side": 1,
+      "message": "Yes, I think the concern was that we might have usernames/passwords appearing in connection strings.",
+      "parentUuid": "83b49cbc_845daa9f",
+      "revId": "5d62adc5a401dc29c274bc6a31edad0ce3d23f3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
