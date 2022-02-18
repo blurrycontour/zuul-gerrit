@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f563d8fb_bd37b810",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-18T00:29:57Z",
+      "side": 1,
+      "message": "This looks right to me but not +2 until I\u0027m out of ideas for the test.",
+      "revId": "5d62adc5a401dc29c274bc6a31edad0ce3d23f3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83b49cbc_845daa9f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1414,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-18T00:29:57Z",
+      "side": 1,
+      "message": "The log.exception method will log the traceback and the exception. I guess what the comment is trying to say is we don\u0027t let that return to the end user in the code review system?",
+      "revId": "5d62adc5a401dc29c274bc6a31edad0ce3d23f3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
