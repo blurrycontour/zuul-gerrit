@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba8496d9_f2e45f74",
+        "filename": "tests/unit/test_cross_crd.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-18T00:16:32Z",
+      "side": 1,
+      "message": "This is a good insight, and I\u0027ve used create_branch() and that actually creates the branch.\n\nI had the thought that deleting the branch isn\u0027t enough, because the object could still be there.  So I added a purge_branch that forces cleanup.  But it\u0027s still not being referenced as I thought it would.\n\nI\u0027ve split it into https://review.opendev.org/c/zuul/zuul/+/829842 with related info in the CL; if there\u0027s interest in collaborating we can look at it there but so far I\u0027m lost on how to get the merger into this path.",
+      "parentUuid": "2a575ac8_20c5e0ba",
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eeb7f246_b3dfa194",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 3
@@ -66,6 +84,30 @@
       "writtenOn": "2022-02-17T17:21:17Z",
       "side": 1,
       "message": "Should this be \u0027repo\u0027 ?",
+      "range": {
+        "startLine": 466,
+        "startChar": 43,
+        "endLine": 466,
+        "endChar": 52
+      },
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71cbb2ea_8f95aa18",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-18T00:16:32Z",
+      "side": 1,
+      "message": "Yep",
+      "parentUuid": "eeb7f246_b3dfa194",
       "range": {
         "startLine": 466,
         "startChar": 43,
@@ -89,6 +131,30 @@
       "writtenOn": "2022-02-17T17:21:17Z",
       "side": 1,
       "message": "This else doesn\u0027t seem necessary as we don\u0027t fall through when the exception is raised.",
+      "range": {
+        "startLine": 470,
+        "startChar": 8,
+        "endLine": 470,
+        "endChar": 13
+      },
+      "revId": "b46f449a60f28fcd7b5fa7e5d203f43660b1488b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af01964b_9e488ce7",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-02-18T00:16:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "843a7322_7bc27988",
       "range": {
         "startLine": 470,
         "startChar": 8,
