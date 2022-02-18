@@ -37,6 +37,10 @@ from zuul.lib.logutil import get_annotated_logger
 NULL_REF = '0000000000000000000000000000000000000000'
 
 
+class MissingObjectException(Exception):
+    pass
+
+
 def redact_url(url):
     parsed = urlsplit(url)
     if parsed.password is None:
@@ -452,7 +456,18 @@ class Repo(object):
     @staticmethod
     def _setRef(path, hexsha, repo):
         binsha = gitdb.util.to_bin_sha(hexsha)
-        obj = git.objects.Object.new_from_sha(repo, binsha)
+        try:
+            obj = git.objects.Object.new_from_sha(repo, binsha)
+        except ValueError:
+            # It is possible that this ref was deleted; e.g. some
+            # github projects use a rebase model for pull requests and
+            # then delete the PR branch.
+            raise MissingObjectException(
+                'Object %s disappeared for repo %s.  This is likely '
+                'due to upstream branch removal.  Consider excluding branches '
+                'that may be removed, such as pull-requests.' %
+                (hexsha, repo.git_dir))
+
         git.refs.Reference.create(repo, path, obj, force=True)
         return 'Created reference %s at %s in %s' % (
             path, hexsha, repo.git_dir)
