@@ -59,7 +59,7 @@ from zuul.model import (
 )
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import ComponentRegistry, WebComponent
+from zuul.zk.components import COMPONENT_REGISTRY, WebComponent
 from zuul.zk.config_cache import SystemConfigCache
 from zuul.zk.event_queues import (
     TenantManagementEventQueue,
@@ -269,7 +269,7 @@ class LogStreamHandler(WebSocket):
 
         try:
             port_location = streamer_utils.getJobLogStreamAddress(
-                self.zuulweb.executor_api, self.zuulweb.component_registry,
+                self.zuulweb.executor_api,
                 request['uuid'], source_zone=self.zuulweb.zone)
         except exceptions.StreamingError as e:
             return self.logClose(4011, str(e))
@@ -1744,7 +1744,7 @@ class ZuulWeb(object):
                                                   self.component_info)
         self.monitoring_server.start()
 
-        self.component_registry = ComponentRegistry(self.zk_client)
+        self.component_registry = COMPONENT_REGISTRY.create(self.zk_client)
 
         self.system_config_cache_wake_event = threading.Event()
         self.system_config_cache = SystemConfigCache(
@@ -1784,8 +1784,7 @@ class ZuulWeb(object):
             self.zk_client
         )
 
-        self.zk_context = ZKContext(self.zk_client, None, None, self.log,
-                                    self.component_registry)
+        self.zk_context = ZKContext(self.zk_client, None, None, self.log)
 
         command_socket = get_default(
             self.config, 'web', 'command_socket',

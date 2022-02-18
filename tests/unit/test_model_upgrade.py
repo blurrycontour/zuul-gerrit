@@ -119,6 +119,7 @@ class TestSemaphoreModelUpgrade(ZuulTestCase):
 
         semaphore_holders = tenant.semaphore_handler.semaphoreHolders(
             "test-semaphore")
+        self.log.debug("Semaphore holders: %s", repr(semaphore_holders))
         self.assertEqual(len(semaphore_holders), 1)
         # Assert that we are still using the old-style handler format
         self.assertTrue(all(isinstance(h, str) for h in semaphore_holders))
@@ -177,6 +178,7 @@ class TestSemaphoreModelUpgrade(ZuulTestCase):
         tenant.semaphore_handler.acquire(item, job, False)
         semaphore_holders = tenant.semaphore_handler.semaphoreHolders(
             "test-semaphore")
+        self.log.debug("Semaphore holders: %s", repr(semaphore_holders))
         self.assertEqual(len(semaphore_holders), 1)
         # Assert that we are now using the new-style handler format
         self.assertTrue(all(isinstance(h, dict) for h in semaphore_holders))

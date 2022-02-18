@@ -28,7 +28,7 @@ from zuul.lib.config import get_default
 from zuul.lib.monitoring import MonitoringServer
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import ComponentRegistry, FingerGatewayComponent
+from zuul.zk.components import COMPONENT_REGISTRY, FingerGatewayComponent
 from zuul.zk.executor import ExecutorApi
 
 COMMANDS = [
@@ -88,7 +88,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         try:
             build_uuid = self.getCommand()
             port_location = streamer_utils.getJobLogStreamAddress(
-                self.fingergw.executor_api, self.fingergw.component_registry,
+                self.fingergw.executor_api,
                 build_uuid, source_zone=self.fingergw.zone)
 
             if not port_location:
@@ -190,12 +190,11 @@ class FingerGateway(object):
         if self.tls_listen:
             self.component_info.use_ssl = True
         self.component_info.register()
+        COMPONENT_REGISTRY.create(self.zk_client)
 
         self.monitoring_server = MonitoringServer(config, 'fingergw',
                                                   self.component_info)
         self.monitoring_server.start()
-
-        self.component_registry = ComponentRegistry(self.zk_client)
 
         self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
 

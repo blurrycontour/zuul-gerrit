@@ -94,8 +94,7 @@ class BranchCache:
 
         # TODO: standardize on a stop event for connections and add it
         # to the context.
-        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log,
-                                    component_registry)
+        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log)
 
         with locked(self.wlock):
             try:
