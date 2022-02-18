@@ -21,6 +21,7 @@ from zuul.model import MERGER_MERGE_RESOLVE, MERGER_MERGE, MERGER_MAP, \
     MERGER_SQUASH_MERGE
 from zuul.lib.logutil import get_annotated_logger
 from zuul.driver.gitlab.gitlabsource import GitlabSource
+from zuul.driver.util import scalar_or_list
 from zuul.exceptions import MergeFailure
 
 
@@ -42,6 +43,12 @@ class GitlabReporter(BaseReporter):
         self._create_comment = self.config.get('comment', True)
         self._approval = self.config.get('approval', None)
         self._merge = self.config.get('merge', False)
+        self._labels = self.config.get('label', [])
+        if not isinstance(self._labels, list):
+            self._labels = [self._labels]
+        self._unlabels = self.config.get('unlabel', [])
+        if not isinstance(self._unlabels, list):
+            self._unlabels = [self._unlabels]
 
     def report(self, item):
         """Report on an event."""
@@ -57,6 +64,8 @@ class GitlabReporter(BaseReporter):
                 self.addMRComment(item)
             if self._approval is not None:
                 self.setApproval(item)
+            if self._labels or self._unlabels:
+                self.setLabels(item)
             if self._merge:
                 self.mergeMR(item)
                 if not item.change.is_merged:
@@ -82,6 +91,16 @@ class GitlabReporter(BaseReporter):
                   item.change, self.config, self._approval)
         self.connection.approveMR(project, mr_number, patchset,
                                   self._approval, event=item.event)
+
+    def setLabels(self, item):
+        log = get_annotated_logger(self.log, item.event)
+        project = item.change.project.name
+        mr_number = item.change.number
+        log.debug('Reporting change %s, params %s, labels: %s, unlabels: %s',
+                  item.change, self.config, self._labels, self._unlabels)
+        self.connection.updateMRLabels(project, mr_number,
+                                       self._labels, self._unlabels,
+                                       zuul_event_id=item.event)
 
     def mergeMR(self, item):
         project = item.change.project.name
@@ -120,5 +139,7 @@ def getSchema():
         'comment': bool,
         'approval': bool,
         'merge': bool,
+        'label': scalar_or_list(str),
+        'unlabel': scalar_or_list(str),
     })
     return gitlab_reporter
