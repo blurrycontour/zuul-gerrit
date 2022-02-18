@@ -275,6 +275,44 @@ class TestGerritToGithubCRD(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
 
+    def test_crd_delete_ref(self):
+        """Test merging fails when a CRD deletes a ref on us"""
+        self.executor_server.hold_jobs_in_build = True
+        self.hold_jobs_in_queue = True
+
+        # Make a branch in the upstream project
+        self.create_branch('github/project2', 'delete-branch')
+
+        A = self.fake_gerrit.addFakeChange('gerrit/project1', 'master', 'A')
+
+        # Open fake pull request against github project
+        B = self.fake_github.openFakePullRequest(
+            'github/project2', 'delete-branch', 'B')
+
+        # Reference this from the Gerrit change
+        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            A.subject, B.url)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Delete the upstream branch and make sure the referenced
+        # object no longer exists in the repo.  This simulates a
+        # pull-request being deleted.
+        self.purge_branch('github/project2', 'delete-branch')
+
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The gerrit job should be in ERROR status having failing
+        # to merge due to the upstream branch going missing
+        self.assertEqual(A.data['status'], 'ERROR')
+
     def test_crd_check_duplicate(self):
         "Test duplicate check in independent pipelines"
         self.executor_server.hold_jobs_in_build = True

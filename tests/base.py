@@ -5032,6 +5032,16 @@ class ZuulTestCase(BaseTestCase):
         repo.head.reset(working_tree=True)
         repo.delete_head(repo.heads[branch], force=True)
 
+    def purge_branch(self, project, branch):
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(path)
+        repo.head.reference = repo.heads['master']
+        repo.head.reset(working_tree=True)
+        repo.delete_head(repo.heads[branch], force=True)
+        repo.git.reflog('expire', '--expire=now', '--all')
+        repo.git.gc('--aggressive', '--prune=now')
+        repo.git.repack('-a', '-d', '-l')
+
     def create_commit(self, project, files=None, head='master',
                       message='Creating a fake commit', **kwargs):
         path = os.path.join(self.upstream_root, project)
