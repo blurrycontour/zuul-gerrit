@@ -568,6 +568,12 @@ class TestGitlabDriver(ZuulTestCase):
 
         self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
         self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.labels = ['gateit', 'prio:low', 'another_label']
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
 
     @simple_layout('layouts/gitlab-label-add-remove.yaml', driver='gitlab')
