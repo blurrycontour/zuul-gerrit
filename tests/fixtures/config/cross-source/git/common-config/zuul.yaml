@@ -116,6 +116,9 @@
         - name: controller
           label: label1
     run: playbooks/project1-project2-integration.yaml
+    required-projects:
+      - review.example.com/gerrit/project1
+      - github.com/github/project2
 
 - job:
     name: project-testfile
