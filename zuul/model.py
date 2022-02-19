@@ -1485,6 +1485,7 @@ class NodeRequest(object):
         if 'tenant_name' in data:
             self.tenant_name = data['tenant_name']
         self.nodes = data.get('nodes', [])
+        self.created_time = data.get('created_time')
 
     @classmethod
     def fromDict(cls, data):
@@ -3624,6 +3625,9 @@ class BuildSet(zkobject.ZKObject):
             files_state=self.NEW,
             repo_state_state=self.NEW,
             configured=False,
+            configured_time=None,  # When setConfigured was called
+            start_time=None,  # When the buildset reported start
+            repo_state_request_time=None,  # When the refstate job was called
             fail_fast=False,
             job_graph=None,
             jobs={},
@@ -3727,6 +3731,9 @@ class BuildSet(zkobject.ZKObject):
             "fail_fast": self.fail_fast,
             "job_graph": (self.job_graph.toDict()
                           if self.job_graph else None),
+            "configured_time": self.configured_time,
+            "start_time": self.start_time,
+            "repo_state_request_time": self.repo_state_request_time,
             # jobs (serialize as separate objects)
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
@@ -3831,8 +3838,8 @@ class BuildSet(zkobject.ZKObject):
             "builds": builds,
             "retry_builds": retry_builds,
             # These are local cache objects only valid for one pipeline run
-            '_old_job_graph': None,
-            '_old_jobs': {},
+            "_old_job_graph": None,
+            "_old_jobs": {},
         })
         return data
 
@@ -3868,6 +3875,7 @@ class BuildSet(zkobject.ZKObject):
                 self.dependent_changes = [i.change.toDict() for i in items]
                 self.merger_items = [i.makeMergerItem() for i in items]
             self.configured = True
+            self.configured_time = time.time()
 
     def getStateName(self, state_num):
         return self.states_map.get(
@@ -4016,6 +4024,7 @@ class QueueItem(zkobject.ZKObject):
             enqueue_time=None,
             report_time=None,
             dequeue_time=None,
+            first_job_start_time=None,
             reported=False,
             reported_start=False,
             quiet=False,
@@ -4088,6 +4097,7 @@ class QueueItem(zkobject.ZKObject):
             "dynamic_state": self.dynamic_state,
             "bundle": self.bundle and self.bundle.serialize(),
             "dequeued_bundle_failing": self.dequeued_bundle_failing,
+            "first_job_start_time": self.first_job_start_time,
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 

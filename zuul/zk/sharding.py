@@ -14,6 +14,7 @@
 
 import io
 from contextlib import suppress
+import time
 import zlib
 
 from kazoo.exceptions import NoNodeError
@@ -30,6 +31,8 @@ class RawShardIO(io.RawIOBase):
         self.shard_base = path
         self.compressed_bytes_read = 0
         self.compressed_bytes_written = 0
+        self.cumulative_read_time_ms = 0.0
+        self.cumulative_write_time_ms = 0.0
 
     def readable(self):
         return True
@@ -46,12 +49,19 @@ class RawShardIO(io.RawIOBase):
     @property
     def _shards(self):
         try:
-            return self.client.get_children(self.shard_base)
+            start = time.perf_counter_ns()
+            ret = self.client.get_children(self.shard_base)
+            self.cumulative_read_time_ms += (
+                time.perf_counter_ns() - start) / 1e6
+            return ret
         except NoNodeError:
             return []
 
     def _getData(self, path):
+        start = time.perf_counter_ns()
         data, _ = self.client.get(path)
+        self.cumulative_read_time_ms += (
+            time.perf_counter_ns() - start) / 1e6
         self.compressed_bytes_read += len(data)
         return zlib.decompress(data)
 
@@ -69,12 +79,15 @@ class RawShardIO(io.RawIOBase):
         shard_bytes = zlib.compress(shard_bytes)
         if not (len(shard_bytes) < NODE_BYTE_SIZE_LIMIT):
             raise RuntimeError("Shard too large")
+        start = time.perf_counter_ns()
         self.client.create(
             "{}/".format(self.shard_base),
             shard_bytes,
             sequence=True,
             makepath=True,
         )
+        self.cumulative_write_time_ms += (
+            time.perf_counter_ns() - start) / 1e6
         self.compressed_bytes_written += len(shard_bytes)
         return min(byte_count, NODE_BYTE_SIZE_LIMIT)
 
@@ -88,6 +101,10 @@ class BufferedShardWriter(io.BufferedWriter):
     def compressed_bytes_written(self):
         return self.__raw.compressed_bytes_written
 
+    @property
+    def cumulative_write_time_ms(self):
+        return self.__raw.cumulative_write_time_ms
+
 
 class BufferedShardReader(io.BufferedReader):
     def __init__(self, client, path):
@@ -97,3 +114,7 @@ class BufferedShardReader(io.BufferedReader):
     @property
     def compressed_bytes_read(self):
         return self.__raw.compressed_bytes_read
+
+    @property
+    def cumulative_read_time_ms(self):
+        return self.__raw.cumulative_read_time_ms
