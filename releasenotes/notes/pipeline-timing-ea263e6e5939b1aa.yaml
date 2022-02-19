@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    The following new statsd metrics are available in order to monitor
+    Zuul system performance:
+
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.event_enqueue_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.merge_request_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.layout_generation_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.job_freeze_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.repo_state_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.node_request_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.job_wait_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.event_job_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.read_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_time`
