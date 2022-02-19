@@ -31,6 +31,8 @@ class ZKContext:
         self.lock = lock
         self.stop_event = stop_event
         self.log = log
+        self.cumulative_read_time_ms = 0.0
+        self.cumulative_write_time_ms = 0.0
 
     def sessionIsValid(self):
         return ((not self.lock or self.lock.is_still_valid()) and
@@ -237,7 +239,11 @@ class ZKObject:
             path = self.getPath()
         while context.sessionIsValid():
             try:
+                start = time.perf_counter_ns()
                 compressed_data, zstat = context.client.get(path)
+                context.cumulative_read_time_ms += (
+                    time.perf_counter_ns() - start) / 1e6
+
                 self._set(_zkobject_hash=None)
                 try:
                     data = zlib.decompress(compressed_data)
@@ -278,6 +284,7 @@ class ZKObject:
         while context.sessionIsValid():
             try:
                 compressed_data = zlib.compress(data)
+                start = time.perf_counter_ns()
                 if create:
                     real_path, zstat = context.client.create(
                         path, compressed_data, makepath=True,
@@ -285,6 +292,8 @@ class ZKObject:
                 else:
                     zstat = context.client.set(path, compressed_data,
                                                version=self._zstat.version)
+                context.cumulative_write_time_ms += (
+                    time.perf_counter_ns() - start) / 1e6
                 self._set(_zstat=zstat,
                           _zkobject_hash=hash(data),
                           _zkobject_compressed_size=len(compressed_data),
@@ -336,6 +345,8 @@ class ShardedZKObject(ZKObject):
                         context.client, path) as stream:
                     data = stream.read()
                     compressed_size = stream.compressed_bytes_read
+                    context.cumulative_read_time_ms += \
+                        stream.cumulative_read_time_ms
                 if not data and context.client.exists(path) is None:
                     raise NoNodeError
                 self._set(**self.deserialize(data, context))
@@ -382,6 +393,9 @@ class ShardedZKObject(ZKObject):
                     stream.write(data)
                     stream.flush()
                     compressed_size = stream.compressed_bytes_written
+                    context.cumulative_write_time_ms += \
+                        stream.cumulative_write_time_ms
+
                 self._set(_zkobject_hash=hash(data),
                           _zkobject_compressed_size=compressed_size,
                           _zkobject_uncompressed_size=len(data),
