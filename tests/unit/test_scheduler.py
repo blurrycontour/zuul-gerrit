@@ -7055,8 +7055,10 @@ class TestSemaphore(ZuulTestCase):
 
         status = tenant.layout.pipelines["check"].formatStatusJSON()
         jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
-        self.assertIsNone(jobs[0]["waiting_status"])
-        self.assertIsNone(jobs[1]["waiting_status"])
+        self.assertEqual(jobs[0]["waiting_status"],
+                         'node request: 200-0000000000')
+        self.assertEqual(jobs[1]["waiting_status"],
+                         'node request: 200-0000000001')
         self.assertEqual(jobs[2]["waiting_status"],
                          'semaphores: test-semaphore')
 
