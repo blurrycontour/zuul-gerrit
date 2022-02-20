@@ -822,6 +822,7 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("Adding node request %s for job %s to item %s",
                       req, job, item)
             build_set.setJobNodeRequestID(job.name, req.id)
+            job.setWaitingStatus(f'node request: {req.id}')
         return True
 
     def _getPausedParent(self, build_set, job):
@@ -860,6 +861,7 @@ class PipelineManager(metaclass=ABCMeta):
                     job, nodes, item, self.pipeline, zone,
                     build_set.dependent_changes,
                     build_set.merger_items)
+                job.setWaitingStatus('executor')
             except Exception:
                 log.exception("Exception while executing job %s "
                               "for change %s:", job, item.change)
