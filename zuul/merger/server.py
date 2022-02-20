@@ -290,23 +290,35 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.log.debug("Got merge job: %s", merge_request.uuid)
         zuul_event_id = merge_request.event_id
 
+        errors = []
+        result = dict(merged=False,
+                      commit=None,
+                      files=None,
+                      repo_state=None,
+                      zuul_event_id=zuul_event_id,
+                      errors=errors)
         for item in args['items']:
-            self._update(item['connection'], item['project'])
+            try:
+                self._update(item['connection'], item['project'])
+            except Exception:
+                msg = (f"Unable to update {item['connection']}/"
+                       f"{item['project']}")
+                errors.append(msg)
+                return result
+
         ret = self.merger.mergeChanges(
             args['items'], args.get('files'),
             args.get('dirs', []),
             args.get('repo_state'),
             branches=args.get('branches'),
             repo_locks=self.repo_locks,
-            zuul_event_id=zuul_event_id)
+            zuul_event_id=zuul_event_id,
+            errors=errors)
 
-        result = dict(merged=(ret is not None))
-        if ret is None:
-            result['commit'] = result['files'] = result['repo_state'] = None
-        else:
+        if ret is not None:
+            result['merged'] = True
             (result['commit'], result['files'], result['repo_state'],
              recent, orig_commit) = ret
-        result['zuul_event_id'] = zuul_event_id
         return result
 
     def refstate(self, merge_request, args):
@@ -363,6 +375,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         repo_state = result.get("repo_state", {})
         item_in_branches = result.get("item_in_branches", [])
         files = result.get("files", {})
+        errors = result.get("errors", [])
 
         log.info(
             "Merge %s complete, merged: %s, updated: %s, commit: %s, "
@@ -406,6 +419,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                     files,
                     repo_state,
                     item_in_branches,
+                    errors,
                 )
 
             def put_complete_event(log, merge_request, event):
