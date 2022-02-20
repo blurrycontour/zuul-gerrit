@@ -239,7 +239,13 @@ class ChangePanel extends React.Component {
           title = 'Waiting on ' + job.waiting_status
         }
         break
-      // 'in progress' 'queued' 'lost' 'aborted' ...
+      case 'queued':
+        className = 'label-default'
+        if (job.waiting_status !== null) {
+          title = 'Waiting on ' + job.waiting_status
+        }
+        break
+      // 'in progress' 'lost' 'aborted' ...
       default:
         className = 'label-default'
     }
