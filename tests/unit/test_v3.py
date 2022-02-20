@@ -7135,6 +7135,8 @@ class TestProvidesRequiresMysql(ZuulTestCase):
     def test_provides_requires_shared_queue_slow(self):
         # Changes share a queue, with both running at the same time.
         self.executor_server.hold_jobs_in_build = True
+        self.hold_merge_jobs_in_queue = True
+
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         self.executor_server.returnData(
             'image-builder', A,
@@ -7148,6 +7150,32 @@ class TestProvidesRequiresMysql(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
+        # We should have a merge job for the buildset
+        jobs = list(self.merger_api.queued())
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0].job_type, 'merge')
+
+        # Release the merge job.
+        self.merger_api.release(jobs[0])
+        self.waitUntilSettled()
+
+        # We should have a global repo state refstate job for the buildset
+        jobs = list(self.merger_api.queued())
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0].job_type, 'refstate')
+
+        # Verify the waiting status for both jobs is "repo state"
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        status = tenant.layout.pipelines["gate"].formatStatusJSON()
+        jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
+        self.assertEqual(jobs[0]["waiting_status"], 'repo state')
+        self.assertEqual(jobs[1]["waiting_status"], 'repo state')
+
+        # Return the merge queue to normal behavior
+        self.hold_merge_jobs_in_queue = False
+        self.merger_api.release()
+        self.waitUntilSettled()
+
         self.assertEqual(len(self.builds), 1)
 
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
@@ -7157,7 +7185,6 @@ class TestProvidesRequiresMysql(ZuulTestCase):
 
         self.assertEqual(len(self.builds), 1)
 
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         status = tenant.layout.pipelines["gate"].formatStatusJSON()
 
         # First change
