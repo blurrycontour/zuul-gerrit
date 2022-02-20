@@ -171,6 +171,7 @@ class MergeClient(object):
                     files=None,
                     repo_state=None,
                     item_in_branches=None,
+                    errors=None,
                 )
             try:
                 self.result_events[merge_request.tenant_name][
