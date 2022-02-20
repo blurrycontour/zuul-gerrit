@@ -7134,7 +7134,9 @@ class TestProvidesRequiresMysql(ZuulTestCase):
     @simple_layout('layouts/provides-requires-two-jobs.yaml')
     def test_provides_requires_shared_queue_slow(self):
         # Changes share a queue, with both running at the same time.
-        self.executor_server.hold_jobs_in_build = True
+
+        # This also seems to be a defacto waiting_status test since it
+        # exercises so many of the statuses.
         self.hold_merge_jobs_in_queue = True
 
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -7171,10 +7173,44 @@ class TestProvidesRequiresMysql(ZuulTestCase):
         self.assertEqual(jobs[0]["waiting_status"], 'repo state')
         self.assertEqual(jobs[1]["waiting_status"], 'repo state')
 
-        # Return the merge queue to normal behavior
+        # Return the merge queue to normal behavior, but pause nodepool
+        self.fake_nodepool.pause()
         self.hold_merge_jobs_in_queue = False
         self.merger_api.release()
         self.waitUntilSettled()
+
+        # Verify the nodepool waiting status
+        status = tenant.layout.pipelines["gate"].formatStatusJSON()
+        jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
+        self.assertEqual(jobs[0]["waiting_status"],
+                         'node request: 100-0000000000')
+        self.assertEqual(jobs[1]["waiting_status"],
+                         'dependencies: image-builder')
+
+        # Return nodepool operation to normal, but hold executor jobs
+        # in queue
+        self.hold_jobs_in_queue = True
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        # Verify the executor waiting status
+        status = tenant.layout.pipelines["gate"].formatStatusJSON()
+        jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
+        self.assertEqual(jobs[0]["waiting_status"], 'executor')
+        self.assertEqual(jobs[1]["waiting_status"],
+                         'dependencies: image-builder')
+
+        # Return the executor queue to normal, but hold jobs in build
+        self.hold_jobs_in_queue = False
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_api.release()
+        self.waitUntilSettled()
+
+        status = tenant.layout.pipelines["gate"].formatStatusJSON()
+        jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
+        self.assertIsNone(jobs[0]["waiting_status"])
+        self.assertEqual(jobs[1]["waiting_status"],
+                         'dependencies: image-builder')
 
         self.assertEqual(len(self.builds), 1)
 
