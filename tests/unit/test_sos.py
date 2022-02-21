@@ -625,3 +625,51 @@ class TestScaleOutSchedulerMultiTenant(ZuulTestCase):
             if 'tenant-three' in second.sched.local_layout_state:
                 break
         self.waitUntilSettled(matcher=[second])
+
+    def test_background_layout_update_remove_tenant(self):
+        # This test removes a tenant and verifies that the two schedulers
+        # remove the tenant from their layout (one after an initial
+        # reconfiguration, the other via the background update
+        # thread).
+
+        first = self.scheds.first
+        # Create a second scheduler instance
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            state_two = first.sched.local_layout_state.get("tenant-two")
+            if all([state_one, state_two]):
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one and
+                second.sched.local_layout_state.get(
+                    "tenant-two") == state_two):
+                break
+        self.assertIn('tenant-two', first.sched.abide.tenants)
+        self.assertIn('tenant-two', second.sched.abide.tenants)
+
+        self.log.debug("Freeze scheduler-1")
+        with second.sched.layout_update_lock:
+            self.log.debug("Reconfigure scheduler-0")
+            self.newTenantConfig('config/two-tenant/one-tenant.yaml')
+            first.smartReconfigure(command_socket=True)
+            for _ in iterate_timeout(
+                    10, "tenants to be removed on scheduler-0"):
+                if 'tenant-two' not in first.sched.local_layout_state:
+                    break
+            self.waitUntilSettled(matcher=[first])
+            self.assertNotIn('tenant-two', first.sched.abide.tenants)
+        self.log.debug("Thaw scheduler-1")
+
+        for _ in iterate_timeout(
+                10, "tenants to be removed on scheduler-1"):
+            if 'tenant-two' not in second.sched.local_layout_state:
+                break
+        self.waitUntilSettled(matcher=[second])
+        self.assertNotIn('tenant-two', second.sched.abide.tenants)
