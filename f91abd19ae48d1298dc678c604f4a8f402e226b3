@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "a7060901_17789cc7",
         "filename": "zuul/merger/merger.py",
@@ -14,8 +15,25 @@
       "side": 1,
       "message": "Is the tag handling there different than for other refs? I wonder if we can make this optimization just for all refs.",
       "revId": "f91abd19ae48d1298dc678c604f4a8f402e226b3",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99ffd450_e3b581ac",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 968,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2022-02-21T15:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7060901_17789cc7",
+      "revId": "f91abd19ae48d1298dc678c604f4a8f402e226b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
