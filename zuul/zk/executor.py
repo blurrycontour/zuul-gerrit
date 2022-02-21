@@ -150,6 +150,11 @@ class ExecutorApi:
         for zone in self._getAllZones():
             request = self.zone_queues[zone].getByUuid(uuid)
             if request:
+                # TODO (felix): Remove the zone return value in
+                # MODEL_API > 4. This is kept for backwards
+                # compatibility until all executors store their zone
+                # information in the worker_info dictionary on the
+                # BuildRequest.
                 return request, zone
         return None, None
 
