@@ -119,9 +119,9 @@ The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
       any name collisions between Zuul tenants, the tenant name is used as index
       name prefix. The real index name will be:
 
-.. code-block::
+      .. code-block::
 
-   <index-name>.<tenant-name>-<YYYY>.<MM>.<DD>
+         <index-name>.<tenant-name>-<YYYY>.<MM>.<DD>
 
       The index will be created if it does not exist.
 
