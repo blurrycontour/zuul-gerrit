@@ -2324,7 +2324,8 @@ class ConfigLoader(object):
 
     def loadTPCs(self, abide, unparsed_abide, tenants=None):
         if tenants:
-            tenants_to_load = {t: unparsed_abide.tenants[t] for t in tenants}
+            tenants_to_load = {t: unparsed_abide.tenants[t] for t in tenants
+                               if t in unparsed_abide.tenants}
         else:
             tenants_to_load = unparsed_abide.tenants
 

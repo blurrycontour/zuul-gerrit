@@ -1100,26 +1100,35 @@ class Scheduler(threading.Thread):
             if self._stopped:
                 break
             with self.layout_update_lock:
-                for tenant_name in list(self.unparsed_abide.tenants):
+                # We need to handle new and deleted tenants, so we need to
+                # process all tenants currently known and the new ones.
+                tenant_names = set(self.abide.tenants)
+                tenant_names.update(self.unparsed_abide.tenants.keys())
+
+                for tenant_name in tenant_names:
                     if self._stopped:
                         break
                     try:
                         if (self.unparsed_abide.ltime
                                 < self.system_config_cache.ltime):
                             self.updateSystemConfig()
+
                         with tenant_read_lock(self.zk_client, tenant_name,
                                               blocking=False):
                             remote_state = self.tenant_layout_state.get(
                                 tenant_name)
-                            if remote_state is None:
+                            local_state = self.local_layout_state.get(
+                                tenant_name)
+
+                            if not local_state and not remote_state:
                                 # The tenant may still be in the
                                 # process of initial configuration
                                 self.layout_update_event.set()
                                 continue
-                            local_state = self.local_layout_state.get(
-                                tenant_name)
+
                             if (local_state is None or
-                                remote_state > local_state):
+                                    remote_state is None or
+                                    remote_state > local_state):
                                 log.debug(
                                     "Local layout of tenant %s not up to date",
                                     tenant_name)
@@ -1316,6 +1325,10 @@ class Scheduler(threading.Thread):
                         self._reconfigureTenant(ctx, tenant, old_tenant)
                     else:
                         self._reconfigureDeleteTenant(ctx, old_tenant)
+                        with suppress(KeyError):
+                            del self.tenant_layout_state[tenant_name]
+                        with suppress(KeyError):
+                            del self.local_layout_state[tenant_name]
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Reconfiguration complete (smart: %s, tenants: %s, "
@@ -1869,6 +1882,15 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals, self.statsd,
                 self, self.merger, self.keystore)
+
+            tenant_names = set(self.abide.tenants)
+            deleted_tenants = tenant_names.difference(
+                self.unparsed_abide.tenants.keys())
+
+            # Remove TPCs of deleted tenants
+            for tenant_name in deleted_tenants:
+                self.abide.clearTPCs(tenant_name)
+
             loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
 
