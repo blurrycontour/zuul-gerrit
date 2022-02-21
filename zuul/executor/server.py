@@ -3726,6 +3726,7 @@ class ExecutorServer(BaseMergeServer):
             build_request.worker_info = {
                 "hostname": self.hostname,
                 "log_port": self.log_streaming_port,
+                "zone": self.zone,
             }
             self.executor_api.update(build_request)
         except Exception:
