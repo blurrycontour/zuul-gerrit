@@ -16,6 +16,24 @@
       "message": "Do you know under what circumstances this could raise a KeyError, or is this just defensive?",
       "revId": "3615cf3db7d93f595f759d9028a81475ac3c5bd4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70e51be0_eba7e901",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-21T15:22:10Z",
+      "side": 1,
+      "message": "This is just defensive and I\u0027m not expecting this to throw a KeyError. But as we only care that it is gone from the layout states I figured it might be better to safeguard against any errors.",
+      "parentUuid": "7b99f256_e612febd",
+      "revId": "3615cf3db7d93f595f759d9028a81475ac3c5bd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
