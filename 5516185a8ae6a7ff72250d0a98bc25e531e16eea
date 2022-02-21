@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e15de58_0cf1d622",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1889,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-21T17:23:03Z",
+      "side": 1,
+      "message": "We aren\u0027t just releasing the lock we are also short circuiting pipeline processing for the tenant. Would it be better to log this as:\n\n  self.log.debug(\"Stopping tenant %s pipeline processing in order to release the tenant read lock.\", tenant.name)\n\nSeparately checking the contenders will involve ZK traffic. I expect that compared to long waits for the lock this is preferable but calling that out in case it represents a problem.",
+      "revId": "5516185a8ae6a7ff72250d0a98bc25e531e16eea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
