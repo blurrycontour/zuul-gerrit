@@ -7276,6 +7276,9 @@ class Tenant(object):
         self.authorization_rules = []
         self.default_auth_realm = None
 
+    def __repr__(self):
+        return f"<Tenant {self.name}>"
+
     @property
     def all_projects(self):
         """
