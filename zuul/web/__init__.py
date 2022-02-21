@@ -2055,6 +2055,14 @@ class ZuulWeb(object):
             self.connections, self.zk_client, self.globals,
             keystorage=self.keystore)
 
+        tenant_names = set(self.abide.tenants)
+        deleted_tenants = tenant_names.difference(
+            self.unparsed_abide.tenants.keys())
+
+        # Remove TPCs of deleted tenants
+        for tenant_name in deleted_tenants:
+            self.abide.clearTPCs(tenant_name)
+
         loader.loadTPCs(self.abide, self.unparsed_abide)
         loader.loadAdminRules(self.abide, self.unparsed_abide)
 
@@ -2064,8 +2072,13 @@ class ZuulWeb(object):
             self.connections, self.zk_client, self.globals,
             keystorage=self.keystore)
 
+        # We need to handle new and deleted tenants, so we need to process all
+        # tenants currently known and the new ones.
+        tenant_names = set(self.abide.tenants)
+        tenant_names.update(self.unparsed_abide.tenants.keys())
+
         min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
-        for tenant_name in self.unparsed_abide.tenants:
+        for tenant_name in tenant_names:
             # Reload the tenant if the layout changed.
             if (self.local_layout_state.get(tenant_name)
                     == self.tenant_layout_state.get(tenant_name)):

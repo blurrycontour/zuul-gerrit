@@ -1233,6 +1233,31 @@ class TestWebMultiTenant(BaseTestWeb):
         self.assertEqual(
             list(map(lambda x: {'name': x}, sorted(expected))), res)
 
+    def test_tenant_add_remove(self):
+        "Test that tenants are correctly added and removed from the layout"
+        resp = self.get_url("api/tenants")
+        data = resp.json()
+        self.assertEqual(sorted(d["name"] for d in data),
+                         sorted(["tenant-one", "tenant-two", "tenant-three"]))
+
+        self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
+        self.scheds.first.smartReconfigure(command_socket=True)
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(
+                10, "tenants to be updated from zuul-web"):
+            if ('tenant-three' not in self.web.web.local_layout_state and
+                    'tenant-four' in self.web.web.local_layout_state):
+                break
+
+        self.assertNotIn('tenant-three', self.web.web.abide.tenants)
+        self.assertIn('tenant-four', self.web.web.abide.tenants)
+
+        resp = self.get_url("api/tenants")
+        data = resp.json()
+        self.assertEqual(sorted(d["name"] for d in data),
+                         sorted(["tenant-one", "tenant-two", "tenant-four"]))
+
 
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
