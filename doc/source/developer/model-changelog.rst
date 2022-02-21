@@ -46,3 +46,11 @@ Version 3
 :Description: Add a new `SupercedeEvent` and use that for dequeuing of
               superceded items from other pipelines. This only affects the
               schedulers.
+
+Version 4
+---------
+
+:Prior Zuul version: 5.0.0
+:Description: Executors store their zone information on the BuildRequest
+              in ZooKeeper. This zone information will now be used to
+              look up of the correct log streaming address in zuul-web.
