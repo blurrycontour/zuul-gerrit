@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b99f256_e612febd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1331,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-21T15:17:02Z",
+      "side": 1,
+      "message": "Do you know under what circumstances this could raise a KeyError, or is this just defensive?",
+      "revId": "3615cf3db7d93f595f759d9028a81475ac3c5bd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
