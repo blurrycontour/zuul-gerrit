@@ -3,7 +3,7 @@ pbr>=1.1.0
 virtualenv!=20.0.0,!=20.0.1,>20
 
 python-dateutil
-github3.py>=1.1.0,<3.0.0 # https://github.com/sigmavirus24/github3.py/issues/1057
+github3.py>=1.1.0
 PyYAML>=5.1.0
 paramiko>=2.0.1
 GitPython>=2.1.8
