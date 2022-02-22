@@ -423,6 +423,7 @@ class PragmaParser(object):
     pragma = {
         'implied-branch-matchers': bool,
         'implied-branches': to_list(str),
+        'default-parent': str,
         '_source_context': model.SourceContext,
         '_start_mark': model.ZuulMark,
     }
@@ -445,6 +446,10 @@ class PragmaParser(object):
         branches = conf.get('implied-branches')
         if branches is not None:
             source_context.implied_branches = as_list(branches)
+
+        default_parent = conf.get('default-parent')
+        if default_parent is not None:
+            source_context.default_parent
 
 
 class NodeSetParser(object):
@@ -693,6 +698,8 @@ class JobParser(object):
                     raise Exception(
                         "Base jobs must be defined in config projects")
                 job.parent = job.BASE_JOB_MARKER
+        elif job.source_context.default_parent is not None:
+            job.parent = job.source_context.default_parent
 
         # Secrets are part of the playbook context so we must establish
         # them earlier than playbooks.

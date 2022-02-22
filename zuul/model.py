@@ -1653,6 +1653,7 @@ class SourceContext(ConfigObject):
         self.trusted = trusted
         self.implied_branch_matchers = None
         self.implied_branches = None
+        self.default_parent = None
 
     def __str__(self):
         return '%s/%s@%s' % (
@@ -1697,6 +1698,7 @@ class SourceContext(ConfigObject):
             "trusted": self.trusted,
             "implied_branch_matchers": self.implied_branch_matchers,
             "implied_branches": self.implied_branches,
+            "default_parent": self.default_parent,
         }
 
     @classmethod
