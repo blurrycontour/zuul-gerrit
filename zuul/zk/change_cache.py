@@ -56,7 +56,9 @@ class ChangeKey:
     refers to a change, it should use ChangeKey.reference.  This is a
     dictionary with structured information about the change.  The
     contents can be used to construct a ChangeKey, and that can be
-    used to pull the Change from the cache.
+    used to pull the Change from the cache.  The reference is used by
+    other objects in ZooKeeper to refer to changes, so the
+    serialization format must be stable or backwards compatible.
 
     The cache itself uses a sha256 digest of the reference as the
     actual cache key in ZK.  This reduces and stabilizes the length of
@@ -110,6 +112,26 @@ class ChangeKey:
             self.change_type == str_or_none(other.change_type),
             self.stable_id == str_or_none(other.stable_id),
         ])
+
+    # Convenience methods for drivers that encode old/newrev in
+    # revision.  Revision is not guaranteed to use this format.
+    @property
+    def oldrev(self):
+        if '..' in self.revision:
+            old = self.revision.split('..')[0]
+            if old == 'None':
+                return None
+            return old
+        return None
+
+    @property
+    def newrev(self):
+        if '..' in self.revision:
+            new = self.revision.split('..')[1]
+            if new == 'None':
+                return None
+            return new
+        return self.revision
 
 
 class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
@@ -246,7 +268,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         # max_age will any change in it be removed.
         for key in to_keep.copy():
             source = sched.connections.getSource(key.connection_name)
-            change = source.getChangeByKey(key)
+            change = source.getChange(key)
             change.getRelatedChanges(sched, to_keep)
         to_prune = set(outdated_versions.keys()) - to_keep
         for key in to_prune:

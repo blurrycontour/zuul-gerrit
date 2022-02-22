@@ -15,6 +15,7 @@
 import logging
 from zuul.source import BaseSource
 from zuul.model import Project
+from zuul.zk.change_cache import ChangeKey
 
 
 class GitSource(BaseSource):
@@ -35,14 +36,24 @@ class GitSource(BaseSource):
     def canMerge(self, change, allow_needs, event=None, allow_refresh=False):
         raise NotImplementedError()
 
-    def getChange(self, event, refresh=False):
-        return self.connection.getChange(event, refresh)
+    def getChangeKey(self, event):
+        connection_name = self.connection.connection_name
+        revision = f'{event.oldrev}..{event.newrev}'
+        if event.ref and event.ref.startswith('refs/heads/'):
+            branch = event.ref[len('refs/heads/'):]
+            return ChangeKey(connection_name, event.project_name,
+                             'Branch', branch, revision)
+        if event.ref:
+            return ChangeKey(connection_name, event.project_name,
+                             'Ref', event.ref, revision)
+        self.log.warning("Unable to format change key for %s" % (self,))
+
+    def getChange(self, change_key, refresh=False, event=None):
+        return self.connection.getChange(change_key, refresh=refresh,
+                                         event=event)
 
     def getChangeByURL(self, url, event):
         return None
-
-    def getChangeByKey(self, key):
-        return self.connection.getChangeByKey(key)
 
     def getChangesDependingOn(self, change, projects, tenant):
         return []

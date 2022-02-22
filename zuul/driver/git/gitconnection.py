@@ -25,7 +25,6 @@ from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.model import Ref, Branch
 from zuul.zk.change_cache import (
     AbstractChangeCache,
-    ChangeKey,
     ConcurrentUpdateError,
 )
 
@@ -102,40 +101,40 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
                 refs[ref] = sha
         return refs
 
-    def getChange(self, event, refresh=False):
-        key = ChangeKey(self.connection_name, event.project_name,
-                        'Ref', event.ref, event.newrev)
-        change = self._change_cache.get(key)
+    def getChange(self, change_key, refresh=False, event=None):
+        change = self._change_cache.get(change_key)
         if change:
             return change
 
-        if event.ref and event.ref.startswith('refs/heads/'):
-            branch = event.ref[len('refs/heads/'):]
-            project = self.getProject(event.project_name)
+        if not event:
+            self.log.error("Change %s not found in cache and no event",
+                           change_key)
+        project = self.source.getProject(change_key.project_name)
+        if change_key.change_type == 'Branch':
+            branch = change_key.stable_id
             change = Branch(project)
             change.branch = branch
-            change.ref = event.ref
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
+            change.ref = f'refs/heads/{branch}'
+            change.oldrev = change_key.oldrev
+            change.newrev = change_key.newrev
             change.url = ""
             change.files = self.getChangeFilesUpdated(
-                event.project_name, change.branch, event.oldrev)
-        elif event.ref:
+                change_key.project_name, branch, change_key.oldrev)
+        elif change_key.change_type == 'Ref':
             # catch-all ref (ie, not a branch or head)
-            project = self.getProject(event.project_name)
             change = Ref(project)
-            change.ref = event.ref
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
+            change.ref = change_key.stable_id
+            change.oldrev = change_key.oldrev
+            change.newrev = change_key.newrev
             change.url = ""
         else:
-            self.log.warning("Unable to get change for %s", event)
+            self.log.warning("Unable to get change for %s", change_key)
             return None
 
         try:
-            self._change_cache.set(key, change)
+            self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
-            change = self._change_cache.get(key)
+            change = self._change_cache.get(change_key)
         return change
 
     def getProjectBranches(self, project, tenant, min_ltime=-1):
@@ -161,7 +160,8 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
 
         # Force changes cache update before passing
         # the event to the scheduler
-        self.getChange(event)
+        change_key = self.source.getChangeKey(event)
+        self.getChange(change_key)
         self.logEvent(event)
         # Pass the event to the scheduler
         self.sched.addTriggerEvent(self.driver_name, event)

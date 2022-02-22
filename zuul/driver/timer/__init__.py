@@ -180,8 +180,10 @@ class TimerDriver(Driver, TriggerInterface):
                 event.timestamp = time.time()
                 # Refresh the branch in order to update the item in the
                 # change cache.
+                change_key = project.source.getChangeKey(event)
                 with self.project_update_locks[project.canonical_name]:
-                    project.source.getChange(event, refresh=True)
+                    project.source.getChange(change_key, refresh=True,
+                                             event=event)
                 log = get_annotated_logger(self.log, event)
                 log.debug("Adding event")
                 self.sched.addTriggerEvent(self.name, event)

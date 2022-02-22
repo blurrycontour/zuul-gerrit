@@ -324,10 +324,8 @@ class GerritEventConnector(threading.Thread):
         # cache as it may be a dependency
         if event.change_number:
             refresh = True
-            key = ChangeKey(self.connection.connection_name, None,
-                            'GerritChange', str(event.change_number),
-                            str(event.patch_number))
-            if self.connection._change_cache.get(key) is None:
+            change_key = self.connection.source.getChangeKey(event)
+            if self.connection._change_cache.get(change_key) is None:
                 refresh = False
                 for tenant in self.connection.sched.abide.tenants.values():
                     # TODO(fungi): it would be better to have some simple means
@@ -350,8 +348,7 @@ class GerritEventConnector(threading.Thread):
                 # we need to update those objects by reference so that they
                 # have the correct/new information and also avoid hitting
                 # gerrit multiple times.
-                self.connection._getChange(event.change_number,
-                                           event.patch_number,
+                self.connection._getChange(change_key,
                                            refresh=True, event=event)
 
 
@@ -743,110 +740,101 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def addProject(self, project: Project) -> None:
         self.projects[project.name] = project
 
-    def getChange(self, event, refresh=False):
-        if event.change_number:
-            change = self._getChange(event.change_number, event.patch_number,
-                                     refresh=refresh)
-        elif event.ref and event.ref.startswith('refs/tags/'):
-            change = self._getTag(event, refresh=refresh)
-        elif event.ref and not event.ref.startswith('refs/'):
-            # Pre 2.13 Gerrit ref-updated events don't have branch prefixes.
-            change = self._getBranch(event, branch=event.ref,
-                                     ref=f'refs/heads/{event.ref}',
-                                     refresh=refresh)
-        elif event.ref and event.ref.startswith('refs/heads/'):
-            # From the timer trigger or Post 2.13 Gerrit
-            change = self._getBranch(event,
-                                     branch=event.ref[len('refs/heads/'):],
-                                     ref=event.ref, refresh=refresh)
-        elif event.ref:
-            # catch-all ref (ie, not a branch or head)
-            change = self._getRef(event, refresh=refresh)
-        else:
-            self.log.warning("Unable to get change for %s" % (event,))
-            change = None
-        return change
+    def getChange(self, change_key, refresh=False, event=None):
+        if change_key.connection_name != self.connection_name:
+            return None
+        if change_key.change_type == 'GerritChange':
+            return self._getChange(change_key, refresh=refresh, event=event)
+        elif change_key.change_type == 'Tag':
+            return self._getTag(change_key, refresh=refresh, event=event)
+        elif change_key.change_type == 'Branch':
+            return self._getBranch(change_key, refresh=refresh, event=event)
+        elif change_key.change_type == 'Ref':
+            return self._getRef(change_key, refresh=refresh, event=event)
 
-    def _getChange(self, number, patchset, refresh=False, history=None,
+    def _getChange(self, change_key, refresh=False, history=None,
                    event=None):
         # Ensure number and patchset are str
-        number = str(number)
-        patchset = str(patchset)
-        key = ChangeKey(self.connection_name, None,
-                        'GerritChange', number, patchset)
-        change = self._change_cache.get(key)
+        change = self._change_cache.get(change_key)
         if change and not refresh:
             return change
         if not change:
+            if not event:
+                self.log.error("Change %s not found in cache and no event",
+                               change_key)
             change = GerritChange(None)
-            change.number = number
-            change.patchset = patchset
-        return self._updateChange(key, change, event, history)
+            change.number = change_key.stable_id
+            change.patchset = change_key.revision
+        return self._updateChange(change_key, change, event, history)
 
-    def _getTag(self, event, refresh=False):
-        tag = event.ref[len('refs/tags/'):]
-        key = ChangeKey(self.connection_name, event.project_name,
-                        'Tag', tag, event.newrev)
-        change = self._change_cache.get(key)
+    def _getTag(self, change_key, refresh=False, event=None):
+        tag = change_key.stable_id
+        change = self._change_cache.get(change_key)
         if change:
             if refresh:
                 self._change_cache.updateChangeWithRetry(
-                    key, change, lambda c: None)
+                    change_key, change, lambda c: None)
             return change
-        project = self.source.getProject(event.project_name)
+        if not event:
+            self.log.error("Change %s not found in cache and no event",
+                           change_key)
+        project = self.source.getProject(change_key.project_name)
         change = Tag(project)
         change.tag = tag
-        change.ref = event.ref
-        change.oldrev = event.oldrev
-        change.newrev = event.newrev
-        change.url = self._getWebUrl(project, sha=event.newrev)
+        change.ref = f'refs/tags/{tag}'
+        change.oldrev = change_key.oldrev
+        change.newrev = change_key.newrev
+        change.url = self._getWebUrl(project, sha=change.newrev)
         try:
-            self._change_cache.set(key, change)
+            self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
-            change = self._change_cache.get(key)
+            change = self._change_cache.get(change_key)
         return change
 
-    def _getBranch(self, event, branch, ref, refresh=False):
-        key = ChangeKey(self.connection_name, event.project_name,
-                        'Branch', branch, event.newrev)
-        change = self._change_cache.get(key)
+    def _getBranch(self, change_key, refresh=False, event=None):
+        branch = change_key.stable_id
+        change = self._change_cache.get(change_key)
         if change:
             if refresh:
                 self._change_cache.updateChangeWithRetry(
-                    key, change, lambda c: None)
+                    change_key, change, lambda c: None)
             return change
-        project = self.source.getProject(event.project_name)
+        if not event:
+            self.log.error("Change %s not found in cache and no event",
+                           change_key)
+        project = self.source.getProject(change_key.project_name)
         change = Branch(project)
         change.branch = branch
-        change.ref = ref
-        change.oldrev = event.oldrev
-        change.newrev = event.newrev
-        change.url = self._getWebUrl(project, sha=event.newrev)
+        change.ref = f'refs/heads/{branch}'
+        change.oldrev = change_key.oldrev
+        change.newrev = change_key.newrev
+        change.url = self._getWebUrl(project, sha=change.newrev)
         try:
-            self._change_cache.set(key, change)
+            self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
-            change = self._change_cache.get(key)
+            change = self._change_cache.get(change_key)
         return change
 
-    def _getRef(self, event, refresh=False):
-        key = ChangeKey(self.connection_name, event.project_name,
-                        'Ref', event.ref, event.newrev)
-        change = self._change_cache.get(key)
+    def _getRef(self, change_key, refresh=False, event=None):
+        change = self._change_cache.get(change_key)
         if change:
             if refresh:
                 self._change_cache.updateChangeWithRetry(
-                    key, change, lambda c: None)
+                    change_key, change, lambda c: None)
             return change
-        project = self.source.getProject(event.project_name)
+        if not event:
+            self.log.error("Change %s not found in cache and no event",
+                           change_key)
+        project = self.source.getProject(change_key.project_name)
         change = Ref(project)
-        change.ref = event.ref
-        change.oldrev = event.oldrev
-        change.newrev = event.newrev
-        change.url = self._getWebUrl(project, sha=event.newrev)
+        change.ref = change_key.stable_id
+        change.oldrev = change_key.oldrev
+        change.newrev = change_key.newrev
+        change.url = self._getWebUrl(project, sha=change.newrev)
         try:
-            self._change_cache.set(key, change)
+            self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
-            change = self._change_cache.get(key)
+            change = self._change_cache.get(change_key)
         return change
 
     def _getDependsOnFromCommit(self, message, change, event):
@@ -939,7 +927,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             dep_num, dep_ps = data.depends_on
             log.debug("Updating %s: Getting git-dependent change %s,%s",
                       change, dep_num, dep_ps)
-            dep = self._getChange(dep_num, dep_ps, history=history,
+            dep_key = ChangeKey(self.connection_name, None,
+                                'GerritChange', str(dep_num), str(dep_ps))
+            dep = self._getChange(dep_key, history=history,
                                   event=event)
             # This is a git commit dependency. So we only ignore it if it is
             # already merged. So even if it is "ABANDONED", we should not
@@ -953,7 +943,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 change.message, change, event):
             log.debug("Updating %s: Getting commit-dependent "
                       "change %s,%s", change, dep_num, dep_ps)
-            dep = self._getChange(dep_num, dep_ps, history=history,
+            dep_key = ChangeKey(self.connection_name, None,
+                                'GerritChange', str(dep_num), str(dep_ps))
+            dep = self._getChange(dep_key, history=history,
                                   event=event)
             if dep.open and dep not in needs_changes:
                 compat_needs_changes.append(dep.cache_key)
@@ -965,7 +957,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             try:
                 log.debug("Updating %s: Getting git-needed change %s,%s",
                           change, dep_num, dep_ps)
-                dep = self._getChange(dep_num, dep_ps, history=history,
+                dep_key = ChangeKey(self.connection_name, None,
+                                    'GerritChange', str(dep_num), str(dep_ps))
+                dep = self._getChange(dep_key, history=history,
                                       event=event)
                 if (dep.open and dep.is_current_patchset and
                     dep not in needed_by_changes):
@@ -987,8 +981,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 # change). In case the dep is already in history we already
                 # refreshed this change so refresh is not needed in this case.
                 refresh = (dep_num, dep_ps) not in history
+                dep_key = ChangeKey(self.connection_name, None,
+                                    'GerritChange', str(dep_num), str(dep_ps))
                 dep = self._getChange(
-                    dep_num, dep_ps, refresh=refresh, history=history,
+                    dep_key, refresh=refresh, history=history,
                     event=event)
                 if (dep.open and dep.is_current_patchset
                     and dep not in needed_by_changes):
@@ -1094,8 +1090,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         changes = []  # type: List[GerritChange]
         for record in data:
             try:
-                changes.append(
-                    self._getChange(record.number, record.current_patchset))
+                change_key = ChangeKey(self.connection_name, None,
+                                       'GerritChange',
+                                       str(record.number),
+                                       str(record.current_patchset))
+                changes.append(self._getChange(change_key))
             except Exception:
                 self.log.exception("Unable to query change %s",
                                    record.number)
