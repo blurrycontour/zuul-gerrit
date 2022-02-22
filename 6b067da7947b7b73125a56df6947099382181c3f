@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bf0c0b9_d6f64d84",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-22T16:35:44Z",
+      "side": 1,
+      "message": "How did we end up with a corrupted change list?",
+      "revId": "6b067da7947b7b73125a56df6947099382181c3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45cb995f_95ec51d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-22T16:35:44Z",
+      "side": 1,
+      "message": "So this change raises an exception which should prevent us from using outdated data, right?",
+      "revId": "6b067da7947b7b73125a56df6947099382181c3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
