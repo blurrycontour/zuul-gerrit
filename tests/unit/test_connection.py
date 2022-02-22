@@ -123,74 +123,83 @@ class TestSQLConnectionMysql(ZuulTestCase):
             pipeline = tenant.layout.pipelines['check']
             reporter = self.scheds.first.connections.getSqlReporter(
                 pipeline)
-            conn = self.scheds.first.connections.getSqlConnection().\
-                engine.connect()
+            with self.scheds.first.connections.getSqlConnection().\
+                    engine.connect() as conn:
 
-            result = conn.execute(
-                sa.sql.select([reporter.connection.zuul_buildset_table]))
+                result = conn.execute(
+                    sa.sql.select([reporter.connection.zuul_buildset_table]))
 
-            buildsets = result.fetchall()
-            self.assertEqual(3, len(buildsets))
-            buildset0 = buildsets[0]
-            buildset1 = buildsets[1]
-            buildset2 = buildsets[2]
+                buildsets = result.fetchall()
+                self.assertEqual(3, len(buildsets))
+                buildset0 = buildsets[0]
+                buildset1 = buildsets[1]
+                buildset2 = buildsets[2]
 
-            self.assertEqual('check', buildset0['pipeline'])
-            self.assertEqual('org/project', buildset0['project'])
-            self.assertEqual(1, buildset0['change'])
-            self.assertEqual('1', buildset0['patchset'])
-            self.assertEqual('SUCCESS', buildset0['result'])
-            self.assertEqual('Build succeeded.', buildset0['message'])
-            self.assertEqual('tenant-one', buildset0['tenant'])
-            self.assertEqual(
-                'https://review.example.com/%d' % buildset0['change'],
-                buildset0['ref_url'])
-            self.assertNotEqual(None, buildset0['event_id'])
-            self.assertNotEqual(None, buildset0['event_timestamp'])
+                self.assertEqual('check', buildset0['pipeline'])
+                self.assertEqual('org/project', buildset0['project'])
+                self.assertEqual(1, buildset0['change'])
+                self.assertEqual('1', buildset0['patchset'])
+                self.assertEqual('SUCCESS', buildset0['result'])
+                self.assertEqual('Build succeeded.', buildset0['message'])
+                self.assertEqual('tenant-one', buildset0['tenant'])
+                self.assertEqual(
+                    'https://review.example.com/%d' % buildset0['change'],
+                    buildset0['ref_url'])
+                self.assertNotEqual(None, buildset0['event_id'])
+                self.assertNotEqual(None, buildset0['event_timestamp'])
 
-            buildset0_builds = conn.execute(
-                sa.sql.select([reporter.connection.zuul_build_table]).where(
-                    reporter.connection.zuul_build_table.c.buildset_id ==
-                    buildset0['id']
-                )
-            ).fetchall()
+                buildset0_builds = conn.execute(
+                    sa.sql.select([
+                        reporter.connection.zuul_build_table
+                    ]).where(
+                        reporter.connection.zuul_build_table.c.buildset_id ==
+                        buildset0['id']
+                    )
+                ).fetchall()
 
-            # Check the first result, which should be the project-merge job
-            self.assertEqual('project-merge', buildset0_builds[0]['job_name'])
-            self.assertEqual("SUCCESS", buildset0_builds[0]['result'])
-            self.assertEqual(None, buildset0_builds[0]['log_url'])
-            self.assertEqual('check', buildset1['pipeline'])
-            self.assertEqual('master', buildset1['branch'])
-            self.assertEqual('org/project', buildset1['project'])
-            self.assertEqual(2, buildset1['change'])
-            self.assertEqual('1', buildset1['patchset'])
-            self.assertEqual('FAILURE', buildset1['result'])
-            self.assertEqual('Build failed.', buildset1['message'])
+                # Check the first result, which should be the project-merge job
+                self.assertEqual(
+                    'project-merge', buildset0_builds[0]['job_name'])
+                self.assertEqual("SUCCESS", buildset0_builds[0]['result'])
+                self.assertEqual(None, buildset0_builds[0]['log_url'])
+                self.assertEqual('check', buildset1['pipeline'])
+                self.assertEqual('master', buildset1['branch'])
+                self.assertEqual('org/project', buildset1['project'])
+                self.assertEqual(2, buildset1['change'])
+                self.assertEqual('1', buildset1['patchset'])
+                self.assertEqual('FAILURE', buildset1['result'])
+                self.assertEqual('Build failed.', buildset1['message'])
 
-            buildset1_builds = conn.execute(
-                sa.sql.select([reporter.connection.zuul_build_table]).where(
-                    reporter.connection.zuul_build_table.c.buildset_id ==
-                    buildset1['id']
-                )
-            ).fetchall()
+                buildset1_builds = conn.execute(
+                    sa.sql.select([
+                        reporter.connection.zuul_build_table
+                    ]).where(
+                        reporter.connection.zuul_build_table.c.buildset_id ==
+                        buildset1['id']
+                    )
+                ).fetchall()
 
-            # Check the second result, which should be the project-test1 job
-            # which failed
-            self.assertEqual('project-test1', buildset1_builds[1]['job_name'])
-            self.assertEqual("FAILURE", buildset1_builds[1]['result'])
-            self.assertEqual(None, buildset1_builds[1]['log_url'])
+                # Check the second result, which should be the project-test1
+                # job which failed
+                self.assertEqual(
+                    'project-test1', buildset1_builds[1]['job_name'])
+                self.assertEqual("FAILURE", buildset1_builds[1]['result'])
+                self.assertEqual(None, buildset1_builds[1]['log_url'])
 
-            buildset2_builds = conn.execute(
-                sa.sql.select([reporter.connection.zuul_build_table]).where(
-                    reporter.connection.zuul_build_table.c.buildset_id ==
-                    buildset2['id']
-                )
-            ).fetchall()
+                buildset2_builds = conn.execute(
+                    sa.sql.select([
+                        reporter.connection.zuul_build_table
+                    ]).where(
+                        reporter.connection.zuul_build_table.c.buildset_id ==
+                        buildset2['id']
+                    )
+                ).fetchall()
 
-            # Check the first result, which should be the project-publish job
-            self.assertEqual('project-publish',
-                             buildset2_builds[0]['job_name'])
-            self.assertEqual("SUCCESS", buildset2_builds[0]['result'])
+                # Check the first result, which should be the project-publish
+                # job
+                self.assertEqual('project-publish',
+                                 buildset2_builds[0]['job_name'])
+                self.assertEqual("SUCCESS", buildset2_builds[0]['result'])
 
         self.executor_server.hold_jobs_in_build = True
 
