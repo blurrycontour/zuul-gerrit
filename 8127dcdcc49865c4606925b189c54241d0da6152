@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6d6fb63_7d718f8e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-22T13:08:41Z",
+      "side": 1,
+      "message": "To be honest I can\u0027t find any other issues with this change, but I\u0027m still a little hesitant to give it a +1. The reason for that is that I don\u0027t quite see this behavior as a bug. If a file was change in a commit that is part of a PR it feels correct to include that file even if a later commit reverts that change.\n\nI know that we had some issues with the files changes API in the past and it took some iterations to get it to the point where it seems to be pretty solid now.\n\nAs mentioned above I did not manage to come up with any other edge cases, but given the history of this API I\u0027m a little on the fence if we really want this change.",
+      "revId": "8127dcdcc49865c4606925b189c54241d0da6152",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
