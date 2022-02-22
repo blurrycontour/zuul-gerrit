@@ -822,6 +822,9 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("Adding node request %s for job %s to item %s",
                       req, job, item)
             build_set.setJobNodeRequestID(job.name, req.id)
+            if req.fulfilled:
+                nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
+                build_set.jobNodeRequestComplete(req.job_name, nodeset)
         return True
 
     def _getPausedParent(self, build_set, job):
