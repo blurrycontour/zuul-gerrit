@@ -16,6 +16,23 @@
       "message": "nit: instead of checking errors multiple times we could also initialize errors to an empty list here:\n\n  errors \u003d errors or []",
       "revId": "61cb275480e0b13c4fc483a689bfdb76b7f977ff",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf0da16f_f6eab1fc",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1093,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-22T15:04:24Z",
+      "side": 1,
+      "message": "Good idea.  I will keep that in mind for the future.",
+      "revId": "61cb275480e0b13c4fc483a689bfdb76b7f977ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
