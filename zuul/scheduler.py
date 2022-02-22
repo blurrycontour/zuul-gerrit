@@ -107,6 +107,8 @@ from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
 from zuul.zk.election import SessionAwareElection
 
+RECONFIG_LOCK_ID = "RECONFIG"
+
 
 class FullReconfigureCommand(commandsocket.Command):
     name = 'full-reconfigure'
@@ -879,6 +881,9 @@ class Scheduler(threading.Thread):
                 # In case we don't have a cached layout state we need to
                 # acquire the write lock since we load a new tenant.
                 if layout_state is None:
+                    # There is no need to use the reconfig lock ID here as
+                    # we are starting from an empty layout state and there
+                    # should be no concurrent read locks.
                     lock_ctx = tenant_write_lock(self.zk_client, tenant_name)
                 else:
                     lock_ctx = tenant_read_lock(self.zk_client, tenant_name)
@@ -1314,7 +1319,8 @@ class Scheduler(threading.Thread):
                 # Consider all project branch caches valid.
                 branch_cache_min_ltimes = defaultdict(lambda: -1)
 
-                with tenant_write_lock(self.zk_client, tenant_name) as lock:
+                with tenant_write_lock(self.zk_client, tenant_name,
+                                       identifier=RECONFIG_LOCK_ID) as lock:
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1373,7 +1379,8 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide,
                             [event.tenant_name])
 
-            with tenant_write_lock(self.zk_client, event.tenant_name) as lock:
+            with tenant_write_lock(self.zk_client, event.tenant_name,
+                                   identifier=RECONFIG_LOCK_ID) as lock:
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1812,7 +1819,7 @@ class Scheduler(threading.Thread):
                     try:
                         with tenant_read_lock(
                             self.zk_client, tenant_name, blocking=False
-                        ):
+                        ) as tlock:
                             remote_state = self.tenant_layout_state.get(
                                 tenant_name)
                             if remote_state is None:
@@ -1839,7 +1846,7 @@ class Scheduler(threading.Thread):
                                 # event queues that are processed below.
                                 self.process_tenant_trigger_queue(tenant)
 
-                            self.process_pipelines(tenant)
+                            self.process_pipelines(tenant, tlock)
                     except LockException:
                         self.log.debug("Skipping locked tenant %s",
                                        tenant.name)
@@ -1898,10 +1905,15 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
 
-    def process_pipelines(self, tenant):
+    def process_pipelines(self, tenant, tenant_lock):
         for pipeline in tenant.layout.pipelines.values():
             stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             if self._stopped:
+                return
+            if RECONFIG_LOCK_ID in tenant_lock.contenders():
+                self.log.debug("Stopping tenant %s pipeline processing due to "
+                               "pending reconfig", tenant.name)
+                self.wake_event.set()
                 return
             try:
                 with pipeline_lock(

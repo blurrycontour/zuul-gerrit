@@ -100,13 +100,14 @@ def tenant_read_lock(client, tenant_name, blocking=True):
 
 
 @contextmanager
-def tenant_write_lock(client, tenant_name, blocking=True):
+def tenant_write_lock(client, tenant_name, blocking=True, identifier=None):
     safe_tenant = quote_plus(tenant_name)
     with locked(
         SessionAwareWriteLock(
             client.client,
-            f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
-        blocking=blocking
+            f"{TENANT_LOCK_ROOT}/{safe_tenant}",
+            identifier=identifier),
+        blocking=blocking,
     ) as lock:
         yield lock
 
