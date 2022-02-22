@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b14ccaf7_1d071a3e",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1093,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-22T13:10:24Z",
+      "side": 1,
+      "message": "nit: instead of checking errors multiple times we could also initialize errors to an empty list here:\n\n  errors \u003d errors or []",
+      "revId": "61cb275480e0b13c4fc483a689bfdb76b7f977ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
