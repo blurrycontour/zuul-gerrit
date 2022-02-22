@@ -16,6 +16,24 @@
       "message": "We aren\u0027t just releasing the lock we are also short circuiting pipeline processing for the tenant. Would it be better to log this as:\n\n  self.log.debug(\"Stopping tenant %s pipeline processing in order to release the tenant read lock.\", tenant.name)\n\nSeparately checking the contenders will involve ZK traffic. I expect that compared to long waits for the lock this is preferable but calling that out in case it represents a problem.",
       "revId": "5516185a8ae6a7ff72250d0a98bc25e531e16eea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef727c2_e041f1c7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1889,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-22T06:24:37Z",
+      "side": 1,
+      "message": "Yes, that might be better. I think I\u0027ll also leave the read lock stuff out of the message as that\u0027s just an implementation detail.\n\nRe. ZK traffic: yep, this needs a few ZK requests, but as there shouldn\u0027t be too many contenders at any given time I think it won\u0027t have a significant performance impact.",
+      "parentUuid": "8e15de58_0cf1d622",
+      "revId": "5516185a8ae6a7ff72250d0a98bc25e531e16eea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
