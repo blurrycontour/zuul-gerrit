@@ -3971,7 +3971,7 @@ class MySQLSchemaFixture(fixtures.Fixture):
                              user="openstack_citest",
                              passwd="openstack_citest",
                              db="openstack_citest",
-                             read_timeout=30)
+                             read_timeout=90)
         try:
             with db.cursor() as cur:
                 cur.execute("drop database %s" % self.name)
