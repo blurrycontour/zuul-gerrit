@@ -16,6 +16,24 @@
       "message": "The side effect of including unexpected files seems worse to me than not noticing the extra config files of a dependent repo. In order to solve this we\u0027d need to change the api here and list the files and dirs per repo.",
       "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e50d48b_0418f739",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-23T15:37:04Z",
+      "side": 1,
+      "message": "On the other hand we could do it like this here to keep the api towards the mergers and filter the files when they return in the result to avoid the side effect.",
+      "parentUuid": "bd2afded_44ceaf05",
+      "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
