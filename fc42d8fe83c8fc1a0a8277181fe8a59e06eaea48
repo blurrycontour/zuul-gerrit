@@ -88,6 +88,24 @@
       "parentUuid": "682f28f5_e6b131e9",
       "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9df14e66_1f052251",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-02-23T20:28:02Z",
+      "side": 1,
+      "message": "I was also thinking about tests, but I can not find existing tests for scheduler, is there anything existing?\nOtherwise it seems complex to mock up everything for testing scheduler.",
+      "parentUuid": "b7bb3ebb_7e112c57",
+      "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
