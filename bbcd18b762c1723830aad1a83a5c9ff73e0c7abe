@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecdfa23f_87ec9871",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-02-23T12:53:42Z",
+      "side": 1,
+      "message": "LGTM, but there is now a conflict.",
+      "revId": "bbcd18b762c1723830aad1a83a5c9ff73e0c7abe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
