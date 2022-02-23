@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "949efdb5_bc701934",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5550,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-23T17:50:45Z",
+      "side": 1,
+      "message": "Is this debugging something we want to keep around? Not sure how much extra data it adds to the test logs.",
+      "revId": "c522bfa46077f0e030f03e0cd4585d5c100ed241",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a7fc140_1ac2915d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1488,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-23T17:50:45Z",
+      "side": 1,
+      "message": "Looks like created_time existed previously, we just weren\u0027t deserializing it properly?",
+      "revId": "c522bfa46077f0e030f03e0cd4585d5c100ed241",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
