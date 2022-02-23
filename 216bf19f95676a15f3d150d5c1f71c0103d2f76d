@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bc8f4a4_9841032a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-23T21:38:40Z",
+      "side": 1,
+      "message": "I just wanted to make sure that we thought about this case. I think the dirty flag is a good idea for an enhancement in a followup.",
+      "parentUuid": "6e2811d2_7a2c12d5",
+      "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fe0c1a4_989a957c",
