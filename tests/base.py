@@ -5647,27 +5647,6 @@ class ZuulTestCase(BaseTestCase):
         for build in self.history:
             self.log.debug(build)
 
-    def updateConfigLayout(self, path):
-        root = os.path.join(self.test_root, "config")
-        if not os.path.exists(root):
-            os.makedirs(root)
-        f = tempfile.NamedTemporaryFile(dir=root, delete=False)
-        f.write("""
-- tenant:
-    name: openstack
-    source:
-      gerrit:
-        config-projects:
-          - %s
-        untrusted-projects:
-          - org/project
-          - org/project1
-          - org/project2\n""" % path)
-        f.close()
-        self.config.set('scheduler', 'tenant_config',
-                        os.path.join(FIXTURE_DIR, f.name))
-        self.setupAllProjectKeys(self.config)
-
     def addTagToRepo(self, project, name, sha):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)

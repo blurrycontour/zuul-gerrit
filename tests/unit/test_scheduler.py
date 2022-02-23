@@ -5116,14 +5116,12 @@ For CI problems and help debugging, contact ci@example.org"""
             )
         )
 
-    @skip("Disabled for early v3 development")
     def test_merge_failure_reports(self):
         """Check that when a change fails to merge the correct message is sent
         to the correct reporter"""
-        self.updateConfigLayout(
-            'tests/fixtures/layout-merge-failure.yaml')
+        self.commitConfigUpdate('common-config',
+                                'layouts/merge-failure.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.registerJobs()
 
         # Check a test failure isn't reported to SMTP
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -5138,9 +5136,9 @@ For CI problems and help debugging, contact ci@example.org"""
         # Check a merge failure is reported to SMTP
         # B should be merged, but C will conflict with B
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addPatchset(['conflict'])
+        B.addPatchset({'conflict': 'foo'})
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        C.addPatchset(['conflict'])
+        C.addPatchset({'conflict': 'bar'})
         B.addApproval('Code-Review', 2)
         C.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
@@ -5152,15 +5150,14 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual('The merge failed! For more information...',
                          self.smtp_messages[0]['body'])
 
-    @skip("Disabled for early v3 development")
     def test_default_merge_failure_reports(self):
         """Check that the default merge failure reports are correct."""
 
         # A should report success, B should report merge failure.
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addPatchset(['conflict'])
+        A.addPatchset({'conflict': 'foo'})
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addPatchset(['conflict'])
+        B.addPatchset({'conflict': 'bar'})
         A.addApproval('Code-Review', 2)
         B.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
@@ -5169,14 +5166,14 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertEqual(3, len(self.history))  # A jobs
         self.assertEqual(A.reported, 2)
-        self.assertEqual(B.reported, 2)
+        self.assertEqual(B.reported, 1)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'NEW')
         self.assertIn('Build succeeded', A.messages[1])
-        self.assertIn('Merge Failed', B.messages[1])
-        self.assertIn('automatically merged', B.messages[1])
-        self.assertNotIn('logs.example.com', B.messages[1])
-        self.assertNotIn('SKIPPED', B.messages[1])
+        self.assertIn('Merge Failed', B.messages[0])
+        self.assertIn('automatically merged', B.messages[0])
+        self.assertNotIn('logs.example.com', B.messages[0])
+        self.assertNotIn('SKIPPED', B.messages[0])
 
     @simple_layout('layouts/nonvoting-pipeline.yaml')
     def test_nonvoting_pipeline(self):
