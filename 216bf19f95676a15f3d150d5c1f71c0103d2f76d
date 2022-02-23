@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e2811d2_7a2c12d5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-23T21:34:07Z",
+      "side": 1,
+      "message": "I originally figured the risk was small and mitigated by the high probability another event would come along.  The alternative is to \"peek\" at the pipeline state (we already do that elsewhere to read the layout uuid), but I didn\u0027t want to keep doing that, especially inside a loop where we would likely immediately read the state again after peeking.  That\u0027s why I went with the event: to keep the number of things to check to a minimum.\n\nBut combined with the point below, perhaps we should address this situation generically.  We could write a flag znode indicating it\u0027s \"dirty\" when we start processing the pipeline, and then clear it below where we set STATE_NORMAL.  We\u0027ll add a check for the flag to the list of conditions where we process a pipeline.  If we hit either of these two situations, the flag will remain, and another scheduler can process it.",
+      "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fe0c1a4_989a957c",
