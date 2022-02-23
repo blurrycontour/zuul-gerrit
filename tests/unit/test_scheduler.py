@@ -5155,8 +5155,10 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertEqual(6, len(self.history))  # A and B jobs
         self.assertEqual(1, len(self.smtp_messages))
-        self.assertEqual('The merge failed! For more information...',
-                         self.smtp_messages[0]['body'])
+        self.assertIn('The merge failed! For more information...',
+                      self.smtp_messages[0]['body'])
+        self.assertIn('Error merging gerrit/org/project',
+                      self.smtp_messages[0]['body'])
 
     def test_default_merge_failure_reports(self):
         """Check that the default merge failure reports are correct."""
@@ -5180,6 +5182,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Build succeeded', A.messages[1])
         self.assertIn('Merge Failed', B.messages[0])
         self.assertIn('automatically merged', B.messages[0])
+        self.assertIn('Error merging gerrit/org/project', B.messages[0])
         self.assertNotIn('logs.example.com', B.messages[0])
         self.assertNotIn('SKIPPED', B.messages[0])
 
@@ -6037,6 +6040,7 @@ For CI problems and help debugging, contact ci@example.org"""
                    os.path.join(FIXTURE_DIR, 'git_fail.sh'))
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
+        self.assertIn('Unable to update gerrit/org/project', A.messages[0])
 
     @simple_layout('layouts/vars.yaml')
     def test_jobdata(self):

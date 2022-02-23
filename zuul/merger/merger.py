@@ -875,8 +875,7 @@ class Merger(object):
                                 process_worker=process_worker)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
-                   zuul_event_id=None,
-                   build=None, process_worker=None):
+                   zuul_event_id=None, build=None, process_worker=None):
         """Fetch from origin if needed
 
         If repo_state is None, then this will always git fetch.
@@ -1084,7 +1083,7 @@ class Merger(object):
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
                      repo_locks=None, branches=None, zuul_event_id=None,
-                     process_worker=None):
+                     process_worker=None, errors=None):
         """Merge changes
 
         Call Merger.updateRepo() first.
@@ -1106,13 +1105,25 @@ class Merger(object):
                     item['connection'], item['project'])
             else:
                 lock = nullcontext()
+            err_msg = (
+                f"Error merging {item['connection']}/{item['project']} "
+                f"for {item['number']},{item['patchset']}"
+            )
             with lock:
                 log.debug("Merging for change %s,%s" %
                           (item["number"], item["patchset"]))
-                orig_commit, commit = self._mergeItem(
-                    item, recent, repo_state, zuul_event_id, branches=branches,
-                    process_worker=process_worker)
+                try:
+                    orig_commit, commit = self._mergeItem(
+                        item, recent, repo_state, zuul_event_id,
+                        branches=branches,
+                        process_worker=process_worker)
+                except Exception:
+                    self.log.exception("Error merging item %s", item)
+                    if errors is not None:
+                        errors.append(err_msg)
                 if not commit:
+                    if errors is not None:
+                        errors.append(err_msg)
                     return None
                 if files or dirs:
                     repo = self.getRepo(item['connection'], item['project'])

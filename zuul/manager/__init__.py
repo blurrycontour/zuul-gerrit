@@ -1736,14 +1736,14 @@ class PipelineManager(metaclass=ABCMeta):
                                     '0000000000000000000000000000000000000000')
         if not build_set.commit:
             self.log.info("Unable to merge change %s" % item.change)
-            item.setUnableToMerge()
+            item.setUnableToMerge(event.errors)
 
     def _onGlobalRepoStateCompleted(self, event, build_set):
         item = build_set.item
         if not event.updated:
             self.log.info("Unable to get global repo state for change %s"
                           % item.change)
-            item.setUnableToMerge()
+            item.setUnableToMerge(event.errors)
         else:
             self.log.info("Received global repo state for change %s"
                           % item.change)

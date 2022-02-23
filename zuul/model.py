@@ -4814,9 +4814,14 @@ class QueueItem(zkobject.ZKObject):
             dequeued_bundle_failing=True)
         self._setMissingJobsSkipped()
 
-    def setUnableToMerge(self):
-        self.current_build_set.updateAttributes(
-            self.pipeline.manager.current_context, unable_to_merge=True)
+    def setUnableToMerge(self, errors=None):
+        with self.current_build_set.activeContext(
+                self.pipeline.manager.current_context):
+            self.current_build_set.unable_to_merge = True
+            if errors:
+                for msg in errors:
+                    self.current_build_set.warning_messages.append(msg)
+                    self.log.info(msg)
         self._setAllJobsSkipped()
 
     def setConfigError(self, error):
@@ -5872,10 +5877,12 @@ class MergeCompletedEvent(ResultEvent):
     :arg dict repo_state: The starting repo state before the merge.
     :arg list item_in_branches: A list of branches in which the final
         commit in the merge list appears (changes without refs).
+    :arg list errors: A list of error message strings
     """
 
     def __init__(self, request_uuid, build_set_uuid, merged, updated,
-                 commit, files, repo_state, item_in_branches):
+                 commit, files, repo_state, item_in_branches,
+                 errors):
         self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.merged = merged
@@ -5884,12 +5891,14 @@ class MergeCompletedEvent(ResultEvent):
         self.files = files or []
         self.repo_state = repo_state or {}
         self.item_in_branches = item_in_branches or []
+        self.errors = errors or []
 
     def __repr__(self):
         return ('<MergeCompletedEvent job: %s buildset: %s merged: %s '
-                'updated: %s commit: %s>' % (
+                'updated: %s commit: %s errors: %s>' % (
                     self.request_uuid, self.build_set_uuid,
-                    self.merged, self.updated, self.commit))
+                    self.merged, self.updated, self.commit,
+                    self.errors))
 
     def toDict(self):
         return {
@@ -5901,6 +5910,7 @@ class MergeCompletedEvent(ResultEvent):
             "files": list(self.files),
             "repo_state": dict(self.repo_state),
             "item_in_branches": list(self.item_in_branches),
+            "errors": list(self.errors),
         }
 
     @classmethod
@@ -5914,6 +5924,7 @@ class MergeCompletedEvent(ResultEvent):
             list(data.get("files", [])),
             dict(data.get("repo_state", {})),
             list(data.get("item_in_branches", [])),
+            list(data.get("errors", [])),
         )
 
 
