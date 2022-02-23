@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c6993d9b_3aa62ed4",
+        "filename": "zuul/driver/zuul/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-23T21:56:32Z",
+      "side": 1,
+      "message": "Does it make sense to make this part of the ZuulTriggerEvent __init__ method then it will always have the value? Might make for a good followup to avoid this type of bug in the future.",
+      "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "26d36264_47e911e9",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -49,6 +66,24 @@
       "side": 1,
       "message": "I just wanted to make sure that we thought about this case. I think the dirty flag is a good idea for an enhancement in a followup.",
       "parentUuid": "6e2811d2_7a2c12d5",
+      "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3881c46_84c0df74",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-23T21:56:32Z",
+      "side": 1,
+      "message": "As noted on Matrix following up to make the dirty flag change is a good thing, but we can get away with this for now so approving as is.",
+      "parentUuid": "8bc8f4a4_9841032a",
       "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
