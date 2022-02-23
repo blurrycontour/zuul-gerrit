@@ -794,6 +794,8 @@ class PipelineChangeList(zkobject.ShardedZKObject):
 
     def refresh(self, context):
         # See comment above about reading without a lock.
+        retry_count = 0
+        max_retries = 5
         while context.sessionIsValid():
             try:
                 super().refresh(context)
@@ -805,6 +807,9 @@ class PipelineChangeList(zkobject.ShardedZKObject):
                 raise
             except Exception:
                 context.log.error("Failed to refresh change list")
+                if retry_count >= max_retries:
+                    raise
+                retry_count += 1
                 time.sleep(self._retry_interval)
 
     def getPath(self):
