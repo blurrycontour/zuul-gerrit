@@ -16,6 +16,23 @@
       "message": "LGTM but without access to azure AD I can\u0027t test manually.",
       "revId": "5826a2a6c8bdd3cb57decf67b601e7ac9f7353a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64a43987_015ee660",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2022-02-23T15:19:24Z",
+      "side": 1,
+      "message": "We have a similar problem with Okta, it is necessary to define a custom audience to match the organization\u0027s default endpoint.\n\nI tested it on staging and the authentication works as expected.\n\nOnly the \"audience\" field has been tested",
+      "revId": "5826a2a6c8bdd3cb57decf67b601e7ac9f7353a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
