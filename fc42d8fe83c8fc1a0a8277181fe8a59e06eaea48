@@ -70,6 +70,24 @@
       "parentUuid": "ba182d93_0f76eed2",
       "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7bb3ebb_7e112c57",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-23T16:07:53Z",
+      "side": 1,
+      "message": "Oh great, then all what\u0027s missing are tests.",
+      "parentUuid": "682f28f5_e6b131e9",
+      "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
