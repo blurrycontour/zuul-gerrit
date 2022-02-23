@@ -54,6 +54,8 @@ from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 
 # HTTP timeout in seconds
 TIMEOUT = 30
+# SSH connection timeout
+SSH_TIMEOUT = TIMEOUT
 
 # commentSizeLimit default set by Gerrit.  Gerrit is a bit
 # vague about what this means, it says
@@ -402,10 +404,13 @@ class GerritWatcher(threading.Thread):
             client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            # SSH banner, handshake, and auth timeouts default to 15
+            # seconds, so we only set the socket timeout here.
             client.connect(self.hostname,
                            username=self.username,
                            port=self.port,
-                           key_filename=self.keyfile)
+                           key_filename=self.keyfile,
+                           timeout=SSH_TIMEOUT)
             transport = client.get_transport()
             transport.set_keepalive(self.keepalive)
 
@@ -1468,10 +1473,13 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             client = paramiko.SSHClient()
             client.load_system_host_keys()
             client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            # SSH banner, handshake, and auth timeouts default to 15
+            # seconds, so we only set the socket timeout here.
             client.connect(self.server,
                            username=self.user,
                            port=self.port,
-                           key_filename=self.keyfile)
+                           key_filename=self.keyfile,
+                           timeout=SSH_TIMEOUT)
             transport = client.get_transport()
             transport.set_keepalive(self.keepalive)
             self.client = client
