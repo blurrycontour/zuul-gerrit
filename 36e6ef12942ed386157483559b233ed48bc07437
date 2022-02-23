@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ec29654_f1ddd8fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-23T18:12:17Z",
+      "side": 1,
+      "message": "This is like half a -1.",
+      "revId": "36e6ef12942ed386157483559b233ed48bc07437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0cb94b6_b1c9a20f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2044,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-02-23T18:12:17Z",
+      "side": 1,
+      "message": "I think this should be an elif to preserve the old behavior of not running hasUnparsedBranchCache() if the prior conditional was True.",
+      "range": {
+        "startLine": 2044,
+        "startChar": 8,
+        "endLine": 2044,
+        "endChar": 10
+      },
+      "revId": "36e6ef12942ed386157483559b233ed48bc07437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
