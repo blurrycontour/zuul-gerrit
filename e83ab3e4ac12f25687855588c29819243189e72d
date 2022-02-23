@@ -16,6 +16,23 @@
       "message": "Is there a case where we forward `PipelinePostConfigEvents`? In the manager we are adding them directly to the pipeline management event queue.\n\nI think the `_forward_management_event()` method will also fail for `PipelinePostConfigEvents` as it expects an event that has a tenant and pipeline name.",
       "revId": "e83ab3e4ac12f25687855588c29819243189e72d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cf7ce80_d382fb5e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2159,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-23T14:11:04Z",
+      "side": 1,
+      "message": "No, but this just seemed more correct and descriptive.  We should probably add tenant+pipeline as required attributes of PipelineManagementEvents to make this more robust.",
+      "revId": "e83ab3e4ac12f25687855588c29819243189e72d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
