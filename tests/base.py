@@ -5545,6 +5545,10 @@ class ZuulTestCase(BaseTestCase):
                     return s_value
             time.sleep(0.1)
 
+        stats = list(itertools.chain.from_iterable(
+            [s.decode('utf-8').split('\n') for s in self.statsd.stats]))
+        for stat in stats:
+            self.log.debug("Stat: %s", stat)
         raise StatException("Key %s not found in reported stats" % key)
 
     def assertUnReportedStat(self, key, value=None, kind=None):

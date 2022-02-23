@@ -146,7 +146,7 @@ class Nodepool(object):
         if request.canceled:
             state = 'canceled'
         elif request.state in (model.STATE_FULFILLED, model.STATE_FAILED):
-            dt = int((request.state_time - request.requested_time) * 1000)
+            dt = (request.state_time - request.requested_time) * 1000
 
         key = 'zuul.nodepool.requests.%s' % state
         pipe.incr(key + ".total")

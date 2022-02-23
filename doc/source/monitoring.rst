@@ -79,10 +79,65 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
    Holds metrics specific to jobs. This hierarchy includes:
 
-   .. stat:: <pipeline name>
+   .. stat:: <pipeline>
 
       A set of metrics for each pipeline named as defined in the Zuul
       config.
+
+      .. stat:: event_enqueue_time
+         :type: timer
+
+         The time elapsed from when a trigger event was received from
+         the remote system to when the corresponding item is enqueued
+         in a pipeline.
+
+      .. stat:: merge_request_time
+         :type: timer
+
+         The amount of time spent waiting for the initial merge
+         operation(s).  This will always include a request to a Zuul
+         merger to speculatively merge the change, but it may also
+         include a second request submitted in parallel to identify
+         the files altered by the change.
+
+      .. stat:: layout_generation_time
+         :type: timer
+
+         The amount of time spent generating a dynamic configuration layout.
+
+      .. stat:: job_freeze_time
+         :type: timer
+
+         The amount of time spent freezing the inheritance hierarchy
+         and parameters of a job.
+
+      .. stat:: repo_state_time
+         :type: timer
+
+         The amount of time waiting for a secondary Zuul merger
+         operation to collect additional information about the repo
+         state of required projects.
+
+      .. stat:: node_request_time
+         :type: timer
+
+         The amount of time spent waiting for each node request to be
+         fulfilled.
+
+      .. stat:: job_wait_time
+         :type: timer
+
+         How long a job waited for an executor to start running it
+         after the build was requested.
+
+      .. stat:: event_job_time
+         :type: timer
+
+         The total amount of time elapsed from when a trigger event
+         was received from the remote system until the item's first
+         job is run.  This is only emitted once per queue item, even
+         if its buildset is reset due to a speculative execution
+         failure.
 
       .. stat:: all_jobs
          :type: counter
@@ -153,8 +208,8 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
                         .. stat:: wait_time
                            :type: timer
 
-                           How long each item spent in the pipeline before its first job
-                           started.
+                           How long the job waited for an executor to
+                           start running it after the build was requested.
 
                   .. stat:: current_changes
                      :type: gauge
@@ -173,6 +228,12 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
                      The number of changes for this project processed by the
                      pipeline since Zuul started.
+
+      .. stat:: read_time
+         :type: timer
+
+         The time spent reading data from ZooKeeper during a single
+         pipeline processing run.
 
       .. stat:: refresh
          :type: timer
@@ -205,6 +266,12 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          :type: gauge
 
          The size of the pipeline's management event queue.
+
+      .. stat:: write_time
+         :type: timer
+
+         The time spent writing data to ZooKeeper during a single
+         pipeline processing run.
 
 .. stat:: zuul.executor.<executor>
 

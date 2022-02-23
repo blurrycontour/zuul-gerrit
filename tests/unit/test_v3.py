@@ -1240,6 +1240,12 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test3', result='SUCCESS', changes='2,1'),
         ], ordered=False)
 
+        # Catch time / monotonic errors
+        val = self.assertReportedStat('zuul.tenant.tenant-one.pipeline.'
+                                      'tenant-one-gate.layout_generation_time',
+                                      kind='ms')
+        self.assertTrue(0.0 < float(val) < 60000.0)
+
     def test_dynamic_template(self):
         # Tests that a project can't update a template in another
         # project.
@@ -7195,6 +7201,12 @@ class TestProvidesRequiresMysql(ZuulTestCase):
                     'type': 'container_image',
                 }
             }])
+
+        # Catch time / monotonic errors
+        val = self.assertReportedStat('zuul.tenant.tenant-one.pipeline.'
+                                      'gate.repo_state_time',
+                                      kind='ms')
+        self.assertTrue(0.0 < float(val) < 60000.0)
 
     @simple_layout('layouts/provides-requires-unshared.yaml')
     def test_provides_requires_unshared_queue(self):

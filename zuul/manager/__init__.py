@@ -1123,7 +1123,10 @@ class PipelineManager(metaclass=ABCMeta):
             return self.getFallbackLayout(item)
 
         log.debug("Preparing dynamic layout for: %s" % item.change)
-        return self._loadDynamicLayout(item)
+        start = time.time()
+        layout = self._loadDynamicLayout(item)
+        self.reportPipelineTiming('layout_generation_time', start)
+        return layout
 
     def _branchesForRepoState(self, projects, tenant, items=None):
         items = items or []
@@ -1256,6 +1259,7 @@ class PipelineManager(metaclass=ABCMeta):
                                        branches=branches)
         item.current_build_set.updateAttributes(
             self.current_context,
+            repo_state_request_time=time.time(),
             repo_state_state=item.current_build_set.PENDING)
         return True
 
@@ -1344,10 +1348,12 @@ class PipelineManager(metaclass=ABCMeta):
         if not item.current_build_set.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
+                start = time.time()
                 item.freezeJobGraph(self.getLayout(item),
                                     self.current_context,
                                     skip_file_matcher=False,
                                     redact_secrets_and_keys=False)
+                self.reportPipelineTiming('job_freeze_time', start)
             except Exception as e:
                 # TODOv3(jeblair): nicify this exception as it will be reported
                 log.exception("Error freezing job graph for %s" % (item,))
@@ -1567,6 +1573,17 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         log.debug("Build %s started", build)
         self.sql.reportBuildStart(build)
+        self.reportPipelineTiming('job_wait_time',
+                                  build.execute_time, build.start_time)
+        if not build.build_set.item.first_job_start_time:
+            # Only report this for the first job in a queue item so
+            # that we don't include gate resets.
+            build.build_set.item.updateAttributes(
+                self.current_context,
+                first_job_start_time=build.start_time)
+            self.reportPipelineTiming('event_job_time',
+                                      build.build_set.item.event.timestamp,
+                                      build.start_time)
         return True
 
     def onBuildPaused(self, build):
@@ -1667,14 +1684,25 @@ class PipelineManager(metaclass=ABCMeta):
         source.setChangeAttributes(item.change, files=event.files)
         build_set.updateAttributes(self.current_context,
                                    files_state=build_set.COMPLETE)
+        if build_set.merge_state == build_set.COMPLETE:
+            # We're the second of the files/merger pair, report the stat
+            self.reportPipelineTiming('merge_request_time',
+                                      build_set.configured_time)
 
     def onMergeCompleted(self, event, build_set):
         if build_set.merge_state == build_set.COMPLETE:
             self._onGlobalRepoStateCompleted(event, build_set)
+            self.reportPipelineTiming('repo_state_time',
+                                      build_set.repo_state_request_time)
         else:
             self._onMergeCompleted(event, build_set)
+            if build_set.files_state == build_set.COMPLETE:
+                # We're the second of the files/merger pair, report the stat
+                self.reportPipelineTiming('merge_request_time',
+                                          build_set.configured_time)
 
     def _onMergeCompleted(self, event, build_set):
+
         item = build_set.item
         source = self.sched.connections.getSource(
             item.change.project.connection_name)
@@ -1705,12 +1733,14 @@ class PipelineManager(metaclass=ABCMeta):
             item.setUnableToMerge()
 
     def _onGlobalRepoStateCompleted(self, event, build_set):
+        item = build_set.item
         if not event.updated:
-            item = build_set.item
             self.log.info("Unable to get global repo state for change %s"
                           % item.change)
             item.setUnableToMerge()
         else:
+            self.log.info("Received global repo state for change %s"
+                          % item.change)
             with build_set.activeContext(self.current_context):
                 build_set.setExtraRepoState(event.repo_state)
                 build_set.repo_state_state = build_set.COMPLETE
@@ -1719,6 +1749,7 @@ class PipelineManager(metaclass=ABCMeta):
         # TODOv3(jeblair): handle provisioning failure here
         log = get_annotated_logger(self.log, request.event_id)
 
+        self.reportPipelineTiming('node_request_time', request.created_time)
         if nodeset is not None:
             build_set.jobNodeRequestComplete(request.job_name, nodeset)
         if not request.fulfilled:
@@ -1887,7 +1918,7 @@ class PipelineManager(metaclass=ABCMeta):
             # Update the gauge on enqueue and dequeue, but timers only
             # when dequeing.
             if item.dequeue_time:
-                dt = int((item.dequeue_time - item.enqueue_time) * 1000)
+                dt = (item.dequeue_time - item.enqueue_time) * 1000
             else:
                 dt = None
             items = len(self.pipeline.getAllItems())
@@ -1922,12 +1953,27 @@ class PipelineManager(metaclass=ABCMeta):
             if added and hasattr(item.event, 'arrived_at_scheduler_timestamp'):
                 now = time.time()
                 arrived = item.event.arrived_at_scheduler_timestamp
-                processing = int((now - arrived) * 1000)
-                elapsed = int((now - item.event.timestamp) * 1000)
+                processing = (now - arrived) * 1000
+                elapsed = (now - item.event.timestamp) * 1000
                 self.sched.statsd.timing(
                     basekey + '.event_enqueue_processing_time',
                     processing)
                 self.sched.statsd.timing(
                     basekey + '.event_enqueue_time', elapsed)
+                self.reportPipelineTiming('event_enqueue_time',
+                                          item.event.timestamp)
         except Exception:
             self.log.exception("Exception reporting pipeline stats")
+
+    def reportPipelineTiming(self, key, start, end=None):
+        if not self.sched.statsd:
+            return
+        if not start:
+            return
+        if end is None:
+            end = time.time()
+        pipeline = self.pipeline
+        tenant = pipeline.tenant
+        stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
+        dt = (end - start) * 1000
+        self.sched.statsd.timing(f'{stats_key}.{key}', dt)

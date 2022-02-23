@@ -797,14 +797,14 @@ class Scheduler(threading.Thread):
                     'RETRY' if build.result is None else build.result
                 )
                 if build.result in ['SUCCESS', 'FAILURE'] and build.start_time:
-                    dt = int((build.end_time - build.start_time) * 1000)
+                    dt = (build.end_time - build.start_time) * 1000
                     self.statsd.timing(key, dt)
                 self.statsd.incr(key)
                 # zuul.tenant.<tenant>.pipeline.<pipeline>.project.
                 #  <host>.<project>.<branch>.job.<job>.wait_time
                 if build.start_time:
                     key = '%s.wait_time' % jobkey
-                    dt = int((build.start_time - build.execute_time) * 1000)
+                    dt = (build.start_time - build.execute_time) * 1000
                     self.statsd.timing(key, dt)
         except Exception:
             self.log.exception("Exception reporting runtime stats")
@@ -1929,6 +1929,11 @@ class Scheduler(threading.Thread):
                         self._process_pipeline(tenant, pipeline)
                     # Update pipeline summary for zuul-web
                     pipeline.summary.update(ctx, self.globals)
+                    if self.statsd:
+                        self.statsd.timing(f'{stats_key}.read_time',
+                                           ctx.cumulative_read_time * 1000)
+                        self.statsd.timing(f'{stats_key}.write_time',
+                                           ctx.cumulative_write_time * 1000)
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
                                pipeline.name, tenant.name)

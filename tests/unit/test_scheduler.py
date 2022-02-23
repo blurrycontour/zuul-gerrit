@@ -440,13 +440,21 @@ class TestScheduler(ZuulTestCase):
                                 value='0', kind='g')
 
         # Catch time / monotonic errors
-        val = self.assertReportedStat(
-            'zuul.tenant.tenant-one.event_enqueue_processing_time',
-            kind='ms')
-        self.assertTrue(0.0 < float(val) < 60000.0)
-        val = self.assertReportedStat(
-            'zuul.tenant.tenant-one.event_enqueue_time', kind='ms')
-        self.assertTrue(0.0 < float(val) < 60000.0)
+        for key in [
+                'zuul.tenant.tenant-one.event_enqueue_processing_time',
+                'zuul.tenant.tenant-one.event_enqueue_time',
+                'zuul.tenant.tenant-one.pipeline.gate.event_enqueue_time',
+                'zuul.tenant.tenant-one.pipeline.gate.merge_request_time',
+                'zuul.tenant.tenant-one.pipeline.gate.job_freeze_time',
+                'zuul.tenant.tenant-one.pipeline.gate.node_request_time',
+                'zuul.tenant.tenant-one.pipeline.gate.job_wait_time',
+                'zuul.tenant.tenant-one.pipeline.gate.event_job_time',
+                'zuul.tenant.tenant-one.pipeline.gate.resident_time',
+                'zuul.tenant.tenant-one.pipeline.gate.read_time',
+                'zuul.tenant.tenant-one.pipeline.gate.write_time',
+        ]:
+            val = self.assertReportedStat(key, kind='ms')
+            self.assertTrue(0.0 < float(val) < 60000.0)
 
         self.assertReportedStat('zuul.tenant.tenant-one.pipeline.gate.'
                                 'data_size_compressed',

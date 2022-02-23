@@ -590,7 +590,7 @@ class ManagementEventQueue(ZooKeeperEventQueue):
             return
 
         result_data = {"traceback": event.traceback,
-                       "timestamp": time.monotonic()}
+                       "timestamp": time.time()}
         try:
             self.kazoo_client.set(
                 event.result_ref,
