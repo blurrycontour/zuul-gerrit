@@ -63,7 +63,7 @@ for tenant in tenants:
     for pipeline in data['pipelines']:
         if options.pipeline and pipeline['name'] != options.pipeline:
             continue
-        for queue in pipeline['change_queues']:
+        for queue in pipeline.get('change_queues', []):
             for head in queue['heads']:
                 for change in head:
                     if not change['live']:

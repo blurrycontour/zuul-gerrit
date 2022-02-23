@@ -207,7 +207,7 @@ class ChangeFilter(object):
     def filterPayload(self, payload):
         status = []
         for pipeline in payload['pipelines']:
-            for change_queue in pipeline['change_queues']:
+            for change_queue in pipeline.get('change_queues', []):
                 for head in change_queue['heads']:
                     for change in head:
                         if self.wantChange(change):
