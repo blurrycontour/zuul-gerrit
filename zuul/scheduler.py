@@ -54,7 +54,8 @@ from zuul.model import (
     BuildStartedEvent,
     BuildStatusEvent,
     Change,
-    ChangeManagementEvent,
+    PipelineManagementEvent,
+    PipelinePostConfigEvent,
     DequeueEvent,
     EnqueueEvent,
     FilesChangesCompletedEvent,
@@ -1907,7 +1908,6 @@ class Scheduler(threading.Thread):
 
     def process_pipelines(self, tenant, tenant_lock):
         for pipeline in tenant.layout.pipelines.values():
-            stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             if self._stopped:
                 return
             if RECONFIG_LOCK_ID in tenant_lock.contenders():
@@ -1921,11 +1921,6 @@ class Scheduler(threading.Thread):
                 ) as lock:
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
-                        with self.statsd_timer(f'{stats_key}.refresh'):
-                            pipeline.state.refresh(ctx)
-                        if pipeline.state.old_queues:
-                            self._reenqueuePipeline(tenant, pipeline, ctx)
-                        pipeline.state.cleanup(ctx)
                         self._process_pipeline(tenant, pipeline)
                     # Update pipeline summary for zuul-web
                     pipeline.summary.update(ctx, self.globals)
@@ -1938,7 +1933,28 @@ class Scheduler(threading.Thread):
                     pipeline.name, tenant.name)
 
     def _process_pipeline(self, tenant, pipeline):
+        # We only need to process the pipeline if there are
+        # outstanding events.
+        if not any((
+            self.pipeline_trigger_events[
+                tenant.name][pipeline.name].hasEvents(),
+            self.pipeline_result_events[
+                tenant.name][pipeline.name].hasEvents(),
+            self.pipeline_management_events[
+                tenant.name][pipeline.name].hasEvents(),
+        )):
+            self.log.debug("No events to process for pipeline %s in tenant %s",
+                           pipeline.name, tenant.name)
+            return
+
         stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
+        ctx = pipeline.manager.current_context
+        with self.statsd_timer(f'{stats_key}.refresh'):
+            pipeline.state.refresh(ctx)
+        if pipeline.state.old_queues:
+            self._reenqueuePipeline(tenant, pipeline, ctx)
+        pipeline.state.cleanup(ctx)
+
         self.process_pipeline_management_queue(tenant, pipeline)
         # Give result events priority -- they let us stop builds, whereas
         # trigger events cause us to execute builds.
@@ -1951,13 +1967,11 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Exception in pipeline processing:")
             pipeline.state.updateAttributes(
-                pipeline.manager.current_context,
-                state=pipeline.STATE_ERROR)
+                ctx, state=pipeline.STATE_ERROR)
             # Continue processing other pipelines+tenants
         else:
             pipeline.state.updateAttributes(
-                pipeline.manager.current_context,
-                state=pipeline.STATE_NORMAL)
+                ctx, state=pipeline.STATE_NORMAL)
 
     def _gatherConnectionCacheKeys(self):
         relevant = set()
@@ -2141,7 +2155,8 @@ class Scheduler(threading.Thread):
             try:
                 if isinstance(event, TenantReconfigureEvent):
                     self._doTenantReconfigureEvent(event)
-                elif isinstance(event, (PromoteEvent, ChangeManagementEvent)):
+                elif isinstance(event,
+                                (PromoteEvent, PipelineManagementEvent)):
                     event_forwarded = self._forward_management_event(event)
                 else:
                     self.log.error("Unable to handle event %s", event)
@@ -2212,6 +2227,10 @@ class Scheduler(threading.Thread):
                 self._doDequeueEvent(event)
             elif isinstance(event, EnqueueEvent):
                 self._doEnqueueEvent(event)
+            elif isinstance(event, PipelinePostConfigEvent):
+                # We don't need to do anything; the event just
+                # triggers a pipeline run.
+                pass
             else:
                 self.log.error("Unable to handle event %s" % event)
         except Exception:

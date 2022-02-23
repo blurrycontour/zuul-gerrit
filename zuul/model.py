@@ -654,16 +654,6 @@ class PipelineState(zkobject.ZKObject):
         safe_pipeline = urllib.parse.quote_plus(pipeline.name)
         return f"/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}"
 
-    def setOldQueues(self, context, queues):
-        old_queues = []
-        for queue in queues:
-            queue._set(pipeline=self.pipeline)
-            for item in queue.queue:
-                item._set(pipeline=self.pipeline)
-            old_queues.append(queue)
-
-        self.updateAttributes(context, old_queues=old_queues)
-
     def removeOldQueue(self, context, queue):
         if queue in self.old_queues:
             with self.activeContext(context):
@@ -5683,7 +5673,18 @@ class PromoteEvent(ManagementEvent):
         return event
 
 
-class ChangeManagementEvent(ManagementEvent):
+class PipelineManagementEvent(ManagementEvent):
+    """Base class for pipeline-specific management events"""
+    pass
+
+
+class PipelinePostConfigEvent(ManagementEvent):
+    """Enqueued after a pipeline has been reconfigured in order
+    to trigger a processing run"""
+    pass
+
+
+class ChangeManagementEvent(PipelineManagementEvent):
     """Base class for events that dequeue/enqueue changes
 
     :arg str tenant_name: the name of the tenant

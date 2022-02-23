@@ -136,6 +136,7 @@ class ZuulDriver(Driver, TriggerInterface):
         event.patch_number = change.patchset
         event.ref = change.ref
         event.zuul_event_id = str(uuid4().hex)
+        event.timestamp = time.time()
         self.sched.addTriggerEvent(self.name, event)
 
     def getTrigger(self, connection_name, config=None):
