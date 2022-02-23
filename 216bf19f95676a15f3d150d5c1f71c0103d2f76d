@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d36264_47e911e9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-23T21:12:22Z",
+      "side": 1,
+      "message": "If the scheduler fails here or crashes it processed all the events but may not have processed the queue. So in those rare cases the pipeline may be stuck until there is an event for it. Do we want to cover this case or should we accept this risk?",
+      "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fe0c1a4_989a957c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1970,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-23T21:12:22Z",
+      "side": 1,
+      "message": "We may want to enqueue a PipelinePostConfigEvent here so the pipeline gets retried in the next loop.",
+      "revId": "216bf19f95676a15f3d150d5c1f71c0103d2f76d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
