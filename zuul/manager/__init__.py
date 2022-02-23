@@ -1238,6 +1238,12 @@ class PipelineManager(metaclass=ABCMeta):
                 repo_state_state=item.current_build_set.COMPLETE)
             return True
 
+        # At this point we know we're going to request a merge job;
+        # set the waiting state on all the item's jobs so users know
+        # what we're waiting on.
+        for job in jobs:
+            job.setWaitingStatus('repo state')
+
         projects = []
         for project_cname in project_cnames:
             projects.append(tenant.getProject(project_cname)[1])
