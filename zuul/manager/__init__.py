@@ -24,6 +24,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
 from zuul.model import (
     Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
+    PipelinePostConfigEvent,
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
@@ -118,6 +119,10 @@ class PipelineManager(metaclass=ABCMeta):
                     self.pipeline, layout.uuid)
                 self.pipeline.change_list = PipelineChangeList.create(
                     self.pipeline)
+                event = PipelinePostConfigEvent()
+                self.sched.pipeline_management_events[
+                    self.pipeline.tenant.name][self.pipeline.name].put(
+                        event, needs_result=False)
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")
