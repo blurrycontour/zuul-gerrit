@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfe4027b_1bc8d485",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-02-24T15:26:37Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e It might be helpful to explain why the tenant default base job isn\u0027t sufficient, or explicitly listing the parent isn\u0027t sufficient.\n\nI think the idea was to introduce default behaviour for the jobs local to a project (in this case to the same file) to reduce the need to repeat yourself when a ton of jobs is inheriting from the same parent in one project and another parent in another project.\nThe tenant default-parent is then on a too big scope since we want it on project level.\n\n\u003e My concerns with this at first glance are that it makes the hierarchy harder to understand (because a user will need to remember to look for pragmas before assuming they have correctly read the job definition).\n\nI don\u0027t think it would be too hard to since the pragma is only affecting the current file from what I understood, so it would only set parent\u003ddefault-parent for any job in the current file that doesn\u0027t specify a parent. So it wouldn\u0027t change the behaviour for a job defined in a separate file or project (pragma in project A wouldn\u0027t affect a job in zuul-jobs).\n\n",
+      "revId": "894f80c3ee2361571cef5a4ef8785a5479f07cf6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
