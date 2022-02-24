@@ -68,6 +68,24 @@
       "parentUuid": "ac32d77f_18027d07",
       "revId": "bfe77b018efee875e3ca4598f50cff933d7d590b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae780bfc_1024473a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-24T20:46:03Z",
+      "side": 1,
+      "message": "It\u0027s created in mergeChanges [1]. And as far as I can see it\u0027s only used in [2] where we gather the hexsha from the commit object [2]. So with the simplification we could just put the sha into recent and remove the \u0027.hexsha\u0027 from [2].\n\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/merger/merger.py#L1093\n[2] https://opendev.org/zuul/zuul/src/branch/master/zuul/merger/merger.py#L1138",
+      "parentUuid": "f9b5df02_06c13e82",
+      "revId": "bfe77b018efee875e3ca4598f50cff933d7d590b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
