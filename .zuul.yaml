@@ -64,6 +64,7 @@
       test_setup_environment:
         ZUUL_TEST_ROOT: /tmp/zuul-test
         YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+      tox_extra_args: -- tests/unit/test_cross_crd.py
 
 - job:
     name: zuul-tox-remote
@@ -281,33 +282,33 @@
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-        - zuul-tox-py36
+        #- zuul-build-image
+        #- zuul-tox-docs
+        #- tox-linters:
+        #    vars:
+        #      tox_install_bindep: false
+        #- zuul-tox-py36
         - zuul-tox-py38
-        - zuul-tox-py38-multi-scheduler
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
+        #- zuul-tox-py38-multi-scheduler
+        #- zuul-build-dashboard-openstack-whitelabel
+        #- zuul-build-dashboard-software-factory
+        #- zuul-build-dashboard-opendev
+        #- nodejs-run-lint:
+        #    vars:
+        #      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #- nodejs-run-test:
+        #    vars:
+        #      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #    files:
+        #      - web/.*
+        #- zuul-stream-functional-2.8
+        #- zuul-stream-functional-2.9
+        #- zuul-tox-remote
+        #- zuul-quick-start:
+        #    requires: nodepool-container-image
+        #    dependencies: zuul-build-image
+        #- zuul-tox-zuul-client
+        #- zuul-build-python-release
     gate:
       jobs:
         - zuul-upload-image
