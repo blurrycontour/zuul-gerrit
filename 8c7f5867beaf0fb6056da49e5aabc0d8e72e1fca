@@ -16,6 +16,24 @@
       "message": "It is possible for this to error when the tenant_name is not in self.cache but we do not get the lock above which means it isn\u0027t necessarily populated by the time we reach this point.\n\nI think there may also be an issue where we\u0027ll serve stale data from the cache (however the thread with the lock should address this quickly enough and we\u0027ll converge on up to date data). I think you may need to block if tenant_name not in self.cache and not block otherwise.",
       "revId": "8c7f5867beaf0fb6056da49e5aabc0d8e72e1fca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34e8b74a_43a66d87",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 939,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-24T19:59:46Z",
+      "side": 1,
+      "message": "Fixed the first part. Regarding the second part this is on purpose to not block the other threads while the status json is being formatted. I think this is ok since the status json is eventually consistent anyway and as soon as the new data is rendered all new requests will get the new data.",
+      "parentUuid": "034b16b6_0707e332",
+      "revId": "8c7f5867beaf0fb6056da49e5aabc0d8e72e1fca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
