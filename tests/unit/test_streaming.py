@@ -802,3 +802,15 @@ class TestStreamingZones(TestStreamingBase):
 
 class TestStreamingZonesSSL(TestStreamingZones):
     fingergw_use_ssl = True
+
+
+class TestStreamingUnzonedJob(TestStreamingZones):
+
+    def setUp(self):
+        super().setUp()
+        self.fake_nodepool.attributes = None
+
+    def setup_config(self, config_file: str):
+        config = super().setup_config(config_file)
+        config.set('executor', 'allow_unzoned', 'true')
+        return config

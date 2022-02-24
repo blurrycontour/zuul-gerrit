@@ -150,8 +150,8 @@ class ExecutorApi:
         for zone in self._getAllZones():
             request = self.zone_queues[zone].getByUuid(uuid)
             if request:
-                return request, zone
-        return None, None
+                return request
+        return None
 
     def remove(self, request):
         return self.zone_queues[request.zone].remove(request)
