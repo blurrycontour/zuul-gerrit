@@ -16,6 +16,23 @@
       "message": "It is possible for event to be None in the calling method. I think that will lead to this function raising an Exception about NoneType not having total_commits_count attribute.\n\nWe already log this situation as an error but had previously tried to continue past it. Now we\u0027ll just hard fail again. Calling this out due to that behavior change.",
       "revId": "6aa5382e5a39d8cbdbaed18ce08601464e2d562f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "531e2d7a_0372fb95",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-24T17:56:15Z",
+      "side": 1,
+      "message": "Good call, that\u0027s a -1. I\u0027ll fix.",
+      "revId": "6aa5382e5a39d8cbdbaed18ce08601464e2d562f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
