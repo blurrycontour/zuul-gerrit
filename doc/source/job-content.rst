@@ -1088,6 +1088,32 @@ For example:
             pause: true
           registry_ip_address: "{{ hostvars[groups.all[0]].ansible_host }}"
 
+Dynamically configuring retries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's possible to force zuul to retry a job, or to skip the retry caused by a
+failure in ``pre-run`` by setting **zuul.retry** to
+``true`` or ``false`` respectively.
+
+For example the following would skip retrying the build:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            retry: false
+
+While this example would force a retry even if the job was successful:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            retry: true
 
 .. _build_status:
 

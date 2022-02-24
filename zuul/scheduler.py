@@ -2479,7 +2479,7 @@ class Scheduler(threading.Thread):
         with build.activeContext(pipeline.manager.current_context):
             build.error_detail = event_result.get("error_detail")
 
-            if result is None:
+            if result is None or result_data.get("retry", False):
                 build.retry = True
             if result == "ABORTED":
                 # Always retry if the executor just went away
