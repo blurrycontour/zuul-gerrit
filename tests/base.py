@@ -5206,7 +5206,7 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
-    def __areAllNodeRequestsComplete(self, matcher) -> bool:
+    def __areAllNodeRequestsComplete(self, matcher=None):
         if self.fake_nodepool.paused:
             return True
         # Check ZK and the scheduler cache and make sure they are
@@ -5232,7 +5232,7 @@ class ZuulTestCase(BaseTestCase):
                         return False
         return True
 
-    def __areAllMergeJobsWaiting(self, matcher) -> bool:
+    def __areAllMergeJobsWaiting(self):
         # Look up the queued merge jobs directly from ZooKeeper
         queued_merge_jobs = list(self.merger_api.all())
         # Always ignore merge jobs which are on hold
@@ -5295,11 +5295,11 @@ class ZuulTestCase(BaseTestCase):
                                self.__areAllSchedulersPrimed(matcher))
                 self._logQueueStatus(
                     self.log.error, matcher,
-                    self.__areZooKeeperEventQueuesEmpty(matcher),
-                    self.__areAllMergeJobsWaiting(matcher),
+                    self.__areZooKeeperEventQueuesEmpty(),
+                    self.__areAllMergeJobsWaiting(),
                     self.__haveAllBuildsReported(),
                     self.__areAllBuildsWaiting(),
-                    self.__areAllNodeRequestsComplete(matcher),
+                    self.__areAllNodeRequestsComplete(),
                     all(self.__eventQueuesEmpty(matcher))
                 )
                 raise Exception("Timeout waiting for Zuul to settle")
@@ -5316,11 +5316,11 @@ class ZuulTestCase(BaseTestCase):
                                  self.scheds.filter(matcher)):
                     sched.run_handler_lock.acquire()
                 if (self.__areAllSchedulersPrimed(matcher) and
-                    self.__areAllMergeJobsWaiting(matcher) and
+                    self.__areAllMergeJobsWaiting() and
                     self.__haveAllBuildsReported() and
                     self.__areAllBuildsWaiting() and
-                    self.__areAllNodeRequestsComplete(matcher) and
-                    self.__areZooKeeperEventQueuesEmpty(matcher) and
+                    self.__areAllNodeRequestsComplete() and
+                    self.__areZooKeeperEventQueuesEmpty() and
                     all(self.__eventQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
