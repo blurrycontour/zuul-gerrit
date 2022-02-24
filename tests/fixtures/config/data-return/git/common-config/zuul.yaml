@@ -120,6 +120,11 @@
     parent: several-zuul-return-parent
     run: playbooks/several-zuul-return-child.yaml
 
+- job:
+    name: skip-retry-return
+    pre-run: playbooks/skip-retry-return.yaml
+    run: playbooks/pass.yaml
+
 - project:
     name: org/project
     check:
@@ -224,3 +229,9 @@
                 soft: true
               - name: data-return-c
                 soft: true
+
+- project:
+    name: org/project-skip-retry
+    check:
+      jobs:
+        - skip-retry-return
