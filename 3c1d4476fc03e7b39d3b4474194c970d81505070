@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "3c1d4476fc03e7b39d3b4474194c970d81505070",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8bb6639_93ef8fa7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-24T07:24:30Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3: Code-Review-1\n\u003e \n\u003e This doesn\u0027t actually require a model API bump.  Why don\u0027t we just put the comments in the code without the API version change?\n\nDone. The idea was to document such deprecations explicitly using the model API so it\u0027s easier to find and remove the backward compatibility handling later on.",
+      "revId": "3c1d4476fc03e7b39d3b4474194c970d81505070",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
