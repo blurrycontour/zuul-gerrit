@@ -65,8 +65,8 @@ function Buildset({ buildset, timezone, tenant, user }) {
     const overallDuration =
       (moment.utc(lastEndBuild.end_time).tz(timezone) -
         moment.utc(
-          buildset.event_timestamp!=null
-          ? buildset.event_timestamp : firstStartBuild.start_time
+          buildset.event_timestamp != null
+            ? buildset.event_timestamp : firstStartBuild.start_time
         ).tz(timezone)
       ) / 1000
 
@@ -177,11 +177,11 @@ function Buildset({ buildset, timezone, tenant, user }) {
   }
 
   function enqueueConfirm() {
-    let changeId = buildset.change ? buildset.change + ',' + buildset.patchset : buildset.newrev
     setShowEnqueueModal(false)
-    if (/^[0-9a-f]{40}$/.test(changeId)) {
+    if (buildset.change === null) {
       const oldrev = '0000000000000000000000000000000000000000'
-      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline, buildset.ref, oldrev, changeId, user.token)
+      const newrev = buildset.newrev ? buildset.newrev : '0000000000000000000000000000000000000000'
+      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline, buildset.ref, oldrev, newrev, user.token)
         .then(() => {
           dispatch(addNotification(
             {
@@ -195,6 +195,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
           dispatch(addApiError(error))
         })
     } else {
+      const changeId = buildset.change + ',' + buildset.patchset
       enqueue(tenant.apiPrefix, buildset.project, buildset.pipeline, changeId, user.token)
         .then(() => {
           dispatch(addNotification(
@@ -213,6 +214,9 @@ function Buildset({ buildset, timezone, tenant, user }) {
 
   function renderEnqueueModal() {
     let changeId = buildset.change ? buildset.change + ',' + buildset.patchset : buildset.newrev
+    let changeInfo = changeId
+      ? <>for change <strong>{changeId}</strong></>
+      : <>for ref <strong>{buildset.ref}</strong></>
     const title = 'You are about to re-enqueue a change'
     return (
       <Modal
@@ -225,7 +229,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
           <Button key="deq_confirm" variant="primary" onClick={enqueueConfirm}>Confirm</Button>,
           <Button key="deq_cancel" variant="link" onClick={() => { setShowEnqueueModal(false) }}>Cancel</Button>,
         ]}>
-        <p>Please confirm that you want to re-enqueue <strong>all jobs</strong> for change <strong>{changeId}</strong> (project <strong>{buildset.project}</strong>) on pipeline <strong>{buildset.pipeline}</strong>.</p>
+        <p>Please confirm that you want to re-enqueue <strong>all jobs</strong> {changeInfo} on project <strong>{buildset.project}</strong> on pipeline <strong>{buildset.pipeline}</strong>.</p>
       </Modal>
     )
   }
