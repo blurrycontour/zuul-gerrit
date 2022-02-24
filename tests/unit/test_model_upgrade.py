@@ -161,6 +161,11 @@ class TestSemaphoreModelUpgrade(ZuulTestCase):
         # Upgrade our component
         self.model_test_component_info.model_api = 2
 
+        # Wait for it to propagate
+        for _ in iterate_timeout(30, "model api to update"):
+            if self.scheds.first.sched.component_registry.model_api == 2:
+                break
+
         tenant.semaphore_handler.cleanupLeaks()
         # Make sure we are not touching old-style handlers during cleanup.
         self.assertEqual(
