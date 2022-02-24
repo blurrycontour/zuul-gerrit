@@ -1073,6 +1073,7 @@ class PipelineManager(metaclass=ABCMeta):
 
     def getLayout(self, item):
         log = get_annotated_logger(self.log, item.event)
+        log.info(".......debug getLayout() 1")
         layout = self._layout_cache.get(item.layout_uuid)
         if layout:
             log.debug("Using cached layout %s for item %s", layout.uuid, item)
@@ -1081,6 +1082,7 @@ class PipelineManager(metaclass=ABCMeta):
         if item.layout_uuid:
             log.debug("Re-calculating layout for item %s", item)
 
+        log.info(".......debug getLayout() 2")
         layout = self._getLayout(item)
         if layout:
             item.updateAttributes(self.current_context,
@@ -1090,6 +1092,7 @@ class PipelineManager(metaclass=ABCMeta):
 
     def _getLayout(self, item):
         log = get_annotated_logger(self.log, item.event)
+        log.info(".......debug _getLayout() 1")
         if item.item_ahead:
             if (
                 (item.item_ahead.live and
@@ -1098,7 +1101,7 @@ class PipelineManager(metaclass=ABCMeta):
             ):
                 # We're probably waiting on a merge job for the item ahead.
                 return None
-
+        log.info(".......debug _getLayout() 2")
         # If the current change does not update the layout, use its parent.
         # If the bundle doesn't update the config or the bundle updates the
         # config but the current change's project is not part of the tenant
@@ -1114,6 +1117,7 @@ class PipelineManager(metaclass=ABCMeta):
             )
         ):
             return self.getFallbackLayout(item)
+        log.info(".......debug _getLayout() 3")
         # Else this item updates the config,
         # ask the merger for the result.
         build_set = item.current_build_set
@@ -1301,12 +1305,23 @@ class PipelineManager(metaclass=ABCMeta):
                 item.bundle and
                 item.bundle.updatesConfig(tenant) and tpc is not None
             ):
+                extra_config_files = set(tpc.extra_config_files)
+                extra_config_dirs = set(tpc.extra_config_dirs)
+                # Merge extra_config_files and extra_config_dirs of the
+                # dependent change
+                for item_ahead in item.items_ahead:
+                    tpc_ahead = tenant.project_configs.get(
+                        item_ahead.change.project.canonical_name)
+                    if tpc_ahead:
+                        extra_config_files.update(tpc_ahead.extra_config_files)
+                        extra_config_dirs.update(tpc_ahead.extra_config_dirs)
+
                 ready = self.scheduleMerge(
                     item,
                     files=(['zuul.yaml', '.zuul.yaml'] +
-                           list(tpc.extra_config_files)),
+                           list(extra_config_files)),
                     dirs=(['zuul.d', '.zuul.d'] +
-                          list(tpc.extra_config_dirs)))
+                          list(extra_config_dirs)))
         if build_set.merge_state == build_set.PENDING:
             ready = False
 

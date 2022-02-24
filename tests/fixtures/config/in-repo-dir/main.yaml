@@ -8,6 +8,10 @@
           - org/project
           - org/project1:
               exclude: project
+          - org/project2:
+              extra-config-paths:
+                - .extra.yaml
+                - extra.d/
 
 - tenant:
     name: tenant-two
