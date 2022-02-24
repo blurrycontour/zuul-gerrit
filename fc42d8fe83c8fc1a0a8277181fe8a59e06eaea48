@@ -106,6 +106,24 @@
       "parentUuid": "b7bb3ebb_7e112c57",
       "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9afb31f7_abf4a764",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-02-24T07:02:59Z",
+      "side": 1,
+      "message": "I found https://opendev.org/zuul/zuul/src/branch/master/tests/unit/test_v3.py#L2800 which uses extra config paths. Maybe you can use that one as a basis for your test case.",
+      "parentUuid": "9df14e66_1f052251",
+      "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
