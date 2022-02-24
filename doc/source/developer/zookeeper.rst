@@ -426,6 +426,11 @@ This is a reference for object layout in Zookeeper.
 
    Pipeline state.
 
+.. path:: zuul/tenant/<tenant>/pipeline/<pipeline>/dirty
+
+   A flag indicating that the pipeline state is "dirty"; i.e., it
+   needs to have the pipeline processor run.
+
 .. path:: zuul/tenant/<tenant>/pipeline/<pipeline>/queue
 
    Holds queue objects.
