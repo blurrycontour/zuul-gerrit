@@ -33,6 +33,8 @@ import traceback
 from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
 
 from kazoo.exceptions import NoNodeError
+from kazoo.retry import KazooRetry
+
 import git
 from urllib.parse import urlsplit
 
@@ -4058,35 +4060,7 @@ class ExecutorServer(BaseMergeServer):
                 log.exception("Unable to process autohold for %s",
                               build_request)
 
-        def update_build_request(log, build_request):
-            try:
-                self.executor_api.update(build_request)
-                return True
-            except JobRequestNotFound as e:
-                log.warning("Could not find build: %s", str(e))
-                return False
-
-        def put_complete_event(log, build_request, event):
-            try:
-                self.result_events[build_request.tenant_name][
-                    build_request.pipeline_name].put(event)
-            except NoNodeError:
-                log.warning("Pipeline was removed: %s",
-                            build_request.pipeline_name)
-
-        build_request.state = BuildRequest.COMPLETED
-        found = self._retry(build_request.lock, log,
-                            update_build_request, log, build_request)
-        lock_valid = build_request.lock.is_still_valid()
-        if lock_valid:
-            # We only need to unlock if we're still locked.
-            self._retry(build_request.lock, log, self.executor_api.unlock,
-                        build_request)
-
-        if not found:
-            # If the build request is gone, don't return a result.
-            return
-
+        lock_valid = self.zkRetry(log, build_request.lock.is_still_valid)
         if not lock_valid:
             # If we lost the lock at any point before updating the
             # state to COMPLETED, then the scheduler may have (or
@@ -4103,21 +4077,45 @@ class ExecutorServer(BaseMergeServer):
             # discarded.
             return
 
-        # TODO: This is racy.  Once we have set the build request to
-        # completed, the only way for it to be deleted is for the
-        # scheduler to process a BuildRequestCompleted event.  So we
-        # need to try really hard to give it one.  But if we exit
-        # between the section above and the section below, we won't,
-        # which will mean that the scheduler will not automatically
-        # delete the build request and we will not be able to recover.
-        #
-        # This is essentially a two-phase commit problem, but we are
-        # unable to use transactions because the result event is
-        # sharded.  We should be able to redesign the result reporting
-        # mechanism to eliminate the race and be more convergent.
+        updater = self.executor_api.getRequestUpdater(build_request)
         event = BuildCompletedEvent(
             build_request.uuid, build_request.build_set_uuid,
             build_request.job_name, build_request.path, result,
             build_request.event_id)
-        self._retry(None, log, put_complete_event, log,
-                    build_request, event)
+        build_request.state = BuildRequest.COMPLETED
+        updated = False
+        put_method = self.result_events[build_request.tenant_name][
+            build_request.pipeline_name].put
+        try:
+            self.zkRetry(log, put_method, event, updater=updater)
+            updated = True
+        except JobRequestNotFound as e:
+            log.warning("Could not find build: %s", str(e))
+            return
+        except NoNodeError:
+            log.warning("Pipeline was removed: %s",
+                        build_request.pipeline_name)
+
+        if not updated:
+            # If the pipeline was removed but the request remains, we
+            # should still update the build request just in case, in
+            # order to prevent another executor from starting an
+            # unecessary build.
+            self.zkRetry(log, self.executor_api.update, build_request)
+
+        self.zkRetry(log, self.executor_api.unlock, build_request)
+
+    def zkRetry(self, log, func, *args, **kw):
+        # This retries func after retryable exceptions from ZK, but
+        # only as long as we're still running.
+        # TODO: Replace MergerServer._retry with a version of this
+        # method.
+        def interrupt():
+            return not self._running
+
+        kazoo_retry = KazooRetry(max_tries=-1, interrupt=interrupt,
+                                 delay=5, backoff=0, ignore_expire=False)
+        try:
+            return kazoo_retry(func, *args, **kw)
+        except InterruptedError:
+            pass
