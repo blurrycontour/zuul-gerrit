@@ -63,6 +63,9 @@ def merge_data(dict_a, dict_b):
         dict_b.setdefault("zuul", {})["file_comments"] = file_comments
     if warnings:
         dict_b.setdefault('zuul', {})['warnings'] = warnings
+
+    dict_b.setdefault('zuul', {})['retry'] = dict_a.getdefault(
+        'zuul', {}).get('retry')
     return dict_b
 
 
