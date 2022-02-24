@@ -20,7 +20,8 @@ from contextlib import suppress
 from enum import Enum
 
 from kazoo.exceptions import LockTimeout, NoNodeError
-from kazoo.protocol.states import EventType
+from kazoo.protocol.states import EventType, ZnodeStat
+from kazoo.client import TransactionRequest
 
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
@@ -38,6 +39,60 @@ class JobRequestEvent(Enum):
     RESUMED = 2
     CANCELED = 3
     DELETED = 4
+
+
+class RequestUpdater:
+    """This class cooperates with the event queues so that we can update a
+    request and submit an event in a single transaction."""
+
+    _log = logging.getLogger("zuul.JobRequestQueue")
+
+    def __init__(self, request):
+        self.request = request
+        self.log = get_annotated_logger(
+            self._log, event=request.event_id, build=request.uuid
+        )
+
+    def preRun(self):
+        """A pre-flight check.  Return whether we should attempt the
+        transaction."""
+        self.log.debug("Updating request %s", self.request)
+
+        if self.request._zstat is None:
+            self.log.debug(
+                "Cannot update request %s: Missing version information.",
+                self.request.uuid,
+            )
+            return False
+        return True
+
+    def run(self, client):
+        """Actually perform the transaction.  The 'client' argument may be a
+        transaction or a plain client."""
+        if isinstance(client, TransactionRequest):
+            setter = client.set_data
+        else:
+            setter = client.set
+        return setter(
+            self.request.path,
+            JobRequestQueue._dictToBytes(self.request.toDict()),
+            version=self.request._zstat.version,
+        )
+
+    def postRun(self, result):
+        """Process the results of the transaction."""
+        try:
+            if isinstance(result, Exception):
+                raise result
+            elif isinstance(result, ZnodeStat):
+                self.request._zstat = result
+            else:
+                raise Exception("Unknown result from ZooKeeper for %s: %s",
+                                self.request, result)
+        except NoNodeError:
+            raise JobRequestNotFound(
+                f"Could not update {self.request.path}"
+            )
 
 
 class JobRequestQueue(ZooKeeperSimpleBase):
@@ -233,7 +288,22 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
         return result
 
+    def getRequestUpdater(self, request):
+        return RequestUpdater(request)
+
     def update(self, request):
+        updater = self.getRequestUpdater(request)
+        if not updater.preRun():
+            return
+
+        try:
+            result = updater.run(self.kazoo_client)
+        except Exception as e:
+            result = e
+
+        updater.postRun(result)
+
+    def old_update(self, request):
         log = get_annotated_logger(
             self.log, event=request.event_id, build=request.uuid
         )
