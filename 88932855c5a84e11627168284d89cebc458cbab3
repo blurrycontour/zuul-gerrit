@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3ecfbfc_760e1298",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-02-24T16:18:07Z",
+      "side": 1,
+      "message": "Perhaps the message could be changed to `Ref queued successfully` ?",
+      "revId": "88932855c5a84e11627168284d89cebc458cbab3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
