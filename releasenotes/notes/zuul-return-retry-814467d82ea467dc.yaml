@@ -1,0 +1,23 @@
+---
+features:
+  - |
+    Added a feature to make it possible to retry more dynamically using
+    `zuul_return`.
+
+    For example it is now possible fail a job without causing a retry in pre-run
+    by returning `retry: false`:
+    ```
+    - zuul_return:
+        data:
+          zuul:
+            retry: false
+    ```
+
+    Or to cause a job to retry even when it failed in the `run` or `post-run`
+    stages:
+    ```
+    - zuul_return:
+        data:
+          zuul:
+            retry: true
+    ```
