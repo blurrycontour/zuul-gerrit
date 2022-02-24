@@ -56,6 +56,7 @@ def merge_data(dict_a, dict_b):
     artifacts = merge_zuul_list(dict_a, dict_b, 'artifacts')
     file_comments = merge_file_comments(dict_a, dict_b)
     warnings = merge_zuul_list(dict_a, dict_b, 'warnings')
+    retry = dict_a.get('zuul', {}).get('retry')
     merge_dict(dict_a, dict_b)
     if artifacts:
         dict_b.setdefault('zuul', {})['artifacts'] = artifacts
@@ -63,6 +64,9 @@ def merge_data(dict_a, dict_b):
         dict_b.setdefault("zuul", {})["file_comments"] = file_comments
     if warnings:
         dict_b.setdefault('zuul', {})['warnings'] = warnings
+    if retry:
+        dict_b.setdefault('zuul', {})['retry'] = retry
+
     return dict_b
 
 
