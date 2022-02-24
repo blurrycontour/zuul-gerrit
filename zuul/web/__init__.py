@@ -1004,6 +1004,7 @@ class ZuulWebAPI(object):
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
         resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Content-Type'] = 'application/json; charset=utf-8'
         return payload
 
     def formatStatus(self, tenant):
@@ -1043,7 +1044,7 @@ class ZuulWebAPI(object):
             status['management_events'] = len(
                 management_event_queues[pipeline.name])
             pipelines.append(status)
-        return data
+        return data, json.dumps(data).encode('utf-8')
 
     def _getTenantOrRaise(self, tenant_name):
         tenant = self.zuulweb.abide.tenants.get(tenant_name)
@@ -1062,15 +1063,14 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def status(self, tenant):
-        return self._getStatus(tenant)
+        return self._getStatus(tenant)[1]
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def status_change(self, tenant, change):
-        payload = self._getStatus(tenant)
+        payload = self._getStatus(tenant)[0]
         result_filter = ChangeFilter(change)
         return result_filter.filterPayload(payload)
 
