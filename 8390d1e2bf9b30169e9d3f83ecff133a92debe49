@@ -33,6 +33,23 @@
       "message": "I proposed https://review.opendev.org/c/zuul/zuul/+/830744 as an alternative that uses the component registry to get zone info and added a test.",
       "revId": "8390d1e2bf9b30169e9d3f83ecff133a92debe49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5d8d51a_f1972a75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-24T19:44:51Z",
+      "side": 1,
+      "message": "\u003e Patch Set 4: Code-Review+2\n\u003e \n\u003e I think I like this change better because it seems like the zone should be in worker_info.\n\nFine for me, but then we should copy over the test from https://review.opendev.org/c/zuul/zuul/+/830744/.",
+      "revId": "8390d1e2bf9b30169e9d3f83ecff133a92debe49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
