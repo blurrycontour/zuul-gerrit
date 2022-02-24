@@ -954,6 +954,7 @@ class AnsibleJob(object):
     RESULT_UNREACHABLE = 3
     RESULT_ABORTED = 4
     RESULT_DISK_FULL = 5
+    RESULT_FAIL_EARLY = 6
 
     RESULT_MAP = {
         RESULT_NORMAL: 'RESULT_NORMAL',
@@ -961,6 +962,7 @@ class AnsibleJob(object):
         RESULT_UNREACHABLE: 'RESULT_UNREACHABLE',
         RESULT_ABORTED: 'RESULT_ABORTED',
         RESULT_DISK_FULL: 'RESULT_DISK_FULL',
+        RESULT_FAIL_EARLY: 'RESULT_FAIL_EARLY',
     }
 
     def __init__(self, executor_server, build_request, arguments):
@@ -1740,7 +1742,11 @@ class AnsibleJob(object):
             pre_status, pre_code = self.runAnsiblePlaybook(
                 playbook, ansible_timeout, self.ansible_version, phase='pre',
                 index=index)
-            if pre_status != self.RESULT_NORMAL or pre_code != 0:
+            if pre_status == self.RESULT_FAIL_EARLY:
+                result = 'RESULT_FAIL_EARLY'
+                pre_failed = True
+                break
+            elif pre_status != self.RESULT_NORMAL or pre_code != 0:
                 # These should really never fail, so return None and have
                 # zuul try again
                 pre_failed = True
