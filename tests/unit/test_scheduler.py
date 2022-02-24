@@ -5082,8 +5082,8 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertEqual(0, len(A.messages))
 
-    @simple_layout('layouts/merge-failure.yaml')
-    def test_merge_failure_reporters(self):
+    @simple_layout('layouts/merge-conflict.yaml')
+    def test_merge_conflict_reporters(self):
         """Check that the config is set up correctly"""
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
@@ -5092,34 +5092,77 @@ For CI problems and help debugging, contact ci@example.org"""
             "dependencies was unable to be automatically merged with the "
             "current state of its repository. Please rebase the change and "
             "upload a new patchset.",
-            tenant.layout.pipelines['check'].merge_failure_message)
+            tenant.layout.pipelines['check'].merge_conflict_message)
         self.assertEqual(
             "The merge failed! For more information...",
-            tenant.layout.pipelines['gate'].merge_failure_message)
+            tenant.layout.pipelines['gate'].merge_conflict_message)
 
         self.assertEqual(
-            len(tenant.layout.pipelines['check'].merge_failure_actions), 1)
+            len(tenant.layout.pipelines['check'].merge_conflict_actions), 1)
         self.assertEqual(
-            len(tenant.layout.pipelines['gate'].merge_failure_actions), 2)
+            len(tenant.layout.pipelines['gate'].merge_conflict_actions), 2)
 
         self.assertTrue(isinstance(
-            tenant.layout.pipelines['check'].merge_failure_actions[0],
+            tenant.layout.pipelines['check'].merge_conflict_actions[0],
             gerritreporter.GerritReporter))
 
         self.assertTrue(
             (
                 isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[0],
+                           merge_conflict_actions[0],
                            zuul.driver.smtp.smtpreporter.SMTPReporter) and
                 isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[1],
+                           merge_conflict_actions[1],
                            gerritreporter.GerritReporter)
             ) or (
                 isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[0],
+                           merge_conflict_actions[0],
                            gerritreporter.GerritReporter) and
                 isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[1],
+                           merge_conflict_actions[1],
+                           zuul.driver.smtp.smtpreporter.SMTPReporter)
+            )
+        )
+
+    @simple_layout('layouts/merge-failure.yaml')
+    def test_merge_failure_reporters(self):
+        """Check that the config is set up correctly"""
+        # TODO: Remove this backwards compat test in v6.0
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(
+            "Merge Failed.\n\nThis change or one of its cross-repo "
+            "dependencies was unable to be automatically merged with the "
+            "current state of its repository. Please rebase the change and "
+            "upload a new patchset.",
+            tenant.layout.pipelines['check'].merge_conflict_message)
+        self.assertEqual(
+            "The merge failed! For more information...",
+            tenant.layout.pipelines['gate'].merge_conflict_message)
+
+        self.assertEqual(
+            len(tenant.layout.pipelines['check'].merge_conflict_actions), 1)
+        self.assertEqual(
+            len(tenant.layout.pipelines['gate'].merge_conflict_actions), 2)
+
+        self.assertTrue(isinstance(
+            tenant.layout.pipelines['check'].merge_conflict_actions[0],
+            gerritreporter.GerritReporter))
+
+        self.assertTrue(
+            (
+                isinstance(tenant.layout.pipelines['gate'].
+                           merge_conflict_actions[0],
+                           zuul.driver.smtp.smtpreporter.SMTPReporter) and
+                isinstance(tenant.layout.pipelines['gate'].
+                           merge_conflict_actions[1],
+                           gerritreporter.GerritReporter)
+            ) or (
+                isinstance(tenant.layout.pipelines['gate'].
+                           merge_conflict_actions[0],
+                           gerritreporter.GerritReporter) and
+                isinstance(tenant.layout.pipelines['gate'].
+                           merge_conflict_actions[1],
                            zuul.driver.smtp.smtpreporter.SMTPReporter)
             )
         )
@@ -5128,7 +5171,7 @@ For CI problems and help debugging, contact ci@example.org"""
         """Check that when a change fails to merge the correct message is sent
         to the correct reporter"""
         self.commitConfigUpdate('common-config',
-                                'layouts/merge-failure.yaml')
+                                'layouts/merge-conflict.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
 
         # Check a test failure isn't reported to SMTP

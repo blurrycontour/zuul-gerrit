@@ -3087,8 +3087,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
             *args, **kw)
-        if not commit:  # merge conflict
-            self.recordResult('MERGER_FAILURE')
+        if not commit:
+            self.recordResult('MERGE_CONFLICT')
 
         return commit
 

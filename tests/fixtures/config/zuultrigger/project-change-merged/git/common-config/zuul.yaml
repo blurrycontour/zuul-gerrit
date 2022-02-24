@@ -43,7 +43,7 @@
     trigger:
       zuul:
         - event: project-change-merged
-    merge-failure:
+    merge-conflict:
       gerrit:
         Verified: -1
 

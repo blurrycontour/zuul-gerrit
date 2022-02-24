@@ -60,7 +60,7 @@ class PagureReporter(BaseReporter):
         if self._merge:
             self.mergePull(item)
             if not item.change.is_merged:
-                msg = self._formatItemReportMergeFailure(item)
+                msg = self._formatItemReportMergeConflict(item)
                 self.addPullComment(item, msg)
 
     def _formatItemReportJobs(self, item):

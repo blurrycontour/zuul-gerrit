@@ -41,7 +41,7 @@ const buildResultLegendData = [
         symbol: { fill: '#F6D173' },
     },
     {
-        name: 'MERGER_FAILURE',
+        name: 'MERGE_CONFLICT',
         // PF orange-200
         symbol: { fill: '#EF9234' },
     },

@@ -82,7 +82,7 @@ class BuildsPage extends React.Component {
           'POST_FAILURE',
           'SKIPPED',
           'NODE_FAILURE',
-          'MERGER_FAILURE',
+          'MERGE_CONFLICT',
           'CONFIG_ERROR',
           'TIMED_OUT',
           'CANCELED',

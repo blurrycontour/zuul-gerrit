@@ -22,7 +22,7 @@ An MQTT report uses this schema:
    .. attr:: action
 
       The reporter action name, e.g.: 'start', 'success', 'failure',
-      'merge-failure', ...
+      'merge-conflict', ...
 
    .. attr:: tenant
 

@@ -1148,7 +1148,7 @@ class PipelineParser(object):
         'start': 'start_actions',
         'success': 'success_actions',
         'failure': 'failure_actions',
-        'merge-failure': 'merge_failure_actions',
+        'merge-conflict': 'merge_conflict_actions',
         'no-jobs': 'no_jobs_actions',
         'disabled': 'disabled_actions',
         'dequeue': 'dequeue_actions',
@@ -1198,6 +1198,7 @@ class PipelineParser(object):
                     'success-message': str,
                     'failure-message': str,
                     'start-message': str,
+                    'merge-conflict-message': str,
                     'merge-failure-message': str,
                     'no-jobs-message': str,
                     'footer-message': str,
@@ -1220,7 +1221,8 @@ class PipelineParser(object):
         pipeline['reject'] = self.getDriverSchema('reject')
         pipeline['trigger'] = vs.Required(self.getDriverSchema('trigger'))
         for action in ['enqueue', 'start', 'success', 'failure',
-                       'merge-failure', 'no-jobs', 'disabled', 'dequeue']:
+                       'merge-conflict', 'merge-failure', 'no-jobs',
+                       'disabled', 'dequeue']:
             pipeline[action] = self.getDriverSchema('reporter')
         return vs.Schema(pipeline)
 
@@ -1236,12 +1238,16 @@ class PipelineParser(object):
         pipeline.precedence = precedence
         pipeline.failure_message = conf.get('failure-message',
                                             "Build failed.")
-        pipeline.merge_failure_message = conf.get(
+        # TODO: Remove in Zuul v6.0
+        backwards_compat_merge_message = conf.get(
             'merge-failure-message', "Merge Failed.\n\nThis change or one "
             "of its cross-repo dependencies was unable to be "
             "automatically merged with the current state of its "
             "repository. Please rebase the change and upload a new "
             "patchset.")
+        pipeline.merge_conflict_message = conf.get(
+            'merge-conflict-message', backwards_compat_merge_message)
+
         pipeline.success_message = conf.get('success-message',
                                             "Build succeeded.")
         pipeline.footer_message = conf.get('footer-message', "")
@@ -1259,12 +1265,18 @@ class PipelineParser(object):
         pipeline.post_review = conf.get(
             'post-review', False)
 
+        # TODO: Remove in Zuul v6.0
+        # Make a copy to manipulate for backwards compat.
+        conf_copy = conf.copy()
+        if 'merge-failure' in conf_copy and 'merge-conflict' not in conf_copy:
+            conf_copy['merge-conflict'] = conf_copy['merge-failure']
+
         for conf_key, action in self.reporter_actions.items():
             reporter_set = []
             allowed_reporters = self.pcontext.tenant.allowed_reporters
-            if conf.get(conf_key):
+            if conf_copy.get(conf_key):
                 for reporter_name, params \
-                    in conf.get(conf_key).items():
+                    in conf_copy.get(conf_key).items():
                     if allowed_reporters is not None and \
                        reporter_name not in allowed_reporters:
                         raise UnknownConnection(reporter_name)
@@ -1274,9 +1286,9 @@ class PipelineParser(object):
                     reporter_set.append(reporter)
             setattr(pipeline, action, reporter_set)
 
-        # If merge-failure actions aren't explicit, use the failure actions
-        if not pipeline.merge_failure_actions:
-            pipeline.merge_failure_actions = pipeline.failure_actions
+        # If merge-conflict actions aren't explicit, use the failure actions
+        if not pipeline.merge_conflict_actions:
+            pipeline.merge_conflict_actions = pipeline.failure_actions
 
         pipeline.disable_at = conf.get(
             'disable-after-consecutive-failures', None)

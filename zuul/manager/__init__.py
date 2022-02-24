@@ -1862,14 +1862,14 @@ class PipelineManager(metaclass=ABCMeta):
         elif item.getConfigErrors():
             log.debug("Invalid config for change %s", item.change)
             # TODOv3(jeblair): consider a new reporter action for this
-            action = 'merge-failure'
-            actions = self.pipeline.merge_failure_actions
+            action = 'merge-conflict'
+            actions = self.pipeline.merge_conflict_actions
             item.setReportedResult('CONFIG_ERROR')
         elif item.didMergerFail():
-            log.debug("Merger failure")
-            action = 'merge-failure'
-            actions = self.pipeline.merge_failure_actions
-            item.setReportedResult('MERGER_FAILURE')
+            log.debug("Merge conflict")
+            action = 'merge-conflict'
+            actions = self.pipeline.merge_conflict_actions
+            item.setReportedResult('MERGE_CONFLICT')
         elif item.wasDequeuedNeedingChange():
             log.debug("Dequeued needing change")
             action = 'failure'

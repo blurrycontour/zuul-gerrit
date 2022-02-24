@@ -58,7 +58,7 @@ const RESULT_ICON_CONFIGS = {
     color: 'var(--pf-global--info-color--100)',
     badgeColor: 'yellow',
   },
-  MERGER_FAILURE: {
+  MERGE_CONFLICT: {
     icon: ExclamationIcon,
     color: 'var(--pf-global--warning-color--100)',
     badgeColor: 'orange',

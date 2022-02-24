@@ -430,7 +430,7 @@ class Pipeline(object):
         self.start_mark = None
         self.description = None
         self.failure_message = None
-        self.merge_failure_message = None
+        self.merge_conflict_message = None
         self.success_message = None
         self.footer_message = None
         self.enqueue_message = None
@@ -448,7 +448,7 @@ class Pipeline(object):
         self.start_actions = []
         self.success_actions = []
         self.failure_actions = []
-        self.merge_failure_actions = []
+        self.merge_conflict_actions = []
         self.no_jobs_actions = []
         self.disabled_actions = []
         self.dequeue_actions = []
@@ -473,7 +473,7 @@ class Pipeline(object):
             self.start_actions +
             self.success_actions +
             self.failure_actions +
-            self.merge_failure_actions +
+            self.merge_conflict_actions +
             self.no_jobs_actions +
             self.disabled_actions +
             self.dequeue_actions
