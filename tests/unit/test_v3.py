@@ -4928,6 +4928,19 @@ class TestDataReturn(AnsibleZuulTestCase):
         self.assertTrue(re.search('data-return .* SKIPPED', A.messages[-1]))
         self.assertIn('Build succeeded', A.messages[-1])
 
+    def test_data_return_skip_retry(self):
+        A = self.fake_gerrit.addFakeChange(
+            'org/project-skip-retry',
+            'master',
+            'A'
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='skip-retry-return', result='FAILURE',
+                 changes='1,1'),
+        ])
+
     def test_data_return_child_jobs_failure(self):
         A = self.fake_gerrit.addFakeChange('org/project5', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
