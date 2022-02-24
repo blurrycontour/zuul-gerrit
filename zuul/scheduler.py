@@ -2059,12 +2059,16 @@ class Scheduler(threading.Thread):
             return
 
         reconfigure_tenant = False
-        if ((event.branch_updated and
-             hasattr(change, 'files') and
-             change.updatesConfig(tenant)) or
-            (event.branch_deleted and
-             self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                               event.branch))):
+        if (event.branch_updated and
+            hasattr(change, 'files') and
+            change.updatesConfig(tenant)):
+            reconfigure_tenant = True
+            if change.files is None:
+                log.debug("Reconfiguring tenant after branch updated "
+                          "without file list, assuming config update")
+        elif (event.branch_deleted and
+              self.abide.hasUnparsedBranchCache(project.canonical_name,
+                                                event.branch)):
             reconfigure_tenant = True
 
         # The branch_created attribute is also true when a tag is
