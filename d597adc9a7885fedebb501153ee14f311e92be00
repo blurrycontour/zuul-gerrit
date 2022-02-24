@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "960ea19f_e99cce35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-24T20:22:13Z",
+      "side": 1,
+      "message": "Implementation lgtm.\n\nHowever this will cause a lot more requests to the api/tenants endpoint. This currently is in zuul-web not optimized as it is uncached and iterates over all tenants and pipelines to gather queue statistics. Especially on large systems with many tenants and pipelines this can add significant extra load on zuul-web. Thus this needs to be optimized via caching similar to the status endpoint before we can merge this change.",
+      "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
