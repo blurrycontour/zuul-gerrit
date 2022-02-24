@@ -40,6 +40,10 @@
 - job:
     name: image-builder
     provides: images
+    nodeset:
+      nodes:
+        - name: builder
+          label: builder
 
 - job:
     name: image-user

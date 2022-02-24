@@ -825,6 +825,8 @@ class PipelineManager(metaclass=ABCMeta):
             if req.fulfilled:
                 nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
                 build_set.jobNodeRequestComplete(req.job_name, nodeset)
+            else:
+                job.setWaitingStatus(f'node request: {req.id}')
         return True
 
     def _getPausedParent(self, build_set, job):
@@ -863,6 +865,7 @@ class PipelineManager(metaclass=ABCMeta):
                     job, nodes, item, self.pipeline, zone,
                     build_set.dependent_changes,
                     build_set.merger_items)
+                job.setWaitingStatus('executor')
             except Exception:
                 log.exception("Exception while executing job %s "
                               "for change %s:", job, item.change)

@@ -5007,7 +5007,7 @@ class QueueItem(zkobject.ZKObject):
                 max_remaining = remaining
 
             waiting_status = None
-            if not (job.queued or result):
+            if elapsed is None:
                 waiting_status = job.waiting_status
 
             ret['jobs'].append({
