@@ -1829,6 +1829,11 @@ class AnsibleJob(object):
         if run_unreachable or post_unreachable:
             return None
 
+        # Report a failure if pre-run failed and the user reported to
+        # zuul that the job should not retry.
+        if result_data.get('zuul', {}).get('retry') is False and not result:
+            result = "FAILURE"
+
         return result
 
     def runCleanupPlaybooks(self, success):
