@@ -2848,6 +2848,41 @@ class TestInRepoConfigDir(ZuulTestCase):
         ], ordered=True)
 
 
+class TestExtraConfigInDependent(ZuulTestCase):
+    # in org/project2, job is defined in extra_config_dir, while project is
+    # defined in .zuul.yaml
+    tenant_config_file = 'config/in-repo-dir/main.yaml'
+
+    # These tests fiddle around with the list of schedulers used in
+    # the test. They delete the existing scheduler and replace it by
+    # a new one. This wouldn't work with multiple schedulers as the
+    # new scheduler wouldn't replace the one at self.scheds[0], but
+    # any of the other schedulers used within a multi-scheduler setup.
+    # As a result, starting self.scheds[0] would fail because it is
+    # already running an threads can only be started once.
+    scheduler_count = 1
+
+    def test_extra_config_in_dependent_change(self):
+        # Test that when a job is defined in a extra_config_dir in a repo, if
+        # a change is dependent on that repo, the job should still be loaded.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        # A Depends-On: B who has a private job defined in extra_config_dir
+        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url'])
+
+        # Make sure zuul has seen the events
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Jobs in both repos should be success
+        self.assertHistory([
+            dict(name='project2-private', result='SUCCESS', changes='2,1'),
+            dict(name='project-test', result='SUCCESS', changes='2,1 1,1 x'),
+        ], ordered=True)
+
+
 class TestGlobalRepoState(AnsibleZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/global-repo-state/main.yaml'
