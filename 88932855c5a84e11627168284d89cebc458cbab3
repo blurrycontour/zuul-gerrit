@@ -16,6 +16,24 @@
       "message": "Perhaps the message could be changed to `Ref queued successfully` ?",
       "revId": "88932855c5a84e11627168284d89cebc458cbab3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebb83437_fda40019",
+        "filename": "web/src/containers/build/Buildset.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-02-24T16:25:03Z",
+      "side": 1,
+      "message": "Done, good catch!",
+      "parentUuid": "e3ecfbfc_760e1298",
+      "revId": "88932855c5a84e11627168284d89cebc458cbab3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
