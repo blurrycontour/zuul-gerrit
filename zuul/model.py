@@ -31,7 +31,7 @@ import textwrap
 import types
 import itertools
 
-from kazoo.exceptions import NoNodeError, ZookeeperError
+from kazoo.exceptions import NodeExistsError, NoNodeError, ZookeeperError
 from cachetools.func import lru_cache
 
 from zuul.lib import yamlutil as yaml
@@ -653,6 +653,24 @@ class PipelineState(zkobject.ZKObject):
         safe_tenant = urllib.parse.quote_plus(pipeline.tenant.name)
         safe_pipeline = urllib.parse.quote_plus(pipeline.name)
         return f"/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}"
+
+    def _dirtyPath(self):
+        return f'{self.getPath()}/dirty'
+
+    def isDirty(self, client):
+        return bool(client.exists(self._dirtyPath()))
+
+    def setDirty(self, client):
+        try:
+            client.create(self._dirtyPath())
+        except NodeExistsError:
+            pass
+
+    def clearDirty(self, client):
+        try:
+            client.delete(self._dirtyPath())
+        except NoNodeError:
+            pass
 
     def removeOldQueue(self, context, queue):
         if queue in self.old_queues:
