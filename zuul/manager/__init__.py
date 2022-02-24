@@ -1301,12 +1301,22 @@ class PipelineManager(metaclass=ABCMeta):
                 item.bundle and
                 item.bundle.updatesConfig(tenant) and tpc is not None
             ):
+                extra_config_files = set(tpc.extra_config_files)
+                extra_config_dirs = set(tpc.extra_config_dirs)
+                # Merge extra_config_files and extra_config_dirs of the
+                # dependent change
+                #for item_ahead in item.items_ahead:
+                #    tpc_ahead = tenant.project_configs.get(
+                #        item_ahead.change.project.canonical_name)
+                #    extra_config_files.update(tpc_ahead.extra_config_files)
+                #    extra_config_dirs.update(tpc_ahead.extra_config_dirs)
+
                 ready = self.scheduleMerge(
                     item,
                     files=(['zuul.yaml', '.zuul.yaml'] +
-                           list(tpc.extra_config_files)),
+                           list(extra_config_files)),
                     dirs=(['zuul.d', '.zuul.d'] +
-                          list(tpc.extra_config_dirs)))
+                          list(extra_config_dirs)))
         if build_set.merge_state == build_set.PENDING:
             ready = False
 
