@@ -54,6 +54,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "843f1b63_bd89ef75",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2081,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-24T21:18:20Z",
+      "side": 1,
+      "message": "I think it makes sense to also add a test case that checks that if that\u0027s False a change doesn\u0027t enter the gate.",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9fc6ef2_d4b00a9d",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 5
@@ -83,6 +100,24 @@
       "side": 1,
       "message": "This behaves like you expect already. In fact gitlab only sets this to false only if project requires this and there are open discussions. Otherwise it is reported as True",
       "parentUuid": "a9fc6ef2_d4b00a9d",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9784935_bca00e07",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-02-24T21:18:20Z",
+      "side": 1,
+      "message": "Ok, great",
+      "parentUuid": "33492cc1_04e1d5cc",
       "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
