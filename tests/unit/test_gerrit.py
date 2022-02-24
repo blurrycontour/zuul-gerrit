@@ -127,7 +127,7 @@ class TestGerrit(BaseTestCase):
         project = gerrit.source.getProject('org/project')
         url = gerrit.source.getGitUrl(project)
         self.assertEqual(
-            'https://gerrit:1%2Fbadpassword@localhost/org/project',
+            'https://gerrit:1%2Fbadpassword@localhost/a/org/project',
             url)
 
     def test_git_over_ssh_getGitURL(self):

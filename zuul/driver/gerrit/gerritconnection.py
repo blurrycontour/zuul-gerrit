@@ -1564,7 +1564,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 urllib.parse.quote(self.password, safe=''),
                 baseurl[1])
             baseurl = urllib.parse.urlunparse(baseurl)
-            url = ('%s/%s' % (baseurl, project.name))
+            url = ('%s/a/%s' % (baseurl, project.name))
         else:
             url = 'ssh://%s@%s:%s/%s' % (self.user, self.server, self.port,
                                          project.name)
