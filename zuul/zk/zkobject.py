@@ -18,11 +18,10 @@ import time
 import types
 import zlib
 
-from kazoo.exceptions import (
-    KazooException, NodeExistsError, NoNodeError, ZookeeperError)
+from kazoo.exceptions import NodeExistsError, NoNodeError
+from kazoo.retry import KazooRetry
 
 from zuul.zk import sharding
-from zuul.zk.exceptions import InvalidObjectError
 
 
 class ZKContext:
@@ -38,6 +37,9 @@ class ZKContext:
         return ((not self.lock or self.lock.is_still_valid()) and
                 (not self.stop_event or not self.stop_event.is_set()))
 
+    def sessionIsInvalid(self):
+        return not self.sessionIsValid()
+
 
 class LocalZKContext:
     """A Local ZKContext that means don't actually write anything to ZK"""
@@ -50,6 +52,9 @@ class LocalZKContext:
 
     def sessionIsValid(self):
         return True
+
+    def sessionIsInvalid(self):
+        return False
 
 
 class ZKObject:
@@ -169,22 +174,16 @@ class ZKObject:
 
     def delete(self, context):
         path = self.getPath()
-        while context.sessionIsValid():
-            try:
-                context.client.delete(path, recursive=True)
-                return
-            except ZookeeperError:
-                # These errors come from the server and are not
-                # retryable.  Connection errors are KazooExceptions so
-                # they aren't caught here and we will retry.
-                context.log.error(
-                    "Exception deleting ZKObject %s at %s", self, path)
-                raise
-            except KazooException:
-                context.log.exception(
-                    "Exception deleting ZKObject %s, will retry", self)
-                time.sleep(self._retry_interval)
-        raise Exception("ZooKeeper session or lock not valid")
+        if context.sessionIsInvalid():
+            raise Exception("ZooKeeper session or lock not valid")
+        try:
+            self._retry(context, context.client.delete,
+                        path, recursive=True)
+            return
+        except Exception:
+            context.log.error(
+                "Exception deleting ZKObject %s at %s", self, path)
+            raise
 
     def estimateDataSize(self, seen=None):
         """Attempt to find all ZKObjects below this one and sum their
@@ -228,89 +227,91 @@ class ZKObject:
 
     # Private methods below
 
+    def _retry(self, context, func, *args, **kw):
+        kazoo_retry = KazooRetry(max_tries=-1,
+                                 interrupt=context.sessionIsInvalid,
+                                 delay=self._retry_interval, backoff=0,
+                                 ignore_expire=False)
+        try:
+            return kazoo_retry(func, *args, **kw)
+        except InterruptedError:
+            pass
+
     def __init__(self):
         # Don't support any arguments in constructor to force us to go
         # through a save or restore path.
         super().__init__()
         self._set(_active_context=None)
 
+    @staticmethod
+    def _retryableLoad(context, path):
+        start = time.perf_counter()
+        compressed_data, zstat = context.client.get(path)
+        context.cumulative_read_time += time.perf_counter() - start
+        return compressed_data, zstat
+
     def _load(self, context, path=None):
         if path is None:
             path = self.getPath()
-        while context.sessionIsValid():
-            try:
-                start = time.perf_counter()
-                compressed_data, zstat = context.client.get(path)
-                context.cumulative_read_time += time.perf_counter() - start
+        if context.sessionIsInvalid():
+            raise Exception("ZooKeeper session or lock not valid")
+        try:
+            compressed_data, zstat = self._retry(context, self._retryableLoad,
+                                                 context, path)
+        except Exception:
+            context.log.error(
+                "Exception loading ZKObject %s at %s", self, path)
+            raise
+        self._set(_zkobject_hash=None)
+        try:
+            data = zlib.decompress(compressed_data)
+        except zlib.error:
+            # Fallback for old, uncompressed data
+            data = compressed_data
+        self._set(**self.deserialize(data, context))
+        self._set(_zstat=zstat,
+                  _zkobject_hash=hash(data),
+                  _zkobject_compressed_size=len(compressed_data),
+                  _zkobject_uncompressed_size=len(data),
+                  )
 
-                self._set(_zkobject_hash=None)
-                try:
-                    data = zlib.decompress(compressed_data)
-                except zlib.error:
-                    # Fallback for old, uncompressed data
-                    data = compressed_data
-                self._set(**self.deserialize(data, context))
-                self._set(_zstat=zstat,
-                          _zkobject_hash=hash(data),
-                          _zkobject_compressed_size=len(compressed_data),
-                          _zkobject_uncompressed_size=len(data),
-                          )
-                return
-            except ZookeeperError:
-                # These errors come from the server and are not
-                # retryable.  Connection errors are KazooExceptions so
-                # they aren't caught here and we will retry.
-                context.log.error(
-                    "Exception loading ZKObject %s at %s", self, path)
-                raise
-            except KazooException:
-                context.log.exception(
-                    "Exception loading ZKObject %s at %s, will retry",
-                    self, path)
-                time.sleep(5)
-            except Exception:
-                # A higher level must handle this exception, but log
-                # ourself here so we know what object triggered it.
-                context.log.error(
-                    "Exception loading ZKObject %s at %s", self, path)
-                raise
-        raise Exception("ZooKeeper session or lock not valid")
+    @staticmethod
+    def _retryableSave(context, create, path, compressed_data, version):
+        start = time.perf_counter()
+        if create:
+            real_path, zstat = context.client.create(
+                path, compressed_data, makepath=True,
+                include_data=True)
+        else:
+            zstat = context.client.set(path, compressed_data,
+                                       version=version)
+        context.cumulative_write_time += time.perf_counter() - start
+        return zstat
 
     def _save(self, context, data, create=False):
         if isinstance(context, LocalZKContext):
             return
         path = self.getPath()
-        while context.sessionIsValid():
-            try:
-                compressed_data = zlib.compress(data)
-                start = time.perf_counter()
-                if create:
-                    real_path, zstat = context.client.create(
-                        path, compressed_data, makepath=True,
-                        include_data=True)
-                else:
-                    zstat = context.client.set(path, compressed_data,
-                                               version=self._zstat.version)
-                context.cumulative_write_time += time.perf_counter() - start
-                self._set(_zstat=zstat,
-                          _zkobject_hash=hash(data),
-                          _zkobject_compressed_size=len(compressed_data),
-                          _zkobject_uncompressed_size=len(data),
-                          )
-                return
-            except ZookeeperError:
-                # These errors come from the server and are not
-                # retryable.  Connection errors are KazooExceptions so
-                # they aren't caught here and we will retry.
-                context.log.error(
-                    "Exception saving ZKObject %s at %s", self, path)
-                raise
-            except KazooException:
-                context.log.exception(
-                    "Exception saving ZKObject %s at %s, will retry",
-                    self, path)
-                time.sleep(self._retry_interval)
-        raise Exception("ZooKeeper session or lock not valid")
+        if context.sessionIsInvalid():
+            raise Exception("ZooKeeper session or lock not valid")
+        compressed_data = zlib.compress(data)
+        try:
+            if hasattr(self, '_zstat'):
+                version = self._zstat.version
+            else:
+                version = None
+            zstat = self._retry(context, self._retryableSave,
+                                context, create, path, compressed_data,
+                                version)
+        except Exception:
+            context.log.error(
+                "Exception saving ZKObject %s at %s", self, path)
+            raise
+        self._set(_zstat=zstat,
+                  _zkobject_hash=hash(data),
+                  _zkobject_compressed_size=len(compressed_data),
+                  _zkobject_uncompressed_size=len(data),
+                  )
 
     def __setattr__(self, name, value):
         if self._active_context:
@@ -333,82 +334,67 @@ class ShardedZKObject(ZKObject):
     # expected.  Don't delete them in that case.
     delete_on_error = True
 
+    @staticmethod
+    def _retryableLoad(context, path):
+        with sharding.BufferedShardReader(context.client, path) as stream:
+            data = stream.read()
+            compressed_size = stream.compressed_bytes_read
+            context.cumulative_read_time += stream.cumulative_read_time
+        if not data and context.client.exists(path) is None:
+            raise NoNodeError
+        return data, compressed_size
+
     def _load(self, context, path=None):
         if path is None:
             path = self.getPath()
-        while context.sessionIsValid():
-            try:
-                self._set(_zkobject_hash=None)
-                with sharding.BufferedShardReader(
-                        context.client, path) as stream:
-                    data = stream.read()
-                    compressed_size = stream.compressed_bytes_read
-                    context.cumulative_read_time += \
-                        stream.cumulative_read_time
-                if not data and context.client.exists(path) is None:
-                    raise NoNodeError
-                self._set(**self.deserialize(data, context))
-                self._set(_zkobject_hash=hash(data),
-                          _zkobject_compressed_size=compressed_size,
-                          _zkobject_uncompressed_size=len(data),
-                          )
-                return
-            except ZookeeperError:
-                # These errors come from the server and are not
-                # retryable.  Connection errors are KazooExceptions so
-                # they aren't caught here and we will retry.
-                context.log.error(
-                    "Exception loading ZKObject %s at %s", self, path)
-                raise
-            except KazooException:
-                context.log.exception(
-                    "Exception loading ZKObject %s at %s, will retry",
-                    self, path)
-                time.sleep(5)
-            except Exception as exc:
-                # A higher level must handle this exception, but log
-                # ourself here so we know what object triggered it.
-                context.log.error(
-                    "Exception loading ZKObject %s at %s", self, path)
-                if self.delete_on_error:
-                    self.delete(context)
-                raise InvalidObjectError from exc
-        raise Exception("ZooKeeper session or lock not valid")
+        if context.sessionIsInvalid():
+            raise Exception("ZooKeeper session or lock not valid")
+        try:
+            self._set(_zkobject_hash=None)
+            data, compressed_size = self._retry(context, self._retryableLoad,
+                                                context, path)
+            self._set(**self.deserialize(data, context))
+            self._set(_zkobject_hash=hash(data),
+                      _zkobject_compressed_size=compressed_size,
+                      _zkobject_uncompressed_size=len(data),
+                      )
+        except Exception:
+            # A higher level must handle this exception, but log
+            # ourself here so we know what object triggered it.
+            context.log.error(
+                "Exception loading ZKObject %s at %s", self, path)
+            if self.delete_on_error:
+                self.delete(context)
+            raise
+
+    @staticmethod
+    def _retryableSave(context, path, data):
+        with sharding.BufferedShardWriter(context.client, path) as stream:
+            stream.truncate(0)
+            stream.write(data)
+            stream.flush()
+            compressed_size = stream.compressed_bytes_written
+            context.cumulative_write_time += stream.cumulative_write_time
+        return compressed_size
 
     def _save(self, context, data, create=False):
         if isinstance(context, LocalZKContext):
             return
         path = self.getPath()
-        while context.sessionIsValid():
-            try:
-                if (create and
-                    not self.truncate_on_create and
-                    context.client.exists(path) is not None):
+        if context.sessionIsInvalid():
+            raise Exception("ZooKeeper session or lock not valid")
+        try:
+            if create and not self.truncate_on_create:
+                exists = self._retry(context, context.client.exists, path)
+                if exists is not None:
                     raise NodeExistsError
-                with sharding.BufferedShardWriter(
-                        context.client, path) as stream:
-                    stream.truncate(0)
-                    stream.write(data)
-                    stream.flush()
-                    compressed_size = stream.compressed_bytes_written
-                    context.cumulative_write_time += \
-                        stream.cumulative_write_time
-
-                self._set(_zkobject_hash=hash(data),
-                          _zkobject_compressed_size=compressed_size,
-                          _zkobject_uncompressed_size=len(data),
-                          )
-                return
-            except ZookeeperError:
-                # These errors come from the server and are not
-                # retryable.  Connection errors are KazooExceptions so
-                # they aren't caught here and we will retry.
-                context.log.error(
-                    "Exception saving ZKObject %s at %s", self, path)
-                raise
-            except KazooException:
-                context.log.exception(
-                    "Exception saving ZKObject %s at %s, will retry",
-                    self, path)
-                time.sleep(self._retry_interval)
-        raise Exception("ZooKeeper session or lock not valid")
+            compressed_size = self._retry(context, self._retryableSave,
+                                          context, path, data)
+            self._set(_zkobject_hash=hash(data),
+                      _zkobject_compressed_size=compressed_size,
+                      _zkobject_uncompressed_size=len(data),
+                      )
+        except Exception:
+            context.log.error(
+                "Exception saving ZKObject %s at %s", self, path)
+            raise
