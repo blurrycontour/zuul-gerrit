@@ -1,0 +1,6 @@
+- project:
+    name: org/project2
+    check:
+      jobs:
+        - project2-private-extra-file
+        - project2-private-extra-dir

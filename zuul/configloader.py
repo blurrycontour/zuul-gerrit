@@ -2464,6 +2464,9 @@ class ConfigLoader(object):
             # Otherwise, do not use the cached config (even if the
             # files are empty as that likely means they were deleted).
             files_list = files_entry.keys()
+
+            self.log.info("......files_list: " + str(files_list))
+
             for fn in files_list:
                 if fn.startswith("zuul.d/"):
                     fns1.append(fn)
