@@ -53,7 +53,7 @@ from tests.base import (
 from zuul.zk.zkobject import ShardedZKObject, ZKObject, ZKContext
 from zuul.zk.locks import tenant_write_lock
 
-from kazoo.exceptions import KazooException, ZookeeperError
+from kazoo.exceptions import ZookeeperError, OperationTimeoutError
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -1603,13 +1603,13 @@ class TestZKObject(ZooKeeperBaseTestCase):
             def delete(self, *args, **kw):
                 self.count += 1
                 if self.count < 2:
-                    raise KazooException()
+                    raise OperationTimeoutError()
                 return self._real_client.delete(*args, **kw)
 
             def set(self, *args, **kw):
                 self.count += 1
                 if self.count < 2:
-                    raise KazooException()
+                    raise OperationTimeoutError()
                 return self._real_client.set(*args, **kw)
 
         # Fail an update
