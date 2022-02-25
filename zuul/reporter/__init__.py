@@ -123,6 +123,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             'success': self._formatItemReportSuccess,
             'failure': self._formatItemReportFailure,
             'merge-conflict': self._formatItemReportMergeConflict,
+            'merge-failure': self._formatItemReportMergeFailure,
             'no-jobs': self._formatItemReportNoJobs,
             'disabled': self._formatItemReportDisabled,
             'dequeue': self._formatItemReportDequeue,
@@ -197,6 +198,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportMergeConflict(self, item, with_jobs=True):
         return item.pipeline.merge_conflict_message
+
+    def _formatItemReportMergeFailure(self, item, with_jobs=True):
+        return 'This change was not merged by the code review system.\n'
 
     def _formatItemReportNoJobs(self, item, with_jobs=True):
         status_url = get_default(self.connection.sched.config,

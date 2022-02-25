@@ -5229,6 +5229,19 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertNotIn('logs.example.com', B.messages[0])
         self.assertNotIn('SKIPPED', B.messages[0])
 
+    def test_submit_failure(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.fail_merge = True
+
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        buildsets = list(
+            self.scheds.first.connections.connections[
+                'database'].getBuildsets())
+        self.assertEqual(buildsets[0].result, 'MERGE_FAILURE')
+
     @simple_layout('layouts/nonvoting-pipeline.yaml')
     def test_nonvoting_pipeline(self):
         "Test that a nonvoting pipeline (experimental) can still report"
