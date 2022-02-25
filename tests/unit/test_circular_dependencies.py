@@ -464,6 +464,75 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
+    def test_failing_cycle_behind_failing_change(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project", "master", "B")
+        C = self.fake_gerrit.addFakeChange("org/project", "master", "C")
+        D = self.fake_gerrit.addFakeChange("org/project", "master", "D")
+        E = self.fake_gerrit.addFakeChange("org/project", "master", "E")
+
+        # B <-> C (via commit-depends)
+        C.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            C.subject, D.data["url"]
+        )
+        D.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            D.subject, C.data["url"]
+        )
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        C.addApproval("Code-Review", 2)
+        D.addApproval("Code-Review", 2)
+        E.addApproval("Code-Review", 2)
+
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        # Make sure we enqueue C as part of the circular dependency with D, so
+        # we end up with the following queue state: A, B, C, ...
+        C.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(D.addApproval("Approved", 1))
+        self.fake_gerrit.addEvent(E.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        # Fail a job of the circular dependency
+        self.executor_server.failJob("project-job", D)
+        self.executor_server.release("project-job", change="4 1")
+
+        # Fail job for item B ahead of the circular dependency so that this
+        # causes a gate reset and item C and D are moved behind item A.
+        self.executor_server.failJob("project-job", B)
+        self.executor_server.release("project-job", change="2 1")
+        self.waitUntilSettled()
+
+        # Don't fail any other tests
+        self.executor_server.fail_tests.clear()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "NEW")
+        self.assertEqual(C.data["status"], "MERGED")
+        self.assertEqual(D.data["status"], "MERGED")
+        self.assertEqual(E.data["status"], "MERGED")
+
+        self.assertHistory([
+            dict(name="project-job", result="SUCCESS", changes="1,1"),
+            dict(name="project-job", result="FAILURE", changes="1,1 2,1"),
+            # First attempt of change C and D before gate reset due to change B
+            dict(name="project-job", result="FAILURE",
+                 changes="1,1 2,1 3,1 4,1"),
+            dict(name="project-job", result="FAILURE",
+                 changes="1,1 2,1 3,1 4,1"),
+            dict(name="project-job", result="ABORTED",
+                 changes="1,1 2,1 3,1 4,1 5,1"),
+            dict(name="project-job", result="SUCCESS", changes="1,1 3,1 4,1"),
+            dict(name="project-job", result="SUCCESS", changes="1,1 3,1 4,1"),
+            dict(name="project-job", result="SUCCESS",
+                 changes="1,1 3,1 4,1 5,1"),
+        ], ordered=False)
+
     def test_dependency_on_cycle_failure(self):
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
