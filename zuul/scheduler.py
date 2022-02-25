@@ -1952,6 +1952,7 @@ class Scheduler(threading.Thread):
                 tenant.name][pipeline.name].hasEvents(),
             self.pipeline_management_events[
                 tenant.name][pipeline.name].hasEvents(),
+            pipeline.state.isDirty(self.zk_client.client),
         )):
             self.log.debug("No events to process for pipeline %s in tenant %s",
                            pipeline.name, tenant.name)
@@ -1961,6 +1962,7 @@ class Scheduler(threading.Thread):
         ctx = pipeline.manager.current_context
         with self.statsd_timer(f'{stats_key}.refresh'):
             pipeline.state.refresh(ctx)
+        pipeline.state.setDirty(self.zk_client.client)
         if pipeline.state.old_queues:
             self._reenqueuePipeline(tenant, pipeline, ctx)
         pipeline.state.cleanup(ctx)
@@ -1982,6 +1984,7 @@ class Scheduler(threading.Thread):
         else:
             pipeline.state.updateAttributes(
                 ctx, state=pipeline.STATE_NORMAL)
+            pipeline.state.clearDirty(self.zk_client.client)
         return True
 
     def _gatherConnectionCacheKeys(self):
