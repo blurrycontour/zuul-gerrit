@@ -236,13 +236,14 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         for needed_change in self.resolveChangeReferences(
                 item.change.needs_changes):
             needed_item = self.getItemForChange(needed_change)
-            if not needed_item:
+            # At this point we only care about needed changes ahead in the
+            # queue and not about needed changes behind. This is relevant
+            # for circular dependencies in order to correctly reset items in
+            # case of a failure.
+            if not (needed_item and needed_item in item.items_ahead):
                 continue
             if needed_item.current_build_set.failing_reasons:
                 failing_items.add(needed_item)
-        if item.isBundleFailing():
-            failing_items.update(item.bundle.items)
-            failing_items.remove(item)
         if failing_items:
             return failing_items
         return None

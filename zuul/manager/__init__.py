@@ -1468,6 +1468,8 @@ class PipelineManager(metaclass=ABCMeta):
 
         if item.hasAnyJobFailed():
             failing_reasons.append("at least one job failed")
+        # if item.isBundleFailing():
+            # failing_reasons.append("bundle is failing")
         if (not item.live) and (not item.items_behind) and (not dequeued):
             failing_reasons.append("is a non-live item with no items behind")
             self.dequeueItem(item)
