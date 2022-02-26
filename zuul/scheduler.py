@@ -1961,7 +1961,10 @@ class Scheduler(threading.Thread):
         stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         ctx = pipeline.manager.current_context
         with self.statsd_timer(f'{stats_key}.refresh'):
+            pipeline.change_list.refresh(ctx)
+            pipeline.summary.refresh(ctx)
             pipeline.state.refresh(ctx)
+
         pipeline.state.setDirty(self.zk_client.client)
         if pipeline.state.old_queues:
             self._reenqueuePipeline(tenant, pipeline, ctx)

@@ -55,6 +55,45 @@ class TestScaleOutScheduler(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @simple_layout('layouts/multi-scheduler-status.yaml')
+    def test_multi_scheduler_status(self):
+        self.hold_merge_jobs_in_queue = True
+
+        first = self.scheds.first
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        self.waitUntilSettled()
+
+        self.log.debug("Force second scheduler to process check")
+        with first.sched.run_handler_lock:
+            event = zuul.model.PipelinePostConfigEvent()
+            first.sched.pipeline_management_events[
+                'tenant-one']['check'].put(event, needs_result=False)
+            self.waitUntilSettled(matcher=[second])
+
+        self.log.debug("Add change in first scheduler")
+        with second.sched.run_handler_lock:
+            A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[first])
+
+        self.log.debug("Finish change in second scheduler")
+        with first.sched.run_handler_lock:
+            self.hold_merge_jobs_in_queue = False
+            self.merger_api.release()
+            self.waitUntilSettled(matcher=[second])
+
+        self.assertHistory([])
+
+        tenant = first.sched.abide.tenants['tenant-one']
+        pipeline = tenant.layout.pipelines['check']
+        summary = zuul.model.PipelineSummary()
+        summary._set(pipeline=pipeline)
+        context = self.createZKContext()
+        summary.refresh(context)
+        self.assertEqual(summary.status['change_queues'], [])
+
     def test_config_priming(self):
         # Wait until scheduler is primed
         self.waitUntilSettled()
