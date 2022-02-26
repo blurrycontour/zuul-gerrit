@@ -88,7 +88,8 @@ class SQLReporter(BaseReporter):
                 db_buildset.message = message
                 end_time = db_buildset.first_build_start_time
                 for build in db_buildset.builds:
-                    if build.end_time and build.end_time > end_time:
+                    if (build.end_time and end_time
+                        and build.end_time > end_time):
                         end_time = build.end_time
                 db_buildset.last_build_end_time = end_time
             elif buildset.builds:
