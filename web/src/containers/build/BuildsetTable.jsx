@@ -29,6 +29,8 @@ import {
   CodeBranchIcon,
   CodeIcon,
   CubeIcon,
+  OutlinedCalendarAltIcon,
+  OutlinedClockIcon,
   PollIcon,
   StreamIcon,
 } from '@patternfly/react-icons'
@@ -41,6 +43,8 @@ import {
   breakWord,
   cellWidth,
 } from '@patternfly/react-table'
+import 'moment-duration-format'
+import * as moment from 'moment'
 
 import { BuildResult, BuildResultWithIcon } from './Misc'
 import { buildExternalTableLink, IconProperty } from '../../Misc'
@@ -50,6 +54,7 @@ function BuildsetTable({
   fetching,
   onClearFilters,
   tenant,
+  timezone,
   history,
 }) {
   const columns = [
@@ -75,6 +80,16 @@ function BuildsetTable({
       cellTransforms: [truncate],
     },
     {
+      title: <IconProperty icon={<OutlinedClockIcon />} value="Duration" />,
+      dataLabel: 'Duration',
+    },
+    {
+      title: (
+        <IconProperty icon={<OutlinedCalendarAltIcon />} value="Start time" />
+      ),
+      dataLabel: 'Start time',
+    },
+    {
       title: <IconProperty icon={<PollIcon />} value="Result" />,
       dataLabel: 'Result',
     },
@@ -82,6 +97,9 @@ function BuildsetTable({
 
   function createBuildsetRow(buildset) {
     const changeOrRefLink = buildExternalTableLink(buildset)
+
+    const duration = moment.utc(buildset.last_build_end_time) -
+          moment.utc(buildset.first_build_start_time)
 
     return {
       // Pass the buildset's uuid as row id, so we can use it later on in the
@@ -107,6 +125,17 @@ function BuildsetTable({
         },
         {
           title: changeOrRefLink && changeOrRefLink,
+        },
+        {
+          title: moment
+            .duration(duration, 'ms')
+            .format('h [hr] m [min] s [sec]'),
+        },
+        {
+          title: moment
+            .utc(buildset.first_build_start_time)
+            .tz(timezone)
+            .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
           title: (
@@ -208,7 +237,11 @@ BuildsetTable.propTypes = {
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   tenant: PropTypes.object.isRequired,
+  timezone: PropTypes.string.isRequired,
   history: PropTypes.object.isRequired,
 }
 
-export default connect((state) => ({ tenant: state.tenant }))(BuildsetTable)
+export default connect((state) => ({
+  tenant: state.tenant,
+  timezone: state.timezone,
+}))(BuildsetTable)
