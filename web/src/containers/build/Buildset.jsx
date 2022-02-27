@@ -116,7 +116,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
               icon={<OutlinedClockIcon />}
               value={
                 <>
-                  <strong>Total build duration </strong>
+                  <strong>Buildset duration </strong>
                   {moment
                     .duration(totalDuration, 'seconds')
                     .format('h [hr] m [min] s [sec]')}{' '}
