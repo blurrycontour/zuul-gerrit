@@ -17,6 +17,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
   Button,
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  DropdownToggle,
   EmptyState,
   EmptyStateBody,
   EmptyStateIcon,
@@ -28,6 +32,7 @@ import {
   BuildIcon,
   CodeBranchIcon,
   CodeIcon,
+  CogIcon,
   CubeIcon,
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
@@ -57,6 +62,16 @@ function BuildsetTable({
   timezone,
   history,
 }) {
+  const [isDurationOpen, setIsDurationOpen] = React.useState(false)
+  const [currentDuration, setCurrentDuration] = React.useState(
+    'Buildset Duration'
+  )
+
+  const handleDurationSelect = (event) => {
+    setIsDurationOpen(!isDurationOpen)
+    setCurrentDuration(event.target.innerText)
+  }
+
   const columns = [
     {
       title: <IconProperty icon={<CubeIcon />} value="Project" />,
@@ -80,8 +95,36 @@ function BuildsetTable({
       cellTransforms: [truncate],
     },
     {
-      title: <IconProperty icon={<OutlinedClockIcon />} value="Duration" />,
+      title: <Dropdown
+               isText
+               isPlain
+               position={DropdownPosition.left}
+               onSelect={handleDurationSelect}
+               toggle={
+                 <DropdownToggle
+                   onToggle={next => setIsDurationOpen(next)}
+                   // Use a gear instead of a caret which looks likea sort indicator.
+                   toggleIndicator={CogIcon}
+                   style={{
+                     padding: 0,
+                     fontWeight: 'var(--pf-c-table--cell-FontWeight)',
+                     fontSize: 'var(--pf-c-table--cell-FontSize)',
+                     color: 'var(--pf-c-table--cell-Color)'
+                   }}
+                   id="toggle-id-duration"
+                 >
+                   <OutlinedClockIcon /> {currentDuration}
+                 </DropdownToggle>
+               }
+               isOpen={isDurationOpen}
+               dropdownItems={[
+                 <DropdownItem key="buildset">Buildset Duration</DropdownItem>,
+                 <DropdownItem key="overall">Overall Duration</DropdownItem>,
+               ]}
+               style={{ width: '100%', padding: 0 }}
+             />,
       dataLabel: 'Duration',
+      props: {style: {overflowY: 'visible'}},
     },
     {
       title: (
@@ -98,8 +141,14 @@ function BuildsetTable({
   function createBuildsetRow(buildset) {
     const changeOrRefLink = buildExternalTableLink(buildset)
 
-    const duration = moment.utc(buildset.last_build_end_time) -
-          moment.utc(buildset.first_build_start_time)
+    let duration
+    if (currentDuration === 'Buildset Duration') {
+      duration = moment.utc(buildset.last_build_end_time) -
+            moment.utc(buildset.first_build_start_time)
+    } else {
+      duration = moment.utc(buildset.last_build_end_time) -
+            moment.utc(buildset.event_timestamp)
+    }
 
     return {
       // Pass the buildset's uuid as row id, so we can use it later on in the
