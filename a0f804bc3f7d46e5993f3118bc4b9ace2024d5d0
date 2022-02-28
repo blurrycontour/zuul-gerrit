@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91fb2a8a_c55f15e6",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-02-28T16:16:39Z",
+      "side": 1,
+      "message": "The new check seems like it would fit well here.",
+      "revId": "a0f804bc3f7d46e5993f3118bc4b9ace2024d5d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
