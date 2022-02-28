@@ -264,6 +264,11 @@ class AuthContainer extends React.Component {
     if (info.isFetching) {
       return (<><div style={containerStyles}>Fetching auth info ...</div></>)
     }
+    if (!auth.auth_params.authority) {
+      return (
+        <div style={containerStyles} title='No authentication configured'>-</div>
+      )
+    }
     if (auth.info && auth.info.default_realm) {
       return this.renderButton(containerStyles)
     } else {
