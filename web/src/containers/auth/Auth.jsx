@@ -265,7 +265,14 @@ class AuthContainer extends React.Component {
       return (<><div style={containerStyles}>Fetching auth info ...</div></>)
     }
     if (auth.info && auth.info.default_realm) {
-      return this.renderButton(containerStyles)
+      if (!auth.auth_params.authority) {
+        // There is an authenticator for the default realm, but not with the right driver
+        return (
+          <div style={containerStyles} title='No OpenID Connect provider configured'>-</div>
+        )
+      } else {
+        return this.renderButton(containerStyles)
+      }
     } else {
       return (<div style={containerStyles} title="Authentication disabled">-</div>)
     }
