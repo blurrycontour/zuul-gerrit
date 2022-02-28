@@ -580,6 +580,55 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Try to lock a request that was just removed
         self.assertFalse(server.lock(exec_a))
 
+    def test_efficient_removal(self):
+        # Test that we don't try to lock a removed request
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+
+        # Scheduler submits two requests
+        request_a = BuildRequest(
+            "A", None, None, "job", "tenant", "pipeline", '1')
+        client.submit(request_a, {})
+
+        request_b = BuildRequest(
+            "B", None, None, "job", "tenant", "pipeline", '2')
+        client.submit(request_b, {})
+        sched_b = client.get(request_b.path)
+
+        request_c = BuildRequest(
+            "C", None, None, "job", "tenant", "pipeline", '3')
+        client.submit(request_c, {})
+        sched_c = client.get(request_c.path)
+
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        count = 0
+        for exec_request in server.next():
+            count += 1
+            if count == 1:
+                # Someone starts the second request and client removes
+                # the third request all while we're processing the first.
+                sched_b.state = sched_b.RUNNING
+                client.update(sched_b)
+                client.remove(sched_c)
+                for _ in iterate_timeout(30, "cache to be up-to-date"):
+                    if (len(server.zone_queues[None]._cached_requests) == 2):
+                        break
+        # Make sure we only got the first request
+        self.assertEqual(count, 1)
+
     def test_lost_build_requests(self):
         # Test that lostBuildRequests() returns unlocked running build
         # requests
@@ -1011,6 +1060,70 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         # Try to lock a request that was just removed
         self.assertFalse(server.lock(server_a))
         self._assertEmptyRoots(client)
+
+    def test_efficient_removal(self):
+        # Test that we don't try to lock a removed request
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+
+        # Scheduler submits three requests
+        payload = {'merge': 'test'}
+        client.submit(MergeRequest(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            event_id='1',
+        ), payload)
+
+        client.submit(MergeRequest(
+            uuid='B',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='BB',
+            tenant_name='tenant',
+            pipeline_name='check',
+            event_id='2',
+        ), payload)
+        client_b = client.get(f"{client.REQUEST_ROOT}/B")
+
+        client.submit(MergeRequest(
+            uuid='C',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='CC',
+            tenant_name='tenant',
+            pipeline_name='check',
+            event_id='2',
+        ), payload)
+        client_c = client.get(f"{client.REQUEST_ROOT}/C")
+
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        count = 0
+        for merge_request in server.next():
+            count += 1
+            if count == 1:
+                # Someone starts the second request and client removes
+                # the third request all while we're processing the first.
+                client_b.state = client_b.RUNNING
+                client.update(client_b)
+                client.remove(client_c)
+                for _ in iterate_timeout(30, "cache to be up-to-date"):
+                    if (len(server._cached_requests) == 2):
+                        break
+        # Make sure we only got the first request
+        self.assertEqual(count, 1)
 
     def test_leaked_lock(self):
         client = MergerApi(self.zk_client)

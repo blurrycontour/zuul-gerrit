@@ -122,7 +122,13 @@ class ExecutorApi:
         return sorted(requests)
 
     def next(self):
-        yield from self.inState(BuildRequest.REQUESTED)
+        for request in self.inState(BuildRequest.REQUESTED):
+            for queue in self.zone_queues.values():
+                request2 = queue._cached_requests.get(request.path)
+                if (request2 and
+                    request2.state == BuildRequest.REQUESTED):
+                    yield request2
+                    break
 
     def submit(self, request, params):
         return self.zone_queues[request.zone].submit(request, params)
