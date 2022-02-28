@@ -1927,11 +1927,7 @@ class Scheduler(threading.Thread):
                     if refreshed:
                         pipeline.summary.update(ctx, self.globals)
                         if self.statsd:
-                            self.statsd.timing(f'{stats_key}.read_time',
-                                               ctx.cumulative_read_time * 1000)
-                            self.statsd.timing(
-                                f'{stats_key}.write_time',
-                                ctx.cumulative_write_time * 1000)
+                            self._contextStats(ctx, stats_key)
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
                                pipeline.name, tenant.name)
@@ -1939,6 +1935,24 @@ class Scheduler(threading.Thread):
                 self.log.exception(
                     "Exception processing pipeline %s in tenant %s",
                     pipeline.name, tenant.name)
+
+    def _contextStats(self, ctx, stats_key):
+        self.statsd.timing(f'{stats_key}.read_time',
+                           ctx.cumulative_read_time * 1000)
+        self.statsd.timing(f'{stats_key}.write_time',
+                           ctx.cumulative_write_time * 1000)
+        self.statsd.gauge(f'{stats_key}.read_objects',
+                          ctx.cumulative_read_objects)
+        self.statsd.gauge(f'{stats_key}.write_objects',
+                          ctx.cumulative_write_objects)
+        self.statsd.gauge(f'{stats_key}.read_znodes',
+                          ctx.cumulative_read_znodes)
+        self.statsd.gauge(f'{stats_key}.write_znodes',
+                          ctx.cumulative_write_znodes)
+        self.statsd.gauge(f'{stats_key}.read_bytes',
+                          ctx.cumulative_read_bytes)
+        self.statsd.gauge(f'{stats_key}.write_bytes',
+                          ctx.cumulative_write_bytes)
 
     def _process_pipeline(self, tenant, pipeline):
         # Return whether or not we refreshed the pipeline.

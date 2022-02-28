@@ -456,6 +456,17 @@ class TestScheduler(ZuulTestCase):
             val = self.assertReportedStat(key, kind='ms')
             self.assertTrue(0.0 < float(val) < 60000.0)
 
+        for key in [
+                'zuul.tenant.tenant-one.pipeline.gate.read_objects',
+                'zuul.tenant.tenant-one.pipeline.gate.write_objects',
+                'zuul.tenant.tenant-one.pipeline.gate.read_znodes',
+                'zuul.tenant.tenant-one.pipeline.gate.write_znodes',
+                'zuul.tenant.tenant-one.pipeline.gate.read_bytes',
+                'zuul.tenant.tenant-one.pipeline.gate.write_bytes',
+        ]:
+            val = self.assertReportedStat(key, kind='g')
+            self.assertTrue(0.0 < float(val) < 60000.0)
+
         self.assertReportedStat('zuul.tenant.tenant-one.pipeline.gate.'
                                 'data_size_compressed',
                                 kind='g')
