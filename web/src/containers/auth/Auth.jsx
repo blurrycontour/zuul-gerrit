@@ -220,7 +220,14 @@ class AuthContainer extends React.Component {
 
   renderButton(containerStyles) {
 
-    const { user } = this.props
+    const { user, auth } = this.props
+    if (!auth.auth_params.authority) {
+      return (
+        <div style={containerStyles} title='No authentication configured'>
+          -
+        </div>
+      )
+    }
     if (!user.data) {
       return (
         <div style={containerStyles}>
