@@ -452,6 +452,10 @@ class TestScheduler(ZuulTestCase):
                 'zuul.tenant.tenant-one.pipeline.gate.resident_time',
                 'zuul.tenant.tenant-one.pipeline.gate.read_time',
                 'zuul.tenant.tenant-one.pipeline.gate.write_time',
+                'zuul.tenant.tenant-one.pipeline.gate.process',
+                'zuul.tenant.tenant-one.pipeline.gate.event_process',
+                'zuul.tenant.tenant-one.pipeline.gate.handling',
+                'zuul.tenant.tenant-one.pipeline.gate.refresh',
         ]:
             val = self.assertReportedStat(key, kind='ms')
             self.assertTrue(0.0 < float(val) < 60000.0)
