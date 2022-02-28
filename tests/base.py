@@ -2925,7 +2925,7 @@ class FakeStatsd(threading.Thread):
                     data = self.sock.recvfrom(1024)
                     if not data:
                         return
-                    # self.log.debug("Appending: %s" % data[0])
+                    self.log.debug("Appending: %s" % data[0])
                     self.stats.append(data[0])
                 if fd == self.wake_read:
                     return
