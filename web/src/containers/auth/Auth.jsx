@@ -264,10 +264,11 @@ class AuthContainer extends React.Component {
     if (info.isFetching) {
       return (<><div style={containerStyles}>Fetching auth info ...</div></>)
     }
-    if (auth.info && auth.info.default_realm) {
+    // auth_params.authority is only set if an OpenID Connect auth is available
+    if (auth.info && auth.info.default_realm && auth.auth_params.authority) {
       return this.renderButton(containerStyles)
     } else {
-      return (<div style={containerStyles} title="Authentication disabled">-</div>)
+      return (<div style={containerStyles} title='Authentication disabled'>-</div>)
     }
   }
 }
