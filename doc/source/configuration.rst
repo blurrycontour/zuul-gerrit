@@ -926,8 +926,10 @@ HS256
 
 This is a symmetrical encryption algorithm that only requires a shared secret
 between the JWT issuer and the JWT consumer (ie Zuul). This driver should be
-used in test deployments only, or in deployments where JWTs will be issued
-manually.
+used in test deployments, or in deployments where JWTs may be issued manually
+to users.
+
+.. note:: At least one HS256 authenticator should be configured in order to use admin commands with the Zuul command line interface.
 
 .. attr:: secret
    :noindex:
@@ -999,6 +1001,8 @@ Client
 Zuul's command line client may be configured to make calls to Zuul's web
 server. The client will then look for a ``zuul.conf`` file with a ``webclient``
 section to set up the connection over HTTP.
+
+.. note:: At least one authenticator must be configured in Zuul for admin commands to be enabled in the client.
 
 .. attr:: webclient
 
