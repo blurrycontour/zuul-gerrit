@@ -59,6 +59,11 @@ be much faster than the full reconfiguration so it is recommended to
 use the smart reconfiguration after changing the tenant configuration
 file.
 
+The ``tenant-reconfigure`` and ``smart-reconfigure`` commands should
+only be run on a single scheduler.  Other schedulers will see any
+changes to the configuration stored in ZooKeeper and automatically
+update their configuration in the background without interrupting
+processing.
 
 Merger
 ------
