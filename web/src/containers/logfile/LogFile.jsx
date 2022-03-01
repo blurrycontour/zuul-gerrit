@@ -26,6 +26,7 @@ import {
   ToggleGroupItem,
 } from '@patternfly/react-core'
 import { FileCodeIcon } from '@patternfly/react-icons'
+import ReAnsi from '@softwarefactory-project/re-ansi'
 
 import { Fetching } from '../Fetching'
 
@@ -210,13 +211,9 @@ export default function LogFile({
                         {line.index}
                       </td>
                       <td>
-                        <span
-                          className={`log-message zuul-log-sev-${
-                            line.severity || 0
-                          }`}
-                        >
-                          {line.text + '\n'}
-                        </span>
+                        <ReAnsi
+                          className={`log-message zuul-log-sev-${line.severity || 0}`}
+                          log={line.text} />
                       </td>
                     </tr>
                   )
