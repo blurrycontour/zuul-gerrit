@@ -38,6 +38,8 @@ and tokens should be handed over with discernment.
 Configuration
 -------------
 
+.. important:: In order to use admin commands in the zuul command line interface, at least one HS256 authenticator should be configured.
+
 To enable tenant-scoped access to privileged actions, see the Zuul Web Server
 component's section.
 
