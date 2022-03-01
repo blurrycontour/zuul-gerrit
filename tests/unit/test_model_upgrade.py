@@ -193,3 +193,55 @@ class TestSemaphoreModelUpgrade(ZuulTestCase):
         self.assertEqual(
             len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
             0)
+
+
+class TestGithubModelUpgrade(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
+
+    @model_version(3)
+    @simple_layout('layouts/gate-github.yaml', driver='github')
+    def test_status_checks_removal(self):
+        # This tests the old behavior -- that changes are not dequeued
+        # once their required status checks are removed -- since the
+        # new behavior requires a flag in ZK.
+        # Contrast with test_status_checks_removal.
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection(
+            'master', contexts=['something/check', 'tenant-one/gate'])
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+        # Since the required status 'something/check' is not fulfilled,
+        # no job is expected
+        self.assertEqual(0, len(self.history))
+
+        # Set the required status 'something/check'
+        repo.create_status(A.head_sha, 'success', 'example.com', 'description',
+                           'something/check')
+
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # Remove it and verify the change is dequeued.
+        repo.create_status(A.head_sha, 'failed', 'example.com', 'description',
+                           'something/check')
+        self.fake_github.emitEvent(A.getCommitStatusEvent('something/check',
+                                                          state='failed',
+                                                          user='foo'))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # the change should have entered the gate
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS'),
+            dict(name='project-test2', result='SUCCESS'),
+        ], ordered=False)
+        self.assertTrue(A.is_merged)
