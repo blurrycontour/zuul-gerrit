@@ -179,6 +179,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             msg = 'This change is part of a bundle that failed to merge.\n'
         elif item.dequeued_needing_change:
             msg = 'This change depends on a change that failed to merge.\n'
+        elif item.dequeued_missing_requirements:
+            msg = ('This change is unable to merge '
+                   'due to a missing requirement.\n')
         elif item.isBundleFailing():
             msg = 'This change is part of a bundle that failed.\n'
             if with_jobs:

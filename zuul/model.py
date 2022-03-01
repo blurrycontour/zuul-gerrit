@@ -50,7 +50,7 @@ from zuul.zk.change_cache import ChangeKey
 
 # When making ZK schema changes, increment this and add a record to
 # docs/developer/model-changelog.rst
-MODEL_API = 3
+MODEL_API = 4
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -4031,6 +4031,7 @@ class QueueItem(zkobject.ZKObject):
             queue=None,
             change=None,  # a ref
             dequeued_needing_change=False,
+            dequeued_missing_requirements=False,
             current_build_set=None,
             item_ahead=None,
             items_behind=[],
@@ -4090,6 +4091,8 @@ class QueueItem(zkobject.ZKObject):
             # This needs change cache and the API to resolve change by key.
             "change": self.change.cache_key,
             "dequeued_needing_change": self.dequeued_needing_change,
+            "dequeued_missing_requirements":
+            self.dequeued_missing_requirements,
             "current_build_set": (self.current_build_set and
                                   self.current_build_set.getPath()),
             "item_ahead": self.item_ahead and self.item_ahead.getPath(),
@@ -4386,6 +4389,9 @@ class QueueItem(zkobject.ZKObject):
 
     def wasDequeuedNeedingChange(self):
         return self.dequeued_needing_change
+
+    def wasDequeuedMissingRequirements(self):
+        return self.dequeued_missing_requirements
 
     def includesConfigUpdates(self):
         includes_trusted = False
@@ -4814,6 +4820,12 @@ class QueueItem(zkobject.ZKObject):
         self.updateAttributes(
             self.pipeline.manager.current_context,
             dequeued_needing_change=True)
+        self._setAllJobsSkipped()
+
+    def setDequeuedMissingRequirements(self):
+        self.updateAttributes(
+            self.pipeline.manager.current_context,
+            dequeued_missing_requirements=True)
         self._setAllJobsSkipped()
 
     def setDequeuedBundleFailing(self):
