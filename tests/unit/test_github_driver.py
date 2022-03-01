@@ -1109,6 +1109,54 @@ class TestGithubDriver(ZuulTestCase):
         # the change should have entered the gate
         self.assertEqual(2, len(self.history))
 
+    @simple_layout('layouts/gate-github.yaml', driver='github')
+    def test_status_checks_removal(self):
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection(
+            'master', contexts=['something/check', 'tenant-one/gate'])
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+        # Since the required status 'something/check' is not fulfilled,
+        # no job is expected
+        self.assertEqual(0, len(self.builds))
+        self.assertEqual(0, len(self.history))
+
+        # Set the required status 'something/check'
+        repo.create_status(A.head_sha, 'success', 'example.com', 'description',
+                           'something/check')
+
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.builds))
+        self.assertEqual(0, len(self.history))
+
+        # Remove it and verify the change is dequeued.
+        repo.create_status(A.head_sha, 'failed', 'example.com', 'description',
+                           'something/check')
+        self.fake_github.emitEvent(A.getCommitStatusEvent('something/check',
+                                                          state='failed',
+                                                          user='foo'))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The change should be dequeued.
+        self.assertHistory([
+            dict(name='project-test1', result='ABORTED'),
+            dict(name='project-test2', result='ABORTED'),
+        ], ordered=False)
+        self.assertEqual(1, len(A.comments))
+        self.assertFalse(A.is_merged)
+        self.assertIn('This change is unable to merge.',
+                      A.comments[0])
+
     # This test case verifies that no reconfiguration happens if a branch was
     # deleted that didn't contain configuration.
     @simple_layout('layouts/basic-github.yaml', driver='github')

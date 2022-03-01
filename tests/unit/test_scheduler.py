@@ -1879,6 +1879,34 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
 
+    def test_approval_removal(self):
+        # Test that we dequeue a change when it can not merge
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.builds))
+        self.assertEqual(0, len(self.history))
+
+        # Remove the approval
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 0))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The change should be dequeued.
+        self.assertHistory([
+            dict(name='project-merge', result='ABORTED'),
+        ], ordered=False)
+        self.assertEqual(2, len(A.messages))
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertIn('This change is unable to merge.',
+                      A.messages[1])
+
     @simple_layout('layouts/nonvoting-job-approval.yaml')
     def test_nonvoting_job_approval(self):
         "Test that non-voting jobs don't vote but leave approval"
