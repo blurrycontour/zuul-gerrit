@@ -16,6 +16,23 @@
       "message": "This seems to work as expected in https://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_7d1/831450/1/check/zuul-build-dashboard-opendev/7d1b384/npm/html/t/zuul/build/70a115b1e51d45449114fba77bde6aea/console",
       "revId": "e0b57df4f5029c593eefac9243a96d4e0cd6e48d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fedf4b26_06a138ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-01T23:35:13Z",
+      "side": 1,
+      "message": "recheck post failure",
+      "revId": "e0b57df4f5029c593eefac9243a96d4e0cd6e48d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
