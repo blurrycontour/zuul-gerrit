@@ -459,6 +459,8 @@ class PipelineManager(metaclass=ABCMeta):
                     item.setConfigErrors(item.getConfigErrors())
                 if item.dequeued_needing_change:
                     item.setDequeuedNeedingChange()
+                if item.dequeued_missing_requirements:
+                    item.setDequeuedMissingRequirements()
 
                 # It can happen that all in-flight builds have been removed
                 # which would lead to paused parent jobs not being resumed.
@@ -1399,14 +1401,24 @@ class PipelineManager(metaclass=ABCMeta):
             item_ahead = None
         change_queue = item.queue
 
-        if self.checkForChangesNeededBy(item.change, change_queue,
-                                        item.event) is not True:
+        if COMPONENT_REGISTRY.model_api > 3:
+            # This sets a QueueItem flag which is only understood by
+            # api 4.
+            meets_reqs = self.isChangeReadyToBeEnqueued(
+                item.change, item.event)
+        else:
+            meets_reqs = True
+        needs_met = self.checkForChangesNeededBy(item.change, change_queue,
+                                                 item.event) is True
+        if not (meets_reqs and needs_met):
             # It's not okay to enqueue this change, we should remove it.
             log.info("Dequeuing change %s because "
                      "it can no longer merge" % item.change)
             self.cancelJobs(item)
             if item.isBundleFailing():
                 item.setDequeuedBundleFailing()
+            elif not meets_reqs:
+                item.setDequeuedMissingRequirements()
             else:
                 item.setDequeuedNeedingChange()
             if item.live:
@@ -1872,6 +1884,11 @@ class PipelineManager(metaclass=ABCMeta):
             item.setReportedResult('MERGER_FAILURE')
         elif item.wasDequeuedNeedingChange():
             log.debug("Dequeued needing change")
+            action = 'failure'
+            actions = self.pipeline.failure_actions
+            item.setReportedResult('FAILURE')
+        elif item.wasDequeuedMissingRequirements():
+            log.debug("Dequeued missing requirements")
             action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
