@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d86ec399_33a856d9",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-01T15:30:27Z",
+      "side": 1,
+      "message": "Do we need to check for \"if auth.auth_params\"?\n\nHow does this relate to the check below for \"authentication disabled\"?",
+      "revId": "c88aaef4aa64ee76b29c5943551a779085ea95ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
