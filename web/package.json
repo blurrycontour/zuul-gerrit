@@ -10,7 +10,7 @@
     "@patternfly/react-charts": "^6.15.23",
     "@patternfly/react-core": "4.175.11",
     "@patternfly/react-table": "4.29.58",
-    "@softwarefactory-project/re-ansi": "^0.4.0",
+    "@softwarefactory-project/re-ansi": "^0.5.0",
     "axios": "^0.19.0",
     "broadcast-channel": "^4.5.0",
     "js-yaml": "^3.13.0",
