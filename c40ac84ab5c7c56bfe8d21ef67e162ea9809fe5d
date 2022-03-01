@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd0b937c_ae1f8fea",
+        "filename": "web/src/containers/build/BuildsetTable.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-01T21:41:29Z",
+      "side": 1,
+      "message": "I\u0027m not sure what good practice is here, but was this left over from development? Should it remain?",
+      "revId": "c40ac84ab5c7c56bfe8d21ef67e162ea9809fe5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
