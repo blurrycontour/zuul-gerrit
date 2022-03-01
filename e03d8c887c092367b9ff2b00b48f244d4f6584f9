@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "e03d8c887c092367b9ff2b00b48f244d4f6584f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e834697c_8bc17e74",
+        "filename": "tests/fixtures/layouts/merge-conflict.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-01T23:47:16Z",
+      "side": 1,
+      "message": "For other reviewers this appears to be a copy of merge-failure.yaml but with the yaml keys renamed to conflict from failure.",
+      "revId": "e03d8c887c092367b9ff2b00b48f244d4f6584f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "446570f6_0f330ca2",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1272,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-01T23:47:16Z",
+      "side": 1,
+      "message": "Why do we need a copy if we know the key doesn\u0027t exist in the original? can\u0027t we set that safely on the original?",
+      "revId": "e03d8c887c092367b9ff2b00b48f244d4f6584f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3636938_07021ed7",
+        "filename": "zuul/driver/sql/alembic/versions/4647def24b32_merge_conflict_rename.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-01T23:47:16Z",
+      "side": 1,
+      "message": "Not a -1. This is one of the cases where a downgrade would be possible?",
+      "revId": "e03d8c887c092367b9ff2b00b48f244d4f6584f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
