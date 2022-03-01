@@ -30,6 +30,7 @@ import {
   InfoCircleIcon,
   SearchPlusIcon,
 } from '@patternfly/react-icons'
+import ReactAnsi from '@softwarefactory-project/re-ansi'
 
 import {
   hasInterestingKeys,
