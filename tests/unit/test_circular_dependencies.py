@@ -667,6 +667,12 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
+        buildsets = {bs.change: bs for bs in
+                     self.scheds.first.connections.connections[
+                         'database'].getBuildsets()}
+        self.assertEqual(buildsets[2].result, 'MERGE_FAILURE')
+        self.assertEqual(buildsets[1].result, 'FAILURE')
+
     def test_cycle_reporting_partial_failure(self):
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")

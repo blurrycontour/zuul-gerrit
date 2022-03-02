@@ -71,6 +71,7 @@ class BuildsetsPage extends React.Component {
           'SUCCESS',
           'FAILURE',
           'MERGE_CONFLICT',
+          'MERGE_FAILURE',
           'DEQUEUED',
         ]
       },

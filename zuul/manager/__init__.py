@@ -1546,10 +1546,13 @@ class PipelineManager(metaclass=ABCMeta):
 
         actions = self.pipeline.failure_actions
         for ri in reported_items:
-            ri.setReportedResult('FAILURE')
             self.sendReport(actions, ri)
-            self.sql.reportBuildsetEnd(ri.current_build_set,
-                                       'failure', final=True)
+            if ri is not item:
+                # Don't override the reported sql result for the item
+                # that "really" failed.
+                ri.setReportedResult('FAILURE')
+                self.sql.reportBuildsetEnd(ri.current_build_set,
+                                           'failure', final=True)
 
     def processQueue(self):
         # Do whatever needs to be done for each change in the queue
@@ -1787,16 +1790,25 @@ class PipelineManager(metaclass=ABCMeta):
 
     def reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
+        action = None
         if not item.reported:
-            # _reportItem() returns True if it failed to report.
+            action, reported = self._reportItem(item)
             item.updateAttributes(self.current_context,
-                                  reported=not self._reportItem(item))
+                                  reported=reported)
         if self.changes_merge:
             succeeded = item.didAllJobsSucceed() and not item.isBundleFailing()
             merged = item.reported
             source = item.change.project.source
             if merged:
                 merged = source.isMerged(item.change, item.change.branch)
+            if action:
+                if action == 'success' and not merged:
+                    log.debug("Overriding result for %s to merge failure",
+                              item.change)
+                    action = 'merge-failure'
+                    item.setReportedResult('MERGE_FAILURE')
+                self.sql.reportBuildsetEnd(item.current_build_set,
+                                           action, final=True)
             change_queue = item.queue
             if not (succeeded and merged):
                 if (not item.current_build_set.job_graph or
@@ -1816,6 +1828,8 @@ class PipelineManager(metaclass=ABCMeta):
                 raise exceptions.MergeFailure(
                     "Change %s failed to merge" % item.change)
             else:
+                self.sql.reportBuildsetEnd(item.current_build_set,
+                                           action, final=True)
                 log.info("Reported change %s status: all-succeeded: %s, "
                          "merged: %s", item.change, succeeded, merged)
                 change_queue.increaseWindowSize()
@@ -1825,6 +1839,9 @@ class PipelineManager(metaclass=ABCMeta):
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
+        elif action:
+            self.sql.reportBuildsetEnd(item.current_build_set,
+                                       action, final=True)
 
     def _reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -1922,8 +1939,7 @@ class PipelineManager(metaclass=ABCMeta):
             ret = self.sendReport(actions, item)
             if ret:
                 log.error("Reporting item %s received: %s", item, ret)
-        self.sql.reportBuildsetEnd(item.current_build_set, action, final=True)
-        return ret
+        return action, (not ret)
 
     def reportStats(self, item, added=False):
         if not self.sched.statsd:
