@@ -122,7 +122,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             'start': self._formatItemReportStart,
             'success': self._formatItemReportSuccess,
             'failure': self._formatItemReportFailure,
-            'merge-failure': self._formatItemReportMergeFailure,
+            'merge-conflict': self._formatItemReportMergeConflict,
             'no-jobs': self._formatItemReportNoJobs,
             'disabled': self._formatItemReportDisabled,
             'dequeue': self._formatItemReportDequeue,
@@ -186,7 +186,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             msg = "{}\n\n{}".format(
                 msg, self._formatItemReportOtherBundleItems(item))
         elif item.didMergerFail():
-            msg = item.pipeline.merge_failure_message
+            msg = item.pipeline.merge_conflict_message
         elif item.getConfigErrors():
             msg = str(item.getConfigErrors()[0].error)
         else:
@@ -195,8 +195,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
-    def _formatItemReportMergeFailure(self, item, with_jobs=True):
-        return item.pipeline.merge_failure_message
+    def _formatItemReportMergeConflict(self, item, with_jobs=True):
+        return item.pipeline.merge_conflict_message
 
     def _formatItemReportNoJobs(self, item, with_jobs=True):
         status_url = get_default(self.connection.sched.config,

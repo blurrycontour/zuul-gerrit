@@ -207,7 +207,7 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       The introductory text in reports when an item is enqueued.
       Empty by default.
 
-   .. attr:: merge-failure-message
+   .. attr:: merge-conflict-message
       :default: Merge failed.
 
       The introductory text in the message reported when a change
@@ -329,10 +329,10 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       These reporters describe what Zuul should do if at least one job
       fails.
 
-   .. attr:: merge-failure
+   .. attr:: merge-conflict
 
       These reporters describe what Zuul should do if it is unable to
-      merge in the patchset. If no merge-failure reporters are listed
+      merge in the patchset. If no merge-conflict reporters are listed
       then the ``failure`` reporters will be used to notify of
       unsuccessful merges.
 
@@ -377,7 +377,7 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       If set, a pipeline can enter a *disabled* state if too many
       changes in a row fail. When this value is exceeded the pipeline
       will stop reporting to any of the **success**, **failure** or
-      **merge-failure** reporters and instead only report to the
+      **merge-conflict** reporters and instead only report to the
       **disabled** reporters.  (No **start** reports are made when a
       pipeline is disabled).
 

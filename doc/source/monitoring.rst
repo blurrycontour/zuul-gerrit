@@ -285,7 +285,7 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       Incremented to represent the status of a Zuul executor's merger
       operations. ``<result>`` can be either ``SUCCESS`` or ``FAILURE``.
       A failed merge operation which would be accounted for as a ``FAILURE``
-      is what ends up being returned by Zuul as a ``MERGER_FAILURE``.
+      is what ends up being returned by Zuul as a ``MERGE_CONFLICT``.
 
    .. stat:: builds
       :type: counter

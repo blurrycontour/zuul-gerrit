@@ -69,7 +69,7 @@ class GitlabReporter(BaseReporter):
             if self._merge:
                 self.mergeMR(item)
                 if not item.change.is_merged:
-                    msg = self._formatItemReportMergeFailure(item)
+                    msg = self._formatItemReportMergeConflict(item)
                     self.addMRComment(item, msg)
 
     def addMRComment(self, item, comment=None):

@@ -105,7 +105,7 @@ Reporter Configuration
 This reporter is used to store build results in an Elasticsearch index.
 
 The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
-:attr:`pipeline.merge-failure`; it only acts on
+:attr:`pipeline.merge-conflict`; it only acts on
 :attr:`pipeline.success` or :attr:`pipeline.failure` reporting stages.
 
 .. attr:: pipeline.<reporter>.<elasticsearch source>

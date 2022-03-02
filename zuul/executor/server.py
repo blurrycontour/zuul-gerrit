@@ -1616,7 +1616,7 @@ class AnsibleJob(object):
             self.executor_server.completeBuild(self.build_request, result)
             return None
         if not ret:  # merge conflict
-            result = dict(result='MERGER_FAILURE')
+            result = dict(result='MERGE_CONFLICT')
             if self.executor_server.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.executor_server.statsd.incr(base_key + ".FAILURE")

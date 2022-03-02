@@ -98,6 +98,30 @@ class TestMysqlDatabase(DBBaseTestCase):
                     f"show create table {table}").one()[1]
                 self.compareMysql(create, sqlalchemy_tables[table])
 
+    def test_migration_4647def24b32(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection._migrate('c57e9e76b812')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result) values ('SUCCESS')")
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result) values ('MERGER_FAILURE')")
+            results = [r[0] for r in connection.exec_driver_sql(
+                "select result from zuul_buildset")]
+            self.assertEqual(results, ['SUCCESS', 'MERGER_FAILURE'])
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r[0] for r in connection.exec_driver_sql(
+                "select result from zuul_buildset")]
+            self.assertEqual(results, ['SUCCESS', 'MERGE_CONFLICT'])
+
     def test_buildsets(self):
         tenant = 'tenant1',
         buildset_uuid = 'deadbeef'

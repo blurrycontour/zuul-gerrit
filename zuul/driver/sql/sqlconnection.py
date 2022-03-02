@@ -284,7 +284,7 @@ class SQLConnection(BaseConnection):
     def getSession(self):
         return DatabaseSession(self)
 
-    def _migrate(self):
+    def _migrate(self, revision='head'):
         """Perform the alembic migrations for this connection"""
         with self.engine.begin() as conn:
             context = alembic.migration.MigrationContext.configure(conn)
@@ -304,9 +304,9 @@ class SQLConnection(BaseConnection):
 
             if current_rev is None and not self.force_migrations:
                 self.metadata.create_all(self.engine)
-                alembic.command.stamp(config, "head", tag=tag)
+                alembic.command.stamp(config, revision, tag=tag)
             else:
-                alembic.command.upgrade(config, 'head', tag=tag)
+                alembic.command.upgrade(config, revision, tag=tag)
 
     def onLoad(self, zk_client, component_registry=None):
         safe_connection = quote_plus(self.connection_name)
