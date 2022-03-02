@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92e9caaf_66605589",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-02T12:59:24Z",
+      "side": 1,
+      "message": "I think we should also adapt the PipelineChangeList.refresh() method to use ZKObject._retry(). For that we might want to allow setting max retries as an attribute.",
+      "revId": "ec55726ddd1087833cb58cc920042913c53f1ea3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
