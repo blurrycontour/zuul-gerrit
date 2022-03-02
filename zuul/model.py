@@ -6110,6 +6110,9 @@ class TriggerEvent(AbstractEvent):
     def isChangeAbandoned(self):
         return False
 
+    def isBranchProtectionChanged(self):
+        return False
+
     def _repr(self):
         flags = [str(self.type)]
         if self.project_name:

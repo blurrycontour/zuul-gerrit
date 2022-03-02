@@ -334,7 +334,9 @@ class GithubEventProcessor(object):
         self.zuul_event_id = self.delivery
         self.log = get_annotated_logger(logger, self.zuul_event_id)
         self.connection_event = connection_event
-        self.event = None
+        # We typically return a list of one event, but we can return
+        # multiple Zuul events from a single Github event.
+        self.events = []
 
     def run(self):
         self.log.debug("Starting event processing")
@@ -344,7 +346,7 @@ class GithubEventProcessor(object):
             self.log.exception("Exception when processing event:")
         finally:
             self.log.debug("Finished event processing")
-        return self.event, self.connection_event
+        return self.events, self.connection_event
 
     def _process_event(self):
         if self.connector._stopped:
@@ -377,17 +379,20 @@ class GithubEventProcessor(object):
             return
 
         self.log.debug("Handling %s event", self.event_type)
-        event = None
+        events = []
         try:
-            event = method()
+            events = method()
+            if not events:
+                events = []
+            elif not isinstance(events, list):
+                events = [events]
         except Exception:
             # NOTE(pabelanger): We should report back to the PR we could
             # not process the event, to give the user a chance to
             # retrigger.
             self.log.exception('Exception when handling event:')
 
-        if event:
-
+        for event in events:
             # Note we limit parallel requests per installation id to avoid
             # triggering abuse detection.
             with self.connection.get_request_lock(installation_id):
@@ -418,7 +423,7 @@ class GithubEventProcessor(object):
                                                      protected=protected)
 
             event.project_hostname = self.connection.canonical_hostname
-            self.event = event
+        self.events = events
 
     def _event_push(self):
         base_repo = self.body.get('repository')
@@ -601,6 +606,60 @@ class GithubEventProcessor(object):
         event.check_run = check_run_tuple
         return event
 
+    def _event_branch_protection_rule(self):
+        # This method can return any number of events depending on
+        # which branches changed their protection status.
+        project_name = self.body.get('repository').get('full_name')
+        project = self.connection.source.getProject(project_name)
+
+        # Save all protected branches
+        old_protected_branches = set(
+            self.connection._branch_cache.getProjectBranches(
+                project_name, True))
+        # Update the project banches
+        self.log.debug('Updating branches for %s after '
+                       'branch protection rule "%s" was %s',
+                       project,
+                       self.body.get('rule').get('name'),
+                       self.body.get('action'))
+        self.connection.updateProjectBranches(project)
+
+        # Get all protected branches
+        new_protected_branches = set(
+            self.connection._branch_cache.getProjectBranches(
+                project_name, True))
+
+        newly_protected = new_protected_branches - old_protected_branches
+        newly_unprotected = old_protected_branches - new_protected_branches
+        # Emit events for changed branches
+
+        events = []
+        for branch in newly_protected:
+            self.log.debug("Generating synthetic event for newly "
+                           "protected branch %s in %s",
+                           branch, project_name)
+            events.append(
+                self._branch_protection_rule_to_event(project_name, branch))
+        for branch in newly_unprotected:
+            self.log.debug("Generating synthetic event for newly "
+                           "unprotected branch %s in %s",
+                           branch, project_name)
+            events.append(
+                self._branch_protection_rule_to_event(project_name, branch))
+        return events
+
+    def _branch_protection_rule_to_event(self, project_name, branch):
+        event = GithubTriggerEvent()
+        event.connection_name = self.connection.connection_name
+        event.trigger_name = 'github'
+        event.project_name = project_name
+        event.branch_protection_changed = True
+        event.type = 'branch_protection_rule'
+
+        event.ref = f'refs/heads/{branch}'
+        event.branch = branch
+        return event
+
     def _check_run_action_to_event(self, check_run, project):
         # Extract necessary values from the check's external id to dequeue
         # the corresponding change in Zuul
@@ -771,17 +830,17 @@ class GithubEventConnector:
                 if not self._event_forward_queue[0].done():
                     return
                 future = self._event_forward_queue.popleft()
-                event, connection_event = future.result()
+                events, connection_event = future.result()
                 try:
-                    if not event:
-                        continue
-                    self.connection.logEvent(event)
-                    if isinstance(event, DequeueEvent):
-                        self.connection.sched.addChangeManagementEvent(event)
-                    else:
-                        self.connection.sched.addTriggerEvent(
-                            self.connection.driver_name, event
-                        )
+                    for event in events:
+                        self.connection.logEvent(event)
+                        if isinstance(event, DequeueEvent):
+                            self.connection.sched.addChangeManagementEvent(
+                                event)
+                        else:
+                            self.connection.sched.addTriggerEvent(
+                                self.connection.driver_name, event
+                            )
                 finally:
                     # Ack event in Zookeeper
                     self.event_queue.ack(connection_event)

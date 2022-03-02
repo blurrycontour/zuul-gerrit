@@ -2828,6 +2828,17 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         }
         return (name, data)
 
+    def getBranchProtectionRuleEvent(self, project, action):
+        name = 'branch_protection_rule'
+        data = {
+            'action': action,
+            'rule': {},
+            'repository': {
+                'full_name': project,
+            }
+        }
+        return (name, data)
+
     def emitEvent(self, event, use_zuulweb=False):
         """Emulates sending the GitHub webhook event to the connection."""
         name, data = event
