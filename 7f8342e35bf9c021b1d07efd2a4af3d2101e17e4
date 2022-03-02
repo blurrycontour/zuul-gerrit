@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd0047d5_2ca46f7b",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-02T06:42:43Z",
+      "side": 1,
+      "message": "I\u0027m wondering if we really need to get the request once more or if this could be simplified to:\n\n          for request in self.inState(BuildRequest.REQUESTED):\n              # Make sure the build request wasn\u0027t picked up by another\n              # worker in the meantime.\n              if request.state \u003d\u003d BuildRequest.REQUESTED:\n                  yield request\n\nIIRC the build request is updated in-place, so what we get from the queue should be the same object (request is request2).",
+      "revId": "7f8342e35bf9c021b1d07efd2a4af3d2101e17e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa56d7f3_842f0286",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 2
