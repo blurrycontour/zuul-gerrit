@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5faeb356_212c44f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-02T20:24:04Z",
+      "side": 1,
+      "message": "As discussed on matrix:\n\ntobiash:\ncorvus: when looking at the overall duration change result (831107) the first thing that came to my mind was that the table is sorted by duration because the drop down sign looks pretty much the same as in other tables the sign that the table is sorted by that column\nI\u0027m not sure if this would confuse some users\nbut I also don\u0027t have a better idea for that drop down field\n\ncorvus:\ntobiash: thanks, that is a really good point and i didn\u0027t see that since i wrote the change. i think we could change that to a gear... maybe that would help?\n\ntobiash:\nI think a gear would work",
+      "revId": "7dbfaef9baa19b28d9592afdde2f43e1095a69d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
