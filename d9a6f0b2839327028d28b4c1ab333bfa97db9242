@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "466c267f_30473288",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-02T20:35:25Z",
+      "side": 1,
+      "message": "oops, that should say `logfile`",
+      "range": {
+        "startLine": 7,
+        "startChar": 47,
+        "endLine": 7,
+        "endChar": 54
+      },
+      "revId": "d9a6f0b2839327028d28b4c1ab333bfa97db9242",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
