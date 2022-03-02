@@ -16,6 +16,23 @@
       "message": "Nit: I find it confusing to carry a ret return value then negate it when we actually return it. Maybe we should call this reported instead? and then track it here with that in mind?",
       "revId": "370d36c0257b5849c0b08308073b690b16b2a180",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10b35ca5_aacdc032",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1849,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-02T00:39:38Z",
+      "side": 1,
+      "message": "I do too, and I actually started to unwind that in this change, but it became too much to deal with in this change so I tried to keep this change minimal for review.",
+      "revId": "370d36c0257b5849c0b08308073b690b16b2a180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
