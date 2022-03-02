@@ -16,6 +16,23 @@
       "message": "Copied the test case from Simon\u0027s change.",
       "revId": "8db6b6113a2f5cc98511cfe1f1aa91c96391ad62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afebb517_73ec9054",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-03-02T06:09:11Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "8db6b6113a2f5cc98511cfe1f1aa91c96391ad62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
