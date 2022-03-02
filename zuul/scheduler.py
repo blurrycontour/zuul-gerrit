@@ -878,6 +878,7 @@ class Scheduler(threading.Thread):
 
         with self.layout_lock:
             for tenant_name in new_tenants:
+                stats_key = f'zuul.tenant.{tenant_name}'
                 layout_state = self.tenant_layout_state.get(tenant_name)
                 # In case we don't have a cached layout state we need to
                 # acquire the write lock since we load a new tenant.
@@ -886,12 +887,15 @@ class Scheduler(threading.Thread):
                     # we are starting from an empty layout state and there
                     # should be no concurrent read locks.
                     lock_ctx = tenant_write_lock(self.zk_client, tenant_name)
+                    timer_ctx = self.statsd_timer(
+                        f'{stats_key}.reconfiguration_time')
                 else:
                     lock_ctx = tenant_read_lock(self.zk_client, tenant_name)
+                    timer_ctx = nullcontext()
 
                 # Consider all caches valid (min. ltime -1)
                 min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
-                with lock_ctx as tlock:
+                with lock_ctx as tlock, timer_ctx:
                     # Refresh the layout state now that we are holding the lock
                     # and we can be sure it won't be changed concurrently.
                     layout_state = self.tenant_layout_state.get(tenant_name)
@@ -1320,8 +1324,11 @@ class Scheduler(threading.Thread):
                 # Consider all project branch caches valid.
                 branch_cache_min_ltimes = defaultdict(lambda: -1)
 
-                with tenant_write_lock(self.zk_client, tenant_name,
-                                       identifier=RECONFIG_LOCK_ID) as lock:
+                stats_key = f'zuul.tenant.{tenant_name}'
+                with tenant_write_lock(
+                        self.zk_client, tenant_name,
+                        identifier=RECONFIG_LOCK_ID) as lock,\
+                        self.statsd_timer(f'{stats_key}.reconfiguration_time'):
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1380,8 +1387,11 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide,
                             [event.tenant_name])
 
-            with tenant_write_lock(self.zk_client, event.tenant_name,
-                                   identifier=RECONFIG_LOCK_ID) as lock:
+            stats_key = f'zuul.tenant.{event.tenant_name}'
+            with tenant_write_lock(
+                    self.zk_client, event.tenant_name,
+                    identifier=RECONFIG_LOCK_ID) as lock,\
+                    self.statsd_timer(f'{stats_key}.reconfiguration_time'):
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
