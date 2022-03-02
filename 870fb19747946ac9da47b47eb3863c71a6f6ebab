@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cafae5c9_fe0b221c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-02T20:20:00Z",
+      "side": 1,
+      "message": "This is already merged through https://review.opendev.org/c/zuul/zuul/+/762759",
+      "revId": "870fb19747946ac9da47b47eb3863c71a6f6ebab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
