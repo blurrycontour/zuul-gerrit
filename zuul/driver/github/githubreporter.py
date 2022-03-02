@@ -119,7 +119,7 @@ class GithubReporter(BaseReporter):
         if job_result in ('SUCCESS', success_message):
             emoji = 'heavy_check_mark'
             bold_result = False
-        elif job_result in ('SKIPPED', 'ABORTED'):
+        elif job_result in ('SKIPPED', 'ABORTED', 'CANCELED'):
             emoji = 'warning'
             bold_result = False
 
