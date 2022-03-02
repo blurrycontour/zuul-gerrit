@@ -443,6 +443,7 @@ class TestScheduler(ZuulTestCase):
         for key in [
                 'zuul.tenant.tenant-one.event_enqueue_processing_time',
                 'zuul.tenant.tenant-one.event_enqueue_time',
+                'zuul.tenant.tenant-one.reconfiguration_time',
                 'zuul.tenant.tenant-one.pipeline.gate.event_enqueue_time',
                 'zuul.tenant.tenant-one.pipeline.gate.merge_request_time',
                 'zuul.tenant.tenant-one.pipeline.gate.job_freeze_time',

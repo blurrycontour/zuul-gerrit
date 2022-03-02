@@ -891,7 +891,9 @@ class Scheduler(threading.Thread):
 
                 # Consider all caches valid (min. ltime -1)
                 min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
-                with lock_ctx as tlock:
+                stats_key = f'zuul.tenant.{tenant_name}'
+                with (lock_ctx as tlock,
+                      self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                     # Refresh the layout state now that we are holding the lock
                     # and we can be sure it won't be changed concurrently.
                     layout_state = self.tenant_layout_state.get(tenant_name)
@@ -1320,8 +1322,10 @@ class Scheduler(threading.Thread):
                 # Consider all project branch caches valid.
                 branch_cache_min_ltimes = defaultdict(lambda: -1)
 
-                with tenant_write_lock(self.zk_client, tenant_name,
-                                       identifier=RECONFIG_LOCK_ID) as lock:
+                stats_key = f'zuul.tenant.{tenant_name}'
+                with (tenant_write_lock(self.zk_client, tenant_name,
+                                        identifier=RECONFIG_LOCK_ID) as lock,
+                      self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1380,8 +1384,10 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide,
                             [event.tenant_name])
 
-            with tenant_write_lock(self.zk_client, event.tenant_name,
-                                   identifier=RECONFIG_LOCK_ID) as lock:
+            stats_key = f'zuul.tenant.{event.tenant_name}'
+            with (tenant_write_lock(self.zk_client, event.tenant_name,
+                                    identifier=RECONFIG_LOCK_ID) as lock,
+                  self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
