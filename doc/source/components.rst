@@ -77,5 +77,5 @@ Statsd listens on UDP port 8125 by default.
 
 A minimal Zuul system may consist of a :ref:`scheduler` and
 :ref:`executor` both running on the same host.  Larger installations
-should consider running multiple executors, each on a dedicated host,
-and running mergers on dedicated hosts as well.
+should consider running multiple schedulers, executors and mergers,
+with each component running on a dedicated host.
