@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ceacf3b0_502c7afc",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-02T00:46:29Z",
+      "side": 1,
+      "message": "We\u0027ll get \"q0000000000\" in both cases.  We will have both for a while as an installation changes over, but the old ones should age out.  We don\u0027t rely on ZK\u0027s ordering (the events implement ordering in python) so having the two styles coexist for a while won\u0027t affect functionality.\n\nIt\u0027s just a quirk (I haven\u0027t traced it down to where exactly) that without a character after / they behave differently; but with one they behave the same.",
+      "revId": "71b4604459699f3988db3e01a2d226fd43cc51c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7284e8b_684731ea",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-03-02T00:25:23Z",
       "side": 1,
       "message": "Pushing the result into postRun just to reraise the exception and then possibly catch it seems like a bad way to handle this (because its working the opposite direction to how most exceptions flow). But I can\u0027t come up with a better way to avoid needing to catch NoNodeError and handle that in this common code.",
+      "revId": "71b4604459699f3988db3e01a2d226fd43cc51c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21f5cc06_2a5f127d",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-02T00:46:29Z",
+      "side": 1,
+      "message": "Note that the exception object comes from ZooKeeper; we get a list of the result for each operation in sequence which might be a regular object, or it might be an exception... basically the failure scenario looks like:\n\ntransaction.set(\u0027/a\u0027)\ntransaction.get(\u0027/b\u0027)\nresult \u003d transaction.commit()\nprint(result) \u003d\u003e [RollbackError, NoNodeError]",
       "revId": "71b4604459699f3988db3e01a2d226fd43cc51c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
