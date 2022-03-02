@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b4ef9c0_c02db59d",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-02T00:25:23Z",
+      "side": 1,
+      "message": "How does this affect non transaction event puts? Does everything just end up with q in the name? or does sequence\u003dTrue in the create() calls drop the q and replace it with a number? Mostly wondering if we\u0027ll end up with two different types of names in zk.",
+      "revId": "71b4604459699f3988db3e01a2d226fd43cc51c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7284e8b_684731ea",
+        "filename": "zuul/zk/job_request_queue.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-02T00:25:23Z",
+      "side": 1,
+      "message": "Pushing the result into postRun just to reraise the exception and then possibly catch it seems like a bad way to handle this (because its working the opposite direction to how most exceptions flow). But I can\u0027t come up with a better way to avoid needing to catch NoNodeError and handle that in this common code.",
+      "revId": "71b4604459699f3988db3e01a2d226fd43cc51c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
