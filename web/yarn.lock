@@ -1701,10 +1701,10 @@
     lodash "^4.17.4"
     read-pkg-up "^7.0.0"
 
-"@softwarefactory-project/re-ansi@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@softwarefactory-project/re-ansi/-/re-ansi-0.4.0.tgz#016173e40077d8a0a0dbcc6b55864fe3a2271a8b"
-  integrity sha512-Qwmp8FRMXm7W2KFop1hrExX94uHzbjz47Yr4Nw/ql96wqb6vcLozFy412H7CRk36+h4wugquH2EjdNh1gB3oRQ==
+"@softwarefactory-project/re-ansi@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@softwarefactory-project/re-ansi/-/re-ansi-0.5.0.tgz#25866af47aca67621e0210ba503899919827a905"
+  integrity sha512-T9cfcra+auRq5oX3EtjzHlCN97FfrmPQpzlcl4G7WjNoNG5EouI3SkvUVxK6nAX+IQVO98INUejfOsbHcK4EZQ==
   dependencies:
     bs-platform "^8.2.0"
     reason-react "^0.9.1"
