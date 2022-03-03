@@ -449,7 +449,11 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         # Get a list of requests which are running but not locked by
         # any client.
         for req in self.inState(self.request_class.RUNNING):
-            if self.isLocked(req):
+            try:
+                if self.isLocked(req):
+                    continue
+            except NoNodeError:
+                # Request was removed in the meantime
                 continue
             # Double check that our cache isn't out of date: it should
             # still exist and be running.
