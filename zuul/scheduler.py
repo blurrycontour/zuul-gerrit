@@ -2428,7 +2428,7 @@ class Scheduler(threading.Thread):
             try:
                 self.sql.reportBuildEnd(
                     build, tenant=pipeline.tenant.name,
-                    final=(not build.retry))
+                    final=True)
             except Exception:
                 log.exception("Error reporting build completion to DB:")
 
