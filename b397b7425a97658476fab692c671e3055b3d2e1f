@@ -43,6 +43,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "83009ec9_03587107",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-03T17:19:43Z",
+      "side": 1,
+      "message": "I\u0027m in favor for this change. Should the legacy attributes be removed, or marked as deprecated in the documentation?\n\nI wonder if the attribute could be named `match-files`, or simply `match`?",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f2902b03_ca03dc3e",
         "filename": "tests/unit/test_include_exclude_filter.py",
         "patchSetId": 3
