@@ -100,6 +100,47 @@ class TestModelUpgrade(ZuulTestCase):
             dict(name='test-job', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @model_version(4)
+    def test_model_4_5(self):
+        # Changes share a queue, but with only one job, the first
+        # merges before the second starts.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        fake_data = [
+            {'name': 'image',
+             'url': 'http://example.com/image',
+             'metadata': {
+                 'type': 'container_image'
+             }},
+        ]
+        self.executor_server.returnData(
+            'project-merge', A,
+            {'zuul': {'artifacts': fake_data}}
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 5
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        # Verify that the child job got the data from the parent
+        test1 = self.getJobFromHistory('project-test1')
+        self.assertEqual(fake_data[0]['url'],
+                         test1.parameters['zuul']['artifacts'][0]['url'])
+
 
 class TestSemaphoreModelUpgrade(ZuulTestCase):
     tenant_config_file = 'config/semaphore/main.yaml'

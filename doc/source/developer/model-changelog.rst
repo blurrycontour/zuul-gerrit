@@ -6,7 +6,7 @@ increases here.
 
 When making a model change:
 
-* Increment the value of ``MODEL_API`` in ``model.py``.
+* Increment the value of ``MODEL_API`` in ``model_api.py``.
 * Update code to use the new API by default and add
   backwards-compatibility handling for older versions.  This makes it
   easier to clean up backwards-compatibility handling in the future.
@@ -54,3 +54,12 @@ Version 4
 :Description: Adds QueueItem.dequeued_missing_requirements and sets it to True
               if a change no longer meets merge requirements in dependent
               pipelines.  This only affects schedulers.
+
+Version 5
+---------
+
+:Prior Zuul version: 5.0.0
+:Description: Changes the result data attributes on Build from
+              ResultData to JobData instances and uses the
+              inline/offloading paradigm from FrozenJob.  This affects
+              schedulers and executors.
