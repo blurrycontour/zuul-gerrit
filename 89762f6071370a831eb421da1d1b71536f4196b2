@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c7d0b03_e967b5d4",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-03T21:01:52Z",
+      "side": 1,
+      "message": "This is not necessary -- Zuul 4.10.0 requires Nodepool 4.3.0 where this was added.",
+      "revId": "89762f6071370a831eb421da1d1b71536f4196b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2558ce84_1ec4aa7a",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-03T21:01:52Z",
+      "side": 1,
+      "message": "This part of the change is troubling.  It intentionally includes nodes which do not belong to this zuul, in order to count them and emit a stat called \"zuul.nodepool.resources\".  It\u0027s starting to seem like this should be a change to Nodepool instead of Zuul.\n\nWhy not keep the zuul_system filter which would make this \"nodepool resources allocated to this zuul tenant\",  or, move this to nodepool which would then be \"nodepool resources allocated to this nodepool tenant\"?",
+      "revId": "89762f6071370a831eb421da1d1b71536f4196b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
