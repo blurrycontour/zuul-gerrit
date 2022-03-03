@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "461339d7_c63aa810",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-03T06:20:06Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we want to publish this metric for the initial priming. In case we only hold the tenant read lock (which should be the case except for the initial startup) this is more like a local layout update than a reconfig.",
+      "revId": "ef72efab216278b65666ff0e67dc37cfee5e0e39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
