@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "520356dd_782b129d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-03T14:55:49Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3:\n\u003e \n\u003e One of the long-held concerns I have (and others seem to share) is that it\u0027s very hard to reason about irrelevant-files behavior. As you\u0027ve observed, combining files and irrelevant-files in the same job makes no sense, and worse you can easily end up inheriting one from a parent and so accidentally combine it with the other without it being immediately obvious. You\u0027ll notice that Zuul\u0027s own job definitions rely only on the files attribute and avoid use of irrelevant-files entirely. Unfortunately, it doesn\u0027t look like our current documentation makes that risk particularly clear.\n\u003e \n\u003e What I like about the proposed implementation is that it avoids the pitfall of users accidentally combining files and irrelevant-files, since the entire fileset is overridden if also set in a child job. I also appreciate that an empty includes list is treated as including everything rather than including nothing; our philosophy with Zuul\u0027s job selection behavior is to prefer running a job over not running it when there\u0027s any doubt as to what the user might have meant. That also makes configuration more terse if the user only wants to exclude files, though I don\u0027t see any examples where you\u0027re explicitly testing that behavior (apologies if I overlooked it).\n\u003e \n\u003e My primary concern with this is that it, similar to irrelevant-files, offers an attractive option with hidden complexities which may allow users to get themselves into trouble and end up not running jobs when they meant to. I agree though that it\u0027s at least got a clear set of rules users can reason through, as long as those are documented.\n\u003e \n\u003e One thing I would like to see is documentation for the new job attribute in doc/source/config/job.html, perhaps including an explanation of how to replicate the files and irrelevant-files behaviors in filesets since this could provide a path for migration if we were to decide to deprecate them in favor of this solution. An up-side to including documentation within the change is that reviewers can more easily understand the feature without needing to thoroughly explain the same points in the commit message (which was very detailed though, thank you).\n\nThanks a lot for the comments. One reason why I propose this change is that in our organization we heavily make use of the files / irrelevant-files configuration for triggering only needed jobs. We have a lot of focus on resource savings and fast feedback. The danger of not running jobs that should run is of course valid and on our side we solved it by introducing a sparse checkout feature based on the same file filter. It means that in our job workspace only files included in the job configuration are actually present and when jobs try to access other files it likely causes a \"file not found\" error making the job red. Of course this doesn\u0027t fully cover all possible cases but it\u0027s a good level of basic certainty that all necessary files are included. Actually I would like to also contribute this feature at some point.\n\nI will of course check this missed test scenario you described and write the job config documentation soon.",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
