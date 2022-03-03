@@ -34,6 +34,23 @@
       "parentUuid": "48b2ac61_2c750c26",
       "revId": "393d0263298fc7523236b37c6e42e6615c972053",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efec568a_b1cb1ee3",
+        "filename": "requirements.txt",
+        "patchSetId": 22
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-03T22:31:02Z",
+      "side": 1,
+      "message": "gear has been removed in the meantime so this change likely needs a rebase.",
+      "revId": "393d0263298fc7523236b37c6e42e6615c972053",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
