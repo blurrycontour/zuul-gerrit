@@ -16,6 +16,23 @@
       "message": "I\u0027m not sure if we want to publish this metric for the initial priming. In case we only hold the tenant read lock (which should be the case except for the initial startup) this is more like a local layout update than a reconfig.",
       "revId": "ef72efab216278b65666ff0e67dc37cfee5e0e39",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a35c28d2_825486ce",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-03T15:30:10Z",
+      "side": 1,
+      "message": "In other words, only emit this if layout_state is None?  (Same condition that we use to set the lock_ctx to write above and reconfigureTenant below.)  Makes sense.",
+      "revId": "ef72efab216278b65666ff0e67dc37cfee5e0e39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
