@@ -173,7 +173,7 @@ class TestSemaphoreModelUpgrade(ZuulTestCase):
             1)
 
         # Try to release the old-style semaphore after the model API upgrade.
-        tenant.semaphore_handler.release(item, job)
+        tenant.semaphore_handler.release(self.scheds.first.sched, item, job)
         self.assertEqual(
             len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
             0)
