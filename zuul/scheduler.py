@@ -56,6 +56,7 @@ from zuul.model import (
     Change,
     ChangeManagementEvent,
     PipelinePostConfigEvent,
+    PipelineSemaphoreReleaseEvent,
     DequeueEvent,
     EnqueueEvent,
     FilesChangesCompletedEvent,
@@ -2250,6 +2251,9 @@ class Scheduler(threading.Thread):
             elif isinstance(event, PipelinePostConfigEvent):
                 # We don't need to do anything; the event just
                 # triggers a pipeline run.
+                pass
+            elif isinstance(event, PipelineSemaphoreReleaseEvent):
+                # Same as above.
                 pass
             else:
                 self.log.error("Unable to handle event %s" % event)
