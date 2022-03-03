@@ -475,6 +475,9 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         for data_id in self.kazoo_client.get_children(self.PARAM_ROOT):
             data_path = self._getParamsPath(data_id)
             data_zstat = self.kazoo_client.exists(data_path)
+            if not data_zstat:
+                # Node was deleted in the meantime
+                continue
             if now - data_zstat.mtime > age:
                 data_nodes[data_id] = data_path
 
