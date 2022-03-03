@@ -159,12 +159,12 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderTimer (change) {
+  renderTimer (change, times) {
     let remainingTime
-    if (change.remaining_time === null) {
+    if (times.remaining === null) {
       remainingTime = 'unknown'
     } else {
-      remainingTime = this.time(change.remaining_time)
+      remainingTime = this.time(times.remaining)
     }
     return (
       <React.Fragment>
@@ -255,7 +255,7 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJob (job) {
+  renderJob (job, job_times) {
     const { tenant } = this.props
     let job_name = job.name
     let ordinal_rules = new Intl.PluralRules('en', {type: 'ordinal'})
@@ -287,8 +287,7 @@ class ChangePanel extends React.Component {
     let resultBar
     let result = this.jobStrResult(job)
     if (result === 'in progress') {
-      resultBar = this.renderJobProgressBar(
-        job.elapsed_time, job.remaining_time)
+      resultBar = this.renderJobProgressBar(job_times.elapsed, job_times.remaining)
     } else {
       resultBar = this.renderJobStatusLabel(job, result)
     }
@@ -303,15 +302,55 @@ class ChangePanel extends React.Component {
       </span>)
   }
 
-  renderJobList (jobs) {
+  renderJobList (jobs, times) {
     return (
       <ul className='list-group zuul-patchset-body'>
         {jobs.map((job, idx) => (
           <li key={idx} className='list-group-item zuul-change-job'>
-            {this.renderJob(job)}
+            {this.renderJob(job, times.jobs[job.name])}
           </li>
         ))}
       </ul>)
+  }
+
+  calculateTimes (change) {
+    let maxRemaining = 0
+    let jobs = {}
+    const now = Date.now()
+
+    for (const job of change.jobs) {
+      let jobElapsed = null
+      let jobRemaining = null
+      if (job.start_time) {
+        let jobStart = parseInt(job.start_time * 1000)
+
+        if (job.end_time) {
+          let jobEnd = parseInt(job.end_time * 1000)
+          jobElapsed = jobEnd - jobStart
+        } else {
+          jobElapsed = Math.max(now - jobStart, 0)
+          if (job.estimated_time) {
+            jobRemaining = Math.max(parseInt(job.estimated_time * 1000) - jobElapsed, 0)
+          }
+        }
+      }
+      if (jobRemaining && jobRemaining > maxRemaining) {
+        maxRemaining = jobRemaining
+      }
+      jobs[job.name] = {
+        elapsed: jobElapsed,
+        remaining: jobRemaining,
+      }
+    }
+    // If not all the jobs have started, this will be null, so only
+    // use our value if it's oky to calculate it.
+    if (change.remaininging_time === null) {
+      maxRemaining = null
+    }
+    return {
+      remaining: maxRemaining,
+      jobs: jobs,
+    }
   }
 
   render () {
@@ -321,6 +360,7 @@ class ChangePanel extends React.Component {
     if (this.clicked) {
       expand = expanded
     }
+    const times = this.calculateTimes(change)
     const header = (
       <div className='panel panel-default zuul-change'>
         <div className='panel-heading zuul-patchset-header'
@@ -339,12 +379,12 @@ class ChangePanel extends React.Component {
             </div>
             {change.live === true ? (
               <div className='col-xs-4 text-right'>
-                {this.renderTimer(change)}
+                {this.renderTimer(change, times)}
               </div>
             ) : ''}
           </div>
         </div>
-        {expand ? this.renderJobList(change.jobs) : ''}
+        {expand ? this.renderJobList(change.jobs, times) : ''}
       </div >
     )
     return (
