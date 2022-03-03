@@ -20,6 +20,7 @@ from urllib.parse import quote_plus, unquote
 from kazoo.exceptions import BadVersionError, NoNodeError
 
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import PipelineSemaphoreReleaseEvent
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.components import COMPONENT_REGISTRY
 
@@ -75,7 +76,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             # Since we know we have less than all the required
             # semaphores, set quiet=True so we don't log an inability
             # to release them.
-            self.release(item, job, quiet=True)
+            self.release(None, item, job, quiet=True)
             return False
         return True
 
@@ -176,7 +177,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             self._emitStats(semaphore_path, len(semaphore_holders))
             break
 
-    def release(self, item, job, quiet=False):
+    def release(self, sched, item, job, quiet=False):
         if not job.semaphores:
             return
 
@@ -184,6 +185,17 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
         for semaphore in job.semaphores:
             self._release_one(log, item, job, semaphore, quiet)
+
+        # If a scheduler has been provided (which it is except in the
+        # case of a rollback from acquire in this class), broadcast an
+        # event to trigger pipeline runs.
+        if sched is None:
+            return
+        for pipeline_name in self.layout.pipelines.keys():
+            event = PipelineSemaphoreReleaseEvent()
+            sched.pipeline_management_events[
+                self.tenant_name][pipeline_name].put(
+                    event, needs_result=False)
 
     def _release_one(self, log, item, job, semaphore, quiet):
         semaphore_key = quote_plus(semaphore.name)
