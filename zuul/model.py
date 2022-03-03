@@ -47,10 +47,7 @@ from zuul.lib.capabilities import capabilities_registry
 from zuul.lib.jsonutil import json_dumps
 from zuul.zk import zkobject
 from zuul.zk.change_cache import ChangeKey
-
-# When making ZK schema changes, increment this and add a record to
-# docs/developer/model-changelog.rst
-MODEL_API = 4
+from zuul.zk.components import COMPONENT_REGISTRY
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -3351,26 +3348,6 @@ class BuildRequest(JobRequest):
         )
 
 
-class ResultData(zkobject.ShardedZKObject):
-    # If the node exists already, it is probably a half-written state
-    # from a crash; truncate it and continue.
-    truncate_on_create = True
-
-    def __init__(self):
-        super().__init__()
-        self._set(data={})
-
-    def getPath(self):
-        return self._path
-
-    def serialize(self, context):
-        data = {
-            "data": self.data,
-            "_path": self._path,
-        }
-        return json.dumps(data, sort_keys=True).encode("utf8")
-
-
 class Build(zkobject.ZKObject):
     """A Build is an instance of a single execution of a Job.
 
@@ -3379,7 +3356,15 @@ class Build(zkobject.ZKObject):
     Job (related builds are grouped together in a BuildSet).
     """
 
+    # If data/variables are more than 10k, we offload them to another
+    # object, otherwise we store them on this one.
+    MAX_DATA_LEN = 10 * 1024
+
     log = logging.getLogger("zuul.Build")
+
+    job_data_attributes = ('result_data',
+                           'secret_result_data',
+                           )
 
     def __init__(self):
         super().__init__()
@@ -3409,10 +3394,6 @@ class Build(zkobject.ZKObject):
             "uuid": self.uuid,
             "url": self.url,
             "result": self.result,
-            "_result_data": (self._result_data.getPath()
-                             if self._result_data else None),
-            "_secret_result_data": (self._secret_result_data.getPath()
-                                    if self._secret_result_data else None),
             "error_detail": self.error_detail,
             "execute_time": self.execute_time,
             "start_time": self.start_time,
@@ -3425,20 +3406,63 @@ class Build(zkobject.ZKObject):
             "zuul_event_id": self.zuul_event_id,
             "build_request_ref": self.build_request_ref,
         }
+        if COMPONENT_REGISTRY.model_api < 5:
+            data["_result_data"] = (self._result_data.getPath()
+                                    if self._result_data else None)
+            data["_secret_result_data"] = (
+                self._secret_result_data.getPath()
+                if self._secret_result_data else None)
+        else:
+            for k in self.job_data_attributes:
+                v = getattr(self, '_' + k)
+                if isinstance(v, JobData):
+                    v = {'storage': 'offload', 'path': v.getPath(),
+                         'hash': v.hash}
+                else:
+                    v = {'storage': 'local', 'data': v}
+                data[k] = v
+
         return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
 
         # Result data can change (between a pause and build
-        # completion) so de-serialize it every time.
+        # completion).
+
+        # MODEL_API < 5
         for k in ('_result_data', '_secret_result_data'):
             try:
-                if data[k]:
-                    data[k] = ResultData.fromZK(context, data[k])
+                if data.get(k):
+                    data[k] = JobData.fromZK(context, data[k])
+                    # This used to be a ResultData object, which is
+                    # the same as a JobData but without a hash, so
+                    # generate one.
+                    data[k]._set(hash=JobData.getHash(data[k].data))
             except Exception:
                 self.log.exception("Failed to restore result data")
                 data[k] = None
+
+        # MODEL_API >= 5; override with this if present.
+        for job_data_key in self.job_data_attributes:
+            job_data = data.pop(job_data_key, None)
+            if job_data:
+                # This is a dict which tells us where the actual data is.
+                if job_data['storage'] == 'local':
+                    # The data are stored locally in this dict
+                    data['_' + job_data_key] = job_data['data']
+                elif job_data['storage'] == 'offload':
+                    existing_job_data = getattr(self, job_data_key, None)
+                    if (getattr(existing_job_data, 'hash', None) ==
+                        job_data['hash']):
+                        # Re-use the existing object since it's the same
+                        data['_' + job_data_key] = existing_job_data
+                    else:
+                        # Load the object from ZK
+                        data['_' + job_data_key] = JobData.fromZK(
+                            context, job_data['path'])
+            else:
+                data['_' + job_data_key] = None
         return data
 
     def getPath(self):
@@ -3448,27 +3472,29 @@ class Build(zkobject.ZKObject):
         return ('<Build %s of %s voting:%s>' %
                 (self.uuid, self.job.name, self.job.voting))
 
+    def _getJobData(self, name):
+        val = getattr(self, name)
+        if isinstance(val, JobData):
+            return val.data
+        return val
+
     @property
     def result_data(self):
-        if self._result_data:
-            return self._result_data.data
-        return {}
+        return self._getJobData('_result_data') or {}
 
     @property
     def secret_result_data(self):
-        if self._secret_result_data:
-            return self._secret_result_data.data
-        return {}
+        return self._getJobData('_secret_result_data') or {}
 
     def setResultData(self, result_data, secret_result_data):
         if not self._active_context:
             raise Exception(
                 "setResultData must be used with a context manager")
-        self._result_data = ResultData.new(
+        self._result_data = JobData.new(
             self._active_context,
             data=result_data,
             _path=self.getPath() + '/result_data')
-        self._secret_result_data = ResultData.new(
+        self._secret_result_data = JobData.new(
             self._active_context,
             data=secret_result_data,
             _path=self.getPath() + '/secret_result_data')
