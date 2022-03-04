@@ -58,6 +58,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ce5b275_18ca11e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:24:11Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3:\n\u003e \n\u003e One other type of documentation which can be helpful to reviewers as well as users (and is pretty much mandatory for feature additions) is to include a release note as part of the proposed change. That too provides context to reviewers, and helps avoid forgetting to mention the new feature in the next release announcement once it\u0027s merged.\n\nWill do, thanks.",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2902b03_ca03dc3e",
