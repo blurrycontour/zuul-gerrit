@@ -49,6 +49,10 @@ branch will not immediately produce a configuration error.
 
       The name of the Nodeset, to be referenced by a :ref:`job`.
 
+      This is required when defining a standalone Nodeset in Zuul.
+      When defining an in-line anonymous nodeset within a job
+      definition, this attribute should be omitted.
+
    .. attr:: nodes
       :required:
 
