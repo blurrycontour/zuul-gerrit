@@ -150,10 +150,24 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          The number of items currently being processed by this
          pipeline.
 
+      .. stat:: handling
+         :type: timer
+
+         The total time taken to refresh and process the pipeline.
+         This is emitted every time a scheduler examines a pipeline
+         regardless of whether it takes any actions.
+
+      .. stat:: event_process
+         :type: timer
+
+         The time taken to process the event queues for the pipeline.
+         This is emitted only if there are events to process.
+
       .. stat:: process
          :type: timer
 
-         The time taken to process the pipeline.
+         The time taken to process the pipeline.  This is emitted only
+         if there were events to process.
 
       .. stat:: data_size_compressed
          :type: gauge

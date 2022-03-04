@@ -20,3 +20,5 @@ features:
     * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_znodes`
     * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.read_bytes`
     * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_bytes`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.event_process`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.handling`

@@ -1922,7 +1922,9 @@ class Scheduler(threading.Thread):
                 ) as lock:
                     ctx = self.createZKContext(lock, self.log)
                     with pipeline.manager.currentContext(ctx):
-                        refreshed = self._process_pipeline(tenant, pipeline)
+                        with self.statsd_timer(f'{stats_key}.handling'):
+                            refreshed = self._process_pipeline(
+                                tenant, pipeline)
                     # Update pipeline summary for zuul-web
                     if refreshed:
                         pipeline.summary.update(ctx, self.globals)
@@ -1984,11 +1986,12 @@ class Scheduler(threading.Thread):
             self._reenqueuePipeline(tenant, pipeline, ctx)
         pipeline.state.cleanup(ctx)
 
-        self.process_pipeline_management_queue(tenant, pipeline)
-        # Give result events priority -- they let us stop builds, whereas
-        # trigger events cause us to execute builds.
-        self.process_pipeline_result_queue(tenant, pipeline)
-        self.process_pipeline_trigger_queue(tenant, pipeline)
+        with self.statsd_timer(f'{stats_key}.event_process'):
+            self.process_pipeline_management_queue(tenant, pipeline)
+            # Give result events priority -- they let us stop builds,
+            # whereas trigger events cause us to execute builds.
+            self.process_pipeline_result_queue(tenant, pipeline)
+            self.process_pipeline_trigger_queue(tenant, pipeline)
         try:
             with self.statsd_timer(f'{stats_key}.process'):
                 while not self._stopped and pipeline.manager.processQueue():
