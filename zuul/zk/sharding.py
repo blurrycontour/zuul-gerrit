@@ -33,6 +33,8 @@ class RawShardIO(io.RawIOBase):
         self.compressed_bytes_written = 0
         self.cumulative_read_time = 0.0
         self.cumulative_write_time = 0.0
+        self.znodes_read = 0
+        self.znodes_written = 0
 
     def readable(self):
         return True
@@ -61,6 +63,7 @@ class RawShardIO(io.RawIOBase):
         data, _ = self.client.get(path)
         self.cumulative_read_time += time.perf_counter() - start
         self.compressed_bytes_read += len(data)
+        self.znodes_read += 1
         return zlib.decompress(data)
 
     def readall(self):
@@ -86,6 +89,7 @@ class RawShardIO(io.RawIOBase):
         )
         self.cumulative_write_time += time.perf_counter() - start
         self.compressed_bytes_written += len(shard_bytes)
+        self.znodes_written += 1
         return min(byte_count, NODE_BYTE_SIZE_LIMIT)
 
 
@@ -102,6 +106,10 @@ class BufferedShardWriter(io.BufferedWriter):
     def cumulative_write_time(self):
         return self.__raw.cumulative_write_time
 
+    @property
+    def znodes_written(self):
+        return self.__raw.znodes_written
+
 
 class BufferedShardReader(io.BufferedReader):
     def __init__(self, client, path):
@@ -115,3 +123,7 @@ class BufferedShardReader(io.BufferedReader):
     @property
     def cumulative_read_time(self):
         return self.__raw.cumulative_read_time
+
+    @property
+    def znodes_read(self):
+        return self.__raw.znodes_read

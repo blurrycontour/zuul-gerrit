@@ -14,3 +14,9 @@ features:
     * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.event_job_time`
     * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.read_time`
     * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_time`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.read_objects`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_objects`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.read_znodes`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_znodes`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.read_bytes`
+    * :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.write_bytes`

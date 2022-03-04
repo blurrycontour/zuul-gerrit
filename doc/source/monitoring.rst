@@ -235,6 +235,24 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          The time spent reading data from ZooKeeper during a single
          pipeline processing run.
 
+      .. stat:: read_znodes
+         :type: gauge
+
+         The number of ZNodes read from ZooKeeper during a single
+         pipeline processing run.
+
+      .. stat:: read_objects
+         :type: gauge
+
+         The number of Zuul data model objects read from ZooKeeper
+         during a single pipeline processing run.
+
+      .. stat:: read_bytes
+         :type: gauge
+
+         The amount of data read from ZooKeeper during a single
+         pipeline processing run.
+
       .. stat:: refresh
          :type: timer
 
@@ -271,6 +289,24 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          :type: timer
 
          The time spent writing data to ZooKeeper during a single
+         pipeline processing run.
+
+      .. stat:: write_znodes
+         :type: gauge
+
+         The number of ZNodes written to ZooKeeper during a single
+         pipeline processing run.
+
+      .. stat:: write_objects
+         :type: gauge
+
+         The number of Zuul data model objects written to ZooKeeper
+         during a single pipeline processing run.
+
+      .. stat:: write_bytes
+         :type: gauge
+
+         The amount of data written to ZooKeeper during a single
          pipeline processing run.
 
 .. stat:: zuul.executor.<executor>
