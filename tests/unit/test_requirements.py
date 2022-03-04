@@ -309,6 +309,18 @@ class TestRequirementsState(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
 
+    def test_pipeline_require_wip(self):
+        A = self.fake_gerrit.addFakeChange('wip-project', 'master', 'A')
+        A.setWorkInProgress(True)
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 0)
+
+        B = self.fake_gerrit.addFakeChange('wip-project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+
 
 class TestRequirementsRejectUsername(ZuulTestCase):
     """Requirements with reject username requirement"""
