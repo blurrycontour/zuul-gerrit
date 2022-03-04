@@ -70,6 +70,18 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
    The size of the tenant's management event queue.
 
+.. stat:: zuul.tenant.<tenant>.reconfiguration_time
+   :type: timer
+
+   A timer metric reporting the time taken to reconfigure a tenant.
+   This is performed by one scheduler after a tenant reconfiguration
+   event is received.  During this time, all processing of that
+   tenant's pipelines are halted.  This measures that time.
+
+   Once the first scheduler completes a tenant reconfiguration, other
+   schedulers may update their layout in the background without
+   interrupting processing.  That is not reported in this metric.
+
 .. stat:: zuul.tenant.<tenant>.trigger_events
    :type: gauge
 
