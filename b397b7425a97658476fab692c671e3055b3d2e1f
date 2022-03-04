@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "f119ece9_18a07df0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "Yes I know it is described correctly. With \"expectation\" I meant more like an \"intuition\".",
+      "parentUuid": "4bf2fbad_b08baae5",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 19
+      },
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "520356dd_782b129d",
@@ -75,6 +99,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26c7aeb0_94066f96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3:\n\u003e \n\u003e As discussed, files and irrelevant-files are rather complex, and I don\u0027t think we should add to the confusion by supporting both.  If we are to do so, then I think we should deprecate and remove files/irrelevant-files.  It would be good to have a plan for this, a timeframe, and documentation and/or tools to help people with the conversion.\n\u003e \n\u003e Getting buy-in on the mailing list or via a spec would be good.\n\nThanks for the guidance. I would prefer to write a spec first then. A conversion script could be also provided of course.",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2902b03_ca03dc3e",
@@ -94,6 +135,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cffe8d65_87ae6110",
+        "filename": "tests/unit/test_include_exclude_filter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "Yes, I agree. Actually the include_exclude_filter is quite old code and was used in a few different CI systems before. The idea of the __str__ interface was to allow any object that can be represented as a string to be used in the filter. It was necessary in another project but not in Zuul so I will simplify it to use simple strings.",
+      "parentUuid": "f2902b03_ca03dc3e",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "308c17cf_0d13864b",
         "filename": "tests/unit/test_scheduler.py",
         "patchSetId": 3
@@ -105,6 +164,30 @@
       "writtenOn": "2022-03-03T16:53:50Z",
       "side": 1,
       "message": "This implies we\u0027re skipping the job but we pass should_skip\u003dFalse below indicating we\u0027re checking the opposite behavior.",
+      "range": {
+        "startLine": 3288,
+        "startChar": 39,
+        "endLine": 3288,
+        "endChar": 48
+      },
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00ff239d_fdfd1919",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3288,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "308c17cf_0d13864b",
       "range": {
         "startLine": 3288,
         "startChar": 39,
@@ -134,6 +217,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fbb2ccb7_70619268",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "Good point. I didn\u0027t think about the valid case to use only excludes.\nHowever I think if a fileset is given there should be either includes, excludes  or both. If neither includes nor excludes are given it would behave as \"match all files\" but intuitively people might think since the fileset property is empty, it would mean \"match nothing\".\nWhat\u0027s your opinion?",
+      "parentUuid": "9721bed5_67228fee",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57e85e20_ca4a3dbe",
         "filename": "zuul/include_exclude_filter.py",
         "patchSetId": 3
@@ -157,6 +258,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "10ccc83c_94703e0a",
+        "filename": "zuul/include_exclude_filter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "Will change it, see reply above.",
+      "parentUuid": "57e85e20_ca4a3dbe",
+      "range": {
+        "startLine": 6,
+        "startChar": 19,
+        "endLine": 6,
+        "endChar": 34
+      },
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3cbf05b1_00412a47",
         "filename": "zuul/include_exclude_filter.py",
         "patchSetId": 3
@@ -168,6 +293,24 @@
       "writtenOn": "2022-03-03T16:53:50Z",
       "side": 1,
       "message": "include_matchers are a required field according to the config schema. I\u0027ve asked on the config loader whether or not this needs to be the case.",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f9a24a6_682d8b1f",
+        "filename": "zuul/include_exclude_filter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-04T08:36:25Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3cbf05b1_00412a47",
       "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
