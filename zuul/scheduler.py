@@ -56,6 +56,7 @@ from zuul.model import (
     Change,
     ChangeManagementEvent,
     PipelinePostConfigEvent,
+    PipelineSemaphoreReleaseEvent,
     DequeueEvent,
     EnqueueEvent,
     FilesChangesCompletedEvent,
@@ -2278,6 +2279,9 @@ class Scheduler(threading.Thread):
                 # We don't need to do anything; the event just
                 # triggers a pipeline run.
                 pass
+            elif isinstance(event, PipelineSemaphoreReleaseEvent):
+                # Same as above.
+                pass
             else:
                 self.log.error("Unable to handle event %s" % event)
         except Exception:
@@ -2669,7 +2673,7 @@ class Scheduler(threading.Thread):
         finally:
             # Release the semaphore in any case
             tenant = buildset.item.pipeline.tenant
-            tenant.semaphore_handler.release(item, job)
+            tenant.semaphore_handler.release(self, item, job)
 
     def createZKContext(self, lock, log):
         return ZKContext(self.zk_client, lock, self.stop_event, log)

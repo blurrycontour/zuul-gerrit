@@ -7743,6 +7743,47 @@ class TestSemaphore(ZuulTestCase):
         # least one should be able to start on each pass through the
         # loop).
 
+    @simple_layout('layouts/semaphore-multi-pipeline.yaml')
+    def test_semaphore_multi_pipeline(self):
+        "Test semaphores in multiple pipelines"
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        # Start a second change in a different pipeline
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Still just the first change holds the lock
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        # Now the second should run
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='gate-job', result='SUCCESS', changes='2,1'),
+        ])
+
 
 class TestSemaphoreMultiTenant(ZuulTestCase):
     tenant_config_file = 'config/multi-tenant-semaphore/main.yaml'

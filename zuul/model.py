@@ -5717,6 +5717,12 @@ class PipelinePostConfigEvent(ManagementEvent):
     pass
 
 
+class PipelineSemaphoreReleaseEvent(ManagementEvent):
+    """Enqueued after a semaphore has been released in order
+    to trigger a processing run"""
+    pass
+
+
 class ChangeManagementEvent(ManagementEvent):
     """Base class for events that dequeue/enqueue changes
 
