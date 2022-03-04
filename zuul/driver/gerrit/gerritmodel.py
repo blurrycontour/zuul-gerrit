@@ -491,7 +491,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
 
 class GerritRefFilter(RefFilter, GerritApprovalFilter):
     def __init__(self, connection_name, open=None, current_patchset=None,
-                 statuses=[], required_approvals=[],
+                 wip=None, statuses=[], required_approvals=[],
                  reject_approvals=[]):
         RefFilter.__init__(self, connection_name)
 
@@ -500,6 +500,7 @@ class GerritRefFilter(RefFilter, GerritApprovalFilter):
                                       reject_approvals=reject_approvals)
 
         self.open = open
+        self.wip = wip
         self.current_patchset = current_patchset
         self.statuses = statuses
 
@@ -524,23 +525,30 @@ class GerritRefFilter(RefFilter, GerritApprovalFilter):
         return ret
 
     def matches(self, change):
-        if self.open is not None:
-            # if a "change" has no number, it's not a change, but a push
-            # and cannot possibly pass this test.
-            if hasattr(change, 'number'):
-                if self.open != change.open:
-                    return False
-            else:
-                return False
 
-        if self.current_patchset is not None:
-            # if a "change" has no number, it's not a change, but a push
-            # and cannot possibly pass this test.
-            if hasattr(change, 'number'):
-                if self.current_patchset != change.is_current_patchset:
-                    return False
-            else:
+        filters = [
+            {
+                "required": self.open,
+                "value": change.open
+            },
+            {
+                "required": self.current_patchset,
+                "value": change.is_current_patchset
+            },
+            {
+                "required": self.wip,
+                "value": change.wip
+            },
+        ]
+        configured = filter(lambda x: x["required"] is not None, filters)
+
+        # if a "change" has no number, it's not a change, but a push
+        # and cannot possibly pass this test.
+        if hasattr(change, 'number'):
+            if any(map(lambda x: x["required"] != x["value"], configured)):
                 return False
+        elif configured:
+            return False
 
         if self.statuses:
             if change.status not in self.statuses:
