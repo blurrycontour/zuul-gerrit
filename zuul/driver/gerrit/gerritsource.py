@@ -173,6 +173,7 @@ class GerritSource(BaseSource):
             connection_name=self.connection.connection_name,
             open=config.get('open'),
             current_patchset=config.get('current-patchset'),
+            wip=config.get('wip'),
             statuses=to_list(config.get('status')),
             required_approvals=to_list(config.get('approval')),
         )
@@ -204,6 +205,7 @@ def getRequireSchema():
     require = {'approval': scalar_or_list(approval),
                'open': bool,
                'current-patchset': bool,
+               'wip': bool,
                'status': scalar_or_list(str)}
 
     return require
