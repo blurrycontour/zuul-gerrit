@@ -227,7 +227,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             return changes_needed
         return True
 
-    def getFailingDependentItems(self, item):
+    def getFailingDependentItems(self, item, nnfi):
         if not hasattr(item.change, 'needs_changes'):
             return None
         if not item.change.needs_changes:
@@ -240,7 +240,10 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                 continue
             if needed_item.current_build_set.failing_reasons:
                 failing_items.add(needed_item)
-        if item.isBundleFailing():
+        # Only look at the bundle if the item ahead is the nearest non-failing
+        # item. This is important in order to correctly reset the bundle items
+        # in case of a failure.
+        if item.item_ahead == nnfi and item.isBundleFailing():
             failing_items.update(item.bundle.items)
             failing_items.remove(item)
         if failing_items:

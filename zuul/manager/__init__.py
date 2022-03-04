@@ -365,7 +365,7 @@ class PipelineManager(metaclass=ABCMeta):
                                 dependency_graph=None):
         return True
 
-    def getFailingDependentItems(self, item):
+    def getFailingDependentItems(self, item, nnfi):
         return None
 
     def getItemForChange(self, change, change_queue=None):
@@ -1420,7 +1420,7 @@ class PipelineManager(metaclass=ABCMeta):
         actionable = change_queue.isActionable(item)
         item.updateAttributes(self.current_context, active=actionable)
 
-        dep_items = self.getFailingDependentItems(item)
+        dep_items = self.getFailingDependentItems(item, nnfi)
         if dep_items:
             failing_reasons.append('a needed change is failing')
             self.cancelJobs(item, prime=False)
