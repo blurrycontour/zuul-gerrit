@@ -37,6 +37,14 @@ to fill the following fields:
 * Valid Redirect URIs: ``https://zuul/*``
 * Web Origins: ``https://zuul/``
 
+If you intend to allow users authenticating with keycloak to use the zuul-client CLI, add the following settings:
+
+* Direct Access Grants Enabled: ``ON`` (to allow using the --username and --password arguments with the CLI)
+* Add to Valid Redirect URIs: ``http://localhost:12345/*``
+* Add to Web Origins: ``http://localhost:12345/``
+
+The last two settings are necessary if authentication is delegated to social identity providers like Github or Facebook.
+
 Click "Save" when done.
 
 Create a client scope

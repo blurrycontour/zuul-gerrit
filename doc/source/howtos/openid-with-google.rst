@@ -36,6 +36,9 @@ authentication. For example, if you are running a yarn development server on
 your computer and want to set up authentication for tenant "local",
 write `http://localhost:3000/t/local/auth_callback` .
 
+If you intend to allow users with google accounts to use the zuul-client CLI, add the
+following address to the authorized redirect URIs: `http://localhost:12345/` .
+
 Click Save. Google will generate a Client ID and a Client secret for your new
 credentials; we will only need the Client ID for the rest of this How-To.
 
