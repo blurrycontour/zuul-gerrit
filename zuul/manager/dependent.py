@@ -138,7 +138,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                            dependency_graph=dependency_graph)
 
     def enqueueChangesAhead(self, change, event, quiet, ignore_requirements,
-                            change_queue, history=None, dependency_graph=None):
+                            change_queue, history=None, dependency_graph=None,
+                            warnings=None):
         log = get_annotated_logger(self.log, event)
 
         history = history if history is not None else []
@@ -149,7 +150,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             return True
 
         ret = self.checkForChangesNeededBy(change, change_queue, event,
-                                           dependency_graph=dependency_graph)
+                                           dependency_graph=dependency_graph,
+                                           warnings=warnings)
         if ret in [True, False]:
             return ret
         log.debug("  Changes %s must be merged ahead of %s", ret, change)
@@ -168,7 +170,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         return True
 
     def checkForChangesNeededBy(self, change, change_queue, event,
-                                dependency_graph=None):
+                                dependency_graph=None, warnings=None):
         log = get_annotated_logger(self.log, event)
 
         # Return true if okay to proceed enqueing this change,
@@ -200,11 +202,16 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                 with self.getChangeQueue(needed_change,
                                          event) as needed_change_queue:
                     if needed_change_queue != change_queue:
-                        log.debug("  Change %s in project %s does not "
-                                  "share a change queue with %s "
-                                  "in project %s",
-                                  needed_change, needed_change.project,
-                                  change, change.project)
+                        msg = ("Change %s in project %s does not "
+                               "share a change queue with %s "
+                               "in project %s" %
+                               (needed_change.number,
+                                needed_change.project,
+                                change.number,
+                                change.project))
+                        log.debug("  " + msg)
+                        if warnings is not None:
+                            warnings.append(msg)
                         return False
                 if not needed_change.is_current_patchset:
                     log.debug("  Needed change is not the current patchset")
