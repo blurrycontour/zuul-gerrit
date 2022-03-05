@@ -194,7 +194,7 @@ class TestGerritLegacyCRD(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(A.reported, 0)
+        self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 0)
         self.assertEqual(len(self.history), 0)
 
@@ -211,7 +211,7 @@ class TestGerritLegacyCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
 
     def test_crd_gate_reverse(self):
         "Test reverse cross-repo dependencies"
@@ -298,7 +298,7 @@ class TestGerritLegacyCRD(ZuulTestCase):
         # should not be processed in dependent pipeline
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(A.reported, 0)
+        self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 0)
         self.assertEqual(len(self.history), 0)
 
@@ -317,7 +317,7 @@ class TestGerritLegacyCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 0)
 

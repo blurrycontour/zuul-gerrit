@@ -38,7 +38,8 @@ class IndependentPipelineManager(PipelineManager):
         return DynamicChangeQueueContextManager(change_queue)
 
     def enqueueChangesAhead(self, change, event, quiet, ignore_requirements,
-                            change_queue, history=None, dependency_graph=None):
+                            change_queue, history=None, dependency_graph=None,
+                            warnings=None):
         log = get_annotated_logger(self.log, event)
 
         history = history if history is not None else []

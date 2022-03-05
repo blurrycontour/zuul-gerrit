@@ -669,7 +669,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # should not be processed in dependent pipeline
         self.assertFalse(A.is_merged)
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(len(A.comments), 0)
+        self.assertEqual(len(A.comments), 1)
         self.assertEqual(B.reported, 0)
         self.assertEqual(len(self.history), 0)
 
@@ -688,7 +688,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertTrue(A.is_merged)
-        self.assertEqual(len(A.comments), 2)
+        self.assertEqual(len(A.comments), 3)
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 0)
 

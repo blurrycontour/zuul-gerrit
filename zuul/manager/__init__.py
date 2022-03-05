@@ -353,7 +353,8 @@ class PipelineManager(metaclass=ABCMeta):
         return True
 
     def enqueueChangesAhead(self, change, event, quiet, ignore_requirements,
-                            change_queue, history=None, dependency_graph=None):
+                            change_queue, history=None, dependency_graph=None,
+                            warnings=None):
         return True
 
     def enqueueChangesBehind(self, change, event, quiet, ignore_requirements,
@@ -525,13 +526,18 @@ class PipelineManager(metaclass=ABCMeta):
                           (change, change.project))
                 return False
 
+            warnings = []
             if not self.enqueueChangesAhead(change, event, quiet,
                                             ignore_requirements,
                                             change_queue, history=history,
-                                            dependency_graph=dependency_graph):
+                                            dependency_graph=dependency_graph,
+                                            warnings=warnings):
                 self.dequeueIncompleteCycle(change, dependency_graph, event,
                                             change_queue)
                 log.debug("Failed to enqueue changes ahead of %s" % change)
+                if warnings:
+                    self._reportNonEqueuedItem(change_queue, change,
+                                               event, warnings)
                 return False
 
             log.debug("History after enqueuing changes ahead: %s", history)
@@ -546,22 +552,9 @@ class PipelineManager(metaclass=ABCMeta):
                 if cycle and not self.canProcessCycle(change.project):
                     log.info("Dequeing change %s since at least one project "
                              "does not allow circular dependencies", change)
-                    actions = self.pipeline.failure_actions
-                    ci = change_queue.enqueueChange(cycle[-1], event)
-                    ci.warning("Dependency cycle detected")
-                    ci.setReportedResult('FAILURE')
-
-                    # Only report the cycle if the project is in the current
-                    # pipeline. Otherwise the change could be spammed by
-                    # reports from unrelated pipelines.
-                    if self.pipeline.tenant.layout.getProjectPipelineConfig(
-                        ci
-                    ):
-                        self.sendReport(actions, ci)
-                    self.dequeueItem(ci)
-                    self.sql.reportBuildsetEnd(ci.current_build_set,
-                                               'failure', final=True)
-
+                    warnings = ["Dependency cycle detected"]
+                    self._reportNonEqueuedItem(change_queue,
+                                               cycle[-1], event, warnings)
                     return False
 
             log.info("Adding change %s to queue %s in %s" %
@@ -599,6 +592,24 @@ class PipelineManager(metaclass=ABCMeta):
                 tenant, item.change, self.pipeline, event)
             self.dequeueSupercededItems(item)
             return True
+
+    def _reportNonEqueuedItem(self, change_queue, change, event, warnings):
+        # Enqueue an item which otherwise can not be enqueued in order
+        # to report a message to the user.
+        actions = self.pipeline.failure_actions
+        ci = change_queue.enqueueChange(change, event)
+        for w in warnings:
+            ci.warning(w)
+        ci.setReportedResult('FAILURE')
+
+        # Only report the item if the project is in the current
+        # pipeline. Otherwise the change could be spammed by
+        # reports from unrelated pipelines.
+        if self.pipeline.tenant.layout.getProjectPipelineConfig(ci):
+            self.sendReport(actions, ci)
+        self.dequeueItem(ci)
+        self.sql.reportBuildsetEnd(ci.current_build_set,
+                                   'failure', final=True)
 
     def cycleForChange(self, change, dependency_graph, event):
         log = get_annotated_logger(self.log, event)
