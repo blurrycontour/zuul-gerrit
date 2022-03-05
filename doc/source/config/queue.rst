@@ -46,30 +46,31 @@ Here is an example ``queue`` configuration.
    .. attr:: allow-circular-dependencies
       :default: false
 
-      Define if Zuul is allowed to process circular dependencies between
-      changes for this queue. All projects that are part of a dependency cycle
-      must share the same change queue.
+      Determines whether Zuul is allowed to process circular
+      dependencies between changes for this queue. All projects that
+      are part of a dependency cycle must share the same change queue.
 
-      In case Zuul detects a dependency cycle it will make sure that every
-      change also includes all other changes that are part of the cycle.
-      However each change will still be a normal item in the queue with its own
-      jobs.
+      If Zuul detects a dependency cycle it will ensure that every
+      change also includes all other changes that are part of the
+      cycle.  However each change will still be a normal item in the
+      queue with its own jobs.
 
       Reporting of success will be postponed until all items in the cycle
-      succeeded. In case of a failure in any of those items the whole cycle
+      succeed. In the case of a failure in any of those items the whole cycle
       will be dequeued.
 
-      An error message will be posted to all items of the cycle in case some
+      An error message will be posted to all items of the cycle if some
       items fail to report (e.g. merge failure when some items were already
       merged). In this case the target branch(es) might be in a broken state.
 
       In general, circular dependencies are considered to be an
       antipattern since they add extra constraints to continuous
       deployment systems.  Additionally, due to the lack of atomicity
-      in merge operations in code review systems, it may be possible
-      for only part of a cycle to be merged.  In that case, manual
-      interventions (such as reverting a commit, or bypassing gating to
-      force-merge the remaining commits) may be required.
+      in merge operations in code review systems (this includes
+      Gerrit, even with submitWholeTopic set), it may be possible for
+      only part of a cycle to be merged.  In that case, manual
+      interventions (such as reverting a commit, or bypassing gating
+      to force-merge the remaining commits) may be required.
 
       .. warning:: If the remote system is able to merge the first but
                    unable to merge the second or later change in a
