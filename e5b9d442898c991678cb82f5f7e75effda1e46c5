@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1828b371_0fb52a84",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2022-03-06T12:43:59Z",
+      "side": 1,
+      "message": "Hi, the way it\u0027s currently written seems to be a breaking change. Before this change zuul\u0027s behaviour is \"any state\" (\"ignore wip state\"). New behaviour is a two-state \"only wip\" or \"only not wip\".\n\n\"any state\" is reasonable for \"check\" pipelines.",
+      "revId": "e5b9d442898c991678cb82f5f7e75effda1e46c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
