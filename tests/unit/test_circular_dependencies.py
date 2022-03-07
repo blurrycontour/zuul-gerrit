@@ -1470,6 +1470,45 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "NEW")
         self.assertIn("does not share a change queue", B.messages[-1])
 
+    @simple_layout('layouts/deps-by-topic.yaml')
+    def test_deps_by_topic(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # We're about to add approvals to changes without adding the
+        # triggering events to Zuul, so that we can be sure that it is
+        # enqueing the changes based on dependencies, not because of
+        # triggering events.  Since it will have the changes cached
+        # already (without approvals), we need to clear the cache
+        # first.
+        for connection in self.scheds.first.connections.connections.values():
+            connection.maintainCache([], max_age=0)
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 3)
+        self.assertEqual(B.reported, 3)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
