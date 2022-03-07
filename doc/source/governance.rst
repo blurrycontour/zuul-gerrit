@@ -68,16 +68,11 @@ Current Zuul Maintainers:
 Name                    Matrix ID
 ======================  ===================================
 Clark Boylan            Clark (@clarkb:matrix.org)
-Clint Byrum             spamaps (@spamaps:spamaps.ems.host)
 Ian Wienand             ianw (@iwienand:matrix.org)
 James E. Blair          corvus (@jim:acmegating.com)
 Jens Harbott
 Jeremy Stanley          fungi (@fungicide:matrix.org)
-Jesse Keating
-Joshua Hesketh
 Monty Taylor            mordred (@mordred:inaugust.com)
-Paul Belanger           pabelanger (@pabelanger:matrix.org)
-Ricardo Carrillo Cruz
 Tobias Henkel           tobiash (@tobias.henkel:matrix.org)
 Tristan Cacqueray       tristanC (@tristanc_:matrix.org)
 ======================  ===================================
