@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "18aca6a5_5f32c83c",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2022-03-07T15:02:46Z",
+      "side": 1,
+      "message": "Fair enough, will remove this.",
+      "parentUuid": "9c7d0b03_e967b5d4",
+      "revId": "89762f6071370a831eb421da1d1b71536f4196b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "2558ce84_1ec4aa7a",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-03-03T21:01:52Z",
       "side": 1,
       "message": "This part of the change is troubling.  It intentionally includes nodes which do not belong to this zuul, in order to count them and emit a stat called \"zuul.nodepool.resources\".  It\u0027s starting to seem like this should be a change to Nodepool instead of Zuul.\n\nWhy not keep the zuul_system filter which would make this \"nodepool resources allocated to this zuul tenant\",  or, move this to nodepool which would then be \"nodepool resources allocated to this nodepool tenant\"?",
+      "revId": "89762f6071370a831eb421da1d1b71536f4196b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4debed12_d5f52d27",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2022-03-07T15:02:46Z",
+      "side": 1,
+      "message": "I thought about this as well.\n\nStill filtering for the zuul_system_id in its current form would not work, as this is stored in node.user_data. We have this only for in-use, used, and held nodes. For the new metric, we especially want to include ready nodes. So we\u0027d need to set the zuul_system_id on a separate property, also already on the node requests like we do with the tenant_name. This would require an accompanying change in nodepool.\n\nGenerally, I also have the feeling that it would be nicer to have this metric entirely implemented in nodepool. But there we would have the \"problem\" that we can\u0027t easily zero the gauges because we don\u0027t know the set of all tenants.\n\nSo as the latter option (nodepool-side impl.) is probably not acceptable because of inaccurate metrics, I\u0027d go with the former and add another \"zuul_system_id\" property to NodeRequest and Node (and removing the system_id from the user_data).\n\nWhat do you think? Any other options I overlooked?",
+      "parentUuid": "2558ce84_1ec4aa7a",
       "revId": "89762f6071370a831eb421da1d1b71536f4196b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
