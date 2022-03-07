@@ -114,6 +114,7 @@ class GerritChange(Change):
         self.wip = data.get('wip', False)
         self.owner = data['owner'].get('username')
         self.message = data['commitMessage']
+        self.topic = data.get('topic')
 
         self.missing_labels = set()
         for sr in data.get('submitRecords', []):
@@ -189,6 +190,7 @@ class GerritChange(Change):
         self.wip = data.get('work_in_progress', False)
         self.owner = data['owner'].get('username')
         self.message = current_revision['commit']['message']
+        self.topic = data.get('topic')
 
 
 class GerritTriggerEvent(TriggerEvent):
