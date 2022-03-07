@@ -1379,6 +1379,7 @@ class QueueParser:
         queue = {vs.Required('name'): str,
                  'per-branch': bool,
                  'allow-circular-dependencies': bool,
+                 'dependencies-by-topic': bool,
                  '_source_context': model.SourceContext,
                  '_start_mark': model.ZuulMark,
                  }
@@ -1390,7 +1391,12 @@ class QueueParser:
             conf['name'],
             conf.get('per-branch', False),
             conf.get('allow-circular-dependencies', False),
+            conf.get('dependencies-by-topic', False),
         )
+        if (queue.dependencies_by_topic and not
+            queue.allow_circular_dependencies):
+            raise Exception("The 'allow-circular-dependencies' setting must be"
+                            "enabled in order to use dependencies-by-topic")
         queue.source_context = conf.get('_source_context')
         queue.start_mark = conf.get('_start_mark')
         queue.freeze()

@@ -733,11 +733,13 @@ class FakeGerritChange(object):
                                       'username': 'owner_jane'},
                             'project': self.project,
                             'subject': self.subject,
-                            'topic': 'master',
                             'url': 'https://hostname/459'},
                  'comment': message,
                  'patchSet': self.patchsets[-1],
                  'type': 'comment-added'}
+        if 'topic' in self.data:
+            event['change']['topic'] = self.data['topic']
+
         self.data['submitRecords'] = self.getSubmitRecords()
         return json.loads(json.dumps(event))
 
@@ -886,6 +888,8 @@ class FakeGerritChange(object):
         }
         if 'parents' in self.data:
             data['parents'] = self.data['parents']
+        if 'topic' in self.data:
+            data['topic'] = self.data['topic']
         return json.loads(json.dumps(data))
 
     def queryRevisionHTTP(self, revision):
