@@ -78,6 +78,7 @@ Joshua Hesketh
 Monty Taylor            mordred (@mordred:inaugust.com)
 Paul Belanger           pabelanger (@pabelanger:matrix.org)
 Ricardo Carrillo Cruz
+Simon Westphahl         swest (@westphahl:matrix.org)
 Tobias Henkel           tobiash (@tobias.henkel:matrix.org)
 Tristan Cacqueray       tristanC (@tristanc_:matrix.org)
 ======================  ===================================
