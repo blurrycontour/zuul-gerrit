@@ -5399,12 +5399,18 @@ class Change(Branch):
         # to Depends-On headers (all drivers):
         self.commit_needs_changes = None
 
+        # Needed changes by topic (all
+        # drivers in theory, but Gerrit only in practice for
+        # emulate-submit-whole-topic):
+        self.topic_needs_changes = None
+
         self.is_current_patchset = True
         self.can_merge = False
         self.is_merged = False
         self.failed_to_merge = False
         self.open = None
         self.owner = None
+        self.topic = None
 
         # This may be the commit message, or it may be a cover message
         # in the case of a PR.  Either way, it's the place where we
@@ -5428,6 +5434,7 @@ class Change(Branch):
             None if data.get("commit_needs_changes") is None
             else data.get("commit_needs_changes", [])
         )
+        self.topic_needs_changes = data.get("topic_needs_changes")
         self.is_current_patchset = data.get("is_current_patchset", True)
         self.can_merge = data.get("can_merge", False)
         self.is_merged = data.get("is_merged", False)
@@ -5448,6 +5455,7 @@ class Change(Branch):
             "compat_needs_changes": self.compat_needs_changes,
             "compat_needed_by_changes": self.git_needed_by_changes,
             "commit_needs_changes": self.commit_needs_changes,
+            "topic_needs_changes": self.topic_needs_changes,
             "is_current_patchset": self.is_current_patchset,
             "can_merge": self.can_merge,
             "is_merged": self.is_merged,
@@ -5478,8 +5486,9 @@ class Change(Branch):
     @property
     def needs_changes(self):
         commit_needs_changes = self.commit_needs_changes or []
+        topic_needs_changes = self.topic_needs_changes or []
         return (self.git_needs_changes + self.compat_needs_changes +
-                commit_needs_changes)
+                commit_needs_changes + topic_needs_changes)
 
     @property
     def needed_by_changes(self):
@@ -7265,11 +7274,13 @@ class Semaphore(ConfigObject):
 
 class Queue(ConfigObject):
     def __init__(self, name, per_branch=False,
-                 allow_circular_dependencies=False):
+                 allow_circular_dependencies=False,
+                 dependencies_by_topic=False):
         super().__init__()
         self.name = name
         self.per_branch = per_branch
         self.allow_circular_dependencies = allow_circular_dependencies
+        self.dependencies_by_topic = dependencies_by_topic
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -7281,7 +7292,9 @@ class Queue(ConfigObject):
             self.name == other.name and
             self.per_branch == other.per_branch and
             self.allow_circular_dependencies ==
-            other.allow_circular_dependencies
+            other.allow_circular_dependencies and
+            self.dependencies_by_topic ==
+            other.dependencies_by_topic
         )
 
 

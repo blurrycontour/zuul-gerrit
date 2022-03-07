@@ -77,3 +77,29 @@ Here is an example ``queue`` configuration.
                    dependency cycle, then the gating system for a
                    project may be broken and may require an
                    intervention to correct.
+
+   .. attr:: dependencies-by-topic
+      :default: false
+
+      Determines whether Zuul should query the code review system for
+      changes under the same topic and treat those as a set of
+      circular dependencies.
+
+      Note that the Gerrit code review system supports a setting
+      called ``change.submitWholeTopic``, which, when set, will cause
+      all changes under the same topic to be merged simultaneously.
+      Zuul automatically observes this setting and treats all changes
+      to be submitted together as circular dependencies.  If this
+      setting is enabled in gerrit, do not enable
+      ``dependencies-by-topic`` in associated Zuul queues.
+
+      Because ``change.submitWholeTopic`` is applied system-wide in
+      Gerrit, some Zuul users may wish to emulate the behavior for
+      some projects without enabling it for all of Gerrit.  In this
+      case, setting ``dependencies-by-topic`` will cause Zuul to
+      approxiamate the Gerrit behavior only for changes enqueued into
+      queues where this is set.
+
+      This setting requires :attr:`queue.allow-circular-dependencies`
+      to also be set.  All of the caveats noted there continue to
+      apply.

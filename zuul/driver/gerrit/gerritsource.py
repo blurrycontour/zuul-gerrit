@@ -143,6 +143,36 @@ class GerritSource(BaseSource):
                 changes.append(change)
         return changes
 
+    def getChangesByTopic(self, topic, changes=None):
+        if not topic:
+            return []
+
+        if changes is None:
+            changes = {}
+
+        query = 'topic:%s' % topic
+        results = self.connection.simpleQuery(query)
+        for result in results:
+            change_key = ChangeKey(self.connection.connection_name, None,
+                                   'GerritChange',
+                                   str(result.number),
+                                   str(result.current_patchset))
+            if change_key in changes:
+                continue
+
+            change = self.connection._getChange(change_key)
+            changes[change_key] = change
+
+        for change in changes.values():
+            for git_key in change.git_needs_changes:
+                if git_key in changes:
+                    continue
+                git_change = self.getChange(git_key)
+                if not git_change.topic or git_change.topic == topic:
+                    continue
+                self.getChangesByTopic(git_change.topic, changes)
+        return list(changes.values())
+
     def getCachedChanges(self):
         yield from self.connection._change_cache
 

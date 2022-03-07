@@ -126,8 +126,23 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         search scope.
         """
 
+    def getChangesByTopic(self, topic):
+        """Return changes in the same topic.
+
+        This should return changes under the same topic, as well as
+        changes under the same topic of any git-dependent changes,
+        recursively.
+
+        This is only implemented by the Gerrit driver, however if
+        other systems have a similar "topic" functionality, it could
+        be added to other drivers.
+        """
+
+        return []
+
     @abc.abstractmethod
     def getProjectOpenChanges(self, project):
+
         """Get the open changes for a project."""
 
     @abc.abstractmethod
