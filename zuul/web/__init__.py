@@ -942,23 +942,23 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def tenants(self):
+    def tenants(self, skip_stats=None):
+        # use skip_stats to skip queue size computation
         result = []
         for tenant_name, tenant in sorted(self.zuulweb.abide.tenants.items()):
-            queue_size = 0
-            for pipeline in tenant.layout.pipelines.values():
-                status = pipeline.summary.refresh(self.zuulweb.zk_context)
-                for queue in status.get("change_queues", []):
-                    for head in queue["heads"]:
-                        for item in head:
-                            if item["live"]:
-                                queue_size += 1
-
-            result.append({
-                'name': tenant_name,
-                'projects': len(tenant.untrusted_projects),
-                'queue': queue_size,
-            })
+            tenant_info = {'name': tenant_name}
+            if skip_stats is None:
+                queue_size = 0
+                for pipeline in tenant.layout.pipelines.values():
+                    status = pipeline.summary.refresh(self.zuulweb.zk_context)
+                    for queue in status.get("change_queues", []):
+                        for head in queue["heads"]:
+                            for item in head:
+                                if item["live"]:
+                                    queue_size += 1
+                tenant_info['projects'] = len(tenant.untrusted_projects)
+                tenant_info['queue'] = queue_size
+            result.append(tenant_info)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'

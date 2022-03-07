@@ -307,6 +307,12 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(3, data[0]['projects'])
         self.assertEqual(1, data[0]['queue'])
 
+        # test no_stats argument
+        data = self.get_url("api/tenants?skip_stats=true").json()
+
+        self.assertEqual('tenant-one', data[0]['name'])
+        self.assertTrue('projects' not in data[0])
+
     def test_web_connections_list(self):
         data = self.get_url('api/connections').json()
         connection = {
