@@ -774,6 +774,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def index(self):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         return {
             'info': '/api/info',
             'connections': '/api/connections',
@@ -820,12 +822,16 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def info(self):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         return self._handleInfo(self.zuulweb.info)
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenant_info(self, tenant):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         info = self.zuulweb.info.copy()
         info.tenant = tenant
         tenant_config = self.zuulweb.unparsed_abide.tenants.get(tenant)
@@ -909,6 +915,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', ])
     def tenant_authorizations(self, tenant):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -943,6 +951,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenants(self):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         result = []
         for tenant_name, tenant in sorted(self.zuulweb.abide.tenants.items()):
             queue_size = 0
@@ -967,6 +977,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def connections(self):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         ret = [s.connection.toDict()
                for s in self.zuulweb.connections.getSources()]
         resp = cherrypy.response
@@ -976,6 +988,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type="application/json; charset=utf-8")
     def components(self):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         ret = {}
         for kind, components in self.zuulweb.component_registry.all():
             for comp in components:
@@ -1064,12 +1078,16 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def status(self, tenant):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         return self._getStatus(tenant)[1]
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def status_change(self, tenant, change):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         payload = self._getStatus(tenant)[0]
         result_filter = ChangeFilter(change)
         return result_filter.filterPayload(payload)
@@ -1080,6 +1098,8 @@ class ZuulWebAPI(object):
         content_type='application/json; charset=utf-8', handler=json_handler,
     )
     def jobs(self, tenant_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         result = []
         for job_name in sorted(tenant.layout.jobs):
@@ -1120,6 +1140,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def config_errors(self, tenant_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         ret = [
             {'source_context': e.key.context.toDict(),
@@ -1135,6 +1157,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
     def job(self, tenant_name, job_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         job_variants = tenant.layout.jobs.get(job_name)
         result = []
@@ -1149,6 +1173,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def projects(self, tenant_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         result = []
         for project in tenant.config_projects:
@@ -1199,6 +1225,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def pipelines(self, tenant_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         ret = []
         for pipeline, pipeline_config in tenant.layout.pipelines.items():
@@ -1223,6 +1251,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def labels(self, tenant_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         allowed_labels = tenant.allowed_labels or []
         disallowed_labels = tenant.disallowed_labels or []
@@ -1240,6 +1270,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def nodes(self, tenant):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         ret = []
         for node_id in self.zk_nodepool.getNodes(cached=True):
             node = self.zk_nodepool.getNode(node_id)
@@ -1264,6 +1296,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def key(self, tenant_name, project_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1276,6 +1310,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def project_ssh_key(self, tenant_name, project_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1360,6 +1396,8 @@ class ZuulWebAPI(object):
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
                limit=50, skip=0, idx_min=None, idx_max=None):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         connection = self._get_connection()
 
         if tenant not in self.zuulweb.abide.tenants.keys():
@@ -1393,6 +1431,9 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def build(self, tenant, uuid):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
+
         connection = self._get_connection()
 
         data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
@@ -1434,6 +1475,9 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def badge(self, tenant, project=None, pipeline=None, branch=None):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
+
         connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
@@ -1461,6 +1505,9 @@ class ZuulWebAPI(object):
                   branch=None, patchset=None, ref=None, newrev=None,
                   uuid=None, result=None, complete=None, limit=50, skip=0,
                   idx_min=None, idx_max=None):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
+
         connection = self._get_connection()
 
         if complete:
@@ -1486,6 +1533,9 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def buildset(self, tenant, uuid):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
+
         connection = self._get_connection()
 
         data = connection.getBuildset(tenant, uuid)
