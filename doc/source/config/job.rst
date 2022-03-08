@@ -367,9 +367,10 @@ Here is an example of two job definitions:
       may be supplied either as a string, in which case it references
       a :ref:`nodeset` definition which appears elsewhere in the
       configuration, or a dictionary, in which case it is interpreted
-      in the same way as a Nodeset definition, though the ``name``
-      attribute should be omitted (in essence, it is an anonymous
-      Nodeset definition unique to this job).  See the :ref:`nodeset`
+      in the same way as a Nodeset definition, though the top-level
+      nodeset ``name`` attribute should be omitted (in essence, it is
+      an anonymous Nodeset definition unique to this job; the nodes
+      themselves still require names).  See the :ref:`nodeset`
       reference for the syntax to use in that case.
 
       If a job has an empty (or no) :ref:`nodeset` definition, it will
