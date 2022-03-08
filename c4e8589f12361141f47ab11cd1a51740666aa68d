@@ -33,6 +33,24 @@
       "message": "recheck\n\nfailure unrelated",
       "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88caa9fd_5d95b4bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-03-08T20:41:12Z",
+      "side": 1,
+      "message": "I did think about this, but I\u0027m not sure what it should be returning.  \n\ncurl -X OPTIONS https://\u003csite\u003e gives:\n\n* google -- 405 with Allow: headers (google.com).  \n* wikipedia.org -- 405 without allow: headers (www.wikipedia.org).\n* developer.mozilla.org -- 403 (error from cloudfront)\n\nI think this is the simplest approach.  I can propose a simple follow-on with a wrapper and we can discuss it there.",
+      "parentUuid": "61b861d3_6309c95a",
+      "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
