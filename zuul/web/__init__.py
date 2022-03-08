@@ -1195,6 +1195,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
     def project(self, tenant_name, project_name):
+        if cherrypy.request.method != 'GET':
+            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
