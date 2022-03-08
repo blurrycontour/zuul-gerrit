@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ea72be5_23e5ed8a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-08T18:11:53Z",
+      "side": 1,
+      "message": "-1: I think we should have a separate lock for the tenant list since it\u0027s different caches.\n\nsuggestion: There is already a change that optimizes the locking for the status endpoint by tenant [1] which will conflict with this. It might make sense to rebase this change on top of it.\n\n[1] https://review.opendev.org/c/zuul/zuul/+/772695",
+      "revId": "941b5ef2ab3371b3f5ffbb5294e6a644faaee5ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
