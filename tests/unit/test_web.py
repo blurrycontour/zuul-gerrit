@@ -925,19 +925,27 @@ class TestWeb(BaseTestWeb):
         self.assertEqual("reason text", ah_request['reason'])
         self.assertEqual([], ah_request['nodes'])
 
-    def test_admin_routes_404_by_default(self):
+    def test_admin_routes_missing_by_default(self):
+        # The /project endpoint doesn't accept POST requests when no
+        # authentication.  GET requests should return 404.
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             json={'job': 'project-test1',
                   'count': 1,
                   'reason': 'because',
                   'node_hold_expiration': 36000})
+        self.assertEqual(405, resp.status_code)
+        resp = self.get_url(
+            "api/tenant/tenant-one/project/org/project/autohold")
         self.assertEqual(404, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
             json={'trigger': 'gerrit',
                   'change': '2,1',
                   'pipeline': 'check'})
+        self.assertEqual(405, resp.status_code)
+        resp = self.get_url(
+            "api/tenant/tenant-one/project/org/project/enqueue")
         self.assertEqual(404, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
@@ -946,6 +954,9 @@ class TestWeb(BaseTestWeb):
                   'newrev': 'aaaa',
                   'oldrev': 'bbbb',
                   'pipeline': 'check'})
+        self.assertEqual(405, resp.status_code)
+        resp = self.get_url(
+            "api/tenant/tenant-one/project/org/project/enqueue")
         self.assertEqual(404, resp.status_code)
 
     def test_jobs_list(self):
@@ -2076,6 +2087,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
             'tenant/my-tenant/nodes',
             'tenant/my-tenant/pipelines',
             'tenant/my-tenant/project-ssh-key/org/project.pub',
+            'tenant/my-tenant/project/my-project',
             'tenant/my-tenant/project/my-project/autohold',
             'tenant/my-tenant/status',
             'tenant/my-tenant/status/change/12345',
