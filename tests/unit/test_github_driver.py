@@ -25,7 +25,7 @@ from unittest import mock, skip
 import git
 import github3.exceptions
 
-from tests.fakegithub import FakeGithubEnterpriseClient
+from tests.fakegithub import FakeFile, FakeGithubEnterpriseClient
 from zuul.driver.github.githubconnection import GithubShaCache
 from zuul.zk.layout import LayoutState
 from zuul.lib import strings
@@ -170,6 +170,19 @@ class TestGithubDriver(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS',
                  changes="%s,%s" % (A.number, A.head_sha)),
         ])
+
+    @simple_layout('layouts/files-github.yaml', driver='github')
+    def test_pull_file_rename(self):
+        A = self.fake_github.openFakePullRequest(
+            'org/project', 'master', 'A', files={"moved": "test"})
+
+        with mock.patch("tests.fakegithub.FakePull.files") as files_mock:
+            files_mock.return_value = [
+                FakeFile(f, previous_filename="foobar-requires")
+                for f in A.files]
+            self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+            self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
     def test_pull_github_files_error(self):

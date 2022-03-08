@@ -469,8 +469,10 @@ class FakeIssue(object):
 
 
 class FakeFile(object):
-    def __init__(self, filename):
+    def __init__(self, filename, previous_filename=None):
         self.filename = filename
+        if previous_filename is not None:
+            self.previous_filename = previous_filename
 
 
 class FakePull(object):
