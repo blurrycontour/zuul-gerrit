@@ -2055,6 +2055,40 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+
+    def test_incorrect_methods(self):
+        """Ensure that endpoints reject HTTP methods they don't know about"""
+        endpoints = [
+            'components',
+            'connections',
+            'info',
+            'tenant/my-tenant/authorizations',
+            'tenant/my-tenant/badge',
+            'tenant/my-tenant/build/uuid',
+            'tenant/my-tenant/builds',
+            'tenant/my-tenant/buildset/uuid',
+            'tenant/my-tenant/buildsets'
+            'tenant/my-tenant/config-errors',
+            'tenant/my-tenant/info',
+            'tenant/my-tenant/job/job-name',
+            'tenant/my-tenant/jobs',
+            'tenant/my-tenant/key/project:foo.pub',
+            'tenant/my-tenant/labels',
+            'tenant/my-tenant/nodes',
+            'tenant/my-tenant/pipelines',
+            'tenant/my-tenant/project-ssh-key/project:foo.pub',
+            'tenant/my-tenant/project/project:foo',
+            'tenant/my-tenant/status',
+            'tenant/my-tenant/status/change/12345',
+            'tenants',
+        ]
+        for endpoint in endpoints:
+            bad_method = self.delete_url('api/%s' % endpoint)
+            self.assertEqual(
+                405,
+                bad_method.status_code,
+                "%s failed: %s" % (endpoint, bad_method.text))
+
     def test_OPTIONS(self):
         """Ensure that protected endpoints handle CORS preflight requests
         properly"""
