@@ -891,6 +891,7 @@ class TestTenantExtra(TenantParserTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         self.assertTrue('project2-extra-file' in tenant.layout.jobs)
         self.assertTrue('project2-extra-dir' in tenant.layout.jobs)
+        self.assertTrue('project6-extra-dir' in tenant.layout.jobs)
 
     def test_dynamic_extra(self):
         in_repo_conf = textwrap.dedent(
@@ -912,6 +913,30 @@ class TestTenantExtra(TenantParserTestCase):
         self.assertHistory([
             dict(name='common-config-job', result='SUCCESS', changes='1,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    def test_dynamic_extra_dir(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project6-extra-dir2
+                parent: common-config-job
+            - project:
+                check:
+                  jobs:
+                    - project6-extra-dir
+                    - project6-extra-dir2
+            """)
+        file_dict = {
+            'other/extra.d/new/extra.yaml': in_repo_conf,
+        }
+        A = self.fake_gerrit.addFakeChange('org/project6', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project6-extra-dir', result='SUCCESS', changes='1,1'),
+            dict(name='project6-extra-dir2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
     def test_extra_reconfigure(self):

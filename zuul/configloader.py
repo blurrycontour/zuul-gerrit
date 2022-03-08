@@ -35,6 +35,8 @@ from zuul.lib.varnames import check_varnames
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.semaphore import SemaphoreHandler
 
+ZUUL_CONF_ROOT = ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d')
+
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
@@ -1911,17 +1913,20 @@ class TenantParser(object):
         branch_cache = abide.getUnparsedBranchCache(
             source_context.project_canonical_name,
             source_context.branch)
-        for conf_root in (
-                ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
-                tpc.extra_config_files + tpc.extra_config_dirs):
+        valid_dirs = ("zuul.d", ".zuul.d") + tpc.extra_config_dirs
+        for conf_root in (ZUUL_CONF_ROOT + tpc.extra_config_files
+                          + tpc.extra_config_dirs):
             for fn in sorted(files.keys()):
-                fn_root = fn.split('/')[0]
-                if fn_root != conf_root or not files.get(fn):
+                if not files.get(fn):
+                    continue
+                if not (fn == conf_root
+                        or (conf_root in valid_dirs
+                            and fn.startswith(f"{conf_root}/"))):
                     continue
                 # Don't load from more than one configuration in a
                 # project-branch (unless an "extra" file/dir).
-                if (conf_root not in tpc.extra_config_files and
-                    conf_root not in tpc.extra_config_dirs):
+                fn_root = fn.split('/')[0]
+                if (fn_root in ZUUL_CONF_ROOT):
                     if (loaded and loaded != conf_root):
                         self.log.warning("Multiple configuration files in %s",
                                          source_context)
@@ -2503,8 +2508,7 @@ class ConfigLoader(object):
 
                     # Don't load from more than one configuration in a
                     # project-branch (unless an "extra" file/dir).
-                    if (conf_root not in tpc.extra_config_files and
-                        conf_root not in tpc.extra_config_dirs):
+                    if (conf_root in ZUUL_CONF_ROOT):
                         if loaded and loaded != conf_root:
                             self.log.warning(
                                 "Configuration in %s ignored because "
