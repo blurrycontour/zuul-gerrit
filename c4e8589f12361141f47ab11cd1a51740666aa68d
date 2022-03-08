@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61b861d3_6309c95a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-08T14:41:08Z",
+      "side": 1,
+      "message": "Why not use the existing handle_options decorator? It\u0027d be easy to add the case where cherrypy.request.method!\u003d OPTION and check that it belongs to allowed_methods.",
+      "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
