@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7c7dc54_237f35dd",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 1096,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-08T18:23:38Z",
+      "side": 1,
+      "message": "This doesn\u0027t make clear if this overrides job.attempts [1] if a job always returns true here but fails.\n\n[1] https://zuul-ci.org/docs/zuul/latest/config/job.html#attr-job.attempts",
+      "revId": "b03205019f6076a11b8e5418320cb78cf95ec757",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8490731b_86e0d85f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2482,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-08T18:23:38Z",
+      "side": 1,
+      "message": "This will also retry successful builds if they return retry for some reason. It\u0027s probably up to debate if we should allow this or if we only should allow to retry failed builds. I\u0027d vote for only retrying failed builds.\n\nFurther this doesn\u0027t take job.attempts into account so we\u0027re running into the risk of endless loops due to job misbehavior. So I think we should limit the retries to job.attempts just like we do with the existing retry_limit handling.",
+      "revId": "b03205019f6076a11b8e5418320cb78cf95ec757",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
