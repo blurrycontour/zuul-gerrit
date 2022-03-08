@@ -1022,18 +1022,27 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code, resp.text)
 
     def test_admin_routes_404_by_default(self):
+        # The /project endpoint doesn't accept POST requests when no
+        # authentication.  GET requests should return 404.  Other
+        # methods should return 405
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             json={'job': 'project-test1',
                   'count': 1,
                   'reason': 'because',
                   'node_hold_expiration': 36000})
+        self.assertEqual(405, resp.status_code)
+        resp = self.get_url(
+            "api/tenant/tenant-one/project/org/project/autohold")
         self.assertEqual(404, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
             json={'trigger': 'gerrit',
                   'change': '2,1',
                   'pipeline': 'check'})
+        self.assertEqual(405, resp.status_code)
+        resp = self.get_url(
+            "api/tenant/tenant-one/project/org/project/enqueue")
         self.assertEqual(404, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
@@ -1042,6 +1051,9 @@ class TestWeb(BaseTestWeb):
                   'newrev': 'aaaa',
                   'oldrev': 'bbbb',
                   'pipeline': 'check'})
+        self.assertEqual(405, resp.status_code)
+        resp = self.get_url(
+            "api/tenant/tenant-one/project/org/project/enqueue")
         self.assertEqual(404, resp.status_code)
 
     def test_jobs_list(self):
@@ -2439,16 +2451,16 @@ class TestTenantScopedWebApi(BaseTestWeb):
              'allowed_methods': ['POST', ]},
             {'action': 'autohold',
              'path': 'api/tenant/my-tenant/project/my-project/autohold',
-             'allowed_methods': ['GET', 'POST', ]},
+             'allowed_methods': ['GET', 'HEAD', 'POST', ]},
             {'action': 'autohold_by_request_id',
              'path': 'api/tenant/my-tenant/autohold/123',
-             'allowed_methods': ['GET', 'DELETE', ]},
+             'allowed_methods': ['GET', 'HEAD', 'DELETE', ]},
             {'action': 'dequeue',
              'path': 'api/tenant/my-tenant/project/my-project/enqueue',
              'allowed_methods': ['POST', ]},
             {'action': 'authorizations',
              'path': 'api/tenant/my-tenant/authorizations',
-             'allowed_methods': ['GET', ]},
+             'allowed_methods': ['GET', 'HEAD']},
         ]
         for endpoint in endpoints:
             preflight = self.options_url(
@@ -3504,39 +3516,39 @@ class TestWebApiAccessRules(BaseTestWeb):
     tenant_config_file = 'config/access-rules/main.yaml'
 
     routes = [
-        '/api/connections',
-        '/api/components',
-        '/api/tenants',
-        '/api/authorizations',
-        '/api/tenant/{tenant}/status',
-        '/api/tenant/{tenant}/status/change/{change}',
-        '/api/tenant/{tenant}/jobs',
-        '/api/tenant/{tenant}/job/{job_name}',
-        '/api/tenant/{tenant}/projects',
-        '/api/tenant/{tenant}/project/{project}',
-        ('/api/tenant/{tenant}/pipeline/{pipeline}/'
-         'project/{project}/branch/{branch}/freeze-jobs'),
-        '/api/tenant/{tenant}/pipelines',
-        '/api/tenant/{tenant}/semaphores',
-        '/api/tenant/{tenant}/labels',
-        '/api/tenant/{tenant}/nodes',
-        '/api/tenant/{tenant}/key/{project}.pub',
-        '/api/tenant/{tenant}/project-ssh-key/{project}.pub',
-        '/api/tenant/{tenant}/console-stream',
-        '/api/tenant/{tenant}/badge',
-        '/api/tenant/{tenant}/builds',
-        '/api/tenant/{tenant}/build/{uuid}',
-        '/api/tenant/{tenant}/buildsets',
-        '/api/tenant/{tenant}/buildset/{uuid}',
-        '/api/tenant/{tenant}/config-errors',
-        '/api/tenant/{tenant}/authorizations',
-        '/api/tenant/{tenant}/project/{project}/autohold',
-        '/api/tenant/{tenant}/autohold',
-        '/api/tenant/{tenant}/autohold/{request_id}',
-        '/api/tenant/{tenant}/autohold/{request_id}',
-        '/api/tenant/{tenant}/project/{project}/enqueue',
-        '/api/tenant/{tenant}/project/{project}/dequeue',
-        '/api/tenant/{tenant}/promote',
+        ('/api/connections', 401),
+        ('/api/components', 401),
+        ('/api/tenants', 401),
+        ('/api/authorizations', 401),
+        ('/api/tenant/{tenant}/status', 401),
+        ('/api/tenant/{tenant}/status/change/{change}', 401),
+        ('/api/tenant/{tenant}/jobs', 401),
+        ('/api/tenant/{tenant}/job/{job_name}', 401),
+        ('/api/tenant/{tenant}/projects', 401),
+        ('/api/tenant/{tenant}/project/{project}', 401),
+        (('/api/tenant/{tenant}/pipeline/{pipeline}/'
+          'project/{project}/branch/{branch}/freeze-jobs'), 401),
+        ('/api/tenant/{tenant}/pipelines', 401),
+        ('/api/tenant/{tenant}/semaphores', 401),
+        ('/api/tenant/{tenant}/labels', 401),
+        ('/api/tenant/{tenant}/nodes', 401),
+        ('/api/tenant/{tenant}/key/{project}.pub', 401),
+        ('/api/tenant/{tenant}/project-ssh-key/{project}.pub', 401),
+        ('/api/tenant/{tenant}/console-stream', 401),
+        ('/api/tenant/{tenant}/badge', 401),
+        ('/api/tenant/{tenant}/builds', 401),
+        ('/api/tenant/{tenant}/build/{uuid}', 401),
+        ('/api/tenant/{tenant}/buildsets', 401),
+        ('/api/tenant/{tenant}/buildset/{uuid}', 401),
+        ('/api/tenant/{tenant}/config-errors', 401),
+        ('/api/tenant/{tenant}/authorizations', 401),
+        ('/api/tenant/{tenant}/project/{project}/autohold', 401),
+        ('/api/tenant/{tenant}/autohold', 401),
+        ('/api/tenant/{tenant}/autohold/{request_id}', 401),
+        ('/api/tenant/{tenant}/autohold/{request_id}', 401),
+        ('/api/tenant/{tenant}/project/{project}/enqueue', 405),
+        ('/api/tenant/{tenant}/project/{project}/dequeue', 405),
+        ('/api/tenant/{tenant}/promote', 405),
     ]
 
     info_routes = [
@@ -3545,7 +3557,7 @@ class TestWebApiAccessRules(BaseTestWeb):
     ]
 
     def test_read_routes_no_token(self):
-        for route in self.routes:
+        for route, status in self.routes:
             url = route.format(tenant='tenant-one',
                                project='org/project',
                                change='1,1',
@@ -3556,7 +3568,7 @@ class TestWebApiAccessRules(BaseTestWeb):
                                request_id='1')
             resp = self.get_url(url)
             self.assertEqual(
-                401,
+                status,
                 resp.status_code,
                 "get %s failed: %s" % (url, resp.text))
 
