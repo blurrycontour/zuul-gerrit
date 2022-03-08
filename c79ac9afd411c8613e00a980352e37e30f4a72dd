@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb14a352_dcf534ba",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-08T17:37:16Z",
+      "side": 1,
+      "message": "Instead of using a mock for this, can we adjust the fake pull request to accept FakeFiles as arguments and include a previous file parameter to that?  That way we can more easily include tests like this in the future and we\u0027re keeping the fake functionality together?",
+      "revId": "c79ac9afd411c8613e00a980352e37e30f4a72dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
