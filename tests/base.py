@@ -2239,11 +2239,15 @@ class GithubChangeReference(git.Reference):
 class FakeGithubPullRequest(object):
 
     def __init__(self, github, number, project, branch,
-                 subject, upstream_root, files=[], number_of_commits=1,
+                 subject, upstream_root, files=None, number_of_commits=1,
                  writers=[], body=None, body_text=None, draft=False,
                  base_sha=None):
         """Creates a new PR with several commits.
-        Sends an event about opened PR."""
+        Sends an event about opened PR.
+
+        If the `files` argument is provided it must be a dictionary of
+        file names OR FakeFile instances -> content.
+        """
         self.github = github
         self.source = github
         self.number = number
@@ -2255,7 +2259,8 @@ class FakeGithubPullRequest(object):
         self.draft = draft
         self.number_of_commits = 0
         self.upstream_root = upstream_root
-        self.files = []
+        # Dictionary of FakeFile -> content
+        self.files = {}
         self.comments = []
         self.labels = []
         self.statuses = {}
@@ -2272,12 +2277,12 @@ class FakeGithubPullRequest(object):
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
-    def addCommit(self, files=[]):
+    def addCommit(self, files=None):
         """Adds a commit on top of the actual PR head."""
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
-    def forcePush(self, files=[]):
+    def forcePush(self, files=None):
         """Clears actual commits and add a commit on top of the base."""
         self._addCommitToRepo(files=files, reset=True)
         self._updateTimeStamp()
@@ -2443,9 +2448,10 @@ class FakeGithubPullRequest(object):
         GithubChangeReference.create(
             repo, self.getPRReference(), base_sha)
 
-    def _addCommitToRepo(self, files=[], reset=False):
+    def _addCommitToRepo(self, files=None, reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getPRReference()]
+
         if reset:
             self.number_of_commits = 0
             ref.set_object('refs/tags/init')
@@ -2455,13 +2461,23 @@ class FakeGithubPullRequest(object):
         repo.git.clean('-x', '-f', '-d')
 
         if files:
-            self.files = files
+            # Normalize the dictionary of 'Union[str,FakeFile] -> content'
+            # to 'FakeFile -> content'.
+            normalized_files = {}
+            for fn, content in files.items():
+                if isinstance(fn, tests.fakegithub.FakeFile):
+                    normalized_files[fn] = content
+                else:
+                    normalized_files[tests.fakegithub.FakeFile(fn)] = content
+            self.files = normalized_files
         else:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
-            self.files = {fn: "test %s %s\n" % (self.branch, self.number)}
+            content = f"test {self.branch} {self.number}\n"
+            self.files = {tests.fakegithub.FakeFile(fn): content}
+
         msg = self.subject + '-' + str(self.number_of_commits)
-        for fn, content in self.files.items():
-            fn = os.path.join(repo.working_dir, fn)
+        for fake_file, content in self.files.items():
+            fn = os.path.join(repo.working_dir, fake_file.filename)
             with open(fn, 'w') as f:
                 f.write(content)
             repo.index.add([fn])
