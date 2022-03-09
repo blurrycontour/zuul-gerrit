@@ -527,6 +527,13 @@ class Pipeline(object):
                 self.queues.remove(queue)
             queue.delete(self.manager.current_context)
 
+    def promoteQueue(self, queue):
+        if queue not in self.queues:
+            return
+        with self.state.activeContext(self.manager.current_context):
+            self.queues.remove(queue)
+            self.queues.insert(0, queue)
+
     def getChangesInQueue(self):
         changes = []
         for shared_queue in self.queues:
