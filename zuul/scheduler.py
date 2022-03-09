@@ -25,7 +25,7 @@ import traceback
 import uuid
 from contextlib import suppress
 from zuul.vendor.contextlib import nullcontext
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -1659,39 +1659,60 @@ class Scheduler(threading.Thread):
         change_ids = [c.split(',') for c in event.change_ids]
         items_to_enqueue = []
         change_queue = None
-        for shared_queue in pipeline.queues:
-            if change_queue:
-                break
-            for item in shared_queue.queue:
-                if (item.change.number == change_ids[0][0] and
-                        item.change.patchset == change_ids[0][1]):
-                    change_queue = shared_queue
-                    break
-        if not change_queue:
-            raise Exception("Unable to find shared change queue for %s" %
-                            event.change_ids[0])
+
+        # A list of (queue, items); the queue should be promoted
+        # within the pipeline, and the items should be promoted within
+        # the queue.
+        promote_operations = OrderedDict()
         for number, patchset in change_ids:
             found = False
-            for item in change_queue.queue:
-                if (item.change.number == number and
+            for shared_queue in pipeline.queues:
+                for item in shared_queue.queue:
+                    if not item.live:
+                        continue
+                    if (item.change.number == number and
                         item.change.patchset == patchset):
-                    found = True
-                    items_to_enqueue.append(item)
+                        promote_operations.setdefault(
+                            shared_queue, []).append(item)
+                        found = True
+                        break
+                if found:
                     break
             if not found:
-                raise Exception("Unable to find %s,%s in queue %s" %
-                                (number, patchset, change_queue))
-        for item in change_queue.queue[:]:
-            if item not in items_to_enqueue:
-                items_to_enqueue.append(item)
-            pipeline.manager.cancelJobs(item)
-            pipeline.manager.dequeueItem(item)
-        for item in items_to_enqueue:
-            pipeline.manager.addChange(
-                item.change, event,
-                enqueue_time=item.enqueue_time,
-                quiet=True,
-                ignore_requirements=True)
+                raise Exception("Unable to find %s,%s" % (number, patchset))
+
+        # Reverse the promote operations so that we promote the first
+        # change queue last (which will put it at the top).
+        for change_queue, items_to_enqueue in\
+            reversed(promote_operations.items()):
+            # We can leave changes in the pipeline as long as the head
+            # remains identical; as soon as we make a change, we have
+            # to re-enqueue everything behind it in order to ensure
+            # dependencies are correct.
+            head_same = True
+            for item in change_queue.queue[:]:
+                if item.live and item == items_to_enqueue[0] and head_same:
+                    # We can skip this one and leave it in place
+                    items_to_enqueue.pop(0)
+                    continue
+                elif not item.live:
+                    # Ignore this; if the actual item behind it is
+                    # dequeued, it will get cleaned up eventually.
+                    continue
+                if item not in items_to_enqueue:
+                    items_to_enqueue.append(item)
+                head_same = False
+                pipeline.manager.cancelJobs(item)
+                pipeline.manager.dequeueItem(item)
+
+            for item in items_to_enqueue:
+                pipeline.manager.addChange(
+                    item.change, item.event,
+                    enqueue_time=item.enqueue_time,
+                    quiet=True,
+                    ignore_requirements=True)
+            # Regardless, move this shared change queue to the head.
+            pipeline.promoteQueue(change_queue)
 
     def _doDequeueEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
