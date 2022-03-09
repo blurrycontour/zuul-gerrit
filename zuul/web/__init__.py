@@ -125,11 +125,8 @@ class SaveParamsTool(cherrypy.Tool):
 cherrypy.tools.save_params = SaveParamsTool()
 
 
-def handle_options(allowed_methods=None):
+def handle_cors_preflight_and_filter_methods(allowed_methods=['GET',]):
     if cherrypy.request.method == 'OPTIONS':
-        methods = allowed_methods or ['GET', 'OPTIONS']
-        if allowed_methods and 'OPTIONS' not in allowed_methods:
-            methods = methods + ['OPTIONS']
         # discard decorated handler
         request = cherrypy.serving.request
         request.handler = None
@@ -138,15 +135,21 @@ def handle_options(allowed_methods=None):
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Access-Control-Allow-Headers'] =\
             ', '.join(['Authorization', 'Content-Type'])
+        allowed_methods.append('OPTIONS')
         resp.headers['Access-Control-Allow-Methods'] =\
-            ', '.join(methods)
+            ', '.join(allowed_methods)
         # Allow caching of the preflight response
         resp.headers['Access-Control-Max-Age'] = 86400
         resp.status = 204
+        return
+
+    if cherrypy.request.method not in allowed_methods:
+        raise cherrypy.HTTPError(405)
 
 
-cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
-                                              handle_options)
+cherrypy.tools. handle_cors_preflight_and_filter_methods = \
+    cherrypy.Tool('on_start_resource',
+                  handle_cors_preflight_and_filter_methods)
 
 
 class StatsTool(cherrypy.Tool):
@@ -414,13 +417,12 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['POST', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods(
+        allowed_methods=['POST', ])
     def dequeue(self, tenant_name, project_name):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
-        if cherrypy.request.method != 'POST':
-            raise cherrypy.HTTPError(405)
         # AuthN/AuthZ
         claims, token_error = self._auth_token_check()
         if token_error is not None:
@@ -460,13 +462,12 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['POST', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods(
+        allowed_methods=['POST', ])
     def enqueue(self, tenant_name, project_name):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
-        if cherrypy.request.method != 'POST':
-            raise cherrypy.HTTPError(405)
         # AuthN/AuthZ
         claims, token_error = self._auth_token_check()
         if token_error is not None:
@@ -526,13 +527,12 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['POST', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods(
+        allowed_methods=['POST', ])
     def promote(self, tenant_name):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
-        if cherrypy.request.method != 'POST':
-            raise cherrypy.HTTPError(405)
         # AuthN/AuthZ
         claims, token_error = self._auth_token_check()
         if token_error is not None:
@@ -567,17 +567,17 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def autohold_list(self, tenant_name, *args, **kwargs):
         # we don't use json_in because a payload is not mandatory with GET
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         # filter by project if passed as a query string
         project_name = cherrypy.request.params.get('project', None)
         return self._autohold_list(tenant_name, project_name)
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', 'POST', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods(
+        allowed_methods=['GET', 'POST', ])
     def autohold(self, tenant_name, project_name=None):
         # we don't use json_in because a payload is not mandatory with GET
         # Note: GET handling is redundant with autohold_list
@@ -637,8 +637,6 @@ class ZuulWebAPI(object):
             resp = cherrypy.response
             resp.headers['Access-Control-Allow-Origin'] = '*'
             return True
-        else:
-            raise cherrypy.HTTPError(405)
 
     def _autohold(self, tenant_name, project_name, job_name, ref_filter,
                   reason, count, node_hold_expiration):
@@ -700,14 +698,13 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', 'DELETE', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods(
+        allowed_methods=['GET', 'DELETE', ])
     def autohold_by_request_id(self, tenant_name, request_id):
         if cherrypy.request.method == 'GET':
             return self._autohold_info(tenant_name, request_id)
         elif cherrypy.request.method == 'DELETE':
             return self._autohold_delete(tenant_name, request_id)
-        else:
-            raise cherrypy.HTTPError(405)
 
     def _autohold_info(self, tenant_name, request_id):
         request = self._get_autohold_request(tenant_name, request_id)
@@ -773,9 +770,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def index(self):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         return {
             'info': '/api/info',
             'connections': '/api/connections',
@@ -821,17 +817,15 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def info(self):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         return self._handleInfo(self.zuulweb.info)
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def tenant_info(self, tenant):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         info = self.zuulweb.info.copy()
         info.tenant = tenant
         tenant_config = self.zuulweb.unparsed_abide.tenants.get(tenant)
@@ -889,7 +883,7 @@ class ZuulWebAPI(object):
     # TODO(mhu) deprecated, remove next version
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def authorizations(self):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
@@ -913,10 +907,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', ])
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def tenant_authorizations(self, tenant):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -950,9 +942,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def tenants(self):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         result = []
         for tenant_name, tenant in sorted(self.zuulweb.abide.tenants.items()):
             queue_size = 0
@@ -976,9 +967,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def connections(self):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         ret = [s.connection.toDict()
                for s in self.zuulweb.connections.getSources()]
         resp = cherrypy.response
@@ -987,9 +977,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type="application/json; charset=utf-8")
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def components(self):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         ret = {}
         for kind, components in self.zuulweb.component_registry.all():
             for comp in components:
@@ -1077,17 +1066,15 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def status(self, tenant):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         return self._getStatus(tenant)[1]
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def status_change(self, tenant, change):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         payload = self._getStatus(tenant)[0]
         result_filter = ChangeFilter(change)
         return result_filter.filterPayload(payload)
@@ -1097,9 +1084,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler,
     )
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def jobs(self, tenant_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         result = []
         for job_name in sorted(tenant.layout.jobs):
@@ -1139,9 +1125,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def config_errors(self, tenant_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         ret = [
             {'source_context': e.key.context.toDict(),
@@ -1156,9 +1141,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def job(self, tenant_name, job_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         job_variants = tenant.layout.jobs.get(job_name)
         result = []
@@ -1172,9 +1156,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def projects(self, tenant_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         result = []
         for project in tenant.config_projects:
@@ -1194,9 +1177,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def project(self, tenant_name, project_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1226,9 +1208,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def pipelines(self, tenant_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         ret = []
         for pipeline, pipeline_config in tenant.layout.pipelines.items():
@@ -1252,9 +1233,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def labels(self, tenant_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         allowed_labels = tenant.allowed_labels or []
         disallowed_labels = tenant.disallowed_labels or []
@@ -1271,9 +1251,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def nodes(self, tenant):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         ret = []
         for node_id in self.zk_nodepool.getNodes(cached=True):
             node = self.zk_nodepool.getNode(node_id)
@@ -1297,9 +1276,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def key(self, tenant_name, project_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1311,9 +1289,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def project_ssh_key(self, tenant_name, project_name):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1393,13 +1370,12 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
                limit=50, skip=0, idx_min=None, idx_max=None):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         connection = self._get_connection()
 
         if tenant not in self.zuulweb.abide.tenants.keys():
@@ -1432,10 +1408,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def build(self, tenant, uuid):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
-
         connection = self._get_connection()
 
         data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
@@ -1476,10 +1450,8 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def badge(self, tenant, project=None, pipeline=None, branch=None):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
-
         connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
@@ -1503,13 +1475,11 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def buildsets(self, tenant, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
                   uuid=None, result=None, complete=None, limit=50, skip=0,
                   idx_min=None, idx_max=None):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
-
         connection = self._get_connection()
 
         if complete:
@@ -1534,10 +1504,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def buildset(self, tenant, uuid):
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
-
         connection = self._get_connection()
 
         data = connection.getBuildset(tenant, uuid)
@@ -1557,6 +1525,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def project_freeze_jobs(self, tenant_name, pipeline_name, project_name,
                             branch_name):
         item = self._freeze_jobs(
@@ -1578,6 +1547,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def project_freeze_job(self, tenant_name, pipeline_name, project_name,
                            branch_name, job_name):
         # TODO(jhesketh): Allow a canonical change/item to be passed in which
