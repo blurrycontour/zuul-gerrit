@@ -166,7 +166,7 @@ class Change extends React.Component {
 
   renderAdminCommands(idx) {
     const { showAdminActions } = this.state
-    const { queue, pipeline } = this.props
+    const { queue } = this.props
     const dropdownCommands = [
       <DropdownItem
         key="dequeue"
@@ -179,22 +179,18 @@ class Change extends React.Component {
           this.setState(() => ({ showDequeueModal: true }))
         }}
       >Dequeue</DropdownItem>,
+      <DropdownItem
+        key="promote"
+        icon={<AngleDoubleUpIcon style={{
+          color: 'var(--pf-global--default-color--200)',
+        }} />}
+        description="Promote this change to the top of the queue"
+        onClick={(event) => {
+          event.preventDefault()
+          this.setState(() => ({ showPromoteModal: true }))
+        }}
+      >Promote</DropdownItem>
     ]
-    if (pipeline.manager === 'dependent') {
-      dropdownCommands.push(
-        <DropdownItem
-          key="promote"
-          icon={<AngleDoubleUpIcon style={{
-            color: 'var(--pf-global--default-color--200)',
-          }} />}
-          description="Promote this change to the top of the queue"
-          onClick={(event) => {
-            event.preventDefault()
-            this.setState(() => ({ showPromoteModal: true }))
-          }}
-        >Promote</DropdownItem>
-      )
-    }
     return (
       <Dropdown
         title='Actions'
