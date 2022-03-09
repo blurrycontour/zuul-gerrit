@@ -16,6 +16,24 @@
       "message": "nit: Making the attribute always present and checking for None might help avoid AttributeErrors later.",
       "revId": "c3796915332956393c872b89189369b03c7a3dc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "669ab58f_0b91b138",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1728,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-09T15:08:21Z",
+      "side": 1,
+      "message": "The object returned by github3py only has this attribute if the file was moved.",
+      "parentUuid": "cf09382e_bfe24c0c",
+      "revId": "c3796915332956393c872b89189369b03c7a3dc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
