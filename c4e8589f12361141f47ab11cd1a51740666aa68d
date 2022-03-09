@@ -51,6 +51,24 @@
       "parentUuid": "61b861d3_6309c95a",
       "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d41bf33_acb4f6f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-03-09T02:20:45Z",
+      "side": 1,
+      "message": "https://review.opendev.org/c/zuul/zuul/+/832731 implements this general idea",
+      "parentUuid": "88caa9fd_5d95b4bd",
+      "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
