@@ -34,6 +34,23 @@
       "parentUuid": "cb14a352_dcf534ba",
       "revId": "c79ac9afd411c8613e00a980352e37e30f4a72dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86fefd3a_47b961c8",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-09T14:35:55Z",
+      "side": 1,
+      "message": "Yeah -- I think the thing that pushes it over the line for me is thinking about it in terms of wanting our fakes to be good and realistic.  Doing this makes it easy to include this behavior in a future test if we need it.",
+      "revId": "c79ac9afd411c8613e00a980352e37e30f4a72dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
