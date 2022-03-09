@@ -1108,6 +1108,35 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
 
+    def test_bundle_id_in_job_vars(self):
+        A = self.fake_gerrit.addFakeChange("org/project1", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.executor_server.hold_jobs_in_build = True
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Check one of the builds, we check the first one
+        print("vars", self.builds[0].job.combined_variables)
+        var_zuul_items = self.builds[0].job.combined_variables["zuul"]["items"]
+        self.assertEqual(len(var_zuul_items), 2)
+
+        self.assertIn("bundle_id", var_zuul_items[0])
+        bundle_id_0 = var_zuul_items[0]["bundle_id"]
+
+        self.assertIn("bundle_id", var_zuul_items[1])
+        bundle_id_1 = var_zuul_items[1]["bundle_id"]
+
+        self.asserEqual(bundle_id_0, bundle_id_1)
+
     def test_cross_tenant_cycle(self):
         org_project_files = {
             "zuul.yaml": textwrap.dedent(
