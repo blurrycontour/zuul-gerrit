@@ -69,6 +69,7 @@ Name                    Matrix ID
 ======================  ===================================
 Clark Boylan            Clark (@clarkb:matrix.org)
 Clint Byrum             spamaps (@spamaps:spamaps.ems.host)
+Felix Edel              felixedel (@felixedel:matrix.org)
 Ian Wienand             ianw (@iwienand:matrix.org)
 James E. Blair          corvus (@jim:acmegating.com)
 Jens Harbott
