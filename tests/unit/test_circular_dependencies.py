@@ -1108,6 +1108,104 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
 
+    def test_bundle_id_in_zuul_var(self):
+        A = self.fake_gerrit.addFakeChange("org/project1", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
+        C = self.fake_gerrit.addFakeChange("org/project1", "master", "C")
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.executor_server.hold_jobs_in_build = True
+
+        # bundle_id should be in check build of A
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        var_zuul_items = self.builds[0].parameters["zuul"]["items"]
+        self.assertEqual(len(var_zuul_items), 2)
+        self.assertIn("bundle_id", var_zuul_items[0])
+        bundle_id_0 = var_zuul_items[0]["bundle_id"]
+        self.assertIn("bundle_id", var_zuul_items[1])
+        bundle_id_1 = var_zuul_items[1]["bundle_id"]
+        self.assertEqual(bundle_id_0, bundle_id_1)
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # bundle_id should be in check build of B
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        var_zuul_items = self.builds[0].parameters["zuul"]["items"]
+        self.assertEqual(len(var_zuul_items), 2)
+        self.assertIn("bundle_id", var_zuul_items[0])
+        bundle_id_0 = var_zuul_items[0]["bundle_id"]
+        self.assertIn("bundle_id", var_zuul_items[1])
+        bundle_id_1 = var_zuul_items[1]["bundle_id"]
+        self.assertEqual(bundle_id_0, bundle_id_1)
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # bundle_id should no be in check build of C
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        var_zuul_items = self.builds[0].parameters["zuul"]["items"]
+        self.assertEqual(len(var_zuul_items), 1)
+        self.assertNotIn("bundle_id", var_zuul_items[0])
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # bundle_id should be in gate build
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        C.addApproval("Code-Review", 2)
+
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.fake_gerrit.addEvent(C.addApproval("Approved", 1))
+
+        self.waitUntilSettled()
+
+        var_zuul_items = self.builds[-1].parameters["zuul"]["items"]
+
+        print("...............")
+        for build in self.builds:
+            print("-------")
+            print(str(build))
+            print(str(type(build)))
+            print(build.parameters["zuul"]["items"])
+
+        self.assertEqual(len(var_zuul_items), 3)
+        self.assertIn("bundle_id", var_zuul_items[0])
+        bundle_id_0 = var_zuul_items[0]["bundle_id"]
+        self.assertIn("bundle_id", var_zuul_items[1])
+        bundle_id_1 = var_zuul_items[1]["bundle_id"]
+        self.assertEqual(bundle_id_0, bundle_id_1)
+        self.assertNotIn("bundle_id", var_zuul_items[2])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 3)
+        self.assertEqual(B.reported, 3)
+        self.assertEqual(C.reported, 3)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+        self.assertEqual(C.data["status"], "MERGED")
+
     def test_cross_tenant_cycle(self):
         org_project_files = {
             "zuul.yaml": textwrap.dedent(

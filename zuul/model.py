@@ -3885,10 +3885,18 @@ class BuildSet(zkobject.ZKObject):
                              if i not in items)
                 items.reverse()
 
-                self.dependent_changes = [i.change.toDict() for i in items]
+                self.dependent_changes = [self._toChangeDict(i) for i in items]
                 self.merger_items = [i.makeMergerItem() for i in items]
             self.configured = True
             self.configured_time = time.time()
+
+    def _toChangeDict(self, item):
+        # Inject bundle_id to dict if available, this can be used to decide
+        # if changes belongs to the same bunbdle
+        change_dict = item.change.toDict()
+        if item.bundle:
+            change_dict['bundle_id'] = item.bundle.uuid
+        return change_dict
 
     def getStateName(self, state_num):
         return self.states_map.get(
