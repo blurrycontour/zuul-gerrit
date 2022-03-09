@@ -1614,6 +1614,7 @@ class StaticHandler(object):
     def __init__(self, root):
         self.root = root
 
+    @cherrypy.tools.handle_cors_preflight_and_filter_methods()
     def default(self, path, **kwargs):
         # Try to handle static file first
         handled = cherrypy.lib.static.staticdir(
