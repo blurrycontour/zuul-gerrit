@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf09382e_bfe24c0c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1728,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-09T14:39:10Z",
+      "side": 1,
+      "message": "nit: Making the attribute always present and checking for None might help avoid AttributeErrors later.",
+      "revId": "c3796915332956393c872b89189369b03c7a3dc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
