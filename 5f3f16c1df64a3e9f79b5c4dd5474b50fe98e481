@@ -39,6 +39,30 @@
       },
       "revId": "5f3f16c1df64a3e9f79b5c4dd5474b50fe98e481",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e86a6ed0_87b5b4ef",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-03-10T01:55:51Z",
+      "side": 1,
+      "message": "huh, now weird.  definitely not deliberate, but\n \u003e\u003e\u003e sys. path\n [\u0027\u0027, \u0027/usr/lib64/python310.zip\u0027, \n \n \u003e\u003e\u003e sys .path\n \u003e\u003e\u003e [\u0027\u0027, \u0027/usr/lib64/python310.zip\u0027, ...\n\nI never knew that worked",
+      "parentUuid": "7e95b4c7_e3a81f25",
+      "range": {
+        "startLine": 150,
+        "startChar": 15,
+        "endLine": 150,
+        "endChar": 16
+      },
+      "revId": "5f3f16c1df64a3e9f79b5c4dd5474b50fe98e481",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
