@@ -159,34 +159,46 @@ class TimerDriver(Driver, TriggerInterface):
         self.log.debug('Got trigger for tenant %s and pipeline %s with '
                        'timespec %s', tenant.name, pipeline_name, timespec)
         for project_name, pcs in tenant.layout.project_configs.items():
-            # timer operates on branch heads and doesn't need speculative
-            # layouts to decide if it should be enqueued or not.
-            # So it can be decided on cached data if it needs to run or not.
-            pcst = tenant.layout.getAllProjectConfigs(project_name)
-            if not [True for pc in pcst if pipeline_name in pc.pipelines]:
-                continue
+            try:
+                # timer operates on branch heads and doesn't need
+                # speculative layouts to decide if it should be
+                # enqueued or not.  So it can be decided on cached
+                # data if it needs to run or not.
+                pcst = tenant.layout.getAllProjectConfigs(project_name)
+                if not [True for pc in pcst if pipeline_name in pc.pipelines]:
+                    continue
 
-            (trusted, project) = tenant.getProject(project_name)
-            for branch in project.source.getProjectBranches(project, tenant):
-                event = TimerTriggerEvent()
-                event.type = 'timer'
-                event.timespec = timespec
-                event.forced_pipeline = pipeline_name
-                event.project_hostname = project.canonical_hostname
-                event.project_name = project.name
-                event.ref = 'refs/heads/%s' % branch
-                event.branch = branch
-                event.zuul_event_id = str(uuid4().hex)
-                event.timestamp = time.time()
-                # Refresh the branch in order to update the item in the
-                # change cache.
-                change_key = project.source.getChangeKey(event)
-                with self.project_update_locks[project.canonical_name]:
-                    project.source.getChange(change_key, refresh=True,
-                                             event=event)
-                log = get_annotated_logger(self.log, event)
-                log.debug("Adding event")
-                self.sched.addTriggerEvent(self.name, event)
+                (trusted, project) = tenant.getProject(project_name)
+                for branch in project.source.getProjectBranches(
+                        project, tenant):
+                    try:
+                        event = TimerTriggerEvent()
+                        event.type = 'timer'
+                        event.timespec = timespec
+                        event.forced_pipeline = pipeline_name
+                        event.project_hostname = project.canonical_hostname
+                        event.project_name = project.name
+                        event.ref = 'refs/heads/%s' % branch
+                        event.branch = branch
+                        event.zuul_event_id = str(uuid4().hex)
+                        event.timestamp = time.time()
+                        # Refresh the branch in order to update the item in the
+                        # change cache.
+                        change_key = project.source.getChangeKey(event)
+                        with self.project_update_locks[project.canonical_name]:
+                            project.source.getChange(change_key, refresh=True,
+                                                     event=event)
+                        log = get_annotated_logger(self.log, event)
+                        log.debug("Adding event")
+                        self.sched.addTriggerEvent(self.name, event)
+                    except Exception:
+                        self.log.exception("Error dispatching timer event for "
+                                           "project %s branch %s",
+                                           project, branch)
+            except Exception:
+                self.log.exception("Error dispatching timer event for "
+                                   "project %s",
+                                   project)
 
     def stop(self):
         self.stopped = True
