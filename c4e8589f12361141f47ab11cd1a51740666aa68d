@@ -87,6 +87,24 @@
       "parentUuid": "5d41bf33_acb4f6f9",
       "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b237a46_8f20636e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-03-10T02:00:48Z",
+      "side": 1,
+      "message": "I agree, but to the letter of the standard as I read it just returning [GET, OPTIONS] as methods for these pages, with a blank body-content, is appropriate anyway.",
+      "parentUuid": "310f32a0_094a9023",
+      "revId": "c4e8589f12361141f47ab11cd1a51740666aa68d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
