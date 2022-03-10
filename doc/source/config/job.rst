@@ -939,3 +939,15 @@ Here is an example of two job definitions:
 
          Note, however, that this scheme may produce collisions with
          `component` and `component/component`.
+
+      .. value:: unique
+
+         This writes the repository into a directory based on the
+         organization name and the  ``urllib.parse.quote_plus`` formatted
+         project name.  For example::
+
+           src/example.com/organization/organization%2Fproject
+
+
+         This scheme will produce unique workspace paths for every repository
+         and won't cause colisions.

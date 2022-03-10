@@ -1137,6 +1137,12 @@ class TestMergerSchemes(ZuulTestCase):
         merger.getRepo('gerrit', 'org/project1')
         self._assertScheme(self.work_root, 'unique')
 
+        merger = self._getMerger(
+            cache_root=self.cache_root,
+            scheme=zuul.model.SCHEME_FLAT)
+        merger.getRepo('gerrit', 'org/project1')
+        self._assertScheme(self.work_root, 'unique')
+
     def test_golang_scheme(self):
         cache_merger = self._getMerger(work_root=self.cache_root)
         cache_merger.updateRepo('gerrit', 'org/project1')
