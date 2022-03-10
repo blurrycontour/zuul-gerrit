@@ -624,7 +624,7 @@ class JobParser(object):
                       'variant-description': str,
                       'post-review': bool,
                       'match-on-config-updates': bool,
-                      'workspace-scheme': vs.Any('golang', 'flat'),
+                      'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
     }
 
     job_name = {vs.Required('name'): str}
