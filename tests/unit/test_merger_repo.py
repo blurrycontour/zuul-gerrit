@@ -1133,7 +1133,13 @@ class TestMergerSchemes(ZuulTestCase):
                 os.path.join(root, 'project1')))
 
     def test_unique_scheme(self):
-        merger = self._getMerger(scheme=zuul.model.SCHEME_UNIQUE)
+        cache_merger = self._getMerger(work_root=self.cache_root)
+        cache_merger.updateRepo('gerrit', 'org/project1')
+        self._assertScheme(self.cache_root, 'unique')
+
+        merger = self._getMerger(
+            cache_root=self.cache_root,
+            scheme=zuul.model.SCHEME_UNIQUE)
         merger.getRepo('gerrit', 'org/project1')
         self._assertScheme(self.work_root, 'unique')
 

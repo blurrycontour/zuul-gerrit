@@ -106,7 +106,7 @@ NODE_STATES = set([STATE_BUILDING,
 # Workspace scheme
 SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
-SCHEME_UNIQUE = 'unique'  # Internal use only
+SCHEME_UNIQUE = 'unique'
 
 
 def add_debug_line(debug_messages, msg, indent=0):
