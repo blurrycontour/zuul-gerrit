@@ -59,6 +59,7 @@ class ZuulRESTClient(object):
         try:
             req.raise_for_status()
         except Exception as e:
+            print(req.headers)
             if req.status_code == 401:
                 print('Unauthorized - your token might be invalid or expired.')
             elif req.status_code == 403:
