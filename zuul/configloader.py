@@ -1660,9 +1660,15 @@ class TenantParser(object):
         tpc.shadow_projects = frozenset(shadow_projects)
 
     def _getProjectBranches(self, tenant, tpc, branch_cache_min_ltimes=None):
-        if branch_cache_min_ltimes:
-            min_ltime = branch_cache_min_ltimes.get(
-                tpc.project.source.connection.connection_name, -1)
+        if branch_cache_min_ltimes is not None:
+            # Use try/except here instead of .get in order to allow
+            # defaultdict to supply a default other than our default
+            # of -1.
+            try:
+                min_ltime = branch_cache_min_ltimes[
+                    tpc.project.source.connection.connection_name]
+            except KeyError:
+                min_ltime = -1
         else:
             min_ltime = -1
         branches = sorted(tpc.project.source.getProjectBranches(
