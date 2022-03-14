@@ -277,7 +277,7 @@
 
 - project:
     vars:
-      node_version: 14
+      node_version: 16
       release_python: python3
     check:
       jobs:

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM docker.io/library/node:14-bullseye as js-builder
+FROM docker.io/library/node:16-bullseye as js-builder
 
 COPY web /tmp/src
 # Explicitly run the Javascript build
