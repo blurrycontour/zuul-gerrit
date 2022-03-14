@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93e4746b_75078d86",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-14T22:59:00Z",
+      "side": 1,
+      "message": "We usually just use @simple_layout for those -- but I wanted to make sure we had in-repo config for this so that I could validate the results based on branch jobs.",
+      "revId": "7f7c303ef468713805516aafc1f2a9b0f1b1d94a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b654d4c7_e9723515",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-03-14T22:50:06Z",
       "side": 1,
       "message": "This was super unexpected defaultdict behavior for me. Basically bar.get(\u0027foo\u0027, -1) will return -1 rather than the defaultdict default value. However, you don\u0027t get a KeyError if you do bar[\u0027foo\u0027] and that returns the default. I wonder if we should reraise here instead of setting this to -1 to ensure we are using defaultdicts. But this should be fine as is.",
+      "revId": "7f7c303ef468713805516aafc1f2a9b0f1b1d94a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c30e92bf_9e3b695b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-14T22:59:00Z",
+      "side": 1,
+      "message": "I agree, I did not expect that behavior either.\n\nI wrote it this way so that we\u0027re compatible with defaultdict or just a regular dict.  One of the possible values is th LayoutState.branch_cache_min_ltimes which is a regular dict (and since it\u0027s stored in ZK, would be difficult to change to a defaultdict).  All things considered, I think this may be the best solution.",
       "revId": "7f7c303ef468713805516aafc1f2a9b0f1b1d94a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
