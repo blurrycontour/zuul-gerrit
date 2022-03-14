@@ -103,8 +103,8 @@ class PipelineManager(metaclass=ABCMeta):
             if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
                 self.pipeline.state = PipelineState()
                 self.pipeline.state._set(pipeline=self.pipeline)
-                self.pipeline.change_list = PipelineChangeList.create(
-                    self.pipeline)
+                self.pipeline.change_list = PipelineChangeList()
+                self.pipeline.change_list._set(pipeline=self.pipeline)
                 return
 
         with pipeline_lock(
