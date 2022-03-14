@@ -1317,13 +1317,22 @@ class Scheduler(threading.Thread):
                     # Consider caches always valid
                     min_ltimes = defaultdict(
                         lambda: defaultdict(lambda: -1))
+                    # Consider all project branch caches valid.
+                    ltime = self.zk_client.getCurrentLtime()
+                    branch_cache_min_ltimes = defaultdict(lambda: -1)
                 else:
+                    # Invalidate the branch cache for all connections
+                    for connection in self.connections.connections.values():
+                        if hasattr(connection, 'clearBranchCache'):
+                            connection.clearBranchCache()
+                    # Consider the branch cache valid only after we
+                    # cleared it
+                    ltime = self.zk_client.getCurrentLtime()
+                    branch_cache_min_ltimes = defaultdict(lambda: ltime)
+
                     # Consider caches valid if the cache ltime >= event ltime
                     min_ltimes = defaultdict(
                         lambda: defaultdict(lambda: event.zuul_event_ltime))
-
-                # Consider all project branch caches valid.
-                branch_cache_min_ltimes = defaultdict(lambda: -1)
 
                 stats_key = f'zuul.tenant.{tenant_name}'
                 with tenant_write_lock(

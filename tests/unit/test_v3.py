@@ -388,6 +388,32 @@ class TestFinal(ZuulTestCase):
         self.assertIn('Unable to modify final job', A.messages[0])
 
 
+class TestBranchCreation(ZuulTestCase):
+    tenant_config_file = 'config/one-project/main.yaml'
+
+    def test_missed_branch_create(self):
+        # Test that if we miss a branch creation event, we can recover
+        # by issuing a full-reconfiguration.
+        self.create_branch('org/project', 'stable/yoga')
+        # We do not emit the gerrit event, thus simulating a missed event;
+        # verify that nothing happens
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable/yoga', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 0)
+        self.assertHistory([])
+
+        # Correct the situation with a full reconfiguration
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1)
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1')])
+
+
 class TestBranchDeletion(ZuulTestCase):
     tenant_config_file = 'config/branch-deletion/main.yaml'
 
