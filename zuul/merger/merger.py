@@ -443,18 +443,13 @@ class Repo(object):
     def getPackedRefs(self, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         refs = repo.git.for_each_ref(
-            '--format=%(objectname) %(objecttype) %(refname)'
+            '--format=%(objectname) %(refname)'
         )
-        packed_refs = {}
         for ref in refs.splitlines():
             parts = ref.split(" ")
-            if len(parts) == 3:
-                packed_refs[parts[2]] = {
-                    "ref": parts[2],
-                    "commit": parts[0],
-                    "type": parts[1]
-                }
-        return packed_refs
+            if len(parts) == 2:
+                commit, ref = parts
+                yield commit, ref
 
     def setRef(self, path, hexsha, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
@@ -952,25 +947,20 @@ class Merger(object):
         projects = repo_state.setdefault(connection_name, {})
         project = projects.setdefault(project_name, {})
 
-        packed_refs = repo.getPackedRefs()
-
-        for ref in repo.getRefs():
-            if ref.path.startswith('refs/zuul/'):
+        for commit, ref in repo.getPackedRefs():
+            if ref.startswith('refs/zuul/'):
                 continue
-            if ref.path.startswith('refs/remotes/'):
+            if ref.startswith('refs/remotes/'):
                 continue
-            if ref.path.startswith('refs/heads/'):
-                branch = ref.path[len('refs/heads/'):]
+            if ref.startswith('refs/heads/'):
+                branch = ref[len('refs/heads/'):]
                 if branches is not None and branch not in branches:
                     continue
                 key = (connection_name, project_name, branch)
                 if key not in recent:
-                    recent[key] = ref.object
+                    recent[key] = commit
 
-            if ref.path in packed_refs:
-                project[ref.path] = packed_refs[ref.path]["commit"]
-            else:
-                project[ref.path] = ref.object.hexsha
+            project[ref] = commit
 
     def _alterRepoState(self, connection_name, project_name,
                         repo_state, path, hexsha):
@@ -1090,7 +1080,7 @@ class Merger(object):
         if not commit:
             return None, None
         # Store this commit as the most recent for this project-branch
-        recent[key] = commit
+        recent[key] = commit.hexsha
 
         # Make sure to have a local ref that points to the  most recent
         # (intermediate) speculative state of a branch, so commits are not
@@ -1156,10 +1146,7 @@ class Merger(object):
                         project=item['project'],
                         branch=item['branch'],
                         files=repo_files))
-        ret_recent = {}
-        for k, v in recent.items():
-            ret_recent[k] = v.hexsha
-        return commit.hexsha, read_files, repo_state, ret_recent, orig_commit
+        return commit.hexsha, read_files, repo_state, recent, orig_commit
 
     def setRepoState(self, connection_name, project_name, repo_state,
                      zuul_event_id=None, process_worker=None):
