@@ -263,7 +263,7 @@ class SQLConnection(BaseConnection):
                 self.dburi,
                 poolclass=sqlalchemy.pool.QueuePool,
                 pool_recycle=self.connection_config.get('pool_recycle', 1),
-                future=True)
+                pool_pre_ping=True, future=True)
 
             # If we want the objects returned from query() to be
             # usable outside of the session, we need to expunge them
