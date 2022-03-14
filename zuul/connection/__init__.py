@@ -315,6 +315,15 @@ class ZKBranchCacheMixin:
             # again.
             event.branch_protected = True
 
+    def clearBranchCache(self):
+        """Clear the branch cache
+
+        In case the branch cache gets out of sync with the source,
+        this method can be called to clear it and force querying the
+        source the next time the cache is used.
+        """
+        self._branch_cache.clear()
+
 
 class ZKChangeCacheMixin:
     # Expected to be defined by the connection and to be an instance
