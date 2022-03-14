@@ -13,6 +13,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import functools
 import urllib
 from collections import defaultdict
 
@@ -468,9 +469,20 @@ class FakeIssue(object):
         return self._fake_pull_request.number
 
 
+@functools.total_ordering
 class FakeFile(object):
-    def __init__(self, filename):
+    def __init__(self, filename, previous_filename=None):
         self.filename = filename
+        if previous_filename is not None:
+            self.previous_filename = previous_filename
+
+    def __eq__(self, other):
+        return self.filename == other.filename
+
+    def __lt__(self, other):
+        return self.filename < other.filename
+
+    __hash__ = object.__hash__
 
 
 class FakePull(object):
@@ -482,8 +494,7 @@ class FakePull(object):
 
     def files(self):
         # Github lists max. 300 files of a PR in alphabetical order
-        return [FakeFile(fn)
-                for fn in sorted(self._fake_pull_request.files)][:300]
+        return sorted(self._fake_pull_request.files)[:300]
 
     def reviews(self):
         return self._fake_pull_request.reviews

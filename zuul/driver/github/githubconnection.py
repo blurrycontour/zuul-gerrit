@@ -1721,7 +1721,13 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                  'asynchronously', number, owner, proj)
                 pr['files'] = None
             else:
-                pr['files'] = [f.filename for f in probj.files()]
+                files = []
+                for pr_file in probj.files():
+                    files.append(pr_file.filename)
+                    # Also include the old path if a file was renamed.
+                    if hasattr(pr_file, "previous_filename"):
+                        files.append(pr_file.previous_filename)
+                pr['files'] = files
         except github3.exceptions.ServerError as exc:
             # NOTE: For PRs with a lot of lines changed, Github will return
             # an error (HTTP 500) because it can't generate the diff.
