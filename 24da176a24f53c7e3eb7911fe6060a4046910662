@@ -16,6 +16,23 @@
       "message": "log.exception() doesn\u0027t reraise the exception. Should not the exception be reraised as in the base revision?",
       "revId": "24da176a24f53c7e3eb7911fe6060a4046910662",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fac25599_67cfc69b",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-14T16:01:43Z",
+      "side": 1,
+      "message": "No it should not; the only thing that would do is emit the traceback to the console, which is the behavior we want to end.",
+      "revId": "24da176a24f53c7e3eb7911fe6060a4046910662",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
