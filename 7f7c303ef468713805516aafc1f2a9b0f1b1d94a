@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d32f9951_053722c8",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 392,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-14T22:50:06Z",
+      "side": 1,
+      "message": "I\u0027m surprised we didn\u0027t already have a super basic config for tests, but looking it seems like we don\u0027t.",
+      "revId": "7f7c303ef468713805516aafc1f2a9b0f1b1d94a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b654d4c7_e9723515",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1671,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-14T22:50:06Z",
+      "side": 1,
+      "message": "This was super unexpected defaultdict behavior for me. Basically bar.get(\u0027foo\u0027, -1) will return -1 rather than the defaultdict default value. However, you don\u0027t get a KeyError if you do bar[\u0027foo\u0027] and that returns the default. I wonder if we should reraise here instead of setting this to -1 to ensure we are using defaultdicts. But this should be fine as is.",
+      "revId": "7f7c303ef468713805516aafc1f2a9b0f1b1d94a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
