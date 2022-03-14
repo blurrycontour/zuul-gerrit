@@ -190,7 +190,11 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         return sorted(requests)
 
     def next(self):
-        yield from self.inState(self.request_class.REQUESTED)
+        for request in self.inState(self.request_class.REQUESTED):
+            request = self._cached_requests.get(request.path)
+            if (request and
+                request.state == self.request_class.REQUESTED):
+                yield request
 
     def submit(self, request, params, needs_result=False):
         log = get_annotated_logger(self.log, event=request.event_id)
