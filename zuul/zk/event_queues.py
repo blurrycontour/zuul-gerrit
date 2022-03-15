@@ -225,7 +225,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         if not self._remove(event.ack_ref.path, event.ack_ref.version):
             self.log.warning("Event %s was already acknowledged", event)
 
-    def _put(self, data):
+    def _put(self, data, updater=None):
         # Event data can be large, so we want to shard it.  But events
         # also need to be atomic (we don't want an event listener to
         # start processing a half-stored event).  A natural solution
@@ -247,13 +247,30 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         # contains the bulk of the data.  We extract it here into the
         # side channel data, then in _iterEvents we re-constitute it
         # into the dictionary.
+        #
+        # If `updater` is supplied, it is a RequestUpdater instance, and
+        # we are engaged in a cooperative transaction with a job
+        # request.
 
-        # Add a trailing / for our sequence nodes
-        event_path = f"{self.event_root}/"
+        # Add a trailing /q for our sequence nodes; transaction
+        # sequence nodes need a character after / otherwise they drop
+        # the /.
+        event_path = f"{self.event_root}/q"
 
+        if updater and not updater.preRun():
+            # Don't even try the update
+            return
+
+        # Write the side channel data here under the assumption that
+        # the transaction will proceed.  If the transaction fails, it
+        # will be cleaned up after about 5 minutes.
         side_channel_data = None
+        size_limit = sharding.NODE_BYTE_SIZE_LIMIT
+        if updater:
+            # If we are in a transaction, leave enough room to share.
+            size_limit /= 2
         encoded_data = json.dumps(data, sort_keys=True).encode("utf-8")
-        if (len(encoded_data) > sharding.NODE_BYTE_SIZE_LIMIT
+        if (len(encoded_data) > size_limit
             and 'event_data' in data):
             # Get a unique data node
             data_id = str(uuid.uuid4())
@@ -269,8 +286,27 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
                     self.kazoo_client, data_root) as stream:
                 stream.write(side_channel_data)
 
-        return self.kazoo_client.create(
-            event_path, encoded_data, sequence=True)
+        if updater is None:
+            return self.kazoo_client.create(
+                event_path, encoded_data, sequence=True)
+
+        # The rest of the method is the updater case.  Start a
+        # transaction.
+        transaction = self.kazoo_client.transaction()
+
+        # Add transaction tasks.
+        transaction.create(event_path, encoded_data, sequence=True)
+        updater.run(transaction)
+
+        # Commit the transaction and process the results.  `results`
+        # is an array of either exceptions or return values
+        # corresponding to the operations in order.
+        result = transaction.commit()
+        if isinstance(result[0], Exception):
+            raise result[0]
+
+        updater.postRun(result[1])
+        return result[0]
 
     def _iterEvents(self):
         try:
@@ -691,12 +727,12 @@ class PipelineResultEventQueue(ZooKeeperEventQueue):
     def _createRegistry(cls, client, tenant_name):
         return DefaultKeyDict(lambda p: cls(client, tenant_name, p))
 
-    def put(self, event):
+    def put(self, event, updater=None):
         data = {
             "event_type": type(event).__name__,
             "event_data": event.toDict(),
         }
-        self._put(data)
+        self._put(data, updater)
 
     def __iter__(self):
         for data, ack_ref, _ in self._iterEvents():

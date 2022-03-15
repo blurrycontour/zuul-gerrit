@@ -3171,6 +3171,8 @@ class JobRequest:
 
     ALL_STATES = (UNSUBMITTED, REQUESTED, HOLD, RUNNING, COMPLETED)
 
+    # This object participates in transactions, and therefore must
+    # remain small and unsharded.
     def __init__(self, uuid, precedence=None, state=None, result_path=None):
         self.uuid = uuid
         if precedence is None:

@@ -133,6 +133,9 @@ class ExecutorApi:
     def submit(self, request, params):
         return self.zone_queues[request.zone].submit(request, params)
 
+    def getRequestUpdater(self, request):
+        return self.zone_queues[request.zone].getRequestUpdater(request)
+
     def update(self, request):
         return self.zone_queues[request.zone].update(request)
 
