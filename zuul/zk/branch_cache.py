@@ -104,6 +104,13 @@ class BranchCache:
                 self.cache = BranchCacheZKObject.new(
                     self.zk_context, _path=data_path)
 
+    def clear(self):
+        """Clear the cache"""
+        with locked(self.wlock):
+            with self.cache.activeContext(self.zk_context):
+                self.cache.protected.clear()
+                self.cache.remainder.clear()
+
     def getProjectBranches(self, project_name, exclude_unprotected,
                            min_ltime=-1):
         """Get the branch names for the given project.

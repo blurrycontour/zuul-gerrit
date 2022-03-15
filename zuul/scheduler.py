@@ -1303,6 +1303,25 @@ class Scheduler(threading.Thread):
             loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
 
+            if event.smart:
+                # Consider caches always valid
+                min_ltimes = defaultdict(
+                    lambda: defaultdict(lambda: -1))
+                # Consider all project branch caches valid.
+                branch_cache_min_ltimes = defaultdict(lambda: -1)
+            else:
+                # Consider caches valid if the cache ltime >= event ltime
+                min_ltimes = defaultdict(
+                    lambda: defaultdict(lambda: event.zuul_event_ltime))
+                # Invalidate the branch cache for all connections
+                for connection in self.connections.connections.values():
+                    if hasattr(connection, 'clearBranchCache'):
+                        connection.clearBranchCache()
+                ltime = self.zk_client.getCurrentLtime()
+                # Consider the branch cache valid only after we
+                # cleared it
+                branch_cache_min_ltimes = defaultdict(lambda: ltime)
+
             for tenant_name in tenant_names:
                 if event.smart:
                     old_tenant = old_unparsed_abide.tenants.get(tenant_name)
@@ -1313,17 +1332,6 @@ class Scheduler(threading.Thread):
                     continue
 
                 old_tenant = self.abide.tenants.get(tenant_name)
-                if event.smart:
-                    # Consider caches always valid
-                    min_ltimes = defaultdict(
-                        lambda: defaultdict(lambda: -1))
-                else:
-                    # Consider caches valid if the cache ltime >= event ltime
-                    min_ltimes = defaultdict(
-                        lambda: defaultdict(lambda: event.zuul_event_ltime))
-
-                # Consider all project branch caches valid.
-                branch_cache_min_ltimes = defaultdict(lambda: -1)
 
                 stats_key = f'zuul.tenant.{tenant_name}'
                 with tenant_write_lock(
