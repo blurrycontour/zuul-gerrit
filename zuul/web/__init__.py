@@ -1359,6 +1359,7 @@ class ZuulWebAPI(object):
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
+               order_by=None,
                limit=50, skip=0, idx_min=None, idx_max=None):
         connection = self._get_connection()
 
@@ -1383,6 +1384,7 @@ class ZuulWebAPI(object):
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
             result=result, final=final, held=held, complete=complete,
+            order_by=order_by,
             limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
 
         resp = cherrypy.response

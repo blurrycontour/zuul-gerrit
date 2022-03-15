@@ -65,7 +65,8 @@ class DatabaseSession(object):
                   first_build_start_time=None, last_build_end_time=None,
                   uuid=None, job_name=None, voting=None, nodeset=None,
                   result=None, provides=None, final=None, held=None,
-                  complete=None, sort_by_buildset=False, limit=50,
+                  complete=None, sort_by_buildset=False, order_by=None,
+                  limit=50,
                   offset=0, idx_min=None, idx_max=None):
 
         build_table = self.connection.zuul_build_table
@@ -131,6 +132,8 @@ class DatabaseSession(object):
             # query can be much faster as it may avoid the use of a
             # temporary table.
             q = q.order_by(buildset_table.c.id.desc())
+        elif order_by:
+            q = q.order_by(sa.desc(order_by))
         else:
             q = q.order_by(build_table.c.id.desc())
         q = q.limit(limit).offset(offset)

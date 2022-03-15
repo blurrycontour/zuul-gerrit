@@ -1473,6 +1473,12 @@ class TestBuildInfo(BaseTestWeb):
         resp = self.get_url("api/tenant/tenant-one/build/1234")
         self.assertEqual(404, resp.status_code)
 
+        order_builds_query = self.get_url("api/tenant/tenant-one/builds?"
+                                    "project=org/project&"
+                                    "project=org/project1&"
+                                    "order_by=end_time").json()
+        self.assertEqual(len(order_builds_query), 6)
+
         builds_query = self.get_url("api/tenant/tenant-one/builds?"
                                     "project=org/project&"
                                     "project=org/project1").json()
