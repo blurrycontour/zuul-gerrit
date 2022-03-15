@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d82754b_59c6d7d0",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-15T22:36:56Z",
+      "side": 1,
+      "message": "Please do not break HEAD.",
+      "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77b89afd_3c4adad7",
