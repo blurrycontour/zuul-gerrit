@@ -31,7 +31,7 @@ import textwrap
 import types
 import itertools
 
-from kazoo.exceptions import NodeExistsError, NoNodeError, ZookeeperError
+from kazoo.exceptions import NodeExistsError, NoNodeError
 from cachetools.func import lru_cache
 
 from zuul.lib import yamlutil as yaml
@@ -801,24 +801,8 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         )
 
     def refresh(self, context):
-        # See comment above about reading without a lock.
-        retry_count = 0
-        max_retries = 5
-        while context.sessionIsValid():
-            try:
-                super().refresh(context)
-                return
-            except ZookeeperError:
-                # These errors come from the server and are not
-                # retryable.  Connection errors are KazooExceptions so
-                # they aren't caught here and we will retry.
-                raise
-            except Exception:
-                context.log.error("Failed to refresh change list")
-                if retry_count >= max_retries:
-                    raise
-                retry_count += 1
-                time.sleep(self._retry_interval)
+        self._retry(context, super().refresh,
+                    context, max_tries=5)
 
     def getPath(self):
         return self.getChangeListPath(self.pipeline)
