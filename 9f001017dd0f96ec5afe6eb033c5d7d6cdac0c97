@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ad2efa0_cfe300fd",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-15T20:49:27Z",
+      "side": 1,
+      "message": "Should we also allow HEAD requests?",
+      "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77b89afd_3c4adad7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-15T20:49:27Z",
+      "side": 1,
+      "message": "Should we be using this decorator to set allowed_methods instead?",
+      "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
