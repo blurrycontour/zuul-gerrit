@@ -94,6 +94,9 @@ class Repo(object):
         self.username = username
         self.cache_path = cache_path
         self._initialized = False
+        # For debug only
+        self.debug_messages = {}
+
         try:
             self._setup_known_hosts()
         except Exception:
@@ -163,7 +166,25 @@ class Repo(object):
 
             log.debug("Cloning from %s to %s",
                       redact_url(clone_url), self.local_path)
+            # Insert debug before clone
+            try:
+                if self.cache_path:
+                    self.debug_messages["Branchs in cache before clone"] = str(
+                        git.cmd.Git(self.cache_path).branch())
+            except Exception:
+                pass
+
             self._git_clone(clone_url, zuul_event_id, build=build)
+
+            # Insert debug after clone
+            try:
+                self.debug_messages["Remote branchs in workspace"] = str(
+                    git.cmd.Git(self.local_path).branch("-r"))
+                if self.cache_path:
+                    self.debug_messages["Branchs in cache after clone"] = str(
+                        git.cmd.Git(self.cache_path).branch())
+            except Exception:
+                pass
 
         repo = git.Repo(self.local_path)
         repo.git.update_environment(**self.env)
@@ -500,9 +521,10 @@ class Repo(object):
             origin_ref = repo.remotes.origin.refs[branch]
         except IndexError:
             log.warning("No remote ref found for branch %s", branch)
-            return
+            return False
         log.debug("Updating remote reference %s to %s", origin_ref, rev)
         origin_ref.commit = rev
+        return True
 
     def deleteRef(self, path, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
@@ -1059,8 +1081,12 @@ class Merger(object):
             # Set origin branch to the rev of the current (speculative) base.
             # This allows tools to determine the commits that are part of a
             # change by looking at origin/master..master.
-            repo.setRemoteRef(item['branch'], base,
-                              zuul_event_id=zuul_event_id)
+            result = repo.setRemoteRef(item['branch'], base,
+                                       zuul_event_id=zuul_event_id)
+            # Only print debug info when there is missing remote ref
+            if not result:
+                log.debug("Missing remote ref debug messages: %s",
+                          str(repo.debug_messages))
 
         # Merge the change
         orig_commit, commit = self._mergeChange(item, base, zuul_event_id)
