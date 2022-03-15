@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e024082_dbbb35d2",
+        "filename": "doc/source/vulnerabilities.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-03-15T11:04:32Z",
+      "side": 1,
+      "message": "These also no longer exist, maybe drop?",
+      "revId": "1abe814d4819404982697881be285b662c449775",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
