@@ -56,13 +56,9 @@ fingerprints:
 .. TODO: add some more contacts/keys here
 
 * Jeremy Stanley <fungi@yuggoth.org>:
-  `key 0x97ae496fc02dec9fc353b2e748f9961143495829`_ (details__)
+  `key 0x97ae496fc02dec9fc353b2e748f9961143495829
+  <_static/0x97ae496fc02dec9fc353b2e748f9961143495829.txt>`_
 
 * Tobias Henkel <tobias.henkel@bmw.de>:
-  `key 0xfb2ee15b2f0f12662b68ed9603750dec158e5fa2`_ (details__)
-
-.. _`key 0x97ae496fc02dec9fc353b2e748f9961143495829`: _static/0x97ae496fc02dec9fc353b2e748f9961143495829.txt
-.. __: http://pool.sks-keyservers.net:11371/pks/lookup?op=vindex&search=0x97ae496fc02dec9fc353b2e748f9961143495829&fingerprint=on
-
-.. _`key 0xfb2ee15b2f0f12662b68ed9603750dec158e5fa2`: _static/0xfb2ee15b2f0f12662b68ed9603750dec158e5fa2.txt
-.. __: http://pool.sks-keyservers.net:11371/pks/lookup?op=vindex&search=0xfb2ee15b2f0f12662b68ed9603750dec158e5fa2&fingerprint=on
+  `key 0xfb2ee15b2f0f12662b68ed9603750dec158e5fa2
+  <_static/0xfb2ee15b2f0f12662b68ed9603750dec158e5fa2.txt>`_
