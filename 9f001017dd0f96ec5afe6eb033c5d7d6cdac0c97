@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fc10b79e_c6a21594",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-03-15T22:40:07Z",
+      "side": 1,
+      "message": "Thanks, yep as discussed I think you\u0027re right that currently this passes back everything, and cherrypy must lop off the actual content when responding to a HEAD request.\n\nI can update this to do the same.  We can unit test as well by comparing a GET and HEAD and make sure the headers match up.",
+      "parentUuid": "1ad2efa0_cfe300fd",
+      "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "77b89afd_3c4adad7",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 5
@@ -65,6 +83,24 @@
       "writtenOn": "2022-03-15T20:49:27Z",
       "side": 1,
       "message": "Should we be using this decorator to set allowed_methods instead?",
+      "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48916e45_2a727367",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-03-15T22:40:07Z",
+      "side": 1,
+      "message": "That was suggested and I proposed that separately as a follow-on; see https://review.opendev.org/#/q/Ib292219e598f6923d2abff4950fe0730a5bcbcb7",
+      "parentUuid": "77b89afd_3c4adad7",
       "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
