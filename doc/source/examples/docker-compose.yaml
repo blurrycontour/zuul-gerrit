@@ -132,7 +132,7 @@ services:
       - "./etc_nodepool/:/etc/nodepool/:z"
       - "certs:/var/certs:z"
     ports:
-      - "8022:8022"
+      - "8005:8005"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && nodepool-launcher -f'"
     networks:
       - zuul
