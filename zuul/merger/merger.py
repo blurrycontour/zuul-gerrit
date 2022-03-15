@@ -500,9 +500,10 @@ class Repo(object):
             origin_ref = repo.remotes.origin.refs[branch]
         except IndexError:
             log.warning("No remote ref found for branch %s", branch)
-            return
+            return False
         log.debug("Updating remote reference %s to %s", origin_ref, rev)
         origin_ref.commit = rev
+        return True
 
     def deleteRef(self, path, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
@@ -1030,6 +1031,16 @@ class Merger(object):
         repo = self.getRepo(item['connection'], item['project'])
         key = (item['connection'], item['project'], item['branch'])
 
+        # To toubleshoot the missing remote ref issue, we need to collect
+        # some debug messages, but only log it when the issue happens
+        debug_messages = {}
+        # Insert debug message for missing remote ref issue
+        try:
+            debug_messages["Just cloned"] = str(
+                git.cmd.Git(repo.local_path).branch("-r"))
+        except Exception:
+            pass
+
         # We need to merge the change
         # Get the most recent commit for this project-branch
         base = recent.get(key)
@@ -1043,9 +1054,27 @@ class Merger(object):
             except Exception:
                 log.exception("Unable to reset repo %s" % repo)
                 return None, None
+
+            # Insert debug message for missing remote ref issue
+            try:
+                debug_messages["After reset"] = str(
+                    git.cmd.Git(repo.local_path).branch("-r"))
+                debug_messages["Repo state"] = str(
+                    repo_state.get(item['connection'], {})
+                    .get(item['project'], {}))
+            except Exception:
+                pass
+
             self._restoreRepoState(item['connection'], item['project'], repo,
                                    repo_state, zuul_event_id,
                                    process_worker=process_worker)
+
+            # Insert debug message for missing remote ref issue
+            try:
+                debug_messages["After restore"] = str(
+                    git.cmd.Git(repo.local_path).branch("-r"))
+            except Exception:
+                pass
 
             base = repo.getBranchHead(item['branch'])
             # Save the repo state so that later mergers can repeat
@@ -1059,8 +1088,13 @@ class Merger(object):
             # Set origin branch to the rev of the current (speculative) base.
             # This allows tools to determine the commits that are part of a
             # change by looking at origin/master..master.
-            repo.setRemoteRef(item['branch'], base,
-                              zuul_event_id=zuul_event_id)
+            result = repo.setRemoteRef(item['branch'], base,
+                                       zuul_event_id=zuul_event_id)
+            # Only print debug info when there is missing remote ref
+            result = False
+            if not result:
+                log.debug("Missing remote ref debug messages: %s",
+                          str(debug_messages))
 
         # Merge the change
         orig_commit, commit = self._mergeChange(item, base, zuul_event_id)
