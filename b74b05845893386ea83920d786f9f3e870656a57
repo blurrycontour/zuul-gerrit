@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e Implementation lgtm, but this needs a test. You could do something similar like test_circular_config_change_job_vars where you enqueue a cycle and check the vars of the build.\n\nTest implemented in patch set 3, please review again.",
       "revId": "b74b05845893386ea83920d786f9f3e870656a57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24dd2128_23807955",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1113,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-16T23:45:29Z",
+      "side": 1,
+      "message": "I think we should have one more change, but no depends-on.  We should enqueue it into gate after A and B, and we should verify that it has no bundle id.  That way we have confirmed that we aren\u0027t accidentally setting the same bundle id for every change.",
+      "revId": "b74b05845893386ea83920d786f9f3e870656a57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
