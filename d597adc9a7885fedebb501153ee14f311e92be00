@@ -52,6 +52,24 @@
       "parentUuid": "6e45de97_76a051f9",
       "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa8526ee_8b183bf3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-16T09:31:24Z",
+      "side": 1,
+      "message": "That was my original plan, see: https://review.opendev.org/c/zuul/zuul/+/832258\n\nI liked the caching approach seen in this present patch because it had a minimal impact on the GUI, ie no need to handle cases in the redux engine when to use names_only or not, or to have a new entry in the redux store for tenants only. I\u0027d have to rework 810955 quite a bit if I were to rebase on top of 832258.\n\nWe could also handle caching at the GUI level, add an option to fetchTenantsIfNeeded to not call the API if tenants info is already in the store when invoked by the tenants dropdown component - if it is possible at all.\n\nThat\u0027s now 3 different approaches for this feature, so I\u0027d appreciate a definitive opinion before going further with it. :)",
+      "parentUuid": "b25bd644_c159a455",
+      "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
