@@ -34,6 +34,24 @@
       "parentUuid": "960ea19f_e99cce35",
       "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b25bd644_c159a455",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-03-16T06:49:01Z",
+      "side": 1,
+      "message": "Maybe we could enhance the /tenants endpoint to only provide the list of tenant names (by adding a get parameter like `names_only`) or add a new endpoint for this. Currently, the costly part of the /tenants endpoint is iterating over all pipelines to get the length of the queues (which iterates directly over the ZooKeeper data structure). However, for a functionality like this, the tenant names would be sufficient (which are looked up from the local abide object in zuul-web directly, so that doesn\u0027t involve any ZooKeeper operations).\n\nWith both in place (tenant names endpoint and tenant dropdown) we could further reduce the amount of requests to the tenants/ endpoint as a user doesn\u0027t need to visit the tenants page to simply switch tenants.",
+      "parentUuid": "6e45de97_76a051f9",
+      "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
