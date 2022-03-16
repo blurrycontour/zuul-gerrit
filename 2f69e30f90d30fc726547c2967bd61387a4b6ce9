@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "732c644e_a6d6651b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-16T23:56:22Z",
+      "side": 1,
+      "message": "It\u0027s not clear to me either, and I wrote it.\n\nI can\u0027t think of a reason not to support this.",
+      "revId": "2f69e30f90d30fc726547c2967bd61387a4b6ce9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "8827c7aa_04709327",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
