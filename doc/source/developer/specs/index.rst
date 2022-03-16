@@ -23,3 +23,4 @@ documentation instead.
    enhanced-regional-executors
    tenant-resource-quota
    community-matrix
+   unrestricted-ansible
