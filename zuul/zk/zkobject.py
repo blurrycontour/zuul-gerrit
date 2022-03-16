@@ -210,7 +210,7 @@ class ZKObject:
                 if obj in seen:
                     return 0, 0
                 seen.add(obj)
-                compress, uncompressed = obj.estimateDataSize(seen)
+                compressed, uncompressed = obj.estimateDataSize(seen)
             elif (isinstance(obj, dict) or
                   isinstance(obj, types.MappingProxyType)):
                 for sub in obj.values():

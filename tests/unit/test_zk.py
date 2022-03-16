@@ -1634,8 +1634,16 @@ class TestZKObject(ZooKeeperBaseTestCase):
                                               '/zuul/pipeline/fake_tenant')
             self.assertEqual(pipeline2.foo, 'bar')
 
-        compressed_size, uncompressed_size = pipeline1.estimateDataSize()
+        compressed_size, uncompressed_size = pipeline2.estimateDataSize()
         self.assertTrue(compressed_size != uncompressed_size != 0)
+
+        # Test that nested ZKObject sizes are summed up correctly
+        p1_compressed, p1_uncompressed = pipeline1.estimateDataSize()
+        p2_compressed, p2_uncompressed = pipeline2.estimateDataSize()
+        pipeline2._set(other=pipeline1)
+        compressed_size, uncompressed_size = pipeline2.estimateDataSize()
+        self.assertEqual(compressed_size, p1_compressed + p2_compressed)
+        self.assertEqual(uncompressed_size, p1_uncompressed + p2_uncompressed)
 
         def get_ltime(obj):
             zstat = self.zk_client.client.exists(obj.getPath())
