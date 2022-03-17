@@ -158,6 +158,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6772220b_908c89f4",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:14:01Z",
+      "side": 1,
+      "message": "Tristan, yes, a successful exploit would get access to ZK and therefore all Zuul secrets.",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5eec9b1_0ceaa702",
