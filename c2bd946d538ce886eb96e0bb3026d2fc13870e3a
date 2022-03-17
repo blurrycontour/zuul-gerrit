@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2788d8bb_920129e2",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 717,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T15:51:40Z",
+      "side": 1,
+      "message": "Should this happen after the config update to ensure we don\u0027t race the next timer trigger?",
+      "revId": "c2bd946d538ce886eb96e0bb3026d2fc13870e3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
