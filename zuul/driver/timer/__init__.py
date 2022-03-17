@@ -153,7 +153,7 @@ class TimerDriver(Driver, TriggerInterface):
             self._dispatchEvent(tenant, pipeline_name, timespec)
         except Exception:
             self.stop_event.set()
-            raise
+            self.log.exception("Error when dispatching timer event")
 
     def _dispatchEvent(self, tenant, pipeline_name, timespec):
         self.log.debug('Got trigger for tenant %s and pipeline %s with '
