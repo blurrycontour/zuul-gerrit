@@ -184,6 +184,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86179b5d_1e7c01d6",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T18:27:39Z",
+      "side": 1,
+      "message": "Are the only ways to include tasks: roles, include, include_tasks, import_tasks and  import_playbooks ?\n\nI think the main issue is implementing the semantic of jinja variable precedences, but that can be done.",
+      "parentUuid": "6c64e761_abe22e0a",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ad5a897_1771bf03",
