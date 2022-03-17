@@ -123,6 +123,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5eb42a84_080441eb",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:01:43Z",
+      "side": 1,
+      "message": "The original idea of Zuul v3 was simple: use your production Ansible playbooks in testing and run both directly from Zuul.  That\u0027s why Nodesets are Ansible inventory, etc.  You just swap one for the other.\n\nThe restricted Ansible environment prevents us from achieving that because an untrusted playbook can\u0027t use enough of Ansible to actually directly execute a real production playbook.  Generally this is solved by nesting Ansible.  At this point, it hardly matters what Zuul itself is running.  It\u0027s just a multi-node execution coordinator that happens to implement a subset of Ansible.\n\nSo the motivation to do this to improve the CD story is to get back to that original idea: just have Zuul run Ansible.\n\nAn OpenDev-like system could just \"run: playbooks/eavesdrop.yaml\" using the built-in ssh keys, etc, and not have to worry about anything else.  Now, OpenDev itself may still not end up doing that because of logs and a desire to run things from bridge.  But the potential is there, and anyone without OpenDev\u0027s concerns about logs might be more comfortable with it.\n\nOpenDev could certainly directly execute simple playbooks like tenant reconfiguration loading, or publishing meeting calendars, or other similar event-driven CD things where the unique requirements aren\u0027t present.\n\nIf we\u0027re inclined to accept the risk and accept this proposal, then I think that\u0027s the story.  If we are not inclined, then I think the CD story becomes \"Zuul runs a tiny subset of mostly-compatible-Ansible that you use to bootstrap whatever it is you want to use to CD, but you\u0027ll need an external node.  More or less what we have today, but you\u0027ve got me thinking that if we can\u0027t fully use Ansible then maybe we should minimize it even more and start really pushing the angle that Zuul\u0027s Ansible is only there to bootstrap stuff.",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5eec9b1_0ceaa702",
@@ -223,6 +240,23 @@
       "side": 1,
       "message": "It is likely impossible for a container to change it\u0027s context after it started, so that may not be useful for executor already running a container. Also this may be difficult to setup as it depends a lot on the host system configuration.",
       "parentUuid": "4cc5e343_fcd806cc",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "993190fb_8e857288",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:01:43Z",
+      "side": 1,
+      "message": "I worry that assuming selinux/apparmor in Zuul assumes too much about deploymont.  We could run bwrap as a secondary user, as long as it doesn\u0027t entail giving the executor more privileges.",
       "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
