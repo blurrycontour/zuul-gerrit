@@ -3,6 +3,74 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "862e2204_05032f99",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T17:48:10Z",
+      "side": 1,
+      "message": "Is it really a hindrance for lightweight jobs, do we have example?",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8ddeec8_d004f6f4",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T17:48:10Z",
+      "side": 1,
+      "message": "Should we consider leveraging execution environment https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html?",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97c6b9bf_639beb7d",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T17:48:10Z",
+      "side": 1,
+      "message": "I wonder if we could implement the restriction using static analysis instead. Before running an unstrusted playbook, perhaps we could manually inspect its content to iterate over its tasks and prevent forbidden usage? When a task is not iterable, for example if it includes a dynamically generated tasks, then we could fail by default?",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ad5a897_1771bf03",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T17:48:10Z",
+      "side": 1,
+      "message": "Perhaps we should consider CPU and memory resources?",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "017a236b_9b60c544",
         "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
         "patchSetId": 3

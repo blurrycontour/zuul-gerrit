@@ -107,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "283228f6_f46ce1e4",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T17:48:10Z",
+      "side": 1,
+      "message": "I agree this is a major concern, would a successful exploit get access to all the secrets known to Zuul?",
+      "parentUuid": "cf3b2a6a_85cf19d1",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b5eec9b1_0ceaa702",
         "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
         "patchSetId": 2
@@ -187,6 +205,24 @@
       "side": 1,
       "message": "Yes, I think the major concerns I\u0027ve got are a privilege escalation on the executor and possibly a container escape given executor\u0027s zk access.\n\nThinking about zk access a bit I wonder if we can/should run the bwrap processes as a secondary user. And possibly something like selinux/apparmor can restrict file access further.\n\nI agree that existing deployments could probably do more alongside Zuul, but not needing to do that lifting separately in every deployment and instead share it via common zuul expectations and deployment tooling would go a long way I think.",
       "parentUuid": "0a3b2eb3_22b27607",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0088b50_b48487e9",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T17:48:10Z",
+      "side": 1,
+      "message": "It is likely impossible for a container to change it\u0027s context after it started, so that may not be useful for executor already running a container. Also this may be difficult to setup as it depends a lot on the host system configuration.",
+      "parentUuid": "4cc5e343_fcd806cc",
       "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
