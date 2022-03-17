@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d788a13_c0c771e0",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T17:41:09Z",
+      "side": 1,
+      "message": "That is the good point about diverging from what people expect from Ansible.",
+      "parentUuid": "225a5d85_431d528d",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf3b2a6a_85cf19d1",
@@ -65,6 +83,24 @@
       "writtenOn": "2022-03-17T17:22:18Z",
       "side": 1,
       "message": "This change has two benefits: 1) it reduces the amount of holes we have to try to find and plug every time there is a new Ansible; and 2) it makes CD directly from Zuul more viable.\n\nIf we don\u0027t think that improves the CD story, then that removes that benefit and makes this much less compelling.\n\nPersonally (as I noted at the bottom) I think the current protection is so weak as to be nearly nonexistent, but I do agree it is something, and it may take someone a little longer to figure out how to run something on the executor.\n\nA determined attacker of course would find and sit on a Zuul restriction bypass until they obtained the local root exploit so they could use them simultaneously.",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ea0ef24_233bdb72",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T17:41:09Z",
+      "side": 1,
+      "message": "Where the CD story becomes problematic for me is the exposure level in using Zuul for CD. With layers of security in theory our exposure is more limited. If we remove one layer of protection we become more exposed potentially.\n\nI think it may be worth expanding on the impact of CD on changes like this and how we can do better in general. Perhaps we can couple the ansible changes with stronger improvements in other areas to make CD more viable.",
+      "parentUuid": "62c8fa41_96bcce3b",
       "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -133,6 +169,24 @@
       "writtenOn": "2022-03-17T17:22:18Z",
       "side": 1,
       "message": "I think there are more things we can do (and maybe that operators could do independent of us), but I think that most of the network and filesystem risks are actively manageable right now.  Even in most corporate environments, I don\u0027t think being able to winrm from the zuul executor is a big concern.  It seems like the local root exploit is the most concerning to you, so if we want to keep the \"no-untrusted-exec\" requirement, I don\u0027t think this is feasible.\n\n(Also, FWIW, I think we were happy to rely on only the restricted Ansible when we started v3 development; bwrap was a nice extra benefit, and then we realized it\u0027s actually doing most of the work.)",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef846761_f165a784",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T17:41:09Z",
+      "side": 1,
+      "message": "Yes, I think the major concerns I\u0027ve got are a privilege escalation on the executor and possibly a container escape given executor\u0027s zk access.\n\nThinking about zk access a bit I wonder if we can/should run the bwrap processes as a secondary user. And possibly something like selinux/apparmor can restrict file access further.\n\nI agree that existing deployments could probably do more alongside Zuul, but not needing to do that lifting separately in every deployment and instead share it via common zuul expectations and deployment tooling would go a long way I think.",
+      "parentUuid": "0a3b2eb3_22b27607",
       "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
