@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc5dc3fc_cbc2a4d6",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T16:48:40Z",
+      "side": 1,
+      "message": "Is it possible for Zuul to install an ansible core + limited batteries included to more closely match 2.9? Would that simplify things enough to be a possibility?",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf3b2a6a_85cf19d1",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T16:48:40Z",
+      "side": 1,
+      "message": "It may be worth noting that the linux kernel has had several such bugs in the last ~month. I think operators would have to consider immediately shutting down Zuul to patch things like the kernel when these local privilege escalation bugs are disclosed.\n\nWe have always tried to patch quickly anyway, but the added layer of protection gives us some breathing room which has been nice.\n\nAdditionally rotating credentials is a very expensive endeavor now that executors can talk to zookeeper.\n\nThese two things combined make me wary of this change. Executors have more access than ever and linux is seeing major exploits right now.\n\nMy initial thought on this is that if the change were made OpenDev should consider not driving CD through Zuul any more. To decouple the risk of executors from the rest of the system more fully. Maybe run a secondary small zuul just for this instead with restricted access? Haven\u0027t fully thought this through.",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5eec9b1_0ceaa702",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T16:48:40Z",
+      "side": 1,
+      "message": "I think it was GKE that basically gives you full cluster root if you have access to this by default. Might be worth explicitly calling out known cases where this is a problem?",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cc5e343_fcd806cc",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-17T16:48:40Z",
+      "side": 1,
+      "message": "Thinking about this from a defense in depth perspective are we able to leverage bwrap to restrict activity a bit more? For example could we restrict network connectivity to ssh/winrm/etc ports in untrusted contexts? Maybe limit system capabilites if we have room there as well?\n\nMostly thinking out loud here as I don\u0027t think we ever wanted to rely on any single defense mechanism and instead layer them to ensure as much safety as possible.\n\nMaybe Selinux or apparmor or similar would be useful here too?",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
