@@ -682,6 +682,8 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def getPushedFileNames(self, event):
         if event is None:
             return None
+        if not hasattr(event, 'total_commits_count'):
+            return None
         if event.total_commits_count > 20:
             # Gitlab only includes files for the most recent 20
             # commits.  If we have more than that, set files to None

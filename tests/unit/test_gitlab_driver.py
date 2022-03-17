@@ -18,6 +18,7 @@ import os
 import git
 import yaml
 import socket
+import time
 
 from zuul.lib import strings
 from zuul.zk.layout import LayoutState
@@ -703,6 +704,34 @@ class TestGitlabDriver(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_timer_event(self):
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('org/common-config',
+                                'layouts/timer-gitlab.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        time.sleep(2)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+        self.executor_server.hold_jobs_in_build = False
+        # Stop queuing timer triggered jobs so that the assertions
+        # below don't race against more jobs being queued.
+        self.commitConfigUpdate('org/common-config',
+                                'layouts/no-timer-gitlab.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        # If APScheduler is in mid-event when we remove the job, we
+        # can end up with one more event firing, so give it an extra
+        # second to settle.
+        time.sleep(1)
+        self.waitUntilSettled()
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-bitrot', result='SUCCESS',
+                 ref='refs/heads/master'),
+        ], ordered=False)
 
     @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab')
     def test_api_token(self):
