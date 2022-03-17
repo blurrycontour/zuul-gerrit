@@ -16,6 +16,23 @@
       "message": "Should this happen after the config update to ensure we don\u0027t race the next timer trigger?",
       "revId": "c2bd946d538ce886eb96e0bb3026d2fc13870e3a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aefbcbb_e408feda",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 717,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T15:59:11Z",
+      "side": 1,
+      "message": "I think this is correct because it won\u0027t cause any immediate action (we are already settled), and this way any changes that are effected by the config update (I don\u0027t think there are any, but it\u0027s theoretically possible) would not cause jobs to be held.\n\nIn short: the other way would probably be fine for this, but this way might be a smidge more correct (and better for future copypasta).",
+      "revId": "c2bd946d538ce886eb96e0bb3026d2fc13870e3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
