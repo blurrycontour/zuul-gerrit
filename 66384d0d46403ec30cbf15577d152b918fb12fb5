@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0465dd01_6a9c0891",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T21:48:06Z",
+      "side": 1,
+      "message": "I do think this is reducing our security posture, the restriction imposed on untrusted jobs may not be perfect, but they provide an extra layer to prevent remote code execution on the executor instances.\n\nIf I understand correctly, this spec has a significant impact for operators, thus if we can improve the compartmentalizations along the way that may be worth the effort. For example, it seems like nodeless job may cause a \"noisy neighbor\" effect resulting in a negative impact.\n\nThat being said, I am in favor of this spec because the benefits outweigh the risk. \n",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "478dccf8_7fd6d6f6",
@@ -232,6 +249,24 @@
       "writtenOn": "2022-03-17T18:11:37Z",
       "side": 1,
       "message": "Yes; the ability to run more zero-node jobs will probably increase CPU and memory pressure.",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c72165f_18d7e6bc",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-17T21:48:06Z",
+      "side": 1,
+      "message": "What about resources exhaustion, is there something we should do to prevent one job to hog all the resources?",
+      "parentUuid": "29e45d92_0c0b45b6",
       "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
