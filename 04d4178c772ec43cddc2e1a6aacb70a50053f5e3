@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0853af71_9b1e1937",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-17T14:10:46Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3:\n\u003e \n\u003e Oh, you should also update job-content.rst to describe the new variable.\n\nDone.",
+      "revId": "04d4178c772ec43cddc2e1a6aacb70a50053f5e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
