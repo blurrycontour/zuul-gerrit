@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bada3af5_6bbea3d6",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:11:37Z",
+      "side": 1,
+      "message": "As a quick example: a git mirroring job that just needs to \"git push\" from the executor.  I\u0027m sure there are better ones, but most zero-node jobs that actually do anything need to have trusted playbooks at this point.",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8ddeec8_d004f6f4",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-03-17T17:48:10Z",
       "side": 1,
       "message": "Should we consider leveraging execution environment https://docs.ansible.com/automation-controller/latest/html/userguide/execution_environments.html?",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9b2aaa5_0ff04980",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:11:37Z",
+      "side": 1,
+      "message": "That could be an interesting way to use Ansible within Zuul, though since it\u0027s essentially building and running a container it\u0027s sort of parallel to what we\u0027re doing with bwrap.  We might even consider it a replacement for bwrap at some point, but I think we can defer that for now since I think fundamentally the security issues are the same.",
       "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +86,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c64e761_abe22e0a",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:11:37Z",
+      "side": 1,
+      "message": "That seems like a distinct possibility.  We might miss something, but we miss things with our current system too.\n\nI worry that we might spend a long time figuring out all the possible ways of including tasks.  :)",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ad5a897_1771bf03",
@@ -65,6 +116,23 @@
       "writtenOn": "2022-03-17T17:48:10Z",
       "side": 1,
       "message": "Perhaps we should consider CPU and memory resources?",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29e45d92_0c0b45b6",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T18:11:37Z",
+      "side": 1,
+      "message": "Yes; the ability to run more zero-node jobs will probably increase CPU and memory pressure.",
       "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
