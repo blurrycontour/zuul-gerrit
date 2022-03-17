@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17aa5db9_1c85fc04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2022-03-17T08:12:22Z",
+      "side": 1,
+      "message": "\u003e Patch Set 4:\n\u003e \n\u003e The gauge certainly complicates things.\n\u003e \n\u003e I think we could go with the do-it-in-zuul approach, but we can simplify that a little:\n\u003e \n\u003e The zuul_system_id is stored in ZK as NodeRequest.requestor (i.e., it\u0027s already a top level attribute on the node request).  We can have nodepool copy that over to the Node as a new field Node.request, and then have Zuul check that.\n\u003e \n\u003e That way we get the system id as a top level variable automatically propagated from node requests in a generic way.\n\nUpdated accordingly. The accompanying change in nodepool is here https://review.opendev.org/c/zuul/nodepool/+/834109.",
+      "revId": "a1342813191c3a5e83dde85d51ca77e4bdac2010",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
