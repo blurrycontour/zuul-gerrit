@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "225a5d85_431d528d",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T17:22:18Z",
+      "side": 1,
+      "message": "Yes.  But then we are curating our own Ansible distribution, and we have to do the work to qualify the collections that we install.  We would have to install several to obtain the basic level of functionality we expect.\n\nEven if we don\u0027t accept this proposal, I think we should use Ansible community so that we continue to approximate what \"install ansible\" means to people.\n\nHowever, if we don\u0027t accept this proposal, we may want to consider going the other direction and say since we\u0027re not going to have a fully-functional Ansible anyway, let\u0027s reduce the functionality further and maybe install fewer collections so that we don\u0027t support everything we have now in 2.9.  That might be a win for maintainability.\n\nAnother approach to consider (especially regarding your concerns below) would be to lift the file/network access permissions from our restricted ansible and try to only focus on limiting untrusted execution.  That might further reduce the scope of work (we would still need to figure out how to override the new collections loading mechanism, but at least then we would have far fewer plugins to try to override).",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf3b2a6a_85cf19d1",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-03-17T16:48:40Z",
       "side": 1,
       "message": "It may be worth noting that the linux kernel has had several such bugs in the last ~month. I think operators would have to consider immediately shutting down Zuul to patch things like the kernel when these local privilege escalation bugs are disclosed.\n\nWe have always tried to patch quickly anyway, but the added layer of protection gives us some breathing room which has been nice.\n\nAdditionally rotating credentials is a very expensive endeavor now that executors can talk to zookeeper.\n\nThese two things combined make me wary of this change. Executors have more access than ever and linux is seeing major exploits right now.\n\nMy initial thought on this is that if the change were made OpenDev should consider not driving CD through Zuul any more. To decouple the risk of executors from the rest of the system more fully. Maybe run a secondary small zuul just for this instead with restricted access? Haven\u0027t fully thought this through.",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62c8fa41_96bcce3b",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T17:22:18Z",
+      "side": 1,
+      "message": "This change has two benefits: 1) it reduces the amount of holes we have to try to find and plug every time there is a new Ansible; and 2) it makes CD directly from Zuul more viable.\n\nIf we don\u0027t think that improves the CD story, then that removes that benefit and makes this much less compelling.\n\nPersonally (as I noted at the bottom) I think the current protection is so weak as to be nearly nonexistent, but I do agree it is something, and it may take someone a little longer to figure out how to run something on the executor.\n\nA determined attacker of course would find and sit on a Zuul restriction bypass until they obtained the local root exploit so they could use them simultaneously.",
       "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +86,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f961b26f_3df9ad03",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T17:22:18Z",
+      "side": 1,
+      "message": "Yeah, wouldn\u0027t hurt to list specific examples.",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4cc5e343_fcd806cc",
@@ -65,6 +116,23 @@
       "writtenOn": "2022-03-17T16:48:40Z",
       "side": 1,
       "message": "Thinking about this from a defense in depth perspective are we able to leverage bwrap to restrict activity a bit more? For example could we restrict network connectivity to ssh/winrm/etc ports in untrusted contexts? Maybe limit system capabilites if we have room there as well?\n\nMostly thinking out loud here as I don\u0027t think we ever wanted to rely on any single defense mechanism and instead layer them to ensure as much safety as possible.\n\nMaybe Selinux or apparmor or similar would be useful here too?",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a3b2eb3_22b27607",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-17T17:22:18Z",
+      "side": 1,
+      "message": "I think there are more things we can do (and maybe that operators could do independent of us), but I think that most of the network and filesystem risks are actively manageable right now.  Even in most corporate environments, I don\u0027t think being able to winrm from the zuul executor is a big concern.  It seems like the local root exploit is the most concerning to you, so if we want to keep the \"no-untrusted-exec\" requirement, I don\u0027t think this is feasible.\n\n(Also, FWIW, I think we were happy to rely on only the restricted Ansible when we started v3 development; bwrap was a nice extra benefit, and then we realized it\u0027s actually doing most of the work.)",
       "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
