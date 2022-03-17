@@ -124,6 +124,24 @@
       "parentUuid": "9df14e66_1f052251",
       "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68e442b2_0179be2d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1317,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-17T08:20:22Z",
+      "side": 1,
+      "message": "Tests are added.",
+      "parentUuid": "9afb31f7_abf4a764",
+      "revId": "fc42d8fe83c8fc1a0a8277181fe8a59e06eaea48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
