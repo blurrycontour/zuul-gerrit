@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "478dccf8_7fd6d6f6",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2022-03-17T18:13:43Z",
+      "side": 1,
+      "message": "This is not exactly accurate, the upstream end of life for Ansible 2.9 is currently planned for May 2022: https://groups.google.com/g/ansible-announce/c/kegIH5_okmg/",
+      "range": {
+        "startLine": 29,
+        "startChar": 61,
+        "endLine": 30,
+        "endChar": 18
+      },
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "862e2204_05032f99",
         "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
         "patchSetId": 3
@@ -65,6 +88,47 @@
       "writtenOn": "2022-03-17T18:11:37Z",
       "side": 1,
       "message": "That could be an interesting way to use Ansible within Zuul, though since it\u0027s essentially building and running a container it\u0027s sort of parallel to what we\u0027re doing with bwrap.  We might even consider it a replacement for bwrap at some point, but I think we can defer that for now since I think fundamentally the security issues are the same.",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60fc1edb_95ea4f9d",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2022-03-17T18:13:43Z",
+      "side": 1,
+      "message": "Execution environments are container images built with ansible-builder (https://github.com/ansible/ansible-builder) and they\u0027re meant to contain particular versions of ansible-core, ansible-runner as well as Ansible collections necessary for the users\u0027 playbooks.\n\nIf you\u0027re curious to see what it looks like in practice, I have a simple example here which adds the ansible and ara packages on top of a \"base\" execution environment: https://github.com/ansible-community/images/tree/main/execution-environments\n\nansible-navigator is a TUI that, amongst other things, knows about execution environments and can run playbooks with them.",
+      "parentUuid": "d8ddeec8_d004f6f4",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d038057c_9bb617f6",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2022-03-17T18:13:43Z",
+      "side": 1,
+      "message": "FWIW: Ansible 5.5.0 was released last week -- the current pace of release for the \u0027ansible\u0027 package is a minor release every 3 weeks and a major release every 6 months (which aligns with the 6 months cycle of ansible-core).\n\nAnsible 6.0.0 is currently expected in May 2022 which aligns with the new release of ansible-core planned at the same time, 2.13.",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 33
+      },
       "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },

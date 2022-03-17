@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "abf4f1cb_f3ac212a",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2022-03-17T18:13:43Z",
+      "side": 1,
+      "message": "I will not speak for Zuul\u0027s ability to do that or not but it is an intended use case to be able to install just ansible-core and then cherry-pick the collections that users are interested in.\n\nThere\u0027s a galaxy requirements file that is available and kept up to date based on the collections that are included in the latest release of the ``ansible`` package from which you can remove the things you don\u0027t have a use for: https://github.com/ansible-community/ansible-build-data/blob/main/5/galaxy-requirements.yaml",
+      "parentUuid": "bc5dc3fc_cbc2a4d6",
+      "revId": "1685cf528f4ca158ef655c1c9585ff3024440a30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cf3b2a6a_85cf19d1",
         "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
         "patchSetId": 2
