@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c90c1233_778b5734",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-17T09:53:05Z",
+      "side": 1,
+      "message": "TaskIcon or AutomationIcon maybe?",
+      "range": {
+        "startLine": 49,
+        "startChar": 13,
+        "endLine": 49,
+        "endChar": 28
+      },
+      "revId": "19833fa099cd9407a5c20182d82e8f844afac3be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f495e8c_a672d07d",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-17T09:53:05Z",
+      "side": 1,
+      "message": "What about TachometerAlt for the web UI? It is supposed to represent a dashboard.",
+      "range": {
+        "startLine": 52,
+        "startChar": 7,
+        "endLine": 52,
+        "endChar": 18
+      },
+      "revId": "19833fa099cd9407a5c20182d82e8f844afac3be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

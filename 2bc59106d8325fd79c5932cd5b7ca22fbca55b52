@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "178b4d54_cc7ca505",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-17T09:53:05Z",
+      "side": 1,
+      "message": "That\u0027s also the icon used for dependent pipelines, mostly used for merging things, so I think that\u0027s a good choice.",
+      "parentUuid": "e1985eaa_b46d7a28",
+      "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8148c559_07112c40",
         "filename": "web/src/containers/component/ComponentTable.jsx",
         "patchSetId": 1
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "I added the TerminalIcon for Fingergw in PS2 as Jim suggested this in his original idea https://review.opendev.org/c/zuul/zuul/+/760807/8#message-99d6494fdd7abb556b1f7dbab54a9e9799b60a53.",
       "parentUuid": "8148c559_07112c40",
+      "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f646fa2_fdbf8988",
+        "filename": "web/src/containers/component/ComponentTable.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-17T09:53:05Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "5148485e_687645e6",
       "revId": "2bc59106d8325fd79c5932cd5b7ca22fbca55b52",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
