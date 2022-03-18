@@ -239,6 +239,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "66d0ea9d_d2c60dc0",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-18T18:46:06Z",
+      "side": 1,
+      "message": "Perhaps this does not have to be implemented within zuul, and maybe that could be useful to others. For example, the `--list-task` argument of ansible-playbook seems promising, but it might need some tweak to be useful here.\n\nIf such a static analysis tool existed, then it seems like we would be able to use ansible without modification, while preserving the restriction for untrusted playbook.",
+      "parentUuid": "c97f7c8a_67344dcf",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ad5a897_1771bf03",
         "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
         "patchSetId": 3
