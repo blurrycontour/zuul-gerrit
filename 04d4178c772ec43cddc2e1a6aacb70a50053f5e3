@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 3:\n\u003e \n\u003e Oh, you should also update job-content.rst to describe the new variable.\n\nDone.",
       "revId": "04d4178c772ec43cddc2e1a6aacb70a50053f5e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "793f7106_696dd20d",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1185,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-18T15:41:14Z",
+      "side": 1,
+      "message": "Sorry, it\u0027s specifically while A, B, C are all in gate that I think we should test, so remove these 2 lines and check the last build while they\u0027re all running.",
+      "revId": "04d4178c772ec43cddc2e1a6aacb70a50053f5e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
