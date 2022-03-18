@@ -221,6 +221,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c97f7c8a_67344dcf",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-18T13:01:28Z",
+      "side": 1,
+      "message": "I don\u0027t think this is feasible for us zuul maintainers. Such a static analysis sounds like it would require an entire project with several people maintaining this. To me this sounds like even more work like we have to do with the current approach.",
+      "parentUuid": "86179b5d_1e7c01d6",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ad5a897_1771bf03",
         "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
         "patchSetId": 3
