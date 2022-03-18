@@ -184,12 +184,14 @@ class TestMergerRepo(ZuulTestCase):
         work_repo = Repo(parent_path, self.workspace_root,
                          'none@example.org', 'User Name', '0', '0')
         work_repo.setRemoteRef('master', commit_sha)
-        work_repo.setRemoteRef('invalid', commit_sha)
+        # missing remote ref would be created
+        work_repo.setRemoteRef('missing', commit_sha)
 
         repo = git.Repo(self.workspace_root)
         self.assertEqual(repo.remotes.origin.refs.master.commit.hexsha,
                          commit_sha)
-        self.assertNotIn('invalid', repo.remotes.origin.refs)
+        self.assertEqual(repo.remotes.origin.refs.missing.commit.hexsha,
+                         commit_sha)
 
     def test_clone_timeout(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
