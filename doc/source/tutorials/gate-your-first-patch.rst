@@ -160,3 +160,5 @@ Exercises left to the reader
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 * Send a new patch that fails to pass the check pipeline. Then fix it by amending it.
+
+Next we will use Zuul's jobs library to take advantage of pre-defined Ansible roles to ease job creation.
