@@ -4,12 +4,31 @@
       become: true
   when: not local
 
-- name: Setup Tutorial Execution
-  include_role:
-    name: setup-tutorial
+- name: Create workspace directory
+  file:
+    state: directory
+    path: "{{ workspace }}"
 
-- name: Run quick-start tutorial
-  include_tasks: quick-start.yaml
+- name: Setup SSH
+  include_role:
+    name: setup-ssh
+
+- name: Initial Setup and Quick Start
+  when: skip_quick_start is undefined or not skip_quick_start
+  block:
+    - name: Setup Tutorial Execution
+      include_role:
+        name: setup-tutorial
+
+    - name: Run quick-start tutorial
+      include_tasks: quick-start.yaml
+
+- name: Run tutorials
+  include_tasks: "{{ tutorial_playbook_name }}"
+  when: run_playbooks is defined
+  loop: "{{ run_playbooks }}"
+  loop_control:
+    loop_var: tutorial_playbook_name
 
 - name: Run admin tutorial
   include_tasks: admin.yaml

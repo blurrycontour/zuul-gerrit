@@ -171,14 +171,27 @@
 # the buildset registry.  It includes zuul as a required project
 # because that is where the docker-compose file is located.
 - job:
-    name: zuul-quick-start
+    name: zuul-tutorial
     parent: opendev-buildset-registry-consumer
-    description: Run the commands in the Zuul tutorial quick-start documentation.
     pre-run: playbooks/tutorial/pre.yaml
     run: playbooks/tutorial/run.yaml
     post-run: playbooks/tutorial/post.yaml
+    requires: nodepool-container-image
     required-projects:
       - zuul/zuul
+
+- job:
+    name: zuul-quick-start
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+
+- job:
+    name: zuul-tutorial-gate-your-first-patch
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial gate your first patch documentation.
+    vars:
+      run_playbooks:
+        - gate-first-patch.yaml
 
 # Image building jobs
 - secret:
@@ -304,7 +317,8 @@
         - zuul-stream-functional-2.9
         - zuul-tox-remote
         - zuul-quick-start:
-            requires: nodepool-container-image
+            dependencies: zuul-build-image
+        - zuul-tutorial-gate-your-first-patch:
             dependencies: zuul-build-image
         - zuul-tox-zuul-client
         - zuul-build-python-release
@@ -330,7 +344,8 @@
         - zuul-stream-functional-2.9
         - zuul-tox-remote
         - zuul-quick-start:
-            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+        - zuul-tutorial-gate-your-first-patch:
             dependencies: zuul-upload-image
         - zuul-tox-zuul-client
         - zuul-build-python-release
