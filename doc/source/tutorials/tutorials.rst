@@ -6,3 +6,4 @@ Tutorials
 
    quick-start
    gate-your-first-patch
+   keycloak_tutorial

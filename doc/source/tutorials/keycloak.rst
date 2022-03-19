@@ -1,3 +1,5 @@
+.. _keycloak_tutorial:
+
 Keycloak Tutorial
 =================
 
