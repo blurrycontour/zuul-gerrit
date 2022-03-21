@@ -11,7 +11,7 @@
     "@patternfly/react-core": "^4.198.5",
     "@patternfly/react-table": "^4.67.5",
     "@softwarefactory-project/re-ansi": "^0.5.0",
-    "axios": "^0.19.0",
+    "axios": "^0.26.0",
     "broadcast-channel": "^4.5.0",
     "js-yaml": "^3.13.0",
     "lodash": "^4.17.10",
