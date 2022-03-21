@@ -255,6 +255,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23d15371_736e8ee4",
+        "filename": "doc/source/developer/specs/unrestricted-ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-21T22:01:44Z",
+      "side": 1,
+      "message": "I wasn\u0027t aware of list-tasks, it looks interesting, but after a quick check, it looks like it doesn\u0027t recurse into include_role.",
+      "revId": "66384d0d46403ec30cbf15577d152b918fb12fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ad5a897_1771bf03",
