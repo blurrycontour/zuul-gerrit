@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af8f7ab9_0d3174c2",
+        "filename": "releasenotes/notes/gerrit-submit-whole-topic-5fef75db6ca450e8.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-21T18:00:35Z",
+      "side": 1,
+      "message": "Even with a git dependency, all the changes in the topic should be submitted together.  So Zuul will see the entire topic as a dependency cycle (sort of superimposed on the git dependency tree), and I think that matches the Gerrit behavior and user expectation.",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e791381_9c6c0994",
@@ -52,6 +69,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1814022_9a36a1e4",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1028,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-21T18:00:35Z",
+      "side": 1,
+      "message": "Absolutely nothing: if submitWholeTopic is enabled for a gerrit site, and pipeline circular dependencies are not enabled, we will report errors to the user.  The errors should be self-explanatory.\n\nI think this behavior is correct -- even though we don\u0027t produce an error today, Gerrit and Zuul have different expectations for what will happen when submit is pressed.  Now, if their expectations are different, then users will be aware of it.",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f62a7690_d5dc9ed6",
@@ -65,6 +99,23 @@
       "writtenOn": "2022-03-21T17:32:57Z",
       "side": 1,
       "message": "The condition here is a restriction on the condition above. I think this means that we may add a change twice to the list/sets modified in these two blocks.\n\nIs this second block necessary if we area always adding the dep even if it isn\u0027t the current patchset? Or maybe we only want to add the current patchset and can remove the first block?",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2624ce5f_42653b45",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-21T18:00:35Z",
+      "side": 1,
+      "message": "The two blocks (I\u0027m assuming you mean 1044-1046 and 1047-1050) modify different lists -- one is depends-on, the other is needed-by.  Each of the above seccions (ie, above line 1028) only handles one direction, but since we\u0027re always doing dependency cycles, we do both.",
       "revId": "249051d8204db9b623275d441b5218108d3e26c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
