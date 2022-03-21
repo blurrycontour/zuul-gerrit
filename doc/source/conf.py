@@ -75,8 +75,8 @@ html_theme = "sphinx_rtd_theme"
 html_baseurl = f'https://zuul-ci.org{doc_root}/latest'
 
 if version.is_release:
-    version = version.release_string
     current_version = version.release_string
+    version = version.release_string
     versions = [('latest', f'{doc_root}/latest/')]
 else:
     # Uncomment this if we want to use the in-development version
