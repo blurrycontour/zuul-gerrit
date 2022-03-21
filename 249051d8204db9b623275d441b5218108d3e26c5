@@ -88,6 +88,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f6a49b63_19293508",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-21T19:48:51Z",
+      "side": 1,
+      "message": "After discussion on Matrix I think it might be helpful to have a comment above this line (1044) that reads something like:\n\n  Gerrit changes marked to be submitted together do not necessarily get posted with dependency cycles using git trees and depends-on. However, they are functionally equivalent to stack of changes with cycles using those methods. Here we set needs_changes and needed_by_changes as if there were a cycle. This ensures Zuul\u0027s cycle handling manages the submit together changes properly.",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f62a7690_d5dc9ed6",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
