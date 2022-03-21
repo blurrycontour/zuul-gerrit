@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "249051d8204db9b623275d441b5218108d3e26c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07ee7d5f_e82db32f",
+        "filename": "releasenotes/notes/gerrit-submit-whole-topic-5fef75db6ca450e8.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-21T17:32:57Z",
+      "side": 1,
+      "message": "I guess with submitWholeTopic it is possible that the dependencies there are not circuluar (at least as expressed in git). Should we require that the gerrit side be expressed as a circular dependency to be in line with how zuul treats it? Less user friendly is the downside but more explicit in how it is treated.",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e791381_9c6c0994",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1028,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-21T17:32:57Z",
+      "side": 1,
+      "message": "This list will be empty when the submitWholeTopic option isn\u0027t enabled for changes. But what ensures that pipeline circular dependencies are enabled before processing this code?",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f62a7690_d5dc9ed6",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-21T17:32:57Z",
+      "side": 1,
+      "message": "The condition here is a restriction on the condition above. I think this means that we may add a change twice to the list/sets modified in these two blocks.\n\nIs this second block necessary if we area always adding the dep even if it isn\u0027t the current patchset? Or maybe we only want to add the current patchset and can remove the first block?",
+      "revId": "249051d8204db9b623275d441b5218108d3e26c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
