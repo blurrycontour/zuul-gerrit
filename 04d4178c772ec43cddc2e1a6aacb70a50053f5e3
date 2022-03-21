@@ -33,6 +33,24 @@
       "message": "Sorry, it\u0027s specifically while A, B, C are all in gate that I think we should test, so remove these 2 lines and check the last build while they\u0027re all running.",
       "revId": "04d4178c772ec43cddc2e1a6aacb70a50053f5e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "781912d8_3aba3b05",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1185,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-21T11:38:46Z",
+      "side": 1,
+      "message": "I misunderstood it. Updated now.",
+      "parentUuid": "793f7106_696dd20d",
+      "revId": "04d4178c772ec43cddc2e1a6aacb70a50053f5e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
