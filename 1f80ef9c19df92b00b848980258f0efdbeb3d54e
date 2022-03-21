@@ -53,6 +53,42 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d23f61ad_b7f2d8d8",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1861,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-21T13:37:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d82c52b9_c7c6c4fa",
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2487be38_29c24f21",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1861,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-21T13:37:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62bc9c3a_2ee7f76a",
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cebf8b5_a58b244a",
@@ -113,6 +149,30 @@
       "writtenOn": "2022-02-04T17:43:38Z",
       "side": 1,
       "message": "Agreed.",
+      "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "894ad4e6_ac50a918",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-21T13:37:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04030be1_af8fa744",
+      "range": {
+        "startLine": 1866,
+        "startChar": 12,
+        "endLine": 1866,
+        "endChar": 15
+      },
       "revId": "1f80ef9c19df92b00b848980258f0efdbeb3d54e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
