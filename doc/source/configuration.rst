@@ -994,6 +994,28 @@ authentication on Zuul's web user interface.
    The well-known configuration of the Identity Provider should provide this URL
    under the key "jwks_uri", therefore this attribute is usually not necessary.
 
+Some providers may not conform to the JWT specification and further
+configuration may be necessary.  In these cases, the following
+additional values may be used:
+
+.. attr:: authority
+   :default: issuer_id
+
+   If the authority in the token response is not the same as the
+   issuer_id in the request, it may be explicitly set here.
+
+.. attr:: audience
+   :default: client_id
+
+   If the audience in the token response is not the same as the
+   issuer_id in the request, it may be explicitly set here.
+
+.. attr:: load_user_info
+   :default: true
+
+   If the web UI should skip accessing the "UserInfo" endpoint and
+   instead rely only on the information returned in the token, set
+   this to ``false``.
 
 Client
 ------

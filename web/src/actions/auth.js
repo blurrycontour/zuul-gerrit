@@ -36,6 +36,7 @@ function createAuthParamsFromJson(json) {
     authority: '',
     client_id: '',
     scope: '',
+    loadUserInfo: true,
   }
   if (!auth_info) {
     console.log('No auth config')
@@ -47,6 +48,7 @@ function createAuthParamsFromJson(json) {
     auth_params.client_id = client_config.client_id
     auth_params.scope = client_config.scope
     auth_params.authority = client_config.authority
+    auth_params.loadUserInfo = client_config.load_user_info
     return auth_params
   } else {
     console.log('No OpenIDConnect provider found')
