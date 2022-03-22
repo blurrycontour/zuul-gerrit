@@ -33,6 +33,24 @@
       "message": "This will also retry successful builds if they return retry for some reason. It\u0027s probably up to debate if we should allow this or if we only should allow to retry failed builds. I\u0027d vote for only retrying failed builds.\n\nFurther this doesn\u0027t take job.attempts into account so we\u0027re running into the risk of endless loops due to job misbehavior. So I think we should limit the retries to job.attempts just like we do with the existing retry_limit handling.",
       "revId": "b03205019f6076a11b8e5418320cb78cf95ec757",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ae9a1be_de5594e6",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2482,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-03-22T09:12:18Z",
+      "side": 1,
+      "message": "\u003e This will also retry successful builds if they return retry for some reason. It\u0027s probably up to debate if we should allow this or if we only should allow to retry failed builds. I\u0027d vote for only retrying failed builds.\n\nI don\u0027t have a strong opinion either way, so I\u0027ll remove it.\n\n\u003e Further this doesn\u0027t take job.attempts into account so we\u0027re running into the risk of endless loops due to job misbehavior. So I think we should limit the retries to job.attempts just like we do with the existing retry_limit handling.\n\nI think it does actually. This only retries if \u0027result is None\u0027 and the executor sets the result to \u0027RETRY_LIMIT\u0027 if all attempts are exhausted.",
+      "parentUuid": "8490731b_86e0d85f",
+      "revId": "b03205019f6076a11b8e5418320cb78cf95ec757",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
