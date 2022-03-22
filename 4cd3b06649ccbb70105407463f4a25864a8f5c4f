@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "438c387a_6cb14077",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-22T18:29:21Z",
+      "side": 1,
+      "message": "Yep, copy-pasta from the other test.",
+      "revId": "4cd3b06649ccbb70105407463f4a25864a8f5c4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6005038b_9f5873d6",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-03-22T18:18:06Z",
       "side": 1,
       "message": "Should this indicate that `The change is unable to merge because of a missing requirement.` ?",
+      "revId": "4cd3b06649ccbb70105407463f4a25864a8f5c4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a66c2409_34f0751c",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-22T18:29:21Z",
+      "side": 1,
+      "message": "Maybe, though we don\u0027t actually know what the requirement is -- we only know that the code review system told us it can\u0027t merge.  But that does sound a little better to me.",
       "revId": "4cd3b06649ccbb70105407463f4a25864a8f5c4f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
