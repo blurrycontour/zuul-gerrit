@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c6f71f9_75fce270",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-22T22:36:24Z",
+      "side": 1,
+      "message": "-1: We only need to protect updating the cache with a lock. Reading from the cache shouldn\u0027t require a lock.\n\n0: We could even go the non-blocking lock way we do like in getStatus to not block requests while the tenant list is updated.",
+      "revId": "dcf60a706bbe0badf5020b30dd794ff41b397277",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fde9b5c_e34ab2ef",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1017,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-22T22:36:24Z",
+      "side": 1,
+      "message": "nit: I think this method would be easier to read if we put \"self.caches[\u0027status\u0027]\" into a local variable.",
+      "revId": "dcf60a706bbe0badf5020b30dd794ff41b397277",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
