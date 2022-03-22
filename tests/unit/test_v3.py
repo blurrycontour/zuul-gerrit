@@ -2880,6 +2880,41 @@ class TestInRepoConfigDir(ZuulTestCase):
         ], ordered=True)
 
 
+class TestExtraConfigInDependent(ZuulTestCase):
+    # in org/project2, jobs are defined in extra config paths, while
+    # project is defined in .zuul.yaml
+    tenant_config_file = 'config/in-repo-dir/main.yaml'
+    scheduler_count = 1
+
+    def test_extra_config_in_dependent_change(self):
+        # Test that when jobs are defined in a extra-config-paths in a repo, if
+        # another change is dependent on a change of that repo, the jobs should
+        # still be loaded.
+
+        # Add an empty zuul.yaml here so we are triggering dynamic layout load
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'zuul.yaml': ''})
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B',
+                                           files={'zuul.yaml': ''})
+        # A Depends-On: B who has private jobs defined in extra-config-paths
+        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url'])
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Jobs in both changes should be success
+        self.assertHistory([
+            dict(name='project2-private-extra-file', result='SUCCESS',
+                 changes='2,1'),
+            dict(name='project2-private-extra-dir', result='SUCCESS',
+                 changes='2,1'),
+            dict(name='project-test1', result='SUCCESS',
+                 changes='2,1 1,1'),
+        ], ordered=False)
+
+
 class TestGlobalRepoState(AnsibleZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/global-repo-state/main.yaml'
