@@ -1656,6 +1656,53 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
                                           new_sha='0' * 40,
                                           removed_files=['zuul.yaml'])
 
+    def test_branch_protection_rule_update(self):
+        """Test the branch_protection_rule event"""
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project2')
+
+        github_connection = self.scheds.first.connections.connections['github']
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        project = github_connection.source.getProject('org/project2')
+
+        # The repo starts without branch protection, and Zuul is
+        # configured to exclude unprotected branches, so we should see
+        # no branches.
+        branches = github_connection.getProjectBranches(project, tenant)
+        self.assertEqual(branches, [])
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        prev_layout = tenant.layout.uuid
+
+        # Add a rule to the master branch
+        repo._set_branch_protection('master', True)
+        self.fake_github.emitEvent(
+            self.fake_github.getBranchProtectionRuleEvent(
+                'org/project2', 'created'))
+        self.waitUntilSettled()
+
+        # Verify that it shows up
+        branches = github_connection.getProjectBranches(project, tenant)
+        self.assertEqual(branches, ['master'])
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        new_layout = tenant.layout.uuid
+        self.assertNotEqual(new_layout, prev_layout)
+        prev_layout = new_layout
+
+        # Remove the rule
+        repo._set_branch_protection('master', False)
+        self.fake_github.emitEvent(
+            self.fake_github.getBranchProtectionRuleEvent(
+                'org/project2', 'deleted'))
+        self.waitUntilSettled()
+
+        # Verify it's gone again
+        branches = github_connection.getProjectBranches(project, tenant)
+        self.assertEqual(branches, [])
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        new_layout = tenant.layout.uuid
+        self.assertNotEqual(new_layout, prev_layout)
+        prev_layout = new_layout
+
 
 class TestGithubWebhook(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'

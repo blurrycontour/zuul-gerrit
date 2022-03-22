@@ -2135,6 +2135,11 @@ class Scheduler(threading.Thread):
 
             reconfigure_tenant = False
 
+        # But if the event is that branch protection status has
+        # changed, do reconfigure.
+        if (event.isBranchProtectionChanged()):
+            reconfigure_tenant = True
+
         if reconfigure_tenant:
             # The change that just landed updates the config
             # or a branch was just created or deleted.  Clear
