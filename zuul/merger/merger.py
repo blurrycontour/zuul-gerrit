@@ -652,7 +652,9 @@ class Repo(object):
                 ret[fn] = None
         if dirs:
             for dn in dirs:
-                if dn not in tree:
+                try:
+                    subtree = tree / dn
+                except KeyError:
                     continue
 
                 # Some people like to keep playbooks, etc. grouped
@@ -660,7 +662,7 @@ class Repo(object):
                 # directories of any .zuul.ignore files and prune them
                 # from the config read.
                 to_ignore = []
-                for blob in tree[dn].traverse():
+                for blob in subtree.traverse():
                     if blob.path.endswith(".zuul.ignore"):
                         to_ignore.append(os.path.split(blob.path)[0])
 
@@ -670,7 +672,7 @@ class Repo(object):
                             return True
                     return False
 
-                for blob in tree[dn].traverse():
+                for blob in subtree.traverse():
                     if not _ignored(blob) and blob.path.endswith(".yaml"):
                         ret[blob.path] = blob.data_stream.read().decode(
                             'utf-8')
