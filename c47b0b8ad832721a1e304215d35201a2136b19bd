@@ -34,6 +34,24 @@
       "parentUuid": "2541b0c8_ab38365c",
       "revId": "c47b0b8ad832721a1e304215d35201a2136b19bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcf1fa9f_ac5b81c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-03-22T15:31:25Z",
+      "side": 1,
+      "message": "Which merge-mode are you using? There is one other option we could consider, which is taking the title and explicitly submitting it with the merge request as commit_title, maybe that changes the result.\n\nCan you link to a PR where you see that or is it all private repos? Could you try to reproduce with a public repo otherwise?",
+      "parentUuid": "127031f7_bf7c1cb5",
+      "revId": "c47b0b8ad832721a1e304215d35201a2136b19bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
