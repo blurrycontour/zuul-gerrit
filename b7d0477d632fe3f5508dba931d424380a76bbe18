@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2066f19_44a2be8a",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-22T22:07:13Z",
+      "side": 1,
+      "message": "Why do we need the lock here?",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd38ad94_7dad7918",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-22T22:07:13Z",
+      "side": 1,
+      "message": "I don\u0027t think we need streamers to be a list here since the log_id is already unique per task and inventory hostname so there will always be just one streamer in there.",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d51db9a3_c5343a4b",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-22T22:07:13Z",
+      "side": 1,
+      "message": "This changes the semantic of this method from \"stop all streamers, aka stop streamers for this task and all hosts\" to \"stop a specific streamer\". I\u0027m not sure what\u0027s the purpose of this change.",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26241bcc_35e99d8c",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-22T22:07:13Z",
+      "side": 1,
+      "message": "Why do we need a lock here?",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
