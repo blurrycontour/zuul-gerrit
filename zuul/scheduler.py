@@ -1247,7 +1247,8 @@ class Scheduler(threading.Thread):
                 loader.loadTPCs(abide, unparsed_abide)
                 for tenant_name in tenants_to_load:
                     loader.loadTenant(abide, tenant_name, self.ansible_manager,
-                                      unparsed_abide, min_ltimes=None)
+                                      unparsed_abide, min_ltimes=None,
+                                      ignore_cat_exception=False)
             finally:
                 self.zk_client.client.delete(validate_root, recursive=True)
 

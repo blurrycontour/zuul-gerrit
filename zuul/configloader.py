@@ -1552,7 +1552,8 @@ class TenantParser(object):
         return vs.Schema(tenant)
 
     def fromYaml(self, abide, conf, ansible_manager, min_ltimes=None,
-                 layout_uuid=None, branch_cache_min_ltimes=None):
+                 layout_uuid=None, branch_cache_min_ltimes=None,
+                 ignore_cat_exception=True):
         # Note: This vs schema validation is not necessary in most cases as we
         # verify the schema when loading tenant configs into zookeeper.
         # However, it is theoretically possible in a multi scheduler setup that
@@ -1618,7 +1619,8 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors, min_ltimes)
+        self._cacheTenantYAML(abide, tenant, loading_errors, min_ltimes,
+                              ignore_cat_exception)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
@@ -1795,7 +1797,8 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors, min_ltimes):
+    def _cacheTenantYAML(self, abide, tenant, loading_errors, min_ltimes,
+                         ignore_cat_exception=True):
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
@@ -1870,12 +1873,16 @@ class TenantParser(object):
                     self.merger.cancel(job)
                 except Exception:
                     self.log.exception("Unable to cancel job %s", job)
+                    if not ignore_cat_exception:
+                        raise
+            if not ignore_cat_exception:
+                raise
 
     def _processCatJobs(self, abide, tenant, loading_errors, jobs):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
-            job.wait(self.merger.git_timeout)
-            if not hasattr(job, 'updated'):
+            res = job.wait(self.merger.git_timeout)
+            if not res:
                 # We timed out
                 raise Exception("Cat job %s timed out; consider setting "
                                 "merger.git_timeout in zuul.conf" % (job,))
@@ -2361,7 +2368,7 @@ class ConfigLoader(object):
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
                    min_ltimes=None, layout_uuid=None,
-                   branch_cache_min_ltimes=None):
+                   branch_cache_min_ltimes=None, ignore_cat_exception=True):
         """(Re-)load a single tenant.
 
         Description of cache stages:
@@ -2438,7 +2445,7 @@ class ConfigLoader(object):
         unparsed_config = unparsed_abide.tenants[tenant_name]
         new_tenant = self.tenant_parser.fromYaml(
             abide, unparsed_config, ansible_manager, min_ltimes, layout_uuid,
-            branch_cache_min_ltimes)
+            branch_cache_min_ltimes, ignore_cat_exception)
         # Copy tenants dictionary to not break concurrent iterations.
         tenants = abide.tenants.copy()
         tenants[tenant_name] = new_tenant
