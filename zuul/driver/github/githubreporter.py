@@ -315,12 +315,10 @@ class GithubReporter(BaseReporter):
                                         zuul_event_id=item.event)
 
     def _formatMergeMessage(self, change):
-        message = []
-        if change.title:
-            message.append(change.title)
         if change.body_text:
-            message.append(change.body_text)
-        merge_message = "\n\n".join(message)
+            merge_message = change.body_text
+        else:
+            merge_message = ""
 
         if change.reviews:
             review_users = []
