@@ -20,3 +20,6 @@
               extra-config-paths:
                 - extra.yaml
                 - extra.d/
+          - org/project6:
+              extra-config-paths:
+                - other/extra.d/
