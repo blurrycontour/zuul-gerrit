@@ -588,6 +588,10 @@ of item.
 
          The target branch of the change (without the `refs/heads/` prefix).
 
+      .. var:: bundle_id
+
+         The id of the bundle if the change is in a circular dependency cycle.
+
       .. var:: change
 
          The identifier for the change.
