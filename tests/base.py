@@ -383,7 +383,8 @@ class FakeGerritChange(object):
 
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
-                 parent=None, merge_parents=None, merge_files=None):
+                 parent=None, merge_parents=None, merge_files=None,
+                 topic=None):
         self.gerrit = gerrit
         self.source = gerrit
         self.reported = 0
@@ -421,6 +422,8 @@ class FakeGerritChange(object):
             'submitRecords': [],
             'url': '%s/%s' % (self.gerrit.baseurl.rstrip('/'), number)}
 
+        if topic:
+            self.data['topic'] = topic
         self.upstream_root = upstream_root
         if merge_parents:
             self.addMergePatchset(parents=merge_parents,
@@ -957,6 +960,7 @@ class GerritWebServer(object):
         class Server(http.server.SimpleHTTPRequestHandler):
             log = logging.getLogger("zuul.test.FakeGerritConnection")
             review_re = re.compile('/a/changes/(.*?)/revisions/(.*?)/review')
+            together_re = re.compile('/a/changes/(.*?)/submitted_together')
             submit_re = re.compile('/a/changes/(.*?)/submit')
             pending_checks_re = re.compile(
                 r'/a/plugins/checks/checks\.pending/\?'
@@ -1005,6 +1009,9 @@ class GerritWebServer(object):
                 m = self.files_re.match(path)
                 if m:
                     return self.get_files(m.group(1), m.group(2))
+                m = self.together_re.match(path)
+                if m:
+                    return self.get_submitted_together(m.group(1))
                 m = self.change_search_re.match(path)
                 if m:
                     return self.get_changes(m.group(1))
@@ -1130,6 +1137,21 @@ class GerritWebServer(object):
                 if data is None:
                     return self._404()
                 self.send_data(data)
+                self.end_headers()
+
+            def get_submitted_together(self, number):
+                change = fake_gerrit.changes.get(int(number))
+                if not change:
+                    return self._404()
+                topic = change.data.get('topic')
+                if not fake_gerrit._fake_submit_whole_topic:
+                    topic = None
+                if topic:
+                    results = fake_gerrit._simpleQuery(
+                        f'topic:{topic}', http=True)
+                else:
+                    results = []
+                self.send_data(results)
                 self.end_headers()
 
             def get_changes(self, query):
@@ -1262,6 +1284,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.fake_checkers = []
         self._poller_event = poller_event
         self._ref_watcher_event = ref_watcher_event
+        self._fake_submit_whole_topic = False
 
     def onStop(self):
         super().onStop()
@@ -1273,14 +1296,15 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
 
     def addFakeChange(self, project, branch, subject, status='NEW',
                       files=None, parent=None, merge_parents=None,
-                      merge_files=None):
+                      merge_files=None, topic=None):
         """Add a change to the fake Gerrit."""
         self.change_number += 1
         c = FakeGerritChange(self, self.change_number, project, branch,
                              subject, upstream_root=self.upstream_root,
                              status=status, files=files, parent=parent,
                              merge_parents=merge_parents,
-                             merge_files=merge_files)
+                             merge_files=merge_files,
+                             topic=topic)
         self.changes[self.change_number] = c
         return c
 
@@ -1431,6 +1455,10 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 queryMethod(change) for change in self.changes.values()
                 if change.data["lastUpdated"] >= cut_off_time
             ]
+        elif query.startswith('topic:'):
+            topic = query[len('topic:'):].strip()
+            l = [queryMethod(change) for change in self.changes.values()
+                 if topic in change.data.get('topic', '')]
         else:
             # Query all open changes
             l = [queryMethod(change) for change in self.changes.values()]

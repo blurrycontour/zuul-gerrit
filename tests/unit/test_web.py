@@ -2667,10 +2667,12 @@ class TestWebMulti(BaseTestWeb):
 
     def test_web_connections_list_multi(self):
         data = self.get_url('api/connections').json()
+        port = self.web.connections.connections['gerrit'].web_server.port
+        url = f'http://localhost:{port}'
         gerrit_connection = {
             'driver': 'gerrit',
             'name': 'gerrit',
-            'baseurl': 'https://review.example.com',
+            'baseurl': url,
             'canonical_hostname': 'review.example.com',
             'server': 'review.example.com',
             'port': 29418,

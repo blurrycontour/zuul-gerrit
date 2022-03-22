@@ -25,6 +25,13 @@ want Zuul to report on.  For instance, you may want to grant
 or values may be added to Gerrit.  Zuul is very flexible and can take
 advantage of those.
 
+If ``change.submitWholeTopic`` is configured in Gerrit, Zuul will
+honor this by enqueing changes with the same topic as circular
+dependencies.  However, it is still necessary to enable circular
+dependency support in any pipeline queues where such changes may
+appear.  See :attr:`queue.allow-circular-dependencies` for information
+on how to configure this.
+
 Connection Configuration
 ------------------------
 

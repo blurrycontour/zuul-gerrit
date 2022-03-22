@@ -881,6 +881,32 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 records.append(result)
         return [(x.number, x.current_patchset) for x in records]
 
+    def _getSubmittedTogether(self, change, event):
+        if not self.session:
+            return []
+        # We could probably ask for everything in one query, but it
+        # might be extremely large, so just get the change ids here
+        # and then query the individual changes.
+        log = get_annotated_logger(self.log, event)
+        log.debug("Updating %s: Looking for changes submitted together",
+                  change)
+        ret = []
+        try:
+            data = self.get(f'changes/{change.number}/submitted_together')
+        except Exception:
+            log.error("Unable to find changes submitted together for %s",
+                      change)
+            return ret
+        for c in data:
+            dep_change = c['_number']
+            dep_ps = c['revisions'][c['current_revision']]['_number']
+            if str(dep_change) == str(change.number):
+                continue
+            log.debug("Updating %s: Found change %s,%s submitted together",
+                      change, dep_change, dep_ps)
+            ret.append((dep_change, dep_ps))
+        return ret
+
     def _updateChange(self, key, change, event, history):
         log = get_annotated_logger(self.log, event)
 
@@ -991,6 +1017,41 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 dep = self._getChange(
                     dep_key, refresh=refresh, history=history,
                     event=event)
+                if (dep.open and dep.is_current_patchset
+                    and dep not in needed_by_changes):
+                    compat_needed_by_changes.append(dep.cache_key)
+                    needed_by_changes.add(dep.cache_key)
+            except Exception:
+                log.exception("Failed to get commit-needed change %s,%s",
+                              dep_num, dep_ps)
+
+        for (dep_num, dep_ps) in self._getSubmittedTogether(change, event):
+            try:
+                log.debug("Updating %s: Getting submitted-together "
+                          "change %s,%s",
+                          change, dep_num, dep_ps)
+                # Because a submitted-together change may be a cross-repo
+                # dependency, cause that change to refresh so that it will
+                # reference the latest patchset of its Depends-On (this
+                # change). In case the dep is already in history we already
+                # refreshed this change so refresh is not needed in this case.
+                refresh = (dep_num, dep_ps) not in history
+                dep_key = ChangeKey(self.connection_name, None,
+                                    'GerritChange', str(dep_num), str(dep_ps))
+                dep = self._getChange(
+                    dep_key, refresh=refresh, history=history,
+                    event=event)
+                # Gerrit changes to be submitted together do not
+                # necessarily get posted with dependency cycles using
+                # git trees and depends-on. However, they are
+                # functionally equivalent to a stack of changes with
+                # cycles using those methods. Here we set
+                # needs_changes and needed_by_changes as if there were
+                # a cycle. This ensures Zuul's cycle handling manages
+                # the submitted together changes properly.
+                if dep.open and dep not in needs_changes:
+                    compat_needs_changes.append(dep.cache_key)
+                    needs_changes.add(dep.cache_key)
                 if (dep.open and dep.is_current_patchset
                     and dep not in needed_by_changes):
                     compat_needed_by_changes.append(dep.cache_key)
@@ -1292,7 +1353,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     self.post('changes/%s/submit' % (changeid,), {})
                     break
                 except HTTPConflictException:
-                    log.exception("Conflict submitting data to gerrit.")
+                    log.info("Conflict submitting data to gerrit, "
+                             "change may already be merged")
                     break
                 except HTTPBadRequestException:
                     log.exception(
