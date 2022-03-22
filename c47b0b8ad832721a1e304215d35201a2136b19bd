@@ -16,6 +16,24 @@
       "message": "Can this be configured? For us what I\u0027m seeing as the merge commit is the following:\n\n  Merge pull request #\u003cno\u003e from \u003corga\u003e/\u003cproject\u003e\n\n  \u003cPR title\u003e\n\n  \u003cPR body\u003e\n\n  \u003cZuul reviewed-by msg\u003e",
       "revId": "c47b0b8ad832721a1e304215d35201a2136b19bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "127031f7_bf7c1cb5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-22T15:10:18Z",
+      "side": 1,
+      "message": "To clarify: this is on GitHub Enterprise",
+      "parentUuid": "2541b0c8_ab38365c",
+      "revId": "c47b0b8ad832721a1e304215d35201a2136b19bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
