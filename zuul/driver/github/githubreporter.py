@@ -327,7 +327,17 @@ class GithubReporter(BaseReporter):
             for r in change.reviews:
                 name = r['by']['name']
                 email = r['by']['email']
-                review_users.append('Reviewed-by: {} <{}>'.format(name, email))
+                username = r['by']['username']
+                review_message = 'Reviewed-by:'
+                if name:
+                    review_message += ' {}'.format(name)
+                elif username:
+                    review_message += ' {}'.format(username)
+                else:
+                    review_message += ' Anonymous'
+                if email:
+                    review_message += ' <{}>'.format(email)
+                review_users.append(review_message)
             merge_message += '\n\n'
             merge_message += '\n'.join(review_users)
 
