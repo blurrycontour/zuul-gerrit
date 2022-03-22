@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45214a54_df3f557f",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-22T18:18:06Z",
+      "side": 1,
+      "message": "Should the comment be `Remove it and verify the change is not dequeued` ?",
+      "revId": "4cd3b06649ccbb70105407463f4a25864a8f5c4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6005038b_9f5873d6",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-22T18:18:06Z",
+      "side": 1,
+      "message": "Should this indicate that `The change is unable to merge because of a missing requirement.` ?",
+      "revId": "4cd3b06649ccbb70105407463f4a25864a8f5c4f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

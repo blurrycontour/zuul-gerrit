@@ -33,6 +33,24 @@
       "message": "This should be 5.1.0 now",
       "revId": "b9c2f162ce1e7d9ccd9a2371df5e216b16a4b99d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abbf3287_4c364f76",
+        "filename": "doc/source/developer/model-changelog.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-22T18:18:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a77fc34_ad85bdc6",
+      "revId": "b9c2f162ce1e7d9ccd9a2371df5e216b16a4b99d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
