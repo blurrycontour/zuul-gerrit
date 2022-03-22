@@ -27,6 +27,7 @@ import datetime
 import json
 import os
 
+from ansible.plugins.loader import PluginLoader
 from ansible.plugins.callback import CallbackBase
 try:
     # It's here in 2.3
@@ -202,3 +203,33 @@ class CallbackModule(CallbackBase):
         outfile.write('\n]\n')
 
     v2_runner_on_unreachable = v2_runner_on_ok
+
+
+# Using 'ansible.builtin.command' instead of 'command' bypasses our
+# custom plugins, so rewrite any uses of ansible.builtin.X to just X.
+# This workaround is temporary until we remove our custom plugins.
+
+# This happens here because Ansible will load the zuul_json plugin for
+# any invocation where we care about restricting access, and this is
+# the earliest in the Ansible startup procedure we can access.
+
+# Monkepatch some PluginLoader methods to rewrite the modules it is
+# loading.
+orig_get = PluginLoader.get
+orig_find_plugin = PluginLoader.find_plugin
+
+
+def mp_get(self, name, *args, **kwargs):
+    name = name.rsplit('.', 1)[-1]
+    ret = orig_get(self, name, *args, **kwargs)
+    return ret
+
+
+def mp_find_plugin(self, name, *args, **kwargs):
+    name = name.rsplit('.', 1)[-1]
+    ret = orig_find_plugin(self, name, *args, **kwargs)
+    return ret
+
+
+PluginLoader.get = mp_get
+PluginLoader.find_plugin = mp_find_plugin

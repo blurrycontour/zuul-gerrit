@@ -3774,6 +3774,12 @@ class FunctionalAnsibleMixIn(object):
         # TODOv3(jeblair): parse the ansible output and verify we're
         # getting the exception we expect.
 
+    def test_plugins_collections(self):
+        plugin_tests = [
+            ('collections_bad', 'FAILURE'),
+        ]
+        self._test_plugins(plugin_tests)
+
     def test_plugins_1(self):
         '''
         Split plugin tests to avoid timeouts and exceeding subunit
