@@ -17,7 +17,7 @@ import textwrap
 
 from zuul.model import PromoteEvent
 
-from tests.base import ZuulTestCase
+from tests.base import ZuulTestCase, simple_layout
 
 
 class TestGerritCircularDependencies(ZuulTestCase):
@@ -180,7 +180,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 1)
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
@@ -1353,7 +1353,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertEqual(A.reported, 3)
         self.assertEqual(B.reported, 3)
-        self.assertEqual(C.reported, 3)
+        self.assertEqual(C.reported, 6)
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
@@ -1387,7 +1387,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.reported, 2)
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
@@ -1398,7 +1398,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 3)
+        self.assertEqual(A.reported, 4)
         self.assertEqual(A.data["status"], "MERGED")
 
     def test_promote_cycle(self):
@@ -1535,6 +1535,27 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.reported, 3)
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
+
+    @simple_layout('layouts/submitted-together-per-branch.yaml')
+    def test_submitted_together_per_branch(self):
+        self.fake_gerrit._fake_submit_whole_topic = True
+        self.create_branch('org/project2', 'stable/foo')
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "stable/foo", "B",
+                                           topic='test-topic')
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 0)
+        self.assertEqual(B.reported, 1)
+        self.assertEqual(A.data["status"], "NEW")
+        self.assertEqual(B.data["status"], "NEW")
+        self.assertIn("does not share a change queue", B.messages[-1])
 
 
 class TestGithubCircularDependencies(ZuulTestCase):
