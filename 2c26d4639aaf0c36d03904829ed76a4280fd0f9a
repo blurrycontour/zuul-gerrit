@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e33fdd35_7f117fb7",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-23T20:46:36Z",
+      "side": 1,
+      "message": "Can you check if this includes the authentication headers? If they\u0027re contained there I think we should redact them before printing.",
+      "revId": "2c26d4639aaf0c36d03904829ed76a4280fd0f9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
