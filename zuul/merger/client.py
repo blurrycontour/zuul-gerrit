@@ -15,6 +15,8 @@
 import logging
 from uuid import uuid4
 
+import traceback
+
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import (
@@ -123,6 +125,9 @@ class MergeClient(object):
     def getFilesChanges(self, connection_name, project_name, branch,
                         tosha=None, precedence=PRECEDENCE_HIGH,
                         build_set=None, needs_result=False, event=None):
+        for line in traceback.format_stack():
+            self.log.info(".......... %s", line.strip())
+
         data = dict(connection=connection_name,
                     project=project_name,
                     branch=branch,
