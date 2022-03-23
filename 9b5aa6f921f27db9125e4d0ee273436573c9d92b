@@ -16,6 +16,24 @@
       "message": "There is already a change that does exactly this and includes tests [1].\n\n[1] https://review.opendev.org/c/zuul/zuul/+/832655",
       "revId": "9b5aa6f921f27db9125e4d0ee273436573c9d92b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21668f9d_8edf8b2c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-03-23T08:03:17Z",
+      "side": 1,
+      "message": "nice!",
+      "parentUuid": "d3df7b2f_000789ed",
+      "revId": "9b5aa6f921f27db9125e4d0ee273436573c9d92b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
