@@ -541,6 +541,7 @@ class FakePull(object):
                     'full_name': pr.project
                 },
                 'ref': pr.branch,
+                'sha': pr.base_sha,
             },
             'user': {
                 'login': 'octocat'
