@@ -16,6 +16,23 @@
       "message": "nit: … dict of …?",
       "revId": "bc1618ed5b683b7c43072e2c26c6a19d6dc8d9f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2858c11_f5979918",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1663,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-23T18:59:44Z",
+      "side": 1,
+      "message": "Technically... yes... but OrderedDict is a bit of both, and in this case the ordering is very important (this was intended to be a list, but indexed for fast duplicate checks).  I could have explained that more, sorry.  In short: incomplete comment, but not a typo.",
+      "revId": "bc1618ed5b683b7c43072e2c26c6a19d6dc8d9f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
