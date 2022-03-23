@@ -28,6 +28,7 @@ from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.merger import MergerApi
 from zuul.zk.exceptions import JobRequestNotFound
 from kazoo.exceptions import BadVersionError, NoNodeError
+import traceback
 
 
 class MergeClient(object):
@@ -123,6 +124,11 @@ class MergeClient(object):
     def getFilesChanges(self, connection_name, project_name, branch,
                         tosha=None, precedence=PRECEDENCE_HIGH,
                         build_set=None, needs_result=False, event=None):
+        log = get_annotated_logger(self.log, event)
+        log.debug("client.getFilesChanges() ....")
+        for line in traceback.format_stack():
+            log.debug(line.strip())
+
         data = dict(connection=connection_name,
                     project=project_name,
                     branch=branch,

@@ -689,9 +689,9 @@ class Repo(object):
         files = set()
 
         if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+            head_commit = repo.commit(head.hexsha)
+            diff_index = head_commit.diff(tosha)
+            files.update((item.a_path for item in diff_index))
         else:
             files.update(head.stats.files.keys())
         return list(files)
