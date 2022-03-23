@@ -363,6 +363,39 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(sorted(['README', 'feature.txt']),
                          sorted(changed_files))
 
+    def test_files_changes_add_and_remove_files(self):
+        """
+        If the changed files in previous commits are reverted in later commits,
+        they should not be considered as changed in the PR.
+        """
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        self.create_branch('org/project1', 'feature1')
+
+        base_sha = git.Repo(parent_path).commit('master').hexsha
+
+        # Let the file that is also changed in the feature branch diverge
+        # in master. This change should NOT be considered in the changed
+        # files list.
+        files = {'to-be-deleted.txt': 'FAIL'}
+        self.create_commit('org/project1', files=files, head='master',
+                           message='Add master file')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        # Add a file in first commit
+        files = {'to-be-deleted.txt': 'test'}
+        self.create_commit('org/project1', files=files, head='feature1',
+                           message='Add file')
+        changed_files = work_repo.getFilesChanges('feature1', base_sha)
+        self.assertEqual(sorted(['README', 'to-be-deleted.txt']),
+                         sorted(changed_files))
+        # Delete the file in second commit
+        delete_files = ['to-be-deleted.txt']
+        self.create_commit('org/project1', files={},
+                           delete_files=delete_files, head='feature1',
+                           message='Delete file')
+        changed_files = work_repo.getFilesChanges('feature1', base_sha)
+        self.assertEqual(['README'], changed_files)
+
     def test_files_changes_master_fork_merges(self):
         """Regression test for getFilesChanges()
 
