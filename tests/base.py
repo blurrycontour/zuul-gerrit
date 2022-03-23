@@ -3675,7 +3675,7 @@ class FakeNodepool(object):
             nodes.append(data)
         return nodes
 
-    def makeNode(self, request_id, node_type):
+    def makeNode(self, request_id, node_type, request):
         now = time.time()
         path = '/nodepool/nodes/'
         remote_ip = os.environ.get('ZUUL_REMOTE_IPV4', '127.0.0.1')
@@ -3734,6 +3734,8 @@ class FakeNodepool(object):
             if 'fedora-pod' in node_type:
                 data['connection_type'] = 'kubectl'
                 data['connection_port']['pod'] = 'fedora-abcdefg'
+        data['tenant_name'] = request['tenant_name']
+        data['requestor'] = request['requestor']
 
         data = json.dumps(data).encode('utf8')
         path = self.client.create(path, data,
@@ -3762,7 +3764,7 @@ class FakeNodepool(object):
             request['state'] = 'fulfilled'
             nodes = request.get('nodes', [])
             for node in request['node_types']:
-                nodeid = self.makeNode(oid, node)
+                nodeid = self.makeNode(oid, node, request)
                 nodes.append(nodeid)
             request['nodes'] = nodes
 

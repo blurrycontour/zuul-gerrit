@@ -2038,8 +2038,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual([], request.nodes)
 
         # Some convenience variables for checking the stats.
-        tenant_ram_stat = 'zuul.nodepool.resources.tenant.tenant-one.ram'
-        project_ram_stat = ('zuul.nodepool.resources.project.'
+        tenant_ram_stat =\
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.ram'
+        project_ram_stat = ('zuul.nodepool.resources.in_use.project.'
                             'review_example_com/org/project.ram')
         # Test that we zeroed the gauges
         self.scheds.first.sched._runStats()
@@ -5701,45 +5702,54 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertHistory([
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
         ])
-        # All 3 nodes are in use
         self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.cores',
+            'zuul.nodepool.resources.total.tenant.tenant-one.cores',
             value='6', kind='g')
         self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.ram',
+            'zuul.nodepool.resources.total.tenant.tenant-one.ram',
             value='3072', kind='g')
         self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.instances',
+            'zuul.nodepool.resources.total.tenant.tenant-one.instances',
+            value='3', kind='g')
+        # All 3 nodes are in use
+        self.assertReportedStat(
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.cores',
+            value='6', kind='g')
+        self.assertReportedStat(
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.ram',
+            value='3072', kind='g')
+        self.assertReportedStat(
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.instances',
             value='3', kind='g')
         self.assertReportedStat(
-            'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'cores', value='6', kind='g')
+            'zuul.nodepool.resources.in_use.project.review_example_com/org/'
+            'project.cores', value='6', kind='g')
         self.assertReportedStat(
-            'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'ram', value='3072', kind='g')
+            'zuul.nodepool.resources.in_use.project.review_example_com/org/'
+            'project.ram', value='3072', kind='g')
         self.assertReportedStat(
-            'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'instances', value='3', kind='g')
+            'zuul.nodepool.resources.in_use.project.review_example_com/org/'
+            'project.instances', value='3', kind='g')
 
         # Check that resource usage counters are reported
         self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.cores',
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.cores',
             kind='c')
         self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.ram',
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.ram',
             kind='c')
         self.assertReportedStat(
-            'zuul.nodepool.resources.tenant.tenant-one.instances',
+            'zuul.nodepool.resources.in_use.tenant.tenant-one.instances',
             kind='c')
         self.assertReportedStat(
-            'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'cores', kind='c')
+            'zuul.nodepool.resources.in_use.project.review_example_com/org/'
+            'project.cores', kind='c')
         self.assertReportedStat(
-            'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'ram', kind='c')
+            'zuul.nodepool.resources.in_use.project.review_example_com/org/'
+            'project.ram', kind='c')
         self.assertReportedStat(
-            'zuul.nodepool.resources.project.review_example_com/org/project.'
-            'instances', kind='c')
+            'zuul.nodepool.resources.in_use.project.review_example_com/org/'
+            'project.instances', kind='c')
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
