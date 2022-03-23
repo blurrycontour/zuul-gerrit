@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e45431d9_416d3d0b",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-23T21:01:12Z",
+      "side": 1,
+      "message": "I think we need to also add \"ARG PUBLIC_URL\" such that it can be used here as a build arg.",
+      "revId": "8b476842a4e74989c68edbf31c314c6847f4e403",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
