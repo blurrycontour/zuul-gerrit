@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2159adc8_793128c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-23T20:41:09Z",
+      "side": 1,
+      "message": "This is an interesting idea. However it won\u0027t match to most of our tenants where we have always a tenant-central ci/integration team that is responsible for what\u0027s going on in the tenant. So we should be able to opt out of this feature.",
+      "revId": "3bc8ef1a7519bbc2a9e84ddfd2d1d8cd53955a70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff119f9a_6c096d55",
+        "filename": "doc/source/developer/specs/code-review-ACL-for-admin-API.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-23T20:41:09Z",
+      "side": 1,
+      "message": "We also need to consider what happens for e.g. promote in a larger gate with several projects in the queue.",
+      "revId": "3bc8ef1a7519bbc2a9e84ddfd2d1d8cd53955a70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
