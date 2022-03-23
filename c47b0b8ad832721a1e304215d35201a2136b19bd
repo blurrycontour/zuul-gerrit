@@ -72,6 +72,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "631c3784_fea8699f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-23T06:49:16Z",
+      "side": 1,
+      "message": "Sorry, missed your comment where you mention that you use merge-rebase. I\u0027m just wondering how this works with Zuul as I don\u0027t see that merge-rebase is supported: https://zuul-ci.org/docs/zuul/latest/config/project.html#attr-project.merge-mode",
+      "parentUuid": "0931555a_deab970a",
+      "revId": "c47b0b8ad832721a1e304215d35201a2136b19bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "c5d4b07d_a5e213f5",
