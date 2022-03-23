@@ -171,6 +171,21 @@ class TestGithubDriver(ZuulTestCase):
                  changes="%s,%s" % (A.number, A.head_sha)),
         ])
 
+    @simple_layout('layouts/push-tag-github.yaml', driver='github')
+    def test_changed_files(self):
+        files = {'{:03d}.txt'.format(n): 'test' for n in range(1000)}
+
+        files["to-be-removed"] = "test"
+        pr = self.fake_github.openFakePullRequest(
+            'org/project', 'master', 'A', files=files)
+
+        pr.addCommit(delete_files=['to-be-removed'])
+
+        self.fake_github.emitEvent(pr.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(1, 2)
+
     @simple_layout('layouts/files-github.yaml', driver='github')
     def test_pull_file_rename(self):
         A = self.fake_github.openFakePullRequest(
