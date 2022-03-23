@@ -364,7 +364,7 @@ class ZuulWebAPI(object):
         self.cache_time = {}
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
-        self.status_lock = threading.Lock()
+        self.status_lock = defaultdict(threading.Lock)
 
     @property
     def log(self):
@@ -991,12 +991,21 @@ class ZuulWebAPI(object):
 
     def _getStatus(self, tenant_name):
         tenant = self._getTenantOrRaise(tenant_name)
-        with self.status_lock:
-            if tenant not in self.cache or \
-               (time.time() - self.cache_time[tenant]) > self.cache_expiry:
-                self.cache[tenant_name] = self.formatStatus(tenant)
-                self.cache_time[tenant_name] = time.time()
-
+        if tenant_name not in self.cache or \
+           (time.time() - self.cache_time[tenant_name]) > self.cache_expiry:
+            if self.status_lock[tenant_name].acquire(blocking=False):
+                try:
+                    self.cache[tenant_name] = self.formatStatus(tenant)
+                    self.cache_time[tenant_name] = time.time()
+                finally:
+                    self.status_lock[tenant_name].release()
+            if not self.cache.get(tenant_name):
+                # If the cache is empty at this point it means that we didn't
+                # get the lock but another thread is initializing the cache
+                # for the first time. In this case we just wait for the lock
+                # to wait for it to finish.
+                with self.status_lock[tenant_name]:
+                    pass
         payload = self.cache[tenant_name]
         resp = cherrypy.response
         resp.headers["Cache-Control"] = f"public, max-age={self.cache_expiry}"
