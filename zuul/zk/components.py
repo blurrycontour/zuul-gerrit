@@ -21,7 +21,7 @@ from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import EventType
 
 from zuul.zk import ZooKeeperBase
-from zuul import model
+from zuul.model_api import MODEL_API
 
 
 COMPONENTS_ROOT = "/zuul/components"
@@ -123,7 +123,7 @@ class BaseComponent(ZooKeeperBase):
             except NoNodeError:
                 self.log.error("Could not update %s in ZooKeeper", self)
 
-    def register(self, model_api=model.MODEL_API):
+    def register(self, model_api=MODEL_API):
         self.content['model_api'] = model_api
         with self.register_lock:
             path = "/".join([COMPONENTS_ROOT, self.kind, self.hostname])
@@ -346,7 +346,7 @@ class ComponentRegistry(ZooKeeperBase):
 
         # Start with our own version in case we're the only component
         # and we haven't registered.
-        version = model.MODEL_API
+        version = MODEL_API
         for kind, components in self.all():
             for component in components:
                 version = min(version, component.model_api)
@@ -358,28 +358,28 @@ class ComponentRegistry(ZooKeeperBase):
         version = self.getMinimumModelApi()
         if version != self.model_api:
             self.log.info(f"System minimum data model version {version}; "
-                          f"this component {model.MODEL_API}")
+                          f"this component {MODEL_API}")
         if self.model_api is None:
-            if version < model.MODEL_API:
+            if version < MODEL_API:
                 self.log.info("The data model version of this component is "
                               "newer than the rest of the system; this "
                               "component will operate in compatability mode "
                               "until the system is upgraded")
-            elif version > model.MODEL_API:
+            elif version > MODEL_API:
                 self.log.error("The data model version of this component is "
                                "older than the rest of the system; "
                                "exiting to prevent data corruption")
                 sys.exit(1)
         else:
             if version > self.model_api:
-                if version > model.MODEL_API:
+                if version > MODEL_API:
                     self.log.info("The data model version of this component "
                                   "is older than other components in the "
                                   "system, so other components will operate "
                                   "in a compability mode; upgrade this "
                                   "component as soon as possible to complete "
                                   "the system upgrade")
-                elif version == model.MODEL_API:
+                elif version == MODEL_API:
                     self.log.info("The rest of the system has been upgraded "
                                   "to the data model version of this "
                                   "component")
