@@ -1565,6 +1565,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                       change.patchset)
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
+        change.base_sha = change.pr.get('base').get('sha')
         change.commit_id = change.pr.get('head').get('sha')
         change.owner = change.pr.get('user').get('login')
         # Don't overwrite the files list. The change object is bound to a
