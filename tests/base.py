@@ -2266,6 +2266,8 @@ class GithubChangeReference(git.Reference):
 
 class FakeGithubPullRequest(object):
 
+    log = logging.getLogger("zuul.test.FakeGithubPullRequest")
+
     def __init__(self, github, number, project, branch,
                  subject, upstream_root, files=None, number_of_commits=1,
                  writers=[], body=None, body_text=None, draft=False,
@@ -2301,13 +2303,14 @@ class FakeGithubPullRequest(object):
         self.merge_message = None
         self.state = 'open'
         self.url = 'https://%s/%s/pull/%s' % (github.server, project, number)
+        self.base_sha = base_sha
         self._createPRRef(base_sha=base_sha)
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
-    def addCommit(self, files=None):
+    def addCommit(self, files=None, delete_files=None):
         """Adds a commit on top of the actual PR head."""
-        self._addCommitToRepo(files=files)
+        self._addCommitToRepo(files=files, delete_files=None)
         self._updateTimeStamp()
 
     def forcePush(self, files=None):
@@ -2476,9 +2479,10 @@ class FakeGithubPullRequest(object):
         GithubChangeReference.create(
             repo, self.getPRReference(), base_sha)
 
-    def _addCommitToRepo(self, files=None, reset=False):
+    def _addCommitToRepo(self, files=None, delete_files=None, reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getPRReference()]
+        self.log.info(".......ref: %s", str(ref))
         if reset:
             self.number_of_commits = 0
             ref.set_object('refs/tags/init')
@@ -2496,11 +2500,11 @@ class FakeGithubPullRequest(object):
                     normalized_files[fn] = content
                 else:
                     normalized_files[tests.fakegithub.FakeFile(fn)] = content
-            self.files = normalized_files
+            self.files.update(normalized_files)
         else:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             content = f"test {self.branch} {self.number}\n"
-            self.files = {tests.fakegithub.FakeFile(fn): content}
+            self.files.update({tests.fakegithub.FakeFile(fn): content})
 
         msg = self.subject + '-' + str(self.number_of_commits)
         for fake_file, content in self.files.items():
@@ -2509,7 +2513,14 @@ class FakeGithubPullRequest(object):
                 f.write(content)
             repo.index.add([fn])
 
+        if delete_files:
+            for fn in delete_files:
+                fn = os.path.join(repo.working_dir, fn.filename)
+                repo.index.remove([fn])
+
         self.head_sha = repo.index.commit(msg).hexsha
+        self.log.info(".........head_sha: %s", self.head_sha)
+
         repo.create_head(self.getPRReference(), self.head_sha, force=True)
         # Create an empty set of statuses for the given sha,
         # each sha on a PR may have a status set on it
@@ -5131,8 +5142,9 @@ class ZuulTestCase(BaseTestCase):
         repo.head.reset(working_tree=True)
         repo.delete_head(repo.heads[branch], force=True)
 
-    def create_commit(self, project, files=None, head='master',
-                      message='Creating a fake commit', **kwargs):
+    def create_commit(self, project, files=None, delete_files=None,
+                      head='master', message='Creating a fake commit',
+                      **kwargs):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = repo.heads[head]
@@ -5144,6 +5156,12 @@ class ZuulTestCase(BaseTestCase):
             with open(file_name, 'a') as f:
                 f.write(content)
             repo.index.add([file_name])
+
+        delete_files = delete_files or []
+        for name in delete_files:
+            file_name = os.path.join(path, name)
+            repo.index.remove([file_name])
+
         commit = repo.index.commit(message, **kwargs)
         return commit.hexsha
 
