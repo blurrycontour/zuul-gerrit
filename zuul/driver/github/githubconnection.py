@@ -1565,6 +1565,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                       change.patchset)
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
+        change.base_sha = change.pr.get('base').get('sha')
         change.commit_id = change.pr.get('head').get('sha')
         change.owner = change.pr.get('user').get('login')
         # Don't overwrite the files list. The change object is bound to a
@@ -1770,7 +1771,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 number, owner, proj))
         pr = probj.as_dict()
         try:
-            if pr.get('changed_files', 0) > 999:
+            if pr.get('changed_files', 0) > 0:
                 # Don't request more than ten pages. If we exceed this we
                 # need to determine the files via the mergers asynchronously
                 # in order to not block the event processing by iterating on
