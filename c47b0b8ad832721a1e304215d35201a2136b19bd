@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "0931555a_deab970a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-23T06:15:36Z",
+      "side": 1,
+      "message": "Unfortunately it\u0027s a private GH instance. We are using the default \"merge-resolve\" mode in Zuul with the \"merge\" mode on GH side.\n\nAre you using squash-merge?",
+      "parentUuid": "dcf1fa9f_ac5b81c2",
+      "revId": "c47b0b8ad832721a1e304215d35201a2136b19bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "c5d4b07d_a5e213f5",
