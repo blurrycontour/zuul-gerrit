@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0cbcd92_abd2c584",
+        "filename": "tests/fixtures/config/data-return/git/common-config/zuul.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-03-24T08:37:24Z",
+      "side": 1,
+      "message": "This should succeed instead of fail, otherwise the test won\u0027t detect the difference between an early fail or a regular failure.",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 31
+      },
+      "revId": "1217f6eab81b106a52d01f4db3b69238fd977aa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
