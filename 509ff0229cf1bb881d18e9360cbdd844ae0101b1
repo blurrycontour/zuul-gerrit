@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f47329b_f2ffacf8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-24T10:57:22Z",
+      "side": 1,
+      "message": "Could we maybe make this a 100% solution by also adding the `base_sha` for Pagure and Gitlab?\n\nForm the API docs it looks like this should be possible:\n* Gitlab: https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr\n\n    \"diff_refs\": {\n      \"base_sha\": \"c380d3acebd181f13629a25d2e2acca46ffe1e00\",\n    ...\n\n* Pagure: https://pagure.io/api/0/#pull_requests-tab\n\n    \"commit_start\": null,\n    ...\n\n  (so in the Pagure case we probably need to use `\u003ccommit-start-sha\u003e^`)",
+      "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "427645a6_591b00aa",
@@ -14,6 +31,23 @@
       "writtenOn": "2022-03-24T07:02:08Z",
       "side": 1,
       "message": "recheck",
+      "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d033fe58_b1c08ac7",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5454,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-24T10:57:22Z",
+      "side": 1,
+      "message": "You also need to (de-)serialize the `base_sha`.\n\nWould it be possible to add an end-to-end test for that in addition to the unittest for the repo API?",
       "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
