@@ -23,6 +23,7 @@ import os
 import re
 import shutil
 import time
+from concurrent.futures.process import BrokenProcessPool
 
 import git
 import gitdb
@@ -1058,6 +1059,8 @@ class Merger(object):
             try:
                 repo.reset(zuul_event_id=zuul_event_id,
                            process_worker=process_worker)
+            except BrokenProcessPool:
+                raise
             except Exception:
                 log.exception("Unable to reset repo %s" % repo)
                 return None, None
@@ -1135,6 +1138,8 @@ class Merger(object):
                         item, recent, repo_state, zuul_event_id,
                         branches=branches,
                         process_worker=process_worker)
+                except BrokenProcessPool:
+                    raise
                 except Exception:
                     self.log.exception("Error merging item %s", item)
                     if errors is not None:
