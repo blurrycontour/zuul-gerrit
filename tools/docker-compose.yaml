@@ -26,15 +26,16 @@ services:
 
   zookeeper:
     container_name: zuul-test-zookeeper
+    user: "${USER_ID}"
     image: zookeeper
     environment:
       - ZOO_AUTOPURGE_PURGEINTERVAL=1
-      - ZOO_LOG4J_PROP=WARN
     ports:
       - "2281:2281"
     tmpfs:
-      - /data
-      - /datalog
+      - /data:uid=${USER_ID}
+      - /datalog:uid=${USER_ID}
     volumes:
       - "./ca:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
+      - "./log4j.properties:/conf/log4j.properties:z"
