@@ -22,6 +22,30 @@
       },
       "revId": "1217f6eab81b106a52d01f4db3b69238fd977aa8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "956a0468_c8952da5",
+        "filename": "tests/fixtures/config/data-return/git/common-config/zuul.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-03-24T11:50:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0cbcd92_abd2c584",
+      "range": {
+        "startLine": 126,
+        "startChar": 0,
+        "endLine": 126,
+        "endChar": 31
+      },
+      "revId": "1217f6eab81b106a52d01f4db3b69238fd977aa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
