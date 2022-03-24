@@ -1,4 +1,5 @@
 # Copyright 2020 BMW Group
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,11 +15,15 @@
 
 import json
 from collections.abc import MutableMapping
+from contextlib import suppress
 from functools import total_ordering
+import logging
+import time
 
 from kazoo.exceptions import NoNodeError
 
-from zuul.zk import ZooKeeperBase
+from zuul.zk.components import COMPONENT_REGISTRY
+from zuul.zk import sharding, ZooKeeperBase
 
 
 @total_ordering
@@ -92,8 +97,10 @@ class LayoutState:
 
 
 class LayoutStateStore(ZooKeeperBase, MutableMapping):
+    log = logging.getLogger("zuul.LayoutStore")
 
     layout_root = "/zuul/layout"
+    layout_data_root = "/zuul/layout-data"
 
     def __init__(self, client, callback):
         super().__init__(client)
@@ -154,3 +161,55 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
         if zstat is None:
             return 0
         return zstat.children_count
+
+    def getMinLtimes(self, layout_state):
+        if COMPONENT_REGISTRY.model_api < 6:
+            return None
+        try:
+            path = f"{self.layout_data_root}/{layout_state.uuid}"
+            with sharding.BufferedShardReader(
+                    self.kazoo_client, path) as stream:
+                data = stream.read()
+        except NoNodeError:
+            return None
+
+        try:
+            return json.loads(data)['min_ltimes']
+        except Exception:
+            return None
+
+    def setMinLtimes(self, layout_state, min_ltimes):
+        data = dict(min_ltimes=min_ltimes)
+        encoded_data = json.dumps(data).encode("utf-8")
+
+        path = f"{self.layout_data_root}/{layout_state.uuid}"
+        with sharding.BufferedShardWriter(
+                self.kazoo_client, path) as stream:
+            stream.write(encoded_data)
+
+    def cleanup(self, delay=300):
+        self.log.debug("Starting layout data cleanup")
+        known_layouts = set()
+        for tenant in self.kazoo_client.get_children(
+                self.layout_root):
+            state = self.get(tenant)
+            if state:
+                known_layouts.add(state.uuid)
+
+        for layout_uuid in self.kazoo_client.get_children(
+                self.layout_data_root):
+            if layout_uuid in known_layouts:
+                continue
+
+            path = f"{self.layout_data_root}/{layout_uuid}"
+            zstat = self.kazoo_client.exists(path)
+            if zstat is None:
+                continue
+
+            now = time.time()
+            if now - zstat.created >= delay:
+                self.log.debug("Deleting unused layout data for %s",
+                               layout_uuid)
+                with suppress(NoNodeError):
+                    self.kazoo_client.delete(path, recursive=True)
+        self.log.debug("Finished layout data cleanup")
