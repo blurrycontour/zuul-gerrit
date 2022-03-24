@@ -26,6 +26,7 @@ services:
 
   zookeeper:
     container_name: zuul-test-zookeeper
+    command: "sh -c 'zkServer.sh start-foreground'"
     image: zookeeper
     environment:
       - ZOO_AUTOPURGE_PURGEINTERVAL=1
