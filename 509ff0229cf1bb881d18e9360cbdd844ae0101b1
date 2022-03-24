@@ -104,6 +104,24 @@
       "parentUuid": "cb345606_a9b90b03",
       "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b114fca_1ff5dab0",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5454,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-24T11:18:19Z",
+      "side": 1,
+      "message": "Thanks for the tip :)",
+      "parentUuid": "429bb62f_da980d45",
+      "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
