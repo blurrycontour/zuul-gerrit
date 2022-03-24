@@ -678,6 +678,7 @@ class Scheduler(threading.Thread):
                 self._runConfigCacheCleanup()
                 self._runExecutorApiCleanup()
                 self._runMergerApiCleanup()
+                self._runLayoutDataCleanup()
                 self.maintainConnectionCache()
             except Exception:
                 self.log.exception("Error in general cleanup:")
@@ -713,6 +714,12 @@ class Scheduler(threading.Thread):
             self.merger.merger_api.cleanup()
         except Exception:
             self.log.exception("Error in merger API cleanup:")
+
+    def _runLayoutDataCleanup(self):
+        try:
+            self.tenant_layout_state.cleanup()
+        except Exception:
+            self.log.exception("Error in layout data cleanup:")
 
     def _runBuildRequestCleanup(self):
         # If someone else is running the cleanup, skip it.
@@ -894,8 +901,6 @@ class Scheduler(threading.Thread):
                     lock_ctx = tenant_read_lock(self.zk_client, tenant_name)
                     timer_ctx = nullcontext()
 
-                # Consider all caches valid (min. ltime -1)
-                min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
                 with lock_ctx as tlock, timer_ctx:
                     # Refresh the layout state now that we are holding the lock
                     # and we can be sure it won't be changed concurrently.
@@ -903,14 +908,18 @@ class Scheduler(threading.Thread):
                     layout_uuid = layout_state and layout_state.uuid
 
                     if layout_state:
+                        # Get the ltimes from the previous reconfiguration.
+                        min_ltimes = self.tenant_layout_state.getMinLtimes(
+                            layout_state)
                         branch_cache_min_ltimes = (
                             layout_state.branch_cache_min_ltimes)
                     else:
-                        # Consider all project branch caches valid if
-                        # we don't have a layout state.
+                        # Consider all caches valid if we don't have a
+                        # layout state.
+                        min_ltimes = defaultdict(
+                            lambda: defaultdict(lambda: -1))
                         branch_cache_min_ltimes = defaultdict(lambda: -1)
 
-                    # This load validates the entire tenant config
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -920,7 +929,7 @@ class Scheduler(threading.Thread):
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
                         ctx = self.createZKContext(tlock, self.log)
-                        self._reconfigureTenant(ctx, tenant)
+                        self._reconfigureTenant(ctx, min_ltimes, tenant)
                         self._reportInitialStats(tenant)
                     else:
                         self.local_layout_state[tenant_name] = layout_state
@@ -1161,8 +1170,6 @@ class Scheduler(threading.Thread):
 
     def updateTenantLayout(self, log, tenant_name):
         log.debug("Updating layout of tenant %s", tenant_name)
-        # Consider all caches valid (min. ltime -1)
-        min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals, self.statsd, self,
             self.merger, self.keystore)
@@ -1179,6 +1186,14 @@ class Scheduler(threading.Thread):
             else:
                 # We don't need the cache ltimes as the tenant was deleted
                 branch_cache_min_ltimes = None
+
+            # Get the ltimes from the previous reconfiguration.
+            if layout_state:
+                min_ltimes = self.tenant_layout_state.getMinLtimes(
+                    layout_state)
+            else:
+                min_ltimes = None
+
             loader.loadTPCs(self.abide, self.unparsed_abide,
                             [tenant_name])
             tenant = loader.loadTenant(
@@ -1346,7 +1361,8 @@ class Scheduler(threading.Thread):
                     reconfigured_tenants.append(tenant_name)
                     ctx = self.createZKContext(lock, self.log)
                     if tenant is not None:
-                        self._reconfigureTenant(ctx, tenant, old_tenant)
+                        self._reconfigureTenant(ctx, min_ltimes,
+                                                tenant, old_tenant)
                     else:
                         self._reconfigureDeleteTenant(ctx, old_tenant)
                         with suppress(KeyError):
@@ -1408,7 +1424,8 @@ class Scheduler(threading.Thread):
                     branch_cache_min_ltimes=branch_cache_min_ltimes)
                 tenant = self.abide.tenants[event.tenant_name]
                 ctx = self.createZKContext(lock, self.log)
-                self._reconfigureTenant(ctx, tenant, old_tenant)
+                self._reconfigureTenant(ctx, min_ltimes,
+                                        tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
         self.log.info("Tenant reconfiguration complete for %s (duration: %s "
                       "seconds)", event.tenant_name, duration)
@@ -1562,7 +1579,8 @@ class Scheduler(threading.Thread):
                 request)
             self.cancelJob(build_set, request_job)
 
-    def _reconfigureTenant(self, context, tenant, old_tenant=None):
+    def _reconfigureTenant(self, context, min_ltimes, tenant,
+                           old_tenant=None):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
         if old_tenant:
@@ -1595,6 +1613,9 @@ class Scheduler(threading.Thread):
             uuid=tenant.layout.uuid,
             branch_cache_min_ltimes=branch_cache_min_ltimes,
         )
+        # Save the min_ltimes which are sharded before we atomically
+        # update the layout state.
+        self.tenant_layout_state.setMinLtimes(layout_state, min_ltimes)
         # We need to update the local layout state before the remote state,
         # to avoid race conditions in the layout changed callback.
         self.local_layout_state[tenant.name] = layout_state

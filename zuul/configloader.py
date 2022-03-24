@@ -32,6 +32,7 @@ import zuul.manager.serial
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.lib.varnames import check_varnames
+from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.semaphore import SemaphoreHandler
 
@@ -1801,7 +1802,69 @@ class TenantParser(object):
 
     def _cacheTenantYAML(self, abide, tenant, loading_errors, min_ltimes,
                          ignore_cat_exception=True):
+        # min_ltimes can be the following: None -- that means that we
+        # should not use the file cache at all a nested dict of
+        # project and branch to ltime.  This usually means we are
+        # being called from the command line config validator.
+        # However, if the model api is old, we may be operating in
+        # compatibility mode and are loading a layout without a stored
+        # min_ltimes.  In that case, we treat it as if min_ltimes is
+        # a defaultdict of -1.
+
+        # If min_ltimes is not None, then it is mutated and returned
+        # with the actual ltimes of each entry in the unparsed branch
+        # cache.
+
+        if min_ltimes is None and COMPONENT_REGISTRY.model_api < 6:
+            min_ltimes = collections.defaultdict(
+                lambda: collections.defaultdict(lambda: -1))
+
+        # If the ltime is -1, then we should consider the file cache
+        # valid.  If we have an unparsed branch cache entry for the
+        # project-branch, we should use it, otherwise we should update
+        # our unparsed branch cache from whatever is in the file
+        # cache.
+
+        # If the ltime is otherwise, then if our unparsed branch cache
+        # is valid for that ltime, we should use the contents.
+        # Otherwise if the files cache is valid for the ltime, we
+        # should update our unparsed branch cache from the files cache
+        # and use that.  Otherwise, we should run a cat job to update
+        # the files cache, then update our unparsed branch cache from
+        # that.
+
+        # The circumstances under which this method is called are:
+
+        # Prime:
+        #   min_ltimes is None: backwards compat from old model api
+        #   which we treat as a universal ltime of -1.
+        #   We'll either get an actual min_ltimes dict from the last
+        #   reconfig, or -1 if this is a new tenant.
+        #   In all cases, our unparsed branch cache will be empty, so
+        #   we will always either load data from zk or issue a cat job
+        #   as appropriate.
+
+        # Background layout update:
+        #   min_ltimes is None: backwards compat from old model api
+        #   which we treat as a universal ltime of -1.
+        #   Otherwise, min_ltimes will always be the actual min_ltimes
+        #   from the last reconfig.  No cat jobs should be needed; we
+        #   either have an unparsed branch cache valid for the ltime,
+        #   or we update it from ZK which should be valid.
+
+        # Smart or full reconfigure:
+        #   min_ltime is -1: a smart reconfig: consider the caches valid
+        #   min_ltime is the event time: a full reconfig; we update
+        #   both of the ccahes as necessary.
+
+        # Tenant reconfigure:
+        #   min_ltime is -1: this project-branch is unchanged by the
+        #   tenant reconfig event, so consider the caches valid.
+        #   min_ltime is the event time: this project-branch was updated
+        #   so check the caches.
+
         jobs = []
+
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
             tpc = tenant.project_configs[project.canonical_name]
@@ -1822,23 +1885,29 @@ class TenantParser(object):
                 if min_ltimes is not None:
                     files_cache = self.unparsed_config_cache.getFilesCache(
                         project.canonical_name, branch)
+                    branch_cache = abide.getUnparsedBranchCache(
+                        project.canonical_name, branch)
+                    pb_ltime = min_ltimes[project.canonical_name][branch]
+
+                    # If our unparsed branch cache is valid for the
+                    # time, then we don't need to do anything else.
+                    if branch_cache.isValidFor(tpc, pb_ltime):
+                        min_ltimes[project.canonical_name][branch] =\
+                            branch_cache.ltime
+                        continue
+
                     with self.unparsed_config_cache.readLock(
                             project.canonical_name):
-                        pb_ltime = min_ltimes[project.canonical_name][branch]
                         if files_cache.isValidFor(tpc, pb_ltime):
                             self.log.debug(
                                 "Using files from cache for project "
                                 "%s @%s: %s",
                                 project.canonical_name, branch,
                                 list(files_cache.keys()))
-                            branch_cache = abide.getUnparsedBranchCache(
-                                project.canonical_name, branch)
-                            if branch_cache.isValidFor(tpc, files_cache.ltime):
-                                # Unparsed branch cache is already up-to-date
-                                continue
                             self._updateUnparsedBranchCache(
                                 abide, tenant, source_context, files_cache,
-                                loading_errors, files_cache.ltime)
+                                loading_errors, files_cache.ltime,
+                                min_ltimes)
                             continue
 
                 extra_config_files = abide.getExtraConfigFiles(project.name)
@@ -1866,7 +1935,8 @@ class TenantParser(object):
                 job.source_context = source_context
                 jobs.append(job)
         try:
-            self._processCatJobs(abide, tenant, loading_errors, jobs)
+            self._processCatJobs(abide, tenant, loading_errors, jobs,
+                                 min_ltimes)
         except Exception:
             self.log.exception("Error processing cat jobs, canceling")
             for job in jobs:
@@ -1880,7 +1950,7 @@ class TenantParser(object):
             if not ignore_cat_exception:
                 raise
 
-    def _processCatJobs(self, abide, tenant, loading_errors, jobs):
+    def _processCatJobs(self, abide, tenant, loading_errors, jobs, min_ltimes):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
             res = job.wait(self.merger.git_timeout)
@@ -1895,7 +1965,7 @@ class TenantParser(object):
 
             self._updateUnparsedBranchCache(abide, tenant, job.source_context,
                                             job.files, loading_errors,
-                                            job.ltime)
+                                            job.ltime, min_ltimes)
 
             # Save all config files in Zookeeper (not just for the current tpc)
             files_cache = self.unparsed_config_cache.getFilesCache(
@@ -1917,7 +1987,7 @@ class TenantParser(object):
                                         job.ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
-                                   loading_errors, ltime):
+                                   loading_errors, ltime, min_ltimes):
         loaded = False
         tpc = tenant.project_configs[source_context.project_canonical_name]
         # Make sure we are clearing the local cache before updating it.
@@ -1955,6 +2025,9 @@ class TenantParser(object):
                     files[fn], source_context, loading_errors)
                 branch_cache.put(source_context.path, incdata)
         branch_cache.setValidFor(tpc, ltime)
+        if min_ltimes is not None:
+            min_ltimes[source_context.project_canonical_name][
+                source_context.branch] = branch_cache.ltime
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
