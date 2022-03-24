@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60d771a6_8f8db1ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-03-24T12:14:14Z",
+      "side": 1,
+      "message": "I wrote this as the question appeared some time ago on the zuul matrix channel. As I wrote the spec it became clear this approach would be complex if possible at all.\n\nMaybe a better approach would be tooling allowing project maintainers to translate existing ACLs from their code review systems into zuul admin rules. If zuul\u0027s tenant and ACL config is versioned and reviewed, the rules could be checked for approval first.",
+      "parentUuid": "2159adc8_793128c9",
+      "revId": "3bc8ef1a7519bbc2a9e84ddfd2d1d8cd53955a70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff119f9a_6c096d55",
