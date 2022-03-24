@@ -39,6 +39,7 @@ CA_DIR=$SCRIPT_DIR/ca
 mkdir -p $CA_DIR
 $SCRIPT_DIR/zk-ca.sh $CA_DIR zuul-test-zookeeper
 
+export USER_ID=$(id -u)
 ${COMPOSE} up -d
 
 echo "Waiting for mysql"
