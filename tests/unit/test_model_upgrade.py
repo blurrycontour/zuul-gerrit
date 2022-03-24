@@ -1,4 +1,4 @@
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -140,6 +140,42 @@ class TestModelUpgrade(ZuulTestCase):
         test1 = self.getJobFromHistory('project-test1')
         self.assertEqual(fake_data[0]['url'],
                          test1.parameters['zuul']['artifacts'][0]['url'])
+
+    @model_version(5)
+    def test_model_5_6(self):
+        # This exercises the min_ltimes=None case in configloader on
+        # layout updates.
+        first = self.scheds.first
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            if state_one:
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one):
+                break
+
+        with second.sched.layout_update_lock, second.sched.run_handler_lock:
+            file_dict = {'zuul.d/test.yaml': ''}
+            A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                               files=file_dict)
+            A.setMerged()
+            self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+            self.waitUntilSettled(matcher=[first])
+
+            # Delete the layout data to simulate the first scheduler
+            # being on model api 5 (we write the data regardless of
+            # the cluster version since it's a new znode).
+            self.scheds.first.sched.zk_client.client.delete(
+                '/zuul/layout-data', recursive=True)
+        self.waitUntilSettled()
+        self.assertEqual(first.sched.local_layout_state.get("tenant-one"),
+                         second.sched.local_layout_state.get("tenant-one"))
 
 
 class TestSemaphoreModelUpgrade(ZuulTestCase):
