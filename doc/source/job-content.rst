@@ -1092,6 +1092,21 @@ For example:
             pause: true
           registry_ip_address: "{{ hostvars[groups.all[0]].ansible_host }}"
 
+Skipping retries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's possible to skip the retry caused by a failure in ``pre-run``
+by setting **zuul.retry** to ``false``.
+
+For example the following would skip retrying the build:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            retry: false
 
 .. _build_status:
 
