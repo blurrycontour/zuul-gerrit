@@ -300,6 +300,11 @@ This is a reference for object layout in Zookeeper.
    needed for a component to determine if its in-memory layout is out
    of date and update it if so.
 
+.. path:: zuul/layout-data/<layout uuid>
+
+   Additional information about the layout.  This is sharded data for
+   each layout UUID.
+
 .. path:: zuul/locks
 
    Holds various types of locks so that multiple components can coordinate.

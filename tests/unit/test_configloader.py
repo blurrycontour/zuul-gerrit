@@ -27,7 +27,7 @@ from zuul.configloader import (
 from zuul.model import Abide, MergeRequest, SourceContext
 from zuul.zk.locks import tenant_read_lock
 
-from tests.base import ZuulTestCase
+from tests.base import iterate_timeout, ZuulTestCase
 
 
 class TestConfigLoader(ZuulTestCase):
@@ -106,6 +106,110 @@ class TestTenantSimple(TenantParserTestCase):
                         project2_config[0].pipelines['check'].job_list.jobs)
         self.assertTrue('project2-job' in
                         project2_config[1].pipelines['check'].job_list.jobs)
+
+    def test_cache(self):
+        # A full reconfiguration should issue cat jobs for all repos
+        with self.assertLogs('zuul.TenantParser', level='DEBUG') as full_logs:
+            self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+            self.waitUntilSettled()
+            self.log.debug("Full reconfigure logs:")
+            for x in full_logs.output:
+                self.log.debug(x)
+            self.assertRegexInList(
+                r'Submitting cat job (.*?) for gerrit common-config master',
+                full_logs.output)
+            self.assertRegexInList(
+                r'Submitting cat job (.*?) for gerrit org/project1 master',
+                full_logs.output)
+            self.assertRegexInList(
+                r'Submitting cat job (.*?) for gerrit org/project2 master',
+                full_logs.output)
+            self.assertRegexNotInList(
+                r'Using files from cache',
+                full_logs.output)
+
+        first = self.scheds.first
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            if state_one:
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one):
+                break
+
+        self.log.debug("Freeze scheduler-1")
+        # Start the log context manager for the update test below now,
+        # so that it's already in place when we release the second
+        # scheduler lock.
+        with self.assertLogs('zuul.TenantParser', level='DEBUG'
+                             ) as update_logs:
+            lock1 = second.sched.layout_update_lock
+            lock2 = second.sched.run_handler_lock
+            with lock1, lock2:
+                # A tenant reconfiguration should use the cache except for the
+                # updated project.
+                file_dict = {'zuul.d/test.yaml': ''}
+
+                # Now start a second log context manager just for the
+                # tenant reconfig test
+                with (self.assertLogs('zuul.TenantParser', level='DEBUG')
+                      as tenant_logs):
+                    A = self.fake_gerrit.addFakeChange(
+                        'org/project1', 'master', 'A',
+                        files=file_dict)
+                    A.setMerged()
+                    self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+                    self.waitUntilSettled(matcher=[first])
+                    self.log.debug("Tenant reconfigure logs:")
+                    for x in tenant_logs.output:
+                        self.log.debug(x)
+
+                    self.assertRegexNotInList(
+                        r'Submitting cat job (.*?) for '
+                        r'gerrit common-config master',
+                        tenant_logs.output)
+                    self.assertRegexInList(
+                        r'Submitting cat job (.*?) for '
+                        r'gerrit org/project1 master',
+                        tenant_logs.output)
+                    self.assertRegexNotInList(
+                        r'Submitting cat job (.*?) for '
+                        r'gerrit org/project2 master',
+                        tenant_logs.output)
+                    self.assertRegexNotInList(
+                        r'Using files from cache',
+                        tenant_logs.output)
+
+            # A layout update should use the unparsed config cache
+            # except for what needs to be refreshed from the files
+            # cache in ZK.
+            self.log.debug("Thaw scheduler-1")
+            self.waitUntilSettled()
+            self.log.debug("Layout update logs:")
+            for x in update_logs.output:
+                self.log.debug(x)
+
+            self.assertRegexNotInList(
+                r'Submitting cat job',
+                update_logs.output)
+            self.assertRegexNotInList(
+                r'Using files from cache for project '
+                r'review.example.com/common-config @master.*',
+                update_logs.output)
+            self.assertRegexInList(
+                r'Using files from cache for project '
+                r'review.example.com/org/project1 @master.*',
+                update_logs.output)
+            self.assertRegexNotInList(
+                r'Using files from cache for project '
+                r'review.example.com/org/project2 @master.*',
+                update_logs.output)
 
     def test_variant_description(self):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
