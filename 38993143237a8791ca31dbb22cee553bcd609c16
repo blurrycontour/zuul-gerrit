@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bbe8ca8_41dfc1c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-24T14:11:40Z",
+      "side": 1,
+      "message": "I believe that you\u0027re seeing a problem, but as another data point, I am not (and it seems unusual to have to override the default command like this).  I suspect there\u0027s something more to this.  Maybe something about your environment?",
+      "revId": "38993143237a8791ca31dbb22cee553bcd609c16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
