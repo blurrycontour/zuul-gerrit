@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f856a246_fe7d8afc",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 1092,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-24T13:27:34Z",
+      "side": 1,
+      "message": "Nit: we usually make this the length of the header.",
+      "revId": "98bda7c3e3991900ff2eba63f3c5b22adfd03c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "299d17d4_9e74f210",
+        "filename": "releasenotes/notes/zuul-return-retry-814467d82ea467dc.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-24T13:27:34Z",
+      "side": 1,
+      "message": "Nit: you can link to the section instead of copying; it sort of teaches people where the docs are.",
+      "revId": "98bda7c3e3991900ff2eba63f3c5b22adfd03c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
