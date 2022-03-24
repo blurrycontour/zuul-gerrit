@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "40071437_67a94786",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-24T11:07:55Z",
+      "side": 1,
+      "message": "I am expecting some other developer will continue implementing that part, as I do not have a test environment to test that.",
+      "parentUuid": "1f47329b_f2ffacf8",
+      "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "427645a6_591b00aa",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-03-24T10:57:22Z",
       "side": 1,
       "message": "You also need to (de-)serialize the `base_sha`.\n\nWould it be possible to add an end-to-end test for that in addition to the unittest for the repo API?",
+      "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb345606_a9b90b03",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5454,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-03-24T11:07:55Z",
+      "side": 1,
+      "message": "I think actually we can do a end-to-end test by adding \u003e 999 files changes in a loop, and check if file filters works fine.\nLet me try that.",
+      "parentUuid": "d033fe58_b1c08ac7",
       "revId": "509ff0229cf1bb881d18e9360cbdd844ae0101b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
