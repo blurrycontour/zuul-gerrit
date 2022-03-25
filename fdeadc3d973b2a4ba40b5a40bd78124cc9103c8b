@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f431449_93a61070",
+        "filename": "releasenotes/notes/deps-by-topic-a0e5733e5406a610.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-25T17:41:47Z",
+      "side": 1,
+      "message": "I guess it is implied that the entire zuul cluster should be upgraded to a version that supports this feature before enabling it at all? I just noticed that I think the only way this has zk schema trouble is if you attempt to use the functionality with a half upgraded cluster.",
+      "revId": "fdeadc3d973b2a4ba40b5a40bd78124cc9103c8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1f98599_f5facfa2",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-03-25T17:41:47Z",
+      "side": 1,
+      "message": "Does it make sense to filter the queriy with status:open in getChangesByTopic to avoid merged and abandoned changes? Or do we consider abandoned changes on the same topic as an unsatisfiable state?",
+      "revId": "fdeadc3d973b2a4ba40b5a40bd78124cc9103c8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
