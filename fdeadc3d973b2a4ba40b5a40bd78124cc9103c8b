@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7750b450_3b8bda17",
+        "filename": "releasenotes/notes/deps-by-topic-a0e5733e5406a610.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-25T22:25:02Z",
+      "side": 1,
+      "message": "Yes.  I feel like that probably goes without saying, but maybe we should say it?",
+      "revId": "fdeadc3d973b2a4ba40b5a40bd78124cc9103c8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1f98599_f5facfa2",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-03-25T17:41:47Z",
       "side": 1,
       "message": "Does it make sense to filter the queriy with status:open in getChangesByTopic to avoid merged and abandoned changes? Or do we consider abandoned changes on the same topic as an unsatisfiable state?",
+      "revId": "fdeadc3d973b2a4ba40b5a40bd78124cc9103c8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02a23456_62d62805",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-25T22:25:02Z",
+      "side": 1,
+      "message": "Yeah, we should add status:open.  I think we should continue to omit \"-is:wip\" since that shows up as \"submitted together\" in gerrit.",
       "revId": "fdeadc3d973b2a4ba40b5a40bd78124cc9103c8b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
