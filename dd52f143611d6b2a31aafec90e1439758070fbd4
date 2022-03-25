@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4035bd4e_b2c10c27",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1907,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-03-25T12:04:01Z",
+      "side": 1,
+      "message": "nit: this can be removed.",
+      "revId": "dd52f143611d6b2a31aafec90e1439758070fbd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
