@@ -16,6 +16,24 @@
       "message": "I don\u0027t see any difference whether i run with this in place or not...",
       "revId": "a1249cd3b5dacae20e1355e3654954c352315787",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5de10e97_3f9287eb",
+        "filename": "tools/log4j.properties",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-03-25T07:46:43Z",
+      "side": 1,
+      "message": "Looks fine for me too now, so I guess logging was somehow related to uids.",
+      "parentUuid": "ff6d7dae_308ed89c",
+      "revId": "a1249cd3b5dacae20e1355e3654954c352315787",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
