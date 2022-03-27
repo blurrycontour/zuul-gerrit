@@ -63,3 +63,12 @@ Version 5
               ResultData to JobData instances and uses the
               inline/offloading paradigm from FrozenJob.  This affects
               schedulers and executors.
+
+Version 6
+---------
+
+:Prior Zuul version: 5.2.0
+:Description: Adds the blob store and stores large secrets in it.
+              Playbook secret references are now either an integer
+              index into the job secret list, or a dict with a blob
+              store key.  This affects schedulers and executors.

@@ -141,6 +141,9 @@ class TestModelUpgrade(ZuulTestCase):
         self.assertEqual(fake_data[0]['url'],
                          test1.parameters['zuul']['artifacts'][0]['url'])
 
+    # No test for model version 6 (secrets in blob store): old and new
+    # code paths are exercised in existing tests.
+
 
 class TestSemaphoreModelUpgrade(ZuulTestCase):
     tenant_config_file = 'config/semaphore/main.yaml'

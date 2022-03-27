@@ -149,6 +149,18 @@ This is a reference for object layout in Zookeeper.
 
    These are sharded JSON blobs of the change data.
 
+.. path:: zuul/cache/blob/data
+
+   Data for the blob store.  These nodes are identified by a
+   sha256sum of the secret content.
+
+   These are sharded blobs of data.
+
+.. path:: zuul/cache/blob/lock
+
+   Side-channel lock directory for the blob store.  The store locks
+   by key id under this znode when writing.
+
 .. path:: zuul/cleanup
 
    This node holds locks for the cleanup routines to make sure that

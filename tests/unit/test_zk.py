@@ -23,6 +23,7 @@ from zuul import model
 from zuul.lib import yamlutil as yaml
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
+from zuul.zk.blob_store import BlobStore
 from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
@@ -1948,3 +1949,37 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
             self.assertEqual(el1.errors[0], e1)
             self.assertNotEqual(e1, e2)
             self.assertEqual([e1, e2], [e1, e2])
+
+
+class TestBlobStore(ZooKeeperBaseTestCase):
+    def test_blob_store(self):
+        stop_event = threading.Event()
+        self.zk_client.client.create('/zuul/pipeline', makepath=True)
+        # Create a new object
+        tenant_name = 'fake_tenant'
+
+        start_ltime = self.zk_client.getCurrentLtime()
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            bs = BlobStore(context)
+            with testtools.ExpectedException(KeyError):
+                bs.get('nope')
+
+            path = bs.put(b'something')
+
+            self.assertEqual(bs.get(path), b'something')
+            self.assertEqual([x for x in bs], [path])
+            self.assertEqual(len(bs), 1)
+
+            self.assertTrue(path in bs)
+            self.assertFalse('nope' in bs)
+            self.assertTrue(bs.checkKey(path))
+            self.assertFalse(bs.checkKey('nope'))
+
+            cur_ltime = self.zk_client.getCurrentLtime()
+            self.assertEqual(bs.getKeysLastUsedBefore(cur_ltime), {path})
+            self.assertEqual(bs.getKeysLastUsedBefore(start_ltime), set())
+            bs.delete(path)
+
+            with testtools.ExpectedException(KeyError):
+                bs.get(path)
