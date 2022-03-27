@@ -74,6 +74,7 @@ import zuul.model
 from zuul.nodepool import Nodepool
 from zuul.version import get_version_string
 from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.blob_store import BlobStore
 from zuul.zk.components import ExecutorComponent, COMPONENT_REGISTRY
 from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.executor import ExecutorApi
@@ -2121,8 +2122,14 @@ class AnsibleJob(object):
 
         """
         ret = {}
+        blobstore = BlobStore(self.executor_server.zk_context)
         for secret_name, secret_index in secrets.items():
-            frozen_secret = self.job.secrets[secret_index]
+            if isinstance(secret_index, dict):
+                key = secret_index['blob']
+                data = blobstore.get(key)
+                frozen_secret = json.loads(data.decode('utf-8'))
+            else:
+                frozen_secret = self.job.secrets[secret_index]
             secret = zuul.model.Secret(secret_name, None)
             secret.secret_data = yaml.encrypted_load(
                 frozen_secret['encrypted_data'])

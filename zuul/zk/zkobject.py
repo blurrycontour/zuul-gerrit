@@ -22,11 +22,16 @@ from kazoo.exceptions import NodeExistsError, NoNodeError
 from kazoo.retry import KazooRetry
 
 from zuul.zk import sharding
+from zuul.zk import ZooKeeperClient
 
 
 class ZKContext:
     def __init__(self, zk_client, lock, stop_event, log):
-        self.client = zk_client.client
+        if isinstance(zk_client, ZooKeeperClient):
+            client = zk_client.client
+        else:
+            client = zk_client
+        self.client = client
         self.lock = lock
         self.stop_event = stop_event
         self.log = log
@@ -45,6 +50,16 @@ class ZKContext:
 
     def sessionIsInvalid(self):
         return not self.sessionIsValid()
+
+    def updateStatsFromOtherContext(self, other):
+        self.cumulative_read_time += other.cumulative_read_time
+        self.cumulative_write_time += other.cumulative_write_time
+        self.cumulative_read_objects += other.cumulative_read_objects
+        self.cumulative_write_objects += other.cumulative_write_objects
+        self.cumulative_read_znodes += other.cumulative_read_znodes
+        self.cumulative_write_znodes += other.cumulative_write_znodes
+        self.cumulative_read_bytes += other.cumulative_read_bytes
+        self.cumulative_write_bytes += other.cumulative_write_bytes
 
 
 class LocalZKContext:
