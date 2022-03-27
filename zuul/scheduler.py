@@ -74,6 +74,7 @@ from zuul.model import (
 )
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
+from zuul.zk.blob_store import BlobStore
 from zuul.zk.cleanup import (
     SemaphoreCleanupLock,
     BuildRequestCleanupLock,
@@ -679,6 +680,7 @@ class Scheduler(threading.Thread):
                 self._runExecutorApiCleanup()
                 self._runMergerApiCleanup()
                 self._runLayoutDataCleanup()
+                self._runBlobStoreCleanup()
                 self.maintainConnectionCache()
             except Exception:
                 self.log.exception("Error in general cleanup:")
@@ -720,6 +722,42 @@ class Scheduler(threading.Thread):
             self.tenant_layout_state.cleanup()
         except Exception:
             self.log.exception("Error in layout data cleanup:")
+
+    def _runBlobStoreCleanup(self):
+        self.log.debug("Starting blob store cleanup")
+        try:
+            live_blobs = set()
+            with self.layout_lock:
+                # get the start ltime so that we can filter out any
+                # blobs used since this point
+                start_ltime = self.zk_client.getCurrentLtime()
+                # lock and refresh the pipeline
+                for tenant in self.abide.tenants.values():
+                    for pipeline in tenant.layout.pipelines.values():
+                        with pipeline_lock(
+                                self.zk_client, tenant.name, pipeline.name,
+                        ) as lock:
+                            ctx = self.createZKContext(lock, self.log)
+                            pipeline.change_list.refresh(ctx)
+                            pipeline.summary.refresh(ctx)
+                            pipeline.state.refresh(ctx)
+                            # add any blobstore references
+                            for item in pipeline.getAllItems(include_old=True):
+                                live_blobs.update(item.getBlobKeys())
+            ctx = self.createZKContext(None, self.log)
+            blobstore = BlobStore(ctx)
+            # get the set of blob keys unused since the start time
+            # (ie, we have already filtered any newly added keys)
+            unused_blobs = blobstore.getKeysLastUsedBefore(start_ltime)
+            # remove the current refences
+            unused_blobs -= live_blobs
+            # delete what's left
+            for key in unused_blobs:
+                self.log.debug("Deleting unused blob: %s", key)
+                blobstore.delete(key, start_ltime)
+            self.log.debug("Finished blob store cleanup")
+        except Exception:
+            self.log.exception("Error in blob store cleanup:")
 
     def _runBuildRequestCleanup(self):
         # If someone else is running the cleanup, skip it.
