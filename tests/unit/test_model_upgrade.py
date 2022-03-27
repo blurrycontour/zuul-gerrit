@@ -177,6 +177,9 @@ class TestModelUpgrade(ZuulTestCase):
         self.assertEqual(first.sched.local_layout_state.get("tenant-one"),
                          second.sched.local_layout_state.get("tenant-one"))
 
+    # No test for model version 7 (secrets in blob store): old and new
+    # code paths are exercised in existing tests.
+
 
 class TestSemaphoreModelUpgrade(ZuulTestCase):
     tenant_config_file = 'config/semaphore/main.yaml'

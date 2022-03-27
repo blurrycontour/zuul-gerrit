@@ -70,3 +70,12 @@ Version 6
 :Prior Zuul version: 5.2.0
 :Description: Stores the complete layout min_ltimes in /zuul/layout-data.
               This only affects schedulers.
+
+Version 7
+---------
+
+:Prior Zuul version: 5.2.2
+:Description: Adds the blob store and stores large secrets in it.
+              Playbook secret references are now either an integer
+              index into the job secret list, or a dict with a blob
+              store key.  This affects schedulers and executors.
