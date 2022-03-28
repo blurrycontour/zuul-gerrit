@@ -1973,6 +1973,10 @@ class Scheduler(threading.Thread):
             return
 
         build.start_time = event.data["start_time"]
+        # Update information about worker
+        if event.data:
+            # Noop builds don't provide any event data
+            build.worker.updateFromData(event.data)
 
         log = get_annotated_logger(
             self.log, build.zuul_event_id, build=build.uuid)

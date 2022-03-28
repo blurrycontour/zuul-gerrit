@@ -2953,7 +2953,13 @@ class TestScheduler(ZuulTestCase):
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
-            if self.executor_server.job_workers:
+            if not self.executor_server.job_workers:
+                continue
+
+            # Wait until the BuildStartedEvent was processed by the scheduler
+            # as we need the worker info in order to cancel a build.
+            builds = self.getCurrentBuilds()
+            if all(b.worker.name != "Unknown" for b in builds):
                 break
 
         tevent = threading.Event()
@@ -5626,6 +5632,39 @@ class TestScheduler(ZuulTestCase):
             dict(name='job2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
+    def test_worker_update_metadata(self):
+        "Test if a worker can send back metadata about itself"
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        current_builds = list(self.getCurrentBuilds())
+        self.assertEqual(len(current_builds), 1)
+
+        self.log.debug('Current builds:')
+        self.log.debug(current_builds)
+
+        start = time.time()
+        while True:
+            if time.time() - start > 10:
+                raise Exception("Timeout waiting for gearman server to report "
+                                + "back to the client")
+            build = list(self.getCurrentBuilds())[0]
+            if build.worker.name == self.executor_server.hostname:
+                break
+            else:
+                time.sleep(0)
+
+        self.log.debug(build)
+        self.assertEqual(self.executor_server.hostname, build.worker.name)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     @simple_layout('layouts/footer-message.yaml')
     def test_footer_message(self):
         "Test a pipeline's footer message is correctly added to the report."
@@ -5804,7 +5843,7 @@ For CI problems and help debugging, contact ci@example.org"""
             # BuildStatus events (which set the worker info). However, this
             # solution might not be as straight forward and more error prone
             # due to the nature of watches.
-            if build.start_time:
+            if build.worker.name == self.executor_server.hostname:
                 break
             else:
                 time.sleep(0)
@@ -5836,6 +5875,7 @@ For CI problems and help debugging, contact ci@example.org"""
                         hostname=self.executor_server.hostname,
                         uuid=job['uuid']),
                     job['finger_url'])
+                self.assertEqual(2, len(job['worker']))
                 self.assertEqual(False, job['canceled'])
                 self.assertEqual(True, job['voting'])
                 self.assertIsNone(job['result'])

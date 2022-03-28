@@ -74,4 +74,5 @@ Other Global Objects
 .. autoclass:: zuul.model.Project
 .. autoclass:: zuul.model.Layout
 .. autoclass:: zuul.model.RepoFiles
+.. autoclass:: zuul.model.Worker
 .. autoclass:: zuul.model.TriggerEvent
