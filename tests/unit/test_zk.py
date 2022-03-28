@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from collections import defaultdict
 import json
 import queue
 import threading
@@ -1303,6 +1305,36 @@ class TestLayoutStore(ZooKeeperBaseTestCase):
                                 {}, ltime=2)
 
         self.assertGreater(state_two, state_one)
+
+    def test_cleanup(self):
+        store = LayoutStateStore(self.zk_client, lambda: None)
+        min_ltimes = defaultdict(lambda x: -1)
+        min_ltimes['foo'] = 1
+        state_one = LayoutState("tenant", "hostname", 1, uuid.uuid4().hex,
+                                {}, ltime=1)
+        state_two = LayoutState("tenant", "hostname", 2, uuid.uuid4().hex,
+                                {}, ltime=2)
+        store.setMinLtimes(state_one, min_ltimes)
+        store.setMinLtimes(state_two, min_ltimes)
+        store['tenant'] = state_one
+        # Run with the default delay of 5 minutes; nothing should be deleted.
+        store.cleanup()
+        self.assertEqual(store.get('tenant'), state_one)
+        self.assertIsNotNone(
+            self.zk_client.client.exists(
+                f'/zuul/layout-data/{state_one.uuid}'))
+        self.assertIsNotNone(
+            self.zk_client.client.exists(
+                f'/zuul/layout-data/{state_two.uuid}'))
+        # Run again with immediate deletion
+        store.cleanup(delay=0)
+        self.assertEqual(store.get('tenant'), state_one)
+        self.assertIsNotNone(
+            self.zk_client.client.exists(
+                f'/zuul/layout-data/{state_one.uuid}'))
+        self.assertIsNone(
+            self.zk_client.client.exists(
+                f'/zuul/layout-data/{state_two.uuid}'))
 
 
 class TestSystemConfigCache(ZooKeeperBaseTestCase):

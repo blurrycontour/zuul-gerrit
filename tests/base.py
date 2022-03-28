@@ -5648,6 +5648,19 @@ class ZuulTestCase(BaseTestCase):
         raise StatException("Key %s found in reported stats: %s" %
                             (key, value))
 
+    def assertRegexInList(self, regex, items):
+        r = re.compile(regex)
+        for x in items:
+            if r.search(x):
+                return
+        raise Exception("Regex '%s' not in %s" % (regex, items))
+
+    def assertRegexNotInList(self, regex, items):
+        r = re.compile(regex)
+        for x in items:
+            if r.search(x):
+                raise Exception("Regex '%s' in %s" % (regex, items))
+
     def assertBuilds(self, builds):
         """Assert that the running builds are as described.
 

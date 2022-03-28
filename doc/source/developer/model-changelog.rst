@@ -63,3 +63,10 @@ Version 5
               ResultData to JobData instances and uses the
               inline/offloading paradigm from FrozenJob.  This affects
               schedulers and executors.
+
+Version 6
+---------
+
+:Prior Zuul version: 5.2.0
+:Description: Stores the complete layout min_ltimes in /zuul/layout-data.
+              This only affects schedulers.
