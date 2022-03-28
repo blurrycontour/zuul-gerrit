@@ -24,6 +24,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ff33cd8_570acda9",
+        "filename": "doc/source/developer/model-changelog.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-28T19:29:45Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "2d362eba5e8deb7b9e039c0b43bcd6bc6c572d48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "874d2278_d9e6d665",
@@ -43,6 +60,23 @@
         "endLine": 1807,
         "endChar": 38
       },
+      "revId": "2d362eba5e8deb7b9e039c0b43bcd6bc6c572d48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "241db72c_75396bda",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1807,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-03-28T19:29:45Z",
+      "side": 1,
+      "message": "Yep, sorry, lost some words is a rewrite.",
       "revId": "2d362eba5e8deb7b9e039c0b43bcd6bc6c572d48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
