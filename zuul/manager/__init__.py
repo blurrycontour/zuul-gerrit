@@ -629,7 +629,7 @@ class PipelineManager(metaclass=ABCMeta):
                 return scc
         return []
 
-    def canProcessCycle(self, project):
+    def getQueueConfig(self, project):
         layout = self.pipeline.tenant.layout
         pipeline_queue_name = None
         project_queue_name = None
@@ -653,13 +653,23 @@ class PipelineManager(metaclass=ABCMeta):
         # project while project has precedence.
         queue_name = project_queue_name or pipeline_queue_name
         if queue_name is None:
+            return None
+
+        return layout.queues.get(queue_name)
+
+    def canProcessCycle(self, project):
+        queue_config = self.getQueueConfig(project)
+        if queue_config is None:
             return False
 
-        queue_config = layout.queues.get(queue_name)
-        return (
-            queue_config is not None and
-            queue_config.allow_circular_dependencies
-        )
+        return queue_config.allow_circular_dependencies
+
+    def useDependenciesByTopic(self, project):
+        queue_config = self.getQueueConfig(project)
+        if queue_config is None:
+            return False
+
+        return queue_config.dependencies_by_topic
 
     def canMergeCycle(self, bundle):
         """Check if the cycle still fulfills the pipeline's ready criteria."""
@@ -811,12 +821,24 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("  Adding dependency: %s", dep)
                 dependencies.append(dep)
         new_commit_needs_changes = [d.cache_key for d in dependencies]
+
+        update_attrs = dict(commit_needs_changes=new_commit_needs_changes)
+
+        # Ask the source for any tenant-specific changes (this allows
+        # drivers to implement their own way of collecting deps):
+        source = self.sched.connections.getSource(
+            change.project.connection_name)
+        if self.useDependenciesByTopic(change.project):
+            log.debug("  Updating topic dependencies for %s", change)
+            new_topic_needs_changes = []
+            for dep in source.getChangesByTopic(change.topic):
+                if dep and (not dep.is_merged):
+                    log.debug("  Adding dependency: %s", dep)
+                    new_topic_needs_changes.append(dep.cache_key)
+            update_attrs['topic_needs_changes'] = new_topic_needs_changes
+
         if change.commit_needs_changes != new_commit_needs_changes:
-            source = self.sched.connections.getSource(
-                change.project.connection_name)
-            source.setChangeAttributes(
-                change,
-                commit_needs_changes=new_commit_needs_changes)
+            source.setChangeAttributes(change, **update_attrs)
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
