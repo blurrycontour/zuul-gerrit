@@ -948,8 +948,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def _updateChangeDependencies(self, log, change, data, event, history):
         if history is None:
             history = []
-        else:
-            history = history[:]
         history.append((change.number, change.patchset))
 
         needs_changes = set()
