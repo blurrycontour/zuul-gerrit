@@ -2213,6 +2213,172 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
+        self.assertEqual(len(self.history), 10)
+
+    def test_promote_no_change(self):
+        """Test that jobs are not unecessarily restarted when promoting"""
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        enqueue_times = {}
+        for item in items:
+            enqueue_times[str(item.change)] = item.enqueue_time
+
+        # REST API
+        args = {'pipeline': 'gate',
+                'changes': ['1,1', '2,1', '3,1']}
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ],
+                 },
+                 'exp': time.time() + 3600,
+                 'iat': time.time()}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        req = self.post_url(
+            'api/tenant/tenant-one/promote',
+            headers={'Authorization': 'Bearer %s' % token},
+            json=args)
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertEqual(True, data)
+
+        # ensure that enqueue times are durable
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        for item in items:
+            self.assertEqual(
+                enqueue_times[str(item.change)], item.enqueue_time)
+
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 6)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test2')
+        self.assertEqual(self.builds[2].name, 'project-test1')
+        self.assertEqual(self.builds[3].name, 'project-test2')
+        self.assertEqual(self.builds[4].name, 'project-test1')
+        self.assertEqual(self.builds[5].name, 'project-test2')
+
+        self.assertTrue(self.builds[0].hasChanges(A))
+        self.assertFalse(self.builds[0].hasChanges(B))
+        self.assertFalse(self.builds[0].hasChanges(C))
+
+        self.assertTrue(self.builds[2].hasChanges(A))
+        self.assertTrue(self.builds[2].hasChanges(B))
+        self.assertFalse(self.builds[2].hasChanges(C))
+
+        self.assertTrue(self.builds[4].hasChanges(A))
+        self.assertTrue(self.builds[4].hasChanges(B))
+        self.assertTrue(self.builds[4].hasChanges(C))
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(C.data['status'], 'MERGED')
+        self.assertEqual(C.reported, 2)
+        # The promote should be a noop, so no canceled jobs
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 0)
+        self.assertEqual(len(self.history), 9)
+
+    def test_promote_check(self):
+        """Test that a change can be promoted via the admin web interface"""
+        self.executor_server.hold_jobs_in_build = True
+        # Make a patch series so that we have some non-live items in
+        # the pipeline and we can make sure they are not promoted.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.setDependsOn(B, 1)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = [i for i in tenant.layout.pipelines['check'].getAllItems()
+                 if i.live]
+        enqueue_times = {}
+        for item in items:
+            enqueue_times[str(item.change)] = item.enqueue_time
+
+        # REST API
+        args = {'pipeline': 'check',
+                'changes': ['2,1', '3,1']}
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ],
+                 },
+                 'exp': time.time() + 3600,
+                 'iat': time.time()}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        req = self.post_url(
+            'api/tenant/tenant-one/promote',
+            headers={'Authorization': 'Bearer %s' % token},
+            json=args)
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertEqual(True, data)
+        self.waitUntilSettled()
+
+        # ensure that enqueue times are durable
+        items = [i for i in tenant.layout.pipelines['check'].getAllItems()
+                 if i.live]
+        for item in items:
+            self.assertEqual(
+                enqueue_times[str(item.change)], item.enqueue_time)
+
+        # We can't reliably test for side effects in the check
+        # pipeline since the change queues are independent, so we
+        # directly examine the queues.
+        queue_items = [(item.change.number, item.live) for item in
+                       tenant.layout.pipelines['check'].getAllItems()]
+        expected = [('1', False),
+                    ('2', True),
+                    ('1', False),
+                    ('2', False),
+                    ('3', True),
+                    ('1', True)]
+        self.assertEqual(expected, queue_items)
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release()
+        self.waitUntilSettled()
+        # No jobs should be canceled
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 0)
+        self.assertEqual(len(self.history), 9)
 
     def test_tenant_authorizations_override(self):
         """Test that user gets overriden tenant authz if allowed"""
