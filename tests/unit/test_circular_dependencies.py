@@ -1539,6 +1539,41 @@ class TestGerritCircularDependencies(ZuulTestCase):
     def test_submitted_together_git(self):
         self.fake_gerrit._fake_submit_whole_topic = True
 
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A")
+        B = self.fake_gerrit.addFakeChange('org/project1', "master", "B")
+        C = self.fake_gerrit.addFakeChange('org/project1', "master", "C")
+        D = self.fake_gerrit.addFakeChange('org/project1', "master", "D")
+        E = self.fake_gerrit.addFakeChange('org/project1', "master", "E")
+        F = self.fake_gerrit.addFakeChange('org/project1', "master", "F")
+        G = self.fake_gerrit.addFakeChange('org/project1', "master", "G")
+        G.setDependsOn(F, 1)
+        F.setDependsOn(E, 1)
+        E.setDependsOn(D, 1)
+        D.setDependsOn(C, 1)
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
+        self.assertEqual(A.queried, 1)
+        self.assertEqual(B.queried, 1)
+        self.assertEqual(C.queried, 1)
+        self.assertEqual(D.queried, 1)
+        self.assertEqual(E.queried, 1)
+        self.assertEqual(F.queried, 1)
+        self.assertEqual(G.queried, 1)
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="1,1 2,1 3,1"),
+            dict(name="project-vars-job", result="SUCCESS", changes="1,1 2,1 3,1"),
+        ], ordered=False)
+
+    def test_submitted_together_git_topic(self):
+        self.fake_gerrit._fake_submit_whole_topic = True
+
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
                                            topic='test-topic')
         B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
@@ -1573,6 +1608,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(E.queried, 8)
         self.assertEqual(F.queried, 8)
         self.assertEqual(G.queried, 8)
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="7,1 6,1 5,1 4,1 1,1 2,1 3,1"),
+            dict(name="project-vars-job", result="SUCCESS", changes="7,1 6,1 5,1 4,1 1,1 2,1 3,1"),
+        ], ordered=False)
 
     @simple_layout('layouts/submitted-together-per-branch.yaml')
     def test_submitted_together_per_branch(self):
