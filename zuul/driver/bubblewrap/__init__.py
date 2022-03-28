@@ -22,7 +22,6 @@ import os
 import psutil
 import pwd
 import shlex
-import sys
 import threading
 import re
 import struct
@@ -41,17 +40,11 @@ class WrappedPopen(object):
     def __call__(self, args, *sub_args, **kwargs):
         try:
             args = self.command + args
-            if kwargs.get('close_fds') or sys.version_info.major >= 3:
-                # The default in py3 is close_fds=True, so we need to pass
-                # our open fds in. However, this can only work right in
-                # py3.2 or later due to the lack of 'pass_fds' in prior
-                # versions. So until we are py3 only we can only bwrap
-                # things that are close_fds=False
-                pass_fds = list(kwargs.get('pass_fds', []))
-                for fd in self.fds:
-                    if fd not in pass_fds:
-                        pass_fds.append(fd)
-                kwargs['pass_fds'] = pass_fds
+            pass_fds = list(kwargs.get('pass_fds', []))
+            for fd in self.fds:
+                if fd not in pass_fds:
+                    pass_fds.append(fd)
+            kwargs['pass_fds'] = pass_fds
             proc = psutil.Popen(args, *sub_args, **kwargs)
         finally:
             self.__del__()
