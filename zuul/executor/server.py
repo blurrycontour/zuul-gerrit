@@ -2829,6 +2829,8 @@ class AnsibleJob(object):
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                # Either this must be present, or we need the
+                # --new-session argument for bwrap.
                 start_new_session=True,
                 env=env_copy,
             )
