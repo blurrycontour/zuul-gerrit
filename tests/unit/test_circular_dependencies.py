@@ -1536,6 +1536,44 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
 
+    def test_submitted_together_git(self):
+        self.fake_gerrit._fake_submit_whole_topic = True
+
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
+                                           topic='test-topic')
+        C = self.fake_gerrit.addFakeChange('org/project1', "master", "C",
+                                           topic='test-topic')
+        D = self.fake_gerrit.addFakeChange('org/project1', "master", "D",
+                                           topic='test-topic')
+        E = self.fake_gerrit.addFakeChange('org/project1', "master", "E",
+                                           topic='test-topic')
+        F = self.fake_gerrit.addFakeChange('org/project1', "master", "F",
+                                           topic='test-topic')
+        G = self.fake_gerrit.addFakeChange('org/project1', "master", "G",
+                                           topic='test-topic')
+        G.setDependsOn(F, 1)
+        F.setDependsOn(E, 1)
+        E.setDependsOn(D, 1)
+        D.setDependsOn(C, 1)
+        C.setDependsOn(B, 1)
+        B.setDependsOn(A, 1)
+
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
+        self.assertEqual(A.queried, 8)
+        self.assertEqual(B.queried, 8)
+        self.assertEqual(C.queried, 8)
+        self.assertEqual(D.queried, 8)
+        self.assertEqual(E.queried, 8)
+        self.assertEqual(F.queried, 8)
+        self.assertEqual(G.queried, 8)
+
     @simple_layout('layouts/submitted-together-per-branch.yaml')
     def test_submitted_together_per_branch(self):
         self.fake_gerrit._fake_submit_whole_topic = True
