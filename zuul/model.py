@@ -5530,12 +5530,18 @@ class Change(Branch):
     def needs_changes(self):
         commit_needs_changes = self.commit_needs_changes or []
         topic_needs_changes = self.topic_needs_changes or []
-        return (self.git_needs_changes + self.compat_needs_changes +
-                commit_needs_changes + topic_needs_changes)
+        r = OrderedDict()
+        for x in (self.git_needs_changes + self.compat_needs_changes +
+                  commit_needs_changes + topic_needs_changes):
+            r[x] = None
+        return tuple(r.keys())
 
     @property
     def needed_by_changes(self):
-        return (self.git_needed_by_changes + self.compat_needed_by_changes)
+        r = OrderedDict()
+        for x in (self.git_needed_by_changes + self.compat_needed_by_changes):
+            r[x] = None
+        return tuple(r.keys())
 
     def isUpdateOf(self, other):
         if (self.project == other.project and

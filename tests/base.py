@@ -815,8 +815,9 @@ class FakeGerritChange(object):
                 d['isCurrentPatchSet'] = False
         return json.loads(json.dumps(self.data))
 
-    def queryHTTP(self):
-        self.queried += 1
+    def queryHTTP(self, internal=False):
+        if not internal:
+            self.queried += 1
         labels = {}
         for cat in self.categories:
             labels[cat] = {}
@@ -1155,6 +1156,11 @@ class GerritWebServer(object):
                         f'topic:{topic}', http=True)
                 else:
                     results = []
+                for dep in change.data.get('dependsOn', []):
+                    dep_change = fake_gerrit.changes.get(int(dep['number']))
+                    r = dep_change.queryHTTP(internal=True)
+                    if r not in results:
+                        results.append(r)
                 self.send_data(results)
                 self.end_headers()
 
