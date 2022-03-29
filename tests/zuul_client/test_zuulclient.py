@@ -330,6 +330,106 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+    def test_dequeue_all_pipeline(self):
+        """Test that the Web client can dequeue a whole pipeline"""
+        self.executor_server.hold_jobs_in_build = True
+        start_builds = len(self.builds)
+        for i in ['', '1', '2']:
+            self.create_branch('org/project' + i, 'stable')
+            self.fake_gerrit.addEvent(
+                self.fake_gerrit.getFakeBranchCreatedEvent(
+                    'org/project' + i, 'stable'))
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('common-config',
+                                'layouts/timer-all-projects.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(90, 'Wait for builds on hold'):
+            if len(self.builds) > start_builds:
+                break
+        self.waitUntilSettled()
+
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url, '--auth-token', token, '-v',
+             'dequeue-all', '--tenant', 'tenant-one',
+             '--pipeline', 'periodic'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        # Depending on how long it takes for settling to happen,
+        # We might trigger the periodic pipeline several times.
+        # The amount of dequeued jobs should be a multiple of 3.
+        self.assertEqual(
+            self.countJobResults(self.history, 'ABORTED') % 3,
+            0)
+
+    def test_dequeue_all_project(self):
+        """Test that the Web client can dequeue all by project"""
+        self.executor_server.hold_jobs_in_build = True
+        start_builds = len(self.builds)
+        for i in ['', '1', '2']:
+            self.create_branch('org/project' + i, 'stable')
+            self.fake_gerrit.addEvent(
+                self.fake_gerrit.getFakeBranchCreatedEvent(
+                    'org/project' + i, 'stable'))
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('common-config',
+                                'layouts/timer-all-projects.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # wait for at least two iterations of the timer trigger
+        for _ in iterate_timeout(90, 'Wait for builds on hold'):
+            if len(self.builds) > start_builds + 6:
+                break
+        self.waitUntilSettled()
+
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url, '--auth-token', token, '-v',
+             'dequeue-all', '--tenant', 'tenant-one',
+             '--pipeline', 'periodic', '--project', 'org/project'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertTrue(
+            self.countJobResults(self.history, 'ABORTED') > 1)
+        dequeued = [x for x in self.history if x.result == 'ABORTED']
+        self.assertTrue(
+            all(x.project == 'org/project' for x in dequeued),
+            dequeued
+        )
+
     def test_promote(self):
         "Test that the Web client can promote a change"
         self.executor_server.hold_jobs_in_build = True
@@ -343,7 +443,6 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
-
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
