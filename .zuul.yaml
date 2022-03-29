@@ -68,7 +68,7 @@
 - job:
     name: zuul-tox-remote
     parent: tox
-    timeout: 2700  # 45 minutes
+    timeout: 2700 # 45 minutes
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
@@ -96,7 +96,7 @@
 - job:
     name: zuul-tox-py36
     parent: zuul-tox
-    timeout: 5400  # 90 minutes
+    timeout: 5400 # 90 minutes
     vars:
       tox_envlist: py36
       python_version: 3.6
@@ -105,7 +105,7 @@
 - job:
     name: zuul-tox-py38
     parent: zuul-tox
-    timeout: 5400  # 90 minutes
+    timeout: 5400 # 90 minutes
     vars:
       tox_envlist: py38
       python_version: 3.8
@@ -202,7 +202,7 @@
     parent: opendev-build-docker-image
     description: Build Docker images.
     allowed-projects: zuul/zuul
-    timeout: 2700  # 45 minutes
+    timeout: 2700 # 45 minutes
     requires:
       - python-builder-3.8-bullseye-container-image
       - python-base-3.8-bullseye-container-image

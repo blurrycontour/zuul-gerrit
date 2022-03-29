@@ -3188,7 +3188,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                          newrev=build.parameters['zuul'].get('newrev'),
                          parameters=build.parameters, jobdir=build.jobdir,
                          pipeline=build.parameters['zuul']['pipeline'],
-                         build_request_ref=build.build_request.path)
+                         build_request_ref=build.build_request.path,
+                         project=build.project)
         )
         self.executor_server.running_builds.remove(build)
         del self.executor_server.job_builds[self.build_request.uuid]
