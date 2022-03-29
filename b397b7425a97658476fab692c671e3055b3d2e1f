@@ -50,6 +50,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "6bef0b74_497ec017",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-29T13:32:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f119ece9_18a07df0",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 19
+      },
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "520356dd_782b129d",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -169,6 +193,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "457c9b51_c6d07a7c",
+        "filename": "tests/unit/test_include_exclude_filter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-29T13:32:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cffe8d65_87ae6110",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "308c17cf_0d13864b",
@@ -251,6 +293,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4915dfd6_a7251120",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-29T13:32:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbb2ccb7_70619268",
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57e85e20_ca4a3dbe",
@@ -288,6 +348,30 @@
       "side": 1,
       "message": "Will change it, see reply above.",
       "parentUuid": "57e85e20_ca4a3dbe",
+      "range": {
+        "startLine": 6,
+        "startChar": 19,
+        "endLine": 6,
+        "endChar": 34
+      },
+      "revId": "b397b7425a97658476fab692c671e3055b3d2e1f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "540cc7d1_9b967169",
+        "filename": "zuul/include_exclude_filter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-03-29T13:32:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10ccc83c_94703e0a",
       "range": {
         "startLine": 6,
         "startChar": 19,
