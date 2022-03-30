@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d22d881b_4ddaed95",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-30T16:26:40Z",
+      "side": 1,
+      "message": "I wonder if \u0027Reviewed-by: Anonymous\u0027 is useful or we should just skip anonymous reviews.",
+      "revId": "f44a0b6cb1e51386fab0ef41da2d2d02855aa74f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
