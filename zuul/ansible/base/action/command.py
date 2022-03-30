@@ -27,7 +27,9 @@ class ActionModule(command.ActionModule):
 
         # we need the zuul_log_id on shell and command tasks
         host = paths._sanitize_filename(task_vars.get('inventory_hostname'))
-        if self._task.action in ('command', 'shell'):
+        if self._task.action in (
+                'command', 'shell',
+                'ansible.builtin.command', 'ansible.builtin.shell'):
             self._task.args['zuul_log_id'] = "%s-%s" % (self._task._uuid, host)
 
         return super(ActionModule, self).run(tmp, task_vars)
