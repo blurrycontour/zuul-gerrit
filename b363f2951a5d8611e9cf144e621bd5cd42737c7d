@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "b363f2951a5d8611e9cf144e621bd5cd42737c7d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5b3114d_b3834adf",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-03-30T16:36:39Z",
+      "side": 1,
+      "message": "Do we want to render this if there is no auth provider configured? As a user I\u0027d be confused to see this.",
+      "revId": "b363f2951a5d8611e9cf144e621bd5cd42737c7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
