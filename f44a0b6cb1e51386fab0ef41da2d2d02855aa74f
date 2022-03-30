@@ -16,6 +16,24 @@
       "message": "I wonder if \u0027Reviewed-by: Anonymous\u0027 is useful or we should just skip anonymous reviews.",
       "revId": "f44a0b6cb1e51386fab0ef41da2d2d02855aa74f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8714c5e_bb785490",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-03-30T16:56:08Z",
+      "side": 1,
+      "message": "I must admit I\u0027m not sure about this one, either, open to suggestions. I\u0027m also not sure if this case will actually ever happen, since the username should always be available, but then I thought better be safe.",
+      "parentUuid": "d22d881b_4ddaed95",
+      "revId": "f44a0b6cb1e51386fab0ef41da2d2d02855aa74f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
