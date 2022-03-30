@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31845baf_18e517fa",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-03-30T20:33:34Z",
+      "side": 1,
+      "message": "Perhaps it would be safer to include the trailing dot, e.g. `ansible.builtin.`",
+      "revId": "b51ac55d0dbceef790f3fadf2fe9a52b14bf6344",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
