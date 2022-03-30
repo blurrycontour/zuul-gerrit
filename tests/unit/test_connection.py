@@ -345,6 +345,55 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
         check_results()
 
+    def test_sql_intermittent_failure(self):
+        # Test that if we fail to create the buildset at the start of
+        # a build, we still create it at the end.
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Delete the buildset
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+
+            result = conn.execute(sa.text("delete from zuul_build;"))
+            result = conn.execute(sa.text("delete from zuul_buildset;"))
+            result = conn.execute(sa.text("commit;"))
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Check the results
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        pipeline = tenant.layout.pipelines['check']
+        reporter = self.scheds.first.connections.getSqlReporter(
+            pipeline)
+
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+
+            result = conn.execute(
+                sa.sql.select([reporter.connection.zuul_buildset_table])
+            )
+
+            buildsets = result.fetchall()
+            self.assertEqual(1, len(buildsets))
+            buildset0 = buildsets[0]
+
+            buildset0_builds = conn.execute(
+                sa.sql.select(
+                    [reporter.connection.zuul_build_table]
+                ).where(
+                    reporter.connection.zuul_build_table.c.buildset_id ==
+                    buildset0['id']
+                )
+            ).fetchall()
+
+            self.assertEqual(len(buildset0_builds), 5)
+
 
 class TestSQLConnectionPostgres(TestSQLConnectionMysql):
     config_file = 'zuul-sql-driver-postgres.conf'
