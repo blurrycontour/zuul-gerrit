@@ -355,6 +355,16 @@ The following section of ``zuul.conf`` is used by the merger:
 
       Path to PID lock file for the merger process.
 
+   .. attr:: prometheus_port
+
+      Set a TCP port to start the prometheus metrics client.
+
+   .. attr:: prometheus_addr
+      :default: 0.0.0.0
+
+      The IPv4 addr to listen for prometheus metrics poll.
+      To use IPv6, python>3.8 is required `issue24209 <https://bugs.python.org/issue24209>`_.
+
 .. _executor:
 
 Executor
@@ -710,6 +720,16 @@ The following sections of ``zuul.conf`` are used by the executor:
 
          Abort all running jobs and exit as soon as possible.
 
+   .. attr:: prometheus_port
+
+      Set a TCP port to start the prometheus metrics client.
+
+   .. attr:: prometheus_addr
+      :default: 0.0.0.0
+
+      The IPv4 addr to listen for prometheus metrics poll.
+      To use IPv6, python>3.8 is required `issue24209 <https://bugs.python.org/issue24209>`_.
+
 
 .. attr:: keystore
 
@@ -729,6 +749,16 @@ The following sections of ``zuul.conf`` are used by the executor:
 
       Value to pass to `git config user.name
       <https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup>`_.
+
+   .. attr:: prometheus_port
+
+      Set a TCP port to start the prometheus metrics client.
+
+   .. attr:: prometheus_addr
+      :default: 0.0.0.0
+
+      The IPv4 addr to listen for prometheus metrics poll.
+      To use IPv6, python>3.8 is required `issue24209 <https://bugs.python.org/issue24209>`_.
 
 .. attr:: ansible_callback "<name>"
 
