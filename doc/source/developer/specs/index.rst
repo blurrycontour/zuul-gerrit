@@ -24,3 +24,4 @@ documentation instead.
    tenant-resource-quota
    community-matrix
    unrestricted-ansible
+   job-fileset
