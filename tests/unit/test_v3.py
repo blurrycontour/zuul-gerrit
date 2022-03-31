@@ -865,6 +865,29 @@ class TestBranchMismatch(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    def test_implied_branch_matcher_regex(self):
+        # Test that branch names that look like regexes aren't treated
+        # as such for implied branch matchers.
+
+        # Make sure the parent job repo is branched, so it gets
+        # implied branch matchers.
+
+        # The '+' in the branch name would cause the change not to
+        # match if it is treated as a regex.
+        self.create_branch('org/project1', 'feature/foo-0.1.12+bar')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'feature/foo-0.1.12+bar'))
+
+        A = self.fake_gerrit.addFakeChange(
+            'org/project1', 'feature/foo-0.1.12+bar', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestBranchRef(ZuulTestCase):
     tenant_config_file = 'config/branch-ref/main.yaml'

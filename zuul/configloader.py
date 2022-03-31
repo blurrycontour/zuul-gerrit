@@ -23,6 +23,7 @@ import subprocess
 
 import voluptuous as vs
 
+from zuul import change_matcher
 from zuul import model
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
@@ -447,7 +448,14 @@ class PragmaParser(object):
 
         branches = conf.get('implied-branches')
         if branches is not None:
-            source_context.implied_branches = as_list(branches)
+            # This is a BranchMatcher (not an ImpliedBranchMatcher)
+            # because as user input, we allow/expect this to be
+            # regular expressions.  Only truly implicit branch names
+            # (automatically generated from source file branches) are
+            # ImpliedBranchMatchers.
+            source_context.implied_branches = [
+                change_matcher.BranchMatcher(x)
+                for x in as_list(branches)]
 
 
 class NodeSetParser(object):
@@ -910,14 +918,13 @@ class JobParser(object):
             job.allowed_projects = frozenset(allowed)
 
         branches = None
-        implied = False
         if 'branches' in conf:
-            branches = as_list(conf['branches'])
+            branches = [change_matcher.BranchMatcher(x)
+                        for x in as_list(conf['branches'])]
         elif not project_pipeline:
             branches = self.pcontext.getImpliedBranches(job.source_context)
-            implied = True
         if branches:
-            job.setBranchMatcher(branches, implied=implied)
+            job.setBranchMatcher(branches)
         if 'files' in conf:
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
@@ -1117,7 +1124,8 @@ class ProjectParser(object):
                 project_config.setImpliedBranchMatchers([])
             else:
                 project_config.setImpliedBranchMatchers(
-                    [source_context.branch])
+                    [change_matcher.ImpliedBranchMatcher(
+                        source_context.branch)])
 
         # Add templates
         for name in conf.get('templates', []):
@@ -1464,7 +1472,7 @@ class ParseContext(object):
         if source_context.implied_branch_matchers is True:
             if source_context.implied_branches is not None:
                 return source_context.implied_branches
-            return [source_context.branch]
+            return [change_matcher.ImpliedBranchMatcher(source_context.branch)]
         elif source_context.implied_branch_matchers is False:
             return None
 
@@ -1482,7 +1490,7 @@ class ParseContext(object):
 
         if source_context.implied_branches is not None:
             return source_context.implied_branches
-        return [source_context.branch]
+        return [change_matcher.ImpliedBranchMatcher(source_context.branch)]
 
 
 class TenantParser(object):
