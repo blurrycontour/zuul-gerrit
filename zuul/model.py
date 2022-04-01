@@ -7468,7 +7468,8 @@ class Tenant(object):
         :arg str regex: The regex to match
         :returns: A list of tuples (trusted, project) describing the found
             projects. Raises an exception if the same project name is found
-            several times across multiple hostnames.
+            several times across multiple hostnames and no matches are found
+            using canonical names.
         """
 
         matcher = re2.compile(regex)
@@ -7476,8 +7477,21 @@ class Tenant(object):
         result = []
 
         for name, hostname_dict in self.projects.items():
+            matched = False
 
-            if matcher.fullmatch(name):
+            # Try to match canonical project names first as these are least
+            # likely to have collisions if the regex is say ^.*$ and multiple
+            # connections have colliding project names.
+            for project in hostname_dict.values():
+                if matcher.fullmatch(project.canonical_name):
+                    projects.append(project)
+                    matched = True
+
+            # If we didn't match using canonical names then try with the
+            # potentially ambigous names as regexes may be written as
+            # ^someorg/.*$ and not match canonical names. If there are
+            # collisions raise an error.
+            if not matched and matcher.fullmatch(name):
                 # validate that this match is unambiguous
                 values = list(hostname_dict.values())
                 if len(values) > 1:
@@ -7486,11 +7500,6 @@ class Tenant(object):
                                     "with a hostname. Valid hostnames "
                                     "are %s." % (name, hostname_dict.keys()))
                 projects.append(values[0])
-            else:
-                # try to match canonical project names
-                for project in hostname_dict.values():
-                    if matcher.fullmatch(project.canonical_name):
-                        projects.append(project)
 
         for project in projects:
             if project in self.config_projects:

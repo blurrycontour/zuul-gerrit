@@ -1,0 +1,15 @@
+---
+fixes:
+  - |
+    Project regex processing has been updated to check canonical names first.
+    This has been done so that common project name regexes like ^.*$ can be
+    used even when a Zuul installation has colliding project names. The old
+    behavior looked at project short names, and if there were multiple results
+    raised an error. Now we check canonical names first and if any matches are
+    made we return those matched and don't check short names. This means it
+    is possible to have colliding short names and still use a regex like ^.*$.
+    To try and be as backward compatible as possible we will check short names
+    against the regex if no canonical names matched. It is still an error if
+    a short name matches with multiple colliding repos. This is a small and
+    subtle behavior change that may necessitate rewriting regexes if you don't
+    want to match specific connection sources.
