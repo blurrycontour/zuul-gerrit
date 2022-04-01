@@ -7467,8 +7467,7 @@ class Tenant(object):
 
         :arg str regex: The regex to match
         :returns: A list of tuples (trusted, project) describing the found
-            projects. Raises an exception if the same project name is found
-            several times across multiple hostnames.
+            projects.
         """
 
         matcher = re2.compile(regex)
@@ -7476,18 +7475,12 @@ class Tenant(object):
         result = []
 
         for name, hostname_dict in self.projects.items():
-
             if matcher.fullmatch(name):
-                # validate that this match is unambiguous
-                values = list(hostname_dict.values())
-                if len(values) > 1:
-                    raise Exception("Project name '%s' is ambiguous, "
-                                    "please fully qualify the project "
-                                    "with a hostname. Valid hostnames "
-                                    "are %s." % (name, hostname_dict.keys()))
-                projects.append(values[0])
+                projects.extend(hostname_dict.values())
             else:
-                # try to match canonical project names
+                # It is possible for the regex to match specific connection
+                # prefixes. Check these more specific names if we didn't add
+                # all of the possible canonical names already.
                 for project in hostname_dict.values():
                     if matcher.fullmatch(project.canonical_name):
                         projects.append(project)
