@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3378850_da02ed91",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 42
+      },
+      "lineNbr": 1568,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-04T12:06:26Z",
+      "side": 1,
+      "message": "We should add change.base_sha for gitlab and pagure as well if possible such that they will behave the same.",
+      "revId": "13db2f85b65deeb1634d30d232c84be18aaa126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
