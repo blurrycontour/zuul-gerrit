@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "380b6e9f_d2218432",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-04T16:35:44Z",
+      "side": 1,
+      "message": "Actually I have no clue why I added this check in the first place. Since the goal of this functionality is to gather a set of repos I don\u0027t think this check makes sense at all. After thinking about this more I believe the way of least surprise would be to remove the check and alter the behavior that it returns a merged set of all short and canonical project matches.",
+      "revId": "2706f9ce3e21212f90e90138a6b7bae89686fa74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
