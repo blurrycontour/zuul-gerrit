@@ -8375,6 +8375,58 @@ class TestPipelineSupersedes(ZuulTestCase):
         ], ordered=False)
 
 
+class TestSchedulerExcludeAll(ZuulTestCase):
+    tenant_config_file = 'config/two-tenant/exclude-all.yaml'
+
+    def test_skip_reconfig_exclude_all(self):
+        """Test that we don't trigger a reconfiguration for a tenant
+        when the changed project excludes all config."""
+        config = textwrap.dedent(
+            """
+            - job:
+                name: project2-test
+                parent: test
+
+            - project:
+                check:
+                  jobs:
+                    - project2-test
+            """)
+        file_dict = {'zuul.yaml': config}
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project2-test', result='SUCCESS', changes='1,1'),
+        ])
+
+        sched = self.scheds.first.sched
+        tenant_one_layout_state = sched.local_layout_state["tenant-one"]
+        tenant_two_layout_state = sched.local_layout_state["tenant-two"]
+
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # We don't expect a reconfiguration for tenant-one as it excludes
+        # all config of org/project2.
+        self.assertEqual(sched.local_layout_state["tenant-one"],
+                         tenant_one_layout_state)
+        # As tenant-two includes the config from org/project2, the merge of
+        # change A should have triggered a reconfig.
+        self.assertGreater(sched.local_layout_state["tenant-two"],
+                           tenant_two_layout_state)
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project2-test', result='SUCCESS', changes='1,1'),
+            dict(name='project2-test', result='SUCCESS', changes='2,1'),
+        ])
+
+
 class TestReportBuildPage(ZuulTestCase):
     tenant_config_file = 'config/build-page/main.yaml'
 
