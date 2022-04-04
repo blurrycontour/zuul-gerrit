@@ -47,6 +47,8 @@ MANAGEMENT_EVENT_TYPE_MAP = {
     "PromoteEvent": model.PromoteEvent,
     "ReconfigureEvent": model.ReconfigureEvent,
     "TenantReconfigureEvent": model.TenantReconfigureEvent,
+    "PipelinePostConfigEvent": model.PipelinePostConfigEvent,
+    "PipelineSemaphoreReleaseEvent": model.PipelineSemaphoreReleaseEvent,
 }
 
 # /zuul/events/tenant   TENANT_ROOT
