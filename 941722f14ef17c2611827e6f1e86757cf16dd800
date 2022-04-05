@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "611d2754_ca4d9836",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-04-05T08:53:38Z",
+      "side": 1,
+      "message": "PS2 resolved the model API merge conflict",
+      "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
