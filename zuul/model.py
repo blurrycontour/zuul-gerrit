@@ -4819,6 +4819,11 @@ class QueueItem(zkobject.ZKObject):
                     to_skip = job_graph.getDependentJobsRecursively(
                         skip, skip_soft=True)
                     skipped += to_skip
+                # Debug for https://support.cc.bmwgroup.net/browse/CCSD-37641
+                # TODO: Remove the debug log afterwards
+                if skipped and "apinext-app-release-test-gateway" in skipped:
+                    self.log.debug("Debug CCSD-37641: %s, %s, %s",
+                                   dependent_jobs, zuul_return, skipped)
 
         elif build.result != 'SUCCESS' and not build.paused:
             to_skip = job_graph.getDependentJobsRecursively(
