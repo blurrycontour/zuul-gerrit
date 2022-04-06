@@ -1,4 +1,0 @@
-- hosts: all
-  tasks:
-    - ansible.builtin.command:
-        cmd: 'echo foobar'
