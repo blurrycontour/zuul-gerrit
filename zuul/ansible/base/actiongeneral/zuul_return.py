@@ -20,8 +20,6 @@ from copy import deepcopy
 
 from ansible.plugins.action import ActionBase
 
-from zuul.ansible import paths
-
 
 def merge_dict(dict_a, dict_b):
     """
@@ -166,9 +164,6 @@ class ActionModule(ActionBase):
         if not path:
             path = os.path.join(os.environ['ZUUL_JOBDIR'], 'work',
                                 'results.json')
-
-        if not paths._is_safe_path(path, allow_trusted=False):
-            return paths._fail_dict(path)
 
         set_value(
             path,
