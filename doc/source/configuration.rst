@@ -398,6 +398,48 @@ available to the restricted environment.
 
 .. _bubblewrap: https://github.com/projectatomic/bubblewrap
 
+.. _executor_security:
+
+Security Considerations
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Bubblewrap restricts access to files outside of the build environment
+in both execution contexts.  Operators may allow either read-only or
+read-write access to additional paths in either the `trusted` context
+or both contexts with additional options described below.  Be careful
+when adding additional paths, and consider that any `trusted` or
+`untrusted` (as appropriate) playbook will have access to these paths.
+
+If executors are configured to use WinRM certificates, these must be
+made available to the bubblewrap environment in order for Ansible to
+use them.  This invariably makes them accessible to any playbook in
+that execution context.  Operators may want to consider only supplying
+WinRM credentials to trusted playbooks and installing per-build
+certificates in a pre-playbook; or using Ansible's experimental SSH
+support instead of WinRM.
+
+Local code execution is permitted on the executor, so if a
+vulnerability in bubblewrap or the kernel allows for an escape from
+the restricted environment, users may be able to escalate their
+privileges and obtain access to any data or secrets available to the
+executor.
+
+Playbooks which run on the executor will have the same network access
+as the executor itself.  This should be kept in mind when considering
+IP-based network access control within an organization.  Zuul's
+internal communication is via ZooKeeper which is authenticated and
+secured by TLS certificates, so as long as these certificates are not
+made available to jobs, users should not be able to access or disrupt
+Zuul's internal communications.  However, statsd is an unauthenticated
+protocol, so a malicious user could emit false statsd information.
+
+If the Zuul executor is running in a cloud environment with a network
+metadata service, users may be able to access that service.  If it
+supplies credentials, they may be able to obtain those credentials and
+access cloud resources.  Operators should ensure that in these
+environments, the executors are configured with appropriately
+restricted IAM profiles.
+
 Configuration
 ~~~~~~~~~~~~~
 
