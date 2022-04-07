@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dcf7ff6_e507146b",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:04:06Z",
+      "side": 1,
+      "message": "Should we have a catch for other exceptions here to handle if db_buildset is still None after attempting to create the buildset again on line 105? Or are we happy with the NoneType has no attribute result exception bubbling up?",
+      "revId": "bf2eb71f95257e0dfac259fb74e7a97fe4a53eb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86f578da_26efd8a6",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:04:06Z",
+      "side": 1,
+      "message": "See the above comment.",
+      "revId": "bf2eb71f95257e0dfac259fb74e7a97fe4a53eb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
