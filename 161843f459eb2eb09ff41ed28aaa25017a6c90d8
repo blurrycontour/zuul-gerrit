@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46a3b42c_ec66645d",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T23:46:53Z",
+      "side": 1,
+      "message": "I agree this should work because the flag is touched whenever we put the blob regardless of whether or not any data is written in the process. And we set ltime while holding the lock when we build the list of deletable blobs.",
+      "revId": "161843f459eb2eb09ff41ed28aaa25017a6c90d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
