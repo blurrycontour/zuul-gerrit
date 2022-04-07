@@ -2,29 +2,7 @@ Ansible Integration
 ===================
 
 Zuul contains Ansible modules and plugins to control the execution of Ansible
-Job content. These break down into two basic categories.
-
-* Restricted Execution on Executors
-* Build Log Support
-
-Restricted Execution
---------------------
-
-Zuul runs ``ansible-playbook`` on executors to run job content on nodes. While
-the intent is that content is run on the remote nodes, Ansible is a flexible
-system that allows delegating actions to ``localhost``, and also reading and
-writing files. These actions can be desirable and necessary for actions such
-as fetching log files or build artifacts, but could also be used as a vector
-to attack the executor.
-
-For that reason Zuul implements a set of Ansible action plugins and lookup
-plugins that override and intercept task execution during untrusted playbook
-execution to ensure local actions are not executed or that for operations that
-are desirable to allow locally that they only interact with files in the zuul
-work directory.
-
-.. autoclass:: zuul.ansible.base.action.normal.ActionModule
-   :members:
+Job content.
 
 Build Log Support
 -----------------

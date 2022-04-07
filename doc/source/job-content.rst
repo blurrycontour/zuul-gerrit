@@ -1093,7 +1093,7 @@ For example:
           registry_ip_address: "{{ hostvars[groups.all[0]].ansible_host }}"
 
 Skipping retries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 It's possible to skip the retry caused by a failure in ``pre-run``
 by setting **zuul.retry** to ``false``.

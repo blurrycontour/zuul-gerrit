@@ -375,11 +375,10 @@ Here is an example of two job definitions:
 
       If a job has an empty (or no) :ref:`nodeset` definition, it will
       still run and is able to perform limited actions within the Zuul
-      executor sandbox (e.g. copying files or triggering APIs).  Note
-      so-called "executor-only" jobs run with an empty inventory, and
-      hence Ansible's *implicit localhost*.  This means an
-      executor-only playbook must be written to match ``localhost``
-      directly; i.e.
+      executor sandbox.  Note so-called "executor-only" jobs run with
+      an empty inventory, and hence Ansible's *implicit localhost*.
+      This means an executor-only playbook must be written to match
+      ``localhost`` directly; i.e.
 
       .. code-block:: yaml
 
