@@ -1034,8 +1034,6 @@ class AnsibleJob(object):
                 self.ansible_version)
         self.library_dir = os.path.join(plugin_dir, 'library')
         self.action_dir = os.path.join(plugin_dir, 'action')
-        self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
-        self.action_dir_trusted = os.path.join(plugin_dir, 'actiontrusted')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
@@ -2618,8 +2616,6 @@ class AnsibleJob(object):
         logging_config.writeJson(self.jobdir.logging_json)
 
     def writeAnsibleConfig(self, jobdir_playbook):
-        trusted = jobdir_playbook.trusted
-
         # TODO(mordred) This should likely be extracted into a more generalized
         #               mechanism for deployers being able to add callback
         #               plugins.
@@ -2653,25 +2649,11 @@ class AnsibleJob(object):
             # 10s to respond
             config.write('timeout = 30\n')
 
-            # We need the general action dir to make the zuul_return plugin
-            # available to every job.
-            action_dirs = [self.action_dir_general]
-            if not trusted:
-                # Untrusted jobs add the action dir which makes sure localhost
-                # modules are restricted where needed. Further the command
-                # plugin needs to be restricted and also inject zuul_log_id
-                # to make log streaming work.
-                action_dirs.append(self.action_dir)
-                config.write('lookup_plugins = %s\n'
-                             % self.lookup_dir)
-            else:
-                # Trusted jobs add the actiontrusted dir which adds the
-                # unrestricted command plugin to inject zuul_log_id to make
-                # log streaming work.
-                action_dirs.append(self.action_dir_trusted)
-
+            # We need the action dir to make the zuul_return plugin
+            # available to every job, and a customized command plugin
+            # to inject zuul_log_id to make log streaming work.
             config.write('action_plugins = %s\n'
-                         % ':'.join(action_dirs))
+                         % self.action_dir)
 
             if jobdir_playbook.roles_path:
                 config.write('roles_path = %s\n' % ':'.join(
