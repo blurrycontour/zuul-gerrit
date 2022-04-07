@@ -16,6 +16,97 @@
       "message": "PS2 resolved the model API merge conflict",
       "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d26553b_e265c5d7",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:32:04Z",
+      "side": 1,
+      "message": "Small nit. Might be worth indicating why this is: because small secrets continue to use the old system which uses fewer zk operations if I read correctly.",
+      "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "219a6694_902a645b",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2517,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:32:04Z",
+      "side": 1,
+      "message": "Just making sure I understand properly. The blob store is storing binary data as provided (possibly sharding it). This means we are storing the encrypted values here right?",
+      "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d55ed2ff_d01c6955",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:32:04Z",
+      "side": 1,
+      "message": "I think this might race with new items enqueuing and using the same secrets since we\u0027ve dropped the locks? We might need to do these deletions with the same lock context held as when we build the list to prevent that?",
+      "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff3e8576_cef46923",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:32:04Z",
+      "side": 1,
+      "message": "Small nit: {key[0:2]} might make it slightly clearer we want the prefix slice of the hash name. I wasn\u0027t sure if we were indexing a dict or not initially. But this is minor if you go read the put() code it is super clear.",
+      "range": {
+        "startLine": 35,
+        "startChar": 34,
+        "endLine": 35,
+        "endChar": 50
+      },
+      "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2954781_a6f6a636",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-07T21:32:04Z",
+      "side": 1,
+      "message": "I guess blocking on the lock here before we return if the data was written by someone else ensures the write by someone else is complete before we report back that the key is present? The alternative to using a lock would be to just let everyone write and let zk sort out the order of operations. But if we do that then a read could happen after someone has deleted the content to rewrite it and before the rewrite is complete.",
+      "revId": "941722f14ef17c2611827e6f1e86757cf16dd800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
