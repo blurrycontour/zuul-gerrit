@@ -6355,69 +6355,6 @@ class TestJobOutput(AnsibleZuulTestCase):
         self.assertIn('Failure test', log_output)
 
 
-class TestPlugins(AnsibleZuulTestCase):
-    tenant_config_file = 'config/speculative-plugins/main.yaml'
-
-    def _run_job(self, job_name, project='org/project', roles=''):
-        # Output extra ansible info so we might see errors.
-        self.executor_server.verbose = True
-        conf = textwrap.dedent(
-            """
-            - job:
-                name: {job_name}
-                run: playbooks/{job_name}/test.yaml
-                nodeset:
-                  nodes:
-                    - name: controller
-                      label: whatever
-                {roles}
-            - project:
-                check:
-                  jobs:
-                    - {job_name}
-            """.format(job_name=job_name, roles=roles))
-
-        file_dict = {'zuul.yaml': conf}
-        A = self.fake_gerrit.addFakeChange(project, 'master', 'A',
-                                           files=file_dict)
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-        return A
-
-    def _check_job(self, job_name, project='org/project', roles=''):
-        A = self._run_job(job_name, project, roles)
-
-        message = A.messages[0]
-        self.assertIn('ERROR Ansible plugin dir', message)
-        self.assertIn('found adjacent to playbook', message)
-        self.assertIn('in non-trusted repo', message)
-
-    def test_filter_plugin(self):
-        self._check_job('filter-plugin-playbook')
-        self._check_job('filter-plugin-playbook-symlink')
-        self._check_job('filter-plugin-bare-role')
-        self._check_job('filter-plugin-role')
-        self._check_job('filter-plugin-repo-role', project='org/projectrole',
-                        roles="roles: [{zuul: 'org/projectrole'}]")
-        self._check_job('filter-plugin-shared-role',
-                        roles="roles: [{zuul: 'org/project2'}]")
-        self._check_job(
-            'filter-plugin-shared-bare-role',
-            roles="roles: [{zuul: 'org/project3', name: 'shared'}]")
-
-    def test_implicit_role_not_added(self):
-        # This fails because the job uses the role which isn't added
-        # to the role path, but it's a normal ansible failure, not a
-        # Zuul executor error.
-        A = self._run_job('filter-plugin-repo-role', project='org/projectrole')
-        self.assertHistory([
-            dict(name='filter-plugin-repo-role', result='FAILURE',
-                 changes='1,1'),
-        ], ordered=False)
-        message = A.messages[0]
-        self.assertNotIn('Ansible plugin', message)
-
-
 class TestNoLog(AnsibleZuulTestCase):
     tenant_config_file = 'config/ansible-no-log/main.yaml'
 
