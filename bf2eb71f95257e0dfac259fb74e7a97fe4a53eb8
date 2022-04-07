@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b4bd7e2_3a73627c",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-07T21:15:07Z",
+      "side": 1,
+      "message": "I thought about that a bit and thought letting the pipeline managers handle (or not) would be the minimal change here.  But maybe we should consider making all of these non-fatal by catching everything here?  That might be good as a followup though.",
+      "revId": "bf2eb71f95257e0dfac259fb74e7a97fe4a53eb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86f578da_26efd8a6",
