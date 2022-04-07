@@ -152,10 +152,6 @@ class RoleNotFoundError(ExecutorError):
     pass
 
 
-class PluginFoundError(ExecutorError):
-    pass
-
-
 class DiskAccountant(object):
     ''' A single thread to periodically run du and monitor a base directory
 
@@ -1975,58 +1971,8 @@ class AnsibleJob(object):
                     host_keys=host_keys))
         return hosts
 
-    def _blockPluginDirs(self, path):
-        '''Prevent execution of playbooks or roles with plugins
-
-        Plugins are loaded from roles and also if there is a plugin
-        dir adjacent to the playbook.  Throw an error if the path
-        contains a location that would cause a plugin to get loaded.
-
-        '''
-        for entry in os.listdir(path):
-            entry = os.path.join(path, entry)
-            if os.path.isdir(entry) and entry.endswith('_plugins'):
-                raise PluginFoundError(
-                    "Ansible plugin dir %s found adjacent to playbook %s in "
-                    "non-trusted repo." % (entry, path))
-
     def findPlaybook(self, path, trusted=False):
         if os.path.exists(path):
-            if not trusted:
-                # Plugins can be defined in multiple locations within the
-                # playbook's subtree.
-                #
-                #  1. directly within the playbook:
-                #       block playbook_dir/*_plugins
-                #
-                #  2. within a role defined in playbook_dir/<rolename>:
-                #       block playbook_dir/*/*_plugins
-                #
-                #  3. within a role defined in playbook_dir/roles/<rolename>:
-                #       block playbook_dir/roles/*/*_plugins
-
-                playbook_dir = os.path.dirname(os.path.abspath(path))
-                paths_to_check = []
-
-                def addPathsToCheck(root_dir):
-                    if os.path.isdir(root_dir):
-                        for entry in os.listdir(root_dir):
-                            entry = os.path.join(root_dir, entry)
-                            if os.path.isdir(entry):
-                                paths_to_check.append(entry)
-
-                # handle case 1
-                paths_to_check.append(playbook_dir)
-
-                # handle case 2
-                addPathsToCheck(playbook_dir)
-
-                # handle case 3
-                addPathsToCheck(os.path.join(playbook_dir, 'roles'))
-
-                for path_to_check in paths_to_check:
-                    self._blockPluginDirs(path_to_check)
-
             return path
         raise ExecutorError("Unable to find playbook %s" % path)
 
@@ -2265,20 +2211,11 @@ class AnsibleJob(object):
     def findRole(self, path, trusted=False):
         d = os.path.join(path, 'tasks')
         if os.path.isdir(d):
-            # This is a bare role
-            if not trusted:
-                self._blockPluginDirs(path)
             # None signifies that the repo is a bare role
             return None
         d = os.path.join(path, 'roles')
         if os.path.isdir(d):
             # This repo has a collection of roles
-            if not trusted:
-                self._blockPluginDirs(d)
-                for entry in os.listdir(d):
-                    entry_path = os.path.join(d, entry)
-                    if os.path.isdir(entry_path):
-                        self._blockPluginDirs(entry_path)
             return d
         # It is neither a bare role, nor a collection of roles
         raise RoleNotFoundError("Unable to find role in %s" % (path,))
@@ -2345,12 +2282,6 @@ class AnsibleJob(object):
         except RoleNotFoundError:
             if role['implicit']:
                 self.log.debug("Implicit role not found in %s", link)
-                return
-            raise
-        except PluginFoundError:
-            if role['implicit']:
-                self.log.info("Not adding implicit role %s due to "
-                              "plugin", link)
                 return
             raise
         if role_path is None:
@@ -2616,8 +2547,6 @@ class AnsibleJob(object):
         logging_config.writeJson(self.jobdir.logging_json)
 
     def writeAnsibleConfig(self, jobdir_playbook):
-        trusted = jobdir_playbook.trusted
-
         # TODO(mordred) This should likely be extracted into a more generalized
         #               mechanism for deployers being able to add callback
         #               plugins.
