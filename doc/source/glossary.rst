@@ -357,23 +357,14 @@ Glossary
    trusted execution context
 
       Playbooks defined in a :term:`config-project` run in the
-      *trusted* execution context.  The trusted execution context has
-      access to all Ansible features, including the ability to load
-      custom Ansible modules.
+      *trusted* execution context.  The trusted execution context may
+      have access to extra directories within the bubblewrap container
+      if the operator has configured these.
 
    untrusted execution context
 
       Playbooks defined in an :term:`untrusted-project` run in the
-      *untrusted* execution context.  Playbooks run in the untrusted
-      execution context are not permitted to load additional Ansible
-      modules or access files outside of the restricted environment
-      prepared for them by the executor.  In addition to the
-      bubblewrap environment applied to both execution contexts, in
-      the untrusted context some standard Ansible modules are replaced
-      with versions which prohibit some actions, including attempts to
-      access files outside of the restricted execution context.  These
-      redundant protections are made as part of a defense-in-depth
-      strategy.
+      *untrusted* execution context.
 
    untrusted-project
 
