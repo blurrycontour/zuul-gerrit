@@ -171,6 +171,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportSuccess(self, item, with_jobs=True):
         msg = item.pipeline.success_message
+        msg += '\n' + item.formatStatusUrl()
         if with_jobs:
             msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
@@ -195,6 +196,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             msg = str(item.getConfigErrors()[0].error)
         else:
             msg = item.pipeline.failure_message
+            msg += '\n' + item.formatStatusUrl()
             if with_jobs:
                 msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
