@@ -34,7 +34,7 @@
 - name: "Check build URL"
   assert:
     that:
-      - (result_json | to_json | from_json | json_query(json_query_finger) | regex_search('(http://[^ ]*)') | length > 0)
+      - (result_json | to_json | from_json | json_query(json_query_finger) | regex_search('[ ](http://[^ ]*)') | trim | length > 0)
 
 - name: Configure a Base Job zuul-config
   copy:
