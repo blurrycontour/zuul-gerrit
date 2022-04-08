@@ -1583,9 +1583,9 @@ class PipelineManager(metaclass=ABCMeta):
                     request_id, cached=True)
                 if not node_request:
                     continue
-                if node_request.fulfilled:
-                    # If the node request is already fulfilled, there is no
-                    # need to update the relative priority.
+                if node_request.state != model.STATE_REQUESTED:
+                    # If the node request was locked and accepted by a
+                    # provider, we can no longer update the relative priority.
                     continue
                 if node_request.relative_priority != priority:
                     self.sched.nodepool.reviseRequest(
