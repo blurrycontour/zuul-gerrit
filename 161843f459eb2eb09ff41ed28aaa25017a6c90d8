@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "19fe28e0_da5f27fe",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-04-08T05:45:11Z",
+      "side": 1,
+      "message": "I think we should also get the tenant read lock to be consistent with our lock sequences in other places. When the tenant write lock is acquired we assume exclusive access to the tenant and all its pipelines.",
+      "revId": "161843f459eb2eb09ff41ed28aaa25017a6c90d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad6dc2a6_e53463fa",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-04-08T05:45:11Z",
+      "side": 1,
+      "message": "Do we need to refresh the pipeline change list and summary here? It doesn\u0027t look like we are using that here.",
+      "revId": "161843f459eb2eb09ff41ed28aaa25017a6c90d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6701ea5_8aff9110",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-04-08T05:45:11Z",
+      "side": 1,
+      "message": "Do we want to retry this indefinitely? I\u0027m little afraid of schedulers/executors hanging because of that.",
+      "revId": "161843f459eb2eb09ff41ed28aaa25017a6c90d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "46a3b42c_ec66645d",
         "filename": "zuul/zk/blob_store.py",
         "patchSetId": 3
