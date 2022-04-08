@@ -349,7 +349,8 @@ class Client(zuul.cmd.ZuulApp):
         cmd_create_auth_token.add_argument(
             '--tenant',
             help='tenant name',
-            required=True)
+            required=True,
+            action='append')
         cmd_create_auth_token.add_argument(
             '--user',
             help=("The user's name. Used for traceability in logs."),
@@ -676,7 +677,7 @@ class Client(zuul.cmd.ZuulApp):
                  'iss': get_default(self.config, auth_section, 'issuer_id'),
                  'aud': get_default(self.config, auth_section, 'client_id'),
                  'sub': self.args.user,
-                 'zuul': {'admin': [self.args.tenant, ]},
+                 'zuul': {'admin': self.args.tenant},
                 }
         driver = get_default(
             self.config, auth_section, 'driver')
