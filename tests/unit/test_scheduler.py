@@ -26,6 +26,7 @@ from collections import namedtuple
 from unittest import mock, skip
 from uuid import uuid4
 from kazoo.exceptions import NoNodeError
+from testtools.matchers import StartsWith
 
 import git
 import fixtures
@@ -365,6 +366,10 @@ class TestScheduler(ZuulTestCase):
                          'label1')
         self.assertEqual(self.getJobFromHistory('project-test2').node,
                          'label1')
+        self.log.debug("A.messages %s", str(A.messages))
+        self.assertThat(A.messages[1],
+                        StartsWith('Build succeeded (gate).\n'
+                                   'https://zuul.example.com/t/tenant-one/buildset')
 
         # TODOv3(jeblair): we may want to report stats by tenant (also?).
         # Per-driver
