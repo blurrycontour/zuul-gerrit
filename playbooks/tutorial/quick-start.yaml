@@ -84,7 +84,7 @@
 
 - name: Find the build URL with regex
   set_fact:
-    build_url: "{{ result_json | to_json | from_json | json_query(json_query_log_url) | regex_search('(http://[^ ]*)') }}"
+    build_url: "{{ result_json | to_json | from_json | json_query(json_query_log_url) | regex_search('-.*(http://[^ ]*)') | regex_search('(http://[^ ]*)') }}"
   vars:
     json_query_log_url: "messages[?contains(@.message, 'http://')].message | [1]"
 
