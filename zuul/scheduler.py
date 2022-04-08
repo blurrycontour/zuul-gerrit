@@ -2178,6 +2178,12 @@ class Scheduler(threading.Thread):
 
             reconfigure_tenant = False
 
+        # If all config classes are excluded for this project we don't need
+        # to trigger a reconfiguration.
+        tpc = tenant.project_configs.get(project.canonical_name)
+        if tpc and not tpc.load_classes:
+            reconfigure_tenant = False
+
         # But if the event is that branch protection status has
         # changed, do reconfigure.
         if (event.isBranchProtectionChanged()):
