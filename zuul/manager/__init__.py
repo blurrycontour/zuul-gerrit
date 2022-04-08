@@ -227,6 +227,7 @@ class PipelineManager(metaclass=ABCMeta):
                 change = source.getChange(key)
                 if change is None:
                     self.log.error("Unable to resolve change from key %s", key)
+                self.updateCommitDependencies(change, None, event=None)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
