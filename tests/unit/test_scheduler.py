@@ -365,6 +365,10 @@ class TestScheduler(ZuulTestCase):
                          'label1')
         self.assertEqual(self.getJobFromHistory('project-test2').node,
                          'label1')
+        self.log.debug("A.messages[0] %s", A.messages[0])
+        self.assertIn('Build succeeded'
+                      'https://zuul.opendev.org/t/zuul/buildset/873cbd82d7ce4a40898adeb5cd3cad89',
+                      A.messages[0])
 
         # TODOv3(jeblair): we may want to report stats by tenant (also?).
         # Per-driver
