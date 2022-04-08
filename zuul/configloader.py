@@ -1654,10 +1654,16 @@ class TenantParser(object):
 
         tenant.layout = self._parseLayout(
             tenant, parsed_config, loading_errors, layout_uuid)
+
         if self.scheduler:
             tenant.semaphore_handler = SemaphoreHandler(
                 self.zk_client, self.statsd, tenant.name, tenant.layout
             )
+            # Only call the postConfig hook if we have a scheduler as this will
+            # change data in ZooKeeper. In case we are in a zuul-web context,
+            # we don't want to do that.
+            for pipeline in tenant.layout.pipelines.values():
+                pipeline.manager._postConfig()
 
         return tenant
 
@@ -2347,16 +2353,7 @@ class TenantParser(object):
         layout = model.Layout(tenant, layout_uuid)
         layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
-
         self._addLayoutItems(layout, tenant, data)
-
-        # Only call the postConfig hook if we have a scheduler as this will
-        # change data in ZooKeeper. In case we are in a zuul-web context,
-        # we don't want to do that.
-        if self.scheduler:
-            for pipeline in layout.pipelines.values():
-                pipeline.manager._postConfig(layout)
-
         return layout
 
 

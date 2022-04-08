@@ -91,7 +91,8 @@ class PipelineManager(metaclass=ABCMeta):
         finally:
             self.current_context = None
 
-    def _postConfig(self, layout):
+    def _postConfig(self):
+        layout = self.pipeline.tenant.layout
         # If our layout UUID already matches the UUID in ZK, we don't
         # need to make any changes in ZK.  But we do still need to
         # update our local object pointers.  Note that our local queue
@@ -227,6 +228,8 @@ class PipelineManager(metaclass=ABCMeta):
                 change = source.getChange(key)
                 if change is None:
                     self.log.error("Unable to resolve change from key %s", key)
+                if isinstance(change, model.Change):
+                    self.updateCommitDependencies(change, None, event=None)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
