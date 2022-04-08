@@ -489,6 +489,8 @@ class Client(zuul.cmd.ZuulApp):
 
     def parseArguments(self, args=None):
         parser = super(Client, self).parseArguments()
+        if self.args.auth_token is None and os.environ.get('ZUUL_TOKEN'):
+            self.args.auth_token = os.environ["ZUUL_TOKEN"]
         if not getattr(self.args, 'func', None):
             parser.print_help()
             sys.exit(1)
