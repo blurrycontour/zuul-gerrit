@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "749e372f_9d8fa837",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-04-08T06:10:39Z",
+      "side": 1,
+      "message": "Seems we are also not read locking the tenant in `_cleanupNodeRequests()`, so ignore my comment here.",
+      "parentUuid": "19fe28e0_da5f27fe",
+      "revId": "161843f459eb2eb09ff41ed28aaa25017a6c90d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ad6dc2a6_e53463fa",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
