@@ -396,6 +396,32 @@ class TestMergerRepo(ZuulTestCase):
         changed_files = work_repo.getFilesChanges('feature1', base_sha)
         self.assertEqual(['README'], changed_files)
 
+    def test_files_changes_add_and_removed_file_source_branch(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        self.create_branch('org/project1', 'feature')
+        self.create_commit('org/project1', head='feature',
+                           files={"file1.txt": "file1\n"})
+        self.create_commit('org/project1', head='feature',
+                           files={"file2.txt": "file2\n"})
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        changed_files = work_repo.getFilesChanges('master', 'feature')
+
+        self.assertEqual(sorted(['README', 'file1.txt', 'file2.txt']),
+                         sorted(changed_files))
+
+        repo = git.Repo(parent_path)
+        repo.head.reference = repo.heads['feature']
+        repo.head.reset(index=True, working_tree=True)
+        repo.index.remove(["file1.txt"], working_tree=True)
+        repo.index.commit('remove file1')
+
+        work_repo.update()
+        work_repo.reset()
+        changed_files = work_repo.getFilesChanges('master', 'feature')
+        self.assertEqual(['README', 'file2.txt'], sorted(changed_files))
+
     def test_files_changes_master_fork_merges(self):
         """Regression test for getFilesChanges()
 
@@ -449,6 +475,96 @@ class TestMergerRepo(ZuulTestCase):
                          'none@example.org', 'User Name', '0', '0')
         changed_files = work_repo.getFilesChanges('messy', 'master')
         self.assertEqual(sorted(['messy1.txt', 'messy2.txt']),
+                         sorted(changed_files))
+
+    def test_files_changes_criss_cross_merges(self):
+        #
+        #        A---C---E (branch1)
+        #       / \ /
+        #      /   X
+        #     /   / \
+        # ---o---B---D---F---G (branch2)
+        #
+        # C and D are merge commits which are amended to include a new file
+        #
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        repo = git.Repo(parent_path)
+        repo.create_head('branch1')
+        repo.create_head('branch2')
+
+        files = {"A": "A"}
+        commitAhexsha = self.create_commit('org/project1', head="branch1",
+                                           files=files, message="A")
+        files = {"B": "B"}
+        commitBhexsha = self.create_commit('org/project1', head="branch2",
+                                           files=files, message="B")
+        files = {"C": "C"}
+        commitChexsha = self.create_commit('org/project1', head="branch1",
+                                           files=files, message="C",
+                                           merge_branch=commitBhexsha)
+        files = {"D": "D"}
+        commitDhexsha = self.create_commit('org/project1', head="branch2",
+                                           files=files, message="D",
+                                           merge_branch=commitAhexsha)
+        files = {"E": "E"}
+        commitEhexsha = self.create_commit('org/project1', head="branch1",
+                                           files=files, message="E")
+        files = {"F": "F"}
+        commitFhexsha = self.create_commit('org/project1', head="branch2",
+                                           files=files, message="F")
+
+        files = {"A": "AA"}
+        commitGhexsha = self.create_commit('org/project1', head="branch2",
+                                           files=files, message="G")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        # ancestor
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitAhexsha)
+        self.assertEqual(sorted(['B', 'D', 'F']), sorted(changed_files))
+        # ancestor
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitBhexsha)
+        self.assertEqual(sorted(['A', 'D', 'F']), sorted(changed_files))
+        # merge-base
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitChexsha)
+        self.assertEqual(sorted(['D', 'F']), sorted(changed_files))
+        # ancestor
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitDhexsha)
+        self.assertEqual(sorted(['F']), sorted(changed_files))
+        # merge-base
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitEhexsha)
+        self.assertEqual(sorted(['D', 'F']), sorted(changed_files))
+        # merge-base, 'A' was removed in previous test due to intersection
+        # using git diff B--F which does not list 'A'.
+        # G includes file 'A', check that it is present  in E/A2 files changes
+        changed_files = work_repo.getFilesChanges(commitGhexsha, commitEhexsha)
+        self.assertEqual(sorted(['A', 'D', 'F']), sorted(changed_files))
+
+        # when one ref is an not ancestor of the other, refBase and refTo order
+        # matters:
+        # [C] vs [D,F]
+        changed_files = work_repo.getFilesChanges(commitChexsha, commitFhexsha)
+        self.assertEqual(sorted(['C']), sorted(changed_files))
+        # [C,E] vs [D,F]
+        changed_files = work_repo.getFilesChanges(commitEhexsha, commitFhexsha)
+        self.assertEqual(sorted(['C', 'E']), sorted(changed_files))
+
+        # when one ref is an ancestor of the other, the order doesn't matter
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitAhexsha)
+        self.assertEqual(sorted(['B', 'D', 'F']), sorted(changed_files))
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitBhexsha)
+        self.assertEqual(sorted(['A', 'D', 'F']), sorted(changed_files))
+        changed_files = work_repo.getFilesChanges(commitFhexsha, commitDhexsha)
+        self.assertEqual(sorted(['F']), sorted(changed_files))
+
+        changed_files = work_repo.getFilesChanges(commitChexsha, commitDhexsha)
+        self.assertEqual(sorted(['C']), sorted(changed_files))
+        changed_files = work_repo.getFilesChanges(commitDhexsha, commitChexsha)
+        self.assertEqual(sorted(['D']), sorted(changed_files))
+
+        # when refBase is None, all tree files are returned
+        changed_files = work_repo.getFilesChanges(commitFhexsha, None)
+        self.assertEqual(sorted(['A', 'B', 'D', 'F', 'README']),
                          sorted(changed_files))
 
     def test_update_needed(self):
