@@ -703,11 +703,13 @@ class Repo(object):
             diff_files.update((item.a_path for item in diff_index))
 
             commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
+            for cmt in repo.iter_commits(commit_diff):
                 files.update(f for f in cmt.stats.files.keys()
                              if f in diff_files)
         else:
-            files.update(head.stats.files.keys())
+            for item in head.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):

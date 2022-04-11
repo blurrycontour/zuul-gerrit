@@ -41,6 +41,9 @@ from tests.base import (
     skipIfMultiScheduler,
 )
 
+from zuul.zk.layout import LayoutState
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {})
+
 
 class TestMultipleTenants(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
@@ -1567,6 +1570,136 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
             dict(name='project-test1', result='SUCCESS', changes='2,1'),
             dict(name='project-test2', result='SUCCESS', changes='3,1')])
+
+    def test_in_repo_branch_merge(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+            - job:
+                name: project-test2
+                run: playbooks/project-test2.yaml
+
+            - project:
+                name: org/project
+                check:
+                  jobs: []
+                tenant-one-gate:
+                  jobs:
+                    - project-test2
+            """)
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test2.yaml': in_repo_playbook}
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+
+        # Change job on branch master, was "project-test1", should be
+        # "project-test2"
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test2', result='SUCCESS', changes='1,1')])
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.assertLess(old, new)
+        old = new
+
+        # create a merge commit change on 'stable' branch: merge branch
+        # 'master' into 'stable'. stable should use job project-test2
+        B = self.fake_gerrit.addFakeChange('org/project', 'stable', 'B',
+                                           files=None, merge_branch='master')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1')],
+            ordered=False)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.assertLess(old, new)
+
+    def test_in_repo_branch_merge_amend(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+            - job:
+                name: project-test2
+                run: playbooks/project-test2.yaml
+            - project:
+                name: org/project
+                tenant-one-gate:
+                  jobs:
+                    - project-test2
+            """)
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test2.yaml': in_repo_playbook}
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+        # Change job on branch master, job project-test1 should be used
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1')])
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.assertLess(old, new)
+        old = new
+        # create a merge commit change on 'stable' branch: merge branch
+        # 'master' into 'stable', amend .zuul.yaml, job project-test2 should be
+        # used
+        B = self.fake_gerrit.addFakeChange('org/project', 'stable', 'B',
+                                           files=file_dict,
+                                           merge_branch='master')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1')])
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.assertLess(old, new)
 
     def test_crd_dynamic_config_branch(self):
         # Test that we can create a job in one repo and be able to use

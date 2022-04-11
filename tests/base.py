@@ -384,7 +384,7 @@ class FakeGerritChange(object):
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
                  parent=None, merge_parents=None, merge_files=None,
-                 topic=None):
+                 topic=None, merge_branch=None):
         self.gerrit = gerrit
         self.source = gerrit
         self.reported = 0
@@ -429,15 +429,13 @@ class FakeGerritChange(object):
             self.addMergePatchset(parents=merge_parents,
                                   merge_files=merge_files)
         else:
-            self.addPatchset(files=files, parent=parent)
-        if merge_parents:
-            self.data['parents'] = merge_parents
-        elif parent:
-            self.data['parents'] = [parent]
+            self.addPatchset(files=files, parent=parent,
+                             merge_branch=merge_branch)
         self.data['submitRecords'] = self.getSubmitRecords()
         self.open = status == 'NEW'
 
-    def addFakeChangeToRepo(self, msg, files, large, parent):
+    def addFakeChangeToRepo(self, msg, files, large, parent,
+                            merge_branch=None):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
         if parent is None:
@@ -450,6 +448,9 @@ class FakeGerritChange(object):
         repo.head.reference = ref
         repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
+
+        if merge_branch:
+            repo.git.merge(merge_branch, no_ff=True)
 
         path = os.path.join(self.upstream_root, self.project)
         if not large:
@@ -474,7 +475,12 @@ class FakeGerritChange(object):
                 f.close()
                 repo.index.add([fn])
 
-        r = repo.index.commit(msg)
+        if merge_branch:
+            if msg:
+                repo.git.commit('--amend', '-m', msg)
+            r = repo.commit('HEAD')
+        else:
+            r = repo.index.commit(msg)
         repo.head.reference = 'master'
         repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
@@ -502,7 +508,8 @@ class FakeGerritChange(object):
         repo.heads['master'].checkout()
         return r
 
-    def addPatchset(self, files=None, large=False, parent=None):
+    def addPatchset(self, files=None, large=False, parent=None,
+                    merge_branch=None):
         self.latest_patchset += 1
         if not files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
@@ -510,11 +517,26 @@ class FakeGerritChange(object):
                     (self.branch, self.number, self.latest_patchset))
             files = {fn: data}
         msg = self.subject + '-' + str(self.latest_patchset)
-        c = self.addFakeChangeToRepo(msg, files, large, parent)
+        c = self.addFakeChangeToRepo(msg, files, large, parent, merge_branch)
+        parent_commits = [parent.hexsha for parent in c.parents]
+        self.parent_hexsha = parent_commits[0]
+
         ps_files = [{'file': '/COMMIT_MSG',
                      'type': 'ADDED'},
                     {'file': 'README',
                      'type': 'MODIFIED'}]
+        if merge_branch:
+            ps_files.append({'file': '/MERGE_LIST', 'type': 'ADDED'})
+
+            path = os.path.join(self.upstream_root, self.project)
+            repo = git.Repo(path)
+            head_commit = repo.commit(c.hexsha)
+            diff_index = head_commit.diff(self.parent_hexsha)
+            merged_files = [item.a_path for item in diff_index]
+            for f in merged_files:
+                if f not in files:
+                    ps_files.append({'file': f, 'type': 'ADDED'})
+
         for f in files:
             ps_files.append({'file': f, 'type': 'ADDED'})
         d = {'approvals': [],
@@ -525,12 +547,15 @@ class FakeGerritChange(object):
                                                self.number,
                                                self.latest_patchset),
              'revision': c.hexsha,
+             'parents': parent_commits,
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
         self.data['currentPatchSet'] = d
         self.patchsets.append(d)
         self.data['submitRecords'] = self.getSubmitRecords()
+        self.data['parents'] = parent_commits
+        self.parent_hexsha = parent_commits[0]
 
     def addMergePatchset(self, parents, merge_files=None):
         self.latest_patchset += 1
@@ -544,6 +569,7 @@ class FakeGerritChange(object):
                      'type': 'ADDED'}]
         for f in merge_files:
             ps_files.append({'file': f, 'type': 'ADDED'})
+        parent_commits = [parent.hexsha for parent in c.parents]
         d = {'approvals': [],
              'createdOn': time.time(),
              'files': ps_files,
@@ -552,12 +578,15 @@ class FakeGerritChange(object):
                                                self.number,
                                                self.latest_patchset),
              'revision': c.hexsha,
+             'parents': parent_commits,
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
         self.data['currentPatchSet'] = d
         self.patchsets.append(d)
         self.data['submitRecords'] = self.getSubmitRecords()
+        self.data['parents'] = parent_commits
+        self.parent_hexsha = parent_commits[0]
 
     def setCheck(self, checker, reset=False, **kw):
         if reset:
@@ -1296,7 +1325,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
 
     def addFakeChange(self, project, branch, subject, status='NEW',
                       files=None, parent=None, merge_parents=None,
-                      merge_files=None, topic=None):
+                      merge_files=None, topic=None, merge_branch=None):
         """Add a change to the fake Gerrit."""
         self.change_number += 1
         c = FakeGerritChange(self, self.change_number, project, branch,
@@ -1304,7 +1333,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                              status=status, files=files, parent=parent,
                              merge_parents=merge_parents,
                              merge_files=merge_files,
-                             topic=topic)
+                             topic=topic, merge_branch=merge_branch)
         self.changes[self.change_number] = c
         return c
 
@@ -5140,11 +5169,14 @@ class ZuulTestCase(BaseTestCase):
 
     def create_commit(self, project, files=None, delete_files=None,
                       head='master', message='Creating a fake commit',
-                      **kwargs):
+                      merge_branch=None, **kwargs):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = repo.heads[head]
         repo.head.reset(index=True, working_tree=True)
+
+        if merge_branch:
+            repo.git.merge(merge_branch, no_ff=True)
 
         files = files or {"README": "creating fake commit\n"}
         for name, content in files.items():
@@ -5158,7 +5190,14 @@ class ZuulTestCase(BaseTestCase):
             file_name = os.path.join(path, name)
             repo.index.remove([file_name])
 
-        commit = repo.index.commit(message, **kwargs)
+        if merge_branch:
+            if message:
+                repo.git.commit('--amend', '-m', message)
+            else:
+                repo.git.commit('--amend', '-C', 'HEAD')
+            commit = repo.commit('HEAD')
+        else:
+            commit = repo.index.commit(message, **kwargs)
         return commit.hexsha
 
     def orderedRelease(self, count=None):
