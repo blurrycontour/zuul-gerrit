@@ -28,6 +28,7 @@ from zuul.zk import ZooKeeperClient
 
 from tests.base import BaseTestCase, ZuulTestCase
 from tests.base import FIXTURE_DIR
+from tests.unit.test_web import BaseTestWeb
 
 
 class BaseClientTestCase(BaseTestCase):
@@ -170,6 +171,40 @@ class TestWebTokenClient(BaseClientTestCase):
         # allow one minute for the process to run
         self.assertTrue(580 <= int(token['exp']) - now < 660,
                         (token['exp'], now))
+
+
+class TestSilentToken(BaseClientTestCase, BaseTestWeb):
+    config_file = 'zuul-admin-web.conf'
+
+    def test_silent_token(self):
+        """Test that a token is generated silently if none is passed"""
+        with open(os.path.join(self.test_root, 'zuulauth.conf'), 'w') as f:
+            self.config.write(f)
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'), '-v',
+             '-c', os.path.join(self.test_root, 'zuulauth.conf'),
+             '--zuul-url', self.base_url,
+             'autohold', '--reason', 'some reason',
+             '--tenant', 'tenant-one', '--project', 'org/project',
+             '--job', 'project-test2', '--count', '1'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        # Check result
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request = autohold_requests[0]
+        self.assertEqual('tenant-one', request['tenant'])
+        self.assertIn('org/project', request['project'])
+        self.assertEqual('project-test2', request['job'])
+        self.assertEqual(".*", request['ref_filter'])
+        self.assertEqual("some reason", request['reason'])
+        self.assertEqual(1, request['max_count'])
 
 
 class TestKeyOperations(ZuulTestCase):

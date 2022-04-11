@@ -516,11 +516,46 @@ class Client(zuul.cmd.ZuulApp):
         if self.args.verbose:
             logging.basicConfig(level=logging.DEBUG)
 
+    def handleAuthToken(self):
+        if self.args.auth_token is None:
+            self.log.info('No token provided, attempting to generate one')
+            if not self.config.sections():
+                print('Missing configuration file.')
+                sys.exit(1)
+            auth_sections = [
+                section_name for section_name in self.config.sections()
+                if section_name.startswith('auth ')
+            ]
+            if len(auth_sections) < 1:
+                print('No authenticator configuration found.')
+                sys.exit(1)
+            auth_section = auth_sections[0]
+            self.log.info('Using authenticator %s' % auth_section[5:])
+            try:
+                self.args.auth_token = self._create_auth_token(
+                    'CLI admin',
+                    self.args.tenant,
+                    auth_section
+                )
+            except Exception as e:
+                print("Error when generating Auth Token")
+                print(e)
+                sys.exit(1)
+
     def main(self):
         self.parseArguments()
-        if not self.args.zuul_url:
+        try:
             self.readConfig()
+        except Exception as e:
+            # Raise only if we do not have a zuul URL
+            if not self.args.zuul_url:
+                print(e)
+                sys.exit(1)
         self.setup_logging()
+        if self.args.func in [self.autohold, self.autohold_delete,
+                              self.enqueue, self.enqueue_ref,
+                              self.dequeue, self.promote]:
+            self.handleAuthToken()
 
         if self.args.func():
             sys.exit(0)
@@ -670,13 +705,28 @@ class Client(zuul.cmd.ZuulApp):
             print('"%s" authenticator configuration not found.'
                   % self.args.auth_config)
             sys.exit(1)
+        try:
+            token = self._create_auth_token(
+                self.args.user, self.args.tenant,
+                auth_section, self.args.expires_in
+            )
+            print('Bearer %s' % token)
+            err_code = 0
+        except Exception as e:
+            print("Error when generating Auth Token")
+            print(e)
+            err_code = 1
+        finally:
+            sys.exit(err_code)
+
+    def _create_auth_token(self, user, tenant, auth_section, expires_in=None):
         now = time.time()
         token = {'iat': now,
-                 'exp': now + self.args.expires_in,
+                 'exp': now + (expires_in is None and 60 or expires_in),
                  'iss': get_default(self.config, auth_section, 'issuer_id'),
                  'aud': get_default(self.config, auth_section, 'client_id'),
-                 'sub': self.args.user,
-                 'zuul': {'admin': [self.args.tenant, ]},
+                 'sub': user,
+                 'zuul': {'admin': [tenant, ]},
                 }
         driver = get_default(
             self.config, auth_section, 'driver')
@@ -688,24 +738,16 @@ class Client(zuul.cmd.ZuulApp):
                 with open(private_key, 'r') as pk:
                     key = pk.read()
             except Exception as e:
-                print('Could not read private key at "%s": %s' % (private_key,
-                                                                  e))
-                sys.exit(1)
+                raise Exception(
+                    'Could not read private key at "%s": %s' % (private_key,
+                                                                e))
         else:
-            print('Unknown or unsupported authenticator driver "%s"' % driver)
-            sys.exit(1)
-        try:
-            auth_token = jwt.encode(token,
-                                    key=key,
-                                    algorithm=driver)
-            print("Bearer %s" % auth_token)
-            err_code = 0
-        except Exception as e:
-            print("Error when generating Auth Token")
-            print(e)
-            err_code = 1
-        finally:
-            sys.exit(err_code)
+            raise Exception(
+                'Unknown or unsupported authenticator driver "%s"' % driver)
+        auth_token = jwt.encode(token,
+                                key=key,
+                                algorithm=driver)
+        return auth_token
 
     def promote(self):
         client = self.get_client()
