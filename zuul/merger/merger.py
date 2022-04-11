@@ -682,19 +682,53 @@ class Repo(object):
                             'utf-8')
         return ret
 
-    def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
+    def getFilesChanges(self, refNew, refBase=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+        commitBase = None
+        commitNew = None
+        if refBase and refBase != (40 * '0'):
+            commitBase = repo.commit(refBase)
+        if refNew and refNew != (40 * '0'):
+            self.fetch(refNew, zuul_event_id=zuul_event_id)
+            commitNew = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
         files = set()
 
-        if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+        # define function for ancestor type diff
+        def gitDiffAncestor(commitA, commitB):
+            ancestorDiffFiles = set()
+            for x in commitA.diff(commitB):
+                if x.a_blob is not None:
+                    ancestorDiffFiles.add(x.a_blob.path)
+                if x.b_blob is not None:
+                    ancestorDiffFiles.add(x.b_blob.path)
+            return ancestorDiffFiles
+
+        # if both defined and non null
+        if (commitBase and commitNew and commitBase.hexsha != (40 * '0')
+                and commitNew.hexsha != (40 * '0')):
+            # if not equal
+            if commitBase != commitNew:
+                # it's either ancestor or merge base
+                if (repo.is_ancestor(commitBase, commitNew) or
+                        repo.is_ancestor(commitNew, commitBase)):
+                    files = gitDiffAncestor(commitBase, commitNew)
+                else:
+                    filesDiffList = []
+                    for mergeBase in repo.merge_base(commitBase, commitNew,
+                                                     all=True):
+                        filesDiffList.append(gitDiffAncestor(mergeBase,
+                                                             commitNew))
+                    files = set.intersection(*filesDiffList)
+            # if equal, there is not differences
+        # if commitBase is null, list files from commitNew
+        elif commitNew and commitNew.hexsha != (40 * '0'):
+            for item in commitNew.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
         else:
-            files.update(head.stats.files.keys())
+            log.exception("Couldn't determine how to get files changes")
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
