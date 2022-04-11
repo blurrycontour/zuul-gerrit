@@ -58,13 +58,13 @@ class ProjectMatcher(AbstractChangeMatcher):
 
 
 class BranchMatcher(AbstractChangeMatcher):
-    fullmatch = False
+    exactmatch = False
 
     def matches(self, change):
         if hasattr(change, 'branch'):
             # an implied branch matcher must do a fullmatch to work correctly
-            if self.fullmatch:
-                if self.regex.fullmatch(change.branch):
+            if self.exactmatch:
+                if self._regex == change.branch:
                     return True
             else:
                 if self.regex.match(change.branch):
@@ -74,13 +74,17 @@ class BranchMatcher(AbstractChangeMatcher):
             return True
         if hasattr(change, 'containing_branches'):
             for branch in change.containing_branches:
-                if self.regex.fullmatch(branch):
-                    return True
+                if self.exactmatch:
+                    if self._regex == branch:
+                        return True
+                else:
+                    if self.regex.fullmatch(branch):
+                        return True
         return False
 
 
 class ImpliedBranchMatcher(BranchMatcher):
-    fullmatch = True
+    exactmatch = True
 
 
 class FileMatcher(AbstractChangeMatcher):

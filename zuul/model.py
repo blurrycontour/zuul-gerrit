@@ -2668,16 +2668,9 @@ class Job(ConfigObject):
         # Return the raw branch list that match this job
         return self._branches
 
-    def setBranchMatcher(self, branches, implied=False):
+    def setBranchMatcher(self, matchers):
         # Set the branch matcher to match any of the supplied branches
-        self._branches = branches
-        matchers = []
-        if implied:
-            matcher_class = change_matcher.ImpliedBranchMatcher
-        else:
-            matcher_class = change_matcher.BranchMatcher
-        for branch in branches:
-            matchers.append(matcher_class(branch))
+        self._branches = [x._regex for x in matchers]
         self.branch_matcher = change_matcher.MatchAny(matchers)
 
     def setFileMatcher(self, files):
@@ -6337,16 +6330,13 @@ class ProjectConfig(ConfigObject):
         r.queue_name = self.queue_name
         return r
 
-    def setImpliedBranchMatchers(self, branches):
-        if len(branches) == 0:
+    def setImpliedBranchMatchers(self, matchers):
+        if len(matchers) == 0:
             self.branch_matcher = None
-        elif len(branches) > 1:
-            matchers = [change_matcher.ImpliedBranchMatcher(branch)
-                        for branch in branches]
+        elif len(matchers) > 1:
             self.branch_matcher = change_matcher.MatchAny(matchers)
         else:
-            self.branch_matcher = change_matcher.ImpliedBranchMatcher(
-                branches[0])
+            self.branch_matcher = matchers[0]
 
     def changeMatches(self, change):
         if self.branch_matcher and not self.branch_matcher.matches(change):
