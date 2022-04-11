@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ca77bbc7_e76b8f4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-04-11T20:16:16Z",
+      "side": 1,
+      "message": "duplicates of 500 days old https://review.opendev.org/c/zuul/zuul/+/762887",
+      "revId": "13db2f85b65deeb1634d30d232c84be18aaa126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f3378850_da02ed91",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 42
