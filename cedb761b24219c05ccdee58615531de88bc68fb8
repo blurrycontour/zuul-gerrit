@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "d2d8a293_fb4af545",
         "filename": "zuul/merger/merger.py",
@@ -14,10 +15,28 @@
       "side": 1,
       "message": "I\u0027m concerned about the additional fetches since we\u0027ve already did an update of the complete repo at this time. Is it possible to do this also locally?",
       "revId": "cedb761b24219c05ccdee58615531de88bc68fb8",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df041449_9363c9f6",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-04-11T20:14:40Z",
+      "side": 1,
+      "message": "Restored as it was previously",
+      "parentUuid": "d2d8a293_fb4af545",
+      "revId": "cedb761b24219c05ccdee58615531de88bc68fb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "2c6b1d5f_139a3242",
         "filename": "zuul/merger/merger.py",
@@ -31,8 +50,25 @@
       "side": 1,
       "message": "Same here.",
       "revId": "cedb761b24219c05ccdee58615531de88bc68fb8",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfe38bd6_1a992f05",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-04-11T20:14:40Z",
+      "side": 1,
+      "message": "Restored as it was previously",
+      "parentUuid": "2c6b1d5f_139a3242",
+      "revId": "cedb761b24219c05ccdee58615531de88bc68fb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
