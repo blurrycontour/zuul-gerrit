@@ -822,22 +822,28 @@ class PipelineManager(metaclass=ABCMeta):
                 dependencies.append(dep)
         new_commit_needs_changes = [d.cache_key for d in dependencies]
 
-        update_attrs = dict(commit_needs_changes=new_commit_needs_changes)
-
         # Ask the source for any tenant-specific changes (this allows
         # drivers to implement their own way of collecting deps):
         source = self.sched.connections.getSource(
             change.project.connection_name)
+
+        new_topic_needs_changes = []
         if self.useDependenciesByTopic(change.project):
             log.debug("  Updating topic dependencies for %s", change)
-            new_topic_needs_changes = []
+
             for dep in source.getChangesByTopic(change.topic):
                 if dep and (not dep.is_merged):
                     log.debug("  Adding dependency: %s", dep)
                     new_topic_needs_changes.append(dep.cache_key)
-            update_attrs['topic_needs_changes'] = new_topic_needs_changes
 
-        if change.commit_needs_changes != new_commit_needs_changes:
+        update_attrs = dict(commit_needs_changes=new_commit_needs_changes,
+                            topic_needs_changes=new_topic_needs_changes)
+
+        needs_changes = change.commit_needs_changes
+        shouldUpdate = needs_changes != update_attrs['commit_needs_changes']
+        shouldUpdate |= needs_changes != update_attrs['topic_needs_changes']
+
+        if (shouldUpdate):
             source.setChangeAttributes(change, **update_attrs)
 
     def provisionNodes(self, item):
