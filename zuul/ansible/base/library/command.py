@@ -3,16 +3,10 @@
 
 # Copyright: (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>, and others
 # Copyright: (c) 2016, Toshio Kuratomi <tkuratomi@ansible.com>
-#
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'core'}
 
 
 # flake8: noqa
@@ -24,115 +18,215 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 # would remove our ability to easily have a discussion with our friends
 # upstream
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: command
-short_description: Executes a command on a remote node
+short_description: Execute commands on targets
 version_added: historical
 description:
      - The C(command) module takes the command name followed by a list of space-delimited arguments.
-     - The given command will be executed on all selected nodes. It will not be
-       processed through the shell, so variables like C($HOME) and operations
-       like C("<"), C(">"), C("|"), C(";") and C("&") will not work (use the M(shell)
-       module if you need these features).
-     - For Windows targets, use the M(win_command) module instead.
+     - The given command will be executed on all selected nodes.
+     - The command(s) will not be
+       processed through the shell, so variables like C($HOSTNAME) and operations
+       like C("*"), C("<"), C(">"), C("|"), C(";") and C("&") will not work.
+       Use the M(ansible.builtin.shell) module if you need these features.
+     - To create C(command) tasks that are easier to read than the ones using space-delimited
+       arguments, pass parameters using the C(args) L(task keyword,../reference_appendices/playbooks_keywords.html#task)
+       or use C(cmd) parameter.
+     - Either a free form command or C(cmd) parameter is required, see the examples.
+     - For Windows targets, use the M(ansible.windows.win_command) module instead.
+extends_documentation_fragment:
+    - action_common_attributes
+    - action_common_attributes.raw
+attributes:
+    check_mode:
+        details: while the command itself is arbitrary and cannot be subject to the check mode semantics it adds C(creates)/C(removes) options as a workaround
+        support: partial
+    diff_mode:
+        support: none
+    platform:
+      support: full
+      platforms: posix
+    raw:
+      support: full
 options:
   free_form:
     description:
-      - The command module takes a free form command to run.  There is no parameter actually named 'free form'.
-        See the examples!
-    required: yes
-  argv:
+      - The command module takes a free form string as a command to run.
+      - There is no actual parameter named 'free form'.
+  cmd:
+    type: str
     description:
-      - Allows the user to provide the command as a list vs. a string.  Only the string or the list form can be
-        provided, not both.  One or the other must be provided.
+      - The command to run.
+  argv:
+    type: list
+    elements: str
+    description:
+      - Passes the command as a list rather than a string.
+      - Use C(argv) to avoid quoting values that would otherwise be interpreted incorrectly (for example "user name").
+      - Only the string (free form) or the list (argv) form can be provided, not both.  One or the other must be provided.
     version_added: "2.6"
   creates:
+    type: path
     description:
-      - A filename or (since 2.0) glob pattern, when it already exists, this step will B(not) be run.
+      - A filename or (since 2.0) glob pattern. If a matching file already exists, this step B(will not) be run.
+      - This is checked before I(removes) is checked.
   removes:
+    type: path
     description:
-      - A filename or (since 2.0) glob pattern, when it does not exist, this step will B(not) be run.
+      - A filename or (since 2.0) glob pattern. If a matching file exists, this step B(will) be run.
+      - This is checked after I(creates) is checked.
     version_added: "0.8"
   chdir:
+    type: path
     description:
       - Change into this directory before running the command.
     version_added: "0.6"
   warn:
     description:
-      - If command_warnings are on in ansible.cfg, do not warn about this particular line if set to C(no).
+      - (deprecated) Enable or disable task warnings.
+      - This feature is deprecated and will be removed in 2.14.
+      - As of version 2.11, this option is now disabled by default.
     type: bool
-    default: 'yes'
+    default: no
     version_added: "1.8"
   stdin:
-    version_added: "2.4"
     description:
       - Set the stdin of the command directly to the specified value.
+    type: str
+    version_added: "2.4"
+  stdin_add_newline:
+    type: bool
+    default: yes
+    description:
+      - If set to C(yes), append a newline to stdin data.
+    version_added: "2.8"
+  strip_empty_ends:
+    description:
+      - Strip empty lines from the end of stdout/stderr in result.
+    version_added: "2.8"
+    type: bool
+    default: yes
 notes:
-    -  If you want to run a command through the shell (say you are using C(<), C(>), C(|), etc), you actually want the M(shell) module instead.
+    -  If you want to run a command through the shell (say you are using C(<), C(>), C(|), and so on),
+       you actually want the M(ansible.builtin.shell) module instead.
        Parsing shell metacharacters can lead to unexpected commands being executed if quoting is not done correctly so it is more secure to
        use the C(command) module when possible.
-    -  " C(creates), C(removes), and C(chdir) can be specified after the command.
-       For instance, if you only want to run a command if a certain file does not exist, use this."
-    -  The C(executable) parameter is removed since version 2.4. If you have a need for this parameter, use the M(shell) module instead.
-    -  For Windows targets, use the M(win_command) module instead.
+    -  C(creates), C(removes), and C(chdir) can be specified after the command.
+       For instance, if you only want to run a command if a certain file does not exist, use this.
+    -  Check mode is supported when passing C(creates) or C(removes). If running in check mode and either of these are specified, the module will
+       check for the existence of the file and report the correct changed status. If these are not supplied, the task will be skipped.
+    -  The C(executable) parameter is removed since version 2.4. If you have a need for this parameter, use the M(ansible.builtin.shell) module instead.
+    -  For Windows targets, use the M(ansible.windows.win_command) module instead.
+    -  For rebooting systems, use the M(ansible.builtin.reboot) or M(ansible.windows.win_reboot) module.
+seealso:
+- module: ansible.builtin.raw
+- module: ansible.builtin.script
+- module: ansible.builtin.shell
+- module: ansible.windows.win_command
 author:
     - Ansible Core Team
     - Michael DeHaan
 '''
 
-EXAMPLES = '''
-- name: return motd to registered var
-  command: cat /etc/motd
+EXAMPLES = r'''
+- name: Return motd to registered var
+  ansible.builtin.command: cat /etc/motd
   register: mymotd
 
-- name: Run the command if the specified file does not exist.
-  command: /usr/bin/make_database.sh arg1 arg2
+# free-form (string) arguments, all arguments on one line
+- name: Run command if /path/to/database does not exist (without 'args')
+  ansible.builtin.command: /usr/bin/make_database.sh db_user db_name creates=/path/to/database
+
+# free-form (string) arguments, some arguments on separate lines with the 'args' keyword
+# 'args' is a task keyword, passed at the same level as the module
+- name: Run command if /path/to/database does not exist (with 'args' keyword)
+  ansible.builtin.command: /usr/bin/make_database.sh db_user db_name
   args:
     creates: /path/to/database
 
-# You can also use the 'args' form to provide the options.
-- name: This command will change the working directory to somedir/ and will only run when /path/to/database doesn't exist.
-  command: /usr/bin/make_database.sh arg1 arg2
+# 'cmd' is module parameter
+- name: Run command if /path/to/database does not exist (with 'cmd' parameter)
+  ansible.builtin.command:
+    cmd: /usr/bin/make_database.sh db_user db_name
+    creates: /path/to/database
+
+- name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist
+  ansible.builtin.command: /usr/bin/make_database.sh db_user db_name
+  become: yes
+  become_user: db_owner
   args:
     chdir: somedir/
     creates: /path/to/database
 
-- name: use argv to send the command as a list.  Be sure to leave command empty
-  command:
-  args:
+# argv (list) arguments, each argument on a separate line, 'args' keyword not necessary
+# 'argv' is a parameter, indented one level from the module
+- name: Use 'argv' to send a command as a list - leave 'command' empty
+  ansible.builtin.command:
     argv:
-      - echo
-      - testing
+      - /usr/bin/make_database.sh
+      - Username with whitespace
+      - dbname with whitespace
+    creates: /path/to/database
 
-- name: safely use templated variable to run command. Always use the quote filter to avoid injection issues.
-  command: cat {{ myfile|quote }}
+- name: Safely use templated variable to run command. Always use the quote filter to avoid injection issues
+  ansible.builtin.command: cat {{ myfile|quote }}
   register: myoutput
 '''
 
-RETURN = '''
+RETURN = r'''
+msg:
+  description: changed
+  returned: always
+  type: bool
+  sample: True
+start:
+  description: The command execution start time.
+  returned: always
+  type: str
+  sample: '2017-09-29 22:03:48.083128'
+end:
+  description: The command execution end time.
+  returned: always
+  type: str
+  sample: '2017-09-29 22:03:48.084657'
+delta:
+  description: The command execution delta time.
+  returned: always
+  type: str
+  sample: '0:00:00.001529'
+stdout:
+  description: The command standard output.
+  returned: always
+  type: str
+  sample: 'Clustering node rabbit@slave1 with rabbit@master …'
+stderr:
+  description: The command standard error.
+  returned: always
+  type: str
+  sample: 'ls cannot access foo: No such file or directory'
 cmd:
-  description: the cmd that was run on the remote machine
+  description: The command executed by the task.
   returned: always
   type: list
   sample:
   - echo
   - hello
-delta:
-  description: cmd end time - cmd start time
+rc:
+  description: The command return code (0 means success).
   returned: always
-  type: string
-  sample: 0:00:00.001529
-end:
-  description: cmd end time
+  type: int
+  sample: 0
+stdout_lines:
+  description: The command standard output split in lines.
   returned: always
-  type: string
-  sample: '2017-09-29 22:03:48.084657'
-start:
-  description: cmd start time
+  type: list
+  sample: [u'Clustering node rabbit@slave1 with rabbit@master …']
+stderr_lines:
+  description: The command standard error split in lines.
   returned: always
-  type: string
-  sample: '2017-09-29 22:03:48.083128'
+  type: list
+  sample: [u'ls cannot access foo: No such file or directory', u'ls …']
 '''
 
 import datetime
@@ -141,6 +235,8 @@ import os
 import shlex
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native, to_bytes, to_text
+from ansible.module_utils.common.collections import is_iterable
 
 # Imports needed for Zuul things
 import re
@@ -157,7 +253,6 @@ from ansible.module_utils.six import (
     text_type,
 )
 from ansible.module_utils.six.moves import shlex_quote
-from ansible.module_utils._text import to_native, to_bytes, to_text
 
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
@@ -211,7 +306,8 @@ def follow(fd, log_uuid):
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
 def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
-                     use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict'):
+                use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
+                expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None, ignore_invalid_cwd=True):
     '''
     Execute a command, returns rc, stdout, and stderr.
 
@@ -226,14 +322,14 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
     :kw data: If given, information to write to the stdin of the command
     :kw binary_data: If False, append a newline to the data.  Default False
     :kw path_prefix: If given, additional path to find the command in.
-        This adds to the PATH environment vairable so helper commands in
+        This adds to the PATH environment variable so helper commands in
         the same directory can also be found
     :kw cwd: If given, working directory to run the command inside
     :kw use_unsafe_shell: See `args` parameter.  Default False
     :kw prompt_regex: Regex string (not a compiled regex) which can be
         used to detect prompts in the stdout which would otherwise cause
         the execution to hang (especially if no input data is specified)
-    :kw environ_update: dictionary to *update* os.environ with
+    :kw environ_update: dictionary to *update* environ variables with
     :kw umask: Umask to be used when running the command. Default None
     :kw encoding: Since we return native strings, on python3 we need to
         know the encoding to use to transform from bytes to text.  If you
@@ -249,12 +345,30 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         python3 versions we support) otherwise a UnicodeError traceback
         will be raised.  This does not affect transformations of strings
         given as args.
+    :kw expand_user_and_vars: When ``use_unsafe_shell=False`` this argument
+        dictates whether ``~`` is expanded in paths and environment variables
+        are expanded before running the command. When ``True`` a string such as
+        ``$SHELL`` will be expanded regardless of escaping. When ``False`` and
+        ``use_unsafe_shell=False`` no path or variable expansion will be done.
+    :kw pass_fds: When running on Python 3 this argument
+        dictates which file descriptors should be passed
+        to an underlying ``Popen`` constructor. On Python 2, this will
+        set ``close_fds`` to False.
+    :kw before_communicate_callback: This function will be called
+        after ``Popen`` object will be created
+        but before communicating to the process.
+        (``Popen`` object will be passed to callback as a first argument)
+    :kw ignore_invalid_cwd: This flag indicates whether an invalid ``cwd``
+        (non-existent or not a directory) should be ignored or should raise
+        an exception.
     :returns: A 3-tuple of return code (integer), stdout (native string),
         and stderr (native string).  On python2, stdout and stderr are both
         byte strings.  On python3, stdout and stderr are text strings converted
         according to the encoding and errors parameters.  If you want byte
         strings on python3, use encoding=None to turn decoding to text off.
     '''
+    # used by clean args later on
+    self._clean = None
 
     if not isinstance(args, (list, binary_type, text_type)):
         msg = "Argument 'args' to run_command must be list or string"
@@ -265,13 +379,16 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
         # stringify args for unsafe/direct shell usage
         if isinstance(args, list):
-            args = " ".join([shlex_quote(x) for x in args])
+            args = b" ".join([to_bytes(shlex_quote(x), errors='surrogate_or_strict') for x in args])
+        else:
+            args = to_bytes(args, errors='surrogate_or_strict')
 
         # not set explicitly, check if set by controller
         if executable:
-            args = [executable, '-c', args]
+            executable = to_bytes(executable, errors='surrogate_or_strict')
+            args = [executable, b'-c', args]
         elif self._shell not in (None, '/bin/sh'):
-            args = [self._shell, '-c', args]
+            args = [to_bytes(self._shell, errors='surrogate_or_strict'), b'-c', args]
         else:
             shell = True
     else:
@@ -285,8 +402,11 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
                 args = to_text(args, errors='surrogateescape')
             args = shlex.split(args)
 
-        # expand shellisms
-        args = [os.path.expanduser(os.path.expandvars(x)) for x in args if x is not None]
+        # expand ``~`` in paths, and all environment vars
+        if expand_user_and_vars:
+            args = [to_bytes(os.path.expanduser(os.path.expandvars(x)), errors='surrogate_or_strict') for x in args if x is not None]
+        else:
+            args = [to_bytes(x, errors='surrogate_or_strict') for x in args if x is not None]
 
     prompt_re = None
     if prompt_regex:
@@ -304,68 +424,38 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
     msg = None
     st_in = None
 
-    # Manipulate the environ we'll send to the new process
-    old_env_vals = {}
+    env = os.environ.copy()
     # We can set this from both an attribute and per call
-    for key, val in self.run_command_environ_update.items():
-        old_env_vals[key] = os.environ.get(key, None)
-        os.environ[key] = val
-    if environ_update:
-        for key, val in environ_update.items():
-            old_env_vals[key] = os.environ.get(key, None)
-            os.environ[key] = val
+    env.update(self.run_command_environ_update or {})
+    env.update(environ_update or {})
     if path_prefix:
-        old_env_vals['PATH'] = os.environ['PATH']
-        os.environ['PATH'] = "%s:%s" % (path_prefix, os.environ['PATH'])
+        path = env.get('PATH', '')
+        if path:
+            env['PATH'] = "%s:%s" % (path_prefix, path)
+        else:
+            env['PATH'] = path_prefix
 
-    # If using test-module and explode, the remote lib path will resemble ...
+    # If using test-module.py and explode, the remote lib path will resemble:
     #   /tmp/test_module_scratch/debug_dir/ansible/module_utils/basic.py
-    # If using ansible or ansible-playbook with a remote system ...
+    # If using ansible or ansible-playbook with a remote system:
     #   /tmp/ansible_vmweLQ/ansible_modlib.zip/ansible/module_utils/basic.py
 
     # Clean out python paths set by ansiballz
-    if 'PYTHONPATH' in os.environ:
-        pypaths = os.environ['PYTHONPATH'].split(':')
-        pypaths = [x for x in pypaths
-                   if not x.endswith('/ansible_modlib.zip') and
+    if 'PYTHONPATH' in env:
+        pypaths = [x for x in env['PYTHONPATH'].split(':')
+                   if x and
+                   not x.endswith('/ansible_modlib.zip') and
                    not x.endswith('/debug_dir')]
-        os.environ['PYTHONPATH'] = ':'.join(pypaths)
-        if not os.environ['PYTHONPATH']:
-            del os.environ['PYTHONPATH']
-
-    # create a printable version of the command for use
-    # in reporting later, which strips out things like
-    # passwords from the args list
-    to_clean_args = args
-    if PY2:
-        if isinstance(args, text_type):
-            to_clean_args = to_bytes(args)
-    else:
-        if isinstance(args, binary_type):
-            to_clean_args = to_text(args)
-    if isinstance(args, (text_type, binary_type)):
-        to_clean_args = shlex.split(to_clean_args)
-
-    clean_args = []
-    is_passwd = False
-    for arg in (to_native(a) for a in to_clean_args):
-        if is_passwd:
-            is_passwd = False
-            clean_args.append('********')
-            continue
-        if PASSWD_ARG_RE.match(arg):
-            sep_idx = arg.find('=')
-            if sep_idx > -1:
-                clean_args.append('%s=********' % arg[:sep_idx])
-                continue
-            else:
-                is_passwd = True
-        arg = heuristic_log_sanitize(arg, self.no_log_values)
-        clean_args.append(arg)
-    clean_args = ' '.join(shlex_quote(arg) for arg in clean_args)
+        if pypaths and any(pypaths):
+            env['PYTHONPATH'] = ':'.join(pypaths)
 
     if data:
         st_in = subprocess.PIPE
+
+    def preexec():
+        self._restore_signal_handlers()
+        if umask:
+            os.umask(umask)
 
     # ZUUL: changed stderr to follow stdout
     kwargs = dict(
@@ -375,35 +465,35 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         stdin=st_in,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
+        preexec_fn=preexec,
+        env=env,
     )
-
-    # store the pwd
-    prev_dir = os.getcwd()
+    if PY3 and pass_fds:
+        kwargs["pass_fds"] = pass_fds
+    elif PY2 and pass_fds:
+        kwargs['close_fds'] = False
 
     # make sure we're in the right working directory
-    if cwd and os.path.isdir(cwd):
-        cwd = os.path.abspath(os.path.expanduser(cwd))
-        kwargs['cwd'] = cwd
-        try:
-            os.chdir(cwd)
-        except (OSError, IOError) as e:
-            self.fail_json(rc=e.errno, msg="Could not open %s, %s" % (cwd, to_native(e)),
-                           exception=traceback.format_exc())
-
-    old_umask = None
-    if umask:
-        old_umask = os.umask(umask)
+    if cwd:
+        cwd = to_bytes(os.path.abspath(os.path.expanduser(cwd)), errors='surrogate_or_strict')
+        if os.path.isdir(cwd):
+            kwargs['cwd'] = cwd
+        elif not ignore_invalid_cwd:
+            self.fail_json(msg="Provided cwd is not a valid directory: %s" % cwd)
 
     t = None
     fail_json_kwargs = None
 
     try:
         if self._debug:
-            self.log('Executing: ' + clean_args)
+            self.log('Executing: ' + self._clean_args(args))
 
         # ZUUL: Replaced the execution loop with the zuul_runner run function
 
         cmd = subprocess.Popen(args, **kwargs)
+        if before_communicate_callback:
+            before_communicate_callback(cmd)
+
         if self.no_log:
             t = None
         else:
@@ -413,15 +503,6 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
         # ZUUL: Our log thread will catch the output so don't do that here.
 
-        # # the communication logic here is essentially taken from that
-        # # of the _communicate() function in ssh.py
-        #
-        # stdout = b('')
-        # stderr = b('')
-        #
-        # # ZUUL: stderr follows stdout
-        # rpipes = [cmd.stdout]
-
         if data:
             if not binary_data:
                 data += '\n'
@@ -429,35 +510,6 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
                 data = to_bytes(data)
             cmd.stdin.write(data)
             cmd.stdin.close()
-
-        # while True:
-        #     rfds, wfds, efds = select.select(rpipes, [], rpipes, 1)
-        #     stdout += self._read_from_pipes(rpipes, rfds, cmd.stdout)
-        #
-        #     # ZUUL: stderr follows stdout
-        #     # stderr += self._read_from_pipes(rpipes, rfds, cmd.stderr)
-        #
-        #     # if we're checking for prompts, do it now
-        #     if prompt_re:
-        #         if prompt_re.search(stdout) and not data:
-        #             if encoding:
-        #                 stdout = to_native(stdout, encoding=encoding, errors=errors)
-        #             else:
-        #                 stdout = stdout
-        #             return (257, stdout, "A prompt was encountered while running a command, but no input data was specified")
-        #     # only break out if no pipes are left to read or
-        #     # the pipes are completely read and
-        #     # the process is terminated
-        #     if (not rpipes or not rfds) and cmd.poll() is not None:
-        #         break
-        #     # No pipes are left to read but process is not yet terminated
-        #     # Only then it is safe to wait for the process to be finished
-        #     # NOTE: Actually cmd.poll() is always None here if rpipes is empty
-        #     elif not rpipes and cmd.poll() is None:
-        #         cmd.wait()
-        #         # The process is terminated. Since no pipes to read from are
-        #         # left, there is no need to call select() again.
-        #         break
 
         # ZUUL: If the console log follow thread *is* stuck in readline,
         # we can't close stdout (attempting to do so raises an
@@ -467,10 +519,10 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
 
         rc = cmd.wait()
 
-        # Give the thread that is writing the console log up to 10 seconds
-        # to catch up and exit.  If it hasn't done so by then, it is very
-        # likely stuck in readline() because it spawed a child that is
-        # holding stdout or stderr open.
+        # ZUUL: Give the thread that is writing the console log up to
+        # 10 seconds to catch up and exit.  If it hasn't done so by
+        # then, it is very likely stuck in readline() because it
+        # spawed a child that is holding stdout or stderr open.
         if t:
             t.join(10)
             with Console(zuul_log_id) as console:
@@ -485,13 +537,13 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         stderr = b('')
 
     except (OSError, IOError) as e:
-        self.log("Error Executing CMD:%s Exception:%s" % (clean_args, to_native(e)))
+        self.log("Error Executing CMD:%s Exception:%s" % (self._clean_args(args), to_native(e)))
         # ZUUL: store fail_json_kwargs and fail later in finally
-        fail_json_kwargs = dict(rc=e.errno, msg=to_native(e), cmd=clean_args)
+        fail_json_kwargs = dict(rc=e.errno, stdout=b'', stderr=b'', msg=to_native(e), cmd=self._clean_args(args))
     except Exception as e:
-        self.log("Error Executing CMD:%s Exception:%s" % (clean_args, to_native(traceback.format_exc())))
+        self.log("Error Executing CMD:%s Exception:%s" % (self._clean_args(args), to_native(traceback.format_exc())))
         # ZUUL: store fail_json_kwargs and fail later in finally
-        fail_json_kwargs = dict(rc=257, msg=to_native(e), exception=traceback.format_exc(), cmd=clean_args)
+        fail_json_kwargs = dict(rc=257, stdout=b'', stderr=b'', msg=to_native(e), exception=traceback.format_exc(), cmd=self._clean_args(args))
     finally:
         if t:
             with Console(zuul_log_id) as console:
@@ -508,26 +560,14 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         if fail_json_kwargs:
             self.fail_json(**fail_json_kwargs)
 
-    # Restore env settings
-    for key, val in old_env_vals.items():
-        if val is None:
-            del os.environ[key]
-        else:
-            os.environ[key] = val
-
-    if old_umask:
-        os.umask(old_umask)
-
     if rc != 0 and check_rc:
         msg = heuristic_log_sanitize(stderr.rstrip(), self.no_log_values)
-        self.fail_json(cmd=clean_args, rc=rc, stdout=stdout, stderr=stderr, msg=msg)
-
-    # reset the pwd
-    os.chdir(prev_dir)
+        self.fail_json(cmd=self._clean_args(args), rc=rc, stdout=stdout, stderr=stderr, msg=msg)
 
     if encoding is not None:
         return (rc, to_native(stdout, encoding=encoding, errors=errors),
                 to_native(stderr, encoding=encoding, errors=errors))
+
     return (rc, stdout, stderr)
 
 
@@ -547,19 +587,19 @@ def check_command(module, commandline):
         command = commandline.split()[0]
     command = os.path.basename(command)
 
-    disable_suffix = "If you need to use command because {mod} is insufficient you can add" \
-                     " warn=False to this command task or set command_warnings=False in" \
-                     " ansible.cfg to get rid of this message."
+    disable_suffix = "If you need to use '{cmd}' because the {mod} module is insufficient you can add" \
+                     " 'warn: false' to this command task or set 'command_warnings=False' in" \
+                     " the defaults section of ansible.cfg to get rid of this message."
     substitutions = {'mod': None, 'cmd': command}
 
     if command in arguments:
-        msg = "Consider using the {mod} module with {subcmd} rather than running {cmd}.  " + disable_suffix
+        msg = "Consider using the {mod} module with {subcmd} rather than running '{cmd}'.  " + disable_suffix
         substitutions['mod'] = 'file'
         substitutions['subcmd'] = arguments[command]
         module.warn(msg.format(**substitutions))
 
     if command in commands:
-        msg = "Consider using the {mod} module rather than running {cmd}.  " + disable_suffix
+        msg = "Consider using the {mod} module rather than running '{cmd}'.  " + disable_suffix
         substitutions['mod'] = commands[command]
         module.warn(msg.format(**substitutions))
 
@@ -571,20 +611,24 @@ def main():
 
     # the command module is the one ansible module that does not take key=value args
     # hence don't copy this one if you are looking to build others!
+    # NOTE: ensure splitter.py is kept in sync for exceptions
     module = AnsibleModule(
         argument_spec=dict(
             _raw_params=dict(),
             _uses_shell=dict(type='bool', default=False),
-            argv=dict(type='list'),
+            argv=dict(type='list', elements='str'),
             chdir=dict(type='path'),
             executable=dict(),
             creates=dict(type='path'),
             removes=dict(type='path'),
             # The default for this really comes from the action plugin
-            warn=dict(type='bool', default=True),
+            warn=dict(type='bool', default=False, removed_in_version='2.14', removed_from_collection='ansible.builtin'),
             stdin=dict(required=False),
+            stdin_add_newline=dict(type='bool', default=True),
+            strip_empty_ends=dict(type='bool', default=True),
             zuul_log_id=dict(type='str'),
-        )
+        ),
+        supports_check_mode=True,
     )
     shell = module.params['_uses_shell']
     chdir = module.params['chdir']
@@ -595,7 +639,12 @@ def main():
     removes = module.params['removes']
     warn = module.params['warn']
     stdin = module.params['stdin']
+    stdin_add_newline = module.params['stdin_add_newline']
+    strip = module.params['strip_empty_ends']
     zuul_log_id = module.params['zuul_log_id']
+
+    # we promissed these in 'always' ( _lines get autoaded on action plugin)
+    r = {'changed': False, 'stdout': '', 'stderr': '', 'rc': None, 'cmd': None, 'start': None, 'end': None, 'delta': None, 'msg': ''}
 
     if not shell and executable:
         module.warn("As of Ansible 2.4, the parameter 'executable' is no longer supported with the 'command' module. Not using '%s'." % executable)
@@ -605,70 +654,92 @@ def main():
         module.fail_json(rc=256, msg="zuul_log_id missing: %s" % module.params)
 
     if (not args or args.strip() == '') and not argv:
-        module.fail_json(rc=256, msg="no command given")
+        r['rc'] = 256
+        r['msg'] = "no command given"
+        module.fail_json(**r)
 
     if args and argv:
-        module.fail_json(rc=256, msg="only command or argv can be given, not both")
+        r['rc'] = 256
+        r['msg'] = "only command or argv can be given, not both"
+        module.fail_json(**r)
 
     if not shell and args:
         args = shlex.split(args)
 
     args = args or argv
+    # All args must be strings
+    if is_iterable(args, include_strings=False):
+        args = [to_native(arg, errors='surrogate_or_strict', nonstring='simplerepr') for arg in args]
 
-    if chdir:
-        chdir = os.path.abspath(chdir)
-        os.chdir(chdir)
-
-    if creates:
-        # do not run the command if the line contains creates=filename
-        # and the filename already exists.  This allows idempotence
-        # of command executions.
-        if glob.glob(creates):
-            module.exit_json(
-                cmd=args,
-                stdout="skipped, since %s exists" % creates,
-                changed=False,
-                rc=0
-            )
-
-    if removes:
-        # do not run the command if the line contains removes=filename
-        # and the filename does not exist.  This allows idempotence
-        # of command executions.
-        if not glob.glob(removes):
-            module.exit_json(
-                cmd=args,
-                stdout="skipped, since %s does not exist" % removes,
-                changed=False,
-                rc=0
-            )
-
+    r['cmd'] = args
     if warn:
+        # nany telling you to use module instead!
         check_command(module, args)
 
-    startd = datetime.datetime.now()
+    if chdir:
+        chdir = to_bytes(chdir, errors='surrogate_or_strict')
 
-    rc, out, err = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None, data=stdin)
+        try:
+            os.chdir(chdir)
+        except (IOError, OSError) as e:
+            r['msg'] = 'Unable to change directory before execution: %s' % to_text(e)
+            module.fail_json(**r)
 
-    endd = datetime.datetime.now()
-    delta = endd - startd
+    # check_mode partial support, since it only really works in checking creates/removes
+    if module.check_mode:
+        shoulda = "Would"
+    else:
+        shoulda = "Did"
 
-    result = dict(
-        cmd=args,
-        stdout=out.rstrip(b"\r\n"),
-        stderr=err.rstrip(b"\r\n"),
-        rc=rc,
-        start=str(startd),
-        end=str(endd),
-        delta=str(delta),
-        changed=True,
-        zuul_log_id=zuul_log_id
-    )
+    # special skips for idempotence if file exists (assumes command creates)
+    if creates:
+        if glob.glob(creates):
+            r['msg'] = "%s not run command since '%s' exists" % (shoulda, creates)
+            r['stdout'] = "skipped, since %s exists" % creates  # TODO: deprecate
 
-    if rc != 0:
-        module.fail_json(msg='non-zero return code', **result)
+            r['rc'] = 0
 
-    module.exit_json(**result)
+    # special skips for idempotence if file does not exist (assumes command removes)
+    if not r['msg'] and removes:
+        if not glob.glob(removes):
+            r['msg'] = "%s not run command since '%s' does not exist" % (shoulda, removes)
+            r['stdout'] = "skipped, since %s does not exist" % removes  # TODO: deprecate
+            r['rc'] = 0
+
+    if r['msg']:
+        module.exit_json(**r)
+
+    # actually executes command (or not ...)
+    if not module.check_mode:
+        r['start'] = datetime.datetime.now()
+        r['rc'], r['stdout'], r['stderr'] = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None,
+                                                               data=stdin, binary_data=(not stdin_add_newline))
+        r['end'] = datetime.datetime.now()
+    else:
+        # this is partial check_mode support, since we end up skipping if we get here
+        r['rc'] = 0
+        r['msg'] = "Command would have run if not in check mode"
+        r['skipped'] = True
+
+    r['changed'] = True
+    r['zuul_log_id'] = zuul_log_id
+
+    # convert to text for jsonization and usability
+    if r['start'] is not None and r['end'] is not None:
+        # these are datetime objects, but need them as strings to pass back
+        r['delta'] = to_text(r['end'] - r['start'])
+        r['end'] = to_text(r['end'])
+        r['start'] = to_text(r['start'])
+
+    if strip:
+        r['stdout'] = to_text(r['stdout']).rstrip("\r\n")
+        r['stderr'] = to_text(r['stderr']).rstrip("\r\n")
+
+    if r['rc'] != 0:
+        r['msg'] = 'non-zero return code'
+        module.fail_json(**r)
+
+    module.exit_json(**r)
 
 
 if __name__ == '__main__':
