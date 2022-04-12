@@ -35,20 +35,18 @@
         - name: complex2
         - name: complex3
 
-    - name: Run a shell task with an ansible python exception
-      command: echo foo
-      args:
-        chdir: /shelltask/somewhere/that/does/not/exist
+    - name: Run a task with an ansible python exception
+      zuul_fail:
+        key: task
       failed_when: false
 
     - name: Loop with items on an ansible python exception
-      command: "echo {{ item }}"
+      zuul_fail:
+        key: loop
       with_items:
         - item1
         - item2
         - item3
-      args:
-        chdir: /itemloop/somewhere/that/does/not/exist
       failed_when: false
 
     - name: Print binary data
