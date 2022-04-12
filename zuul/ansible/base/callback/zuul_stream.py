@@ -255,6 +255,12 @@ class CallbackModule(default.CallbackModule):
         else:
             task_name = task.get_name().strip()
 
+        if task.loop:
+            # Don't try to stream from loops
+            return
+        if task.async_val:
+            # Don't try to stream from async tasks
+            return
         if task.action in ('command', 'shell'):
             play_vars = self._play._variable_manager._hostvars
 
@@ -269,9 +275,6 @@ class CallbackModule(default.CallbackModule):
                         'ansible_inventory_host'))
                 if ip in ('localhost', '127.0.0.1'):
                     # Don't try to stream from localhost
-                    continue
-                if task.loop:
-                    # Don't try to stream from loops
                     continue
                 if play_vars[host].get('ansible_connection') in ('winrm',):
                     # The winrm connections don't support streaming for now
