@@ -3733,6 +3733,10 @@ class TestAnsible29(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
     ansible_version = '2.9'
 
 
+class TestAnsible5(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
+    ansible_version = '5'
+
+
 class TestPrePlaybooks(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
@@ -7733,6 +7737,7 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
             dict(name='ansible-29', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-5', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
 
@@ -7753,6 +7758,7 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
                  changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
             dict(name='ansible-29', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-5', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
 

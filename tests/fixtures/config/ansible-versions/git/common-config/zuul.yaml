@@ -52,6 +52,13 @@
       test_ansible_version_major: 2
       test_ansible_version_minor: 9
 
+- job:
+    name: ansible-5
+    parent: ansible-version
+    ansible-version: 5
+    vars:
+      test_ansible_version_major: 2
+      test_ansible_version_minor: 12
 
 - project:
     name: common-config
@@ -60,6 +67,7 @@
         - ansible-default
         - ansible-28
         - ansible-29
+        - ansible-5
 
 - project:
     name: org/project
@@ -68,3 +76,4 @@
         - ansible-default-zuul-conf
         - ansible-28
         - ansible-29
+        - ansible-5
