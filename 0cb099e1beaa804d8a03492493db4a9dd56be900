@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57f04721_46745169",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-12T16:04:58Z",
+      "side": 1,
+      "message": "Considering some people have issues and others do not I suspect that either people generated certs with different uids or that others are just lucky and have uid overlap between their user in the container and the user outside of the container. Being explicit in this case seems fine.",
+      "revId": "0cb099e1beaa804d8a03492493db4a9dd56be900",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfe0bdf8_7a9c85c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-12T16:04:58Z",
+      "side": 1,
+      "message": "Note the change doesn\u0027t do this anymore.",
+      "revId": "0cb099e1beaa804d8a03492493db4a9dd56be900",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
