@@ -5118,6 +5118,20 @@ For CI problems and help debugging, contact ci@example.org"""
         start_msg = "Jobs started in gate for 1,1."
         self.assertTrue(self.smtp_messages[0]['body'].startswith(start_msg))
 
+    @simple_layout('layouts/start-message-repr.yaml')
+    def test_start_message_repr(self):
+        "Test a pipeline's start message substituions are correctly defaulted."
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(1, len(self.smtp_messages))
+        start_msg = 'pipeline=<Pipeline gate> change=<Change '
+        end_msg = 'org/project 1,1>'
+        self.assertTrue(self.smtp_messages[0]['body'].startswith(start_msg))
+        self.assertTrue(self.smtp_messages[0]['body'].endswith(end_msg))
+
     @simple_layout('layouts/unmanaged-project.yaml')
     def test_unmanaged_project_start_message(self):
         "Test start reporting is not done for unmanaged projects."

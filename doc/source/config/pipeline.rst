@@ -199,8 +199,26 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       :default: Starting {pipeline.name} jobs.
 
       The introductory text in reports when jobs are started.
-      Three replacement fields are available ``status_url``, ``pipeline`` and
-      ``change``.
+      Three replacement fields are available.
+
+      * ``status_url`` : The status URL
+
+      * ``pipeline``
+
+        ** ``pipeline.name`` : The pipeline name
+
+      *  ``change``.
+
+         ** ``change.project`` : The associated project
+
+         ** ``change.number`` : The change number
+
+         ** ``change.patchset`` : The change patchset
+
+      For example
+      ::
+
+        Jobs started in {pipeline.name} for {change.number},{change.patchset}.
 
    .. attr:: enqueue-message
 

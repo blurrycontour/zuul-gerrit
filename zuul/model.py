@@ -325,9 +325,25 @@ class RequirementsError(Exception):
 
 class Attributes(object):
     """A class to hold attributes for string formatting."""
+    def __init__(self, repr_string, **kw):
+        r"""
+        :param repr_string: A string to set as the repr for the
+          object.  This is expanded with format() using the kw dict,
+          so you could do
 
-    def __init__(self, **kw):
+           Attributes('foo={foo} bar={bar}', foo="foo", bar="bar")
+
+          However, it is probably easier to pass in the result of
+          self.__repr__() for more complex objects.
+
+        :param \**kw: list of arguments to be set as dictionary keys
+          in the new object
+        """
         setattr(self, '__dict__', kw)
+        self.__repr_string = repr_string.format(**kw)
+
+    def __repr__(self):
+        return self.__repr_string
 
 
 class Freezable(object):
@@ -481,7 +497,8 @@ class Pipeline(object):
         return '<Pipeline %s>' % self.name
 
     def getSafeAttributes(self):
-        return Attributes(name=self.name)
+        return Attributes(self.__repr__(),
+                          name=self.name)
 
     def validateReferences(self, layout):
         # Verify that references to other objects in the layout are
@@ -1167,7 +1184,8 @@ class Project(object):
         return '<Project %s>' % (self.name)
 
     def getSafeAttributes(self):
-        return Attributes(name=self.name)
+        return Attributes(self.__repr__(),
+                          name=self.name)
 
     def toDict(self):
         d = {}
@@ -2196,7 +2214,8 @@ class FrozenJob(zkobject.ZKObject):
         return Job._deepUpdate(self.parent_data or {}, self.variables)
 
     def getSafeAttributes(self):
-        return Attributes(name=self.name)
+        return Attributes(self.__repr__(),
+                          name=self.name)
 
     @staticmethod
     def updateParentData(parent_data, secret_parent_data, artifact_data,
@@ -3534,7 +3553,8 @@ class Build(zkobject.ZKObject):
         return log_url
 
     def getSafeAttributes(self):
-        return Attributes(uuid=self.uuid,
+        return Attributes(self.__repr__(),
+                          uuid=self.uuid,
                           result=self.result,
                           error_detail=self.error_detail,
                           result_data=self.result_data)
@@ -4060,7 +4080,8 @@ class BuildSet(zkobject.ZKObject):
         return MERGER_MERGE_RESOLVE
 
     def getSafeAttributes(self):
-        return Attributes(uuid=self.uuid)
+        return Attributes(self.__repr__(),
+                          uuid=self.uuid)
 
 
 class QueueItem(zkobject.ZKObject):
@@ -5391,7 +5412,8 @@ class Ref(object):
         return False
 
     def getSafeAttributes(self):
-        return Attributes(project=self.project,
+        return Attributes(self.__repr__(),
+                          project=self.project,
                           ref=self.ref,
                           oldrev=self.oldrev,
                           newrev=self.newrev)
@@ -5602,7 +5624,8 @@ class Change(Branch):
                 change.getRelatedChanges(sched, related)
 
     def getSafeAttributes(self):
-        return Attributes(project=self.project,
+        return Attributes(self.__repr__(),
+                          project=self.project,
                           number=self.number,
                           patchset=self.patchset)
 
@@ -7555,7 +7578,8 @@ class Tenant(object):
         self._addProject(tpc)
 
     def getSafeAttributes(self):
-        return Attributes(name=self.name)
+        return Attributes(self.__repr__(),
+                          name=self.name)
 
 
 class UnparsedBranchCache(object):
