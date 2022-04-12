@@ -26,7 +26,8 @@ class FunctionalZuulStreamMixIn:
     wait_timeout = 120
 
     def _setUp(self):
-        self.log_console_port = 19000 + int(self.ansible_version.split('.')[1])
+        self.log_console_port = 19000 + int(
+            self.ansible_core_version.split('.')[1])
         self.fake_nodepool.remote_ansible = True
 
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
@@ -109,7 +110,7 @@ class FunctionalZuulStreamMixIn:
                 r'playbooks/command.yaml@master\]', text)
             self.assertLogLine(r'PLAY \[all\]', text)
             self.assertLogLine(
-                r'Ansible version={}'.format(self.ansible_version), text)
+                r'Ansible version={}'.format(self.ansible_core_version), text)
             self.assertLogLine(r'TASK \[Show contents of first file\]', text)
             self.assertLogLine(r'controller \| command test one', text)
             self.assertLogLine(
@@ -201,19 +202,14 @@ class FunctionalZuulStreamMixIn:
             text = self._get_job_output(build)
             self.assertLogLine(r'TASK \[Module failure\]', text)
 
-            if self.ansible_version in ('2.5', '2.6'):
-                regex = r'controller \| MODULE FAILURE: This module is broken'
-            else:
-                # Ansible starting with 2.7 emits a different error message
-                # if a module exits without an exception or the ansible
-                # supplied methods.
-                regex = r'controller \|   "msg": "New-style module did not ' \
-                        r'handle its own exit"'
+            regex = r'controller \|   "msg": "New-style module did not ' \
+                r'handle its own exit"'
             self.assertLogLine(regex, text)
 
 
 class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     ansible_version = '2.8'
+    ansible_core_version = '2.8'
 
     def setUp(self):
         super().setUp()
@@ -222,6 +218,16 @@ class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
 
 class TestZuulStream29(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     ansible_version = '2.9'
+    ansible_core_version = '2.9'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
+
+
+class TestZuulStream5(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+    ansible_version = '5'
+    ansible_core_version = '2.12'
 
     def setUp(self):
         super().setUp()
