@@ -17,13 +17,6 @@ import textwrap
 
 from tests.base import AnsibleZuulTestCase, FIXTURE_DIR
 
-ERROR_ACCESS_OUTSIDE = "Accessing files from outside the working dir"
-ERROR_LOCAL_CODE = "Executing local code is prohibited"
-ERROR_SYNC_TO_OUTSIDE = "Syncing files to outside the working dir"
-ERROR_SYNC_FROM_OUTSIDE = "Syncing files from outside the working dir"
-ERROR_SYNC_RSH = "Using custom synchronize rsh is prohibited"
-ERROR_SCHEME_INVALID = "file urls are not allowed from localhost."
-
 
 class FunctionalActionModulesMixIn:
     tenant_config_file = 'config/remote-action-modules/main.yaml'
@@ -36,11 +29,6 @@ class FunctionalActionModulesMixIn:
 
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
         self.assertIsNotNone(ansible_remote)
-
-        # inject some files as forbidden sources
-        fixture_dir = os.path.join(FIXTURE_DIR, 'bwrap-mounts')
-        self.executor_server.execution_wrapper.bwrap_command.extend(
-            ['--ro-bind', fixture_dir, '/opt'])
 
     def _run_job(self, job_name, result, expect_error=None):
         # Keep the jobdir around so we can inspect contents if an
@@ -86,24 +74,6 @@ class FunctionalActionModulesMixIn:
                 with open(path, 'r') as f:
                     self.assertIn(expect_error, f.read())
 
-    def test_assemble_module(self):
-        self._run_job('assemble-good', 'SUCCESS')
-
-        # assemble-delegate does multiple tests with various delegates and
-        # safe and non-safe paths. It asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('assemble-delegate', 'SUCCESS')
-        self._run_job('assemble-localhost', 'SUCCESS')
-
-        self._run_job('assemble-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('assemble-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('assemble-bad-dir-with-symlink', 'FAILURE',
-                      ERROR_ACCESS_OUTSIDE)
-
-    def test_synchronize_rsh_fail(self):
-        self._run_job('synchronize-rsh-bad', 'FAILURE', ERROR_SYNC_RSH)
-        self._run_job('synchronize-rsh-env-bad', 'FAILURE', ERROR_SYNC_RSH)
-
     def test_command_module(self):
         self._run_job('command-good', 'SUCCESS')
 
@@ -113,120 +83,8 @@ class FunctionalActionModulesMixIn:
     def test_zuul_return_module_delegate_to(self):
         self._run_job('zuul_return-good-delegate', 'SUCCESS')
 
-    def test_copy_module(self):
-        self._run_job('copy-good', 'SUCCESS')
-
-        # copy-delegate does multiple tests with various delegates and
-        # safe and non-safe paths. It asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('copy-delegate', 'SUCCESS')
-        self._run_job('copy-localhost', 'SUCCESS')
-
-        self._run_job('copy-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('copy-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('copy-bad-dir-with-symlink', 'FAILURE',
-                      ERROR_ACCESS_OUTSIDE)
-
-    def test_includevars_module(self):
-        self._run_job('includevars-good', 'SUCCESS')
-        self._run_job('includevars-good-dir', 'SUCCESS')
-
-        self._run_job('includevars-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('includevars-bad-symlink', 'FAILURE',
-                      ERROR_ACCESS_OUTSIDE)
-        self._run_job('includevars-bad-dir', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('includevars-bad-dir-symlink', 'FAILURE',
-                      ERROR_ACCESS_OUTSIDE)
-        self._run_job('includevars-bad-dir-with-symlink', 'FAILURE',
-                      ERROR_ACCESS_OUTSIDE)
-        self._run_job('includevars-bad-dir-with-double-symlink', 'FAILURE',
-                      ERROR_ACCESS_OUTSIDE)
-
-    def test_patch_module(self):
-        self._run_job('patch-good', 'SUCCESS')
-
-        # patch-delegate does multiple tests with various delegates and
-        # safe and non-safe paths. It asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('patch-delegate', 'SUCCESS')
-        self._run_job('patch-localhost', 'SUCCESS')
-
-        self._run_job('patch-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('patch-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-
-    def test_raw_module(self):
-        self._run_job('raw-good', 'SUCCESS')
-
-        # raw-delegate does multiple tests with various delegates. It
-        # asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('raw-delegate', 'SUCCESS')
-        self._run_job('raw-localhost', 'SUCCESS')
-
-    def test_script_module(self):
-        self._run_job('script-good', 'SUCCESS')
-
-        # script-delegate does multiple tests with various delegates. It
-        # asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('script-delegate', 'SUCCESS')
-        self._run_job('script-localhost', 'SUCCESS')
-
-        self._run_job('script-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('script-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-
     def test_shell_module(self):
         self._run_job('shell-good', 'SUCCESS')
-        self._run_job('shell-localhost', 'FAILURE', ERROR_LOCAL_CODE)
-        self._run_job('shell-delegate', 'FAILURE', ERROR_LOCAL_CODE)
-
-    def test_synchronize_module(self):
-        self._run_job('synchronize-good', 'SUCCESS')
-        self._run_job('synchronize-bad-pull', 'FAILURE', ERROR_SYNC_TO_OUTSIDE)
-        self._run_job(
-            'synchronize-bad-push', 'FAILURE', ERROR_SYNC_FROM_OUTSIDE)
-        self._run_job('synchronize-delegate-good', 'SUCCESS')
-
-    def test_template_module(self):
-        self._run_job('template-good', 'SUCCESS')
-
-        # template-delegate does multiple tests with various delegates and
-        # safe and non-safe paths. It asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('template-delegate', 'SUCCESS')
-        self._run_job('template-localhost', 'SUCCESS')
-
-        self._run_job('template-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('template-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-
-    def test_unarchive_module(self):
-        self._run_job('unarchive-good', 'SUCCESS')
-
-        # template-delegate does multiple tests with various delegates and
-        # safe and non-safe paths. It asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('unarchive-delegate', 'SUCCESS')
-        self._run_job('unarchive-localhost', 'SUCCESS')
-
-        self._run_job('unarchive-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('unarchive-bad-symlink', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-
-    def test_known_hosts_module(self):
-        self._run_job('known-hosts-good', 'SUCCESS')
-
-        # known-hosts-delegate does multiple tests with various delegates and
-        # safe and non-safe paths. It asserts by itself within ansible so we
-        # expect SUCCESS here.
-        self._run_job('known-hosts-delegate', 'SUCCESS')
-        self._run_job('known-hosts-localhost', 'SUCCESS')
-
-        self._run_job('known-hosts-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-
-    def test_uri_module(self):
-        self._run_job('uri-good', 'SUCCESS')
-        self._run_job('uri-bad-src', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('uri-bad-dest', 'FAILURE', ERROR_ACCESS_OUTSIDE)
-        self._run_job('uri-bad-url', 'FAILURE', ERROR_SCHEME_INVALID)
 
 
 class TestActionModules28(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
