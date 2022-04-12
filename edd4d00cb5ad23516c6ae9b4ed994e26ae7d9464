@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8cb5299_482a551b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-12T15:57:06Z",
+      "side": 1,
+      "message": "zuul/model.py has a comment next to SCHEME_UNIQUE that indicates this is internal use only. This change exposes the scheme to users and that comment should be removed.",
+      "revId": "edd4d00cb5ad23516c6ae9b4ed994e26ae7d9464",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
