@@ -1514,6 +1514,7 @@ class TenantParser(object):
         'exclude': to_list(classes),
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
+        'exclude-branch-pattern': str,
         'extra-config-paths': no_dup_config_paths,
         'load-branch': str,
         'allow-circular-dependencies': bool,
@@ -1553,6 +1554,7 @@ class TenantParser(object):
                   'max-job-timeout': int,
                   'source': self.validateTenantSources(),
                   'exclude-unprotected-branches': bool,
+                  'exclude-branch-pattern': str,
                   'allowed-triggers': to_list(str),
                   'allowed-reporters': to_list(str),
                   'allowed-labels': to_list(str),
@@ -1589,6 +1591,9 @@ class TenantParser(object):
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
+        if conf.get('exclude-branch-pattern') is not None:
+            tenant.branch_filter = \
+                re.compile(conf['exclude-branch-pattern'])
         if conf.get('admin-rules') is not None:
             tenant.authorization_rules = conf['admin-rules']
         if conf.get('authentication-realm') is not None:
@@ -2559,9 +2564,18 @@ class ConfigLoader(object):
         if trusted:
             branches = [tpc.load_branch if tpc.load_branch else 'master']
         else:
+            def filter_branch_pattern(branch):
+                if tenant.branch_filter:
+                    match = tenant.branch_filter.match(branch)
+                    if match is not None:
+                        return False
+                return True
             # Use the cached branch list; since this is a dynamic
             # reconfiguration there should not be any branch changes.
-            branches = tenant.getProjectBranches(project.canonical_name)
+            branches = filter(
+                filter_branch_pattern,
+                tenant.getProjectBranches(project.canonical_name)
+            )
 
         for branch in branches:
             fns1 = []

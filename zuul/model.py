@@ -6288,6 +6288,7 @@ class TenantProjectConfig(object):
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
+        self.branch_filter = None
         self.parsed_branch_config = {}  # branch -> ParsedConfig
         # The list of paths to look for extra zuul config files
         self.extra_config_files = ()
@@ -7385,6 +7386,7 @@ class Tenant(object):
         self.max_nodes_per_job = 5
         self.max_job_timeout = 10800
         self.exclude_unprotected_branches = False
+        self.branch_filter = None
         self.default_base_job = None
         self.layout = None
         # The unparsed configuration from the main zuul config for
