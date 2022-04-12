@@ -107,3 +107,21 @@
           label: ubuntu-xenial
     ansible-version: '2.8'
     run: playbooks/ansible-version.yaml
+
+- job:
+    name: ansible-version29-inventory
+    nodeset:
+      nodes:
+        - name: ubuntu-xenial
+          label: ubuntu-xenial
+    ansible-version: '2.9'
+    run: playbooks/ansible-version.yaml
+
+- job:
+    name: ansible-version5-inventory
+    nodeset:
+      nodes:
+        - name: ubuntu-xenial
+          label: ubuntu-xenial
+    ansible-version: '5'
+    run: playbooks/ansible-version.yaml
