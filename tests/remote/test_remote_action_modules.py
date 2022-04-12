@@ -101,3 +101,11 @@ class TestActionModules29(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
     def setUp(self):
         super().setUp()
         self._setUp()
+
+
+class TestActionModules5(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
+    ansible_version = '5'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()

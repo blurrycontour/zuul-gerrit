@@ -53,25 +53,25 @@
         egrep "^.+\| node1 \| ok: Item: Runtime" job-output.txt
         egrep "^.+\| node2 \| ok: Item: Runtime" job-output.txt
 
-    - name: Validate output - shell task with exception
+    - name: Validate output - failed shell task
       shell: |
-        egrep "^.+\| node1 \| (OSError|FileNotFoundError).+\/shelltask\/" job-output.txt
-        egrep "^.+\| node2 \| (OSError|FileNotFoundError).+\/shelltask\/" job-output.txt
+        egrep "^.+\| node1 \| Exception: Test module failure exception task" job-output.txt
+        egrep "^.+\| node2 \| Exception: Test module failure exception task" job-output.txt
 
     - name: Validate output - item loop with exception
       shell: |
-        egrep "^.+\| node1 \| (OSError|FileNotFoundError).+\/itemloop\/" job-output.txt
-        egrep "^.+\| node2 \| (OSError|FileNotFoundError).+\/itemloop\/" job-output.txt
+        egrep "^.+\| node1 \| Exception: Test module failure exception loop" job-output.txt
+        egrep "^.+\| node2 \| Exception: Test module failure exception loop" job-output.txt
 
     - name: Validate output - failure shell task with exception
       shell: |
-        egrep "^.+\| node1 \| (OSError|FileNotFoundError).+\/failure-shelltask\/" job-output.txt
-        egrep "^.+\| node2 \| (OSError|FileNotFoundError).+\/failure-shelltask\/" job-output.txt
+        egrep "^.+\| node1 \| Exception: Test module failure exception fail-task" job-output.txt
+        egrep "^.+\| node2 \| Exception: Test module failure exception fail-task" job-output.txt
 
     - name: Validate output - failure item loop with exception
       shell: |
-        egrep "^.+\| node1 \| (OSError|FileNotFoundError).+\/failure-itemloop\/" job-output.txt
-        egrep "^.+\| node2 \| (OSError|FileNotFoundError).+\/failure-itemloop\/" job-output.txt
+        egrep "^.+\| node1 \| Exception: Test module failure exception fail-loop" job-output.txt
+        egrep "^.+\| node2 \| Exception: Test module failure exception fail-loop job-output.txt
 
     - name: Validate output - binary data
       shell: |

@@ -23,10 +23,10 @@ class FunctionalZuulStreamMixIn:
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
     # This should be overriden in child classes.
     ansible_version = '2.9'
+    log_console_port = 19009
     wait_timeout = 120
 
     def _setUp(self):
-        self.log_console_port = 19000 + int(self.ansible_version.split('.')[1])
         self.fake_nodepool.remote_ansible = True
 
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
@@ -214,6 +214,7 @@ class FunctionalZuulStreamMixIn:
 
 class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     ansible_version = '2.8'
+    log_console_port = 19008
 
     def setUp(self):
         super().setUp()
@@ -222,6 +223,16 @@ class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
 
 class TestZuulStream29(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     ansible_version = '2.9'
+    log_console_port = 19009
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
+
+
+class TestZuulStream5(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+    ansible_version = '5'
+    log_console_port = 19005
 
     def setUp(self):
         super().setUp()
