@@ -25,12 +25,14 @@ from time import sleep
 from unittest import skip, skipIf
 from zuul.lib import yamlutil
 
+import fixtures
 import git
 import paramiko
 
 import zuul.configloader
 from zuul.lib import yamlutil as yaml
 from zuul.model import MergeRequest
+from zuul.zk.blob_store import BlobStore
 
 from tests.base import (
     AnsibleZuulTestCase,
@@ -5663,6 +5665,39 @@ class TestSecrets(ZuulTestCase):
         self.assertEqual(
             self._getSecrets('project2-complex', 'playbooks'),
             [secret])
+
+    def test_blobstore_secret(self):
+        # Test the large secret blob store
+        self.executor_server.hold_jobs_in_build = True
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.model.Job.SECRET_BLOB_SIZE',
+            1))
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        context = self.scheds.first.sched.createZKContext(None, self.log)
+        bs = BlobStore(context)
+        self.assertEqual(len(bs), 1)
+
+        self.scheds.first.sched._runBlobStoreCleanup()
+        self.assertEqual(len(bs), 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1, "A should report success")
+        self.assertHistory([
+            dict(name='project1-secret', result='SUCCESS', changes='1,1'),
+        ])
+        self.assertEqual(
+            [{'secret_name': self.secret}],
+            self._getSecrets('project1-secret', 'playbooks'))
+
+        self.scheds.first.sched._runBlobStoreCleanup()
+        self.assertEqual(len(bs), 0)
 
 
 class TestSecretInheritance(ZuulTestCase):

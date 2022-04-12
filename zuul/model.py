@@ -46,6 +46,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
 from zuul.lib.jsonutil import json_dumps
 from zuul.zk import zkobject
+from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
 
@@ -2280,6 +2281,12 @@ class FrozenJob(zkobject.ZKObject):
                 _artifact_data=self._makeJobData(
                     context, 'artifact_data', artifact_data))
 
+    @property
+    def all_playbooks(self):
+        for k in ('pre_run', 'run', 'post_run', 'cleanup_run'):
+            playbooks = getattr(self, k)
+            yield from playbooks
+
 
 class Job(ConfigObject):
     """A Job represents the defintion of actions to perform.
@@ -2298,6 +2305,8 @@ class Job(ConfigObject):
     empty_nodeset = NodeSet()
 
     BASE_JOB_MARKER = object()
+    # Secrets larger than this size will be put in the blob store
+    SECRET_BLOB_SIZE = 10 * 1024
 
     def isBase(self):
         return self.parent is self.BASE_JOB_MARKER
@@ -2490,17 +2499,35 @@ class Job(ConfigObject):
             role['project'] = role_project.name
         return d
 
-    def _deduplicateSecrets(self, secrets, playbook):
+    def _deduplicateSecrets(self, context, secrets, playbook):
         # secrets is a list of secrets accumulated so far
         # playbook is a frozen playbook from _freezePlaybook
 
+        # At the end of this method, the values in the playbook
+        # secrets dictionary will be mutated to either be an integer
+        # (which is an index into the job's secret list) or a dict
+        # (which contains a pointer to a key in the global blob
+        # store).
+
+        blobstore = BlobStore(context)
+
         # Cast to list so we can modify in place
         for secret_key, secret_value in list(playbook['secrets'].items()):
-            if secret_value in secrets:
-                playbook['secrets'][secret_key] = secrets.index(secret_value)
+            secret_serialized = json_dumps(
+                secret_value, sort_keys=True).encode("utf8")
+            if (COMPONENT_REGISTRY.model_api >= 6 and
+                len(secret_serialized) > self.SECRET_BLOB_SIZE):
+                # If the secret is large, store it in the blob store
+                # and store the key in the playbook secrets dict.
+                blob_key = blobstore.put(secret_serialized)
+                playbook['secrets'][secret_key] = {'blob': blob_key}
             else:
-                secrets.append(secret_value)
-                playbook['secrets'][secret_key] = len(secrets) - 1
+                if secret_value in secrets:
+                    playbook['secrets'][secret_key] =\
+                        secrets.index(secret_value)
+                else:
+                    secrets.append(secret_value)
+                    playbook['secrets'][secret_key] = len(secrets) - 1
 
     def freezeJob(self, context, tenant, layout, item,
                   redact_secrets_and_keys):
@@ -2534,7 +2561,7 @@ class Job(ConfigObject):
                     # it's clear that the value ("REDACTED") is
                     # redacted.
                     for pb in v:
-                        self._deduplicateSecrets(secrets, pb)
+                        self._deduplicateSecrets(context, secrets, pb)
             kw[k] = v
         kw['secrets'] = secrets
         kw['affected_projects'] = self._getAffectedProjects(tenant)
@@ -5192,6 +5219,18 @@ class QueueItem(zkobject.ZKObject):
                 log.debug("Found an updated job")
                 return True  # This job's configuration has changed
         return False
+
+    def getBlobKeys(self):
+        # Return a set of blob keys used by this item
+        # for each job in the frozen job graph
+        keys = set()
+        job_graph = self.current_build_set.job_graph
+        for job in job_graph.getJobs():
+            for pb in job.all_playbooks:
+                for secret in pb['secrets'].values():
+                    if isinstance(secret, dict) and 'blob' in secret:
+                        keys.add(secret['blob'])
+        return keys
 
 
 class Bundle:
