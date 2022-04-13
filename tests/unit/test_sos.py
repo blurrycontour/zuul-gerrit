@@ -211,14 +211,19 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = True
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
         # Delete the change cache
         for connection in self.scheds.first.connections.connections.values():
             if hasattr(connection, '_change_cache'):
                 connection.maintainCache([], max_age=0)
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
 
         # Release
         self.executor_server.hold_jobs_in_build = False
@@ -229,6 +234,9 @@ class TestScaleOutScheduler(ZuulTestCase):
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
     def test_pipeline_summary(self):
