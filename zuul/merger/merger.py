@@ -401,13 +401,18 @@ class Repo(object):
         log.debug("Resetting repository %s", self.local_path)
         self.createRepoObject(zuul_event_id, build=build)
 
-        if process_worker is None:
-            self._reset(self.local_path, self.env, log)
-        else:
-            job = process_worker.submit(Repo._reset, self.local_path, self.env)
-            messages = job.result()
-            for message in messages:
-                log.debug(message)
+        try:
+            if process_worker is None:
+                self._reset(self.local_path, self.env, log)
+            else:
+                job = process_worker.submit(
+                    Repo._reset, self.local_path, self.env)
+                messages = job.result()
+                for message in messages:
+                    log.debug(message)
+        except Exception:
+            shutil.rmtree(self.local_path)
+            raise
 
     def getBranchHead(self, branch, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
