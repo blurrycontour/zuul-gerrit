@@ -1265,6 +1265,22 @@ class TestWebMultiTenant(BaseTestWeb):
                          sorted(["tenant-one", "tenant-two", "tenant-four"]))
 
 
+class TestEmptyConfig(BaseTestWeb):
+    tenant_config_file = 'config/empty-config/main.yaml'
+
+    def test_empty_config_startup(self):
+        # Test that we can bootstrap a tenant with an empty config
+
+        resp = self.get_url("api/tenant/tenant-one/jobs").json()
+        self.assertEqual(len(resp), 1)
+        self.commitConfigUpdate('common-config',
+                                'config/empty-config/git/common-config/new-zuul.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        resp = self.get_url("api/tenant/tenant-one/jobs").json()
+        self.assertEqual(len(resp), 3)
+
+
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
 

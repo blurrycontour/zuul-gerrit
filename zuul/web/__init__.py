@@ -2084,7 +2084,6 @@ class ZuulWeb(object):
         tenant_names = set(self.abide.tenants)
         tenant_names.update(self.unparsed_abide.tenants.keys())
 
-        min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
         for tenant_name in tenant_names:
             # Reload the tenant if the layout changed.
             if (self.local_layout_state.get(tenant_name)
@@ -2096,11 +2095,15 @@ class ZuulWeb(object):
                 layout_uuid = layout_state and layout_state.uuid
 
                 if layout_state:
+                    min_ltimes = self.tenant_layout_state.getMinLtimes(
+                        layout_state)
                     branch_cache_min_ltimes = (
                         layout_state.branch_cache_min_ltimes)
                 else:
                     # Consider all project branch caches valid if
                     # we don't have a layout state.
+                    min_ltimes = defaultdict(
+                        lambda: defaultdict(lambda: -1))
                     branch_cache_min_ltimes = defaultdict(lambda: -1)
 
                 # The tenant will be stored in self.abide.tenants after
