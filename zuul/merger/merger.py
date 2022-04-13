@@ -509,12 +509,11 @@ class Repo(object):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         try:
-            origin_ref = repo.remotes.origin.refs[branch]
+            log.debug("Updating remote reference origin/%s to %s", branch, rev)
+            repo.remotes.origin.refs[branch].commit = rev
         except IndexError:
-            log.warning("No remote ref found for branch %s", branch)
-            return
-        log.debug("Updating remote reference %s to %s", origin_ref, rev)
-        origin_ref.commit = rev
+            log.warning("No remote ref found for branch %s, creating", branch)
+            Repo._setRef(f"refs/remotes/origin/{branch}", str(rev), repo)
 
     def deleteRef(self, path, repo=None, zuul_event_id=None):
         ref_log = get_annotated_logger(
