@@ -16,6 +16,23 @@
       "message": "Note the `build` tool from pypi is the modern way to build a wheel but this should work for a while yet anyway.",
       "revId": "422c761841672284550714195a1623932e9548f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e7e8fd2_8e7fa262",
+        "filename": "playbooks/zuul-stream/pre.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-13T21:08:21Z",
+      "side": 1,
+      "message": "We may want to update \"assemble\" then since I got this from that.",
+      "revId": "422c761841672284550714195a1623932e9548f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
