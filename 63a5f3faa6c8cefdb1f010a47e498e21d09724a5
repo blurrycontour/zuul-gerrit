@@ -16,6 +16,23 @@
       "message": "perhaps the comment can stay?",
       "revId": "63a5f3faa6c8cefdb1f010a47e498e21d09724a5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0560f000_56375e02",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2550,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-13T21:19:51Z",
+      "side": 0,
+      "message": "I thought about it, but I don\u0027t think it\u0027s that useful with the code gone; possibly a little confusing.",
+      "revId": "63a5f3faa6c8cefdb1f010a47e498e21d09724a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
