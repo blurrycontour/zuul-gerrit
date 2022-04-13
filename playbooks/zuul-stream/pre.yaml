@@ -9,10 +9,20 @@
 
   post_tasks:
 
-    - name: Install software
+    - name: Install pip
       shell: |+
         python3 -m pip install --upgrade pip setuptools wheel
-        python3 -m pip install src/opendev.org/zuul/zuul
+      become: yes
+
+    - name: Build wheel
+      shell:
+        chdir: src/opendev.org/zuul/zuul
+        cmd: |+
+          python3 setup.py bdist_wheel
+
+    - name: Install software
+      shell: |+
+        python3 -m pip install src/opendev.org/zuul/zuul/dist/*.whl
       become: yes
 
     - name: Install managed ansible versions
