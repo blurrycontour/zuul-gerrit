@@ -14,7 +14,6 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
-        ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         PYTHONPATH: "{{ python_path }}"
 
     - name: Run ansible playbook that should fail
@@ -26,7 +25,6 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
-        ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         PYTHONPATH: "{{ python_path }}"
 
     - name: Validate output - setupvar
