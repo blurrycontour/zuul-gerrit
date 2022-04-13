@@ -25,7 +25,6 @@
     run: playbooks/zuul-stream/functional.yaml
     post-run:
       - playbooks/zuul-stream/post.yaml
-      - playbooks/zuul-stream/post-ara.yaml
     files:
       - zuul/ansible/.*
       - zuul/lib/ansible*
