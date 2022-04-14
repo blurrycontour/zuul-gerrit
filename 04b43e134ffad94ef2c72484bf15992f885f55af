@@ -16,6 +16,63 @@
       "message": "lgtm",
       "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eb612db_eb0bc272",
+        "filename": "releasenotes/notes/zuul-admin-cli-53f52cff1aad986c.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-14T17:11:52Z",
+      "side": 1,
+      "message": "This is a stray \u0027g\u0027.",
+      "range": {
+        "startLine": 6,
+        "startChar": 83,
+        "endLine": 6,
+        "endChar": 84
+      },
+      "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "730a5f53_610b56e7",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-14T17:11:52Z",
+      "side": 1,
+      "message": "Should the warning go to stderr? Might help peopel if they have scripts around `zuul` commands redirected to grep or files etc.",
+      "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34f6f455_cdb640a1",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-14T17:11:52Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
