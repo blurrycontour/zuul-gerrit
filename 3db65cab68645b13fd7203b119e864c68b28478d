@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60fe6a71_89557572",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-14T16:26:03Z",
+      "side": 1,
+      "message": "\u003e Patch Set 5: Code-Review-1\n\u003e \n\u003e First a general comment: this seems like a good improvement -- but I had the idea that we wanted to eventually remove this functionality from this client and expect folks to use zuul-client instead.  If that\u0027s our goal, I don\u0027t think we should support this.  If it\u0027s not our goal then... erm... I\u0027m sad that we have duplicate code and we will have a permanently confusing situation for users (\"zuul client\" vs \"zuul-client\" is already becoming difficult).\n\u003e \n\u003e If we want behavior like this (so that admins don\u0027t have to generate tokens and make config files), but still also want to deprecate/remove these ops from the \"zuul\" command, then maybe we can add features to zuul-client so that if you run it on a zuul server (zuul.conf is available) it would do this?\n\u003e \n\u003e Second: this is a real -1: if we do decide to do this, this should have docs updates -- probably the best thing would be to update the command\u0027s general help text to explain what it does.\n\nIf we\u0027re good with deprecating the REST functionalities from zuul in favor of zuul-client, this is addressed here: https://review.opendev.org/c/zuul/zuul/+/837852\n\nAnd I have moved this feature in zuul-client here: https://review.opendev.org/c/zuul/zuul-client/+/837908\n\nI think this addresses your remarks; if it is fine with you we can then abandon this change.",
+      "revId": "3db65cab68645b13fd7203b119e864c68b28478d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
