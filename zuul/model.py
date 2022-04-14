@@ -3863,9 +3863,16 @@ class BuildSet(zkobject.ZKObject):
         # jobs (deserialize as separate objects)
         if data['job_graph']:
             for job_name in data['job_graph'].jobs:
+                # If we have a current build result before refreshing,
+                # we may be able to skip refreshing some items since
+                # they will not have changed.
+                old_build = self.builds.get(job_name)
+                old_build_result = (old_build and old_build.result)
+
                 if job_name in self.jobs:
                     job = self.jobs[job_name]
-                    job.refresh(context)
+                    if not old_build_result:
+                        job.refresh(context)
                 else:
                     job_path = FrozenJob.jobPath(job_name, self.getPath())
                     job = FrozenJob.fromZK(context, job_path, buildset=self)
@@ -3875,7 +3882,8 @@ class BuildSet(zkobject.ZKObject):
                 if build_path:
                     build = self.builds.get(job_name)
                     if build and build.getPath() == build_path:
-                        build.refresh(context)
+                        if not build.result:
+                            build.refresh(context)
                     else:
                         build = Build.fromZK(
                             context, build_path, job=job, build_set=self)
@@ -3884,7 +3892,8 @@ class BuildSet(zkobject.ZKObject):
                 for retry_path in data["retry_builds"].get(job_name, []):
                     retry_build = existing_retry_builds.get(retry_path)
                     if retry_build and retry_build.getPath() == retry_path:
-                        retry_build.refresh(context)
+                        # Retry builds never change.
+                        pass
                     else:
                         retry_build = Build.fromZK(
                             context, retry_path, job=job, build_set=self)
