@@ -15,7 +15,7 @@
 import logging
 import requests
 
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 
 class FormAuth(requests.auth.AuthBase):
@@ -29,8 +29,8 @@ class FormAuth(requests.auth.AuthBase):
         adapter = requests.adapters.HTTPAdapter()
         request = _copy_request(response.request)
 
-        u = urlparse.urlparse(response.url)
-        url = urlparse.urlunparse([u.scheme, u.netloc, '/login',
+        u = urlparse(response.url)
+        url = urlunparse([u.scheme, u.netloc, '/login',
                                    None, None, None])
         auth = {'username': self.username,
                 'password': self.password}
