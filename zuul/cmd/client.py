@@ -521,7 +521,13 @@ class Client(zuul.cmd.ZuulApp):
         if not self.args.zuul_url:
             self.readConfig()
         self.setup_logging()
-
+        if self.args.func in [self.autohold, self.autohold_delete,
+                              self.enqueue, self.enqueue_ref,
+                              self.dequeue, self.promote]:
+            print(
+                "Warning: this command is deprecated with zuul-admin, "
+                "please use `zuul-client` instead",
+                file=sys.stderr)
         if self.args.func():
             sys.exit(0)
         else:
@@ -990,4 +996,9 @@ class Client(zuul.cmd.ZuulApp):
 
 
 def main():
+    if sys.argv[0].endswith('zuul'):
+        print(
+            "Warning: this command name is deprecated, "
+            "use `zuul-admin` instead",
+            file=sys.stderr)
     Client().main()
