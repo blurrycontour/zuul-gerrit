@@ -1,11 +1,12 @@
-:title: Zuul Client
+:title: Zuul Admin Client
 
-Zuul Client
-===========
+Zuul Admin Client
+=================
 
 Zuul includes a simple command line client that may be used to affect Zuul's
-behavior while running. It must be run on a host with access to Zuul's web
-server.
+behavior while running.
+
+.. note:: For operations related to normal workflow like enqueue, dequeue, autohold and promote, the `zuul-client` CLI should be used instead.
 
 Configuration
 -------------
@@ -13,76 +14,77 @@ Configuration
 The client uses the same zuul.conf file as the server, and will look
 for it in the same locations if not specified on the command line.
 
-The ``webclient`` section is required.
+Autohold, enqueue, dequeue, promote and show-running-jobs
+.........................................................
+
+In order to run these commands, the ``webclient`` section is required in the configuration file.
 
 It is also possible to run the client without a configuration file, by using the
 ``--zuul-url`` option to specify the base URL of the Zuul web server.
-
-.. note:: Not all commands are available through the REST API.
 
 Usage
 -----
 The general options that apply to all subcommands are:
 
-.. program-output:: zuul --help
+.. program-output:: zuul-admin --help
 
 The following subcommands are supported:
 
 Autohold
 ^^^^^^^^
-.. program-output:: zuul autohold --help
+.. program-output:: zuul-admin autohold --help
 
 Example::
 
-  zuul autohold --tenant openstack --project example_project --job example_job --reason "reason text" --count 1
+  zuul-admin autohold --tenant openstack --project example_project --job example_job --reason "reason text" --count 1
 
 Autohold Delete
 ^^^^^^^^^^^^^^^
-.. program-output:: zuul autohold-delete --help
+.. program-output:: zuul-admin autohold-delete --help
 
 Example::
 
-  zuul autohold-delete --id 0000000123
+  zuul-admin autohold-delete --id 0000000123
 
 Autohold Info
 ^^^^^^^^^^^^^
-.. program-output:: zuul autohold-info --help
+.. program-output:: zuul-admin autohold-info --help
 
 Example::
 
-  zuul autohold-info --id 0000000123
+  zuul-admin autohold-info --id 0000000123
 
 Autohold List
 ^^^^^^^^^^^^^
-.. program-output:: zuul autohold-list --help
+.. program-output:: zuul-admin autohold-list --help
 
 Example::
 
-  zuul autohold-list --tenant openstack
+  zuul-admin autohold-list --tenant openstack
 
 Dequeue
 ^^^^^^^
-.. program-output:: zuul dequeue --help
+.. program-output:: zuul-admin dequeue --help
 
 Examples::
 
-    zuul dequeue --tenant openstack --pipeline check --project example_project --change 5,1
-    zuul dequeue --tenant openstack --pipeline periodic --project example_project --ref refs/heads/master
+    zuul-admin dequeue --tenant openstack --pipeline check --project example_project --change 5,1
+    zuul-admin dequeue --tenant openstack --pipeline periodic --project example_project --ref refs/heads/master
 
 Enqueue
 ^^^^^^^
-.. program-output:: zuul enqueue --help
+.. program-output:: zuul-admin enqueue --help
 
 Example::
 
-  zuul enqueue --tenant openstack --trigger gerrit --pipeline check --project example_project --change 12345,1
+  zuul-admin enqueue --tenant openstack --trigger gerrit --pipeline check --project example_project --change 12345,1
 
 Note that the format of change id is <number>,<patchset>.
 
 Enqueue-ref
 ^^^^^^^^^^^
 
-.. program-output:: zuul enqueue-ref --help
+.. program-output:: zuul-admin enqueue-ref --help
 
 This command is provided to manually simulate a trigger from an
 external source.  It can be useful for testing or replaying a trigger
@@ -106,7 +108,7 @@ the jobs, pass the failed tag as the ``ref`` argument and set
 ``newrev`` to the change associated with the tag in the project
 repository (i.e. what you see from ``git show X.Y.Z``)::
 
-  zuul enqueue-ref --tenant openstack --trigger gerrit --pipeline release --project openstack/example_project --ref refs/tags/X.Y.Z --newrev abc123..
+  zuul-admin enqueue-ref --tenant openstack --trigger gerrit --pipeline release --project openstack/example_project --ref refs/tags/X.Y.Z --newrev abc123..
 
 The command can also be used asynchronosly trigger a job in a
 ``periodic`` pipeline that would usually be run at a specific time by
@@ -114,7 +116,7 @@ the ``timer`` driver.  For example, the following command would
 trigger the ``periodic`` jobs against the current ``master`` branch
 top-of-tree for a project::
 
-  zuul enqueue-ref --tenant openstack --trigger timer --pipeline periodic --project openstack/example_project --ref refs/heads/master
+  zuul-admin enqueue-ref --tenant openstack --trigger timer --pipeline periodic --project openstack/example_project --ref refs/heads/master
 
 Another common pipeline is a ``post`` queue listening for ``gerrit``
 merge results.  Triggering here is slightly more complicated as you
@@ -128,7 +130,7 @@ current ``HEAD`` and the prior change, then enqueue the event::
   NEW_REF=$(git rev-parse HEAD)
   OLD_REF=$(git rev-parse HEAD~1)
 
-  zuul enqueue-ref --tenant openstack --trigger gerrit --pipeline post --project openstack/example_project --ref refs/heads/master --newrev $NEW_REF --oldrev $OLD_REF
+  zuul-admin enqueue-ref --tenant openstack --trigger gerrit --pipeline post --project openstack/example_project --ref refs/heads/master --newrev $NEW_REF --oldrev $OLD_REF
 
 Note that zero values for ``oldrev`` and ``newrev`` can indicate
 branch creation and deletion; the source code is the best reference
@@ -138,11 +140,11 @@ for these more advanced operations.
 Promote
 ^^^^^^^
 
-.. program-output:: zuul promote --help
+.. program-output:: zuul-admin promote --help
 
 Example::
 
-  zuul promote --tenant openstack --pipeline gate --changes 12345,1 13336,3
+  zuul-admin promote --tenant openstack --pipeline gate --changes 12345,1 13336,3
 
 Note that the format of changes id is <number>,<patchset>.
 
@@ -168,11 +170,11 @@ priorities will increase.
 tenant-conf-check
 ^^^^^^^^^^^^^^^^^
 
-.. program-output:: zuul tenant-conf-check --help
+.. program-output:: zuul-admin tenant-conf-check --help
 
 Example::
 
-  zuul tenant-conf-check
+  zuul-admin tenant-conf-check
 
 This command validates the tenant configuration schema. It exits '-1' in
 case of errors detected.
@@ -184,11 +186,11 @@ create-auth-token
           ``zuul.conf``. Furthermore the authenticator's configuration must
           include a signing secret.
 
-.. program-output:: zuul create-auth-token --help
+.. program-output:: zuul-admin create-auth-token --help
 
 Example::
 
-    zuul create-auth-token --auth-config zuul-operator --user alice --tenant tenantA --expires-in 1800
+    zuul-admin create-auth-token --auth-config zuul-operator --user alice --tenant tenantA --expires-in 1800
 
 The return value is the value of the ``Authorization`` header the user must set
 when querying a protected endpoint on Zuul's REST API.
@@ -200,53 +202,53 @@ Example::
 export-keys
 ^^^^^^^^^^^
 
-.. program-output:: zuul export-keys --help
+.. program-output:: zuul-admin export-keys --help
 
 Example::
 
-  zuul export-keys /var/backup/zuul-keys.json
+  zuul-admin export-keys /var/backup/zuul-keys.json
 
 import-keys
 ^^^^^^^^^^^
 
-.. program-output:: zuul import-keys --help
+.. program-output:: zuul-admin import-keys --help
 
 Example::
 
-  zuul import-keys /var/backup/zuul-keys.json
+  zuul-admin import-keys /var/backup/zuul-keys.json
 
 copy-keys
 ^^^^^^^^^
 
-.. program-output:: zuul copy-keys --help
+.. program-output:: zuul-admin copy-keys --help
 
 Example::
 
-  zuul copy-keys gerrit old_project gerrit new_project
+  zuul-admin copy-keys gerrit old_project gerrit new_project
 
 delete-keys
 ^^^^^^^^^^^
 
-.. program-output:: zuul delete-keys --help
+.. program-output:: zuul-admin delete-keys --help
 
 Example::
 
-  zuul delete-keys gerrit old_project
+  zuul-admin delete-keys gerrit old_project
 
 delete-state
 ^^^^^^^^^^^^
 
-.. program-output:: zuul delete-state --help
+.. program-output:: zuul-admin delete-state --help
 
 Example::
 
-  zuul delete-state
+  zuul-admin delete-state
 
 delete-pipeline-state
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. program-output:: zuul delete-pipeline-state --help
+.. program-output:: zuul-admin delete-pipeline-state --help
 
 Example::
 
-  zuul delete-pipeline-state tenant pipeline
+  zuul-admin delete-pipeline-state tenant pipeline
