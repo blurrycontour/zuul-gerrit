@@ -189,7 +189,8 @@ class Client(zuul.cmd.ZuulApp):
 
         # Autohold
         cmd_autohold = subparsers.add_parser(
-            'autohold', help='hold nodes for failed job')
+            'autohold', help='[DEPRECATED - use zuul-client] '
+                             'hold nodes for failed job')
         cmd_autohold.add_argument('--tenant', help='tenant name',
                                   required=True)
         cmd_autohold.add_argument('--project', help='project name',
@@ -214,25 +215,30 @@ class Client(zuul.cmd.ZuulApp):
         cmd_autohold.set_defaults(func=self.autohold)
 
         cmd_autohold_delete = subparsers.add_parser(
-            'autohold-delete', help='delete autohold request')
+            'autohold-delete', help='[DEPRECATED - use zuul-client] '
+                                    'delete autohold request')
         cmd_autohold_delete.set_defaults(func=self.autohold_delete)
         cmd_autohold_delete.add_argument('id', metavar='REQUEST_ID',
                                          help='the hold request ID')
 
         cmd_autohold_info = subparsers.add_parser(
-            'autohold-info', help='retrieve autohold request detailed info')
+            'autohold-info', help='[DEPRECATED - use zuul-client] '
+                                  'retrieve autohold request detailed info')
         cmd_autohold_info.set_defaults(func=self.autohold_info)
         cmd_autohold_info.add_argument('id', metavar='REQUEST_ID',
                                        help='the hold request ID')
 
         cmd_autohold_list = subparsers.add_parser(
-            'autohold-list', help='list autohold requests')
+            'autohold-list', help='[DEPRECATED - use zuul-client] '
+                                  'list autohold requests')
         cmd_autohold_list.add_argument('--tenant', help='tenant name',
                                        required=True)
         cmd_autohold_list.set_defaults(func=self.autohold_list)
 
         # Enqueue/Dequeue
-        cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
+        cmd_enqueue = subparsers.add_parser(
+            'enqueue',
+            help='[DEPRECATED - use zuul-client] enqueue a change')
         cmd_enqueue.add_argument('--tenant', help='tenant name',
                                  required=True)
         # TODO(mhu) remove in a few releases
@@ -249,7 +255,8 @@ class Client(zuul.cmd.ZuulApp):
         cmd_enqueue.set_defaults(func=self.enqueue)
 
         cmd_enqueue = subparsers.add_parser(
-            'enqueue-ref', help='enqueue a ref',
+            'enqueue-ref',
+            help='[DEPRECATED - use zuul-client] enqueue a ref',
             formatter_class=argparse.RawDescriptionHelpFormatter,
             description=textwrap.dedent('''\
             Submit a trigger event
@@ -273,9 +280,11 @@ class Client(zuul.cmd.ZuulApp):
             '--newrev', help='new revision', default=None)
         cmd_enqueue.set_defaults(func=self.enqueue_ref)
 
-        cmd_dequeue = subparsers.add_parser('dequeue',
-                                            help='dequeue a buildset by its '
-                                                 'change or ref')
+        cmd_dequeue = subparsers.add_parser(
+            'dequeue',
+            help='[DEPRECATED - use zuul-client] '
+                 'dequeue a buildset by its '
+                 'change or ref')
         cmd_dequeue.add_argument('--tenant', help='tenant name',
                                  required=True)
         cmd_dequeue.add_argument('--pipeline', help='pipeline name',
@@ -289,8 +298,10 @@ class Client(zuul.cmd.ZuulApp):
         cmd_dequeue.set_defaults(func=self.dequeue)
 
         # Promote
-        cmd_promote = subparsers.add_parser('promote',
-                                            help='promote one or more changes')
+        cmd_promote = subparsers.add_parser(
+            'promote',
+            help='[DEPRECATED - use zuul-client] '
+                 'promote one or more changes')
         cmd_promote.add_argument('--tenant', help='tenant name',
                                  required=True)
         cmd_promote.add_argument('--pipeline', help='pipeline name',
@@ -300,8 +311,10 @@ class Client(zuul.cmd.ZuulApp):
         cmd_promote.set_defaults(func=self.promote)
 
         # Show
-        cmd_show = subparsers.add_parser('show',
-                                         help='show current statuses')
+        cmd_show = subparsers.add_parser(
+            'show',
+            help='[DEPRECATED - use zuul-client] '
+                 'show current statuses')
         cmd_show.set_defaults(func=self.show_running_jobs)
         show_subparsers = cmd_show.add_subparsers(title='show')
         show_running_jobs = show_subparsers.add_parser(
@@ -521,7 +534,13 @@ class Client(zuul.cmd.ZuulApp):
         if not self.args.zuul_url:
             self.readConfig()
         self.setup_logging()
-
+        if self.args.func in [self.autohold, self.autohold_delete,
+                              self.enqueue, self.enqueue_ref,
+                              self.dequeue, self.promote]:
+            print(
+                "Warning: this command is deprecated with zuul-admin, "
+                "please use `zuul-client` instead",
+                file=sys.stderr)
         if self.args.func():
             sys.exit(0)
         else:
@@ -990,4 +1009,9 @@ class Client(zuul.cmd.ZuulApp):
 
 
 def main():
+    if sys.argv[0].endswith('zuul'):
+        print(
+            "Warning: this command name is deprecated, "
+            "use `zuul-admin` instead",
+            file=sys.stderr)
     Client().main()

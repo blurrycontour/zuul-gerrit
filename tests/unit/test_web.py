@@ -2892,7 +2892,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'autohold', '--reason', 'some reason',
              '--tenant', 'tenant-one', '--project', 'org/project',
@@ -2931,7 +2931,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'enqueue', '--tenant', 'tenant-one',
              '--project', 'org/project',
@@ -2960,7 +2960,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'enqueue-ref', '--tenant', 'tenant-one',
              '--project', 'org/project',
@@ -2999,7 +2999,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'dequeue', '--tenant', 'tenant-one', '--project', 'org/project',
              '--pipeline', 'periodic', '--ref', 'refs/heads/stable'],
@@ -3050,7 +3050,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'promote', '--tenant', 'tenant-one',
              '--pipeline', 'gate', '--changes', '2,1', '3,1'],
