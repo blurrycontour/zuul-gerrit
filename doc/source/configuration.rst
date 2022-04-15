@@ -808,6 +808,11 @@ sections of ``zuul.conf`` are used by the web server:
 
 .. attr:: web
 
+   .. attr:: command_socket
+      :default: /var/lib/zuul/web.socket
+
+      Path to command socket file for the web process.
+
    .. attr:: listen_address
       :default: 127.0.0.1
 
