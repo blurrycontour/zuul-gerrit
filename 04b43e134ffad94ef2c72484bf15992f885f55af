@@ -58,6 +58,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29f6cc43_ac6e160c",
+        "filename": "releasenotes/notes/zuul-admin-cli-53f52cff1aad986c.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-15T10:07:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eb612db_eb0bc272",
+      "range": {
+        "startLine": 6,
+        "startChar": 83,
+        "endLine": 6,
+        "endChar": 84
+      },
+      "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "730a5f53_610b56e7",
@@ -75,6 +99,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3e4e239_bef090de",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-15T10:07:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "730a5f53_610b56e7",
+      "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34f6f455_cdb640a1",
@@ -88,6 +130,24 @@
       "writtenOn": "2022-04-14T17:11:52Z",
       "side": 1,
       "message": "See above.",
+      "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4928772_f49d1b32",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-15T10:07:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34f6f455_cdb640a1",
       "revId": "04b43e134ffad94ef2c72484bf15992f885f55af",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
