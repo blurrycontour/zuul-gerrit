@@ -16,6 +16,23 @@
       "message": "It would be good to update our Dockerfile and related image build stuff to use python3.9 images at the same time.",
       "revId": "6360bf85a87c30aa2c47f8a849659e13af7ab5f0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a568eff8_2453f885",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-18T20:12:32Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e I agree we should update it, but maybe we can do that after this ansible stack has landed and we release 6.0?  That way we can more easily see any fallout from the python interpreter change?\n\nThat works for me. One of the things I\u0027m trying to make progress on is python3.10 base images too. Maybe zuul can jump to 3.10 from 3.8 depending on the timing.",
+      "revId": "6360bf85a87c30aa2c47f8a849659e13af7ab5f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
