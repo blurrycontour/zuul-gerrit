@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7a779b6_b8730ff4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-18T19:51:16Z",
+      "side": 1,
+      "message": "It would be good to update our Dockerfile and related image build stuff to use python3.9 images at the same time.",
+      "revId": "6360bf85a87c30aa2c47f8a849659e13af7ab5f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
