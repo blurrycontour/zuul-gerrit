@@ -1719,7 +1719,12 @@ class AnsibleJob(object):
                             self.original_hostvars)
         freeze_status, freeze_code = self.runAnsibleFreeze(
             self.jobdir.freeze_playbook, self.ansible_version)
-        if freeze_status != self.RESULT_NORMAL or setup_code != 0:
+        # We ignore the return code because we run this playbook on
+        # all hosts, even ones which we didn't run the setup playbook
+        # on.  If a host is unreachable, we should still proceed (a
+        # later playbook may cause it to become reachable).  We just
+        # won't have all of the variables set.
+        if freeze_status != self.RESULT_NORMAL:
             return result
 
         self.loadFrozenHostvars()
@@ -2567,6 +2572,11 @@ class AnsibleJob(object):
                 with open(path) as f:
                     facts = json.loads(f.read())
             self.frozen_hostvars[host['name']] = facts.pop('_zuul_frozen', {})
+            # Always include the nodepool vars, even if we didn't run
+            # the playbook for this host.
+            if 'host_vars' in host:
+                self.frozen_hostvars[host['name']]['nodepool'] =\
+                    host['host_vars']['nodepool']
             with open(path, 'w') as f:
                 f.write(json.dumps(facts))
 
