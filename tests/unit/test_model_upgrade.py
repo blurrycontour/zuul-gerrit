@@ -35,7 +35,7 @@ def model_version(version):
 
 
 class TestModelUpgrade(ZuulTestCase):
-    tenant_config_file = "config/single-tenant/main.yaml"
+    tenant_config_file = "config/single-tenant/main-model-upgrade.yaml"
     scheduler_count = 1
 
     def getJobData(self, tenant, pipeline):
@@ -99,6 +99,40 @@ class TestModelUpgrade(ZuulTestCase):
             dict(name='test-job', result='ABORTED', changes='1,1'),
             dict(name='test-job', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+    @model_version(4)
+    def test_model_4(self):
+        # Test that Zuul return values are correctly passed to child
+        # jobs in version 4 compatibility mode.
+        A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
+        fake_data = [
+            {'name': 'image',
+             'url': 'http://example.com/image',
+             'metadata': {
+                 'type': 'container_image'
+             }},
+        ]
+        self.executor_server.returnData(
+            'project-merge', A,
+            {'zuul': {'artifacts': fake_data}}
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        # Verify that the child jobs got the data from the parent
+        test1 = self.getJobFromHistory('project-test1')
+        self.assertEqual(fake_data[0]['url'],
+                         test1.parameters['zuul']['artifacts'][0]['url'])
+        integration = self.getJobFromHistory('project1-project2-integration')
+        self.assertEqual(fake_data[0]['url'],
+                         integration.parameters['zuul']['artifacts'][0]['url'])
 
     @model_version(4)
     def test_model_4_5(self):

@@ -3478,8 +3478,6 @@ class Build(zkobject.ZKObject):
                         # Load the object from ZK
                         data['_' + job_data_key] = JobData.fromZK(
                             context, job_data['path'])
-            else:
-                data['_' + job_data_key] = None
         return data
 
     def getPath(self):
