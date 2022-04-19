@@ -34,3 +34,4 @@
         - multiple-child-no-run
         - multiple-run
         - multiple-run-failure
+        - bubblewrap
