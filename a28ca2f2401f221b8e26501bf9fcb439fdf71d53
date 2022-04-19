@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13262178_4d467a7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-19T21:42:30Z",
+      "side": 1,
+      "message": "Corvus has indicated new tests can be written to cover this and the remote module tests use real remote nodes which are not necessary to test bwrap behavior in an executor context this way.",
+      "revId": "a28ca2f2401f221b8e26501bf9fcb439fdf71d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
