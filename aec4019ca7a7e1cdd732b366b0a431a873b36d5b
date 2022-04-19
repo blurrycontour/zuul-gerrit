@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1940e86e_e00a180c",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-19T21:33:32Z",
+      "side": 0,
+      "message": "Thinking out loud here it may be a good idea to test that RO bwrap mounts are not writable. Does removing all of this testing framework make that more difficult? In particular I think we could update the sync tests that try to sync to previously verboten paths due to being untrusted to syncing to non writeable paths due to bwrap to cover that.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 70
+      },
+      "revId": "aec4019ca7a7e1cdd732b366b0a431a873b36d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
