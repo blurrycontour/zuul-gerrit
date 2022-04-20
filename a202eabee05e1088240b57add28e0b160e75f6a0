@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e69fac7d_5705420f",
+        "filename": "playbooks/tutorial/roles/zuul-web-test/library/zuul-web-test.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-20T21:06:42Z",
+      "side": 1,
+      "message": "This file should have a license header.",
+      "revId": "a202eabee05e1088240b57add28e0b160e75f6a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
