@@ -16,6 +16,23 @@
       "message": "Can\u0027t we already stop refreshing the job when an `old_build` exists? As far as I can see we won\u0027t change a job after we\u0027ve scheduled a build.",
       "revId": "ef4dbfb64d4ece8d4521318a3ac84cfce855b5ec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "750f1a90_eaeddc74",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3874,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-20T15:28:18Z",
+      "side": 1,
+      "message": "I think you\u0027re right.",
+      "revId": "ef4dbfb64d4ece8d4521318a3ac84cfce855b5ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
