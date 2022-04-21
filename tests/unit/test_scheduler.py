@@ -7016,6 +7016,9 @@ class TestSchedulerMerges(ZuulTestCase):
         result = self._test_project_merge_mode('cherry-pick')
         self.assertEqual(result, expected_messages)
 
+    def test_project_merge_mode_cherrypick_merge(self):
+        self._test_merge('cherry-pick')
+
     def test_merge_branch(self):
         "Test that the right commits are on alternate branches"
         self.create_branch('org/project-merge-branches', 'mp')
