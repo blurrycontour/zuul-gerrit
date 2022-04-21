@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import sqlalchemy as sa
+
 from zuul.model import DequeueEvent
 
 from tests.base import ZuulTestCase, simple_layout
@@ -128,3 +130,29 @@ class TestReporting(ZuulTestCase):
         self.assertIn("Build canceled (check)", A.messages[1])
         self.assertIn("Build started (check)", A.messages[2])
         self.assertIn("Build succeeded (check)", A.messages[3])
+
+    @simple_layout("layouts/no-jobs-reporting.yaml")
+    def test_no_jobs_reporting(self):
+        # Test that we don't report NO_JOBS results
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        A.addApproval("Code-Review", 2)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(0, A.reported)
+        self.assertHistory([])
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['check']
+        reporter = self.scheds.first.connections.getSqlReporter(
+            pipeline)
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+
+            result = conn.execute(
+                sa.sql.select([reporter.connection.zuul_buildset_table]))
+
+            buildsets = result.fetchall()
+            self.assertEqual(0, len(buildsets))
