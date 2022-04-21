@@ -494,7 +494,8 @@ class FakeGerritChange(object):
         repo.git.clean('-x', '-f', '-d')
 
         repo.index.merge_tree(parents[1])
-        r = repo.index.commit(msg)
+        parent_commits = [repo.commit(p) for p in parents]
+        r = repo.index.commit(msg, parent_commits=parent_commits)
 
         repo.head.reference = 'master'
         repo.head.reset(working_tree=True)

@@ -7062,6 +7062,51 @@ class TestSchedulerMerges(ZuulTestCase):
         result = self._test_project_merge_mode('cherry-pick')
         self.assertEqual(result, expected_messages)
 
+    def test_project_merge_mode_cherrypick_branch_merge(self):
+        "Test that branches can be merged together in cherry-pick mode"
+        self.create_branch('org/project-merge-branches', 'mp')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project-merge-branches', 'mp'))
+        self.waitUntilSettled()
+
+        path = os.path.join(self.upstream_root, 'org/project-merge-branches')
+        repo = git.Repo(path)
+        master_sha = repo.heads.master.commit.hexsha
+        mp_sha = repo.heads.mp.commit.hexsha
+
+        self.executor_server.hold_jobs_in_build = True
+        M = self.fake_gerrit.addFakeChange(
+            'org/project-merge-branches', 'master', 'M',
+            merge_parents=[
+                master_sha,
+                mp_sha,
+            ])
+        M.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(M.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        build = self.builds[-1]
+        self.assertEqual(build.parameters['zuul']['branch'], 'master')
+        path = os.path.join(build.jobdir.src_root, 'review.example.com',
+                            "org/project-merge-branches")
+        repo = git.Repo(path)
+        repo_messages = [c.message.strip() for c in repo.iter_commits()]
+        repo_messages.reverse()
+        correct_messages = [
+            'initial commit',
+            'add content from fixture',
+            'mp commit',
+            'M-1']
+        self.assertEqual(repo_messages, correct_messages)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     def test_merge_branch(self):
         "Test that the right commits are on alternate branches"
         self.create_branch('org/project-merge-branches', 'mp')
