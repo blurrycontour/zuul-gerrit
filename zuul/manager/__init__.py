@@ -1900,7 +1900,7 @@ class PipelineManager(metaclass=ABCMeta):
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
-        elif action:
+        elif action != 'no-jobs':
             self.sql.reportBuildsetEnd(item.current_build_set,
                                        action, final=True)
 
