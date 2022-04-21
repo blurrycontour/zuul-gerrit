@@ -555,9 +555,13 @@ class Repo(object):
     def cherryPick(self, ref, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
-        log.debug("Cherry-picking %s", ref)
         self.fetch(ref, zuul_event_id=zuul_event_id)
-        repo.git.cherry_pick("FETCH_HEAD")
+        if len(repo.commit("FETCH_HEAD").parents) > 1:
+            log.debug("Merging %s instead of cherry-picking", ref)
+            repo.git.merge("FETCH_HEAD")
+        else:
+            log.debug("Cherry-picking %s", ref)
+            repo.git.cherry_pick("FETCH_HEAD")
         return repo.head.commit
 
     def merge(self, ref, strategy=None, zuul_event_id=None):
