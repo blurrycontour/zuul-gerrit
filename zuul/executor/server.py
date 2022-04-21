@@ -3710,6 +3710,14 @@ class ExecutorServer(BaseMergeServer):
                         break
                     if not self._running:
                         break
+
+                    # Delay our response to running a new job based on the number
+                    # of jobs we're currently running, in an attempt to spread
+                    # load evenly among executors.
+                    workers = len(self.job_workers)
+                    delay = (workers ** 2) / 1000.0
+                    time.sleep(delay)
+
                     self._runBuildWorker(build_request)
             except Exception:
                 self.log.exception("Error in build loop:")
