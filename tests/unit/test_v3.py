@@ -6598,6 +6598,51 @@ class TestNoLog(AnsibleZuulTestCase):
         self.assertNotIn('my-very-secret-password-2', text_log)
 
 
+class TestJsonStringResults(AnsibleZuulTestCase):
+    tenant_config_file = 'config/ansible-json-string-results/main.yaml'
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_ansible_json_string_results(self):
+        """Test modules that return string results are captured
+
+        The yum/dnf modules are seemily almost unique in setting
+        "results" in their module return value to a list of strings
+        (other things might too, but not many other built-in
+        components).  Confusingly, when using loops in ansible the
+        output also has a "results" which is a list of dicts with
+        return values from each iteration.
+
+        The zuul_json callback handler needs to deal with both; We've
+        broken this before making changes to its results parsing.
+        This test fakes some string return values like the yum modules
+        do, and ensures they are captured.
+
+        """
+
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        json_log = self._get_file(self.history[0], 'work/logs/job-output.json')
+        text_log = self._get_file(self.history[0], 'work/logs/job-output.txt')
+
+        self.assertIn('if you see this string, it is working', json_log)
+        # Note the text log doesn't include the detail of the returned
+        # results, just the msg field, hence to following "not in"
+        self.assertNotIn('if you see this string, it is working', text_log)
+        self.assertIn('A plugin message', text_log)
+        # no_log checking
+        self.assertNotIn('this is a secret string', json_log)
+        self.assertNotIn('this is a secret string', text_log)
+
+
 class TestUnreachable(AnsibleZuulTestCase):
     tenant_config_file = 'config/ansible-unreachable/main.yaml'
 
