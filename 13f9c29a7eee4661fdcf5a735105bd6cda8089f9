@@ -16,6 +16,24 @@
       "message": "One thought/concern here. Is there some other attribute/value that we need to check for no_log state that we\u0027ll now skip over? Previously we raised an exception and didn\u0027t add the data to self.results so that was equivalent to censoring. But now we\u0027ll potentially continue and log anyway.\n\nMaybe we need to check the type is string to be specific?",
       "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70fdcaa0_4d268d85",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-04-22T03:33:27Z",
+      "side": 1,
+      "message": "Honestly per the note, I think that Ansible has fixed things so that we will not actually ever get in here with individual tasks having this set.  It\u0027s already filtered out as \"censored\" before the result is passed in here.  But, I haven\u0027t proved that to myself, hence not reverting this.  This seems totally free-form as to what any plugin may return here, so we\u0027ll always have some variation...\n\nI\u0027ve proposed a test in the follow-on Ib0d2360f98daf33e05207c9c285528ce2f51cbf9.  I think that will help we don\u0027t regress here, if we do fiddle things.",
+      "parentUuid": "46f4656b_3b82d056",
+      "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
