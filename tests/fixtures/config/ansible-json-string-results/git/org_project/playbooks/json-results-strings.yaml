@@ -1,0 +1,8 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+
+    - name: Ensure we handle string returns properly
+      return_strings:
+        an_arg: 'if you see this string, it is working'
+
