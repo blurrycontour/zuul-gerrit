@@ -315,6 +315,13 @@ class PipelineManager(metaclass=ABCMeta):
                 self.log.error("Reporting item start %s received: %s" %
                                (item, ret))
 
+    def reportNormalBuildsetEnd(self, build_set, action, final, result=None):
+        # Report a buildset end, but only if there are jobs
+        if (build_set.job_graph and
+            len(build_set.job_graph.jobs) > 0):
+            self.sql.reportBuildsetEnd(build_set, action,
+                                       final, result)
+
     def reportDequeue(self, item):
         if not self.pipeline.state.disabled:
             self.log.info(
@@ -329,8 +336,8 @@ class PipelineManager(metaclass=ABCMeta):
                 )
         # This might be called after canceljobs, which also sets a
         # non-final 'cancel' result.
-        self.sql.reportBuildsetEnd(item.current_build_set, 'dequeue',
-                                   final=False)
+        self.reportNormalBuildsetEnd(item.current_build_set, 'dequeue',
+                                     final=False)
 
     def sendReport(self, action_reporters, item, message=None):
         """Sends the built message off to configured reporters.
@@ -613,6 +620,8 @@ class PipelineManager(metaclass=ABCMeta):
         if self.pipeline.tenant.layout.getProjectPipelineConfig(ci):
             self.sendReport(actions, ci)
         self.dequeueItem(ci)
+        # We don't use reportNormalBuildsetEnd here because we want to
+        # report even with no jobs.
         self.sql.reportBuildsetEnd(ci.current_build_set,
                                    'failure', final=True)
 
@@ -949,7 +958,7 @@ class PipelineManager(metaclass=ABCMeta):
                 item.didBundleStartReporting()):
             # Force a dequeued result here because we haven't actually
             # reported the item, but we are done with this buildset.
-            self.sql.reportBuildsetEnd(
+            self.reportNormalBuildsetEnd(
                 item.current_build_set, 'dequeue', final=False,
                 result='DEQUEUED')
             item.resetAllBuilds()
@@ -1610,8 +1619,8 @@ class PipelineManager(metaclass=ABCMeta):
                 # Don't override the reported sql result for the item
                 # that "really" failed.
                 ri.setReportedResult('FAILURE')
-                self.sql.reportBuildsetEnd(ri.current_build_set,
-                                           'failure', final=True)
+                self.reportNormalBuildsetEnd(ri.current_build_set,
+                                             'failure', final=True)
 
     def processQueue(self):
         # Do whatever needs to be done for each change in the queue
@@ -1868,8 +1877,8 @@ class PipelineManager(metaclass=ABCMeta):
                               item.change)
                     action = 'merge-failure'
                     item.setReportedResult('MERGE_FAILURE')
-                self.sql.reportBuildsetEnd(item.current_build_set,
-                                           action, final=True)
+                self.reportNormalBuildsetEnd(item.current_build_set,
+                                             action, final=True)
             change_queue = item.queue
             if not (succeeded and merged):
                 if (not item.current_build_set.job_graph or
@@ -1889,8 +1898,8 @@ class PipelineManager(metaclass=ABCMeta):
                 raise exceptions.MergeFailure(
                     "Change %s failed to merge" % item.change)
             else:
-                self.sql.reportBuildsetEnd(item.current_build_set,
-                                           action, final=True)
+                self.reportNormalBuildsetEnd(item.current_build_set,
+                                             action, final=True)
                 log.info("Reported change %s status: all-succeeded: %s, "
                          "merged: %s", item.change, succeeded, merged)
                 change_queue.increaseWindowSize()
@@ -1900,9 +1909,9 @@ class PipelineManager(metaclass=ABCMeta):
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
-        elif action != 'no-jobs':
-            self.sql.reportBuildsetEnd(item.current_build_set,
-                                       action, final=True)
+        elif action:
+            self.reportNormalBuildsetEnd(item.current_build_set,
+                                         action, final=True)
 
     def _reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
