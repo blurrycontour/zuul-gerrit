@@ -132,12 +132,11 @@ class TestReporting(ZuulTestCase):
         self.assertIn("Build succeeded (check)", A.messages[3])
 
     @simple_layout("layouts/no-jobs-reporting.yaml")
-    def test_no_jobs_reporting(self):
+    def test_no_jobs_reporting_check(self):
         # Test that we don't report NO_JOBS results
 
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
-        A.addApproval("Code-Review", 2)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -155,4 +154,35 @@ class TestReporting(ZuulTestCase):
                 sa.sql.select([reporter.connection.zuul_buildset_table]))
 
             buildsets = result.fetchall()
+            for x in buildsets:
+                self.log.debug("Buildset %s", x)
+            self.assertEqual(0, len(buildsets))
+
+    @simple_layout("layouts/no-jobs-reporting.yaml")
+    def test_no_jobs_reporting_check_and_gate(self):
+        # Test that we don't report NO_JOBS results
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        A.addApproval("Code-Review", 2)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(0, A.reported)
+        self.assertHistory([])
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['check']
+        reporter = self.scheds.first.connections.getSqlReporter(
+            pipeline)
+        with self.scheds.first.connections.getSqlConnection().\
+             engine.connect() as conn:
+
+            result = conn.execute(
+                sa.sql.select([reporter.connection.zuul_buildset_table]))
+
+            buildsets = result.fetchall()
+            for x in buildsets:
+                self.log.debug("Buildset %s", x)
             self.assertEqual(0, len(buildsets))

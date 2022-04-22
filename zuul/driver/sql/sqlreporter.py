@@ -102,6 +102,7 @@ class SQLReporter(BaseReporter):
                         tenant=buildset.item.pipeline.tenant.name,
                         uuid=buildset.uuid)
                     if not db_buildset:
+                        print("XXX create")
                         db_buildset = self._createBuildset(db, buildset)
                     db_buildset.result = buildset.result or result
                     db_buildset.message = message
