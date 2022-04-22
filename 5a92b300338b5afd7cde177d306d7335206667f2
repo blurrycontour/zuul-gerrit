@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9ca3a124_81cfd5f5",
+        "filename": "tests/unit/test_reporting.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-22T21:32:35Z",
+      "side": 1,
+      "message": "Is this debugging intended to remain in the merged code?",
+      "range": {
+        "startLine": 157,
+        "startChar": 12,
+        "endLine": 158,
+        "endChar": 48
+      },
+      "revId": "5a92b300338b5afd7cde177d306d7335206667f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "810622d2_2c50708b",
         "filename": "tests/unit/test_reporting.py",
         "patchSetId": 2
@@ -19,6 +42,29 @@
         "startChar": 44,
         "endLine": 176,
         "endChar": 49
+      },
+      "revId": "5a92b300338b5afd7cde177d306d7335206667f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77a64e3f_75ae5aa2",
+        "filename": "tests/unit/test_reporting.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-22T21:32:35Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 186,
+        "startChar": 12,
+        "endLine": 187,
+        "endChar": 48
       },
       "revId": "5a92b300338b5afd7cde177d306d7335206667f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
