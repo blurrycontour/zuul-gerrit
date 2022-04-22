@@ -791,6 +791,40 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual("http://tokenname5:555@gitlabfivvve/org/project1.git",
                          project_git_url)
 
+    @simple_layout('layouts/files-gitlab.yaml', driver='gitlab')
+    def test_changed_file_match_filter(self):
+        path = os.path.join(self.upstream_root, 'org/project')
+        base_sha = git.Repo(path).head.object.hexsha
+
+        files = {'{:03d}.txt'.format(n): 'test' for n in range(300)}
+        files["foobar-requires"] = "test"
+        files["to-be-removed"] = "test"
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project', 'master', 'A', files=files, base_sha=base_sha)
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        # project-test1 and project-test2 should be run
+        self.assertEqual(2, len(self.history))
+
+    @simple_layout('layouts/files-gitlab.yaml', driver='gitlab')
+    def test_changed_and_reverted_file_not_match_filter(self):
+        path = os.path.join(self.upstream_root, 'org/project')
+        base_sha = git.Repo(path).head.object.hexsha
+
+        files = {'{:03d}.txt'.format(n): 'test' for n in range(300)}
+        files["foobar-requires"] = "test"
+        files["to-be-removed"] = "test"
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project', 'master', 'A', files=files, base_sha=base_sha)
+        A.addCommit(delete_files=['to-be-removed'])
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        # Only project-test1 should be run, because the file to-be-removed
+        # is reverted and not in changed files to trigger project-test2
+        self.assertEqual(1, len(self.history))
+
 
 class TestGitlabUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-gitlab-driver.conf'
