@@ -16,6 +16,24 @@
       "message": "I\u0027d suggest to rebase on top of https://review.opendev.org/c/zuul/zuul/+/838002 to avoid conflicting with that.\n\nIt\u0027s also unclear to me how the changes outside zuul.yaml are related and if they are necessary in this patch, maybe add some comments?",
       "revId": "866830e00a7d6138c0de292f462f425c18547ef1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd6d9dd6_18f71032",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 24
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-25T14:04:29Z",
+      "side": 1,
+      "message": "This is a pretty old patch now, started before some dependencies were fully supporting python 3.10. Some of these changes were needed to build the dependencies. Let me update a new, rebased patch dropping these files and see if it works.",
+      "parentUuid": "f4668b49_bb1d2d19",
+      "revId": "866830e00a7d6138c0de292f462f425c18547ef1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
