@@ -33,6 +33,24 @@
       "message": "\"in the next version\" is a bit vague. Is this the next major version or the next minor version...?",
       "revId": "1c20cc599fafb1af8f037e71a0dbb20b19978611",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a888681_f548035e",
+        "filename": "releasenotes/notes/zuul-admin-cli-53f52cff1aad986c.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-25T13:03:49Z",
+      "side": 1,
+      "message": "Honestly it\u0027s really at your convenience, as long as we don\u0027t forget to do it. I\u0027d suggest to be done with it as soon as possible, and since I wouldn\u0027t consider this a major breakage introducing this with the next minor versions sounds fine to me.\n\nThere must be however enough time between the minor releases for operators to become aware of the deprecation - read the release notes, the doc, use zuul\u0027s zuul-client and see the warning - and act upon it if needed. So it really mainly depends on zuul\u0027s expected release velocity.",
+      "parentUuid": "2a5bc0e6_d23ebb5c",
+      "revId": "1c20cc599fafb1af8f037e71a0dbb20b19978611",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
