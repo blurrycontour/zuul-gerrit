@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67006cf5_130d0e58",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 42
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-25T20:55:42Z",
+      "side": 1,
+      "message": "These print statements should be removed (they could be converted to self.log.debug, but the tests always print out the history at the end anyway, so they are redundant).",
+      "revId": "13db2f85b65deeb1634d30d232c84be18aaa126c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3378850_da02ed91",
