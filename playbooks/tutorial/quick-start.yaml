@@ -106,3 +106,7 @@
 
 - name: Verify log contents
   command: "grep 'Hello world!' {{ workspace }}/job-output.txt"
+
+- name: "Check zuul web: status and builds"
+  include_role:
+    name: zuul-web-test
