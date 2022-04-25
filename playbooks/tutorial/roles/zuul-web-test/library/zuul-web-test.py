@@ -28,11 +28,6 @@ def run():
         command_executor="http://127.0.0.1:4444", options=firefox_options
     )
 
-    # In case of assert errors caused by a change that legitimatly modifies
-    # zuul web pages layout, You can use Selenium extension in your browser
-    # to get the new element data and update the following code.
-    # Start a record and click on text area.
-    #
     # To quickly test local updates to this role:
     # cd playbooks/tutorial
     # ansible -m include_role -a name=zuul-web-test localhost
@@ -40,33 +35,21 @@ def run():
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, "zuul-pipeline")))
 
-    assert("check" in driver.find_element(
-        By.CSS_SELECTOR, ".zuul-pipeline:nth-child(1) .pf-c-title"
-    ).text), 'status: "check" not found'
+    driver.find_element_by_xpath("//*[text()[contains(.,'check')]]")
 
-    assert("gate" in driver.find_element(
-        By.CSS_SELECTOR, ".zuul-pipeline:nth-child(2) .pf-c-title"
-    ).text), 'status: "gate" not found'
+    driver.find_element_by_xpath("//*[text()[contains(.,'gate')]]")
 
     driver.get("http://127.0.0.1:9000/t/example-tenant/builds")
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, "zuul-table")))
 
-    assert(driver.find_element(
-        By.CSS_SELECTOR, "tr:nth-child(1) > .pf-m-break-word:nth-child(1)"
-    ).text == "testjob"), 'builds: 2nd "testjob" not found'
+    testjob = driver.find_elements_by_xpath(
+        "//*[text()[contains(.,'testjob')]]")
+    assert len(testjob) == 2, 'jobs "testjob" not found'
 
-    assert(driver.find_element(
-        By.CSS_SELECTOR, "tr:nth-child(2) > .pf-m-break-word:nth-child(1)"
-    ).text == "noop"), 'builds: 2nd "noop" not found'
-
-    assert(driver.find_element(
-        By.CSS_SELECTOR, "tr:nth-child(3) > .pf-m-break-word:nth-child(1)"
-    ).text == "noop"), 'builds: 1st "noop" not found'
-
-    assert(driver.find_element(
-        By.CSS_SELECTOR, "tr:nth-child(4) > .pf-m-break-word:nth-child(1)"
-    ).text == "testjob"), 'builds: 1st "testjob" not found'
+    noop = driver.find_elements_by_xpath(
+        "//*[text()[contains(.,'noop')]]")
+    assert len(noop) == 2, 'jobs "noop" not found'
 
     driver.quit()
 
