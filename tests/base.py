@@ -1670,9 +1670,9 @@ class FakePagurePullRequest(object):
         return PagureChangeReference.create(
             repo, self.getPRReference(), 'refs/tags/init')
 
-    def addCommit(self, files={}):
+    def addCommit(self, files={}, delete_files=None):
         """Adds a commit on top of the actual PR head."""
-        self._addCommitInPR(files=files)
+        self._addCommitInPR(files=files, delete_files=delete_files)
         self._updateTimeStamp()
 
     def forcePush(self, files={}):
@@ -1680,7 +1680,7 @@ class FakePagurePullRequest(object):
         self._addCommitInPR(files=files, reset=True)
         self._updateTimeStamp()
 
-    def _addCommitInPR(self, files={}, reset=False):
+    def _addCommitInPR(self, files={}, delete_files=None, reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getPRReference()]
         if reset:
@@ -1692,7 +1692,7 @@ class FakePagurePullRequest(object):
 
         if files:
             self.files = files
-        else:
+        elif not delete_files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             self.files = {fn: "test %s %s\n" % (self.branch, self.number)}
         msg = self.subject + '-' + str(self.number_of_commits)
@@ -1701,6 +1701,13 @@ class FakePagurePullRequest(object):
             with open(fn, 'w') as f:
                 f.write(content)
             repo.index.add([fn])
+
+        if delete_files:
+            for fn in delete_files:
+                if fn in self.files:
+                    del self.files[fn]
+                fn = os.path.join(repo.working_dir, fn)
+                repo.index.remove([fn])
 
         self.commit_stop = repo.index.commit(msg).hexsha
         if not self.commit_start:
@@ -2148,7 +2155,7 @@ class FakeGitlabMergeRequest(object):
 
         if files:
             self.files = files
-        else:
+        elif not delete_files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             self.files = {fn: "test %s %s\n" % (self.branch, self.number)}
         msg = self.subject + '-' + str(self.number_of_commits)
@@ -2160,6 +2167,8 @@ class FakeGitlabMergeRequest(object):
 
         if delete_files:
             for fn in delete_files:
+                if fn in self.files:
+                    del self.files[fn]
                 fn = os.path.join(repo.working_dir, fn)
                 repo.index.remove([fn])
 
@@ -2507,7 +2516,7 @@ class FakeGithubPullRequest(object):
                 else:
                     normalized_files[tests.fakegithub.FakeFile(fn)] = content
             self.files.update(normalized_files)
-        else:
+        elif not delete_files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             content = f"test {self.branch} {self.number}\n"
             self.files.update({tests.fakegithub.FakeFile(fn): content})
@@ -2521,6 +2530,8 @@ class FakeGithubPullRequest(object):
 
         if delete_files:
             for fn in delete_files:
+                if fn in self.files:
+                    del self.files[fn]
                 fn = os.path.join(repo.working_dir, fn)
                 repo.index.remove([fn])
 

@@ -656,6 +656,34 @@ class TestPagureDriver(ZuulTestCase):
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
 
+    @simple_layout('layouts/files-pagure.yaml', driver='pagure')
+    def test_changed_file_match_filter(self):
+        files = {'{:03d}.txt'.format(n): 'test' for n in range(300)}
+        files["foobar-requires"] = "test"
+        files["to-be-removed"] = "test"
+        A = self.fake_pagure.openFakePullRequest(
+            'org/project', 'master', 'A', files=files)
+
+        self.fake_pagure.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        # project-test1 and project-test2 should be run
+        self.assertEqual(2, len(self.history))
+
+    @simple_layout('layouts/files-pagure.yaml', driver='pagure')
+    def test_changed_and_reverted_file_not_match_filter(self):
+        files = {'{:03d}.txt'.format(n): 'test' for n in range(3)}
+        files["foobar-requires"] = "test"
+        files["to-be-removed"] = "test"
+        A = self.fake_pagure.openFakePullRequest(
+            'org/project', 'master', 'A', files=files)
+        A.addCommit(delete_files=['to-be-removed'])
+
+        self.fake_pagure.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        # Only project-test1 should be run, because the file to-be-removed
+        # is reverted and not in changed files to trigger project-test2
+        self.assertEqual(1, len(self.history))
+
 
 class TestPagureToGerritCRD(ZuulTestCase):
     config_file = 'zuul-crd-pagure.conf'
