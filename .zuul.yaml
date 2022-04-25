@@ -67,7 +67,7 @@
 - job:
     name: zuul-tox-remote
     parent: tox
-    timeout: 2700  # 45 minutes
+    timeout: 2700 # 45 minutes
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
@@ -95,7 +95,7 @@
 - job:
     name: zuul-tox-py39
     parent: zuul-tox
-    timeout: 5400  # 90 minutes
+    timeout: 5400 # 90 minutes
     vars:
       tox_envlist: py39
       python_version: 3.9
@@ -103,7 +103,7 @@
 - job:
     name: zuul-tox-py38
     parent: zuul-tox
-    timeout: 5400  # 90 minutes
+    timeout: 5400 # 90 minutes
     vars:
       tox_envlist: py38
       python_version: 3.8
@@ -115,6 +115,15 @@
     vars:
       tox_environment:
         ZUUL_SCHEDULER_COUNT: 2
+
+- job:
+    name: zuul-tox-py310
+    parent: zuul-tox
+    timeout: 4800 # 80 minutes
+    vars:
+      tox_envlist: py310
+      python_version: "3.10"
+      python_use_pyenv: true
 
 - job:
     name: zuul-build-dashboard
@@ -200,7 +209,7 @@
     parent: opendev-build-docker-image
     description: Build Docker images.
     allowed-projects: zuul/zuul
-    timeout: 2700  # 45 minutes
+    timeout: 2700 # 45 minutes
     requires:
       - python-builder-3.8-bullseye-container-image
       - python-base-3.8-bullseye-container-image
@@ -286,6 +295,8 @@
               tox_install_bindep: false
         - zuul-tox-py38
         - zuul-tox-py39
+        - zuul-tox-py310:
+            voting: false
         - zuul-tox-py39-multi-scheduler
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
