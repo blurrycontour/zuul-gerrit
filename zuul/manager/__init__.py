@@ -287,6 +287,8 @@ class PipelineManager(metaclass=ABCMeta):
 
         change_in_pipeline = False
         for item in self.pipeline.getAllItems():
+            if not isinstance(change, model.Change):
+                continue
             for dep_change_ref in item.change.commit_needs_changes:
                 if item.change.equals(change):
                     change_in_pipeline = True
