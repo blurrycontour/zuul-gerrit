@@ -1,0 +1,12 @@
+- name: grand parent
+  hosts: all
+  tasks:
+    - name: skip parent1
+      debug:
+        msg: skip parent1
+
+    - zuul_return:
+        data:
+          zuul:
+            child_jobs:
+              - parent2
