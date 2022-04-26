@@ -6741,6 +6741,61 @@ class TestDependencyGraph(ZuulTestCase):
             dict(name='deploy', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @simple_layout('layouts/not-skip-when-reenqueue.yaml')
+    def test_child_with_soft_dependency_should_not_skip(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.returnData(
+            'grand-parent', A,
+            {'zuul':
+                {'child_jobs': ['parent2']}
+            }
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('grand-parent')
+        self.waitUntilSettled()
+        # grand-parent success, parent1 skipped, parent2 running
+        self.assertHistory([
+            dict(name='grand-parent', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertBuilds([dict(name='parent2')])
+
+        print("debug 1..........history:", self.history)
+        print("debug 1..........builds:", self.builds)
+
+        # Reconfigure to trigger a re-enqueue, this should not cause job
+        # 'child' to be skipped because parent1 was skipped
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        self.executor_server.release('parent1')
+        self.executor_server.release('parent2')
+        self.waitUntilSettled()
+        # grand-parent success, parent1 skipped, parent2 success, child running
+        self.assertHistory([
+            dict(name='grand-parent', result='SUCCESS', changes='1,1'),
+            dict(name='parent2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertBuilds([dict(name='child')])
+        print("debug 2..........history:", self.history)
+        print("debug 2..........builds:", self.builds)
+
+        self.executor_server.release('child')
+        self.waitUntilSettled()
+        # grand-parent success, parent1 skipped, parent2 success, child success
+        self.assertHistory([
+            dict(name='grand-parent', result='SUCCESS', changes='1,1'),
+            dict(name='parent2', result='SUCCESS', changes='1,1'),
+            dict(name='child', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertBuilds([])
+        print("debug 3..........history:", self.history)
+        print("debug 3..........builds:", self.builds)
+
+        self.assertEqual(1, 2)
+
     @simple_layout('layouts/soft-dependencies.yaml')
     def test_soft_dependencies_failure(self):
         file_dict = {'main.c': 'test'}
