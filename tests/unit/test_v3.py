@@ -890,6 +890,39 @@ class TestBranchMismatch(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    def test_implied_branch_matcher_pragma_syntax_error(self):
+        # Test that syntax errors are reported if the implied branch
+        # matcher pragma is set.  This catches potential errors when
+        # serializing configuration errors since the pragma causes
+        # extra information to be added to the error source context.
+        self.create_branch('org/project1', 'feature/test')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'feature/test'))
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                nodeset: bar
+            - pragma:
+                implied-branches:
+                  - master
+                  - feature/r1
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([])
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertIn('nodeset "bar" was not found', A.messages[0],
+                      "A should have a syntax error reported")
+
 
 class TestBranchRef(ZuulTestCase):
     tenant_config_file = 'config/branch-ref/main.yaml'
@@ -1715,6 +1748,25 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.reported, 1,
                          "A should report failure")
         self.assertIn('while constructing a mapping', A.messages[0],
+                      "A should have a syntax error reported")
+
+    def test_yaml_dict_error3(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertIn('is not a dictionary', A.messages[0],
                       "A should have a syntax error reported")
 
     def test_yaml_duplicate_key_error(self):

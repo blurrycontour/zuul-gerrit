@@ -82,6 +82,17 @@ class BranchMatcher(AbstractChangeMatcher):
                         return True
         return False
 
+    def serialize(self):
+        return {
+            "implied": self.exactmatch,
+            "regex": self._regex,
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        o = cls.__new__(cls, data['regex'])
+        return o
+
 
 class ImpliedBranchMatcher(BranchMatcher):
     exactmatch = True

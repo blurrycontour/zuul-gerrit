@@ -1695,6 +1695,9 @@ class SourceContext(ConfigObject):
                 self.trusted == other.trusted)
 
     def serialize(self):
+        ibs = None
+        if self.implied_branches:
+            ibs = [ibm.serialize() for ibm in self.implied_branches]
         return {
             "project_canonical_name": self.project_canonical_name,
             "project_name": self.project_name,
@@ -1703,12 +1706,22 @@ class SourceContext(ConfigObject):
             "path": self.path,
             "trusted": self.trusted,
             "implied_branch_matchers": self.implied_branch_matchers,
-            "implied_branches": self.implied_branches,
+            "implied_branches": ibs,
         }
 
     @classmethod
     def deserialize(cls, data):
         o = cls.__new__(cls)
+        ibs = data.get('implied_branches')
+        if ibs:
+            data['implied_branches'] = []
+            for matcher_data in ibs:
+                if matcher_data['implied']:
+                    cls = change_matcher.ImpliedBranchMatcher
+                else:
+                    cls = change_matcher.BranchMatcher
+                data['implied_branches'].append(
+                    cls.deserialize(matcher_data))
         o.__dict__.update(data)
         return o
 
@@ -6738,6 +6751,8 @@ class UnparsedConfig(object):
             if len(item.keys()) > 1:
                 raise ConfigItemMultipleKeysError(item)
             key, value = list(item.items())[0]
+            if not isinstance(value, dict):
+                raise ConfigItemNotDictError(item)
             if key == 'project':
                 self.projects.append(value)
             elif key == 'job':

@@ -31,6 +31,7 @@ import zuul.lib.connections
 from tests.base import BaseTestCase, FIXTURE_DIR
 from zuul.lib.ansible import AnsibleManager
 from zuul.zk.zkobject import LocalZKContext
+from zuul import change_matcher
 
 
 class Dummy(object):
@@ -746,3 +747,22 @@ class TestRef(BaseTestCase):
 
         self.assertFalse(branch1.equals(change1))
         self.assertFalse(branch1.equals(tag1))
+
+
+class TestSourceContext(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.connection = Dummy(connection_name='dummy_connection')
+        self.source = Dummy(canonical_hostname='git.example.com',
+                            connection=self.connection)
+        self.project = model.Project('project', self.source)
+        self.context = model.SourceContext(
+            self.project.canonical_name, self.project.name,
+            self.project.connection_name, 'master', 'test', True)
+        self.context.implied_branches = [
+            change_matcher.BranchMatcher('foo'),
+            change_matcher.ImpliedBranchMatcher('foo'),
+        ]
+
+    def test_serialize(self):
+        self.context.deserialize(self.context.serialize())
