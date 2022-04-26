@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a47db676_eced127b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 43
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T00:11:35Z",
+      "side": 1,
+      "message": "It might be nice to clarify a bit in the commit message and/or code that the base_sha is available to systems like gerrit. Butalso we don\u0027t rely on it for Gerrit since we can get the file list from the Gerrit api.\n\nI agree that this approach appears to be simpler and importantly allows us to take advantage of the listings code review systems give us. I suppose if we need to in the future we can always pivot to the more complex and costly thing if necessary but starting with simple and cheap makes sense to me.",
+      "revId": "79b6252370568926e69610f752f2c2618a557341",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb429312_c9060bb2",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 1226,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T00:11:35Z",
+      "side": 1,
+      "message": "For systems like gerrit the base_sha is just the previous commit to the change. I\u0027m not sure it is entirely accurate to say that only github provides this info?",
+      "revId": "79b6252370568926e69610f752f2c2618a557341",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
