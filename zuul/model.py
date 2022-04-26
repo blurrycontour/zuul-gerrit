@@ -4838,7 +4838,8 @@ class QueueItem(zkobject.ZKObject):
                         skip, skip_soft=True)
                     skipped += to_skip
 
-        elif build.result != 'SUCCESS' and not build.paused:
+        # elif build.result not in ('SUCCESS', 'SKIPPED') and not build.paused:
+        elif build.result not in ('SUCCESS') and not build.paused:
             to_skip = job_graph.getDependentJobsRecursively(
                 build.job.name)
             skipped += to_skip
