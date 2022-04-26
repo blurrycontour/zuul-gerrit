@@ -1,0 +1,152 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c00e427_7b53030f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "This looks good. I do have some thoughts about making the new command.py easier to diff in the future. I\u0027m fine with addressing that here or in a followup or possibly not at all if others have good reasons for not making the suggested changes.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef704b0_49ddaaeb",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream-failure.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "Nit should we pass {{ item }} as part of key? Something like:\n\n  key: \"fail-loop-{{ item }}\"\n\nThen we can be sure that each iteration through failed.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90471064_39ee9632",
+        "filename": "zuul/ansible/2.9/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "I don\u0027t know why Gerrit marks this file as \"rewritten\" I copied the old file aside locally and diffed it against this file and the 2.8 file and both diffs are empty. All that to say the files seem to match what the commit message says they have done.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9f206e8_9280a1e9",
+        "filename": "zuul/ansible/5/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "Considering we\u0027re keeping copies of this file now for ease of removal when old versions of ansible go away should we go ahead and just make this the actual content rather than a symlink?",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ffb86d6_325934b1",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "I\u0027m looking for the source of this file to run a diff between the zuul copy and upstream and not finding it easily particularly now that ansible has split itself in a bunch of pieces. Might be a good idea to link to it here?\n\nhttps://github.com/ansible/ansible/blob/v2.12.5/lib/ansible/modules/command.py appears to be the source.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21fef896_df88a18e",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "https://github.com/ansible/ansible/blob/v2.12.5/lib/ansible/module_utils/basic.py#L1846-L2104 appears to be the source for this function.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "195f61a3_67890853",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "Nit we\u0027ve replaced it with the follow function and the thread management below. If we want to make this a bit more clear doing so in a followup is fine as this was how the old code described it too.\n\nAnother thought for the code that is replaced here it might make diffing clearer to keep the upstream code but comment it out? We do that in opendev to make diffing between upstream gitea content a bit easier. It looks like the old code did that and I personally find it helpful when doing these diffs and reviews.",
+      "range": {
+        "startLine": 491,
+        "startChar": 65,
+        "endLine": 491,
+        "endChar": 68
+      },
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c231450c_817d17de",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 722,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-26T21:45:29Z",
+      "side": 1,
+      "message": "The upstream code guards this line with this conditional:\n\n  if creates is None and removes is None:\n    r[\u0027skipped\u0027] \u003d True\n\nMight be good to reduce the delta? Also possible I\u0027m looking at a slightly newer version of the upstream file than what was adapted. If that is the case a followon change to reduce the delta seems fine to me.",
+      "range": {
+        "startLine": 722,
+        "startChar": 8,
+        "endLine": 722,
+        "endChar": 27
+      },
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
