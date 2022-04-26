@@ -4809,18 +4809,21 @@ class QueueItem(zkobject.ZKObject):
             self.removeBuild(build)
             return
 
+        self.log.debug(".............setResult for: " + str(build.job.name))
+        self.log.debug(".............build result: " + str(build.result))
         buildset = self.current_build_set
         job_graph = self.current_build_set.job_graph
         skipped = []
         # NOTE(pabelanger): Check successful/paused jobs to see if
         # zuul_return includes zuul.child_jobs.
         build_result = build.result_data.get('zuul', {})
+        self.log.debug(".............result_data: " + str(build.result_data))
         if ((build.result == 'SUCCESS' or build.paused)
                 and 'child_jobs' in build_result):
             zuul_return = build_result.get('child_jobs', [])
             dependent_jobs = job_graph.getDirectDependentJobs(
                 build.job.name)
-
+            self.log.debug("......zuul_return child jobs: " + str(zuul_return))
             if not zuul_return:
                 # If zuul.child_jobs exists and is empty, the user
                 # wants to skip all child jobs.
@@ -4833,18 +4836,24 @@ class QueueItem(zkobject.ZKObject):
 
                 for skip in (dependent_jobs - intersect_jobs):
                     s = buildset.jobs.get(skip)
+                    self.log.debug(".......skip0: " + str(s))
                     skipped.append(s)
                     to_skip = job_graph.getDependentJobsRecursively(
                         skip, skip_soft=True)
                     skipped += to_skip
+                    self.log.debug(".......skip1: " + str(to_skip))
 
-        elif build.result != 'SUCCESS' and not build.paused:
+        # elif build.result not in ('SUCCESS', 'SKIPPED') and not build.paused:
+        elif build.result not in ('SUCCESS') and not build.paused:
             to_skip = job_graph.getDependentJobsRecursively(
                 build.job.name)
             skipped += to_skip
+            self.log.debug(".......skip2: " + str(to_skip))
 
         for job in skipped:
+            self.log.debug(".......skip_all: " + job.name)
             child_build = self.current_build_set.getBuild(job.name)
+            self.log.debug(".......child_build: " + str(child_build))
             if not child_build:
                 fakebuild = Build.new(self.pipeline.manager.current_context,
                                       job=job,
