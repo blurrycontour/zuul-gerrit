@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52e6941d_5f9fae7e",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream-failure.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-26T22:01:24Z",
+      "side": 1,
+      "message": "That seems reasonable, but I agree, probably not worth a respin.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90471064_39ee9632",
@@ -69,6 +86,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81a22648_9faf3dbb",
+        "filename": "zuul/ansible/5/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-26T22:01:24Z",
+      "side": 1,
+      "message": "Maybe -- maybe let\u0027s do that if it starts to change more than it has historically?",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ffb86d6_325934b1",
@@ -86,6 +120,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49badc0b_ebcfc24f",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-26T22:01:24Z",
+      "side": 1,
+      "message": "++",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21fef896_df88a18e",
@@ -99,6 +150,23 @@
       "writtenOn": "2022-04-26T21:45:29Z",
       "side": 1,
       "message": "https://github.com/ansible/ansible/blob/v2.12.5/lib/ansible/module_utils/basic.py#L1846-L2104 appears to be the source for this function.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45fa9a21_53761d27",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-26T22:01:24Z",
+      "side": 1,
+      "message": "++",
       "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -126,6 +194,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fca1afe1_c6db832c",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-26T22:01:24Z",
+      "side": 1,
+      "message": "That\u0027s fair.  I\u0027ll try to keep that in mind next time.  I did find it easier to apply the result of the diff between the two ansible versions without the commented code.  That\u0027s probably why I removed it.",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c231450c_817d17de",
@@ -145,6 +230,23 @@
         "endLine": 722,
         "endChar": 27
       },
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7564c5f0_43f7ad58",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 722,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-04-26T22:01:24Z",
+      "side": 1,
+      "message": "Seems like we could probably keep this as-is, then do another reconciliation with the next point release.",
       "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
