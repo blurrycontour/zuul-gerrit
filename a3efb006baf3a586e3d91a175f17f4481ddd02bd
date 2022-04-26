@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "a3efb006baf3a586e3d91a175f17f4481ddd02bd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f4923c0_bb930601",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-04-26T13:31:47Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e (1 comment)\n\u003e \n\u003e This is cool, but I have the following concerns:\n\u003e \n\u003e * It is potentially fragile because of high reliance on auto-generated patternfly css attributes.  If we upgrade PF or even change our display slightly, we will likely need to update this.\n\u003e \n\u003e * Related to the above -- strictly speaking, it\u0027s asserting more than we really want to assert.  Our goal isn\u0027t to ensure that the second child of a table row is the noop job; our goal is to verify that the noop build is shown to the user.\n\u003e \n\u003e I\u0027d rather we stick to verifying the results through the REST API since that is simpler and more stable.  Then we can assume that the web UI correctly represents the REST API state (and if we want to directly add tests for that, do so separately).\n\nI modified the test to be as generic as possible, it now looks for all possible text data in pages for each string. there was a flaky wait (see [1]) that is no longer present in this patchset.\n\n[1] https://review.opendev.org/c/zuul/zuul/+/839231/2",
+      "revId": "a3efb006baf3a586e3d91a175f17f4481ddd02bd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
