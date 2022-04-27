@@ -68,6 +68,24 @@
       "parentUuid": "a5b3114d_b3834adf",
       "revId": "b363f2951a5d8611e9cf144e621bd5cd42737c7d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0516ed52_cd100aa0",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-27T20:30:20Z",
+      "side": 1,
+      "message": "Yeah, I think I\u0027d prefer to just drop this information. It would be only useful for an admin and not for the user (and an admin should be able to judge from the missing login button that auth settings are wrong). For the end user it\u0027s just confusing.",
+      "parentUuid": "e84988dd_f58f119d",
+      "revId": "b363f2951a5d8611e9cf144e621bd5cd42737c7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
