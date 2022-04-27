@@ -1,1 +1,0 @@
-../../base/actiontrusted/command.pyi
