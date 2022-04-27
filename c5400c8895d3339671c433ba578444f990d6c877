@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "743457d7_2009f59f",
+        "filename": ".zuul.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-27T19:44:22Z",
+      "side": 1,
+      "message": "0: Is there a reason for this change? It\u0027s quite common to have two spaces before such an inline comment (e.g. yamllint has a rule for that)",
+      "revId": "c5400c8895d3339671c433ba578444f990d6c877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0957c4ce_b1348ef9",
+        "filename": "tox.ini",
+        "patchSetId": 25
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-27T19:44:22Z",
+      "side": 1,
+      "message": "-1: Is this section really needed? It defines the same deps as the generic testenv.",
+      "revId": "c5400c8895d3339671c433ba578444f990d6c877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
