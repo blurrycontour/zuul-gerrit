@@ -849,8 +849,7 @@ class PipelineManager(metaclass=ABCMeta):
                     new_topic_needs_changes.append(dep.cache_key)
             update_attrs['topic_needs_changes'] = new_topic_needs_changes
 
-        if change.commit_needs_changes != new_commit_needs_changes:
-            source.setChangeAttributes(change, **update_attrs)
+        source.setChangeAttributes(change, **update_attrs)
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)

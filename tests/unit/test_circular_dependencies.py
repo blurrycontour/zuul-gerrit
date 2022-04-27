@@ -1677,6 +1677,44 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
 
+    @simple_layout('layouts/deps-by-topic.yaml')
+    def test_deps_by_topic_new_patchset(self):
+        # Make sure that we correctly update the change cache on new
+        # patchsets.
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertHistory([
+            dict(name="test-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="test-job", result="SUCCESS", changes="1,1 2,1"),
+        ], ordered=False)
+
+        A.addPatchset()
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            # Original check run
+            dict(name="test-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="test-job", result="SUCCESS", changes="1,1 2,1"),
+            # Second check run
+            dict(name="test-job", result="SUCCESS", changes="2,1 1,2"),
+        ], ordered=False)
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
