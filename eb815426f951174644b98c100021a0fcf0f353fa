@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efc5438b_d61f358f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-27T20:01:25Z",
+      "side": 1,
+      "message": "Zuul always produces a predicted future state which means applying the change onto the target branch. Doing a checkout in this case feels like the most surprising thing we could do.\n\nWhat\u0027s the exact use case you have? Having a gerrit change that is a merge? If that\u0027s the case, what\u0027s the result gerrit produces when using the cherry pick merge method?\n\nWe need to replicate the result of the \u0027merge\u0027 operation of the review system as close as possible.",
+      "revId": "eb815426f951174644b98c100021a0fcf0f353fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
