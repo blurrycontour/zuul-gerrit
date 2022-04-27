@@ -34,6 +34,24 @@
       "parentUuid": "46f4656b_3b82d056",
       "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4759a68b_e78d3d57",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-27T19:26:27Z",
+      "side": 1,
+      "message": "Right, my concern is that the code we are fixing \"failed safe\" in cases where it didn\u0027t understand the input. But now we can get an unexpected type and then echo the information that was meant to not be logged. I\u0027ve left a suggestion on the child change for improving the test to try and cover this specific thing.",
+      "parentUuid": "70fdcaa0_4d268d85",
+      "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
