@@ -33,6 +33,24 @@
       "message": "To cover the case that I\u0027m concerned about I think we need a task that sets no_log to true as well. Because what we want to avoid is bypassing no_log somehow.\n\nMaybe add a second task here that looks something like:\n\n  - name: Ensure we don\u0027t accidentally log no_log strings\n    return_strings:\n      an_arg: \u0027this is a secret non visible string\u0027\n    no_log: true\n\nThe plugin message emitted directly by the plugin itself makes this complicated. We may need a second playbook to do this so that we check that the plugin string is also missing from the test.",
       "revId": "9cb92943421d15deb6ca25c48c8853f1323a49cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e923264_92ca8035",
+        "filename": "tests/fixtures/config/ansible-json-string-results/git/org_project/playbooks/json-results-strings.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-27T23:48:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d5a2ea6_29ac41cf",
+      "revId": "9cb92943421d15deb6ca25c48c8853f1323a49cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
