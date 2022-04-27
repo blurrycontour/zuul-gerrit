@@ -400,38 +400,13 @@ playbook is in a config project, the executor runs the playbook in the
 *trusted* execution context, otherwise, it is run in the *untrusted*
 execution context.
 
-Both execution contexts use `bubblewrap`_ [#nullwrap]_ to create a namespace to
+Both execution contexts use `bubblewrap`_ to create a namespace to
 ensure that playbook executions are isolated and are unable to access
 files outside of a restricted environment.  The administrator may
 configure additional local directories on the executor to be made
 available to the restricted environment.
 
-The trusted execution context has access to all Ansible features,
-including the ability to load custom Ansible modules.  Needless to
-say, extra scrutiny should be given to code that runs in a trusted
-context as it could be used to compromise other jobs running on the
-executor, or the executor itself, especially if the administrator has
-granted additional access through bubblewrap, or a method of escaping
-the restricted environment created by bubblewrap is found.
-
-Playbooks run in the untrusted execution context are not permitted to
-load additional Ansible modules or access files outside of the
-restricted environment prepared for them by the executor.  In addition
-to the bubblewrap environment applied to both execution contexts, in
-the untrusted context some standard Ansible modules are replaced with
-versions which prohibit some actions, including attempts to access
-files outside of the restricted execution context.  These redundant
-protections are made as part of a defense-in-depth strategy.
-
 .. _bubblewrap: https://github.com/projectatomic/bubblewrap
-
-.. _zuul-discuss: http://lists.zuul-ci.org/cgi-bin/mailman/listinfo/zuul-discuss
-
-.. [#nullwrap] `bubblewrap` is integral to securely operating Zuul.
-      If it is difficult for you to use it in your environment, we
-      encourage you to let us know via the `zuul-discuss`_ mailing
-      list.
-
 
 Configuration
 ~~~~~~~~~~~~~
