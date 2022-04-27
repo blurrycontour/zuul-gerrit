@@ -51,6 +51,24 @@
       "parentUuid": "bb429312_c9060bb2",
       "revId": "79b6252370568926e69610f752f2c2618a557341",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59f54bc3_a4db4cab",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 1226,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-04-27T11:27:24Z",
+      "side": 1,
+      "message": "ignore my comment above, I overlooked the comment from Jim above.",
+      "parentUuid": "f7bb53ac_914a6cae",
+      "revId": "79b6252370568926e69610f752f2c2618a557341",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
