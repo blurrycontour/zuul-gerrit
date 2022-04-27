@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c11dd93_dad55449",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-27T12:47:30Z",
+      "side": 1,
+      "message": "nit: 2.8 and 2.9",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "1c00e427_7b53030f",
@@ -151,6 +168,24 @@
       "writtenOn": "2022-04-26T22:01:24Z",
       "side": 1,
       "message": "++",
+      "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8d4b432_d3766e8c",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-04-27T12:47:30Z",
+      "side": 1,
+      "message": "Yeah I think this makes sense. Do you want to respin or add this in a followup?",
+      "parentUuid": "49badc0b_ebcfc24f",
       "revId": "ebf5c96d577ee769e825760f5a0b88623b26f510",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
