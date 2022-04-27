@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4875a75e_dd20a7c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-27T19:26:19Z",
+      "side": 1,
+      "message": "On second thought after rereading the parent I think there is a bit more we can/should do here to cover the concern in the parent.\n\nBasically this change is good at checking the behavior we think ansible has. But what it isn\u0027t checking is the behavior of no_log when supplied expected input types. Suggestions inline on covering that.",
+      "revId": "9cb92943421d15deb6ca25c48c8853f1323a49cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d5a2ea6_29ac41cf",
+        "filename": "tests/fixtures/config/ansible-json-string-results/git/org_project/playbooks/json-results-strings.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-27T19:26:19Z",
+      "side": 1,
+      "message": "To cover the case that I\u0027m concerned about I think we need a task that sets no_log to true as well. Because what we want to avoid is bypassing no_log somehow.\n\nMaybe add a second task here that looks something like:\n\n  - name: Ensure we don\u0027t accidentally log no_log strings\n    return_strings:\n      an_arg: \u0027this is a secret non visible string\u0027\n    no_log: true\n\nThe plugin message emitted directly by the plugin itself makes this complicated. We may need a second playbook to do this so that we check that the plugin string is also missing from the test.",
+      "revId": "9cb92943421d15deb6ca25c48c8853f1323a49cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
