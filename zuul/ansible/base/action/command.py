@@ -15,16 +15,12 @@
 
 
 from zuul.ansible import paths
-from ansible.errors import AnsibleError
 command = paths._import_ansible_action_plugin("command")
 
 
 class ActionModule(command.ActionModule):
 
     def run(self, tmp=None, task_vars=None):
-        if paths._is_localhost_task(self):
-            raise AnsibleError("Executing local code is prohibited")
-
         # we need the zuul_log_id on shell and command tasks
         host = paths._sanitize_filename(task_vars.get('inventory_hostname'))
         if self._task.action in (
