@@ -33,6 +33,24 @@
       "message": "For systems like gerrit the base_sha is just the previous commit to the change. I\u0027m not sure it is entirely accurate to say that only github provides this info?",
       "revId": "79b6252370568926e69610f752f2c2618a557341",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7bb53ac_914a6cae",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 1226,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2022-04-27T11:22:31Z",
+      "side": 1,
+      "message": "It is not only available in github, but I just do not have a test environment to implement and test it for others. So the implementation for other providers could be done later (probably by Jim)",
+      "parentUuid": "bb429312_c9060bb2",
+      "revId": "79b6252370568926e69610f752f2c2618a557341",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
