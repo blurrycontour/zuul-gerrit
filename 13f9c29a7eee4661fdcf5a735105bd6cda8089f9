@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c01d1bc_49f7e3ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-27T23:48:48Z",
+      "side": 1,
+      "message": "Not approving this as I think we should land this change and the child together. Hopefully whoever reviews the child can +A this one too.",
+      "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "46f4656b_3b82d056",
@@ -86,6 +103,24 @@
       "side": 1,
       "message": "What we can test is that we don\u0027t leak the information. Whether or not we enter this block is somewhat orthogonal to checking that. Can we update the test to check that in a no_log task with strings instead of dicts we don\u0027t leak the strings?",
       "parentUuid": "7530859e_dad951af",
+      "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9302e99e_ac49b592",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-27T23:48:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2478c95_5d651a64",
       "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
