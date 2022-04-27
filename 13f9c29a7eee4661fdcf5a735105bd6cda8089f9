@@ -52,6 +52,24 @@
       "parentUuid": "70fdcaa0_4d268d85",
       "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7530859e_dad951af",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-04-27T22:34:12Z",
+      "side": 1,
+      "message": "So I can no longer get Ansible actually into this code path; empirically, v2_runner_on_ok does not actually receive anything it should not log.  even something like\n\n - name: loopit\n   foo:\n    bar: \u0027arg\u0027\n   no_log: \u0027{{ item }}\u0027\n   loop:\n     - true\n     - false\n\nwill be censored; for the above v2_runner_on_ok just receives a result._result value of\n\n {\u0027censored\u0027: \u0027...\u0027, changed: False}\n\n(I belive this is https://github.com/ansible/ansible/commit/bda074d34e46ee9862a48ed067ad42260d3f92ab -- task is no_log if any item is)\n\nThe fact that we could get here at all was the original bug, since fixed in Ansible.  I would propose removing this, but that will involve getting 3 people (including myself) to all read through the ansible changes and convince themselves that we can indeed no longer get here.  It\u0027s not an API as such, there\u0027s no documentation on what is being passed in (I can find).  So that\u0027s why I left it as the \"abundance of caution\" comment ...\n\nSo I can\u0027t really get this path tested, because you can\u0027t hit it?",
+      "parentUuid": "4759a68b_e78d3d57",
+      "revId": "13f9c29a7eee4661fdcf5a735105bd6cda8089f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
