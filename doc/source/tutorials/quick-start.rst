@@ -106,9 +106,9 @@ configuration.
 Zuul is a multi-tenant application, so that differing needs of
 independent work-groups can be supported from one system.  This
 example configures a single tenant named ``example-tenant``.  Assigned
-to this tenant are three projects: ``zuul-config``, ``test1`` and
-``test2``.  These have already been created in Gerrit and are ready
-for us to begin using.
+to this tenant are two projects: ``zuul-config`` and ``test1``.  These
+have already been created in Gerrit and are ready for us to begin
+using.
 
 Add Your Gerrit Account
 -----------------------
