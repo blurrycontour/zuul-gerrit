@@ -5505,6 +5505,9 @@ class Change(Branch):
         # This can be the commit id of the patchset enqueued or
         # in the case of a PR the id of HEAD of the branch.
         self.commit_id = None
+        # The sha of the base commit, e.g. the sha of the target branch
+        # from which the feature branch is created.
+        self.base_sha = None
 
     def deserialize(self, data):
         super().deserialize(data)
@@ -5529,6 +5532,7 @@ class Change(Branch):
         self.owner = data.get("owner")
         self.message = data.get("message")
         self.commit_id = data.get("commit_id")
+        self.base_sha = data.get("base_sha")
 
     def serialize(self):
         d = super().serialize()
@@ -5550,6 +5554,7 @@ class Change(Branch):
             "owner": self.owner,
             "message": self.message,
             "commit_id": self.commit_id,
+            "base_sha": self.base_sha,
         })
         return d
 

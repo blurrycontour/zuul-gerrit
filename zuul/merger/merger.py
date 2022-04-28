@@ -694,9 +694,22 @@ class Repo(object):
         files = set()
 
         if tosha:
+            # When "tosha" is the target branch, the result of diff() correctly
+            # excluds the files whose changes are reverted between the commits.
+            # But it may also include the files that are not changed in the
+            # referenced commit(s). This can happen, e.g. if the target branch
+            # has diverged from the feature branch.
+            # The idea is to use this result to filter out the files whose
+            # changes are reverted between the commits.
+            diff_files = set()
+            head_commit = repo.commit(head.hexsha)
+            diff_index = head_commit.diff(tosha)
+            diff_files.update((item.a_path for item in diff_index))
+
             commit_diff = "{}..{}".format(tosha, head.hexsha)
             for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+                files.update(f for f in cmt.stats.files.keys()
+                             if f in diff_files)
         else:
             files.update(head.stats.files.keys())
         return list(files)

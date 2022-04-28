@@ -1259,7 +1259,10 @@ class PipelineManager(metaclass=ABCMeta):
         log.debug("Scheduling fileschanged for item %s", item)
         build_set = item.current_build_set
 
-        to_sha = getattr(item.change, "branch", None)
+        # if base_sha is not available, fallback to branch
+        to_sha = getattr(item.change, "base_sha",
+                         getattr(item.change, "branch", None))
+
         self.sched.merger.getFilesChanges(
             item.change.project.connection_name, item.change.project.name,
             item.change.ref, to_sha, build_set=build_set,
