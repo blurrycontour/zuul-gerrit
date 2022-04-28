@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd63a043_a48f4de2",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-04-28T18:07:59Z",
+      "side": 1,
+      "message": "Based on tracebacks I\u0027m seeing in the failing tests, this is apparently returning None and then raising TypeError because you want to concatenate NoneType to the leading newline str here.",
+      "revId": "db088f4d734bcb8122795fa6bb31d21fa60fd135",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
