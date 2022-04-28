@@ -615,7 +615,7 @@ class JobParser(object):
                       'post-run': to_list(str),
                       'run': to_list(str),
                       'cleanup-run': to_list(str),
-                      'ansible-version': vs.Any(str, float),
+                      'ansible-version': vs.Any(str, float, int),
                       '_source_context': model.SourceContext,
                       '_start_mark': model.ZuulMark,
                       'roles': to_list(role),
@@ -753,8 +753,8 @@ class JobParser(object):
 
         # Configure and validate ansible version
         if 'ansible-version' in conf:
-            # The ansible-version can be treated by yaml as a float so convert
-            # it to a string.
+            # The ansible-version can be treated by yaml as a float or
+            # int so convert it to a string.
             ansible_version = str(conf['ansible-version'])
             self.pcontext.ansible_manager.requestVersion(ansible_version)
             job.ansible_version = ansible_version
