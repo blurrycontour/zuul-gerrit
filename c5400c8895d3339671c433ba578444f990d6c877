@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "92a14223_578ebb01",
+        "filename": ".zuul.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-28T12:44:05Z",
+      "side": 1,
+      "message": "This looks like an automated formatting, sorry about this.",
+      "parentUuid": "743457d7_2009f59f",
+      "revId": "c5400c8895d3339671c433ba578444f990d6c877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0957c4ce_b1348ef9",
         "filename": "tox.ini",
         "patchSetId": 25
@@ -31,6 +49,24 @@
       "writtenOn": "2022-04-27T19:44:22Z",
       "side": 1,
       "message": "-1: Is this section really needed? It defines the same deps as the generic testenv.",
+      "revId": "c5400c8895d3339671c433ba578444f990d6c877",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ad455ae_cfddc9f0",
+        "filename": "tox.ini",
+        "patchSetId": 25
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-04-28T12:44:05Z",
+      "side": 1,
+      "message": "Let\u0027s remove it and make sure it\u0027s not needed",
+      "parentUuid": "0957c4ce_b1348ef9",
       "revId": "c5400c8895d3339671c433ba578444f990d6c877",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
