@@ -1026,9 +1026,6 @@ class AnsibleJob(object):
 
         plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
             self.ansible_version)
-        self.ara_callbacks = \
-            self.executor_server.ansible_manager.getAraCallbackPlugin(
-                self.ansible_version)
         self.library_dir = os.path.join(plugin_dir, 'library')
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
@@ -2554,15 +2551,7 @@ class AnsibleJob(object):
         logging_config.writeJson(self.jobdir.logging_json)
 
     def writeAnsibleConfig(self, jobdir_playbook):
-        # TODO(mordred) This should likely be extracted into a more generalized
-        #               mechanism for deployers being able to add callback
-        #               plugins.
-        if self.ara_callbacks:
-            callback_path = '%s:%s' % (
-                self.callback_dir,
-                os.path.dirname(self.ara_callbacks))
-        else:
-            callback_path = self.callback_dir
+        callback_path = self.callback_dir
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('inventory = %s\n' % jobdir_playbook.inventory)
@@ -2668,8 +2657,6 @@ class AnsibleJob(object):
                     for key, value in os.environ.copy().items()
                     if not key.startswith("ZUUL_")}
         env_copy.update(self.ssh_agent.env)
-        if self.ara_callbacks:
-            env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
         if self.executor_server.log_console_port != DEFAULT_STREAM_PORT:
