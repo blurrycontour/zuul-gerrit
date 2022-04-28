@@ -3789,6 +3789,9 @@ class FunctionalAnsibleMixIn(object):
                                         build_python27.uuid + '.secrets')
             with open(secrets_path) as f:
                 self.assertEqual(f.read(), "test-username test-password")
+        build_bubblewrap = self.getJobFromHistory('bubblewrap')
+        with self.jobLog(build_bubblewrap):
+            self.assertEqual(build_bubblewrap.result, 'SUCCESS')
 
     def test_repo_ansible(self):
         A = self.fake_gerrit.addFakeChange('org/ansible', 'master', 'A')

@@ -239,3 +239,9 @@
     name: failpost
     run: playbooks/post-broken.yaml
     post-run: playbooks/post-broken.yaml
+
+- job:
+    name: bubblewrap
+    run: playbooks/bubblewrap.yaml
+    nodeset:
+      nodes: []
