@@ -1988,11 +1988,12 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         return super(FakeGitlabConnection, self).getGitUrl(project)
 
     def openFakeMergeRequest(self, project,
-                             branch, title, description='', files=[]):
+                             branch, title, description='', files=[],
+                             base_sha=None):
         self.mr_number += 1
         merge_request = FakeGitlabMergeRequest(
             self, self.mr_number, project, branch, title, self.upstream_root,
-            files=files, description=description)
+            files=files, description=description, base_sha=base_sha)
         self.merge_requests.setdefault(
             project, {})[str(self.mr_number)] = merge_request
         return merge_request
@@ -2078,7 +2079,8 @@ class FakeGitlabMergeRequest(object):
     log = logging.getLogger("zuul.test.FakeGitlabMergeRequest")
 
     def __init__(self, gitlab, number, project, branch,
-                 subject, upstream_root, files=[], description=''):
+                 subject, upstream_root, files=[], description='',
+                 base_sha=None):
         self.gitlab = gitlab
         self.source = gitlab
         self.number = number
@@ -2099,18 +2101,20 @@ class FakeGitlabMergeRequest(object):
         self.notes = []
         self.url = "https://%s/%s/merge_requests/%s" % (
             self.gitlab.server, self.project, self.number)
+        self.base_sha = base_sha
         self.approved = False
-        self.mr_ref = self._createMRRef()
+        self.mr_ref = self._createMRRef(base_sha=base_sha)
         self._addCommitInMR(files=files)
 
     def _getRepo(self):
         repo_path = os.path.join(self.upstream_root, self.project)
         return git.Repo(repo_path)
 
-    def _createMRRef(self):
+    def _createMRRef(self, base_sha=None):
+        base_sha = base_sha or 'refs/tags/init'
         repo = self._getRepo()
         return GitlabChangeReference.create(
-            repo, self.getMRReference(), 'refs/tags/init')
+            repo, self.getMRReference(), base_sha)
 
     def getMRReference(self):
         return '%s/head' % self.number
@@ -2123,8 +2127,8 @@ class FakeGitlabMergeRequest(object):
             }
         )
 
-    def addCommit(self, files=[]):
-        self._addCommitInMR(files=files)
+    def addCommit(self, files=[], delete_files=None):
+        self._addCommitInMR(files=files, delete_files=delete_files)
         self._updateTimeStamp()
 
     def closeMergeRequest(self):
@@ -2142,7 +2146,7 @@ class FakeGitlabMergeRequest(object):
         self._updateTimeStamp()
         self.merged_at = None
 
-    def _addCommitInMR(self, files=[], reset=False):
+    def _addCommitInMR(self, files=[], delete_files=None, reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getMRReference()]
         if reset:
@@ -2163,6 +2167,11 @@ class FakeGitlabMergeRequest(object):
             with open(fn, 'w') as f:
                 f.write(content)
             repo.index.add([fn])
+
+        if delete_files:
+            for fn in delete_files:
+                fn = os.path.join(repo.working_dir, fn)
+                repo.index.remove([fn])
 
         self.sha = repo.index.commit(msg).hexsha
 
