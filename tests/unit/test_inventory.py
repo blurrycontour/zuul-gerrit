@@ -445,7 +445,8 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
         # Output extra ansible info so we might see errors.
         self.executor_server.verbose = True
         A = self.fake_gerrit.addFakeChange(
-            'org/project2', 'master', expected_message)
+            'org/project2', 'master', expected_message,
+            files={'jinja.txt': 'foo'})
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([
@@ -476,6 +477,19 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
 
     def test_jinja2_message_raw(self):
         self._jinja2_message("This message has {% raw %} in {% endraw %} it ")
+
+    def test_network_inventory(self):
+        # Network appliances can't run the freeze or setup playbooks,
+        # so they won't have any job variables available.  But they
+        # should still have nodepool hostvars.  Run a playbook that
+        # verifies that.
+        A = self.fake_gerrit.addFakeChange(
+            'org/project2', 'master', 'A',
+            files={'network.txt': 'foo'})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='network', result='SUCCESS', changes='1,1')])
 
 
 class TestWindowsInventory(TestInventoryBase):
