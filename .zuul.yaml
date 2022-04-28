@@ -93,13 +93,12 @@
       tox_envlist: zuul_client
 
 - job:
-    name: zuul-tox-py36
+    name: zuul-tox-py39
     parent: zuul-tox
     timeout: 5400  # 90 minutes
     vars:
-      tox_envlist: py36
-      python_version: 3.6
-    nodeset: ubuntu-bionic
+      tox_envlist: py39
+      python_version: 3.9
 
 - job:
     name: zuul-tox-py38
@@ -110,8 +109,8 @@
       python_version: 3.8
 
 - job:
-    name: zuul-tox-py38-multi-scheduler
-    parent: zuul-tox-py38
+    name: zuul-tox-py39-multi-scheduler
+    parent: zuul-tox-py39
     voting: false
     vars:
       tox_environment:
@@ -285,9 +284,9 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - zuul-tox-py36
         - zuul-tox-py38
-        - zuul-tox-py38-multi-scheduler
+        - zuul-tox-py39
+        - zuul-tox-py39-multi-scheduler
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -314,8 +313,8 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - zuul-tox-py36
         - zuul-tox-py38
+        - zuul-tox-py39
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
