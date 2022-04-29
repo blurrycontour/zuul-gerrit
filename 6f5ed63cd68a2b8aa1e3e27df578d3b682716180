@@ -16,6 +16,24 @@
       "message": "https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples/playbooks/setup.yaml#L86-L90 shows that test2 should be created.",
       "revId": "6f5ed63cd68a2b8aa1e3e27df578d3b682716180",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0251c37_ec75e9e2",
+        "filename": "doc/source/tutorials/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 34800
+      },
+      "writtenOn": "2022-04-29T17:36:12Z",
+      "side": 1,
+      "message": "I see. It is then just an empty project that is not really used in quick-start tutorial. Perhaps it should be removed? \nAs a beginner, I was confused by the reference to test2 because the tutorial didn\u0027t use it.",
+      "parentUuid": "717119be_e46dbc0a",
+      "revId": "6f5ed63cd68a2b8aa1e3e27df578d3b682716180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
