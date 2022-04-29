@@ -350,6 +350,11 @@ order to be enqueued into the pipeline.
       A boolean value (``true`` or ``false``) that indicates whether the
       change must be the current patchset in order to be enqueued.
 
+   .. attr:: wip
+
+      A boolean value (``true`` or ``false``) that indicates whether the
+      change must be wip or not wip in order to be enqueued.
+
    .. attr:: status
 
       A string value that corresponds with the status of the change
