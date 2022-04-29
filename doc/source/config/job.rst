@@ -375,10 +375,11 @@ Here is an example of two job definitions:
 
       If a job has an empty (or no) :ref:`nodeset` definition, it will
       still run and is able to perform limited actions within the Zuul
-      executor sandbox.  Note so-called "executor-only" jobs run with
-      an empty inventory, and hence Ansible's *implicit localhost*.
-      This means an executor-only playbook must be written to match
-      ``localhost`` directly; i.e.
+      executor sandbox (e.g. copying files or triggering APIs).  Note
+      so-called "executor-only" jobs run with an empty inventory, and
+      hence Ansible's *implicit localhost*.  This means an
+      executor-only playbook must be written to match ``localhost``
+      directly; i.e.
 
       .. code-block:: yaml
 
@@ -879,6 +880,23 @@ Here is an example of two job definitions:
 
       See :attr:`pragma.implied-branch-matchers` for how to override
       this behavior on a per-file basis.
+
+      .. note::
+
+         A common misconception is that **branches** is a type of
+         filter that indicates the job variants should only be created
+         for a select set of branches. This is incorrect however; as the
+         job variants are always created on every branch in which they are
+         seen by zuul, and **branches** allows that job to target a
+         branch *instead* of the implicit default of the branch on which
+         it currently lives.
+
+         If the **branches** property is incorrectly used as a filter
+         (for example, setting it to `master` in an attempt to prevent the
+         job from running on any branch except for `master`), strange
+         behaviors can occur because Zuul will end up seeing multiple jobs
+         that target the same branch and will attempt to combine them
+         together.
 
    .. attr:: files
 
