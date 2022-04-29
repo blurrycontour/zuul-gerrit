@@ -880,6 +880,23 @@ Here is an example of two job definitions:
       See :attr:`pragma.implied-branch-matchers` for how to override
       this behavior on a per-file basis.
 
+      .. note::
+
+         A common misconception is that :attr:`branches` is a type of
+         filter that indicates the job variants should only be created
+         for a select set of branches. This is incorrect however; as the
+         job variants are always created on every branch in which they are
+         seen by zuul, and :attr:`branches` allows that job to target a
+         branch *instead* of the implicit default of the branch on which
+         it currently lives.
+
+         If the :attr:`branches` property is incorrectly used as a filter
+         (for example, setting it to `master` in an attempt to prevent the
+         job from running on any branch except for `master`), strange
+         behaviors can occur because Zuul will end up seeing multiple jobs
+         that target the same branch and will attempt to combine them
+         together.
+
    .. attr:: files
 
       This indicates that the job should only run on changes where the
