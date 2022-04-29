@@ -225,7 +225,7 @@ reviewer approves the change in Gerrit.  It will run test jobs again
 (in case other changes have merged since the change in question was
 uploaded) and if these final tests pass, will automatically merge the
 change.  To configure these pipelines, copy the following file into
-`zuul.d/pipelines.yaml`:
+``zuul.d/pipelines.yaml``:
 
 .. literalinclude:: /examples/zuul-config/zuul.d/pipelines.yaml
    :language: yaml
