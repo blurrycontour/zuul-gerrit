@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "717119be_e46dbc0a",
+        "filename": "doc/source/tutorials/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-04-29T16:53:06Z",
+      "side": 1,
+      "message": "https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples/playbooks/setup.yaml#L86-L90 shows that test2 should be created.",
+      "revId": "6f5ed63cd68a2b8aa1e3e27df578d3b682716180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
