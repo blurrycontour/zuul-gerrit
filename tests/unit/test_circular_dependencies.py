@@ -17,7 +17,7 @@ import textwrap
 
 from zuul.model import PromoteEvent
 
-from tests.base import ZuulTestCase, simple_layout
+from tests.base import ZuulTestCase, simple_layout, iterate_timeout
 
 
 class TestGerritCircularDependencies(ZuulTestCase):
@@ -1113,6 +1113,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
                 """
                 - job:
                     name: project-vars-job
+                    deduplicate: false
                     vars:
                       test_var: pass
 
@@ -1535,6 +1536,362 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
         self.assertEqual(C.data['status'], 'MERGED')
+
+    def _test_job_deduplication(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+
+    @simple_layout('layouts/job-dedup-auto-shared.yaml')
+    def test_job_deduplication_auto_shared(self):
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 3)
+
+    @simple_layout('layouts/job-dedup-auto-unshared.yaml')
+    def test_job_deduplication_auto_unshared(self):
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is not deduplicated
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 4)
+
+    @simple_layout('layouts/job-dedup-true.yaml')
+    def test_job_deduplication_true(self):
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 3)
+
+    @simple_layout('layouts/job-dedup-false.yaml')
+    def test_job_deduplication_false(self):
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is not deduplicated, though it would be under auto
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 4)
+
+    @simple_layout('layouts/job-dedup-empty-nodeset.yaml')
+    def test_job_deduplication_empty_nodeset(self):
+        # Make sure that jobs with empty nodesets can still be
+        # deduplicated
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 0)
+
+    @simple_layout('layouts/job-dedup-auto-shared.yaml')
+    def test_job_deduplication_failed_node_request(self):
+        # Pause nodepool so we can fail the node request later
+        self.fake_nodepool.pause()
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        # Fail the node request and unpause
+        for req in self.fake_nodepool.getNodeRequests():
+            if req['requestor_data']['job_name'] == 'common-job':
+                self.fake_nodepool.addFailRequest(req)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertHistory([])
+        self.assertEqual(len(self.fake_nodepool.history), 3)
+
+    @simple_layout('layouts/job-dedup-auto-shared.yaml')
+    def test_job_deduplication_failed_job(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.executor_server.failJob("common-job", A)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="FAILURE", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 3)
+
+    @simple_layout('layouts/job-dedup-retry.yaml')
+    def test_job_deduplication_retry(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.executor_server.retryJob('common-job', A)
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # There should be exactly 3 runs of the job (not 6)
+            dict(name="common-job", result=None, changes="2,1 1,1"),
+            dict(name="common-job", result=None, changes="2,1 1,1"),
+            dict(name="common-job", result=None, changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 5)
+
+    @simple_layout('layouts/job-dedup-retry-child.yaml')
+    def test_job_deduplication_retry_child(self):
+        # This tests retrying a paused build (simulating an executor restart)
+        # See test_data_return_child_from_retried_paused_job
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.executor_server.returnData(
+            'parent-job', A,
+            {'zuul': {'pause': True}}
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.executor_server.release('parent-job')
+        self.waitUntilSettled("till job is paused")
+
+        paused_job = self.builds[0]
+        self.assertTrue(paused_job.paused)
+
+        # Stop the job worker to simulate an executor restart
+        for job_worker in self.executor_server.job_workers.values():
+            if job_worker.build_request.uuid == paused_job.uuid:
+                job_worker.stop()
+        self.waitUntilSettled("stop job worker")
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled("all jobs are done")
+        # The "pause" job might be paused during the waitUntilSettled
+        # call and appear settled; it should automatically resume
+        # though, so just wait for it.
+        for x in iterate_timeout(60, 'paused job'):
+            if not self.builds:
+                break
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertHistory([
+            dict(name="parent-job", result="ABORTED", changes="2,1 1,1"),
+            dict(name="project1-job", result="ABORTED", changes="2,1 1,1"),
+            dict(name="project2-job", result="ABORTED", changes="2,1 1,1"),
+            dict(name="parent-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 6)
+
+    @simple_layout('layouts/job-dedup-parent-data.yaml')
+    def test_job_deduplication_parent_data(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        # The parent job returns data
+        self.executor_server.returnData(
+            'parent-job', A,
+            {'zuul':
+             {'artifacts': [
+                 {'name': 'image',
+                  'url': 'http://example.com/image',
+                  'metadata': {
+                      'type': 'container_image'
+                  }},
+             ]}}
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertHistory([
+            dict(name="parent-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # Only one run of the common job since it's the same
+            dict(name="common-child-job", result="SUCCESS", changes="2,1 1,1"),
+            # The forked job depends on different parents
+            # so it should run twice
+            dict(name="forked-child-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="forked-child-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 6)
+
+    def _test_job_deduplication_semaphore(self):
+        "Test semaphores with max=1 (mutex) and get resources first"
+        self.executor_server.hold_jobs_in_build = True
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 3)
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+    @simple_layout('layouts/job-dedup-semaphore.yaml')
+    def test_job_deduplication_semaphore(self):
+        self._test_job_deduplication_semaphore()
+
+    @simple_layout('layouts/job-dedup-semaphore-first.yaml')
+    def test_job_deduplication_semaphore_resources_first(self):
+        self._test_job_deduplication_semaphore()
 
     def test_submitted_together(self):
         self.fake_gerrit._fake_submit_whole_topic = True

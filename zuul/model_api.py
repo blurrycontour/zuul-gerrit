@@ -14,4 +14,4 @@
 
 # When making ZK schema changes, increment this and add a record to
 # docs/developer/model-changelog.rst
-MODEL_API = 7
+MODEL_API = 8
