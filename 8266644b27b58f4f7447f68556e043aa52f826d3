@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cf585e8_290c2755",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31760
+      },
+      "writtenOn": "2022-04-30T07:12:52Z",
+      "side": 1,
+      "message": "Does the quick-start.yaml / test needs to be updated in a separate commit first?",
+      "revId": "8266644b27b58f4f7447f68556e043aa52f826d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
