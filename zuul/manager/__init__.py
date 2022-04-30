@@ -951,7 +951,7 @@ class PipelineManager(metaclass=ABCMeta):
         jobs_to_cancel = item.getJobs()
 
         for job in jobs_to_cancel:
-            self.sched.cancelJob(old_build_set, job)
+            self.sched.cancelJob(old_build_set, job, final=True)
 
         # Don't reset builds for a failing bundle when it has already started
         # reporting, to keep available build results. Those items will be
