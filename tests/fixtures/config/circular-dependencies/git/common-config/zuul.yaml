@@ -67,6 +67,7 @@
     name: base
     parent: null
     run: playbooks/run.yaml
+    deduplicate: false
     required-projects:
       - common-config
       - org/project

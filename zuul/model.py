@@ -2005,6 +2005,7 @@ class FrozenJob(zkobject.ZKObject):
                   'requires',
                   'workspace_scheme',
                   'config_hash',
+                  'deduplicate',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -2018,8 +2019,32 @@ class FrozenJob(zkobject.ZKObject):
                            'affected_projects',
                            )
 
+    def __init__(self):
+        super().__init__()
+        self._set(_ready_to_run=False)
+
     def __repr__(self):
         return '<FrozenJob %s>' % (self.name)
+
+    def isEqual(self, other):
+        # Compare two frozen jobs to determine whether they are
+        # effectively equal.  The inheritance path will always be
+        # different, so it is ignored.  But if otherwise they have the
+        # same attributes, they will probably produce the same
+        # results.
+        if not isinstance(other, FrozenJob):
+            return False
+        if self.name != other.name:
+            return False
+        for k in self.attributes:
+            if k in ['inheritance_path', 'waiting_status', 'queued']:
+                continue
+            if getattr(self, k) != getattr(other, k):
+                return False
+        for k in self.job_data_attributes:
+            if getattr(self, k) != getattr(other, k):
+                return False
+        return True
 
     @classmethod
     def new(klass, context, **kw):
@@ -2367,6 +2392,7 @@ class Job(ConfigObject):
                                     self.cleanup_run))
         d['post_review'] = self.post_review
         d['match_on_config_updates'] = self.match_on_config_updates
+        d['deduplicate'] = self.deduplicate
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -2404,6 +2430,7 @@ class Job(ConfigObject):
             irrelevant_file_matcher=None,  # skip-if
             _irrelevant_files=(),
             match_on_config_updates=True,
+            deduplicate='auto',
             tags=frozenset(),
             provides=frozenset(),
             requires=frozenset(),
@@ -3040,6 +3067,16 @@ class JobDependency(ConfigObject):
         super(JobDependency, self).__init__()
         self.name = name
         self.soft = soft
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, JobDependency):
+            return False
+        return self.toDict() == other.toDict()
+
+    __hash__ = object.__hash__
 
     def toDict(self):
         return {'name': self.name,
@@ -3698,6 +3735,7 @@ class BuildSet(zkobject.ZKObject):
             fail_fast=False,
             job_graph=None,
             jobs={},
+            deduplicated_jobs=[],
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
@@ -4028,7 +4066,22 @@ class BuildSet(zkobject.ZKObject):
 
     def removeJobNodeRequestID(self, job_name):
         if job_name in self.node_requests:
-            del self.node_requests[job_name]
+            with self.activeContext(
+                    self.item.pipeline.manager.current_context):
+                del self.node_requests[job_name]
+
+    def setJobNodeRequestDuplicate(self, job_name, other_item):
+        with self.activeContext(
+                self.item.pipeline.manager.current_context):
+            self.node_requests[job_name] = {
+                'deduplicated_item': other_item.uuid}
+
+    def setJobNodeSetInfoDuplicate(self, job_name, other_item):
+        # Nothing uses this value yet; we just need an entry in the
+        # nodset_info dict.
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.nodeset_info[job_name] = {
+                'deduplicated_item': other_item.uuid}
 
     def jobNodeRequestComplete(self, job_name, nodeset):
         if job_name in self.nodeset_info:
@@ -4415,7 +4468,7 @@ class QueueItem(zkobject.ZKObject):
                 continue
             build = self.current_build_set.getBuild(job.name)
             if (build and build.result and
-                    build.result not in ['SUCCESS', 'SKIPPED']):
+                    build.result not in ['SUCCESS', 'SKIPPED', 'RETRY']):
                 return True
         return False
 
@@ -4626,7 +4679,8 @@ class QueueItem(zkobject.ZKObject):
             data = []
             ret = self.item_ahead.providesRequirements(job, data)
             data.reverse()
-            job.setArtifactData(data)
+            if data:
+                job.setArtifactData(data)
         except RequirementsError as e:
             self.warning(str(e))
             fakebuild = Build.new(self.pipeline.manager.current_context,
@@ -4637,24 +4691,36 @@ class QueueItem(zkobject.ZKObject):
             ret = False
         return ret
 
-    def findJobsToRun(self, semaphore_handler):
-        torun = []
-        if not self.live:
-            return []
-        if not self.current_build_set.job_graph:
-            return []
-        if self.item_ahead:
-            # Only run jobs if any 'hold' jobs on the change ahead
-            # have completed successfully.
-            if self.item_ahead.isHoldingFollowingChanges():
-                return []
+    def findDuplicateJob(self, job):
+        """
+        If another item in the bundle has a duplicate job,
+        return the other item
+        """
+        if not self.bundle:
+            return None
+        if job.deduplicate is False:
+            return None
+        for other_item in self.bundle.items:
+            if other_item is self:
+                continue
+            for other_job in other_item.getJobs():
+                if other_job.isEqual(job):
+                    if job.deduplicate == 'auto':
+                        # Deduplicate if there are required projects
+                        # or the item project is the same.
+                        if (not job.required_projects and
+                            self.change.project != other_item.change.project):
+                            continue
+                    return other_item
 
+    def updateJobParentData(self):
         job_graph = self.current_build_set.job_graph
         failed_job_names = set()  # Jobs that run and failed
         ignored_job_names = set()  # Jobs that were skipped or canceled
         unexecuted_job_names = set()  # Jobs that were not started yet
         jobs_not_started = set()
         for job in job_graph.getJobs():
+            job._set(_ready_to_run=False)
             build = self.current_build_set.getBuild(job.name)
             if build:
                 if build.result == 'SUCCESS' or build.paused:
@@ -4667,8 +4733,6 @@ class QueueItem(zkobject.ZKObject):
                 unexecuted_job_names.add(job.name)
                 jobs_not_started.add(job)
 
-        # Attempt to run jobs in the order they appear in
-        # configuration.
         for job in job_graph.getJobs():
             if job not in jobs_not_started:
                 continue
@@ -4719,7 +4783,88 @@ class QueueItem(zkobject.ZKObject):
                     job.setParentData(new_parent_data,
                                       new_secret_parent_data,
                                       new_artifact_data)
+                job._set(_ready_to_run=True)
 
+    def deduplicateJobs(self, log):
+        """Sync node request and build info with deduplicated jobs"""
+        if not self.live:
+            return
+        if not self.current_build_set.job_graph:
+            return
+        if self.item_ahead:
+            # Only run jobs if any 'hold' jobs on the change ahead
+            # have completed successfully.
+            if self.item_ahead.isHoldingFollowingChanges():
+                return
+
+        self.updateJobParentData()
+
+        if not self.bundle:
+            return None
+
+        build_set = self.current_build_set
+        job_graph = build_set.job_graph
+        for job in job_graph.getJobs():
+            this_request = build_set.getJobNodeRequestID(job.name)
+            this_nodeset = build_set.getJobNodeSetInfo(job.name)
+            this_build = build_set.getBuild(job.name)
+
+            if this_build:
+                # Nothing more possible for this job
+                continue
+
+            other_item = self.findDuplicateJob(job)
+            if not other_item:
+                continue
+            other_build_set = other_item.current_build_set
+
+            # Handle node requests
+            other_request = other_build_set.getJobNodeRequestID(job.name)
+            if (isinstance(other_request, dict) and
+                other_request.get('deduplicated_item') == self.uuid):
+                # We're the original, but we're probably in the middle
+                # of a retry
+                return
+            if other_request is not None and this_request is None:
+                log.info("Deduplicating request of bundle job %s for item %s "
+                         "with item %s", job, self, other_item)
+                build_set.setJobNodeRequestDuplicate(job.name, other_item)
+
+            # Handle provisioned nodes
+            other_nodeset = other_build_set.getJobNodeSetInfo(job.name)
+            if (isinstance(other_nodeset, dict) and
+                other_nodeset.get('deduplicated_item') == self.uuid):
+                # We're the original, but we're probably in the middle
+                # of a retry
+                return
+            if other_nodeset is not None and this_nodeset is None:
+                log.info("Deduplicating nodeset of bundle job %s for item %s "
+                         "with item %s", job, self, other_item)
+                build_set.setJobNodeSetInfoDuplicate(job.name, other_item)
+
+            # Handle builds
+            other_build = other_build_set.getBuild(job.name)
+            if other_build and not this_build:
+                log.info("Deduplicating build of bundle job %s for item %s "
+                         "with item %s", job, self, other_item)
+                self.addBuild(other_build)
+                job._set(_ready_to_run=False)
+
+    def findJobsToRun(self, semaphore_handler):
+        torun = []
+        if not self.live:
+            return []
+        if not self.current_build_set.job_graph:
+            return []
+        if self.item_ahead:
+            # Only run jobs if any 'hold' jobs on the change ahead
+            # have completed successfully.
+            if self.item_ahead.isHoldingFollowingChanges():
+                return []
+
+        job_graph = self.current_build_set.job_graph
+        for job in job_graph.getJobs():
+            if job._ready_to_run:
                 nodeset = self.current_build_set.getJobNodeSetInfo(job.name)
                 if nodeset is None:
                     # The nodes for this job are not ready, skip

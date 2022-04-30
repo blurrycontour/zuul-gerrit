@@ -45,6 +45,7 @@
     name: base
     parent: null
     run: playbooks/base.yaml
+    deduplicate: false
     nodeset:
       nodes:
         - label: ubuntu-xenial

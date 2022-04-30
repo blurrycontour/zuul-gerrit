@@ -3119,6 +3119,8 @@ class FakeBuild(object):
         result = (RecordingAnsibleJob.RESULT_NORMAL, 0)  # Success
         if self.shouldFail():
             result = (RecordingAnsibleJob.RESULT_NORMAL, 1)  # Failure
+        if self.shouldRetry():
+            result = (RecordingAnsibleJob.RESULT_NORMAL, None)
         if self.aborted:
             result = (RecordingAnsibleJob.RESULT_ABORTED, None)
         if self.requeue:
@@ -3131,6 +3133,17 @@ class FakeBuild(object):
         for change in changes:
             if self.hasChanges(change):
                 return True
+        return False
+
+    def shouldRetry(self):
+        entries = self.executor_server.retry_tests.get(self.name, [])
+        for entry in entries:
+            if self.hasChanges(entry['change']):
+                if entry['retries'] is None:
+                    return True
+                if entry['retries']:
+                    entry['retries'] = entry['retries'] - 1
+                    return True
         return False
 
     def writeReturnData(self):
@@ -3478,6 +3491,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.running_builds = []
         self.build_history = []
         self.fail_tests = {}
+        self.retry_tests = {}
         self.return_data = {}
         self.job_builds = {}
 
@@ -3493,6 +3507,19 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         l = self.fail_tests.get(name, [])
         l.append(change)
         self.fail_tests[name] = l
+
+    def retryJob(self, name, change, retries=None):
+        """Instruct the executor to report matching builds as retries.
+
+        :arg str name: The name of the job to fail.
+        :arg Change change: The :py:class:`~tests.base.FakeChange`
+            instance which should cause the job to fail.  This job
+            will also fail for changes depending on this change.
+
+        """
+        self.retry_tests.setdefault(name, []).append(
+            dict(change=change,
+                 retries=retries))
 
     def returnData(self, name, change, data):
         """Instruct the executor to return data for this build.
@@ -3634,6 +3661,7 @@ class FakeNodepool(object):
         self.python_path = 'auto'
         self.shell_type = None
         self.connection_port = None
+        self.history = []
 
     def stop(self):
         self._running = False
@@ -3792,6 +3820,7 @@ class FakeNodepool(object):
         if request['state'] != 'requested':
             return
         request = request.copy()
+        self.history.append(request)
         oid = request['_oid']
         del request['_oid']
 
