@@ -23,6 +23,7 @@ pragma directives may not be set and then unset within the same file.
    The pragma item currently supports the following attributes:
 
    .. attr:: implied-branch-matchers
+      :default: True
 
       This is a boolean, which, if set, may be used to enable
       (``True``) or disable (``False``) the addition of implied branch
