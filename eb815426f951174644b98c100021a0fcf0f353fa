@@ -16,6 +16,24 @@
       "message": "Zuul always produces a predicted future state which means applying the change onto the target branch. Doing a checkout in this case feels like the most surprising thing we could do.\n\nWhat\u0027s the exact use case you have? Having a gerrit change that is a merge? If that\u0027s the case, what\u0027s the result gerrit produces when using the cherry pick merge method?\n\nWe need to replicate the result of the \u0027merge\u0027 operation of the review system as close as possible.",
       "revId": "eb815426f951174644b98c100021a0fcf0f353fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eca1a4d_a2511433",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2022-05-02T12:58:55Z",
+      "side": 1,
+      "message": "Gerrit will always do a merge when the Gerrit itself is a merge, which can result in a merge of a merge\n \n A \u003c- master\n |\\\n B C\n |/ \\\n D   E \u003c- feature\n\n\nIf you merge `feature` into `master` when `master` is at commit D, it will make commit C, which is uploaded to Gerrit. If B is submitted in the mean time, then when C is submitted, Gerrit will merge the merge into `master` to make a new commit A.\n\nTL; DR it does a merge. I\u0027ll make Zuul match.",
+      "parentUuid": "efc5438b_d61f358f",
+      "revId": "eb815426f951174644b98c100021a0fcf0f353fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
