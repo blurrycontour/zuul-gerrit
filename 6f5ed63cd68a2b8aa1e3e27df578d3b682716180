@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f187d181_0fb6f7c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34800
+      },
+      "writtenOn": "2022-05-02T19:39:57Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e As Clark mentioned, it\u0027s intentionally created.  It\u0027s there so that users can experiment with other repos, including cross-repo deps.\n\nThat is fair. I\u0027d recommend making a note of what you just said \"so that users can experiment with other repos, including cross-repo deps\" in the tutorial itself about test2. I was expecting to see a step in the tutorial involving test2. ",
+      "revId": "6f5ed63cd68a2b8aa1e3e27df578d3b682716180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "717119be_e46dbc0a",
         "filename": "doc/source/tutorials/quick-start.rst",
         "patchSetId": 2
