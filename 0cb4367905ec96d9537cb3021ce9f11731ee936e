@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e37d3f70_e530586b",
+        "filename": "doc/source/config/pragma.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-02T19:10:55Z",
+      "side": 1,
+      "message": "Looking at the code [0][1] the default appears to be None (which is equivalent to unset). Can you expand a bit on why the documentation is not complete here? I\u0027m missing it.\n\n[0] https://opendev.org/zuul/zuul/src/branch/master/zuul/configloader.py#L443-L447\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/configloader.py#L1470-L1477",
+      "revId": "0cb4367905ec96d9537cb3021ce9f11731ee936e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
