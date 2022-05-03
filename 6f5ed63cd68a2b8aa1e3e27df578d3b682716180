@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7382c0af_cd5cc475",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-05-03T18:31:07Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e As Clark mentioned, it\u0027s intentionally created.  It\u0027s there so that users can experiment with other repos, including cross-repo deps.\n\nhttps://review.opendev.org/c/zuul/zuul/+/732071 😊",
+      "revId": "6f5ed63cd68a2b8aa1e3e27df578d3b682716180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "717119be_e46dbc0a",
