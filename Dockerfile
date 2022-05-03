@@ -19,7 +19,7 @@ COPY web /tmp/src
 # Explicitly run the Javascript build
 RUN cd /tmp/src && yarn install -d && yarn build
 
-FROM docker.io/opendevorg/python-builder:3.8-bullseye as builder
+FROM docker.io/opendevorg/python-builder:3.10-bullseye as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Optional location of Zuul API endpoint.
@@ -48,7 +48,7 @@ RUN /output/install-from-bindep \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz --strip-components=1 -C /tmp/openshift-install
 
-FROM docker.io/opendevorg/python-base:3.8-bullseye as zuul
+FROM docker.io/opendevorg/python-base:3.10-bullseye as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
