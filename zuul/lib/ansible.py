@@ -55,7 +55,7 @@ class ManagedAnsible:
                       upgrade=upgrade)
 
     def _run_pip(self, requirements, upgrade=False):
-        cmd = [os.path.join(self.venv_path, 'bin', 'pip'), 'install',
+        cmd = [os.path.join(self.bin_path, 'pip'), 'install',
                '--no-cache-dir']
         if upgrade:
             cmd.append('-U')
@@ -111,10 +111,24 @@ class ManagedAnsible:
         return None
 
     @property
-    def python_path(self):
+    def bin_path(self):
         venv_path = self.venv_path
         if venv_path:
-            return os.path.join(self.venv_path, 'bin', 'python')
+            bin_path = os.path.join(venv_path, 'bin')
+            # Virtualenvs created on ubuntu jammy put the
+            # bin dir in venv/local/bin
+            local_bin_path = os.path.join(venv_path, 'local', 'bin')
+            if os.path.exists(bin_path):
+                return bin_path
+            elif os.path.exists(local_bin_path):
+                return local_bin_path
+        return None
+
+    @property
+    def python_path(self):
+        bin_path = self.bin_path
+        if bin_path:
+            return os.path.join(bin_path, 'python')
         return None
 
     @property
@@ -282,7 +296,7 @@ class AnsibleManager:
         if not venv_path:
             raise Exception('Requested ansible version \'%s\' is not '
                             'installed' % version)
-        return os.path.join(ansible.venv_path, 'bin', command)
+        return os.path.join(ansible.bin_path, command)
 
     def getAnsibleInstallDir(self, version):
         ansible = self._getAnsible(version)
