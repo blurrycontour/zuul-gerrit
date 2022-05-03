@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "97cc43ff_f2483eef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34800
+      },
+      "writtenOn": "2022-05-03T19:10:28Z",
+      "side": 1,
+      "message": "Thanks for sharing the link. That\u0027d be a great addition to an already useful tutorial. I\u0027ll abandon my small change.",
+      "parentUuid": "7382c0af_cd5cc475",
+      "revId": "6f5ed63cd68a2b8aa1e3e27df578d3b682716180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "717119be_e46dbc0a",
