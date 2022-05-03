@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e4340f3_8d348b09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-03T18:39:57Z",
+      "side": 1,
+      "message": "I expect that this is ready for Zuul whenever Zuul is ready. One thing to note is that opendev doesn\u0027t have a jammy wheel mirror up yet, but that should happen in the near future and slightly speed up test jobs.",
+      "revId": "2770a6a0d87cba87abb1e18a25a8b53cb099be92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
