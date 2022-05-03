@@ -148,6 +148,15 @@ class CallbackModule(CallbackBase):
 
             for index, item_result in enumerate(
                     clean_result.get('results', [])):
+                # If in a loop, this will be a list of result
+                # dictionaries.  Otherwise for other tasks
+                # (yum/package are examples) each entry is a string.
+                if not hasattr(item_result, 'get'):
+                    continue
+                # NOTE(ianw) 2022-04-21 : it is not entirely clear if
+                # results having _ansible_no_log here has actually
+                # been fixed upstream.  For an abundance of caution,
+                # leave this.
                 if not item_result.get('_ansible_no_log', False):
                     continue
                 clean_result['results'][index] = dict(
