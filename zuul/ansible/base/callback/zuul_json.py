@@ -135,35 +135,12 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_ok(self, result, **kwargs):
         host = result._host
         action = result._task.action
-        if result._result.get('_ansible_no_log', False) or result._task.no_log:
-            self.results[-1]['tasks'][-1]['hosts'][host.name] = dict(
-                censored="the output has been hidden due to the fact that"
-                         " 'no_log: true' was specified for this result")
-        else:
-            # strip_internal_keys makes a deep copy of dict items, but
-            # not lists, so we need to create our own complete deep
-            # copy first so we don't modify the original.
-            myresult = copy.deepcopy(result._result)
-            clean_result = strip_internal_keys(myresult)
-
-            for index, item_result in enumerate(
-                    clean_result.get('results', [])):
-                # If in a loop, this will be a list of result
-                # dictionaries.  Otherwise for other tasks
-                # (yum/package are examples) each entry is a string.
-                if not hasattr(item_result, 'get'):
-                    continue
-                # NOTE(ianw) 2022-04-21 : it is not entirely clear if
-                # results having _ansible_no_log here has actually
-                # been fixed upstream.  For an abundance of caution,
-                # leave this.
-                if not item_result.get('_ansible_no_log', False):
-                    continue
-                clean_result['results'][index] = dict(
-                    censored="the output has been hidden due to the fact that"
-                             " 'no_log: true' was specified for this result")
-
-            self.results[-1]['tasks'][-1]['hosts'][host.name] = clean_result
+        # strip_internal_keys makes a deep copy of dict items, but
+        # not lists, so we need to create our own complete deep
+        # copy first so we don't modify the original.
+        myresult = copy.deepcopy(result._result)
+        clean_result = strip_internal_keys(myresult)
+        self.results[-1]['tasks'][-1]['hosts'][host.name] = clean_result
         end_time = current_time()
         self.results[-1]['tasks'][-1]['task']['duration']['end'] = end_time
         self.results[-1]['play']['duration']['end'] = end_time
