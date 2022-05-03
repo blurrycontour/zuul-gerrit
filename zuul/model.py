@@ -6907,6 +6907,10 @@ class Layout(object):
                                 job.source_context.project_name,
                                 prior_jobs[0],
                                 prior_jobs[0].source_context.project_name))
+
+        if job.include_branch_pattern and not job.include_branch_pattern.match(job.source_context.branch):
+            skip_add = True
+
         if skip_add:
             return False
         if job.name in self.jobs:

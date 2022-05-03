@@ -633,6 +633,7 @@ class JobParser(object):
                       'post-review': bool,
                       'match-on-config-updates': bool,
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
+                      'include-branch-pattern': str,
     }
 
     job_name = {vs.Required('name'): str}
@@ -929,6 +930,8 @@ class JobParser(object):
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
             job.setIrrelevantFileMatcher(as_list(conf['irrelevant-files']))
+        if 'include-branch-pattern' in conf:
+            job.include_branch_pattern = re.compile(conf.get('include-branch-pattern'))
         job.freeze()
         return job
 
