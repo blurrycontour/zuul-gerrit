@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d205ff9_bdd26233",
+        "filename": "doc/source/developer/specs/job-fileset.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-03T17:20:10Z",
+      "side": 1,
+      "message": "This part about the commit message doesn\u0027t make sense to me.  There\u0027s always a commit message, so how does that allow triggering of jobs when there is a \"commit message modification\"?",
+      "revId": "08a2ea95179857320b04c6e15e100bf51d47867c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aec69590_b0d825d4",
+        "filename": "doc/source/developer/specs/job-fileset.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-03T17:20:10Z",
+      "side": 1,
+      "message": "It looks like you\u0027re still developing the deprecation plan.",
+      "revId": "08a2ea95179857320b04c6e15e100bf51d47867c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
