@@ -18,7 +18,10 @@ starting with very basic jobs which describe characteristics that all
 jobs on the system should have, progressing through stages of
 specialization before arriving at a particular job.  A job may inherit
 from any other job in any project (however, if the other job is marked
-as :attr:`job.final`, jobs may not inherit from it).
+as :attr:`job.final`, jobs may not inherit from it).  Generally,
+attributes on child jobs will override (or completely replace)
+attributes on the parent, however some attributes are combined.  See
+the documentation for individual attributes for these exceptions.
 
 A job with no parent is called a *base job* and may only be defined in
 a :term:`config-project`.  Every other job must have a parent, and so
@@ -58,6 +61,7 @@ be:
 * child playbook
 * child post-run playbook
 * parent post-run playbook
+* parent cleanup-run playbook
 
 Further inheritance would nest even deeper.
 
@@ -146,6 +150,11 @@ Here is an example of two job definitions:
       To indicate a job is not intended to be run directly, but
       instead must be inherited from, set this attribute to ``true``.
 
+      Once this is set to ``true`` in a job it cannot be reset to
+      ``false`` within the same job by other variants; however jobs
+      which inherit from it can (and by default do) reset it to
+      ``false``.
+
       .. warning::
 
          It is possible to circumvent the use of `abstract` in an
@@ -161,6 +170,11 @@ Here is an example of two job definitions:
       not be inherited by a final job.  All ``intermediate`` jobs
       *must* also be ``abstract``; a configuration error will be
       raised if not.
+
+      Once this is set to ``true`` in a job it cannot be reset to
+      ``false`` within the same job by other variants; however jobs
+      which inherit from it can (and by default do) reset it to
+      ``false``.
 
       For example, you may define a base abstract job `foo` and create
       two abstract jobs that inherit from `foo` called
@@ -258,6 +272,10 @@ Here is an example of two job definitions:
       by this job which may be used by other jobs for other changes
       using the :attr:`job.requires` attribute.
 
+      When inheriting jobs or applying variants, the list of
+      `provides` is extended (`provides` specified in a job definition
+      are added to any supplied by their parents).
+
    .. attr:: requires
 
       A list of free-form strings which identify resources which may
@@ -276,6 +294,10 @@ Here is an example of two job definitions:
       paused.  Additionally, the :ref:`artifacts <return_artifacts>`
       returned by the `provides` jobs will be made available to the
       `requires` job.
+
+      When inheriting jobs or applying variants, the list of
+      `requires` is extended (`requires` specified in a job definition
+      are added to any supplied by their parents).
 
       For example, a job which produces a builder container image in
       one project that is then consumed by a container image build job
@@ -488,6 +510,10 @@ Here is an example of two job definitions:
       even when the job is canceled. Cleanup results are not taken into
       account.
 
+      When a job inherits from a parent, the child's cleanup-run
+      playbooks are run before the parent's.  See :ref:`job` for more
+      information.
+
    .. attr:: run
 
       The name of a playbook or list of playbooks for this job.  If it
@@ -539,15 +565,18 @@ Here is an example of two job definitions:
       appear on the job -- roles earlier in the list will take
       precedence over those which follow.
 
-      In the case of job inheritance or variance, the roles used for
-      each of the playbooks run by the job will be only those which
-      were defined along with that playbook.  If a child job inherits
-      from a parent which defines a pre and post playbook, then the
-      pre and post playbooks it inherits from the parent job will run
-      only with the roles that were defined on the parent.  If the
-      child adds its own pre and post playbooks, then any roles added
-      by the child will be available to the child's playbooks.  This
-      is so that a job which inherits from a parent does not
+      This attribute is not overridden on inheritance or variance;
+      instead roles are added with each new job or variant.  In the
+      case of job inheritance or variance, the roles used for each of
+      the playbooks run by the job will be only those which were
+      cumulatively defined up to that point in the inheritance
+      hierarchy where that playbook was added.  If a child job
+      inherits from a parent which defines a pre and post playbook,
+      then the pre and post playbooks it inherits from the parent job
+      will run only with the roles that were defined on the parent.
+      If the child adds its own pre and post playbooks, then any roles
+      added by the child will be available to the child's playbooks.
+      This is so that a job which inherits from a parent does not
       inadvertently alter the behavior of the parent's playbooks by
       the addition of conflicting roles.  Roles added by a child will
       appear before those it inherits from its parent.
@@ -625,9 +654,15 @@ Here is an example of two job definitions:
       A list of other projects which are used by this job.  Any Zuul
       projects specified here will also be checked out by Zuul into
       the working directory for the job.  Speculative merging and
-      cross-repo dependencies will be honored.
+      cross-repo dependencies will be honored.  If there is not a
+      change for the project ahead in the pipeline, its repo state as
+      of the time the item was enqueued will be frozen and used for
+      all jobs for a given change (see :ref:`global_repo_state`).
 
-      This attribute is a union of all applicable parents and variants.
+      This attribute is not overridden by inheritance; instead it is
+      the union of all applicable parents and variants (i.e., jobs can
+      expand but not reduce the set of required projects when they
+      inherit).
 
       The format for this attribute is either a list of strings or
       dictionaries.  Strings are interpreted as project names,
@@ -776,6 +811,11 @@ Here is an example of two job definitions:
       However, a :term:`config-project` may still add such a job to
       any project's pipeline.  Apply caution when doing so as other
       projects may be able to expose the source project's secrets.
+
+      This attribute is not overridden by inheritance; instead it is
+      the intersection of all applicable parents and variants (i.e.,
+      jobs can reduce but not expand the set of allowed projects when
+      they inherit).
 
       .. warning::
 
