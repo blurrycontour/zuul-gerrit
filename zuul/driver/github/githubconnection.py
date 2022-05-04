@@ -1267,6 +1267,21 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.server = self.connection_config.get('server', 'github.com')
         self.canonical_hostname = self.connection_config.get(
             'canonical_hostname', self.server)
+        self.repo_cache = self.connection_config.get('repo_cache')
+        if self.git_ssh_key and self.repo_cache:
+            self.log.warning("Both sshkey and repo_cache specified "
+                             "but are incompatible; "
+                             "repo_cache will be ignored")
+            self.repo_cache = None
+        if self.repo_cache:
+            rrt = self.connection_config.get('repo_retry_timeout')
+            if rrt:
+                self.repo_retry_timeout = int(rrt)
+            else:
+                self.repo_retry_timeout = None
+        else:
+            self.repo_retry_timeout = None
+
         self.source = driver.getSource(self)
         self._sha_pr_cache = GithubShaCache()
 
@@ -1288,6 +1303,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             "baseurl": self._github_client_manager.base_url,
             "canonical_hostname": self.canonical_hostname,
             "server": self.server,
+            "repo_cache": self.repo_cache,
         })
         return d
 
@@ -1667,6 +1683,11 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if not self._github_client_manager.initialized:
             self._github_client_manager.initialize()
 
+        if self.repo_cache:
+            server = self.repo_cache
+        else:
+            server = self.server
+
         if self._github_client_manager.usesAppAuthentication:
             # We may be in the context of a merger or executor here. The
             # mergers and executors don't receive webhook events so they miss
@@ -1676,10 +1697,10 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._github_client_manager.get_installation_key(
                     project.name, reprime=True)
             return 'https://x-access-token:%s@%s/%s' % (installation_key,
-                                                        self.server,
+                                                        server,
                                                         project.name)
 
-        return 'https://%s/%s' % (self.server, project.name)
+        return 'https://%s/%s' % (server, project.name)
 
     def getGitwebUrl(self, project, sha=None, tag=None):
         url = 'https://%s/%s' % (self.server, project)

@@ -150,6 +150,10 @@ class GithubSource(BaseSource):
         """Get the git url for a project."""
         return self.connection.getGitUrl(project)
 
+    def getRetryTimeout(self, project):
+        """Get the retry timeout for a project."""
+        return self.connection.repo_retry_timeout
+
     def getGitwebUrl(self, project, sha=None):
         """Get the git-web url for a project."""
         return self.connection.getGitwebUrl(project, sha)
