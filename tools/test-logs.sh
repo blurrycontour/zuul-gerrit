@@ -66,12 +66,12 @@ gathering = smart
 gather_subset = !all
 fact_caching = jsonfile
 fact_caching_connection = ~/.cache/facts
-lookup_plugins = ${ZUUL_ANSIBLE}/zuul/ansible/lookup
-callback_plugins = ${ZUUL_ANSIBLE}/zuul/ansible/callback:$ARA_DIR/plugins/callbacks
-action_plugins = ${ZUUL_ANSIBLE}/zuul/ansible/actiongeneral:${ZUUL_ANSIBLE}/zuul/ansible/actiontrusted
-module_utils = ${ZUUL_ANSIBLE}/zuul/ansible/module_utils
+lookup_plugins = ${ZUUL_ANSIBLE}/zuul/ansible/base/lookup
+callback_plugins = ${ZUUL_ANSIBLE}/zuul/ansible/base/callback:$ARA_DIR/plugins/callbacks
+action_plugins = ${ZUUL_ANSIBLE}/zuul/ansible/base/action
+module_utils = ${ZUUL_ANSIBLE}/zuul/ansible/base/module_utils
 stdout_callback = zuul_stream
-library = ${ZUUL_ANSIBLE}/zuul/ansible/library
+library = ${ZUUL_ANSIBLE}/zuul/ansible/base/library
 retry_files_enabled = False
 EOF
 
