@@ -23,12 +23,14 @@ import textwrap
 from unittest import mock, skip
 
 import git
+import gitdb
 import github3.exceptions
 
 from tests.fakegithub import FakeFile, FakeGithubEnterpriseClient
 from zuul.driver.github.githubconnection import GithubShaCache
 from zuul.zk.layout import LayoutState
 from zuul.lib import strings
+from zuul.merger.merger import Repo
 from zuul.model import MergeRequest, EnqueueEvent, DequeueEvent
 
 from tests.base import (AnsibleZuulTestCase, BaseTestCase,
@@ -2407,7 +2409,7 @@ class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):
         })
 
 
-class TestGithubDriverEnterise(ZuulGithubAppTestCase):
+class TestGithubDriverEnterprise(ZuulGithubAppTestCase):
     config_file = 'zuul-github-driver-enterprise.conf'
     scheduler_count = 1
 
@@ -2445,7 +2447,7 @@ class TestGithubDriverEnterise(ZuulGithubAppTestCase):
         self.assertEqual(len(A.comments), 0)
 
 
-class TestGithubDriverEnteriseLegacy(ZuulGithubAppTestCase):
+class TestGithubDriverEnterpriseLegacy(ZuulGithubAppTestCase):
     config_file = 'zuul-github-driver-enterprise.conf'
     scheduler_count = 1
 
@@ -2478,6 +2480,106 @@ class TestGithubDriverEnteriseLegacy(ZuulGithubAppTestCase):
         # Note: PR was not approved but old github does not support
         # reviewDecision so this gets ignored and zuul merges nevertheless
         self.assertTrue(A.is_merged)
+        self.assertThat(A.merge_message,
+                        MatchesRegex(r'.*PR title\n\nPR body.*', re.DOTALL))
+        self.assertThat(A.merge_message,
+                        Not(MatchesRegex(
+                            r'.*I shouldnt be seen.*',
+                            re.DOTALL)))
+        self.assertEqual(len(A.comments), 0)
+
+
+class TestGithubDriverEnterpriseCache(ZuulGithubAppTestCase):
+    config_file = 'zuul-github-driver-enterprise.conf'
+    scheduler_count = 1
+
+    def setup_config(self, config_file):
+        self.upstream_cache_root = self.upstream_root + '-cache'
+        config = super().setup_config(config_file)
+        # This adds the GHE repository cache feature
+        config.set('connection github', 'repo_cache', self.upstream_cache_root)
+        config.set('connection github', 'repo_retry_timeout', '30')
+        # Synchronize the upstream repos to the upstream repo cache
+        self.synchronize_repo('org/common-config')
+        self.synchronize_repo('org/project')
+        return config
+
+    def init_repo(self, project, tag=None):
+        super().init_repo(project, tag)
+        # After creating the upstream repo, also create the empty
+        # cache repo (but unsynchronized for now)
+        parts = project.split('/')
+        path = os.path.join(self.upstream_cache_root, *parts[:-1])
+        if not os.path.exists(path):
+            os.makedirs(path)
+        path = os.path.join(self.upstream_cache_root, project)
+        repo = git.Repo.init(path)
+
+        with repo.config_writer() as config_writer:
+            config_writer.set_value('user', 'email', 'user@example.com')
+            config_writer.set_value('user', 'name', 'User Name')
+
+    def synchronize_repo(self, project):
+        # Synchronize the upstream repo to the cache
+        upstream_path = os.path.join(self.upstream_root, project)
+        upstream = git.Repo(upstream_path)
+
+        cache_path = os.path.join(self.upstream_cache_root, project)
+        cache = git.Repo(cache_path)
+
+        refs = upstream.git.for_each_ref(
+            '--format=%(objectname) %(refname)'
+        )
+        for ref in refs.splitlines():
+            parts = ref.split(" ")
+            if len(parts) == 2:
+                commit, ref = parts
+            else:
+                continue
+
+            self.log.debug("Synchronize ref %s: %s", ref, commit)
+            cache.git.fetch(upstream_path, ref)
+            binsha = gitdb.util.to_bin_sha(commit)
+            obj = git.objects.Object.new_from_sha(cache, binsha)
+            git.refs.Reference.create(cache, ref, obj, force=True)
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    def test_github_repo_cache(self):
+        # Test that we fetch and configure retries correctly when
+        # using a github enterprise repo cache (the cache can be
+        # slightly out of sync).
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection('master', require_review=True)
+
+        # Make sure we have correctly overridden the retry attempts
+        merger = self.executor_server.merger
+        repo = merger.getRepo('github', 'org/project')
+        self.assertEqual(repo.retry_attempts, 1)
+
+        # Our initial attempt should fail; make it happen quickly
+        self.patch(Repo, 'retry_interval', 1)
+
+        # pipeline merges the pull request on success
+        A = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'PR title',
+                                                 body='I shouldnt be seen',
+                                                 body_text='PR body')
+
+        A.addReview('user', 'APPROVED')
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled('initial failed attempt')
+
+        self.assertFalse(A.is_merged)
+
+        # Now synchronize the upstream repo to the cache and try again
+        self.synchronize_repo('org/project')
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled('second successful attempt')
+
+        self.assertTrue(A.is_merged)
+
         self.assertThat(A.merge_message,
                         MatchesRegex(r'.*PR title\n\nPR body.*', re.DOTALL))
         self.assertThat(A.merge_message,

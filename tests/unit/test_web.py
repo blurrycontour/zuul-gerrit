@@ -2872,6 +2872,7 @@ class TestWebMulti(BaseTestWeb):
             'driver': 'github',
             'name': 'github',
             'server': 'github.com',
+            'repo_cache': None,
         }
         self.assertEqual([gerrit_connection, github_connection], data)
 

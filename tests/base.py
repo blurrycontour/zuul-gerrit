@@ -333,11 +333,9 @@ class GitlabDriverMock(GitlabDriver):
 
 
 class TestConnectionRegistry(ConnectionRegistry):
-    def __init__(self, changes: Dict[str, Dict[str, Change]],
-                 config: ConfigParser, additional_event_queues,
-                 upstream_root: str, poller_events,
-                 git_url_with_auth: bool,
-                 add_cleanup: Callable[[Callable[[], None]], None]):
+    def __init__(self, changes, config, additional_event_queues,
+                 upstream_root, poller_events, git_url_with_auth,
+                 add_cleanup):
         self.connections = OrderedDict()
         self.drivers = {}
 
@@ -2952,6 +2950,8 @@ class FakeGithubConnection(githubconnection.GithubConnection):
             prefix = 'file://x-access-token:%s@' % auth_token
         else:
             prefix = ''
+        if self.repo_cache:
+            return prefix + os.path.join(self.repo_cache, str(project))
         return prefix + os.path.join(self.upstream_root, str(project))
 
     def real_getGitUrl(self, project):

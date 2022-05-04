@@ -142,12 +142,20 @@ class BaseSource(object, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def getProjectOpenChanges(self, project):
-
         """Get the open changes for a project."""
 
     @abc.abstractmethod
     def getGitUrl(self, project):
         """Get the git url for a project."""
+
+    def getRetryTimeout(self, project):
+        """Get the retry timeout for a project in seconds.
+
+        This is used by the mergers to potentially increase the number
+        of git fetch retries before giving up.  Return None to use the
+        default.
+        """
+        return None
 
     @abc.abstractmethod
     def getProject(self, name):
