@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de89144d_6a4c459b",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-05-04T07:40:41Z",
+      "side": 1,
+      "message": "nit: starts",
+      "range": {
+        "startLine": 424,
+        "startChar": 48,
+        "endLine": 424,
+        "endChar": 53
+      },
+      "revId": "57cc4041481aeb0ca7dcc18b9e085e1e3ad3a92a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
