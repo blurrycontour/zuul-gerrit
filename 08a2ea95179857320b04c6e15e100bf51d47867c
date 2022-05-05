@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4acaf760_40e5c113",
+        "filename": "doc/source/developer/specs/job-fileset.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-05-05T05:25:14Z",
+      "side": 1,
+      "message": "I think this also gets confusing with e.g. Github where you have multiple commits as part of a PR. So in that case it should probably apply to the PR message?!\n\nThe other problem I see is that it might not be possible to determine if the commit or PR/MR/... message changed between different \u0027versions\u0027 of a change. It could work for Gerrit where you still have the older patchsets, but I\u0027m not sure about the other providers.\n\nAt the moment we only look a the change itself and not at the diff between patchsets/versions so this would be a new concept that I think should not be mixed with the fileset proposed here.",
+      "parentUuid": "9d205ff9_bdd26233",
+      "revId": "08a2ea95179857320b04c6e15e100bf51d47867c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "aec69590_b0d825d4",
         "filename": "doc/source/developer/specs/job-fileset.rst",
         "patchSetId": 2
