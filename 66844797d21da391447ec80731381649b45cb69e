@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d984e120_01946748",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2022-05-05T14:33:49Z",
+      "side": 1,
+      "message": "PoC of that issue is: https://review.opendev.org/c/openstack/ci-log-processing/+/840667 in ci-log-processing-bcrypt CI job.",
+      "revId": "66844797d21da391447ec80731381649b45cb69e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
