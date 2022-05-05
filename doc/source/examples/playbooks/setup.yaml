@@ -1,31 +1,41 @@
 - hosts: localhost
   gather_facts: false
   tasks:
+    - name: Correct volume ownership
+      shell: |
+        chown -R zuul.zuul /var/lib/zuul/tutorial/ssh
+        chown -R zuul.zuul /var/lib/zuul/tutorial/node
+        chown -R zuul.zuul /var/lib/zuul/tutorial/certs
+
+- hosts: localhost
+  gather_facts: false
+  become: zuul
+  tasks:
     - name: Generate ZooKeeper certs
       shell: |
         set -e
-        /var/zuul-tools/zk-ca.sh /var/certs examples_zk_1.examples_default
-        chmod -R a+rX /var/certs
+        /var/zuul-tools/zk-ca.sh /var/lib/zuul/tutorial/certs examples_zk_1.examples_default
+        chmod -R a+rX /var/lib/zuul/tutorial/certs
     - name: Wait for Gerrit to start
       wait_for:
         host: gerrit
         port: 29418
     - name: Generate admin SSH key for Gerrit
-      command: ssh-keygen -f /var/ssh/admin -N ''
+      command: ssh-keygen -f /var/lib/zuul/tutorial/ssh/admin -N ''
       args:
-        creates: /var/ssh/admin.pub
+        creates: /var/lib/zuul/tutorial/ssh/admin.pub
     - name: Generate Zuul SSH key for Gerrit
-      command: ssh-keygen -f /var/ssh/zuul -N '' -t rsa -m PEM
+      command: ssh-keygen -f /var/lib/zuul/tutorial/ssh/zuul -N '' -t rsa -m PEM
       args:
-        creates: /var/ssh/zuul.pub
+        creates: /var/lib/zuul/tutorial/ssh/zuul.pub
     - name: Generate Zuul SSH key for Nodepool
-      command: ssh-keygen -f /var/ssh/nodepool -N '' -t rsa -m PEM
+      command: ssh-keygen -f /var/lib/zuul/tutorial/ssh/nodepool -N '' -t rsa -m PEM
       args:
-        creates: /var/ssh/nodepool.pub
+        creates: /var/lib/zuul/tutorial/ssh/nodepool.pub
     - name: Add Nodepool key to node authorized_keys file
-      command: cp /var/ssh/nodepool.pub /var/node/authorized_keys
+      command: cp /var/lib/zuul/tutorial/ssh/nodepool.pub /var/lib/zuul/tutorial/node/authorized_keys
       args:
-        creates: /var/node/authorized_keys
+        creates: /var/lib/tutorial/node/authorized_keys
     # The Gerrit container puts up a helpful info page the first time
     # you hit the web server; get past that.
     - name: Get Gerrit first login screen
@@ -41,7 +51,7 @@
         method: POST
         user: admin
         password: secret
-        body: "{{ lookup('file', '/var/ssh/admin.pub') }}"
+        body: "{{ lookup('file', '/var/lib/zuul/tutorial/ssh/admin.pub') }}"
         status_code: 201
         headers:
           Content-Type: text/plain
@@ -55,13 +65,13 @@
     - name: Checkout All-Projects config
       git:
         repo: ssh://gerrit:29418/All-Projects/
-        ssh_opts: "-o StrictHostKeyChecking=no -i /var/ssh/admin -l admin"
+        ssh_opts: "-o StrictHostKeyChecking=no -i /var/lib/zuul/tutorial/ssh/admin -l admin"
         dest: "{{ all_projects_repo }}"
         refspec: '+refs/meta/config:refs/meta/config'
         version: refs/meta/config
     - name: Copy new All-Projects config into place
       copy:
-        src: "/var/playbooks/project.config"
+        src: "/var/lib/zuul/tutorial/playbooks/project.config"
         dest: "{{ all_projects_repo }}/project.config"
     - name: Update All-Projects config in Gerrit
       shell: |
@@ -108,7 +118,7 @@
         body_format: json
         body:
           name: Zuul
-          ssh_key: "{{ lookup('file', '/var/ssh/zuul.pub') }}"
+          ssh_key: "{{ lookup('file', '/var/lib/zuul/tutorial/ssh/zuul.pub') }}"
           http_password: secret
           groups:
             - "Service Users"
