@@ -18,15 +18,17 @@ services:
       - no_proxy=${no_proxy},gerrit
     depends_on:
       - gerrit
+    # Run this as root so it can chown the new volumes to zuul
+    user: root
     volumes:
-      - "sshkey:/var/ssh:z"
-      - "nodessh:/var/node:z"
-      - "./playbooks/:/var/playbooks/:z"
-      - "certs:/var/certs:z"
+      - "sshkey:/var/lib/zuul/tutorial/ssh:z"
+      - "nodessh:/var/lib/zuul/tutorial/node:z"
+      - "./playbooks/:/var/lib/zuul/tutorial/playbooks/:z"
+      - "certs:/var/lib/zuul/tutorial/certs:z"
       - "../../../tools/:/var/zuul-tools/:z"
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
-    command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
+    command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/lib/zuul/tutorial/playbooks/setup.yaml"
     networks:
       - zuul
   zk:
