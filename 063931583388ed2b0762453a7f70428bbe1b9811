@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb4ca4c8_68ea627e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-05T22:24:32Z",
+      "side": 1,
+      "message": "Overall this seems fine and useful. One small thing inline to clarify things though.",
+      "revId": "063931583388ed2b0762453a7f70428bbe1b9811",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9338404_77a09c6a",
+        "filename": "doc/source/developer/specs/global-semaphores.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-05T22:24:32Z",
+      "side": 1,
+      "message": "These two sentences are a bit ambiguous to me. If this is a configuration error then why would one or the other take precedence. It should just fail to exist entirely instead?",
+      "revId": "063931583388ed2b0762453a7f70428bbe1b9811",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
