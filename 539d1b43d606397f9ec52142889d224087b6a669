@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d22e3a8_03f31614",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-05T20:57:35Z",
+      "side": 1,
+      "message": "Alternatively, we could default zuul-fingergw to zuul and expect people running it to configure it to run as root.  This would require a change for deployers like opendev, so we should announce it, but maybe that\u0027s a safer default?",
+      "revId": "539d1b43d606397f9ec52142889d224087b6a669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
