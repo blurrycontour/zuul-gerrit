@@ -59,6 +59,11 @@ export default function LogFile({
     // Only highlight the lines if the log is present (otherwise it doesn't make
     // sense). Although, scrolling to the selected section only works once the
     // necessary log lines are part of the DOM tree.
+    // Additionally note that if we set highlightStart before the page content
+    // is available then the window scrolling won't match any lines and we won't
+    // scroll. Then when we try to set highlightStart after page content is loaded
+    // the value isn't different than what is set previously preventing the
+    // scroll event from firing.
     if (!isFetching) {
       // Get the line numbers to highlight from the URL and directly cast them to
       // a number. The substring(1) removes the '#' character.

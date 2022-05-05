@@ -23,7 +23,7 @@ export default {
   logfile: {
     // Store files by buildId->filename->content
     files: {},
-    isFetching: false,
+    isFetching: true,
     url: null,
   },
   auth: {},
