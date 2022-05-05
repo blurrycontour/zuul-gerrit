@@ -61,9 +61,11 @@ RUN /output/install-from-bindep zuul_base \
   && git config --system protocol.version 2
 
 VOLUME /var/lib/zuul
+USER zuul
 CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
+USER root
 ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
@@ -74,9 +76,11 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+USER zuul
 CMD ["/usr/local/bin/zuul-executor", "-f"]
 
 FROM zuul as zuul-fingergw
+USER root
 CMD ["/usr/local/bin/zuul-fingergw", "-f"]
 
 FROM zuul as zuul-merger
