@@ -16,6 +16,23 @@
       "message": "Alternatively, we could default zuul-fingergw to zuul and expect people running it to configure it to run as root.  This would require a change for deployers like opendev, so we should announce it, but maybe that\u0027s a safer default?",
       "revId": "539d1b43d606397f9ec52142889d224087b6a669",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8e258dd_111afa72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-05-06T05:59:30Z",
+      "side": 1,
+      "message": "Executor has following issue: if you want it to let manage ansible with additional libraries installed it will fail, cause something in the process still tries to install those under /use/local/Zuul even with ansible_root set. Same stuff happens with zuul-manage-ansible command. I had no time yet to go deeper through the code, but eventual issue is in detection if the venv_path.\nLong story short: using Zuul user for executor make it impossible to addlibs to ansible installations",
+      "revId": "539d1b43d606397f9ec52142889d224087b6a669",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
