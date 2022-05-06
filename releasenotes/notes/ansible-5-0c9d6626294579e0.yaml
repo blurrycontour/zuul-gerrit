@@ -25,3 +25,8 @@ upgrade:
     therefore the latest available micro-version will be installed at
     build-time.  If you need more control over the version of Ansible
     used, see the help text for ``zuul-manage-ansible``.
+
+  - |
+    Python 3.8 or newer is required to run Zuul. This change was necessary
+    to support Ansible 5 and newer as Ansible's minimum python requirement
+    is 3.8.
