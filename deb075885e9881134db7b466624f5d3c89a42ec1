@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23557ab9_1339ae96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-09T22:16:16Z",
+      "side": 1,
+      "message": "This seems fine. I don\u0027t know what github/gitlab/pagure/etc do in this case but it seems reasonable given the gerrit behavior.",
+      "revId": "deb075885e9881134db7b466624f5d3c89a42ec1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
