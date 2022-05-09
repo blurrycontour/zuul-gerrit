@@ -50,6 +50,24 @@
       "message": "Sorry, I was trying to convey that the in-repo semaphore would cause a configuration error which means that the config object would not be loaded; therefore any jobs that referenced that semaphore name would get the global one.\n\nIn other words, if you start with an in-repo semaphore \"foo\" and use it in jobs, then add a global semaphore \"foo\" then as soon as you do that, you get a config error and also the jobs continue to run but using the global semaphore.",
       "revId": "063931583388ed2b0762453a7f70428bbe1b9811",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7b2f229_62602117",
+        "filename": "doc/source/developer/specs/global-semaphores.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-09T20:44:26Z",
+      "side": 1,
+      "message": "Ya, that makes sense. I guess that means jobs don\u0027t automatically fail but you may have more contention for the semaphore in which case having an error is helpful.",
+      "parentUuid": "8d83b2e7_a93111e8",
+      "revId": "063931583388ed2b0762453a7f70428bbe1b9811",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
