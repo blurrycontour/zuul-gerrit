@@ -8048,3 +8048,120 @@ class TestConnectionVars(AnsibleZuulTestCase):
         # job_output = self._get_file(job, 'work/logs/job-output.txt')
         # self.log.debug(job_output)
         # self.assertNotIn("/bin/du", job_output)
+
+
+class IncludeBranchesTestCase(ZuulTestCase):
+    def _test_include_branches(self, history1, history2, history3, history4):
+        self.create_branch('org/project', 'stable')
+        self.create_branch('org/project', 'feature/foo')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'feature/foo'))
+        self.waitUntilSettled()
+
+        # Test the jobs on the master branch.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory(history1, ordered=False)
+
+        # Test the jobs on the excluded feature branch.
+        B = self.fake_gerrit.addFakeChange('org/project', 'feature/foo', 'A')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory(history1 + history2, ordered=False)
+
+        # Test in-repo config proposed on the excluded feature branch.
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: project-dynamic
+
+            - project:
+                check:
+                  jobs:
+                    - project-dynamic
+            """)
+        file_dict = {'zuul.yaml': conf}
+        C = self.fake_gerrit.addFakeChange('org/project', 'feature/foo', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory(history1 + history2 + history3, ordered=False)
+
+        # Merge a change to the excluded feature branch.
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertHistory(history1 + history2 + history3 + history4,
+                           ordered=False)
+
+
+class TestIncludeBranchesProject(IncludeBranchesTestCase):
+    tenant_config_file = 'config/dynamic-only-project/include.yaml'
+
+    def test_include_branches(self):
+        history1 = [
+            dict(name='central-test', result='SUCCESS', changes='1,1'),
+            dict(name='project-test', result='SUCCESS', changes='1,1'),
+        ]
+        history2 = [
+            dict(name='central-test', result='SUCCESS', changes='2,1'),
+        ]
+        history3 = [
+            dict(name='central-test', result='SUCCESS', changes='3,1'),
+        ]
+        history4 = [
+            dict(name='central-test', result='SUCCESS', changes='2,1'),
+        ]
+        self._test_include_branches(history1, history2, history3, history4)
+
+
+class TestExcludeBranchesProject(IncludeBranchesTestCase):
+    tenant_config_file = 'config/dynamic-only-project/exclude.yaml'
+
+    def test_exclude_branches(self):
+        history1 = [
+            dict(name='central-test', result='SUCCESS', changes='1,1'),
+            dict(name='project-test', result='SUCCESS', changes='1,1'),
+        ]
+        history2 = [
+            dict(name='central-test', result='SUCCESS', changes='2,1'),
+        ]
+        history3 = [
+            dict(name='central-test', result='SUCCESS', changes='3,1'),
+        ]
+        history4 = [
+            dict(name='central-test', result='SUCCESS', changes='2,1'),
+        ]
+        self._test_include_branches(history1, history2, history3, history4)
+
+
+class TestDynamicBranchesProject(IncludeBranchesTestCase):
+    tenant_config_file = 'config/dynamic-only-project/dynamic.yaml'
+
+    def test_dynamic_branches(self):
+        history1 = [
+            dict(name='central-test', result='SUCCESS', changes='1,1'),
+            dict(name='project-test', result='SUCCESS', changes='1,1'),
+        ]
+        history2 = [
+            dict(name='central-test', result='SUCCESS', changes='2,1'),
+            dict(name='project-test', result='SUCCESS', changes='2,1'),
+        ]
+        history3 = [
+            dict(name='central-test', result='SUCCESS', changes='3,1'),
+            dict(name='project-dynamic', result='SUCCESS', changes='3,1'),
+        ]
+        history4 = [
+            dict(name='central-test', result='SUCCESS', changes='2,1'),
+            dict(name='project-test', result='SUCCESS', changes='2,1'),
+        ]
+        self._test_include_branches(history1, history2, history3, history4)
