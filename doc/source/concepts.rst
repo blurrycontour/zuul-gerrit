@@ -53,8 +53,12 @@ substantially different than the git repo state of the change itself
 since the repo may have merged other changes since the change was
 originally authored).  Items in a pipeline may depend on other items,
 and if they do, all of their dependent changes will be included in the
-git repo state that Zuul prepares.  For more detail on this process,
-see :ref:`project_gating` and :ref:`dependencies`.
+git repo state that Zuul prepares.  Jobs may also specify that they
+require additional git repos, and if so, the repo state (as of the
+time when the item was enqueued in the pipeline) for those repos will
+also be included.  For more detail on this process, see
+:ref:`project_gating`, :ref:`dependencies`, and
+:ref:`global_repo_state`.
 
 The configuration for nearly everything described above is held in
 files inside of the git repos upon which Zuul operates.  Zuul's

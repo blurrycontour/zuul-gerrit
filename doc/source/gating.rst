@@ -409,3 +409,17 @@ If a cycle is created by use of cross-project dependencies, Zuul will
 abort its work very early.  There will be no message in Gerrit and no
 changes that are part of the cycle will be enqueued into any pipeline.
 This is to protect Zuul from infinite loops.
+
+.. _global_repo_state:
+
+Global Repo State
+~~~~~~~~~~~~~~~~~
+
+If a git repository is used by at least one job for a queue item, then
+Zuul will freeze the repo state (i.e., branch heads and tags) and use
+that same state for every job run for that queue item.  Not every job
+will get a git repo checkout of every repo, but for any repo that is
+checked out, it will have the same state.  Because of this, authors
+can be sure that jobs running on the same queue item have a consistent
+view of all involved git repos, even if one job starts running much
+later than another.
