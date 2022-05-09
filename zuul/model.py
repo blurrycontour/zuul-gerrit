@@ -5387,6 +5387,9 @@ class Ref(object):
         tpc = tenant.project_configs.get(self.project.canonical_name)
         if tpc is None:
             return False
+        if hasattr(self, 'branch'):
+            if tpc.isAlwaysDynamicBranch(self.branch):
+                return True
         if self.files is None:
             # If self.files is None we don't know if this change updates the
             # config so assume it does as this is a safe default if we don't
@@ -6309,11 +6312,13 @@ class TenantProjectConfig(object):
         self.load_classes = set()
         self.shadow_projects = set()
         self.branches = []
+        self.dynamic_branches = []
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
         self.include_branches = None
         self.exclude_branches = None
+        self.always_dynamic_branches = None
         self.parsed_branch_config = {}  # branch -> ParsedConfig
         # The list of paths to look for extra zuul config files
         self.extra_config_files = ()
@@ -6321,6 +6326,13 @@ class TenantProjectConfig(object):
         self.extra_config_dirs = ()
         # Load config from a different branch if this is a config project
         self.load_branch = None
+
+    def isAlwaysDynamicBranch(self, branch):
+        if self.always_dynamic_branches is None:
+            return False
+        for r in self.always_dynamic_branches:
+            if r.fullmatch(branch):
+                return True
 
     def includesBranch(self, branch):
         if self.include_branches is not None:
@@ -7575,16 +7587,21 @@ class Tenant(object):
                                 (project,))
         return result
 
-    def getProjectBranches(self, project_canonical_name):
+    def getProjectBranches(self, project_canonical_name,
+                           include_always_dynamic=False):
         """Return a project's branches (filtered by this tenant config)
 
         :arg str project_canonical: The project's canonical name.
+        :arg bool include_always_dynamic: Whether to include
+             always-dynamic-branches
 
         :returns: A list of branch names.
         :rtype: [str]
 
         """
         tpc = self.project_configs[project_canonical_name]
+        if include_always_dynamic:
+            return tpc.branches + tpc.dynamic_branches
         return tpc.branches
 
     def getExcludeUnprotectedBranches(self, project):
