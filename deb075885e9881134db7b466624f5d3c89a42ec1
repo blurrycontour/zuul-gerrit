@@ -16,6 +16,23 @@
       "message": "This seems fine. I don\u0027t know what github/gitlab/pagure/etc do in this case but it seems reasonable given the gerrit behavior.",
       "revId": "deb075885e9881134db7b466624f5d3c89a42ec1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6decaab7_ca4525a5",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-09T22:58:05Z",
+      "side": 1,
+      "message": "Does the strategy matter here?  Gerrit\u0027s default merge behavior is closest to merge-resolve, which is why that\u0027s the default in Zuul.  When merging a merge commit, does the strategy matter?  If so, does gerrit\u0027s strategy in this case match merge-resolve?  If so, should that be what\u0027s chosen here?",
+      "revId": "deb075885e9881134db7b466624f5d3c89a42ec1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
