@@ -1518,6 +1518,7 @@ class TenantParser(object):
         'load-branch': str,
         'include-branches': to_list(str),
         'exclude-branches': to_list(str),
+        'always-dynamic-branches': to_list(str),
         'allow-circular-dependencies': bool,
     }}
 
@@ -1700,11 +1701,18 @@ class TenantParser(object):
             min_ltime = -1
         branches = sorted(tpc.project.source.getProjectBranches(
             tpc.project, tenant, min_ltime))
-        branches = [b for b in branches if tpc.includesBranch(b)]
         if 'master' in branches:
             branches.remove('master')
             branches = ['master'] + branches
-        tpc.branches = branches
+        static_branches = []
+        always_dynamic_branches = []
+        for b in branches:
+            if tpc.includesBranch(b):
+                static_branches.append(b)
+            elif tpc.isAlwaysDynamicBranch(b):
+                always_dynamic_branches.append(b)
+        tpc.branches = static_branches
+        tpc.dynamic_branches = always_dynamic_branches
 
     def _loadProjectKeys(self, connection_name, project):
         project.private_secrets_key, project.public_secrets_key = (
@@ -1730,6 +1738,7 @@ class TenantParser(object):
             project_exclude_unprotected_branches = None
             project_include_branches = None
             project_exclude_branches = None
+            project_always_dynamic_branches = None
             project_load_branch = None
         else:
             project_name = list(conf.keys())[0]
@@ -1754,12 +1763,28 @@ class TenantParser(object):
                 project_include_branches = [
                     re.compile(b) for b in as_list(project_include_branches)
                 ]
-            project_exclude_branches = conf[project_name].get(
+            exclude_branches = conf[project_name].get(
                 'exclude-branches', None)
-            if project_exclude_branches is not None:
+            if exclude_branches is not None:
                 project_exclude_branches = [
-                    re.compile(b) for b in as_list(project_exclude_branches)
+                    re.compile(b) for b in as_list(exclude_branches)
                 ]
+            else:
+                project_exclude_branches = None
+            always_dynamic_branches = conf[project_name].get(
+                'always-dynamic-branches', None)
+            if always_dynamic_branches is not None:
+                if project_exclude_branches is None:
+                    project_exclude_branches = []
+                    exclude_branches = []
+                project_always_dynamic_branches = []
+                for b in always_dynamic_branches:
+                    rb = re.compile(b)
+                    if b not in exclude_branches:
+                        project_exclude_branches.append(rb)
+                    project_always_dynamic_branches.append(rb)
+            else:
+                project_always_dynamic_branches = None
             if conf[project_name].get('extra-config-paths') is not None:
                 extra_config_paths = as_list(
                     conf[project_name]['extra-config-paths'])
@@ -1777,6 +1802,8 @@ class TenantParser(object):
             project_exclude_unprotected_branches
         tenant_project_config.include_branches = project_include_branches
         tenant_project_config.exclude_branches = project_exclude_branches
+        tenant_project_config.always_dynamic_branches = \
+            project_always_dynamic_branches
         tenant_project_config.extra_config_files = extra_config_files
         tenant_project_config.extra_config_dirs = extra_config_dirs
         tenant_project_config.load_branch = project_load_branch
@@ -2577,7 +2604,8 @@ class ConfigLoader(object):
         else:
             # Use the cached branch list; since this is a dynamic
             # reconfiguration there should not be any branch changes.
-            branches = tenant.getProjectBranches(project.canonical_name)
+            branches = tenant.getProjectBranches(project.canonical_name,
+                                                 include_always_dynamic=True)
 
         for branch in branches:
             fns1 = []
