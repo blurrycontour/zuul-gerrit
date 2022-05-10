@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd0d5272_0bbaa2e3",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-05-10T20:20:27Z",
+      "side": 1,
+      "message": "This should say \"A list of regex matching branches\" like \u0027include-branches\u0027 above, right?",
+      "range": {
+        "startLine": 226,
+        "startChar": 12,
+        "endLine": 226,
+        "endChar": 30
+      },
+      "revId": "8a58dfaec991a23aa2356c2d1afd7572d19fbcb6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
