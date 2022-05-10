@@ -33,6 +33,24 @@
       "message": "Does the strategy matter here?  Gerrit\u0027s default merge behavior is closest to merge-resolve, which is why that\u0027s the default in Zuul.  When merging a merge commit, does the strategy matter?  If so, does gerrit\u0027s strategy in this case match merge-resolve?  If so, should that be what\u0027s chosen here?",
       "revId": "deb075885e9881134db7b466624f5d3c89a42ec1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a40c9e1_20d2833a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2022-05-10T14:54:33Z",
+      "side": 1,
+      "message": "In most cases, I think the strategy is irrelevant because the user is the one making the actual merge and resolving any conflicts, in which case this is an effective fast-forward. If other changes land on the target branch before the merge (which, in my experience is rare, but I could be in the minority) Gerrit will do a merge of the merge (see diagram in my comment on Patch Set 1). I think in this case it just acts like the Submit Type is \"merge-if-necessary\" instead of \"cherry-pick\"/\"rebase-if-necessary\". I\u0027m not sure if that means we need a knob to control the merge resolution or not.",
+      "parentUuid": "6decaab7_ca4525a5",
+      "revId": "deb075885e9881134db7b466624f5d3c89a42ec1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
