@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "6eb86783_615811ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-05-11T13:30:31Z",
+      "side": 1,
+      "message": "I added a section about re2 introduction under implementation notes. There are 3 different ways proposed to proceed with this topic. If any specific direction is preferred by maintainers or any further alternatives proposed I will rewrite the spec accordingly.",
+      "parentUuid": "df723f60_29ca80de",
+      "revId": "08a2ea95179857320b04c6e15e100bf51d47867c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9d205ff9_bdd26233",
         "filename": "doc/source/developer/specs/job-fileset.rst",
         "patchSetId": 2
@@ -102,6 +120,24 @@
       "side": 1,
       "message": "I will make an update in the next patch.",
       "parentUuid": "aec69590_b0d825d4",
+      "revId": "08a2ea95179857320b04c6e15e100bf51d47867c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d652398_5f976f7a",
+        "filename": "doc/source/developer/specs/job-fileset.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-05-11T13:30:31Z",
+      "side": 1,
+      "message": "A concrete proposal for the deprecation plan is added now.",
+      "parentUuid": "fb56cb88_8168d5e2",
       "revId": "08a2ea95179857320b04c6e15e100bf51d47867c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
