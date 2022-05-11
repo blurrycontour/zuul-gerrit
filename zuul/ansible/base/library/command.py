@@ -532,8 +532,10 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
             # ZUUL: stdout and stderr are in the console log file
             # ZUUL: return the saved log lines so we can ship them back
             stdout = b('').join(_log_lines)
+            uncensored_stdout = stdout
         else:
             stdout = b('')
+            uncensored_stdout = cmd.stdout.read()
         stderr = b('')
 
     except (OSError, IOError) as e:
@@ -565,10 +567,10 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         self.fail_json(cmd=self._clean_args(args), rc=rc, stdout=stdout, stderr=stderr, msg=msg)
 
     if encoding is not None:
-        return (rc, to_native(stdout, encoding=encoding, errors=errors),
+        return (rc, to_native(uncensored_stdout, encoding=encoding, errors=errors),
                 to_native(stderr, encoding=encoding, errors=errors))
 
-    return (rc, stdout, stderr)
+    return (rc, uncensored_stdout, stderr)
 
 
 def check_command(module, commandline):
