@@ -16,6 +16,23 @@
       "message": "Should this be mentioned in the release notes?",
       "revId": "dadf9854be90d42fdbf6d2aa3b092006c9a05380",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4705d943_7f89fd5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-11T18:27:05Z",
+      "side": 1,
+      "message": "The deprecation itself is already in the release notes and sending email reminding people about it and pointing at the tool seems sufficient.",
+      "revId": "dadf9854be90d42fdbf6d2aa3b092006c9a05380",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
