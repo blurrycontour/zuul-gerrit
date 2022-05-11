@@ -57,12 +57,14 @@ class BranchCacheZKObject(ShardedZKObject):
     def __init__(self):
         super().__init__()
         self._set(protected={},
-                  remainder={})
+                  remainder={},
+                  ltimes={})
 
     def serialize(self, context):
         data = {
             "protected": self.protected,
             "remainder": self.remainder,
+            "ltimes": self.ltimes,
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
@@ -128,6 +130,10 @@ class BranchCache:
         if self.ltime < min_ltime:
             with locked(self.rlock):
                 self.cache.refresh(self.zk_context)
+
+        project_ltime = self.cache.ltimes.get(project_name)
+        if project_ltime is not None and project_ltime < min_ltime:
+            return None
 
         protected_branches = self.cache.protected.get(project_name)
         remainder_branches = self.cache.remainder.get(project_name)

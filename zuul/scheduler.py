@@ -1365,13 +1365,9 @@ class Scheduler(threading.Thread):
                 # Consider caches valid if the cache ltime >= event ltime
                 min_ltimes = defaultdict(
                     lambda: defaultdict(lambda: event.zuul_event_ltime))
-                # Invalidate the branch cache for all connections
-                for connection in self.connections.connections.values():
-                    if hasattr(connection, 'clearBranchCache'):
-                        connection.clearBranchCache()
                 ltime = self.zk_client.getCurrentLtime()
-                # Consider the branch cache valid only after we
-                # cleared it
+                # Consider a project's branch cache valid if it was
+                # refreshed after this point.
                 branch_cache_min_ltimes = defaultdict(lambda: ltime)
 
             for tenant_name in tenant_names:
