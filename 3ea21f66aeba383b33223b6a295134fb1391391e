@@ -18,6 +18,41 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71c09010_6e00a372",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-05-11T15:31:12Z",
+      "side": 1,
+      "message": "Thank you for the prompt feedback. If we want to proceed, this needs a test to check the job-output.json does not contains the output.\n\nDaniel is added as a reviewer because he brought up the issue when he was trying to generate secret for opensearch with http-utils (when passlib is not installed).",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02cd7161_e6ab6aff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-05-11T15:31:12Z",
+      "side": 1,
+      "message": "I am also confused about this behavior, it\u0027s just that the tasks defined in the commit message are presently not working with Zuul, while they do work with Ansible.\n\nIf I understand correctly, Ansible does censor the output later when running in verbose mode:\n\n  # in roles/testy/tasks/main.yaml\n  - name: No log shell register\n    zuul_command:\n      zuul_log_id: 42\n      argv:\n        - echo\n        - secret\n    register: _task\n    no_log: true\n\n  # setup zuul_command with ln -s command.py zuul/ansible/base/library/zuul_command.py\n\n  $ ansible -v testy.yamml\n  PLAY [localhost] \n\n  TASK [testy : No log shell register] \n  changed: [localhost] \u003d\u003e {\"censored\": \"the output has been hidden due to the fact that \u0027no_log: true\u0027 was specified for this result\", \"changed\": true}\n\n\nThough I guess we\u0027ll need to also patch the zuul_json callback to do the same for job-output.json.",
+      "parentUuid": "5a0cae5f_4358be8f",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94996fc5_a4a9e0e4",
