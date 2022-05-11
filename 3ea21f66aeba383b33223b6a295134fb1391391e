@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a0cae5f_4358be8f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-11T14:40:10Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e So, to be clear, the intent is that the uncensored_stdout winds up in the stdout arg for module.exit_json(). Does the same patch need to be copied to the version-specific (2.8, 2.9) forks of command.py?\n\u003e \n\u003e Also, the existing tests.test_v3 doesn\u0027t look like it has any no_log scenarios which would cover stdout. It would probably be a good idea to extend testing to make sure we don\u0027t leak sensitive strings into the text log or json log if they appear in the stdout of a no_log task.\n\nI agree at the very least we should have testing to cover this and we should ensure that all of the ansible versions exhibit the same behavior.\n\nThat said I\u0027m a bit confused as I thought the whole point of no_log was to not log things which woudl explain why the current code doesn\u0027t log things. It would be helpful to explain why the current code isn\u0027t correct and why the proposed change is under those expectations in addition to testing that we don\u0027t overexpose anything.\n\nFinally I left some implementation details inline should we decide to proceed with these changes.",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94996fc5_a4a9e0e4",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-11T14:40:10Z",
+      "side": 1,
+      "message": "You should remove this case instead then remove the else block below.",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52d8a087_9231dc8a",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-11T14:40:10Z",
+      "side": 1,
+      "message": "This case existed because no log doesn\u0027t record any stdout so we can just skip along without processing the stdout in a separate thread. But now you are undoing that so we should undo the special handling as noted above.",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
