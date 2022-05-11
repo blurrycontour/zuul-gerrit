@@ -533,7 +533,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
             # ZUUL: return the saved log lines so we can ship them back
             stdout = b('').join(_log_lines)
         else:
-            stdout = b('')
+            stdout = cmd.stdout.read()
         stderr = b('')
 
     except (OSError, IOError) as e:
