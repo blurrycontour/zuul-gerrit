@@ -16,6 +16,24 @@
       "message": "Will this end up getting leaked into the job-output.json or will it still get marked as censored there? It looks like Zuul\u0027s not responsible for redacting the record, so I\u0027m assuming not, but for example this is passed into self.fail_json down at line 565. Would it be a good idea to test for that, or do you think it\u0027s unnecessary?",
       "revId": "9f1d41235501bf2f56f52f0096a75a9aca3669e6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89a41ba1_cf1bff29",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-05-11T13:09:25Z",
+      "side": 1,
+      "message": "Good catch, we need to fix the fail_json path too.",
+      "parentUuid": "a4743f5d_a5c287b9",
+      "revId": "9f1d41235501bf2f56f52f0096a75a9aca3669e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
