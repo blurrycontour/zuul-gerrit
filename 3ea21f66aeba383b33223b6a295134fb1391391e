@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e435fd5_405818e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2022-05-12T08:42:33Z",
+      "side": 1,
+      "message": "The problem encountered in Zuul prevents the execution of an external program,\nscript. Everything that produce stdout, that later is registered as task variable,\nis cleared by Zuul.\nIt raise an issue, when the stdout needs to be set into a variable, template, etc.\nFor example, user might want to encrypt a text as a base64 by using command/shell\nmodule, then it will be registered to the task variable. Normally, the\nvariable in printing will be a dictionary, which contain \"stdout\", \"stdout_lines\" keys, that\nlater can be used in other tasks. In Zuul, it makes that field empty, which is incorrect.\nI agree, that Zuul should not be able to print variables, that earlier were declared, because\nit might be a securrity breach, but for the newest variables, it should allow to do it. However, user can print old variable and assign it to the new var, which can be a huge problem.\nIn other words, it might be difficult from Zuul CI administrator, to prevent showing sensitive data to the user. From the other side,\nbasic functionality that is provided by Ansible is needed.",
+      "parentUuid": "02cd7161_e6ab6aff",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94996fc5_a4a9e0e4",
         "filename": "zuul/ansible/base/library/command.py",
         "patchSetId": 2
