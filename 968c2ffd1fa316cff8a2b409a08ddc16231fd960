@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 7:\n\u003e \n\u003e Given that this is in service of Gerrit, and the gerrit default strategy is approximately equal to merge-resolve (recall that Gerrit uses jgit and we\u0027re using cgit and they don\u0027t behave the same way) we should probably match Gerrit as closely as possible (as we do generally).\n\ndone",
       "revId": "968c2ffd1fa316cff8a2b409a08ddc16231fd960",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bad1fff_7fb65ee6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2022-05-12T13:10:51Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "968c2ffd1fa316cff8a2b409a08ddc16231fd960",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
