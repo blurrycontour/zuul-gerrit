@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "343eaebc_6e5fb7fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34418
+      },
+      "writtenOn": "2022-05-12T07:55:11Z",
+      "side": 1,
+      "message": "I used this review to test the alternative pyre2 python module. If we decide to go this way it should be probably done in a separate review.",
+      "revId": "72104dbbdfda0fce5567bb2d9bcd5d75b81926d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
