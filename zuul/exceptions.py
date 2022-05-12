@@ -82,11 +82,11 @@ class AuthTokenUnauthorizedException(AuthTokenException):
 
 
 class AuthTokenUndecodedException(AuthTokenUnauthorizedException):
-    default_msg = 'Auth Token could not be decoded'
+    defaultMsg = 'Auth Token could not be decoded'
 
 
 class AuthTokenInvalidSignatureException(AuthTokenUnauthorizedException):
-    default_msg = 'Invalid signature'
+    defaultMsg = 'Invalid signature'
 
 
 class BearerTokenRequiredError(AuthTokenUnauthorizedException):

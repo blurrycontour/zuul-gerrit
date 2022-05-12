@@ -1740,6 +1740,33 @@ class TestTenantScopedWebApi(BaseTestWeb):
                   'pipeline': 'check'})
         self.assertEqual(401, resp.status_code)
 
+    def test_bad_format_JWT_token(self):
+        token = 'thisisnotwhatatokenshouldbelike'
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/autohold",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'job': 'project-test1',
+                  'count': 1,
+                  'reason': 'because',
+                  'node_hold_expiration': 36000})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'trigger': 'gerrit',
+                  'change': '2,1',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/project/org/project/enqueue",
+            headers={'Authorization': 'Bearer %s' % token},
+            json={'trigger': 'gerrit',
+                  'ref': 'abcd',
+                  'newrev': 'aaaa',
+                  'oldrev': 'bbbb',
+                  'pipeline': 'check'})
+        self.assertEqual(401, resp.status_code)
+
     def test_expired_JWT_token(self):
         authz = {'iss': 'zuul_operator',
                  'sub': 'testuser',
