@@ -1211,6 +1211,7 @@ class PipelineParser(object):
                     'start-message': str,
                     'merge-conflict-message': str,
                     'merge-failure-message': str,
+                    'enqueue-message': str,
                     'no-jobs-message': str,
                     'footer-message': str,
                     'dequeue-message': str,
