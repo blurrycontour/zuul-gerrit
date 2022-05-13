@@ -16,6 +16,23 @@
       "message": "PoC of that issue is: https://review.opendev.org/c/openstack/ci-log-processing/+/840667 in ci-log-processing-bcrypt CI job.",
       "revId": "66844797d21da391447ec80731381649b45cb69e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51626e06_b091f1da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2022-05-13T06:31:20Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1:\n\u003e \n\u003e We similarly discovered that network interface interrogation in the Ansible stdlib relies on the netaddr package, but doesn\u0027t declare a dependency on it (hence why it got appended to the list recently). Dropping ARA caused a regression for a bunch of jobs in OpenDev (and likely elsewhere) because ARA declared a dependency on netaddr and so was implicitly providing it in the venv.\n\u003e \n\u003e This raises a larger question, should Ansible be delcaring dependencies on modules used by its stdlib?\n\nIMO yes and it was strange for me, that those libraries are not included by default into requirements.txt file. I will try to talk with Ansible team to get answer.",
+      "revId": "66844797d21da391447ec80731381649b45cb69e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
