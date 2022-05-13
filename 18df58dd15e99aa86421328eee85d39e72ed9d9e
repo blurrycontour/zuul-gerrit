@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f20e684b_2b712a0d",
+        "filename": "tests/fixtures/layouts/start-message-repr.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-13T15:38:55Z",
+      "side": 1,
+      "message": "Might also be good to test the sub attributes like pipeline.name and change.name? They are explicitly called out in the docs now.",
+      "revId": "18df58dd15e99aa86421328eee85d39e72ed9d9e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "439fc076_01595dac",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-13T15:38:55Z",
+      "side": 1,
+      "message": "This seems unnecessarily complex if we always pass in self.__repr__() which is formatting the string for us. Can we instead simply accept the string and set it as an attribute which we return as the __repr__ of the Attributes object?\n\nAs an alternative Attributes() is meant to be a safe to string format set of attributes related to a broader object. It is possible that broader object\u0027s internal __repr__ isn\u0027t safe for external consumption?\n\nWe might want to instead track which attributes are set on this object and then do a simple foo\u003d{foo} repr to ensure we only expose these safe attributes?",
+      "revId": "18df58dd15e99aa86421328eee85d39e72ed9d9e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
