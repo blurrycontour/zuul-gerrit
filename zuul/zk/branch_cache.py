@@ -104,12 +104,17 @@ class BranchCache:
                 self.cache = BranchCacheZKObject.new(
                     self.zk_context, _path=data_path)
 
-    def clear(self):
+    def clear(self, projects=None):
         """Clear the cache"""
         with locked(self.wlock):
             with self.cache.activeContext(self.zk_context):
-                self.cache.protected.clear()
-                self.cache.remainder.clear()
+                if projects is None:
+                    self.cache.protected.clear()
+                    self.cache.remainder.clear()
+                else:
+                    for p in projects:
+                        self.cache.protected.pop(p, None)
+                        self.cache.remainder.pop(p, None)
 
     def getProjectBranches(self, project_name, exclude_unprotected,
                            min_ltime=-1):
