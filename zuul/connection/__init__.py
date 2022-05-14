@@ -21,6 +21,10 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Project
 
 
+class ReadOnlyBranchCacheError(RuntimeError):
+    pass
+
+
 class BaseConnection(object, metaclass=abc.ABCMeta):
     """Base class for connections.
 
@@ -241,15 +245,35 @@ class ZKBranchCacheMixin:
             # Handle the case where tenant validation doesn't use the cache
             branches = None
 
-        if branches is not None:
+        if branches:
             return sorted(branches)
 
         if self.read_only:
+            if branches is None:
+                # A scheduler hasn't attempted to fetch them yet
+                raise ReadOnlyBranchCacheError(
+                    "Will not fetch project branches as read-only is set")
+            # A scheduler has previously attempted a fetch, but got
+            # the empty list due to an error; we can't retry since
+            # we're read-only
             raise RuntimeError(
                 "Will not fetch project branches as read-only is set")
 
         # We need to perform a query
-        branches = self._fetchProjectBranches(project, exclude_unprotected)
+        try:
+            branches = self._fetchProjectBranches(project, exclude_unprotected)
+        except Exception:
+            # We weren't able to get the branches.  We need to tell
+            # future schedulers to try again but tell zuul-web that we
+            # tried and failed.  Set the branches to the empty list to
+            # indicate that we have performed a fetch and retrieved no
+            # data.  Any time we encounter the empty list in the
+            # cache, we will try again (since it is not reasonable to
+            # have a project with no branches).
+            if self._branch_cache:
+                self._branch_cache.setProjectBranches(
+                    project.name, exclude_unprotected, [])
+            raise
         self.log.info("Got branches for %s" % project.name)
 
         if self._branch_cache:
@@ -315,14 +339,14 @@ class ZKBranchCacheMixin:
             # again.
             event.branch_protected = True
 
-    def clearBranchCache(self):
+    def clearBranchCache(self, projects=None):
         """Clear the branch cache
 
         In case the branch cache gets out of sync with the source,
         this method can be called to clear it and force querying the
         source the next time the cache is used.
         """
-        self._branch_cache.clear()
+        self._branch_cache.clear(projects)
 
 
 class ZKChangeCacheMixin:

@@ -28,6 +28,7 @@ from unittest import skip
 import requests
 
 from zuul.lib.statsd import normalize_statsd_name
+from zuul.zk.locks import tenant_write_lock
 import zuul.web
 
 from tests.base import ZuulTestCase, AnsibleZuulTestCase
@@ -1226,6 +1227,94 @@ class TestWebStatusDisplayBranch(BaseTestWeb):
 
 class TestWebMultiTenant(BaseTestWeb):
     tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def test_tenant_reconfigure_command(self):
+        # The 'zuul-scheduler tenant-reconfigure' and full-reconfigure
+        # are used to correct problems, and as such they clear the
+        # branch cache.  Until the reconfiguration is complete,
+        # zuul-web will be unable to load configuration for any tenant
+        # which has projects that have been cleared from the branch
+        # cache.  This test verifies that we retry that operation
+        # after encountering missing branch errors.
+        sched = self.scheds.first.sched
+        web = self.web.web
+        # Don't perform any automatic config updates on zuul web so
+        # that we can control the sequencing.
+        self.web.web._system_config_running = False
+        self.web.web.system_config_cache_wake_event.set()
+        self.web.web.system_config_thread.join()
+
+        first_state = sched.tenant_layout_state.get('tenant-one')
+        self.assertEqual(first_state,
+                         web.local_layout_state.get('tenant-one'))
+
+        data = self.get_url('api/tenant/tenant-one/jobs').json()
+        self.assertEqual(len(data), 4)
+
+        # Reconfigure tenant-one so that the layout state will be
+        # different and we can start a layout update in zuul-web
+        # later.
+        self.log.debug("Reconfigure tenant-one")
+        self.scheds.first.tenantReconfigure(['tenant-one'])
+        self.waitUntilSettled()
+        self.log.debug("Done reconfigure tenant-one")
+
+        second_state = sched.tenant_layout_state.get('tenant-one')
+        self.assertEqual(second_state,
+                         sched.local_layout_state.get('tenant-one'))
+        self.assertEqual(first_state,
+                         web.local_layout_state.get('tenant-one'))
+
+        self.log.debug("Grab write lock for tenant-two")
+        with tenant_write_lock(self.zk_client, 'tenant-two') as lock:
+            # Start a reconfiguration of tenant-two; allow it to
+            # proceed past the point that the branch cache is cleared
+            # and is waiting on the lock we hold.
+            self.scheds.first.tenantReconfigure(
+                ['tenant-two'], command_socket=True)
+            for _ in iterate_timeout(30, "reconfiguration to start"):
+                if 'RECONFIG' in lock.contenders():
+                    break
+            # Now that the branch cache is cleared as part of the
+            # tenant-two reconfiguration, allow zuul-web to
+            # reconfigure tenant-one.  This should produce an error
+            # because of the missing branch cache.
+            self.log.debug("Web update layout 1")
+            self.web.web.updateSystemConfig()
+            self.assertFalse(self.web.web.updateLayout())
+            self.log.debug("Web update layout done")
+
+            self.assertEqual(second_state,
+                             sched.local_layout_state.get('tenant-one'))
+            self.assertEqual(first_state,
+                             web.local_layout_state.get('tenant-one'))
+
+            # Make sure we can still access tenant-one's config via
+            # zuul-web
+            data = self.get_url('api/tenant/tenant-one/jobs').json()
+            self.assertEqual(len(data), 4)
+        self.log.debug("Release write lock for tenant-two")
+        for _ in iterate_timeout(30, "reconfiguration to finish"):
+            if 'RECONFIG' not in lock.contenders():
+                break
+
+        self.log.debug("Web update layout 2")
+        self.web.web.updateSystemConfig()
+        self.web.web.updateLayout()
+        self.log.debug("Web update layout done")
+
+        # Depending on tenant order, we may need to run one more time
+        self.log.debug("Web update layout 3")
+        self.web.web.updateSystemConfig()
+        self.assertTrue(self.web.web.updateLayout())
+        self.log.debug("Web update layout done")
+
+        self.assertEqual(second_state,
+                         sched.local_layout_state.get('tenant-one'))
+        self.assertEqual(second_state,
+                         web.local_layout_state.get('tenant-one'))
+        data = self.get_url('api/tenant/tenant-one/jobs').json()
+        self.assertEqual(len(data), 4)
 
     def test_web_labels_allowed_list(self):
         labels = ["tenant-one-label", "fake", "tenant-two-label"]

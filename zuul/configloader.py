@@ -25,6 +25,7 @@ import voluptuous as vs
 
 from zuul import change_matcher
 from zuul import model
+from zuul.connection import ReadOnlyBranchCacheError
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -232,6 +233,8 @@ def project_configuration_exceptions(context, accumulator):
     try:
         yield
     except ConfigurationSyntaxError:
+        raise
+    except ReadOnlyBranchCacheError:
         raise
     except Exception as e:
         intro = textwrap.fill(textwrap.dedent("""\

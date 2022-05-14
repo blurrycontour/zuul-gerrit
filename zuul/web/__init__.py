@@ -36,7 +36,7 @@ import prometheus_client
 import zuul.executor.common
 from zuul import exceptions
 from zuul.configloader import ConfigLoader
-from zuul.connection import BaseConnection
+from zuul.connection import BaseConnection, ReadOnlyBranchCacheError
 import zuul.lib.repl
 from zuul.lib import commandsocket, encryption, streamer_utils
 from zuul.lib.ansible import AnsibleManager
@@ -2048,7 +2048,11 @@ class ZuulWeb(object):
                 if not self._system_config_running:
                     return
                 self.updateSystemConfig()
-                self.updateLayout()
+                if not self.updateLayout():
+                    # Branch cache errors with at least one tenant,
+                    # try again.
+                    time.sleep(10)
+                    self.system_config_cache_wake_event.set()
             except Exception:
                 self.log.exception("Exception while updating system config")
 
@@ -2084,6 +2088,7 @@ class ZuulWeb(object):
         tenant_names = set(self.abide.tenants)
         tenant_names.update(self.unparsed_abide.tenants.keys())
 
+        success = True
         for tenant_name in tenant_names:
             # Reload the tenant if the layout changed.
             if (self.local_layout_state.get(tenant_name)
@@ -2091,31 +2096,48 @@ class ZuulWeb(object):
                 continue
             self.log.debug("Reloading tenant %s", tenant_name)
             with tenant_read_lock(self.zk_client, tenant_name):
-                layout_state = self.tenant_layout_state.get(tenant_name)
-                layout_uuid = layout_state and layout_state.uuid
-
-                if layout_state:
-                    min_ltimes = self.tenant_layout_state.getMinLtimes(
-                        layout_state)
-                    branch_cache_min_ltimes = (
-                        layout_state.branch_cache_min_ltimes)
-                else:
-                    # Consider all project branch caches valid if
-                    # we don't have a layout state.
-                    min_ltimes = defaultdict(
-                        lambda: defaultdict(lambda: -1))
-                    branch_cache_min_ltimes = defaultdict(lambda: -1)
-
-                # The tenant will be stored in self.abide.tenants after
-                # it was loaded.
-                tenant = loader.loadTenant(
-                    self.abide, tenant_name, self.ansible_manager,
-                    self.unparsed_abide, min_ltimes=min_ltimes,
-                    layout_uuid=layout_uuid,
-                    branch_cache_min_ltimes=branch_cache_min_ltimes)
-                if tenant is not None:
-                    self.local_layout_state[tenant_name] = layout_state
-                else:
-                    with suppress(KeyError):
-                        del self.local_layout_state[tenant_name]
+                try:
+                    self._updateTenantLayout(loader, tenant_name)
+                except ReadOnlyBranchCacheError:
+                    self.log.info(
+                        "Unable to update layout due to incomplete branch "
+                        "cache, possibly due to in-progress tenant "
+                        "reconfiguration; will retry")
+                    success = False
         self.log.debug("Done updating layout state")
+        return success
+
+    def _updateTenantLayout(self, loader, tenant_name):
+        # Reload the tenant if the layout changed.
+        if (self.local_layout_state.get(tenant_name)
+                == self.tenant_layout_state.get(tenant_name)):
+            return
+        self.log.debug("Reloading tenant %s", tenant_name)
+        with tenant_read_lock(self.zk_client, tenant_name):
+            layout_state = self.tenant_layout_state.get(tenant_name)
+            layout_uuid = layout_state and layout_state.uuid
+
+            if layout_state:
+                min_ltimes = self.tenant_layout_state.getMinLtimes(
+                    layout_state)
+                branch_cache_min_ltimes = (
+                    layout_state.branch_cache_min_ltimes)
+            else:
+                # Consider all project branch caches valid if
+                # we don't have a layout state.
+                min_ltimes = defaultdict(
+                    lambda: defaultdict(lambda: -1))
+                branch_cache_min_ltimes = defaultdict(lambda: -1)
+
+            # The tenant will be stored in self.abide.tenants after
+            # it was loaded.
+            tenant = loader.loadTenant(
+                self.abide, tenant_name, self.ansible_manager,
+                self.unparsed_abide, min_ltimes=min_ltimes,
+                layout_uuid=layout_uuid,
+                branch_cache_min_ltimes=branch_cache_min_ltimes)
+            if tenant is not None:
+                self.local_layout_state[tenant_name] = layout_state
+            else:
+                with suppress(KeyError):
+                    del self.local_layout_state[tenant_name]
