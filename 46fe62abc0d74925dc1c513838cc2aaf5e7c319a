@@ -24,6 +24,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20279cae_cc0ceacf",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-16T23:15:20Z",
+      "side": 1,
+      "message": "Yes, let\u0027s adopt the release-note language here to try to make it more clear.\n\nBasically, we won\u0027t load any configuration into a tenant\u0027s layout.  But we will create dynamic layouts for every change, and include the contents of the repo in those dynamic layouts.",
+      "revId": "46fe62abc0d74925dc1c513838cc2aaf5e7c319a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "498e65e0_df5fbd42",
@@ -41,6 +58,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fce360f_c395b64d",
+        "filename": "tests/fixtures/config/dynamic-only-project/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-16T23:15:20Z",
+      "side": 1,
+      "message": "Yes; I thought we would need this to test that static configuration wasn\u0027t being loaded, but the post job is sufficient for that so we can remove this.",
+      "revId": "46fe62abc0d74925dc1c513838cc2aaf5e7c319a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b75cb2e_69a6b497",
@@ -54,6 +88,23 @@
       "writtenOn": "2022-05-16T23:05:38Z",
       "side": 1,
       "message": "I think the docs confusion also leads to some confusion here. Why isn\u0027t project-test also running if it ran on the previous change at line 8157? Seems like it should\u0027ve have run there?",
+      "revId": "46fe62abc0d74925dc1c513838cc2aaf5e7c319a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1667e60b_7e646607",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 8161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-16T23:15:20Z",
+      "side": 1,
+      "message": "Change #2 ran with a dynamic config created with the contents of the repo which say to run \"project-test\", so it ran that job.  That tests the main part of this new feature: \"don\u0027t bother loading static config for this branch, but instead create a dynamic config every time\".\n\nChange #3 is a proposed change to overwrite the in-repo config so that instead of running \"project-test\" it only runs \"project-dynamic\".  That tests that even when we\u0027re doing the main thing this feature adds (which is treating static config as dynamic) we also still support changing the dynamic config.  In other words, this tests that dynamic config works in the way it normally does on proposed changes to zuul.yaml in all cases.",
       "revId": "46fe62abc0d74925dc1c513838cc2aaf5e7c319a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
