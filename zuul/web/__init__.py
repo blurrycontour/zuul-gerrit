@@ -2070,8 +2070,9 @@ class ZuulWeb(object):
         for tenant_name in deleted_tenants:
             self.abide.clearTPCs(tenant_name)
 
-        loader.loadTPCs(self.abide, self.unparsed_abide)
         loader.loadAdminRules(self.abide, self.unparsed_abide)
+        loader.loadSemaphores(self.abide, self.unparsed_abide)
+        loader.loadTPCs(self.abide, self.unparsed_abide)
 
     def updateLayout(self):
         self.log.debug("Updating layout state")

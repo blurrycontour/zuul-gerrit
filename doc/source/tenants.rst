@@ -363,6 +363,57 @@ configuration. Some examples of tenant definitions are:
          to add finer filtering to admin rules, for example filtering by the ``iss``
          claim (generally equal to the issuer ID).
 
+   .. attr:: semaphores
+
+      A list of names of :attr:`global-semaphore` objects to allow
+      jobs in this tenant to access.
+
+.. _global_semaphore:
+
+Global Semaphore
+----------------
+
+Semaphores are normally defined in in-repo configuration (see
+:ref:`semaphore`), however to support use-cases where semaphores are
+used to represent constrained global resources that may be used by
+multiple Zuul tenants, semaphores may be defined within the main
+tenant configuration file.
+
+In order for a job to use a global semaphore, the semaphore must first
+be defined in the tenant configuration file with
+:attr:`global-semaphore` and then added to each tenant which should
+have access to it with :attr:`tenant.semaphores`.  Once that is done,
+Zuul jobs may use that semaphore in the same way they would use a
+normal tenant-scoped semaphore.
+
+If any tenant which is granted access to a global semaphore also has a
+tenant-scoped semaphore defined with the same name, that definition
+will be treated as a configuration error and subsequently ignored in
+favor of the global semaphore.
+
+An example definition looks similar to the normal semaphore object:
+
+.. code-block:: yaml
+
+   - global-semaphore:
+       name: global-semaphore-foo
+       max: 5
+
+.. attr:: global-semaphore
+
+   The following attributes are available:
+
+   .. attr:: name
+      :required:
+
+      The name of the semaphore, referenced by jobs.
+
+   .. attr:: max
+      :default: 1
+
+      The maximum number of running jobs which can use this semaphore.
+
+
 .. _admin_rule_definition:
 
 Access Rule
