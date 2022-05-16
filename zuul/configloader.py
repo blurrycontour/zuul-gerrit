@@ -190,6 +190,16 @@ class ProjectNotPermittedError(Exception):
         super(ProjectNotPermittedError, self).__init__(message)
 
 
+class GlobalSemaphoreNotFoundError(Exception):
+    def __init__(self, semaphore):
+        message = textwrap.dedent("""\
+        The global semaphore "{semaphore}" was not found.  All
+        global semaphores must be added to the main configuration
+        file by the Zuul administrator.""")
+        message = textwrap.fill(message.format(semaphore=semaphore))
+        super(GlobalSemaphoreNotFoundError, self).__init__(message)
+
+
 class YAMLDuplicateKeyError(ConfigurationSyntaxError):
     def __init__(self, key, node, context, start_mark):
         intro = textwrap.fill(textwrap.dedent("""\
@@ -1454,6 +1464,26 @@ class AuthorizationRuleParser(object):
         return a
 
 
+class GlobalSemaphoreParser(object):
+    def __init__(self):
+        self.log = logging.getLogger("zuul.GlobalSemaphoreParser")
+        self.schema = self.getSchema()
+
+    def getSchema(self):
+        semaphore = {vs.Required('name'): str,
+                     'max': int,
+                     }
+
+        return vs.Schema(semaphore)
+
+    def fromYaml(self, conf):
+        self.schema(conf)
+        semaphore = model.Semaphore(conf['name'], conf.get('max', 1),
+                                    global_scope=True)
+        semaphore.freeze()
+        return semaphore
+
+
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
@@ -1569,6 +1599,7 @@ class TenantParser(object):
                   'default-parent': str,
                   'default-ansible-version': vs.Any(str, float),
                   'admin-rules': to_list(str),
+                  'semaphores': to_list(str),
                   'authentication-realm': str,
                   # TODO: Ignored, allowed for backwards compat, remove for v5.
                   'report-build-page': bool,
@@ -1601,6 +1632,11 @@ class TenantParser(object):
             tenant.authorization_rules = conf['admin-rules']
         if conf.get('authentication-realm') is not None:
             tenant.default_auth_realm = conf['authentication-realm']
+        if conf.get('semaphores') is not None:
+            tenant.global_semaphores = set(as_list(conf['semaphores']))
+            for semaphore_name in tenant.global_semaphores:
+                if semaphore_name not in abide.semaphores:
+                    raise GlobalSemaphoreNotFoundError(semaphore_name)
         tenant.web_root = conf.get('web-root', self.globals.web_root)
         if tenant.web_root and not tenant.web_root.endswith('/'):
             tenant.web_root += '/'
@@ -1673,7 +1709,7 @@ class TenantParser(object):
 
         if self.scheduler:
             tenant.semaphore_handler = SemaphoreHandler(
-                self.zk_client, self.statsd, tenant.name, tenant.layout
+                self.zk_client, self.statsd, tenant.name, tenant.layout, abide
             )
             # Only call the postConfig hook if we have a scheduler as this will
             # change data in ZooKeeper. In case we are in a zuul-web context,
@@ -2410,6 +2446,7 @@ class ConfigLoader(object):
             connections, zk_client, scheduler, merger, keystorage,
             zuul_globals, statsd)
         self.admin_rule_parser = AuthorizationRuleParser()
+        self.global_semaphore_parser = GlobalSemaphoreParser()
 
     def expandConfigPath(self, config_path):
         if config_path:
@@ -2465,6 +2502,12 @@ class ConfigLoader(object):
         for conf_admin_rule in unparsed_abide.admin_rules:
             admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
             abide.admin_rules[admin_rule.name] = admin_rule
+
+    def loadSemaphores(self, abide, unparsed_abide):
+        abide.semaphores.clear()
+        for conf_semaphore in unparsed_abide.semaphores:
+            semaphore = self.global_semaphore_parser.fromYaml(conf_semaphore)
+            abide.semaphores[semaphore.name] = semaphore
 
     def loadTPCs(self, abide, unparsed_abide, tenants=None):
         if tenants:

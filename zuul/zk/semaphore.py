@@ -39,13 +39,22 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
     log = logging.getLogger("zuul.zk.SemaphoreHandler")
 
     semaphore_root = "/zuul/semaphores"
+    global_semaphore_root = "/zuul/global-semaphores"
 
-    def __init__(self, client, statsd, tenant_name, layout):
+    def __init__(self, client, statsd, tenant_name, layout, abide):
         super().__init__(client)
+        self.abide = abide
         self.layout = layout
         self.statsd = statsd
         self.tenant_name = tenant_name
         self.tenant_root = f"{self.semaphore_root}/{tenant_name}"
+
+    def _makePath(self, semaphore):
+        semaphore_key = quote_plus(semaphore.name)
+        if semaphore.global_scope:
+            return f"{self.global_semaphore_root}/{semaphore_key}"
+        else:
+            return f"{self.tenant_root}/{semaphore_key}"
 
     def _emitStats(self, semaphore_path, num_holders):
         if self.statsd is None:
@@ -80,8 +89,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             return False
         return True
 
-    def _acquire_one(self, log, item, job, request_resources, semaphore):
-        if semaphore.resources_first and request_resources:
+    def _acquire_one(self, log, item, job, request_resources, job_semaphore):
+        if job_semaphore.resources_first and request_resources:
             # We're currently in the resource request phase and want to get the
             # resources before locking. So we don't need to do anything here.
             return True
@@ -92,8 +101,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             # the resources phase.
             pass
 
-        semaphore_key = quote_plus(semaphore.name)
-        semaphore_path = f"{self.tenant_root}/{semaphore_key}"
+        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
+        semaphore_path = self._makePath(semaphore)
         semaphore_handle = {
             "buildset_path": item.current_build_set.getPath(),
             "job_name": job.name,
@@ -139,10 +148,13 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         return holdersFromData(data), zstat
 
     def getSemaphores(self):
-        try:
-            return self.kazoo_client.get_children(self.tenant_root)
-        except NoNodeError:
-            return []
+        ret = []
+        for root in (self.global_semaphore_root, self.tenant_root):
+            try:
+                ret.extend(self.kazoo_client.get_children(root))
+            except NoNodeError:
+                pass
+        return ret
 
     def _release(self, log, semaphore_path, semaphore_handle, quiet,
                  legacy_handle=None):
@@ -183,23 +195,31 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
         log = get_annotated_logger(self.log, item.event)
 
-        for semaphore in job.semaphores:
-            self._release_one(log, item, job, semaphore, quiet)
+        for job_semaphore in job.semaphores:
+            self._release_one(log, item, job, job_semaphore, quiet)
 
         # If a scheduler has been provided (which it is except in the
         # case of a rollback from acquire in this class), broadcast an
         # event to trigger pipeline runs.
         if sched is None:
             return
-        for pipeline_name in self.layout.pipelines.keys():
-            event = PipelineSemaphoreReleaseEvent()
-            sched.pipeline_management_events[
-                self.tenant_name][pipeline_name].put(
-                    event, needs_result=False)
 
-    def _release_one(self, log, item, job, semaphore, quiet):
-        semaphore_key = quote_plus(semaphore.name)
-        semaphore_path = f"{self.tenant_root}/{semaphore_key}"
+        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
+        if semaphore.global_scope:
+            tenants = [t for t in self.abide.tenants.values()
+                       if job_semaphore.name in t.global_semaphores]
+        else:
+            tenants = [self.abide.tenants[self.tenant_name]]
+        for tenant in tenants:
+            for pipeline_name in tenant.layout.pipelines.keys():
+                event = PipelineSemaphoreReleaseEvent()
+                sched.pipeline_management_events[
+                    tenant.name][pipeline_name].put(
+                        event, needs_result=False)
+
+    def _release_one(self, log, item, job, job_semaphore, quiet):
+        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
+        semaphore_path = self._makePath(semaphore)
         semaphore_handle = {
             "buildset_path": item.current_build_set.getPath(),
             "job_name": job.name,
@@ -209,16 +229,16 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                       legacy_handle)
 
     def semaphoreHolders(self, semaphore_name):
-        semaphore_key = quote_plus(semaphore_name)
-        semaphore_path = f"{self.tenant_root}/{semaphore_key}"
+        semaphore = self.layout.getSemaphore(self.abide, semaphore_name)
+        semaphore_path = self._makePath(semaphore)
         try:
             holders, _ = self.getHolders(semaphore_path)
         except NoNodeError:
             holders = []
         return holders
 
-    def _max_count(self, semaphore_name: str) -> int:
-        semaphore = self.layout.semaphores.get(semaphore_name)
+    def _max_count(self, semaphore_name):
+        semaphore = self.layout.getSemaphore(self.abide, semaphore_name)
         return 1 if semaphore is None else semaphore.max
 
     def cleanupLeaks(self):
@@ -240,8 +260,9 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                         is not None):
                     continue
 
-                semaphore_key = quote_plus(semaphore_name)
-                semaphore_path = f"{self.tenant_root}/{semaphore_key}"
+                semaphore = self.layout.getSemaphore(
+                    self.abide, semaphore_name)
+                semaphore_path = self._makePath(semaphore)
                 self.log.error("Releasing leaked semaphore %s held by %s",
                                semaphore_path, holder)
                 self._release(self.log, semaphore_path, holder, quiet=False)
