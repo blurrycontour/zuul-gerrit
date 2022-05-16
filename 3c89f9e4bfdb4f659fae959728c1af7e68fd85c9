@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36ad670_c71366ab",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 7438,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-16T22:53:51Z",
+      "side": 1,
+      "message": "Thanks, this seems likely to be leftover.",
+      "revId": "3c89f9e4bfdb4f659fae959728c1af7e68fd85c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00fafa7c_60c77f44",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-05-16T22:41:22Z",
       "side": 1,
       "message": "This seems redundant as tpc isn\u0027t used until line 2227 but we set its value again on line 2220.",
+      "revId": "3c89f9e4bfdb4f659fae959728c1af7e68fd85c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0f403af_fa5534ed",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-16T22:53:51Z",
+      "side": 1,
+      "message": "Agreed.",
       "revId": "3c89f9e4bfdb4f659fae959728c1af7e68fd85c9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
