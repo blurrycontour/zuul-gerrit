@@ -8128,8 +8128,8 @@ class TestSemaphoreInRepo(ZuulTestCase):
         item_dynamic_layout = pipeline.manager._layout_cache.get(
             queue_item.layout_uuid)
         self.assertIsNotNone(item_dynamic_layout)
-        dynamic_test_semaphore = \
-            item_dynamic_layout.semaphores.get('test-semaphore')
+        dynamic_test_semaphore = item_dynamic_layout.getSemaphore(
+            self.scheds.first.sched.abide, 'test-semaphore')
         self.assertEqual(dynamic_test_semaphore.max, 1)
 
         # one build must be in queue, one semaphores acquired
@@ -8152,7 +8152,8 @@ class TestSemaphoreInRepo(ZuulTestCase):
 
         # now that change A was merged, the new semaphore max must be effective
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-        self.assertEqual(tenant.layout.semaphores.get('test-semaphore').max, 2)
+        self.assertEqual(tenant.layout.getSemaphore(
+            self.scheds.first.sched.abide, 'test-semaphore').max, 2)
 
         # two builds must be in queue, two semaphores acquired
         self.assertEqual(len(self.builds), 2)

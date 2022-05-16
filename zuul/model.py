@@ -6650,11 +6650,13 @@ class UnparsedAbideConfig(object):
         self.ltime = -1
         self.tenants = {}
         self.admin_rules = []
+        self.semaphores = []
 
     def extend(self, conf):
         if isinstance(conf, UnparsedAbideConfig):
             self.tenants.update(conf.tenants)
             self.admin_rules.extend(conf.admin_rules)
+            self.semaphores.extend(conf.semaphores)
             return
 
         if not isinstance(conf, list):
@@ -6673,6 +6675,8 @@ class UnparsedAbideConfig(object):
                 self.tenants[value["name"]] = value
             elif key == 'admin-rule':
                 self.admin_rules.append(value)
+            elif key == 'global-semaphore':
+                self.semaphores.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -6681,6 +6685,7 @@ class UnparsedAbideConfig(object):
             "uuid": self.uuid,
             "tenants": self.tenants,
             "admin_rules": self.admin_rules,
+            "semaphores": self.semaphores,
         }
 
     @classmethod
@@ -6690,6 +6695,7 @@ class UnparsedAbideConfig(object):
         unparsed_abide.ltime = ltime
         unparsed_abide.tenants = data["tenants"]
         unparsed_abide.admin_rules = data["admin_rules"]
+        unparsed_abide.semaphores = data.get("semaphores")
         return unparsed_abide
 
 
@@ -6961,6 +6967,9 @@ class Layout(object):
         # It's ok to have a duplicate semaphore definition, but only if
         # they are in different branches of the same repo, and have
         # the same values.
+        if semaphore.name in self.tenant.global_semaphores:
+            raise Exception("Semaphore %s shadows a global semaphore and "
+                            "will be ignored" % (semaphore.name))
         other = self.semaphores.get(semaphore.name)
         if other is not None:
             if not semaphore.source_context.isSameProject(
@@ -6979,6 +6988,19 @@ class Layout(object):
             # ignore the duplicate definition
             return
         self.semaphores[semaphore.name] = semaphore
+
+    def getSemaphore(self, abide, semaphore_name):
+        if semaphore_name in self.tenant.global_semaphores:
+            return abide.semaphores[semaphore_name]
+        semaphore = self.semaphores.get(semaphore_name)
+        if semaphore:
+            return semaphore
+        # Return an implied semaphore with max=1
+        # TODO: consider deprecating implied semaphores to avoid typo
+        # config errors
+        semaphore = Semaphore(semaphore_name)
+        semaphore.freeze()
+        return semaphore
 
     def addQueue(self, queue):
         # Change queues must be unique and cannot be overridden.
@@ -7364,9 +7386,10 @@ class Layout(object):
 
 
 class Semaphore(ConfigObject):
-    def __init__(self, name, max=1):
+    def __init__(self, name, max=1, global_scope=False):
         super(Semaphore, self).__init__()
         self.name = name
+        self.global_scope = global_scope
         self.max = int(max)
 
     def __ne__(self, other):
@@ -7442,6 +7465,7 @@ class Tenant(object):
 
         self.authorization_rules = []
         self.default_auth_realm = None
+        self.global_semaphores = set()
 
     def __repr__(self):
         return f"<Tenant {self.name}>"
@@ -7645,6 +7669,7 @@ class UnparsedBranchCache(object):
 class Abide(object):
     def __init__(self):
         self.admin_rules = {}
+        self.semaphores = {}
         self.tenants = {}
         # tenant -> project -> list(tpcs)
         # The project TPCs are stored as a list as we don't check for
