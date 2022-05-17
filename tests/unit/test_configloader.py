@@ -211,6 +211,36 @@ class TestTenantSimple(TenantParserTestCase):
                 r'review.example.com/org/project2 @master.*',
                 update_logs.output)
 
+    def test_cache_new_branch(self):
+        # A full reconfiguration should issue cat jobs for all repos
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        first = self.scheds.first
+
+        lock1 = first.sched.layout_update_lock
+        lock2_ = first.sched.run_handler_lock
+        with lock1, lock2_:
+            self.create_branch('org/project1', 'stable')
+            self.fake_gerrit.addEvent(
+                self.fake_gerrit.getFakeBranchCreatedEvent(
+                    'org/project1', 'stable'))
+
+            second = self.createScheduler()
+            second.start()
+            self.assertEqual(len(self.scheds), 2)
+            for _ in iterate_timeout(10, "until priming is complete"):
+                state_one = first.sched.local_layout_state.get("tenant-one")
+                if state_one:
+                    break
+
+            for _ in iterate_timeout(
+                    10, "all schedulers to have the same layout state"):
+                if (second.sched.local_layout_state.get(
+                        "tenant-one") == state_one):
+                    break
+        self.waitUntilSettled()
+
     def test_variant_description(self):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         job = tenant.layout.jobs.get("project2-job")
