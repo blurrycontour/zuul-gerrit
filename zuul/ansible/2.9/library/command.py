@@ -404,12 +404,9 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         # ZUUL: Replaced the execution loop with the zuul_runner run function
 
         cmd = subprocess.Popen(args, **kwargs)
-        if self.no_log:
-            t = None
-        else:
-            t = threading.Thread(target=follow, args=(cmd.stdout, zuul_log_id))
-            t.daemon = True
-            t.start()
+        t = threading.Thread(target=follow, args=(cmd.stdout, zuul_log_id))
+        t.daemon = True
+        t.start()
 
         # ZUUL: Our log thread will catch the output so don't do that here.
 
