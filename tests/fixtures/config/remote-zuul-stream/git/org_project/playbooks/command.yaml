@@ -89,3 +89,22 @@
         - failed_in_loop1
         - failed_in_loop2
       ignore_errors: True
+
+# Try transitive includes two different ways
+- hosts: compute1
+  tasks:
+    - include_role:
+        name: include-echo-role
+      vars:
+        item: transitive-one
+    - include_role:
+        name: include-echo-role
+      vars:
+        item: transitive-two
+
+- hosts: compute1
+  roles:
+    - role: include-echo-role
+      item: transitive-three
+    - role: include-echo-role
+      item: transitive-four

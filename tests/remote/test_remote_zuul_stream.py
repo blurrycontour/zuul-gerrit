@@ -28,6 +28,7 @@ class FunctionalZuulStreamMixIn:
     def _setUp(self):
         self.log_console_port = 19000 + int(
             self.ansible_core_version.split('.')[1])
+        self.executor_server.log_console_port = self.log_console_port
         self.fake_nodepool.remote_ansible = True
 
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
@@ -150,6 +151,10 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(r'compute1 \| failed_in_loop2', text)
             self.assertLogLine(r'compute1 \| ok: Item: failed_in_loop2 '
                                r'Result: 1', text)
+            self.assertLogLine(r'compute1 \| transitive-one', text)
+            self.assertLogLine(r'compute1 \| transitive-two', text)
+            self.assertLogLine(r'compute1 \| transitive-three', text)
+            self.assertLogLine(r'compute1 \| transitive-four', text)
             self.assertLogLine(
                 r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
             self.assertLogLine('PLAY RECAP', text)
