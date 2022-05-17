@@ -86,6 +86,24 @@
       "parentUuid": "e84988dd_f58f119d",
       "revId": "b363f2951a5d8611e9cf144e621bd5cd42737c7d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "652750bd_8de0dd6b",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-05-17T15:43:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0516ed52_cd100aa0",
+      "revId": "b363f2951a5d8611e9cf144e621bd5cd42737c7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
