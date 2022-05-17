@@ -1,0 +1,11 @@
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+1: Fabien Boucher <fboucher@redhat.com>
+Code-Review+1: Gonéri Le Bouder <goneri@redhat.com>
+Code-Review+2: James E. Blair <jim@acmegating.com>
+Workflow+1: James E. Blair <jim@acmegating.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 17 May 2022 16:46:52 +0000
+Reviewed-on: https://review.opendev.org/c/zuul/zuul/+/840679
+Project: zuul/zuul
+Branch: refs/heads/master
