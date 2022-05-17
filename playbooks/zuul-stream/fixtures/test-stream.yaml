@@ -51,3 +51,22 @@
 
     - name: Print binary data
       command: echo -e '\x80abc'
+
+    # Check if no_log is working as expected
+    - name: Check no_log set to false
+      shell: echo secret | base64
+      register: _example_1
+      no_log: false
+
+    - name: Ensure that task stdout variable value is not empty
+      assert:
+        that: _example_1.stdout != ''
+
+    - name: Check no_log set to true
+      shell: echo secret | base64
+      register: _example_2
+      no_log: true
+
+    - name: Ensure that task stdout variable value is not empty
+      assert:
+        that: _example_2.stdout != ''
