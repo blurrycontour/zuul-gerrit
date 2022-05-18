@@ -2836,7 +2836,7 @@ class TestHeldAttributeInBuildInfo(BaseTestWeb):
                                        "project=org/project")
         held_builds_resp = self.get_url("api/tenant/tenant-one/builds?"
                                         "project=org/project&"
-                                        "held=1")
+                                        "held=true")
         self.assertEqual(200,
                          all_builds_resp.status_code,
                          all_builds_resp.text)
