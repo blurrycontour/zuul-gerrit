@@ -257,9 +257,11 @@ function getChipsFromFilters(filters, category) {
     switch ([...filters[category.key]].pop()) {
       case 1:
       case '1':
+      case 'true':
         return ['True',]
       case 0:
       case '0':
+      case 'false':
         return ['False',]
       default:
         return []

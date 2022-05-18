@@ -32,9 +32,11 @@ function FilterTernarySelect(props) {
     switch (value) {
       case 1:
       case '1':
+      case 'true':
         return category.options[1]
       case 0:
       case '0':
+      case 'false':
         return category.options[2]
       default:
         return null
@@ -56,9 +58,9 @@ function FilterTernarySelect(props) {
     const setNewFilter = (value) => {
       switch (value) {
         case category.options[1]:
-          return [1,]
+          return ['true',]
         case category.options[2]:
-          return [0,]
+          return ['false',]
         default:
           return []
       }
