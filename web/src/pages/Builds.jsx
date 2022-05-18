@@ -121,8 +121,19 @@ class BuildsPage extends React.Component {
         type: 'ternary',
         options: [
           'All',
-          'Voting Only',
-          'Non-Voting Only',
+          'Voting Builds Only',
+          'Non-Voting Builds Only',
+        ]
+      },
+      {
+        key: 'final',
+        title: 'Final',
+        placeholder: 'Choose Final Status...',
+        type: 'ternary',
+        options: [
+          'All',
+          'Final Builds Only',
+          'Non-Final Builds Only',
         ]
       },
     ]

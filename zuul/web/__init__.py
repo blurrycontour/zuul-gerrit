@@ -94,6 +94,12 @@ COMMANDS = [
 ]
 
 
+def boolean_or_none(x):
+    if x is not None:
+        return str(x).lower() in ['true', '1']
+    return x
+
+
 def get_zuul_request_id():
     request = cherrypy.serving.request
     if not hasattr(request, 'zuul_request_id'):
@@ -1537,12 +1543,12 @@ class ZuulWebAPI(object):
                 404,
                 f'Tenant {tenant_name} does not exist.')
 
-        # If final is None, we return all builds, both final and non-final
-        if final is not None:
-            final = final.lower() == "true"
-
-        if complete is not None:
-            complete = complete.lower() == 'true'
+        # If a boolean-type param is None, we return all builds
+        # otherwise we filter by the param.
+        final = boolean_or_none(final)
+        held = boolean_or_none(held)
+        voting = boolean_or_none(voting)
+        complete = boolean_or_none(complete)
 
         try:
             _idx_max = idx_max is not None and int(idx_max) or idx_max
@@ -1643,9 +1649,7 @@ class ZuulWebAPI(object):
                   idx_min=None, idx_max=None):
         connection = self._get_connection()
 
-        if complete:
-            complete = complete.lower() == 'true'
-
+        complete = boolean_or_none(complete)
         try:
             _idx_max = idx_max is not None and int(idx_max) or idx_max
             _idx_min = idx_min is not None and int(idx_min) or idx_min
