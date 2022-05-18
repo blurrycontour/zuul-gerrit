@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The zuul CLI is renamed "zuul-admin" to better reflect its intended use. 
+    The deprecated commands in the zuul CLI are removed. Use the zuul-client CLI
+    to perform autohold, enqueues, dequeues and other REST-based operations.

@@ -27,7 +27,7 @@ import jwt
 import testtools
 
 from zuul.zk import ZooKeeperClient
-from zuul.cmd.client import parse_cutoff
+from zuul.cmd.admin_client import parse_cutoff
 
 from tests.base import BaseTestCase, ZuulTestCase
 from tests.base import FIXTURE_DIR
