@@ -90,6 +90,12 @@ COMMANDS = [
 ]
 
 
+def boolean_or_none(x):
+    if x is not None:
+        return str(x).lower() in ['true', '1']
+    return x
+
+
 def get_request_logger(logger=None):
     if logger is None:
         logger = logging.getLogger("zuul.web")
@@ -1374,12 +1380,12 @@ class ZuulWebAPI(object):
         if tenant not in self.zuulweb.abide.tenants.keys():
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
 
-        # If final is None, we return all builds, both final and non-final
-        if final is not None:
-            final = final.lower() == "true"
-
-        if complete is not None:
-            complete = complete.lower() == 'true'
+        # If a boolean-type param is None, we return all builds
+        # otherwise we filter by the param.
+        final = boolean_or_none(final)
+        held = boolean_or_none(held)
+        voting = boolean_or_none(voting)
+        complete = boolean_or_none(complete)
 
         try:
             _idx_max = idx_max is not None and int(idx_max) or idx_max
@@ -1472,9 +1478,7 @@ class ZuulWebAPI(object):
                   idx_min=None, idx_max=None):
         connection = self._get_connection()
 
-        if complete:
-            complete = complete.lower() == 'true'
-
+        complete = boolean_or_none(complete)
         try:
             _idx_max = idx_max is not None and int(idx_max) or idx_max
             _idx_min = idx_min is not None and int(idx_min) or idx_min

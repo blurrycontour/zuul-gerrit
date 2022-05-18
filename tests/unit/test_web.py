@@ -2834,21 +2834,49 @@ class TestHeldAttributeInBuildInfo(BaseTestWeb):
 
         all_builds_resp = self.get_url("api/tenant/tenant-one/builds?"
                                        "project=org/project")
-        held_builds_resp = self.get_url("api/tenant/tenant-one/builds?"
-                                        "project=org/project&"
-                                        "held=1")
         self.assertEqual(200,
                          all_builds_resp.status_code,
                          all_builds_resp.text)
-        self.assertEqual(200,
-                         held_builds_resp.status_code,
-                         held_builds_resp.text)
         all_builds = all_builds_resp.json()
-        held_builds = held_builds_resp.json()
-        self.assertEqual(len(held_builds), 1, all_builds)
-        held_build = held_builds[0]
-        self.assertEqual('project-test2', held_build['job_name'], held_build)
-        self.assertEqual(True, held_build['held'], held_build)
+        for i in ['true', '1']:
+            held_builds_resp = self.get_url("api/tenant/tenant-one/builds?"
+                                            "project=org/project&"
+                                            "held=" + i)
+            self.assertEqual(200,
+                             held_builds_resp.status_code,
+                             held_builds_resp.text)
+            held_builds = held_builds_resp.json()
+            self.assertEqual(len(held_builds), 1, all_builds)
+            held_build = held_builds[0]
+            self.assertEqual('project-test2', held_build['job_name'],
+                             held_build)
+            self.assertEqual(True, held_build['held'], held_build)
+
+        # Non-held only
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        self.executor_server.failJob('project-test2', C)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        all_builds_resp = self.get_url("api/tenant/tenant-one/builds?"
+                                       "project=org/project")
+        self.assertEqual(200,
+                         all_builds_resp.status_code,
+                         all_builds_resp.text)
+        all_builds = all_builds_resp.json()
+        for i in ['false', '0', 'whatevs']:
+            non_held_builds_resp = self.get_url(
+                "api/tenant/tenant-one/builds?"
+                "project=org/project&"
+                "held=" + i)
+            self.assertEqual(200,
+                             non_held_builds_resp.status_code,
+                             non_held_builds_resp.text)
+            non_held_builds = non_held_builds_resp.json()
+            self.assertEqual(len(non_held_builds), 1, all_builds)
 
 
 class TestWebMulti(BaseTestWeb):
