@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fd76a48_d60f6e7c",
+        "filename": "doc/source/client.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-05-19T13:09:21Z",
+      "side": 1,
+      "message": "Maybe stop showing all those examples of deprecated commands and replace them with links to zuul-client docs?\n\nOr at least group them into a \"Deprecated\" section?",
+      "revId": "458b8bd43b0b9d3fbbedda05f3e913c634bd9e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
