@@ -1908,7 +1908,12 @@ class TenantParser(object):
                         project.canonical_name, branch)
                     branch_cache = abide.getUnparsedBranchCache(
                         project.canonical_name, branch)
-                    pb_ltime = min_ltimes[project.canonical_name][branch]
+                    try:
+                        pb_ltime = min_ltimes[project.canonical_name][branch]
+                    except KeyError:
+                        self.log.exception(
+                            "Min. ltime missing for project/branch")
+                        pb_ltime = -1
 
                     # If our unparsed branch cache is valid for the
                     # time, then we don't need to do anything else.
