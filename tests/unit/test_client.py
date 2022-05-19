@@ -66,7 +66,7 @@ class TestTenantValidationClient(BaseClientTestCase):
         with open(os.path.join(self.test_root, 'tenant_ok.conf'), 'w') as f:
             self.config.write(f)
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', os.path.join(self.test_root, 'tenant_ok.conf'),
              'tenant-conf-check'], stdout=subprocess.PIPE)
         p.communicate()
@@ -78,7 +78,7 @@ class TestTenantValidationClient(BaseClientTestCase):
         with open(os.path.join(self.test_root, 'tenant_ko.conf'), 'w') as f:
             self.config.write(f)
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', os.path.join(self.test_root, 'tenant_ko.conf'),
              'tenant-conf-check'], stdout=subprocess.PIPE)
         out, _ = p.communicate()
@@ -100,7 +100,7 @@ class TestWebTokenClient(BaseClientTestCase):
                                'no_zuul_operator.conf'), 'w') as f:
             self.config.write(f)
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', os.path.join(self.test_root, 'no_zuul_operator.conf'),
              'create-auth-token',
              '--auth-config', 'zuul_operator',
@@ -122,7 +122,7 @@ class TestWebTokenClient(BaseClientTestCase):
         with open(os.path.join(self.test_root, 'JWKS.conf'), 'w') as f:
             self.config.write(f)
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', os.path.join(self.test_root, 'JWKS.conf'),
              'create-auth-token',
              '--auth-config', 'someauth',
@@ -140,7 +140,7 @@ class TestWebTokenClient(BaseClientTestCase):
         with open(os.path.join(self.test_root, 'good.conf'), 'w') as f:
             self.config.write(f)
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', os.path.join(self.test_root, 'good.conf'),
              'create-auth-token',
              '--auth-conf', 'zuul_operator',
@@ -187,7 +187,7 @@ class TestKeyOperations(ZuulTestCase):
 
         # Export keys
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'export-keys', export_root],
             stdout=subprocess.PIPE)
@@ -204,7 +204,7 @@ class TestKeyOperations(ZuulTestCase):
 
         # Import keys
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'import-keys', export_root],
             stdout=subprocess.PIPE)
@@ -222,7 +222,7 @@ class TestKeyOperations(ZuulTestCase):
             self.config.write(f)
 
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'copy-keys',
              'gerrit', 'org/project',
@@ -242,7 +242,7 @@ class TestKeyOperations(ZuulTestCase):
             data['/keystorage/gerrit/neworg/neworg%2Fnewproject/ssh'])
 
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'delete-keys',
              'gerrit', 'org/project',
@@ -269,7 +269,7 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org'))
 
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'delete-keys',
              'gerrit', 'org/project1',
@@ -280,7 +280,7 @@ class TestKeyOperations(ZuulTestCase):
         self.assertEqual(p.returncode, 0)
 
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'delete-keys',
              'gerrit', 'org/project2',
@@ -328,7 +328,7 @@ class TestOfflineZKOperations(ZuulTestCase):
         old_data = self.getZKTree('/keystorage')
 
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'delete-state',
              ],
@@ -367,7 +367,7 @@ class TestOnlineZKOperations(ZuulTestCase):
         # Make sure the pipeline exists
         self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'delete-pipeline-state',
              'tenant-one', 'check',
@@ -405,7 +405,7 @@ class TestOnlineZKOperations(ZuulTestCase):
         # Make sure the pipeline exists
         self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
         p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul'),
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
              'delete-pipeline-state',
              'tenant-one', 'gate',
