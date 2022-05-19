@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3f1f09f_3a91d6dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-05-19T13:36:07Z",
+      "side": 1,
+      "message": "\u003e Patch Set 5:\n\u003e \n\u003e For avoidance of further confusion, the zuul-admin documentation of the individual enqueue, dequeue, autohold and promote subcommands should probably also mention they\u0027re deprecated in favor of zuul-client (in addition to the note you have about them at the top).\n\nDone",
+      "revId": "57c78c08e1b9ee12d36f13cf45384f21354435b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
