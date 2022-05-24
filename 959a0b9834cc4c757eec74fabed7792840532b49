@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f334c535_cb800db4",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 910,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:44:17Z",
+      "side": 1,
+      "message": "I believe the heuristic we apply is sufficient to warrant enabling it by default; it is fairly conservative, and I think the risk of running too few jobs is low.",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6cd1790_4a03b7c2",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-05-24T18:17:21Z",
       "side": 1,
       "message": "There is a project1-job and a project2-job that should run (one for each of the changes) if I am reading the layout properly. Why is this history empty here. Then just below we assert history length is 3 which is what I expected.",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f99d076d_02856b05",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:44:17Z",
+      "side": 1,
+      "message": "It\u0027s a quirk of circluar dependencies: because the node request failed, neither change can merge and therefore both are removed from the queue.  All the jobs are canceled before being run.  So the build history is empty, but the nodepool request history is not.\n\nTo be honest, I\u0027m not quite sure this is the best behavior for Zuul (it seems a bit inconsistent with non-circular dependencies), but it is the current behavior and not affected by this change.\n\nAt least we have testing of this now and can see and understand the behavior.",
       "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -58,6 +92,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "041cfbd3_3ba6ad1c",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:44:17Z",
+      "side": 1,
+      "message": "True -- because it\u0027s a circular dependency and change A is in the set.",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90652456_cdf94906",
@@ -71,6 +122,23 @@
       "writtenOn": "2022-05-24T18:17:21Z",
       "side": 1,
       "message": "Why not move the block below out of the loop and operate on the objects via build instead of item? I think that is easier to read. Or do we have to process these in order including the build that completed?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f06ded74_431174e5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1769,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:44:17Z",
+      "side": 1,
+      "message": "We need to update every item/buildset that the build is in.  So while \"build\" stays constant in this loop, item and therefore build_set change on each iteration.\n\nBasically, this loop is tidying up the node and build accounting for each item the build is in.",
       "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -143,6 +211,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af457f41_ea462343",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4077,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:44:17Z",
+      "side": 1,
+      "message": "We\u0027re actually deduplicating node requests too, which happen before builds.  So really, we\u0027re deduplicating at the point where we transition from abstract \"jobs\" to concrete \"builds\".  The item is where that\u0027s centered.\n\nPragmatically: we use this value (in deduplicateJobs) before we actually have a build uuid.",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd472729_be3c23aa",
@@ -156,6 +241,23 @@
       "writtenOn": "2022-05-24T18:17:21Z",
       "side": 1,
       "message": "Is it no longer valid to set empty artifact data? I guess if we deduplicated we don\u0027t want to update artifact info?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddbc7ee5_18052716",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4683,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:44:17Z",
+      "side": 1,
+      "message": "There\u0027s no user-visible impact to this.  It just avoids setting the artifact data to [] in ZK which is different than the default of None, which would make a job ineligible for deduplication.\n\nSaves a ZK write too.",
       "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
