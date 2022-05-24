@@ -16,6 +16,23 @@
       "message": "zuul-fingergw shouldn\u0027t need root, or does it?",
       "revId": "884285d6b6b67cd3dd502f8da86ef63eafbd90e5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "287f3cc7_93f05080",
+        "filename": "Dockerfile",
+        "patchSetId": 8
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:09:05Z",
+      "side": 1,
+      "message": "The default configuration is to start as root and drop priveleges, so that it can get port 79.\n\nIf a user wants to avoid that, they can do so by specifying some config options.\n\nWe also might be able to do something with caps to avoid it.\n\nBut at least for now, this still gets us to a point where all the zuul processes run as non-root in the default configuration without any special configuration from operators.",
+      "revId": "884285d6b6b67cd3dd502f8da86ef63eafbd90e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
