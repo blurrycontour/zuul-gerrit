@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca1d6f41_55f61843",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3079,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-05-24T17:49:17Z",
+      "side": 1,
+      "message": "Why is the __hash__ function defined?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
