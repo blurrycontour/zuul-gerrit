@@ -109,6 +109,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc0e0690_d3f617cb",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3079,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-24T18:22:14Z",
+      "side": 1,
+      "message": "Overridding __eq__ makes the default __hash__ object raise an error, and we store these in a frozenset when we deserialize them.  So this just adds the original behavior back (which is sufficient for this class).",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b39d202_0735a188",
