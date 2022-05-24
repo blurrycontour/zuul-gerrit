@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0365add_29c7f0eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-05-24T09:25:30Z",
+      "side": 1,
+      "message": "I\u0027m wondering if we need to bump the MODEL_API version for this change? I\u0027m thinking about the case where a job is de-duped but an \"old\" scheduler is processing the build result event.",
+      "revId": "bebf0f2b624f76081f1b7b86653a171b6a1123e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
