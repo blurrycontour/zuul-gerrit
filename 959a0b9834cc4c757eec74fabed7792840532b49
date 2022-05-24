@@ -3,6 +3,80 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ecc3de5f_40597e3d",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 910,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "Should the default be false to avoid running too few jobs by default?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6cd1790_4a03b7c2",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "There is a project1-job and a project2-job that should run (one for each of the changes) if I am reading the layout properly. Why is this history empty here. Then just below we assert history length is 3 which is what I expected.",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aca7754_1361f41d",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "Nit should be result\u003d\"FAILURE\"",
+      "range": {
+        "startLine": 1691,
+        "startChar": 38,
+        "endLine": 1691,
+        "endChar": 54
+      },
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90652456_cdf94906",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1769,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "Why not move the block below out of the loop and operate on the objects via build instead of item? I think that is easier to read. Or do we have to process these in order including the build that completed?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ca1d6f41_55f61843",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -14,6 +88,57 @@
       "writtenOn": "2022-05-24T17:49:17Z",
       "side": 1,
       "message": "Why is the __hash__ function defined?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f40f3f4_f39b5ae3",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3079,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "Why do we need to override the hash method to object\u0027s method? Is that not what we get by default? Testing this locally it seems they produce similar results based on id()?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b39d202_0735a188",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4077,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "Talking out loud here we are deduplicating builds not items right? Should we list the deduplicated entity as the build uuid to make that more clear?",
+      "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd472729_be3c23aa",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4683,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-24T18:17:21Z",
+      "side": 1,
+      "message": "Is it no longer valid to set empty artifact data? I guess if we deduplicated we don\u0027t want to update artifact info?",
       "revId": "959a0b9834cc4c757eec74fabed7792840532b49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
