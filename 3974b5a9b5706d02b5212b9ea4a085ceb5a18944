@@ -16,6 +16,23 @@
       "message": "This lock is held by the calling function. Do we need to grab it again here? Might make sense to remove the with block from the caller actually.\n\nThe above early return check is also performed by the caller. We may not need to run it in the caller?",
       "revId": "3974b5a9b5706d02b5212b9ea4a085ceb5a18944",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3a81d87_32c054af",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2116,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-25T20:43:56Z",
+      "side": 1,
+      "message": "Yes, this looks like a copy/paste error.",
+      "revId": "3974b5a9b5706d02b5212b9ea4a085ceb5a18944",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
