@@ -52,3 +52,20 @@ def _import_ansible_action_plugin(name):
 
 def _sanitize_filename(name):
     return ''.join(c for c in name if c.isalnum())
+
+
+# Ansible assigns a unique id to every task (Task._uuid).  However, if
+# a role is included more than once, the task object is re-used.  In
+# order to provide unique log ids for the Zuul command log streaming
+# system, this global dictionary is used to map keys that are derived
+# from tasks (task._uuid concatenated with the host name) to a counter
+# which is incremented each time the task+host combination is
+# encountered.  Ansible will not run more than one task on a host
+# simultaneously, so this should be sufficiently unique to avoid
+# collisions.
+#
+# We use a global dictionary defined here so that zuul_stream can
+# write to it and zuul.ansible.command modules can read it.  Note that
+# the command module operates after a fork and therefore it should be
+# treated as read-only there.
+ZUUL_LOG_ID_MAP = {}

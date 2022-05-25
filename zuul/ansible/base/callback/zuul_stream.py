@@ -261,7 +261,8 @@ class CallbackModule(default.CallbackModule):
         if task.async_val:
             # Don't try to stream from async tasks
             return
-        if task.action in ('command', 'shell'):
+        if task.action in ('command', 'shell',
+                           'ansible.builtin.command', 'ansible.builtin.shell'):
             play_vars = self._play._variable_manager._hostvars
 
             hosts = self._get_task_hosts(task)
@@ -290,8 +291,17 @@ class CallbackModule(default.CallbackModule):
                         continue
                     ip = '127.0.0.1'
 
-                log_id = "%s-%s" % (
-                    task._uuid, paths._sanitize_filename(inventory_hostname))
+                # Get a unique key for ZUUL_LOG_ID_MAP.  Use it to add
+                # a counter to the log id so that if we run the same
+                # task more than once, we get a unique log file.  See
+                # comments in paths.py for details.
+                log_host = paths._sanitize_filename(inventory_hostname)
+                key = "%s-%s" % (self._task._uuid, log_host)
+                count = paths.ZUUL_LOG_ID_MAP.get(key, 0) + 1
+                paths.ZUUL_LOG_ID_MAP[key] = count
+                log_id = "%s-%s-%s" % (
+                    self._task._uuid, count, log_host)
+
                 streamer = threading.Thread(
                     target=self._read_log, args=(
                         host, ip, port, log_id, task_name, hosts))
