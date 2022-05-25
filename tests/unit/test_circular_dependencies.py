@@ -464,6 +464,45 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
+    @simple_layout('layouts/circular-deps-node-failure.yaml')
+    def test_cycle_failed_node_request(self):
+        # Test a node request failure as part of a dependency cycle
+
+        # Pause nodepool so we can fail the node request later
+        self.fake_nodepool.pause()
+
+        A = self.fake_gerrit.addFakeChange("org/project1", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project2", "master", "B")
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        B.addApproval("Approved", 1)
+
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        # Fail the node request and unpause
+        req = self.fake_nodepool.getNodeRequests()
+        self.fake_nodepool.addFailRequest(req[0])
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+        self.assertIn("bundle", A.messages[-1])
+        self.assertIn("bundle", B.messages[-1])
+        self.assertEqual(A.data["status"], "NEW")
+        self.assertEqual(B.data["status"], "NEW")
+
     def test_failing_cycle_behind_failing_change(self):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
