@@ -79,3 +79,10 @@ Version 7
               Playbook secret references are now either an integer
               index into the job secret list, or a dict with a blob
               store key.  This affects schedulers and executors.
+
+Version 8
+---------
+
+:Prior Zuul version: 6.0.0
+:Description: Deduplicates jobs in dependency cycles.  Affects
+              schedulers only.

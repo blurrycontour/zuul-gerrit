@@ -633,6 +633,7 @@ class JobParser(object):
                       'post-review': bool,
                       'match-on-config-updates': bool,
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
+                      'deduplicate': vs.Any(bool, 'auto'),
     }
 
     job_name = {vs.Required('name'): str}
@@ -658,6 +659,7 @@ class JobParser(object):
         'override-checkout',
         'match-on-config-updates',
         'workspace-scheme',
+        'deduplicate',
     ]
 
     def __init__(self, pcontext):

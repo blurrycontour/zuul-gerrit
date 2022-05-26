@@ -1447,6 +1447,7 @@ class PipelineManager(metaclass=ABCMeta):
         if build_set.repo_state_state == build_set.PENDING:
             return False
 
+        item.deduplicateJobs(log)
         return True
 
     def _processOneItem(self, item, nnfi):
@@ -1745,25 +1746,45 @@ class PipelineManager(metaclass=ABCMeta):
                      build, item)
             return
 
-        item.setResult(build)
-        log.debug("Item %s status is now:\n %s", item, item.formatStatus())
+        # If the build was for deduplicated jobs, apply the results to
+        # all the items that use this build.
+        build_in_items = [item]
+        if item.bundle:
+            for other_item in item.bundle.items:
+                if other_item not in build_in_items:
+                    build_in_items.append(other_item)
+        for item in build_in_items:
+            # We don't care about some actions below if this build
+            # isn't in the current buildset, so determine that before
+            # it is potentially removed with setResult.
+            if item.current_build_set.getBuild(build.job.name) is not build:
+                current = False
+            else:
+                current = True
+            item.setResult(build)
+            log.debug("Item %s status is now:\n %s", item, item.formatStatus())
 
-        if build.retry:
-            if build.build_set.getJobNodeSetInfo(build.job.name):
-                build.build_set.removeJobNodeSetInfo(build.job.name)
+            if not current:
+                continue
+            build_set = item.current_build_set
 
-            # in case this was a paused build we need to retry all child jobs
-            self._resetDependentBuilds(build.build_set, build)
+            if build.retry:
+                if build_set.getJobNodeSetInfo(build.job.name):
+                    build_set.removeJobNodeSetInfo(build.job.name)
 
-        self._resumeBuilds(build.build_set)
+                # in case this was a paused build we need to retry all
+                # child jobs
+                self._resetDependentBuilds(build_set, build)
 
-        if (item.current_build_set.fail_fast and
-            build.failed and build.job.voting and not build.retry):
-            # If fail-fast is set and the build is not successful
-            # cancel all remaining jobs.
-            log.debug("Build %s failed and fail-fast enabled, canceling "
-                      "running builds", build)
-            self._cancelRunningBuilds(build.build_set)
+            self._resumeBuilds(build_set)
+
+            if (build_set.fail_fast and
+                build.failed and build.job.voting and not build.retry):
+                # If fail-fast is set and the build is not successful
+                # cancel all remaining jobs.
+                log.debug("Build %s failed and fail-fast enabled, canceling "
+                          "running builds", build)
+                self._cancelRunningBuilds(build_set)
 
         return True
 

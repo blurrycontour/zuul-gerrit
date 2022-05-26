@@ -946,6 +946,44 @@ Here is an example of two job definitions:
       self-testing without requiring that the file matchers include
       the Zuul configuration file defining the job.
 
+   .. attr:: deduplicate
+      :default: auto
+
+      In the case of a dependency cycle where multiple changes within
+      the cycle run the same job, this setting indicates whether Zuul
+      should attempt to deduplicate the job.  If it is deduplicated,
+      then the job will only run for one queue item within the cycle
+      and other items which run the same job will use the results of
+      that build.
+
+      This setting determins whether Zuul will consider deduplication.
+      If it is set to ``false``, Zuul will never attempt to
+      deduplicate the job.  If it is set to ``auto`` (the default),
+      then Zuul will compare the job with other jobs of other queue
+      items in the dependency cycle, and if they are equivalent and
+      meet certain project criteria, it will deduplicate them.
+
+      The project criteria that Zuul considers under the ``auto``
+      setting are either:
+
+      * The job must specify :attr:`job.required-projects`.
+      * Or the queue items must be for the same project.
+
+      This is because of the following heuristic: if a job specifies
+      :attr:`job.required-projects`, it is most likely to be one which
+      operates in the same way regardless of which project the change
+      under test belongs to, therefore the result of the same job
+      running on two queue items in the same dependency cycle should
+      be the same.  If a job does not specify
+      :attr:`job.required-projects` and runs with two different
+      projects under test, the outcome is likely different for those
+      two items.
+
+      If this is not true for a job (e.g., the job ignores the project
+      under test and interacts only with external resources)
+      :attr:`job.deduplicate` may be set to ``true`` to ignore the
+      heuristic and deduplicate anyway.
+
    .. attr:: workspace-scheme
       :default: golang
 
