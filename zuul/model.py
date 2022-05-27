@@ -2039,6 +2039,8 @@ class FrozenJob(zkobject.ZKObject):
         for k in self.attributes:
             if k in ['inheritance_path', 'waiting_status', 'queued']:
                 continue
+            elif k == 'deduplicate' and COMPONENT_REGISTRY.model_api < 8:
+                continue
             if getattr(self, k) != getattr(other, k):
                 return False
         for k in self.job_data_attributes:
@@ -2091,6 +2093,9 @@ class FrozenJob(zkobject.ZKObject):
             # TODO: Backwards compat handling, remove after 5.0
             if k == 'config_hash':
                 if not hasattr(self, k):
+                    continue
+            elif k == 'deduplicate':
+                if not hasattr(self, k) and COMPONENT_REGISTRY.model_api < 8:
                     continue
             v = getattr(self, k)
             if k == 'nodeset':
