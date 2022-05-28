@@ -67,12 +67,16 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
             # Keep running until the parent dies:
             pipe_read = os.fdopen(pipe_read)
-            pipe_read.read()
+            try:
+                pipe_read.read()
+            except KeyboardInterrupt:
+                pass
             self.log.info("Stopping log streamer")
             streamer.stop()
             os._exit(0)
         else:
             os.close(pipe_read)
+            self.log_streamer_pipe = pipe_write
             self.log_streamer_pid = child_pid
 
     def run(self):
@@ -113,7 +117,16 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
 
-        self.executor.join()
+        while True:
+            try:
+                self.executor.join()
+                break
+            except KeyboardInterrupt:
+                print("Ctrl + C: asking executor to exit nicely...\n")
+                self.exit_handler(signal.SIGINT, None)
+
+        os.close(self.log_streamer_pipe)
+        os.waitpid(self.log_streamer_pid, 0)
 
 
 def main():
