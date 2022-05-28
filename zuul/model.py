@@ -2123,6 +2123,10 @@ class FrozenJob(zkobject.ZKObject):
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
 
+        # MODEL_API < 8
+        if 'deduplicate' not in data:
+            data['deduplicate'] = 'auto'
+
         if hasattr(self, 'nodeset'):
             nodeset = self.nodeset
         else:
