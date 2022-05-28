@@ -886,6 +886,9 @@ class PipelineSummary(zkobject.ShardedZKObject):
         # while zuul-web tries to read it.
         try:
             super().refresh(context)
+        except NoNodeError:
+            self.log.warning("No pipeline summary found "
+                             "(may not be created yet)")
         except Exception:
             self.log.exception("Failed to refresh data")
         return self.status
