@@ -68,6 +68,7 @@ class SQLReporter(BaseReporter):
             ref_url=item.change.url,
             event_id=event_id,
             event_timestamp=event_timestamp,
+            updated=datetime.datetime.utcnow(),
         )
         return db_buildset
 
@@ -111,6 +112,7 @@ class SQLReporter(BaseReporter):
                             and build.end_time > end_time):
                             end_time = build.end_time
                     db_buildset.last_build_end_time = end_time
+                    db_buildset.updated = datetime.datetime.utcnow()
                     return
             except sqlalchemy.exc.DBAPIError:
                 if retry_count < self.retry_count - 1:

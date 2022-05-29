@@ -108,6 +108,15 @@ Example::
 
   zuul-admin delete-pipeline-state tenant pipeline
 
+prune-database
+^^^^^^^^^^^^^^
+
+.. program-output:: zuul-admin prune-database --help
+
+Example::
+
+  zuul-admin prune-database --older-than 180d
+
 Deprecated commands
 -------------------
 

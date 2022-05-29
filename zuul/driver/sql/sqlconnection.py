@@ -173,6 +173,7 @@ class DatabaseSession(object):
     def getBuildsets(self, tenant=None, project=None, pipeline=None,
                      change=None, branch=None, patchset=None, ref=None,
                      newrev=None, uuid=None, result=None, complete=None,
+                     updated_max=None,
                      limit=50, offset=0, idx_min=None, idx_max=None):
 
         buildset_table = self.connection.zuul_buildset_table
@@ -201,6 +202,9 @@ class DatabaseSession(object):
             q = q.filter(buildset_table.c.result != None)  # noqa
         elif complete is False:
             q = q.filter(buildset_table.c.result == None)  # noqa
+
+        if updated_max:
+            q = q.filter(buildset_table.c.updated < updated_max)
 
         q = q.order_by(buildset_table.c.id.desc()).\
             limit(limit).\
@@ -231,6 +235,13 @@ class DatabaseSession(object):
             return None
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise Exception("Multiple buildset found with uuid %s", uuid)
+
+    def deleteBuildsets(self, cutoff):
+        """Delete buildsets before the cutoff"""
+
+        # delete buildsets updated before the cutoff
+        for buildset in self.getBuildsets(updated_max=cutoff):
+            self.session().delete(buildset)
 
 
 class SQLConnection(BaseConnection):
@@ -349,6 +360,7 @@ class SQLConnection(BaseConnection):
             event_timestamp = sa.Column(sa.DateTime, nullable=True)
             first_build_start_time = sa.Column(sa.DateTime, nullable=True)
             last_build_end_time = sa.Column(sa.DateTime, nullable=True)
+            updated = sa.Column(sa.DateTime, nullable=True)
 
             sa.Index(self.table_prefix + 'project_pipeline_idx',
                      project, pipeline)
@@ -472,3 +484,8 @@ class SQLConnection(BaseConnection):
         """Return a BuildSet objects"""
         with self.getSession() as db:
             return db.getBuildset(*args, **kw)
+
+    def deleteBuildsets(self, *args, **kw):
+        """Delete buildsets"""
+        with self.getSession() as db:
+            return db.deleteBuildsets(*args, **kw)
