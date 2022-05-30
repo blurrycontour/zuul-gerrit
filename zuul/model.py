@@ -3915,18 +3915,20 @@ class BuildSet(zkobject.ZKObject):
                 # If we have a current build before refreshing, we may
                 # be able to skip refreshing some items since they
                 # will not have changed.
+                build_path = data["builds"].get(job_name)
                 old_build = self.builds.get(job_name)
+                old_build_exists = (old_build
+                                    and old_build.getPath() == build_path)
 
                 if job_name in self.jobs:
                     job = self.jobs[job_name]
-                    if not old_build:
+                    if not old_build_exists:
                         job.refresh(context)
                 else:
                     job_path = FrozenJob.jobPath(job_name, self.getPath())
                     job = FrozenJob.fromZK(context, job_path, buildset=self)
                     self.jobs[job_name] = job
 
-                build_path = data["builds"].get(job_name)
                 if build_path:
                     build = self.builds.get(job_name)
                     if build and build.getPath() == build_path:
