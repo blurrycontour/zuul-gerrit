@@ -182,6 +182,37 @@ The supported options in ``zuul.conf`` connections are:
       Enable or disable GitHub rate limit logging. If rate limiting is disabled
       in GitHub Enterprise this can save some network round trip times.
 
+   .. attr:: repo_cache
+
+      To configure Zuul to use a GitHub Enterprise `repository cache
+      <https://docs.github.com/en/enterprise-server@3.3/admin/enterprise-management/caching-repositories/about-repository-caching>`_
+      set this value to the hostname of the cache (e.g.,
+      ``europe-ci.github.example.com``).  Zuul will fetch commits as
+      well as determine the global repo state of repositories used in
+      jobs from this host.
+
+      This setting is incompatible with :attr:`<github
+      connection>.sshkey`.
+
+      Because the repository cache may be several minutes behind the
+      canonical site, enabling this setting automatically sets the
+      default :attr:`<github connection>.repo_retry_timeout` to 600
+      seconds.  That setting may still be overidden to specify a
+      different value.
+
+   .. attr:: repo_retry_timeout
+
+      This setting is only used if :attr:`<github
+      connection>.repo_cache` is set.  It specifies the amount of time
+      in seconds that Zuul mergers and executors should spend
+      attempting to fetch git commits which are not available from the
+      GitHub repository cache host.
+
+      When :attr:`<github connection>.repo_cache` is set, this value
+      defaults to 600 seconds, but it can be overridden.  Zuul retries
+      git fetches every 30 seconds, and this value will be rounded up
+      to the next highest multiple of 30 seconds.
+
 Trigger Configuration
 ---------------------
 GitHub webhook events can be configured as triggers.

@@ -19,6 +19,7 @@ from typing import Optional
 from urllib.parse import urlsplit, urlunsplit, urlparse
 import hashlib
 import logging
+import math
 import os
 import re
 import shutil
@@ -74,7 +75,7 @@ class Repo(object):
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 zuul_event_id=None):
+                 zuul_event_id=None, retry_timeout=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
@@ -85,6 +86,9 @@ class Repo(object):
             'GIT_HTTP_LOW_SPEED_TIME': speed_time,
         }
         self.git_timeout = git_timeout
+        if retry_timeout:
+            self.retry_attempts = math.ceil(
+                retry_timeout / self.retry_interval)
         self.sshkey = sshkey
         if sshkey:
             self.env['GIT_SSH_COMMAND'] = 'ssh -i %s' % (sshkey,)
@@ -865,7 +869,7 @@ class Merger(object):
             f.write(self.scheme)
 
     def _addProject(self, hostname, connection_name, project_name, url, sshkey,
-                    zuul_event_id, process_worker=None):
+                    zuul_event_id, process_worker=None, retry_timeout=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
@@ -884,7 +888,7 @@ class Merger(object):
                 url, path, self.email, self.username, self.speed_limit,
                 self.speed_time, sshkey=sshkey, cache_path=cache_path,
                 logger=self.logger, git_timeout=self.git_timeout,
-                zuul_event_id=zuul_event_id)
+                zuul_event_id=zuul_event_id, retry_timeout=retry_timeout)
 
             self.repos[key] = repo
         except Exception:
@@ -899,6 +903,7 @@ class Merger(object):
         project = source.getProject(project_name)
         hostname = project.canonical_hostname
         url = source.getGitUrl(project)
+        retry_timeout = source.getRetryTimeout(project)
         key = '/'.join([hostname, project_name])
         if key in self.repos:
             repo = self.repos[key]
@@ -912,7 +917,8 @@ class Merger(object):
                             (connection_name, project_name,))
         return self._addProject(hostname, connection_name, project_name, url,
                                 sshkey, zuul_event_id,
-                                process_worker=process_worker)
+                                process_worker=process_worker,
+                                retry_timeout=retry_timeout)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
                    zuul_event_id=None, build=None, process_worker=None):
