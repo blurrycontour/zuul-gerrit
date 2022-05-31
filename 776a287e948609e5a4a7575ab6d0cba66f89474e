@@ -16,6 +16,23 @@
       "message": "Is there a reason why the condition is not added to the existing `if`?",
       "revId": "776a287e948609e5a4a7575ab6d0cba66f89474e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64951715_2036074c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1755,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-31T14:17:53Z",
+      "side": 1,
+      "message": "Nope, that would be better, sorry.  But that\u0027s probably not worth redoing the patch series, so I\u0027ll just +W for now.",
+      "revId": "776a287e948609e5a4a7575ab6d0cba66f89474e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
