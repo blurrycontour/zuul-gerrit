@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d9b3b89_9abf45a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-05-31T15:21:46Z",
+      "side": 1,
+      "message": "http://lists.openstack.org/pipermail/openstack-discuss/2022-May/028727.html also indicates that the openstack modules currently don\u0027t intend on supporting 0.99.0 either. Newer module releases will do that and I don\u0027t think they exist yet. More reason to pin this even if the swift issue isn\u0027t addressed.",
+      "revId": "a399318b6079b3220971c283256c3e42be3864d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
