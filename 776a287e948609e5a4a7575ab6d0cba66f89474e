@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a659578_095259fa",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1755,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-05-31T13:04:40Z",
+      "side": 1,
+      "message": "Is there a reason why the condition is not added to the existing `if`?",
+      "revId": "776a287e948609e5a4a7575ab6d0cba66f89474e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
