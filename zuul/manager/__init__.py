@@ -222,7 +222,7 @@ class PipelineManager(metaclass=ABCMeta):
     def resolveChangeKeys(self, change_keys):
         resolved_changes = []
         for key in change_keys:
-            change = self._change_cache.get(key)
+            change = self._change_cache.get(key.reference)
             if change is None:
                 source = self.sched.connections.getSource(key.connection_name)
                 change = source.getChange(key)
