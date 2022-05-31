@@ -16,6 +16,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import itertools
 import logging
 import socket
 import sys
@@ -1365,10 +1366,27 @@ class Scheduler(threading.Thread):
                 # Consider caches valid if the cache ltime >= event ltime
                 min_ltimes = defaultdict(
                     lambda: defaultdict(lambda: event.zuul_event_ltime))
-                # Invalidate the branch cache for all connections
+                # Invalidate the branch cache
                 for connection in self.connections.connections.values():
                     if hasattr(connection, 'clearBranchCache'):
-                        connection.clearBranchCache()
+                        if event.tenants:
+                            # Only clear the projects used by this
+                            # tenant (zuul-web won't be able to load
+                            # any tenants that we don't immediately
+                            # reconfigure after clearing)
+                            for tenant_name in event.tenants:
+                                projects = [
+                                    tpc.project.name for tpc in
+                                    itertools.chain(
+                                        self.abide.getConfigTPCs(tenant_name),
+                                        self.abide.getUntrustedTPCs(
+                                            tenant_name))
+                                ]
+                                connection.clearBranchCache(projects)
+                        else:
+                            # Clear all projects since we're reloading
+                            # all tenants.
+                            connection.clearBranchCache()
                 ltime = self.zk_client.getCurrentLtime()
                 # Consider the branch cache valid only after we
                 # cleared it

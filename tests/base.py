@@ -4419,9 +4419,16 @@ class SchedulerTestApp:
         else:
             self.sched.validateTenants(self.config, validate_tenants)
 
-    def fullReconfigure(self):
+    def fullReconfigure(self, command_socket=False):
         try:
-            self.sched.reconfigure(self.config)
+            if command_socket:
+                command_socket = self.sched.config.get(
+                    'scheduler', 'command_socket')
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                    s.connect(command_socket)
+                    s.sendall('full-reconfigure\n'.encode('utf8'))
+            else:
+                self.sched.reconfigure(self.config)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
@@ -4438,9 +4445,19 @@ class SchedulerTestApp:
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
-    def tenantReconfigure(self, tenants):
+    def tenantReconfigure(self, tenants, command_socket=False):
         try:
-            self.sched.reconfigure(self.config, smart=False, tenants=tenants)
+            if command_socket:
+                command_socket = self.sched.config.get(
+                    'scheduler', 'command_socket')
+                args = json.dumps(tenants)
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                    s.connect(command_socket)
+                    s.sendall(f'tenant-reconfigure {args}\n'.
+                              encode('utf8'))
+            else:
+                self.sched.reconfigure(
+                    self.config, smart=False, tenants=tenants)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
