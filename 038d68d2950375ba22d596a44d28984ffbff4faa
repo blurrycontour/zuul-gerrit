@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21c333a8_4c299bf4",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-05-31T22:59:07Z",
+      "side": 1,
+      "message": "Style nit: these don\u0027t really need a leading underscore, nor does this need to be double-spaced.",
+      "revId": "038d68d2950375ba22d596a44d28984ffbff4faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
