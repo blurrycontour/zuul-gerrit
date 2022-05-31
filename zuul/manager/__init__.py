@@ -1752,7 +1752,8 @@ class PipelineManager(metaclass=ABCMeta):
         if item.bundle:
             for other_item in item.bundle.items:
                 if other_item not in build_in_items:
-                    build_in_items.append(other_item)
+                    if other_item.current_build_set.getBuild(build.job.name):
+                        build_in_items.append(other_item)
         for item in build_in_items:
             # We don't care about some actions below if this build
             # isn't in the current buildset, so determine that before
