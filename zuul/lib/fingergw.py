@@ -217,6 +217,7 @@ class FingerGateway(object):
             raise
 
     def start(self):
+        self.log.info("Starting finger gateway")
         kwargs = dict(
             user=self.user,
             pid_file=self.pid_file,
@@ -260,6 +261,7 @@ class FingerGateway(object):
         self.log.info("Finger gateway is started")
 
     def stop(self):
+        self.log.info("Stopping finger gateway")
         self.component_info.state = self.component_info.STOPPED
 
         if self.server:
@@ -283,7 +285,7 @@ class FingerGateway(object):
 
         self.log.info("Finger gateway is stopped")
 
-    def wait(self):
+    def join(self):
         '''
         Wait on the gateway to shutdown.
         '''

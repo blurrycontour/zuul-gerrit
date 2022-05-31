@@ -49,19 +49,15 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
-            while True:
-                try:
-                    signal.pause()
-                except KeyboardInterrupt:
-                    print("Ctrl + C: asking merger to exit nicely...\n")
-                    self.exit_handler(signal.SIGINT, None)
-        else:
-            self.merger.join()
+
+        while True:
+            try:
+                self.merger.join()
+                break
+            except KeyboardInterrupt:
+                print("Ctrl + C: asking merger to exit nicely...\n")
+                self.exit_handler(signal.SIGINT, None)
 
 
 def main():
     Merger().main()
-
-
-if __name__ == "__main__":
-    main()
