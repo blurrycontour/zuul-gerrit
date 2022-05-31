@@ -5547,6 +5547,31 @@ class ZuulTestCase(BaseTestCase):
         logger("All builds waiting: %s", all_builds_waiting)
         logger("All requests completed: %s", all_node_requests_completed)
         logger("All event queues empty: %s", all_event_queues_empty)
+        for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            for connection_name in sched.connections.connections:
+                for e in self.connection_event_queues[connection_name]:
+                    logger("conn event %s %s", connection_name, e)
+            for tenant in sched.abide.tenants.values():
+                for e in sched.management_events[tenant.name]:
+                    logger("man event %s %s", tenant.name, e)
+                for e in sched.trigger_events[tenant.name]:
+                    logger("trigger event %s %s", tenant.name, e)
+                for pipeline_name in tenant.layout.pipelines:
+                    for e in sched.pipeline_management_events[tenant.name][
+                        pipeline_name
+                    ]:
+                        logger("pipeline man event %s %s %s",
+                               tenant.name, pipeline_name, e)
+                    for e in sched.pipeline_trigger_events[tenant.name][
+                        pipeline_name
+                    ]:
+                        logger("pipeline trigger event %s %s %s",
+                               tenant.name, pipeline_name, e)
+                    for e in sched.pipeline_result_events[tenant.name][
+                        pipeline_name
+                    ]:
+                        logger("pipeline result event %s %s %s",
+                               tenant.name, pipeline_name, e)
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)
