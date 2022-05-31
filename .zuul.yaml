@@ -101,7 +101,7 @@
 - job:
     name: zuul-tox-py39
     parent: zuul-tox
-    timeout: 5400  # 90 minutes
+    timeout: 7200  # 120 minutes
     vars:
       tox_envlist: py39
       python_version: 3.9
@@ -109,7 +109,7 @@
 - job:
     name: zuul-tox-py38
     parent: zuul-tox
-    timeout: 5400  # 90 minutes
+    timeout: 7200  # 120 minutes
     vars:
       tox_envlist: py38
       python_version: 3.8
