@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,6 +17,8 @@
 import argparse
 import babel.dates
 import datetime
+import dateutil.parser
+import dateutil.tz
 import json
 import jwt
 import logging
@@ -38,6 +41,28 @@ from zuul.zk.locks import tenant_write_lock
 from zuul.zk.zkobject import ZKContext
 from zuul.zk.layout import LayoutState, LayoutStateStore
 from zuul.zk.components import COMPONENT_REGISTRY
+
+
+def parse_cutoff(now, before, older_than):
+    if before and not older_than:
+        cutoff = dateutil.parser.parse(before)
+        if cutoff.tzinfo and cutoff.tzinfo != dateutil.tz.tzutc():
+            raise RuntimeError("Timestamp must be specified as UTC")
+        cutoff = cutoff.replace(tzinfo=dateutil.tz.tzutc())
+        return cutoff
+    elif older_than and not before:
+        value = older_than[:-1]
+        suffix = older_than[-1]
+        if suffix == 'd':
+            delta = datetime.timedelta(days=int(value))
+        elif suffix == 'h':
+            delta = datetime.timedelta(hours=int(value))
+        else:
+            raise RuntimeError("Unsupported relative time")
+        return now - delta
+    else:
+        raise RuntimeError(
+            "Either --before or --older-than must be supplied")
 
 
 # todo This should probably live somewhere else
@@ -498,6 +523,27 @@ class Client(zuul.cmd.ZuulApp):
                                                help='tenant name')
         cmd_delete_pipeline_state.add_argument('pipeline', type=str,
                                                help='pipeline name')
+
+        # DB Maintenance
+        cmd_prune_database = subparsers.add_parser(
+            'prune-database',
+            help='prune old database entries',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Prune old database entries
+
+            This command will delete database entries older than the
+            specified cutoff (which can be specified as either an
+            absolute or relative time).'''))
+        cmd_prune_database.set_defaults(command='prune-database')
+        cmd_prune_database.add_argument(
+            '--before',
+            help='absolute timestamp (e.g., "2022-01-31 12:00:00")')
+        cmd_prune_database.add_argument(
+            '--older-than',
+            help='relative time (e.g., "24h" or "180d")')
+        cmd_prune_database.set_defaults(func=self.prune_database)
+
         return parser
 
     def parseArguments(self, args=None):
@@ -1005,6 +1051,16 @@ class Client(zuul.cmd.ZuulApp):
             tenant_layout_state = LayoutStateStore(zk_client, lambda: None)
             tenant_layout_state[args.tenant] = layout_state
 
+        sys.exit(0)
+
+    def prune_database(self):
+        logging.basicConfig(level=logging.INFO)
+        args = self.args
+        now = datetime.datetime.now(dateutil.tz.tzutc())
+        cutoff = parse_cutoff(now, args.before, args.older_than)
+        self.configure_connections(source_only=False, require_sql=True)
+        connection = self.connections.getSqlConnection()
+        connection.deleteBuildsets(cutoff)
         sys.exit(0)
 
 

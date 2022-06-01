@@ -106,6 +106,7 @@ class TestMysqlDatabase(DBBaseTestCase):
                 connection.exec_driver_sql(f"drop table {table}")
             connection.exec_driver_sql("set foreign_key_checks=1")
 
+        self.connection.force_migrations = True
         self.connection._migrate('c57e9e76b812')
         with self.connection.engine.begin() as connection:
             connection.exec_driver_sql(
@@ -121,6 +122,49 @@ class TestMysqlDatabase(DBBaseTestCase):
             results = [r[0] for r in connection.exec_driver_sql(
                 "select result from zuul_buildset")]
             self.assertEqual(results, ['SUCCESS', 'MERGE_CONFLICT'])
+
+    def test_migration_c7467b642498(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('4647def24b32')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result) values ('SUCCESS')")
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result, first_build_start_time) "
+                "values ('SUCCESS', '2022-05-01 12:34:56')")
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result, last_build_end_time) "
+                "values ('SUCCESS', '2022-05-02 12:34:56')")
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result, event_timestamp) "
+                "values ('SUCCESS', '2022-05-03 12:34:56')")
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (result, "
+                "first_build_start_time, "
+                "last_build_end_time, "
+                "event_timestamp)"
+                "values ('SUCCESS', "
+                "'2022-05-11 12:34:56', "
+                "'2022-05-12 12:34:56', "
+                "'2022-05-13 12:34:56')")
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [str(r[0]) for r in connection.exec_driver_sql(
+                "select updated from zuul_buildset")]
+            self.assertEqual(results,
+                             ['1970-01-01 00:00:00',
+                              '2022-05-01 12:34:56',
+                              '2022-05-02 12:34:56',
+                              '2022-05-03 12:34:56',
+                              '2022-05-13 12:34:56'])
 
     def test_buildsets(self):
         tenant = 'tenant1',

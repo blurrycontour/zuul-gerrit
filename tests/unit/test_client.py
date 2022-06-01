@@ -1,4 +1,5 @@
 # Copyright 2018 Red Hat, Inc.
+# Copyright 2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,17 +18,21 @@ import os
 import sys
 import subprocess
 import time
-
 import configparser
+import datetime
+import dateutil.tz
+
 import fixtures
 import jwt
 import testtools
-from kazoo.exceptions import NoNodeError
 
 from zuul.zk import ZooKeeperClient
+from zuul.cmd.client import parse_cutoff
 
 from tests.base import BaseTestCase, ZuulTestCase
 from tests.base import FIXTURE_DIR
+
+from kazoo.exceptions import NoNodeError
 
 
 class BaseClientTestCase(BaseTestCase):
@@ -429,3 +434,118 @@ class TestOnlineZKOperations(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='2,1'),
             dict(name='project-test2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestDBPruneParse(BaseTestCase):
+    def test_db_prune_parse(self):
+        now = datetime.datetime(year=2023, month=5, day=28,
+                                hour=22, minute=15, second=1,
+                                tzinfo=dateutil.tz.tzutc())
+        reference = datetime.datetime(year=2022, month=5, day=28,
+                                      hour=22, minute=15, second=1,
+                                      tzinfo=dateutil.tz.tzutc())
+        # Test absolute times
+        self.assertEqual(
+            reference,
+            parse_cutoff(now, '2022-05-28 22:15:01 UTC', None))
+        self.assertEqual(
+            reference,
+            parse_cutoff(now, '2022-05-28 22:15:01', None))
+
+        # Test relative times
+        self.assertEqual(reference,
+                         parse_cutoff(now, None, '8760h'))
+        self.assertEqual(reference,
+                         parse_cutoff(now, None, '365d'))
+        with testtools.ExpectedException(RuntimeError):
+            self.assertEqual(reference,
+                             parse_cutoff(now, None, '1y'))
+
+
+class DBPruneTestCase(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def _setup(self):
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        time.sleep(1)
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        connection = self.scheds.first.sched.sql.connection
+        buildsets = connection.getBuildsets()
+        builds = connection.getBuilds()
+        self.assertEqual(len(buildsets), 2)
+        self.assertEqual(len(builds), 6)
+        for build in builds:
+            self.log.debug("Build %s %s %s",
+                           build, build.start_time, build.end_time)
+        return config_file
+
+    def test_db_prune_before(self):
+        # Test pruning buildsets before a specific date
+        config_file = self._setup()
+        connection = self.scheds.first.sched.sql.connection
+
+        # Builds are reverse ordered; 0 is most recent
+        buildsets = connection.getBuildsets()
+        start_time = buildsets[0].first_build_start_time
+        self.log.debug("Cutoff %s", start_time)
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
+             '-c', config_file,
+             'prune-database',
+             '--before', str(start_time),
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        buildsets = connection.getBuildsets()
+        builds = connection.getBuilds()
+        self.assertEqual(len(buildsets), 1)
+        self.assertEqual(len(builds), 3)
+        for build in builds:
+            self.log.debug("Build %s %s %s",
+                           build, build.start_time, build.end_time)
+
+    def test_db_prune_older_than(self):
+        # Test pruning buildsets older than a relative time
+        config_file = self._setup()
+        connection = self.scheds.first.sched.sql.connection
+
+        # We use 0d as the relative time here since the earliest we
+        # support is 1d and that's tricky in unit tests.  The
+        # prune_before test handles verifying that we don't just
+        # always delete everything.
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
+             '-c', config_file,
+             'prune-database',
+             '--older-than', '0d',
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+
+        buildsets = connection.getBuildsets()
+        builds = connection.getBuilds()
+        self.assertEqual(len(buildsets), 0)
+        self.assertEqual(len(builds), 0)
+
+
+class TestDBPruneMysql(DBPruneTestCase):
+    config_file = 'zuul-sql-driver-mysql.conf'
+
+
+class TestDBPrunePostgres(DBPruneTestCase):
+    config_file = 'zuul-sql-driver-postgres.conf'
