@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "9f025619eacbe78559ea16625b1d0514ccae82e6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13f72ec6_12bd2cf1",
+        "filename": "tests/fixtures/layouts/two-projects-integrated.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-02T13:52:20Z",
+      "side": 1,
+      "message": "It\u0027s probably worth adding a comment mentioning why this is a template, just so we don\u0027t optimize it out in the future.",
+      "revId": "9f025619eacbe78559ea16625b1d0514ccae82e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
