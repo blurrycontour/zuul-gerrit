@@ -58,16 +58,20 @@
       jobs:
         - test
 
-- project:
-    name: org/project1
+- project-template:
+    name: project1-template
     check:
-      queue: integrated
       jobs:
         - integration
     gate:
-      queue: integrated
       jobs:
         - integration
+
+- project:
+    name: org/project1
+    queue: integrated
+    templates:
+      - project1-template
 
 - project:
     name: org/project2
