@@ -139,13 +139,13 @@ class PipelineManager(metaclass=ABCMeta):
             for project_config in layout.getAllProjectConfigs(project_name):
                 project_pipeline_config = project_config.pipelines.get(
                     self.pipeline.name)
+                if not project_queue_name:
+                    project_queue_name = project_config.queue_name
                 if project_pipeline_config is None:
                     continue
                 project_in_pipeline = True
                 if not pipeline_queue_name:
                     pipeline_queue_name = project_pipeline_config.queue_name
-                if not project_queue_name:
-                    project_queue_name = project_config.queue_name
             if not project_in_pipeline:
                 continue
 
