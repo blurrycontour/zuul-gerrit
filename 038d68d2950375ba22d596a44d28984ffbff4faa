@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "a62fb027_bff817c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-06-02T09:21:42Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e (1 comment)\n\u003e \n\u003e Any reason not to be as generous on the API side as we are on the javascript side?  That is, accept 0, 1, \u00270\u0027, \u00271\u0027 as well?\n\u003e \n\u003e If we did that, I think we could merge this without a release note.  Otherwise, it probably warrants a release note in case people have \"\u003d0\" encoded in queries or automation.\n\nSince \"final\" and \"complete\" were added last and only took variations of true as a possible value I assumed it was intentionally restrictive. No problem with being more permissive.",
+      "revId": "038d68d2950375ba22d596a44d28984ffbff4faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "21c333a8_4c299bf4",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 2
