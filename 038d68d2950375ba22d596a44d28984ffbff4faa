@@ -33,6 +33,24 @@
       "message": "Style nit: these don\u0027t really need a leading underscore, nor does this need to be double-spaced.",
       "revId": "038d68d2950375ba22d596a44d28984ffbff4faa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4448b8e6_6d232b23",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1391,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-06-02T09:50:18Z",
+      "side": 1,
+      "message": "\u003e Style nit: these don\u0027t really need a leading underscore, nor does this need to be double-spaced.\n\nDone",
+      "parentUuid": "21c333a8_4c299bf4",
+      "revId": "038d68d2950375ba22d596a44d28984ffbff4faa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
