@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c4884b0_5f613657",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 7151,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-06-02T07:10:08Z",
+      "side": 1,
+      "message": "I think it could be confusing to users to allow defining local semaphores with the same name as global ones. What do you thing about banning local semaphores with the same name as a global one in general?",
+      "revId": "7fc94effe7910c61ee755106b2aa51c18ce2b1a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
