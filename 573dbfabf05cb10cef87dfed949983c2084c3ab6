@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "facb2a4c_33cc6b1f",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2081,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-06-02T11:25:06Z",
+      "side": 1,
+      "message": "Would love to do that, but I am not so deep in those types of tests (and have sadly no time to dive deeply). If I can at least get some guidance I would be glad to add this.",
+      "parentUuid": "843f1b63_bd89ef75",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9fc6ef2_d4b00a9d",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 5
