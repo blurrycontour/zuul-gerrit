@@ -569,6 +569,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def autohold_list(self, tenant_name, *args, **kwargs):
         # we don't use json_in because a payload is not mandatory with GET
+        _ = self._getTenantOrRaise(tenant_name)
         if cherrypy.request.method != 'GET':
             raise cherrypy.HTTPError(405)
         # filter by project if passed as a query string
@@ -582,6 +583,7 @@ class ZuulWebAPI(object):
         # we don't use json_in because a payload is not mandatory with GET
         # Note: GET handling is redundant with autohold_list
         # and could be removed.
+        tenant = self._getTenantOrRaise(tenant_name)
         if cherrypy.request.method == 'GET':
             return self._autohold_list(tenant_name, project_name)
         elif cherrypy.request.method == 'POST':
@@ -593,6 +595,8 @@ class ZuulWebAPI(object):
             if token_error is not None:
                 return token_error
             self.isAuthorizedOrRaise(claims, tenant_name)
+            project = self._getProjectOrRaise(tenant, project_name)
+
             msg = 'User "%s" requesting "%s" on %s/%s'
             self.log.info(
                 msg % (claims['__zuul_uid_claim'], 'autohold',
@@ -618,9 +622,6 @@ class ZuulWebAPI(object):
                 raise cherrypy.HTTPError(400, 'Invalid request body')
             if count < 0:
                 raise cherrypy.HTTPError(400, "Count must be greater 0")
-
-            tenant = self._getTenantOrRaise(tenant_name)
-            project = self._getProjectOrRaise(tenant, project_name)
 
             project_name = project.canonical_name
 

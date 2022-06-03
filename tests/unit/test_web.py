@@ -938,6 +938,11 @@ class TestWeb(BaseTestWeb):
         self.assertEqual("reason text", ah_request['reason'])
         self.assertEqual([], ah_request['nodes'])
 
+        # Unknown tenants return 404
+        resp = self.get_url(
+            "api/tenant/tenant-fifty/autohold")
+        self.assertEqual(404, resp.status_code, resp.text)
+
     def test_admin_routes_404_by_default(self):
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
