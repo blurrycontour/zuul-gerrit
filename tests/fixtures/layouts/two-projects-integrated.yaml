@@ -58,16 +58,24 @@
       jobs:
         - test
 
-- project:
-    name: org/project1
+# Define jobs for org/project1 in a template to test that the queue name is
+# picked up correctly from the project config. This should also be the case
+# when the project doesn't include any pipeline config and only references a
+# template.
+- project-template:
+    name: project1-template
     check:
-      queue: integrated
       jobs:
         - integration
     gate:
-      queue: integrated
       jobs:
         - integration
+
+- project:
+    name: org/project1
+    queue: integrated
+    templates:
+      - project1-template
 
 - project:
     name: org/project2
