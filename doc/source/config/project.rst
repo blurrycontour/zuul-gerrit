@@ -166,10 +166,6 @@ pipeline.
       stanza; it may appear in secondary instances or even in a
       :ref:`project-template` definition.
 
-      Pipeline managers other than `dependent` do not use this
-      attribute, however, it may still be used if
-      :attr:`scheduler.relative_priority` is enabled.
-
       .. note:: This attribute is not evaluated speculatively and
                 its setting shall be merged to be effective.
 
