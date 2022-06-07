@@ -16,6 +16,23 @@
       "message": "I think it could be confusing to users to allow defining local semaphores with the same name as global ones. What do you thing about banning local semaphores with the same name as a global one in general?",
       "revId": "7fc94effe7910c61ee755106b2aa51c18ce2b1a8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12a3088a_5ee4a639",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 7180,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-06-07T20:21:42Z",
+      "side": 1,
+      "message": "ftr, I\u0027m in favour of deprecation of implied semaphores.",
+      "revId": "7fc94effe7910c61ee755106b2aa51c18ce2b1a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
