@@ -70,6 +70,24 @@
       "parentUuid": "b25bd644_c159a455",
       "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "735e9138_31b459f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-06-07T20:34:04Z",
+      "side": 1,
+      "message": "Fine for me as is with the now implemented caching of /tenants",
+      "parentUuid": "fa8526ee_8b183bf3",
+      "revId": "d597adc9a7885fedebb501153ee14f311e92be00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
