@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1c41e4ce_4a6455ee",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2081,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-06-07T19:31:49Z",
+      "side": 1,
+      "message": "I think the easiest would be to duplicate the test_merge_request_approved test case and set blocking_discussions_resolved to false in the fake merge request created there. Then just change the first assert to expect self.history is empty and remove anything that follows.",
+      "parentUuid": "facb2a4c_33cc6b1f",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a9fc6ef2_d4b00a9d",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 5
