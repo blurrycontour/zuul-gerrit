@@ -10,7 +10,7 @@ Prerequisites
 * The Zuul instance must be able to query Keycloak over HTTPS.
 * Authenticating users must be able to reach Keycloak's web UI.
 * Have a realm set up in Keycloak.
-  `Instructions on how to do so can be found here <https://www.keycloak.org/docs/latest/getting_started/index.html#creating-a-realm-and-user>`_ .
+  `Instructions on how to do so can be found here <https://www.keycloak.org/docs/latest/server_admin/#configuring-realms>`_ .
 
 By convention, we will assume the Keycloak server's FQDN is ``keycloak``, and
 Zuul's Web UI's base URL is ``https://zuul/``. We will use the realm ``my_realm``.
@@ -81,7 +81,7 @@ Keycloak can delegate authentication to predefined social networks. Follow
 
 If you don't set up authentication delegation, make sure to create at least one
 user in your realm, or allow self-registration. See Keycloak's documentation section
-on `user management <https://www.keycloak.org/docs/latest/server_admin/index.html#user-management>`_
+on `user management <https://www.keycloak.org/docs/latest/server_admin/index.html#assembly-managing-users_server_administration_guide>`_
 for more details on how to do so.
 
 Setting up Zuul
@@ -107,4 +107,4 @@ Further Reading
 ---------------
 
 This How-To is based on `Keycloak's documentation <https://www.keycloak.org/documentation.html>`_,
-specifically `the documentation about clients <https://www.keycloak.org/docs/latest/server_admin/#_clients>`_.
+specifically `the documentation about clients <https://www.keycloak.org/docs/latest/server_admin/#assembly-managing-clients_server_administration_guide>`_.
