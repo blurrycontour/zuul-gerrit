@@ -16,6 +16,24 @@
       "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e Please add a test for this, thanks!\n\nWould love to if I get some guidance. I am not very deep in those tests and sadly have no free time to dive deep.",
       "revId": "77fb4011247d7b484fff9002f4f4f4ad10367269",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9853cda_1970233e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-06-07T19:39:05Z",
+      "side": 1,
+      "message": "You can duplicate test_merge_request_approved with an adjusted layout that uses squash merge. Further you can check for the parameter in fakegitlab.py in put_mr_merge and forward it into FakeGitlabMergerequest.mergeMergeRequest where you store the merge type. This makes it possible to assert on that in the test case after the merge.",
+      "parentUuid": "d6c60f45_09a4c5a4",
+      "revId": "77fb4011247d7b484fff9002f4f4f4ad10367269",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
