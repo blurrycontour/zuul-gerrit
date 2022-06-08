@@ -238,6 +238,8 @@ the following options.
 
       .. value:: check_run
 
+      .. value:: workflow_dispatch
+
    .. attr:: action
 
       A :value:`pipeline.trigger.<github source>.event.pull_request`
@@ -301,6 +303,10 @@ the following options.
 
          A check run completed.
 
+      A :value:`pipeline.trigger.<github
+      source>.event.workflow_dispatch` event will have NO associated
+      action(s) to trigger from.
+
    .. attr:: branch
 
       The branch associated with the event. Example: ``master``.  This
@@ -342,7 +348,7 @@ the following options.
       format of ``user:context:status``.  For example,
       ``zuul_github_ci_bot:check_pipeline:success``.
 
-   .. attr: check
+   .. attr:: check
 
       This is only used for ``check_run`` events. It works similar to
       the ``status`` attribute and accepts a list of strings each of
