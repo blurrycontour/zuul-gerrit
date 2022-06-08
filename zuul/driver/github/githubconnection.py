@@ -513,7 +513,28 @@ class GithubEventProcessor(object):
         event.state = review.get('state')
         event.account = self._get_sender(self.body)
         event.type = 'pull_request_review'
-        event.action = self.body.get('action')
+        return event
+
+    def _event_workflow_dispatch(self):
+        """Handles workflow dispatches"""
+        base_repo = self.body.get('repository')
+
+        event = GithubTriggerEvent()
+        event.account = self._get_sender(self.body)
+        event.connection_name = self.connection.connection_name
+        event.project_name = base_repo.get('full_name')
+        event.trigger_name = 'github'
+        event.type = 'workflow_dispatch'
+        event.ref = self.body.get('ref')
+
+        ref_parts = event.ref.split('/', 2)  # ie, ['refs', 'heads', 'foo/bar']
+
+        if ref_parts[1] == "heads":
+            # necessary for the scheduler to match against particular branches
+            event.branch = ref_parts[2]
+
+        self.connection.clearConnectionCacheOnBranchEvent(event)
+
         return event
 
     def _event_status(self):
