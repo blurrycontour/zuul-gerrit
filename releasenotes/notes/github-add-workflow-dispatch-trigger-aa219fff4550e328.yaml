@@ -1,0 +1,8 @@
+---
+prelude: >
+    You can now trigger workflows from GitHub manually through workflow
+    dispatch.
+features:
+  - |
+    GitHub allows workflows to be triggered manually. This is now
+    also implemented in zuul and you can create a pipeline for it.
