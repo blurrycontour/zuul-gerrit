@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7611964_eb8fc34e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34950
+      },
+      "writtenOn": "2022-06-13T12:02:29Z",
+      "side": 1,
+      "message": "( Hi @tim This is my first Gerrit review ever)\nThank you for improving the integration with GitHub (my $DAYJOB use github.com...!)\nI have some suggestions for making the descriptions more clear and I\u0027m happy to wordsmith, if you find this useful (years in marketing come in handy).",
+      "revId": "ab2fe2e2783b5ea4e7faa69b1d02c9d1787cb2ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30b2ea9f_0703c03f",
@@ -14,6 +31,24 @@
       "writtenOn": "2022-06-13T09:22:49Z",
       "side": 1,
       "message": "I find this wording hard to follow. At first, I thought it was about triggering Zuul runs from within GHA but it turned out to be vice versa. Maybe \"on GitHub\"? Or mention workflows on GitHub Actions CI/CD platform explicitly?",
+      "revId": "ab2fe2e2783b5ea4e7faa69b1d02c9d1787cb2ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8b27733_5efcf45c",
+        "filename": "releasenotes/notes/github-add-workflow-dispatch-trigger-aa219fff4550e328.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 34950
+      },
+      "writtenOn": "2022-06-13T12:02:29Z",
+      "side": 1,
+      "message": "FWIW, I also struggled to understand the Description.\nMay I propose a few alternatives for you to consider (and they may reflect my misunderstanding)...\n\n\u003e Use workflow dispatch to trigger GitHub Actions\n\u003e Trigger Github Actions manually\n\u003e Manually trigger Github Actions and workflows",
+      "parentUuid": "30b2ea9f_0703c03f",
       "revId": "ab2fe2e2783b5ea4e7faa69b1d02c9d1787cb2ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
