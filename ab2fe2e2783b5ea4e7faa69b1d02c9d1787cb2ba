@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30b2ea9f_0703c03f",
+        "filename": "releasenotes/notes/github-add-workflow-dispatch-trigger-aa219fff4550e328.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 22720
+      },
+      "writtenOn": "2022-06-13T09:22:49Z",
+      "side": 1,
+      "message": "I find this wording hard to follow. At first, I thought it was about triggering Zuul runs from within GHA but it turned out to be vice versa. Maybe \"on GitHub\"? Or mention workflows on GitHub Actions CI/CD platform explicitly?",
+      "revId": "ab2fe2e2783b5ea4e7faa69b1d02c9d1787cb2ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
