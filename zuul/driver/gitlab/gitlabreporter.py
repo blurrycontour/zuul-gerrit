@@ -49,6 +49,7 @@ class GitlabReporter(BaseReporter):
         self._unlabels = self.config.get('unlabel', [])
         if not isinstance(self._unlabels, list):
             self._unlabels = [self._unlabels]
+        self._commit_status = self.config.get('status', None)
 
     def report(self, item):
         """Report on an event."""
@@ -132,6 +133,32 @@ class GitlabReporter(BaseReporter):
 
     def getSubmitAllowNeeds(self):
         return []
+
+    def setCommitStatus(self, item):
+        log = get_annotated_logger(self.log, item.event)
+        project = item.change.project.name
+        if hasattr(item.change, 'patchset'):
+            sha = item.change.patchset
+        elif hasattr(item.change, 'newrev'):
+            sha = item.change.newrev
+        state = self._commit_status
+
+        url = item.formatStatusUrl()
+
+        description = '%s status: %s' % (item.pipeline.name,
+                                         self._commit_status)
+        for job in item.getJobs():
+            name = '%s.%s' & (item.pipeline.name, job.name)
+
+            log.debug(
+                'Reporting change %s, params %s, '
+                'context: %s, state: %s, description: %s, url: %s',
+                item.change, self.config, self.context, state, description, url)
+
+            self.connection.setCommitStatus(
+                project, item.change.number, sha, state,
+                zuul_event_id=item.event, name=name, target_url=url,
+                description=description)
 
 
 def getSchema():
