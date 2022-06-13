@@ -27,17 +27,19 @@ from git.util import IterableList
 
 class GitlabWebServer(object):
 
-    def __init__(self, merge_requests):
+    def __init__(self, merge_requests, statuses=None):
         super(GitlabWebServer, self).__init__()
         self.merge_requests = merge_requests
         self.fake_repos = defaultdict(lambda: IterableList('name'))
         # A dictionary so we can mutate it
         self.options = dict(community_edition=False)
+        self.statuses = statuses if statuses else dict()
 
     def start(self):
         merge_requests = self.merge_requests
         fake_repos = self.fake_repos
         options = self.options
+        statuses = self.statuses
 
         class Server(http.server.SimpleHTTPRequestHandler):
             log = logging.getLogger("zuul.test.GitlabWebServer")
@@ -66,6 +68,11 @@ class GitlabWebServer(object):
                                      r'merge_requests/(?P<mr>\d+)/merge$')
             mr_update_re = re.compile(r'.+/projects/(?P<project>.+)/'
                                       r'merge_requests/(?P<mr>\d+)$')
+            commit_status_re = re.compile(r'.+/projects/(?P<project>.+)/'
+                                          r'statuses/(?P<sha>.+)$')
+            commit_statuses_re = re.compile(r'.+/projects/(?P<project>.+)/'
+                                            r'repository/statuses/'
+                                            r'(?P<sha>.+)$')
 
             def _get_mr(self, project, number):
                 project = urllib.parse.unquote(project)
@@ -91,6 +98,9 @@ class GitlabWebServer(object):
                 m = self.branches_re.match(path)
                 if m:
                     return self.get_branches(path, **m.groupdict())
+                m = self.commit_statuses_re.match(path)
+                if m:
+                    return self.list_commit_statuses(path, **m.groupdict())
                 self.send_response(500)
                 self.end_headers()
 
@@ -114,6 +124,10 @@ class GitlabWebServer(object):
                 m = self.mr_unapprove_re.match(path)
                 if m:
                     return self.post_mr_unapprove(data, **m.groupdict())
+
+                m = self.commit_status_re.match(path)
+                if m:
+                    return self.post_commit_status(data, **m.groupdict())
                 self.send_response(500)
                 self.end_headers()
 
@@ -245,6 +259,24 @@ class GitlabWebServer(object):
                 labels = labels | set(add_labels)
                 mr.labels = list(labels)
                 self.send_data({})
+
+            def post_commit_status(self, data, project, sha):
+                status = dict(
+                    name=data.get('name', 'default'),
+                    state=data['state'],
+                    sha=sha,
+                    target_url=data.get('target_url'),
+                    description=data.get('description'),
+                    coverage=data.get('coverage')
+                )
+                statuses.update({sha: status})
+
+                self.send_data({'status': data['status']})
+
+            def list_commit_statuses(self, data, project, sha):
+                # Return statuses from the internal status cache
+                data = statuses.get(sha)
+                self.send_data({'status': data})
 
             def log_message(self, fmt, *args):
                 self.log.debug(fmt, *args)
