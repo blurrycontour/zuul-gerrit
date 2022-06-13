@@ -825,6 +825,18 @@ class TestGitlabDriver(ZuulTestCase):
         # is reverted and not in changed files to trigger project-test2
         self.assertEqual(1, len(self.history))
 
+    @simple_layout('layouts/reporting-gitlab.yaml', driver='gitlab')
+    def test_reporting(self):
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project1', 'master', 'A')
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual(1, len(self.history))
+
+        statuses = self.fake_gitlab.getCommitStatuses(A.project, A.sha)
+        self.assertEqual({}, statuses)
+
 
 class TestGitlabUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-gitlab-driver.conf'

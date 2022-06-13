@@ -1,0 +1,42 @@
+- pipeline:
+    name: status-reporting
+    manager: independent
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action: comment
+          comment: (?i)^\s*recheck\s*$
+        - event: gl_merge_request
+          action:
+            - opened
+            - changed
+    enqueue:
+      gitlab:
+        status: True
+    start:
+      gitlab:
+        status: True
+    success:
+      gitlab:
+        status: True
+    failure:
+      gitlab:
+        status: True
+    dequeue:
+      gitlab:
+        status: True
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- project:
+    name: org/project1
+    status-reporting:
+      jobs:
+        - project-test1
