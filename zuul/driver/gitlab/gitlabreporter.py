@@ -49,6 +49,7 @@ class GitlabReporter(BaseReporter):
         self._unlabels = self.config.get('unlabel', [])
         if not isinstance(self._unlabels, list):
             self._unlabels = [self._unlabels]
+        self._commit_status = self.config.get('status', False)
 
     def report(self, item):
         """Report on an event."""
@@ -66,6 +67,8 @@ class GitlabReporter(BaseReporter):
                 self.setApproval(item)
             if self._labels or self._unlabels:
                 self.setLabels(item)
+            if self._commit_status:
+                self.setCommitStatus(item)
             if self._merge:
                 self.mergeMR(item)
                 if not item.change.is_merged:
@@ -133,12 +136,52 @@ class GitlabReporter(BaseReporter):
     def getSubmitAllowNeeds(self):
         return []
 
+    def setCommitStatus(self, item):
+        log = get_annotated_logger(self.log, item.event)
+        project = item.change.project.name
+        if hasattr(item.change, 'patchset'):
+            sha = item.change.patchset
+        elif hasattr(item.change, 'newrev'):
+            sha = item.change.newrev
+
+        url = item.formatStatusUrl()
+
+        description = '%s status: %s' % (item.pipeline.name,
+                                         self._commit_status)
+        state = None
+        if self._action == 'enqueue':
+            state = 'pending'
+        elif self._action == 'start':
+            state = 'running'
+        elif self._action == 'success':
+            state = 'success'
+        elif self._action == 'failure':
+            state = 'failed'
+        elif self._action == 'cancelled':
+            state = 'canceled'
+        elif self._action == 'dequeued':
+            state = 'canceled'
+
+        for job in item.getJobs():
+            name = '%s.%s' % (item.pipeline.name, job.name)
+            if state:
+                log.debug(
+                    'Reporting change %s, params %s, '
+                    'state: %s, description: %s, url: %s',
+                    item.change, self.config, state, description, url)
+
+                self.connection.setCommitStatus(
+                    project, item.change.number, sha, state,
+                    zuul_event_id=item.event, name=name, target_url=url,
+                    description=description)
+
 
 def getSchema():
     gitlab_reporter = v.Schema({
         'comment': bool,
         'approval': bool,
         'merge': bool,
+        'status': bool,
         'label': scalar_or_list(str),
         'unlabel': scalar_or_list(str),
     })
