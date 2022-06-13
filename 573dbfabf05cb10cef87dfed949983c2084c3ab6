@@ -105,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a1a0b03_8e1450c2",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2081,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-06-13T13:11:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c41e4ce_4a6455ee",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9fc6ef2_d4b00a9d",
@@ -154,6 +172,24 @@
       "side": 1,
       "message": "Ok, great",
       "parentUuid": "33492cc1_04e1d5cc",
+      "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0e828e3_5a04cab7",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-06-13T13:11:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9784935_bca00e07",
       "revId": "573dbfabf05cb10cef87dfed949983c2084c3ab6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
