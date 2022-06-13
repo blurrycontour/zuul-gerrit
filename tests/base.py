@@ -1953,8 +1953,10 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self.merge_requests = changes_db
         self.upstream_root = upstream_root
         self.mr_number = 0
+        self.statuses = dict()
 
-        self._test_web_server = tests.fakegitlab.GitlabWebServer(changes_db)
+        self._test_web_server = tests.fakegitlab.GitlabWebServer(
+            changes_db, self.statuses)
         self._test_web_server.start()
         self._test_baseurl = 'http://localhost:%s' % self._test_web_server.port
         connection_config['baseurl'] = self._test_baseurl
