@@ -453,6 +453,38 @@ class GitlabAPIClient():
         self._manage_error(*resp, zuul_event_id=zuul_event_id)
         return resp[0]
 
+    # https://docs.gitlab.com/ee/api/commits.html#post-the-build-status-to-a-commit
+    def set_commit_status(self, project_name, sha, status,
+                          zuul_event_id=None, **params):
+        path = "/projects/%s/statuses/%s" % (
+            quote_plus(project_name), sha)
+        if status not in [
+            'pending', 'running', 'success', 'failed',
+            'cancelled'
+        ]:
+            raise GitlabAPIClientException(
+                "[e: %s] Unable to set status to %s: not supported "
+                "value." % (zuul_event_id, status)
+            )
+
+        status_body = dict()
+        for attr in ['ref', 'name', 'target_url', 'description', 'coverage']:
+            if hasattr(params, attr):
+                status_body[attr] = params[attr]
+        resp = self.post(self.baseurl + path, params=status_body,
+                         zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
+    # https://docs.gitlab.com/ee/api/commits.html#list-the-statuses-of-a-commit
+    def get_commit_statuses(self, project_name, sha,
+                            zuul_event_id=None):
+        path = "/projects/%s/repository/commits/%s/statuses" % (
+            quote_plus(project_name), sha)
+        resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
 
 class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'gitlab'
@@ -757,6 +789,15 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             remove_labels=','.join(unlabels))
         log.debug("Added labels %s to, and removed labels %s from %s#%s",
                   labels, unlabels, project_name, mr_number)
+
+    def setCommitStatus(self, project_name, mr_number, sha, status,
+                        zuul_event_id=None, **params):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        self.gl_client.set_commit_status(
+            project_name, sha, status, zuul_event_id, **params
+        )
+        log.debug("Set %s#%s commit %s status to %s",
+                  project_name, mr_number, sha, status)
 
 
 class GitlabWebController(BaseWebController):

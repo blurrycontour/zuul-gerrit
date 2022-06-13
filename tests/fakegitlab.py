@@ -66,6 +66,8 @@ class GitlabWebServer(object):
                                      r'merge_requests/(?P<mr>\d+)/merge$')
             mr_update_re = re.compile(r'.+/projects/(?P<project>.+)/'
                                       r'merge_requests/(?P<mr>\d+)$')
+            commit_status_re = re.compile(r'.+/projects/(?P<project>.+)/'
+                                          r'statuses/(?P<sha>\d+)$')
 
             def _get_mr(self, project, number):
                 project = urllib.parse.unquote(project)
@@ -114,6 +116,10 @@ class GitlabWebServer(object):
                 m = self.mr_unapprove_re.match(path)
                 if m:
                     return self.post_mr_unapprove(data, **m.groupdict())
+
+                m = self.commit_status_re.match(path)
+                if m:
+                    return self.post_commit_status(data, **m.groupdict())
                 self.send_response(500)
                 self.end_headers()
 
@@ -245,6 +251,9 @@ class GitlabWebServer(object):
                 labels = labels | set(add_labels)
                 mr.labels = list(labels)
                 self.send_data({})
+
+            def post_commit_status(self, data, project, sha):
+                self.send_data({'status': data.get('status')})
 
             def log_message(self, fmt, *args):
                 self.log.debug(fmt, *args)
