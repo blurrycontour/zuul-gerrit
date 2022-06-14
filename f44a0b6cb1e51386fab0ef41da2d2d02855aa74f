@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b9c9d0b_7a37fe14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-14T20:38:07Z",
+      "side": 1,
+      "message": "Not approving this as I\u0027m not primarily a github user so can\u0027t chime in on the inline discussion. I\u0027ll defer to github users on that before approval.",
+      "revId": "f44a0b6cb1e51386fab0ef41da2d2d02855aa74f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d22d881b_4ddaed95",
