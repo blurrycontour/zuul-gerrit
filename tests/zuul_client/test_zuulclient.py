@@ -330,6 +330,85 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+    def _dequeue_all_prelude(self):
+        self.executor_server.hold_jobs_in_build = True
+        start_builds = len(self.builds)
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('common-config',
+                                'layouts/test-dequeue-all.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        fakeChanges = {}
+        for i in ['', '1', '2']:
+            A = self.fake_gerrit.addFakeChange(
+                'org/project' + i, 'master', 'A' + i)
+            fakeChanges[i] = A
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(90, 'Wait for builds on hold'):
+            if len(self.builds) > start_builds:
+                break
+        self.waitUntilSettled()
+
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        return token
+
+    def test_dequeue_all_by_pipeline(self):
+        """Test that the Web client can dequeue a whole pipeline"""
+        token = self._dequeue_all_prelude()
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url, '--auth-token', token, '-v',
+             'dequeue-all', '--tenant', 'tenant-one',
+             '--pipeline', 'check2'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(
+            self.countJobResults(self.history, 'ABORTED'),
+            3,
+            self.builds)
+
+    def test_dequeue_all_by_project(self):
+        """Test that the Web client can dequeue all by project"""
+        token = self._dequeue_all_prelude()
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url, '--auth-token', token, '-v',
+             'dequeue-all', '--tenant', 'tenant-one',
+             '--pipeline', 'check1', '--project', 'org/project'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(
+            self.countJobResults(self.history, 'ABORTED'), 2, self.builds)
+        dequeued = [x for x in self.history if x.result == 'ABORTED']
+        self.assertTrue(
+            all(x.project == 'org/project' for x in dequeued),
+            dequeued
+        )
+
     def test_promote(self):
         "Test that the Web client can promote a change"
         self.executor_server.hold_jobs_in_build = True
@@ -343,7 +422,6 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
-
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
