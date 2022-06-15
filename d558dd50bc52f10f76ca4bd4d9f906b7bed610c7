@@ -16,6 +16,40 @@
       "message": "Never mind.  I updated the wrong regex.  (This should teach me not to make changes 3 am in the morning...)",
       "revId": "d558dd50bc52f10f76ca4bd4d9f906b7bed610c7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73e538f3_3b4bfefe",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-15T17:23:32Z",
+      "side": 1,
+      "message": "You could assign it to a variable and use that rather than calling the formatting function twice.",
+      "revId": "d558dd50bc52f10f76ca4bd4d9f906b7bed610c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7725565f_39284781",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-15T17:23:32Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "d558dd50bc52f10f76ca4bd4d9f906b7bed610c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
