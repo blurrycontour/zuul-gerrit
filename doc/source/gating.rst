@@ -405,10 +405,10 @@ change in project C.
 Cycles
 ~~~~~~
 
-If a cycle is created by use of cross-project dependencies, Zuul will
-abort its work very early.  There will be no message in Gerrit and no
-changes that are part of the cycle will be enqueued into any pipeline.
-This is to protect Zuul from infinite loops.
+Zuul supports cycles that are created by use of cross-project dependencies.
+However this is opt-in and can be configured on the queue.
+See :attr:`queue.allow-circular-dependencies` for information on how to
+configure this.
 
 .. _global_repo_state:
 
