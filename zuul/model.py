@@ -2708,6 +2708,8 @@ class Job(ConfigObject):
                     job=self.name,
                     maxnodes=layout.tenant.max_nodes_per_job))
 
+        for dependency in self.dependencies:
+            layout.getJob(dependency.name)
         for pb in self.pre_run + self.run + self.post_run + self.cleanup_run:
             pb.validateReferences(layout)
 
