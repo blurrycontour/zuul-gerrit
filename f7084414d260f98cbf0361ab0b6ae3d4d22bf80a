@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "711669d6_b09326f5",
+        "filename": "tests/remote/test_remote_zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-16T21:21:13Z",
+      "side": 1,
+      "message": "I guess we are trying to assert that not only do we log the correct value but that the time step between entries doesn\u0027t have significant delay as with the old code?",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32cbb72f_4e60d4a4",
+        "filename": "zuul/ansible/2.8/library/command.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-16T21:21:13Z",
+      "side": 1,
+      "message": "See comment in base file.",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f982f1eb_870d2272",
+        "filename": "zuul/ansible/2.9/library/command.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-16T21:21:13Z",
+      "side": 1,
+      "message": "See comment in base file.",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87f0fc77_6032b3a8",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 559,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-16T21:21:13Z",
+      "side": 1,
+      "message": "This code might flow a bit better if we reorganize it a bit to something like:\n\n  with Console(zuul_log_id) as console:\n    if t and t.is_alive():\n      console.addLine(\"...\")\n    if fail_json_kwargs:\n      rc \u003d fail_json_kwargs[\u0027rc\u0027]\n    console.addLine(\"...\")",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
