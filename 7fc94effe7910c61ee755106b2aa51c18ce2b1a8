@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fff06da_f1d37687",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 7151,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-16T22:32:25Z",
+      "side": 1,
+      "message": "That\u0027s basically what this does since this will cause a config error.",
+      "revId": "7fc94effe7910c61ee755106b2aa51c18ce2b1a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12a3088a_5ee4a639",
