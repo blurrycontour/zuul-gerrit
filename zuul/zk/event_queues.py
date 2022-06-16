@@ -28,6 +28,7 @@ from kazoo.protocol.states import EventType
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
+from zuul.lib.logutil import get_annotated_logger
 from zuul.zk import ZooKeeperSimpleBase, sharding
 from zuul.zk.election import SessionAwareElection
 
@@ -853,7 +854,7 @@ class PipelineTriggerEventQueue(TriggerEventQueue):
 class ConnectionEventQueue(ZooKeeperEventQueue):
     """Connection events via ZooKeeper"""
 
-    log = logging.getLogger("zuul.zk.event_queues.ConnectionEventQueue")
+    log = logging.getLogger("zuul.ConnectionEventQueue")
 
     def __init__(self, client, connection_name):
         queue_root = "/".join((CONNECTION_ROOT, connection_name, "events"))
@@ -875,8 +876,11 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
         )
 
     def put(self, data):
-        self.log.debug("Submitting connection event to queue %s: %s",
-                       self.event_root, data)
+        log = self.log
+        if "zuul_event_id" in data:
+            log = get_annotated_logger(log, data["zuul_event_id"])
+        log.debug("Submitting connection event to queue %s: %s",
+                  self.event_root, data)
         self._put({'event_data': data})
 
     def __iter__(self):
