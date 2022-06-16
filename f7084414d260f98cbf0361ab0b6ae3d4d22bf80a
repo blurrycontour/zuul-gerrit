@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38fa2562_832ca730",
+        "filename": "tests/remote/test_remote_zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-16T22:28:13Z",
+      "side": 1,
+      "message": "I\u0027m a little worried that we will fail this in opendev\u0027s zuul since our test nodes are so underpowered.  The timeout is 10 seconds right?  Can we bump this to 9 and still have it be a useful test?",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32cbb72f_4e60d4a4",
