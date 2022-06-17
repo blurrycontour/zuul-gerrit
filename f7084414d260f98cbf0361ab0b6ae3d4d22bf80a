@@ -53,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01269471_91380c34",
+        "filename": "tests/remote/test_remote_zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-06-17T19:35:41Z",
+      "side": 1,
+      "message": "Updated, but it was almost instant, see my answer to Clark comment",
+      "parentUuid": "38fa2562_832ca730",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32cbb72f_4e60d4a4",
