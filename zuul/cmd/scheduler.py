@@ -39,6 +39,10 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                  'listed, all tenants will be validated. '
                                  'Note: this requires ZooKeeper and '
                                  'will distribute work to mergers.')
+        parser.add_argument('--wait-for-init', dest='wait_for_init',
+                            action='store_true',
+                            help='Wait until all tenants are fully loaded '
+                                 'before beginning to process events.')
         self.addSubCommands(parser, zuul.scheduler.COMMANDS)
         return parser
 
@@ -82,7 +86,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.configure_connections(require_sql=True)
         self.sched = zuul.scheduler.Scheduler(self.config,
-                                              self.connections, self)
+                                              self.connections, self,
+                                              self.args.wait_for_init)
         if self.args.validate_tenants is None:
             self.connections.registerScheduler(self.sched)
             self.connections.load(self.sched.zk_client,
