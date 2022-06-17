@@ -578,6 +578,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         self.user = self.connection_config.get('user')
         self.server = self.connection_config.get('server')
+        self.ssh_server = self.connection_config.get('ssh_server', self.server)
         self.canonical_hostname = self.connection_config.get(
             'canonical_hostname', self.server)
         self.port = int(self.connection_config.get('port', 29418))
@@ -680,6 +681,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             "baseurl": self.baseurl,
             "canonical_hostname": self.canonical_hostname,
             "server": self.server,
+            "ssh_server": self.ssh_server,
             "port": self.port,
         })
         return d
@@ -1535,7 +1537,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             client.set_missing_host_key_policy(paramiko.WarningPolicy())
             # SSH banner, handshake, and auth timeouts default to 15
             # seconds, so we only set the socket timeout here.
-            client.connect(self.server,
+            client.connect(self.ssh_server,
                            username=self.user,
                            port=self.port,
                            key_filename=self.keyfile,
@@ -1626,7 +1628,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             baseurl = urllib.parse.urlunparse(baseurl)
             url = ('%s/a/%s' % (baseurl, project.name))
         else:
-            url = 'ssh://%s@%s:%s/%s' % (self.user, self.server, self.port,
+            url = 'ssh://%s@%s:%s/%s' % (self.user, self.ssh_server, self.port,
                                          project.name)
         return url
 
@@ -1717,7 +1719,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.watcher_thread = GerritWatcher(
             self,
             self.user,
-            self.server,
+            self.ssh_server,
             self.port,
             keyfile=self.keyfile,
             keepalive=self.keepalive)
