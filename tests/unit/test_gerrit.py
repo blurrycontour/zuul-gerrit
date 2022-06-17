@@ -148,6 +148,25 @@ class TestGerrit(BaseTestCase):
             'ssh://gerrit@localhost:29418/org/project',
             url)
 
+    def test_ssh_server_getGitURL(self):
+        gerrit_config = {
+            'user': 'gerrit',
+            'server': 'otherserver',
+            'password': '1/badpassword',
+            'ssh_server': 'localhost',
+            'git_over_ssh': 'true',
+        }
+        # The 1/ in the password ensures we test the url encoding
+        # path; this is the format of password we get from
+        # googlesource.com.
+        driver = GerritDriver()
+        gerrit = GerritConnection(driver, 'review_gerrit', gerrit_config)
+        project = gerrit.source.getProject('org/project')
+        url = gerrit.source.getGitUrl(project)
+        self.assertEqual(
+            'ssh://gerrit@localhost:29418/org/project',
+            url)
+
 
 class TestGerritWeb(ZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'
