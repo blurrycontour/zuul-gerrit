@@ -316,6 +316,7 @@ class TestWeb(BaseTestWeb):
             'baseurl': 'https://review.example.com',
             'canonical_hostname': 'review.example.com',
             'server': 'review.example.com',
+            'ssh_server': 'review.example.com',
             'port': 29418,
         }
         self.assertEqual([connection], data)
@@ -2954,7 +2955,7 @@ class TestHeldAttributeInBuildInfo(BaseTestWeb):
 
 
 class TestWebMulti(BaseTestWeb):
-    config_file = 'zuul-gerrit-github.conf'
+    config_file = 'zuul-gerrit-ssh.conf'
 
     def test_web_connections_list_multi(self):
         data = self.get_url('api/connections').json()
@@ -2966,6 +2967,7 @@ class TestWebMulti(BaseTestWeb):
             'baseurl': url,
             'canonical_hostname': 'review.example.com',
             'server': 'review.example.com',
+            'ssh_server': 'ssh-review.example.com',
             'port': 29418,
         }
         github_connection = {
