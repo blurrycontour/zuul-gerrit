@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc659c0c_3f92e8eb",
+        "filename": "tests/remote/test_remote_zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-06-17T19:34:02Z",
+      "side": 1,
+      "message": "Yes. With this change it\u0027s 0.5sec + XXXmsec, it was 10sec + 0.5sec + XXXmsec before\n\nfirst trace is [1] with 0.5sec wait before sending [2] which stops the streamer [3]\n\n[1] https://opendev.org/zuul/zuul/src/commit/f7084414d260f98cbf0361ab0b6ae3d4d22bf80a/zuul/ansible/base/library/zuul_console.py#L188-L189\n[2] https://opendev.org/zuul/zuul/src/commit/f7084414d260f98cbf0361ab0b6ae3d4d22bf80a/zuul/ansible/base/library/command.py#L559\n[3] https://opendev.org/zuul/zuul/src/commit/f7084414d260f98cbf0361ab0b6ae3d4d22bf80a/zuul/ansible/base/callback/zuul_stream.py#L191",
+      "parentUuid": "711669d6_b09326f5",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32cbb72f_4e60d4a4",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-06-16T21:21:13Z",
       "side": 1,
       "message": "See comment in base file.",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "873e953a_5bf6a48a",
+        "filename": "zuul/ansible/2.8/library/command.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-06-17T19:34:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32cbb72f_4e60d4a4",
       "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30729283_2d6f9c65",
+        "filename": "zuul/ansible/2.9/library/command.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-06-17T19:34:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f982f1eb_870d2272",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87f0fc77_6032b3a8",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-06-16T21:21:13Z",
       "side": 1,
       "message": "This code might flow a bit better if we reorganize it a bit to something like:\n\n  with Console(zuul_log_id) as console:\n    if t and t.is_alive():\n      console.addLine(\"...\")\n    if fail_json_kwargs:\n      rc \u003d fail_json_kwargs[\u0027rc\u0027]\n    console.addLine(\"...\")",
+      "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30905506_ccb90417",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 559,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2022-06-17T19:34:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87f0fc77_6032b3a8",
       "revId": "f7084414d260f98cbf0361ab0b6ae3d4d22bf80a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
