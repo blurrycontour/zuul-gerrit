@@ -16,6 +16,23 @@
       "message": "I think we should also validate that no tenant reconfiguration happens after merging a zuul.yaml change since there is no static configuration that would be altered.",
       "revId": "9e6bfded5618c9af020e818a430bdf203b29a0e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "369ff36b_0fc85028",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-17T23:00:38Z",
+      "side": 1,
+      "message": "Good idea.  Done in https://review.opendev.org/846449",
+      "revId": "9e6bfded5618c9af020e818a430bdf203b29a0e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
