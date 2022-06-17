@@ -4379,11 +4379,12 @@ class SchedulerTestApp:
     def __init__(self, log, config, changes, additional_event_queues,
                  upstream_root, poller_events,
                  git_url_with_auth, add_cleanup, validate_tenants,
-                 instance_id):
+                 wait_for_init, instance_id):
         self.log = log
         self.config = config
         self.changes = changes
         self.validate_tenants = validate_tenants
+        self.wait_for_init = wait_for_init
 
         # Register connections from the config using fakes
         self.connections = TestConnectionRegistry(
@@ -4397,7 +4398,8 @@ class SchedulerTestApp:
         )
         self.connections.configure(self.config)
 
-        self.sched = TestScheduler(self.config, self.connections, self)
+        self.sched = TestScheduler(self.config, self.connections, self,
+                                   wait_for_init)
         self.sched.log = logging.getLogger(f"zuul.Scheduler-{instance_id}")
         self.sched._stats_interval = 1
 
@@ -4463,13 +4465,12 @@ class SchedulerTestApp:
 
 
 class SchedulerTestManager:
-    def __init__(self, validate_tenants):
+    def __init__(self, validate_tenants, wait_for_init):
         self.instances = []
-        self.validate_tenants = validate_tenants
 
     def create(self, log, config, changes, additional_event_queues,
-               upstream_root, poller_events,
-               git_url_with_auth, add_cleanup, validate_tenants):
+               upstream_root, poller_events, git_url_with_auth,
+               add_cleanup, validate_tenants, wait_for_init):
         # Since the config contains a regex we cannot use copy.deepcopy()
         # as this will raise an exception with Python <3.7
         config_data = StringIO()
@@ -4490,7 +4491,7 @@ class SchedulerTestManager:
                                additional_event_queues, upstream_root,
                                poller_events,
                                git_url_with_auth, add_cleanup,
-                               validate_tenants, instance_id)
+                               validate_tenants, wait_for_init, instance_id)
         self.instances.append(app)
         return app
 
@@ -4593,6 +4594,7 @@ class ZuulTestCase(BaseTestCase):
     git_url_with_auth: bool = False
     log_console_port: int = 19885
     validate_tenants = None
+    wait_for_init = None
     scheduler_count = SCHEDULER_COUNT
 
     def __getattr__(self, name):
@@ -4757,7 +4759,8 @@ class ZuulTestCase(BaseTestCase):
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
 
-        self.scheds = SchedulerTestManager(self.validate_tenants)
+        self.scheds = SchedulerTestManager(self.validate_tenants,
+                                           self.wait_for_init)
         for _ in range(self.scheduler_count):
             self.createScheduler()
 
@@ -4776,7 +4779,7 @@ class ZuulTestCase(BaseTestCase):
             self.log, self.config, self.changes,
             self.additional_event_queues, self.upstream_root,
             self.poller_events, self.git_url_with_auth,
-            self.addCleanup, self.validate_tenants)
+            self.addCleanup, self.validate_tenants, self.wait_for_init)
 
     def createZKContext(self, lock=None):
         if lock is None:

@@ -184,9 +184,11 @@ class Scheduler(threading.Thread):
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
 
-    def __init__(self, config, connections, app, testonly=False):
+    def __init__(self, config, connections, app, wait_for_init,
+                 testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
+        self.wait_for_init = wait_for_init
         self.hostname = socket.getfqdn()
         self.primed_event = threading.Event()
         # Wake up the main run loop
@@ -1901,6 +1903,9 @@ class Scheduler(threading.Thread):
             self.log.debug("Statsd enabled")
         else:
             self.log.debug("Statsd not configured")
+        if self.wait_for_init:
+            self.log.debug("Waiting for tenant initialization")
+            self.primed_event.wait()
         while True:
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
