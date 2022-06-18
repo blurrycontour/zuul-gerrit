@@ -5138,6 +5138,9 @@ class ZuulTestCase(BaseTestCase):
         self.fake_nodepool.stop()
         self.zk_client.disconnect()
         self.printHistory()
+
+    def assertCleanShutdown(self):
+        self.log.debug("Assert clean shutdown")
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
         whitelist = ['watchdog',
@@ -5166,9 +5169,6 @@ class ZuulTestCase(BaseTestCase):
                 log_str += "".join(traceback.format_stack(stack_frame))
             self.log.debug(log_str)
             raise Exception("More than one thread is running: %s" % threads)
-
-    def assertCleanShutdown(self):
-        pass
 
     def init_repo(self, project, tag=None):
         parts = project.split('/')

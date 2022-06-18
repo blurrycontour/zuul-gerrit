@@ -315,6 +315,9 @@ class TestOfflineZKOperations(ZuulTestCase):
     def assertFinalState(self):
         pass
 
+    def assertCleanShutdown(self):
+        pass
+
     def test_delete_state(self):
         # Shut everything down (as much as possible) to reduce
         # logspam and errors.
