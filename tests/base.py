@@ -5119,25 +5119,6 @@ class ZuulTestCase(BaseTestCase):
             for pipeline in tenant.layout.pipelines.values():
                 if isinstance(pipeline.manager, ipm):
                     self.assertEqual(len(pipeline.queues), 0)
-
-    def shutdown(self):
-        self.log.debug("Shutting down after tests")
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.scheds.execute(lambda app: app.sched.executor.stop())
-        if self.merge_server:
-            self.merge_server.stop()
-            self.merge_server.join()
-
-        self.executor_server.stop()
-        self.executor_server.join()
-        self.scheds.execute(lambda app: app.sched.stop())
-        self.scheds.execute(lambda app: app.sched.join())
-        self.statsd.stop()
-        self.statsd.join()
-        self.fake_nodepool.stop()
-        self.zk_client.disconnect()
-        self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
         whitelist = ['watchdog',
@@ -5166,6 +5147,25 @@ class ZuulTestCase(BaseTestCase):
                 log_str += "".join(traceback.format_stack(stack_frame))
             self.log.debug(log_str)
             raise Exception("More than one thread is running: %s" % threads)
+
+    def shutdown(self):
+        self.log.debug("Shutting down after tests")
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.scheds.execute(lambda app: app.sched.executor.stop())
+        if self.merge_server:
+            self.merge_server.stop()
+            self.merge_server.join()
+
+        self.executor_server.stop()
+        self.executor_server.join()
+        self.scheds.execute(lambda app: app.sched.stop())
+        self.scheds.execute(lambda app: app.sched.join())
+        self.statsd.stop()
+        self.statsd.join()
+        self.fake_nodepool.stop()
+        self.zk_client.disconnect()
+        self.printHistory()
 
     def assertCleanShutdown(self):
         pass
