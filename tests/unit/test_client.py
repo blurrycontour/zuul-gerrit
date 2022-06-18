@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import gc
 import io
 import os
 import sys
@@ -318,6 +319,9 @@ class TestOfflineZKOperations(ZuulTestCase):
     def test_delete_state(self):
         # Shut everything down (as much as possible) to reduce
         # logspam and errors.
+        # Give any destructors (like for ThreadPoolExecutors) a change
+        # to run.
+        gc.collect()
         ZuulTestCase.shutdown(self)
 
         # Re-start the client connection because we need one for the
