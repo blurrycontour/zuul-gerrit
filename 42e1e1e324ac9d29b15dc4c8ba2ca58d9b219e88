@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b869552_e30b9808",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2029,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-20T23:18:58Z",
+      "side": 1,
+      "message": "The basic structure here hasn\u0027t changed for some time, and I think \"accumulate list of jobs to wait on\" is a simple and well-defined enough use case to just rely on the atomicity of job.append (and worth the simplicity in this case).",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec2216e4_8256ae67",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-06-20T23:10:49Z",
       "side": 1,
       "message": "Nit, in the zuul context an executor is the thing that runs the CI/CD jobs with ansible. Might be more clear to call this tpool or similar just to avoid confusion.",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f60e68a_ffb154d3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2508,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-20T23:18:58Z",
+      "side": 1,
+      "message": "True.  We call it \"process_worker\" in the executor itself (though that\u0027s also a little misleading, since it\u0027s a ProcessPoolExecutor which itself has workers).  I like tpool/thread_pool (and maybe process_pool) for future work.",
       "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -65,6 +99,23 @@
       "writtenOn": "2022-06-20T23:10:49Z",
       "side": 1,
       "message": "Does this need to happen in a loop? I\u0027m just wondering if there is one race here can there be multiple failures one after another?",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f400a41_ef069d2f",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-20T23:18:58Z",
+      "side": 1,
+      "message": "Shouldn\u0027t be necessary -- the case with threads [A] and [B] is:\n[A] Attempts to update it; fails because it does not exist\n[B] Attempts to update it; fails because it does not exist\n[B] Creates it; succeeds\n[A] Attempts to create it; fails because it does exist\n[A] Updates it; succeeds\n\nAs long as nothing is deleting it (and nothing should), an alternative circumstance shouldn\u0027t arise.",
       "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
