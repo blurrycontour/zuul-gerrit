@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d07bacf0_d51323b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-20T22:52:56Z",
+      "side": 1,
+      "message": "Not approving as Alex Gaynor had a followup on the upstream issue and it isn\u0027t clear if we fall into that case. I don\u0027t think we do as we generate the keys ourselves and then store them in the encrypted DB. But wanted someone else to double check it before approving.",
+      "revId": "c4476d1b6aebec0ea3198e0203c7d35bedbea57a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
