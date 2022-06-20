@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b01f9936_03b3d0c7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2029,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-20T23:10:49Z",
+      "side": 1,
+      "message": "I think this is currently safe as written because we only ever modify the list itself and not the list contents in the portion of code that will have contention. Thinking out loud we might want to consider using something like queue.Queue to be explicitly thread safe to avoid any problems should the code change in the future?",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec2216e4_8256ae67",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2508,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-20T23:10:49Z",
+      "side": 1,
+      "message": "Nit, in the zuul context an executor is the thing that runs the CI/CD jobs with ansible. Might be more clear to call this tpool or similar just to avoid confusion.",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00a30810_348f9a41",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2597,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-20T23:10:49Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "994a96cc_b52b388a",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-20T23:10:49Z",
+      "side": 1,
+      "message": "Does this need to happen in a loop? I\u0027m just wondering if there is one race here can there be multiple failures one after another?",
+      "revId": "42e1e1e324ac9d29b15dc4c8ba2ca58d9b219e88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
