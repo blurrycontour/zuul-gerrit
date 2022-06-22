@@ -232,6 +232,45 @@ configuration. Some examples of tenant definitions are:
             It will not exclude a branch which already matched
             *include-branches*.
 
+         .. attr:: always-dynamic-branches
+
+            A list of regular expressions matching branches which
+            should be treated as if every change newly proposes
+            dynamic Zuul configuration.  In other words, the only time
+            Zuul will realize any configuration related to these
+            branches is during the time it is running jobs for a
+            proposed change.
+
+            This is potentially useful for situations with large
+            numbers of rarely used feature branches, but comes at the
+            cost of a significant reduction in Zuul features for these
+            branches.
+
+            Every regular expression listed here will also implicitly
+            be included in *exclude-branches*, therefore Zuul will not
+            load any static in-repo configuration from this branch.
+            These branches will not be available for use in overriding
+            checkouts of repos, nor will they be included in the git
+            repos that Zuul prepares for *required-projects* (unless
+            there is a change in the dependency tree for this branch).
+
+            In particular, this means that the only jobs which can be
+            specified for these branches are pre-merge and gating jobs
+            (such as :term:`check` and :term:`gate`).  No post-merge
+            or periodic jobs will run for these branches.
+
+            Using this setting also incurs additional processing for
+            each change submitted for these branches as Zuul must
+            recalculate the configuration layout it uses for such a
+            change as if it included a change to a ``zuul.yaml`` file,
+            even if the change does not alter the configuration).
+
+            With all these caveats in mind, this can be useful for
+            repos with large numbers of rarely used branches as it
+            allows Zuul to omit their configuration in most
+            circumstances and only calculate the configuration of a
+            single additional branch when it is used.
+
          .. attr:: extra-config-paths
 
             Normally Zuul loads in-repo configuration from the first
