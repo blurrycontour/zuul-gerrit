@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b9b62cb_2ac06032",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-22T14:36:12Z",
+      "side": 1,
+      "message": "This is the backwards compat -- we use ssh_server if given, otherwise, \"server\" (which is required).",
+      "revId": "595fb3e9eff9103a3cd1cd3286908a5e4dd982ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "042cb126_79b1fed9",
@@ -14,6 +31,23 @@
       "writtenOn": "2022-06-22T14:31:27Z",
       "side": 1,
       "message": "Question regarding backwards-compatiblity: Does this mean that the SSH connection is now fully relying on the ssh_server attribute or is there still some fallback to the \"old\" server attribute?",
+      "revId": "595fb3e9eff9103a3cd1cd3286908a5e4dd982ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14e0b1ca_61848e08",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1540,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-22T14:36:12Z",
+      "side": 1,
+      "message": "ssh_server is optional; we initialize it to \"server\" if it\u0027s not present.  I left a comment at the site for that.",
       "revId": "595fb3e9eff9103a3cd1cd3286908a5e4dd982ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
