@@ -1296,6 +1296,7 @@ class Scheduler(threading.Thread):
             try:
                 abide = Abide()
                 loader.loadAdminRules(abide, unparsed_abide)
+                loader.loadSemaphores(abide, unparsed_abide)
                 loader.loadTPCs(abide, unparsed_abide)
                 for tenant_name in tenants_to_load:
                     loader.loadTenant(abide, tenant_name, self.ansible_manager,
@@ -1353,8 +1354,9 @@ class Scheduler(threading.Thread):
             for tenant_name in deleted_tenants:
                 self.abide.clearTPCs(tenant_name)
 
-            loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
+            loader.loadSemaphores(self.abide, self.unparsed_abide)
+            loader.loadTPCs(self.abide, self.unparsed_abide)
 
             if event.smart:
                 # Consider caches always valid
@@ -1999,8 +2001,9 @@ class Scheduler(threading.Thread):
                 tenant_config, from_script=script)
             self.system_config_cache.set(self.unparsed_abide, self.globals)
 
-            loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
+            loader.loadSemaphores(self.abide, self.unparsed_abide)
+            loader.loadTPCs(self.abide, self.unparsed_abide)
 
     def updateSystemConfig(self):
         with self.layout_lock:
@@ -2019,8 +2022,9 @@ class Scheduler(threading.Thread):
             for tenant_name in deleted_tenants:
                 self.abide.clearTPCs(tenant_name)
 
-            loader.loadTPCs(self.abide, self.unparsed_abide)
             loader.loadAdminRules(self.abide, self.unparsed_abide)
+            loader.loadSemaphores(self.abide, self.unparsed_abide)
+            loader.loadTPCs(self.abide, self.unparsed_abide)
 
     def process_pipelines(self, tenant, tenant_lock):
         for pipeline in tenant.layout.pipelines.values():

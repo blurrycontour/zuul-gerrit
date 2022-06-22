@@ -219,14 +219,14 @@ Here is an example of two job definitions:
 
    .. attr:: semaphores
 
-      The name of a :ref:`semaphore` (or list of them) which should be
-      acquired and released when the job begins and ends.  If the
-      semaphore is at maximum capacity, then Zuul will wait until it
-      can be acquired before starting the job. The format is either a
-      string, a dictionary, or a list of either of those in the case
-      of multiple semaphores. If it's a string it references a
-      semaphore using the default value for
-      :attr:`job.semaphores.resources-first`.
+      The name of a :ref:`semaphore` (or list of them) or
+      :ref:`global_semaphore` which should be acquired and released
+      when the job begins and ends.  If the semaphore is at maximum
+      capacity, then Zuul will wait until it can be acquired before
+      starting the job. The format is either a string, a dictionary,
+      or a list of either of those in the case of multiple
+      semaphores. If it's a string it references a semaphore using the
+      default value for :attr:`job.semaphores.resources-first`.
 
       If multiple semaphores are requested, the job will not start
       until all have been acquired, and Zuul will wait until all are

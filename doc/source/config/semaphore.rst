@@ -15,6 +15,10 @@ project as long as the value is the same.  This is to aid in branch
 maintenance, so that creating a new branch based on an existing branch
 will not immediately produce a configuration error.
 
+Zuul also supports global semaphores (see :ref:`global_semaphore`)
+which may only be created by the Zuul administrator, but can be used
+to coordinate resources across multiple tenants.
+
 Semaphores are never subject to dynamic reconfiguration.  If the value
 of a semaphore is changed, it will take effect only when the change
 where it is updated is merged.  However, Zuul will attempt to validate

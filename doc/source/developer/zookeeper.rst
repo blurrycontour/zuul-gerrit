@@ -414,6 +414,13 @@ This is a reference for object layout in Zookeeper.
    An election to decide which scheduler will report system-wide stats
    (such as total node requests).
 
+.. path:: zuul/global-semaphores/<semaphore>
+   :type: SemaphoreHandler
+
+   Represents a global semaphore (shared by multiple tenants).
+   Information about which builds hold the semaphore is stored in the
+   znode data.
+
 .. path:: zuul/semaphores/<tenant>/<semaphore>
    :type: SemaphoreHandler
 
