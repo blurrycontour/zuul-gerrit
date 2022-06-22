@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "042cb126_79b1fed9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1540,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-06-22T14:31:27Z",
+      "side": 1,
+      "message": "Question regarding backwards-compatiblity: Does this mean that the SSH connection is now fully relying on the ssh_server attribute or is there still some fallback to the \"old\" server attribute?",
+      "revId": "595fb3e9eff9103a3cd1cd3286908a5e4dd982ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
