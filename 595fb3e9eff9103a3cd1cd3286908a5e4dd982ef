@@ -50,6 +50,24 @@
       "message": "ssh_server is optional; we initialize it to \"server\" if it\u0027s not present.  I left a comment at the site for that.",
       "revId": "595fb3e9eff9103a3cd1cd3286908a5e4dd982ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "486bb66f_a3112321",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1540,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-06-23T05:16:02Z",
+      "side": 1,
+      "message": "Ah thanks. I was searching for something like this but somehow couldn\u0027t spot it :D",
+      "parentUuid": "14e0b1ca_61848e08",
+      "revId": "595fb3e9eff9103a3cd1cd3286908a5e4dd982ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
