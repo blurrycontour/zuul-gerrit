@@ -17,7 +17,7 @@ from threading import Thread
 from typing import List, Callable
 
 from kazoo.client import KazooClient
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import NoNodeError, NodeExistsError
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 
@@ -211,8 +211,11 @@ class ZooKeeperClient(object):
         try:
             zstat = self.client.set("/zuul/ltime", b"")
         except NoNodeError:
-            self.client.create("/zuul/ltime", b"", makepath=True)
-            zstat = self.client.set("/zuul/ltime", b"")
+            try:
+                self.client.create("/zuul/ltime", b"", makepath=True)
+                zstat = self.client.set("/zuul/ltime", b"")
+            except NodeExistsError:
+                zstat = self.client.set("/zuul/ltime", b"")
         return zstat.last_modified_transaction_id
 
 
