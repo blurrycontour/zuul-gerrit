@@ -30,8 +30,10 @@ class ElasticsearchReporter(BaseReporter):
         self.index_vars = self.config.get('index-vars')
         self.index_returned_vars = self.config.get('index-returned-vars')
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         """Create an entry into a database."""
+        if not phase1:
+            return
         docs = []
         index = '%s.%s-%s' % (self.index, item.pipeline.tenant.name,
                               time.strftime("%Y.%m.%d"))

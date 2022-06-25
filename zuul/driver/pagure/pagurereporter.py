@@ -34,7 +34,7 @@ class PagureReporter(BaseReporter):
         self._merge = self.config.get('merge', False)
         self.context = "{}/{}".format(pipeline.tenant.name, pipeline.name)
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
 
         # If the source is not PagureSource we cannot report anything here.
@@ -47,17 +47,18 @@ class PagureReporter(BaseReporter):
                 self.connection.canonical_hostname:
             return
 
-        if self._commit_status is not None:
-            if (hasattr(item.change, 'patchset') and
-                    item.change.patchset is not None):
-                self.setCommitStatus(item)
-            elif (hasattr(item.change, 'newrev') and
-                    item.change.newrev is not None):
-                self.setCommitStatus(item)
-        if hasattr(item.change, 'number'):
-            if self._create_comment:
-                self.addPullComment(item)
-        if self._merge:
+        if phase1:
+            if self._commit_status is not None:
+                if (hasattr(item.change, 'patchset') and
+                        item.change.patchset is not None):
+                    self.setCommitStatus(item)
+                elif (hasattr(item.change, 'newrev') and
+                        item.change.newrev is not None):
+                    self.setCommitStatus(item)
+            if hasattr(item.change, 'number'):
+                if self._create_comment:
+                    self.addPullComment(item)
+        if phase2 and self._merge:
             self.mergePull(item)
             if not item.change.is_merged:
                 msg = self._formatItemReportMergeConflict(item)
