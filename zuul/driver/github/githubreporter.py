@@ -55,7 +55,7 @@ class GithubReporter(BaseReporter):
             self._unlabels = [self._unlabels]
         self.context = "{}/{}".format(pipeline.tenant.name, pipeline.name)
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
         # If the source is not GithubSource we cannot report anything here.
         if not isinstance(item.change.project.source, GithubSource):
@@ -69,7 +69,7 @@ class GithubReporter(BaseReporter):
 
         # order is important for github branch protection.
         # A status should be set before a merge attempt
-        if self._commit_status is not None:
+        if phase1 and self._commit_status is not None:
             if (hasattr(item.change, 'patchset') and
                     item.change.patchset is not None):
                 self.setCommitStatus(item)
@@ -80,22 +80,24 @@ class GithubReporter(BaseReporter):
         # If the change is not a pull request (e.g. a push) skip them.
         if hasattr(item.change, 'number'):
             errors_received = False
-            if self._labels or self._unlabels:
-                self.setLabels(item)
-            if self._review:
-                self.addReview(item)
-            if self._check:
-                check_errors = self.updateCheck(item)
-                # TODO (felix): We could use this mechanism to also report back
-                # errors from label and review actions
-                if check_errors:
-                    item.current_build_set.warning_messages.extend(
-                        check_errors
-                    )
-                    errors_received = True
-            if self._create_comment or errors_received:
-                self.addPullComment(item)
-            if (self._merge):
+            if phase1:
+                if self._labels or self._unlabels:
+                    self.setLabels(item)
+                if self._review:
+                    self.addReview(item)
+                if self._check:
+                    check_errors = self.updateCheck(item)
+                    # TODO (felix): We could use this mechanism to
+                    # also report back errors from label and review
+                    # actions
+                    if check_errors:
+                        item.current_build_set.warning_messages.extend(
+                            check_errors
+                        )
+                        errors_received = True
+                if self._create_comment or errors_received:
+                    self.addPullComment(item)
+            if phase2 and self._merge:
                 try:
                     self.mergePull(item)
                 except Exception as e:
