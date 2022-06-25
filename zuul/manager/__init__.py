@@ -341,18 +341,19 @@ class PipelineManager(metaclass=ABCMeta):
         self.reportNormalBuildsetEnd(item.current_build_set, 'dequeue',
                                      final=False)
 
-    def sendReport(self, action_reporters, item, message=None):
+    def sendReport(self, action_reporters, item, phase1=True, phase2=True):
         """Sends the built message off to configured reporters.
 
-        Takes the action_reporters, item, message and extra options and
-        sends them to the pluggable reporters.
+        Takes the action_reporters and item and sends them to the
+        pluggable reporters.
+
         """
         log = get_annotated_logger(self.log, item.event)
         report_errors = []
         if len(action_reporters) > 0:
             for reporter in action_reporters:
                 try:
-                    ret = reporter.report(item)
+                    ret = reporter.report(item, phase1=phase1, phase2=phase2)
                     if ret:
                         report_errors.append(ret)
                 except Exception as e:
@@ -1567,8 +1568,23 @@ class PipelineManager(metaclass=ABCMeta):
             item.bundle.started_reporting = can_report
 
         if can_report:
+            # If we're starting to report a successful bundle, enable
+            # two-phase reporting.  Report the first phase for every item
+            # in the bundle, then the second.
+            phase1 = True
+            phase2 = True
+            if (self.changes_merge
+                and item.bundle
+                and (not item.cannotMergeBundle())
+                and (not item.isBundleFailing())):
+                for i in item.bundle.items:
+                    if not i.reported:
+                        self.log.debug("Report phase1 for bundle item %s", i)
+                        self.reportItem(i, phase1=True, phase2=False)
+                phase1 = False
+
             try:
-                self.reportItem(item)
+                self.reportItem(item, phase1=phase1, phase2=phase2)
             except exceptions.MergeFailure:
                 failing_reasons.append("it did not merge")
                 for item_behind in item.items_behind:
@@ -1576,7 +1592,7 @@ class PipelineManager(metaclass=ABCMeta):
                              "item ahead, %s, failed to merge" %
                              (item_behind.change, item))
                     self.cancelJobs(item_behind)
-                # Only re-reported items in the cycle when we encounter a merge
+                # Only re-report items in the cycle when we encounter a merge
                 # failure for a successful bundle.
                 if (item.bundle and not (
                         item.isBundleFailing() or item.cannotMergeBundle())):
@@ -1884,18 +1900,24 @@ class PipelineManager(metaclass=ABCMeta):
                  "with nodes %s",
                  request, request.job_name, build_set.item, request.nodes)
 
-    def reportItem(self, item):
+    def reportItem(self, item, phase1=True, phase2=True):
         log = get_annotated_logger(self.log, item.event)
         action = None
-        if not item.reported:
-            action, reported = self._reportItem(item)
+
+        already_reported = item.reported
+        if phase2 and not phase1:
+            already_reported = False
+        if not already_reported:
+            action, reported = self._reportItem(item, phase1, phase2)
             item.updateAttributes(self.current_context,
                                   reported=reported)
+        if not phase2:
+            return
         if self.changes_merge:
             succeeded = item.didAllJobsSucceed() and not item.isBundleFailing()
             merged = item.reported
             source = item.change.project.source
-            if merged:
+            if merged and phase2:
                 merged = source.isMerged(item.change, item.change.branch)
             if action:
                 if action == 'success' and not merged:
@@ -1914,7 +1936,7 @@ class PipelineManager(metaclass=ABCMeta):
                     error_reason = "failed tests"
                 else:
                     error_reason = "failed to merge"
-                log.info("Reported change %s did not merge because it %s,"
+                log.info("Reported change %s did not merge because it %s, "
                          "status: all-succeeded: %s, merged: %s",
                          item.change, error_reason, succeeded, merged)
                 if not succeeded:
@@ -1939,9 +1961,10 @@ class PipelineManager(metaclass=ABCMeta):
             self.reportNormalBuildsetEnd(item.current_build_set,
                                          action, final=True)
 
-    def _reportItem(self, item):
+    def _reportItem(self, item, phase1, phase2):
         log = get_annotated_logger(self.log, item.event)
-        log.debug("Reporting change %s", item.change)
+        log.debug("Reporting phase1: %s phase2: %s change: %s",
+                  phase1, phase2, item.change)
         ret = True  # Means error as returned by trigger.report
 
         # In the case of failure, we may not have completed an initial
@@ -2037,7 +2060,7 @@ class PipelineManager(metaclass=ABCMeta):
                 self.current_context, disabled=True)
         if actions:
             log.info("Reporting item %s, actions: %s", item, actions)
-            ret = self.sendReport(actions, item)
+            ret = self.sendReport(actions, item, phase1, phase2)
             if ret:
                 log.error("Reporting item %s received: %s", item, ret)
         return action, (not ret)

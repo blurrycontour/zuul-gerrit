@@ -50,7 +50,7 @@ class GitlabReporter(BaseReporter):
         if not isinstance(self._unlabels, list):
             self._unlabels = [self._unlabels]
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
         if not isinstance(item.change.project.source, GitlabSource):
             return
@@ -60,13 +60,14 @@ class GitlabReporter(BaseReporter):
             return
 
         if hasattr(item.change, 'number'):
-            if self._create_comment:
-                self.addMRComment(item)
-            if self._approval is not None:
-                self.setApproval(item)
-            if self._labels or self._unlabels:
-                self.setLabels(item)
-            if self._merge:
+            if phase1:
+                if self._create_comment:
+                    self.addMRComment(item)
+                if self._approval is not None:
+                    self.setApproval(item)
+                if self._labels or self._unlabels:
+                    self.setLabels(item)
+            if phase2 and self._merge:
                 self.mergeMR(item)
                 if not item.change.is_merged:
                     msg = self._formatItemReportMergeConflict(item)

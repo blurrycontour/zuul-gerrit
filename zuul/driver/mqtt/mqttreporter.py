@@ -27,7 +27,9 @@ class MQTTReporter(BaseReporter):
     name = 'mqtt'
     log = logging.getLogger("zuul.MQTTReporter")
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
+        if not phase1:
+            return
         log = get_annotated_logger(self.log, item.event)
         log.debug("Report change %s, params %s", item.change, self.config)
         message = {

@@ -766,7 +766,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(B.reported, 3)
         self.assertEqual(A.patchsets[-1]["approvals"][-1]["value"], "-2")
         self.assertEqual(B.patchsets[-1]["approvals"][-1]["value"], "-2")
