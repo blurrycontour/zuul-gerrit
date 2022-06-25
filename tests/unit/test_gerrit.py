@@ -767,3 +767,84 @@ class TestWrongConnection(ZuulTestCase):
             dict(name='test-job', result='SUCCESS', changes='1,1'),
             dict(name='test-job', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestGerritFake(ZuulTestCase):
+    config_file = "zuul-gerrit-github.conf"
+    tenant_config_file = "config/circular-dependencies/main.yaml"
+
+    def _get_tuple(self, change_number):
+        ret = []
+        data = self.fake_gerrit.get(
+            f'changes/{change_number}/submitted_together')
+        for c in data:
+            dep_change = c['_number']
+            dep_ps = c['revisions'][c['current_revision']]['_number']
+            ret.append((dep_change, dep_ps))
+        return sorted(ret)
+
+    def test_submitted_together_normal(self):
+        # Test that the fake submitted together endpoint returns
+        # expected data
+
+        # This test verifies behavior with submitWholeTopic=False
+
+        # A single change
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        data = self._get_tuple(1)
+        self.assertEqual(data, [])
+        ret = self.fake_gerrit._getSubmittedTogether(A, None)
+        self.assertEqual(ret, [])
+
+        # A dependent series (B->A)
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        data = self._get_tuple(2)
+        self.assertEqual(data, [(1, 1), (2, 1)])
+        # The Gerrit connection method filters out the queried change
+        ret = self.fake_gerrit._getSubmittedTogether(B, None)
+        self.assertEqual(ret, [(1, 1)])
+
+        # A topic cycle
+        C1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'C1',
+                                            topic='test-topic')
+        C2 = self.fake_gerrit.addFakeChange('org/project', 'master', 'C2',
+                                            topic='test-topic')
+        data = self._get_tuple(3)
+        self.assertEqual(data, [])
+        ret = self.fake_gerrit._getSubmittedTogether(C1, None)
+        self.assertEqual(ret, [])
+
+    def test_submitted_together_whole_topic(self):
+        # Test that the fake submitted together endpoint returns
+        # expected data
+
+        # This test verifies behavior with submitWholeTopic=True
+        self.fake_gerrit._fake_submit_whole_topic = True
+
+        # A single change
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        data = self._get_tuple(1)
+        self.assertEqual(data, [])
+        ret = self.fake_gerrit._getSubmittedTogether(A, None)
+        self.assertEqual(ret, [])
+
+        # A dependent series (B->A)
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        data = self._get_tuple(2)
+        self.assertEqual(data, [(1, 1), (2, 1)])
+        # The Gerrit connection method filters out the queried change
+        ret = self.fake_gerrit._getSubmittedTogether(B, None)
+        self.assertEqual(ret, [(1, 1)])
+
+        # A topic cycle
+        C1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'C1',
+                                            topic='test-topic')
+        C2 = self.fake_gerrit.addFakeChange('org/project', 'master', 'C2',
+                                            topic='test-topic')
+        data = self._get_tuple(3)
+        self.assertEqual(data, [(3, 1), (4, 1)])
+        # The Gerrit connection method filters out the queried change
+        ret = self.fake_gerrit._getSubmittedTogether(C1, None)
+        self.assertEqual(ret, [(4, 1)])

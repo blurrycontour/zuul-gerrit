@@ -1035,6 +1035,10 @@ class GerritWebServer(object):
                 self.send_response(404)
                 self.end_headers()
 
+            def _409(self):
+                self.send_response(409)
+                self.end_headers()
+
             def _get_change(self, change_id):
                 change_id = urllib.parse.unquote(change_id)
                 project, branch, change = change_id.split('~')
@@ -1060,7 +1064,7 @@ class GerritWebServer(object):
                 tag = data.get('tag', None)
                 fake_gerrit._test_handle_review(
                     int(change.data['number']), message, False, labels,
-                    comments, tag=tag)
+                    True, False, comments, tag=tag)
                 self.send_response(200)
                 self.end_headers()
 
@@ -1069,10 +1073,20 @@ class GerritWebServer(object):
                 if not change:
                     return self._404()
 
+                if fake_gerrit._fake_submit_whole_topic:
+                    results = fake_gerrit._test_get_submitted_together(change)
+                    for record in results:
+                        candidate = self._get_change(record['id'])
+                        sr = candidate.getSubmitRecords()
+                        if sr[0]['status'] != 'OK':
+                            # One of the changes in this topic isn't
+                            # ready to merge
+                            return self._409()
                 message = None
                 labels = {}
                 fake_gerrit._test_handle_review(
-                    int(change.data['number']), message, True, labels)
+                    int(change.data['number']), message, True, labels,
+                    False, True)
                 self.send_response(200)
                 self.end_headers()
 
@@ -1147,19 +1161,8 @@ class GerritWebServer(object):
                 change = fake_gerrit.changes.get(int(number))
                 if not change:
                     return self._404()
-                topic = change.data.get('topic')
-                if not fake_gerrit._fake_submit_whole_topic:
-                    topic = None
-                if topic:
-                    results = fake_gerrit._simpleQuery(
-                        f'topic:{topic}', http=True)
-                else:
-                    results = []
-                for dep in change.data.get('dependsOn', []):
-                    dep_change = fake_gerrit.changes.get(int(dep['number']))
-                    r = dep_change.queryHTTP(internal=True)
-                    if r not in results:
-                        results.append(r)
+
+                results = fake_gerrit._test_get_submitted_together(change)
                 self.send_data(results)
                 self.end_headers()
 
@@ -1378,16 +1381,33 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         return event
 
     def review(self, item, message, submit, labels, checks_api, file_comments,
-               zuul_event_id=None):
+               phase1, phase2, zuul_event_id=None):
         if self.web_server:
             return super(FakeGerritConnection, self).review(
                 item, message, submit, labels, checks_api, file_comments,
-                zuul_event_id)
+                phase1, phase2, zuul_event_id)
         self._test_handle_review(int(item.change.number), message, submit,
-                                 labels)
+                                 labels, phase1, phase2)
+
+    def _test_get_submitted_together(self, change):
+        topic = change.data.get('topic')
+        if not self._fake_submit_whole_topic:
+            topic = None
+        if topic:
+            results = self._simpleQuery(f'topic:{topic}', http=True)
+        else:
+            results = [change.queryHTTP(internal=True)]
+        for dep in change.data.get('dependsOn', []):
+            dep_change = self.changes.get(int(dep['number']))
+            r = dep_change.queryHTTP(internal=True)
+            if r not in results:
+                results.append(r)
+        if len(results) == 1:
+            return []
+        return results
 
     def _test_handle_review(self, change_number, message, submit, labels,
-                            file_comments=None, tag=None):
+                            phase1, phase2, file_comments=None, tag=None):
         # Handle a review action from a test
         change = self.changes[change_number]
 
@@ -1401,24 +1421,25 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         # happens they can add their own verified event into the queue.
         # Nevertheless, we can update change with the new review in gerrit.
 
-        for cat in labels:
-            change.addApproval(cat, labels[cat], username=self.user,
-                               tag=tag)
+        if phase1:
+            for cat in labels:
+                change.addApproval(cat, labels[cat], username=self.user,
+                                   tag=tag)
 
-        if message:
-            change.messages.append(message)
+            if message:
+                change.messages.append(message)
 
-        if file_comments:
-            for filename, commentlist in file_comments.items():
-                for comment in commentlist:
-                    change.addComment(filename, comment['line'],
-                                      comment['message'], 'Zuul',
-                                      'zuul@example.com', self.user,
-                                      comment.get('range'))
-        if submit:
+            if file_comments:
+                for filename, commentlist in file_comments.items():
+                    for comment in commentlist:
+                        change.addComment(filename, comment['line'],
+                                          comment['message'], 'Zuul',
+                                          'zuul@example.com', self.user,
+                                          comment.get('range'))
+            if message:
+                change.setReported()
+        if submit and phase2:
             change.setMerged()
-        if message:
-            change.setReported()
 
     def queryChangeSSH(self, number, event=None):
         self.log.debug("Query change SSH: %s", number)
