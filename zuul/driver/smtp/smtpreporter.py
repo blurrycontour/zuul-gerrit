@@ -25,8 +25,10 @@ class SMTPReporter(BaseReporter):
     name = 'smtp'
     log = logging.getLogger("zuul.SMTPReporter")
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         """Send the compiled report message via smtp."""
+        if not phase1:
+            return
         log = get_annotated_logger(self.log, item.event)
         message = self._formatItemReport(item)
 
