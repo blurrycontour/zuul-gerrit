@@ -16,6 +16,23 @@
       "message": "Thanks Tobias for hints wrt tests",
       "revId": "48467b172d2c1bbf02676c8b20f45e25dd281199",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbe5ead7_32fd5896",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-06-27T13:39:10Z",
+      "side": 1,
+      "message": "You need init this field in the MergeRequest class and also (de-)serialize it so it is stored in the change cache.",
+      "revId": "48467b172d2c1bbf02676c8b20f45e25dd281199",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
