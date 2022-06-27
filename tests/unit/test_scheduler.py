@@ -8794,3 +8794,20 @@ class TestEventProcessing(ZuulTestCase):
             dict(name='tagjob', result='SUCCESS'),
             dict(name='checkjob', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+
+class TestWaitForInit(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    wait_for_init = True
+
+    def setUp(self):
+        with self.assertLogs('zuul.Scheduler-0', level='DEBUG') as full_logs:
+            super().setUp()
+            self.assertRegexInList('Waiting for tenant initialization',
+                                   full_logs.output)
+
+    def test_wait_for_init(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
