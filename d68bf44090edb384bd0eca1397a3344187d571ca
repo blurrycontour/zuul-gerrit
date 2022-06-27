@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09a61fa8_ddb7d7fb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1575,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-06-27T13:04:36Z",
+      "side": 1,
+      "message": "Is this some debug leftover?",
+      "revId": "d68bf44090edb384bd0eca1397a3344187d571ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27a729d8_aef0c3bd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-06-27T13:04:36Z",
+      "side": 1,
+      "message": "nit: This condition could be removed my moving the whole block to the `if can_report:` section below.",
+      "revId": "d68bf44090edb384bd0eca1397a3344187d571ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
