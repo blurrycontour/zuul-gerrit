@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c007f9f6_04ba774a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1575,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-27T17:28:59Z",
+      "side": 1,
+      "message": "Yes, thanks!  I switched back and forth on several unit tests to observe behavior.",
+      "revId": "d68bf44090edb384bd0eca1397a3344187d571ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27a729d8_aef0c3bd",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-06-27T13:04:36Z",
       "side": 1,
       "message": "nit: This condition could be removed my moving the whole block to the `if can_report:` section below.",
+      "revId": "d68bf44090edb384bd0eca1397a3344187d571ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d50fcb10_bec7a6a6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1577,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-27T17:28:59Z",
+      "side": 1,
+      "message": "Indeed, that reads better, I\u0027ll fix that at the same time.",
       "revId": "d68bf44090edb384bd0eca1397a3344187d571ca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
