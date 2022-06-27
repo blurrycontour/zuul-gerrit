@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "1bd6a1e92fb6f8f251854a230eed37af5afe72bf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "260720b8_b8541cd6",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-27T21:09:02Z",
+      "side": 1,
+      "message": "Nit: These don\u0027t actually behave the same way, so it feels a little misleading to have them share the same data structure.  I don\u0027t think there\u0027s an advantage over just doing:\n\nself.status_cache \u003d {}\nself.status_cache_time \u003d {}\nself.status_cache_lock \u003d defaultdict(threading.Lock)\n...\n\nUses fewer lines, less subject to typos, and static analysis (ie, pyflakes) can run on it.",
+      "revId": "1bd6a1e92fb6f8f251854a230eed37af5afe72bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
