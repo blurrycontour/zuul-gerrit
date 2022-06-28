@@ -360,18 +360,13 @@ class ZuulWebAPI(object):
         self.system = ZuulSystem(self.zk_client)
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client,
                                              enable_node_cache=True)
-        self.caches = {
-            'status': {
-                'cache': {},
-                'cache_time': {},
-                'lock': defaultdict(threading.Lock)
-            },
-            'tenants': {
-                'cache': [],
-                'cache_time': 0,
-                'lock': threading.Lock()
-            },
-        }
+        self.status_caches = {}
+        self.status_cache_times = {}
+        self.status_cache_locks = defaultdict(threading.Lock)
+        self.tenants_cache = []
+        self.tenants_cache_time = 0
+        self.tenants_cache_lock = threading.Lock()
+
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
 
@@ -972,21 +967,21 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenants(self):
-        cache_time = self.caches['tenants']['cache_time']
+        cache_time = self.tenants_cache_time
         if time.time() - cache_time > self.cache_expiry:
-            with self.caches['tenants']['lock']:
-                self.caches['tenants']['cache'] = self._tenants()
-                self.caches['tenants']['cache_time'] = time.time()
+            with self.tenants_cache_lock:
+                self.tenants_cache = self._tenants()
+                self.tenants_cache_time = time.time()
 
         resp = cherrypy.response
         resp.headers["Cache-Control"] = f"public, max-age={self.cache_expiry}"
         last_modified = datetime.utcfromtimestamp(
-            self.caches['tenants']['cache_time']
+            self.tenants_cache_time
         )
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return self.caches['tenants']['cache']
+        return self.tenants_cache
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1015,32 +1010,31 @@ class ZuulWebAPI(object):
 
     def _getStatus(self, tenant_name):
         tenant = self._getTenantOrRaise(tenant_name)
-        cache_times = self.caches['status']['cache_time']
-        cache_time = cache_times.get(tenant_name, 0)
-        if tenant_name not in self.caches['status']['lock'] or \
+        cache_time = self.status_cache_times.get(tenant_name, 0)
+        if tenant_name not in self.status_cache_locks or \
            (time.time() - cache_time) > self.cache_expiry:
-            if self.caches['status']['lock'][tenant_name].acquire(
+            if self.status_cache_locks[tenant_name].acquire(
                 blocking=False
             ):
                 try:
-                    self.caches['status']['cache'][tenant_name] =\
+                    self.status_caches[tenant_name] =\
                         self.formatStatus(tenant)
-                    self.caches['status']['cache_time'][tenant_name] =\
+                    self.status_cache_times[tenant_name] =\
                         time.time()
                 finally:
-                    self.caches['status']['lock'][tenant_name].release()
-            if not self.caches['status']['cache'].get(tenant_name):
+                    self.status_cache_locks[tenant_name].release()
+            if not self.status_caches.get(tenant_name):
                 # If the cache is empty at this point it means that we didn't
                 # get the lock but another thread is initializing the cache
                 # for the first time. In this case we just wait for the lock
                 # to wait for it to finish.
-                with self.caches['status']['lock'][tenant_name]:
+                with self.status_cache_locks[tenant_name]:
                     pass
-        payload = self.caches['status']['cache'][tenant_name]
+        payload = self.status_caches[tenant_name]
         resp = cherrypy.response
         resp.headers["Cache-Control"] = f"public, max-age={self.cache_expiry}"
         last_modified = datetime.utcfromtimestamp(
-            self.caches['status']['cache_time'][tenant_name]
+            self.status_cache_times[tenant_name]
         )
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
