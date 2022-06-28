@@ -51,6 +51,12 @@ The supported options in ``zuul.conf`` connections are:
 
       Fully qualified domain name of Gerrit server.
 
+   .. attr:: ssh_server
+
+      If SSH access to the Gerrit server should be via a different
+      hostname than web access, set this value to the hostname to use
+      for SSH connections.
+
    .. attr:: canonical_hostname
 
       The canonical hostname associated with the git repos on the
