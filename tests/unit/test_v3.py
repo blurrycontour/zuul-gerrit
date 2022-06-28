@@ -6471,6 +6471,22 @@ class TestJobOutput(AnsibleZuulTestCase):
         self.assertIn('Final playbook failed', log_output)
         self.assertIn('Failure test', log_output)
 
+    def test_job_POST_FAILURE_reports_statsd(self):
+        """Test that POST_FAILURES output job stats."""
+        self.statsd.clear()
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='job-output-failure',
+                 result='POST_FAILURE', changes='1,1'),
+        ], ordered=False)
+        post_failure_stat = 'zuul.tenant.tenant-one.pipeline.check.project.' \
+                            'review_example_com.org_project2.master.job.' \
+                            'job-output-failure.POST_FAILURE'
+        self.assertReportedStat(post_failure_stat, value='1', kind='c')
+        self.assertReportedStat(post_failure_stat, kind='ms')
+
 
 class TestNoLog(AnsibleZuulTestCase):
     tenant_config_file = 'config/ansible-no-log/main.yaml'
