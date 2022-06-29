@@ -16,6 +16,63 @@
       "message": "recheck",
       "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "670b0416_e9d9b7da",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-29T19:06:29Z",
+      "side": 1,
+      "message": "The docs for this API endpoint say \"As a special case, the list is empty if this change would be submitted by itself (without other changes).\" I\u0027m not sure the old code got this right either, but it seems that even in the case of whole topics submitted together if the only change with that topic is the current change we should return an empty list.\n\nWe are already handling the case where change doesn\u0027t exist and returning a 404 there. That means we shouldn\u0027t need to do a 404 here. It is either an empty list or a populated list with at least 2 items in it. I think the current code will never fall into this 404, however, it may return a list with a single item rather than an empty list in the single change case.\n\nConsidering we\u0027re working to fix deficiencies in the whole topic submitted together support addressing this API behavior is probably worthwhile.",
+      "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41e4068f_9627cba5",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1442,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-29T19:06:29Z",
+      "side": 1,
+      "message": "Nit this might be easier to read the flow if you move it into the if phase1 block. Something like:\n\n  if phase1:\n      #stuff\n      if message:\n          change.setReported()\n  if submit and phase2:\n      change.setMerged()",
+      "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "980dbd94_46b40561",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1920,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-29T19:06:29Z",
+      "side": 1,
+      "message": "This check is unnecessary as we return if not phase2 on line 1915 above.",
+      "range": {
+        "startLine": 1920,
+        "startChar": 21,
+        "endLine": 1920,
+        "endChar": 32
+      },
+      "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
