@@ -807,8 +807,6 @@ class ZuulWebAPI(object):
             'buildsets': '/api/tenant/{tenant}/buildsets',
             'buildset': '/api/tenant/{tenant}/buildset/{uuid}',
             'config_errors': '/api/tenant/{tenant}/config-errors',
-            # TODO(mhu) remove after next release
-            'authorizations': '/api/user/authorizations',
             'tenant_authorizations': ('/api/tenant/{tenant}'
                                       '/authorizations'),
             'autohold': '/api/tenant/{tenant}/project/{project:.*}/autohold',
@@ -834,14 +832,14 @@ class ZuulWebAPI(object):
         info = self.zuulweb.info.copy()
         info.tenant = tenant
         tenant_config = self.zuulweb.unparsed_abide.tenants.get(tenant)
-        if tenant_config is not None:
-            # TODO: should we return 404 if tenant not found?
-            tenant_auth_realm = tenant_config.get('authentication-realm')
-            if tenant_auth_realm is not None:
-                if (info.capabilities is not None and
-                    info.capabilities.toDict().get('auth') is not None):
-                    info.capabilities.capabilities['auth']['default_realm'] =\
-                        tenant_auth_realm
+        if tenant_config is None:
+            raise cherrypy.HTTPError(404, "Unknown tenant")
+        tenant_auth_realm = tenant_config.get('authentication-realm')
+        if tenant_auth_realm is not None:
+            if (info.capabilities is not None and
+                info.capabilities.toDict().get('auth') is not None):
+                info.capabilities.capabilities['auth']['default_realm'] =\
+                    tenant_auth_realm
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
@@ -885,35 +883,11 @@ class ZuulWebAPI(object):
                 return True
         return False
 
-    # TODO(mhu) deprecated, remove next version
-    @cherrypy.expose
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', ])
-    def authorizations(self):
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        try:
-            admin_tenants = self._authorizations()
-        except exceptions.AuthTokenException as e:
-            for header, contents in e.getAdditionalHeaders().items():
-                cherrypy.response.headers[header] = contents
-            cherrypy.response.status = e.HTTPError
-            return {'description': e.error_description,
-                    'error': e.error,
-                    'realm': e.realm}
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
-        return {'zuul': {'admin': admin_tenants}, }
-
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', ])
     def tenant_authorizations(self, tenant):
+        self._getTenantOrRaise(tenant)
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -1081,14 +1055,15 @@ class ZuulWebAPI(object):
             pipelines.append(status)
         return data, json.dumps(data).encode('utf-8')
 
-    def _getTenantOrRaise(self, tenant_name):
+    def _getTenantOrRaise(self, tenant_name, raise_if_not_ready=True):
         tenant = self.zuulweb.abide.tenants.get(tenant_name)
         if tenant:
             return tenant
         if tenant_name not in self.zuulweb.unparsed_abide.tenants:
             raise cherrypy.HTTPError(404, "Unknown tenant")
         self.log.warning("Tenant %s isn't loaded", tenant_name)
-        raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
+        if raise_if_not_ready:
+            raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
 
     def _getProjectOrRaise(self, tenant, project_name):
         _, project = tenant.getProject(project_name)
@@ -1275,6 +1250,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def nodes(self, tenant):
+        self._getTenantOrRaise(tenant)
         ret = []
         for node_id in self.zk_nodepool.getNodes(cached=True):
             node = self.zk_nodepool.getNode(node_id)
@@ -1396,9 +1372,9 @@ class ZuulWebAPI(object):
                result=None, final=None, held=None, complete=None,
                limit=50, skip=0, idx_min=None, idx_max=None):
         connection = self._get_connection()
-
-        if tenant not in self.zuulweb.abide.tenants.keys():
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        # The tenant might not be loaded yet, but it exists
+        # so do not raise on 204s
+        self._getTenantOrRaise(tenant, raise_if_not_ready=False)
 
         # If final is None, we return all builds, both final and non-final
         if final is not None:
@@ -1429,6 +1405,10 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def build(self, tenant, uuid):
         connection = self._get_connection()
+
+        # The tenant might not be loaded yet, but it exists
+        # so do not raise on 204s
+        self._getTenantOrRaise(tenant, raise_if_not_ready=False)
 
         data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
         if not data:
@@ -1469,6 +1449,10 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def badge(self, tenant, project=None, pipeline=None, branch=None):
+        # The tenant might not be loaded yet, but it exists
+        # so do not raise on 204s
+        self._getTenantOrRaise(tenant, raise_if_not_ready=False)
+
         connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
@@ -1498,6 +1482,10 @@ class ZuulWebAPI(object):
                   idx_min=None, idx_max=None):
         connection = self._get_connection()
 
+        # The tenant might not be loaded yet, but it exists
+        # so do not raise on 204s
+        self._getTenantOrRaise(tenant, raise_if_not_ready=False)
+
         if complete:
             complete = complete.lower() == 'true'
 
@@ -1523,6 +1511,10 @@ class ZuulWebAPI(object):
     def buildset(self, tenant, uuid):
         connection = self._get_connection()
 
+        # The tenant might not be loaded yet, but it exists
+        # so do not raise on 204s
+        self._getTenantOrRaise(tenant, raise_if_not_ready=False)
+
         data = connection.getBuildset(tenant, uuid)
         if not data:
             raise cherrypy.HTTPError(404, "Buildset not found")
@@ -1535,6 +1527,10 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
     def console_stream(self, tenant):
+        # The tenant might not be loaded yet, but it exists
+        # so do not raise on 204s
+        self._getTenantOrRaise(tenant, raise_if_not_ready=False)
+
         cherrypy.request.ws_handler.zuulweb = self.zuulweb
 
     @cherrypy.expose
