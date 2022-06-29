@@ -16,6 +16,23 @@
       "message": "Do we need to check change.getSubmitRecords() separately if results is empty?",
       "revId": "9fa506cdb8868791fb4df955e9537f5f1b1767d8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bd9f2a8_35d8d5e8",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1084,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-29T22:32:24Z",
+      "side": 1,
+      "message": "Seems like a good idea.",
+      "revId": "9fa506cdb8868791fb4df955e9537f5f1b1767d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
