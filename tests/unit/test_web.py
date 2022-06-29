@@ -2210,10 +2210,6 @@ class TestTenantScopedWebApi(BaseTestWeb):
             {'action': 'authorizations',
              'path': 'api/tenant/my-tenant/authorizations',
              'allowed_methods': ['GET', ]},
-            # TODO (mhu) deprecated, remove in next version
-            {'action': 'authorizations',
-             'path': 'api/user/authorizations',
-             'allowed_methods': ['GET', ]},
         ]
         for endpoint in endpoints:
             preflight = self.options_url(
@@ -2669,10 +2665,6 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
-        # TODO(mhu) deprecated, remove after next release
-        req = self.get_url('/api/user/authorizations',
-                           headers={'Authorization': 'Bearer %s' % token})
-        self.assertEqual(401, req.status_code, req.text)
         req = self.get_url('/api/tenant/tenant-one/authorizations',
                            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(401, req.status_code, req.text)
@@ -2711,18 +2703,6 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             authz['exp'] = time.time() + 3600
             token = jwt.encode(authz, key='NoDanaOnlyZuul',
                                algorithm='HS256')
-            # TODO(mhu) deprecated, remove after next release
-            req = self.get_url('/api/user/authorizations',
-                               headers={'Authorization': 'Bearer %s' % token})
-            self.assertEqual(200, req.status_code, req.text)
-            data = req.json()
-            self.assertTrue('zuul' in data,
-                            "%s got %s" % (authz['sub'], data))
-            self.assertTrue('admin' in data['zuul'],
-                            "%s got %s" % (authz['sub'], data))
-            self.assertEqual(test_user['zuul.admin'],
-                             data['zuul']['admin'],
-                             "%s got %s" % (authz['sub'], data))
 
             req = self.get_url('/api/tenant/tenant-one/authorizations',
                                headers={'Authorization': 'Bearer %s' % token})
@@ -2757,9 +2737,6 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
     def test_authorizations_no_header(self):
         """Test that missing Authorization header results in HTTP 401"""
         req = self.get_url('/api/tenant/tenant-one/authorizations')
-        self.assertEqual(401, req.status_code, req.text)
-        # TODO(mhu) deprecated, remove after next release
-        req = self.get_url('/api/user/authorizations')
         self.assertEqual(401, req.status_code, req.text)
 
 
