@@ -149,6 +149,18 @@ cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
                                               handle_options)
 
 
+def error_as_json(status, message, traceback, *args, **kwargs):
+    response = cherrypy.response
+    response.headers['Content-Type'] = 'application/json'
+    payload = {'status': status,
+               'description': message,
+               'traceback': status > 499 and traceback or None}
+    return json.dumps(
+        payload,
+        indent=2
+    )
+
+
 class StatsTool(cherrypy.Tool):
     def __init__(self, statsd, metrics):
         self.statsd = statsd
@@ -1986,6 +1998,7 @@ class ZuulWeb(object):
                 'server.socket_host': self.listen_address,
                 'server.socket_port': int(self.listen_port),
             },
+            'error_page.default': error_as_json,
         })
 
         app = cherrypy.tree.mount(api, '/', config=conf)
