@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83b73ebb_f9b6a43b",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-29T21:08:15Z",
+      "side": 1,
+      "message": "Sounds good.  We\u0027re accepting enough in our input that it doesn\u0027t matter for Zuul, but I agree, part of the goal here is to make the test fakes better, so we should do that.  :)",
+      "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41e4068f_9627cba5",
@@ -48,6 +65,23 @@
       "writtenOn": "2022-06-29T19:06:29Z",
       "side": 1,
       "message": "Nit this might be easier to read the flow if you move it into the if phase1 block. Something like:\n\n  if phase1:\n      #stuff\n      if message:\n          change.setReported()\n  if submit and phase2:\n      change.setMerged()",
+      "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f145cfc7_5235237c",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1442,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-06-29T21:08:15Z",
+      "side": 1,
+      "message": "Technically it slightly changes the sequencing of things in the case where they\u0027re both set.  I\u0027ll try it and see if any tests bomb.",
       "revId": "c9cee863418fa020446b1c63e9c40f35b6909b57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
