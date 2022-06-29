@@ -52,7 +52,7 @@ class AuthTokenException(Exception):
     def __init__(self, realm=None, msg=None):
         super(AuthTokenException, self).__init__(msg or self.defaultMsg)
         self.realm = realm
-        self.error = self.__class__.__name__
+        self.error = self.HTTPError
         self.error_description = msg or self.defaultMsg
 
     def getAdditionalHeaders(self):

@@ -149,6 +149,27 @@ cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
                                               handle_options)
 
 
+def error_as_json(status, message, traceback, version):
+    response = cherrypy.response
+    try:
+        request_id = cherrypy.serving.request.zuul_request_id
+    except AttributeError:
+        request_id = 'N/A'
+    response.headers['Content-Type'] = 'application/json'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    try:
+        error_code = int(status[:3])
+    except ValueError:
+        error_code = status
+    payload = {'error': error_code,
+               'description': message,
+               'zuul_request_id': request_id}
+    return json.dumps(
+        payload,
+        indent=2
+    )
+
+
 class StatsTool(cherrypy.Tool):
     def __init__(self, statsd, metrics):
         self.statsd = statsd
@@ -381,24 +402,21 @@ class ZuulWebAPI(object):
         # Add basic checks here
         if token is None:
             status = 401
-            e = 'Missing "Authorization" header'
-            e_desc = e
+            e_desc = 'Missing "Authorization" header'
         elif not token.lower().startswith('bearer '):
             status = 401
-            e = 'Invalid Authorization header format'
-            e_desc = '"Authorization" header must start with "Bearer"'
+            e_desc = 'Invalid Authorization header format: '
+            e_desc += '"Authorization" header must start with "Bearer"'
         else:
             return None
         error_header = '''Bearer realm="%s"
        error="%s"
        error_description="%s"''' % (self.zuulweb.authenticators.default_realm,
-                                    e,
+                                    status,
                                     e_desc)
         cherrypy.response.status = status
         cherrypy.response.headers["WWW-Authenticate"] = error_header
-        return {'description': e_desc,
-                'error': e,
-                'realm': self.zuulweb.authenticators.default_realm}
+        raise cherrypy.HTTPError(status, e_desc)
 
     def _auth_token_check(self):
         rawToken = \
@@ -408,11 +426,7 @@ class ZuulWebAPI(object):
         except exceptions.AuthTokenException as e:
             for header, contents in e.getAdditionalHeaders().items():
                 cherrypy.response.headers[header] = contents
-            cherrypy.response.status = e.HTTPError
-            return ({},
-                    {'description': e.error_description,
-                     'error': e.error,
-                     'realm': e.realm})
+            raise cherrypy.HTTPError(e.HTTPError, e.error_description)
         return (claims, None)
 
     @cherrypy.expose
@@ -424,7 +438,7 @@ class ZuulWebAPI(object):
         if basic_error is not None:
             return basic_error
         if cherrypy.request.method != 'POST':
-            raise cherrypy.HTTPError(405)
+            raise cherrypy.HTTPError(405, 'Invalid HTTP method')
         # AuthN/AuthZ
         claims, token_error = self._auth_token_check()
         if token_error is not None:
@@ -470,7 +484,7 @@ class ZuulWebAPI(object):
         if basic_error is not None:
             return basic_error
         if cherrypy.request.method != 'POST':
-            raise cherrypy.HTTPError(405)
+            raise cherrypy.HTTPError(405, 'Invalid HTTP method')
         # AuthN/AuthZ
         claims, token_error = self._auth_token_check()
         if token_error is not None:
@@ -536,7 +550,7 @@ class ZuulWebAPI(object):
         if basic_error is not None:
             return basic_error
         if cherrypy.request.method != 'POST':
-            raise cherrypy.HTTPError(405)
+            raise cherrypy.HTTPError(405, 'Invalid HTTP method')
         # AuthN/AuthZ
         claims, token_error = self._auth_token_check()
         if token_error is not None:
@@ -575,7 +589,7 @@ class ZuulWebAPI(object):
         # we don't use json_in because a payload is not mandatory with GET
         _ = self._getTenantOrRaise(tenant_name)
         if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
+            raise cherrypy.HTTPError(405, 'Invalid HTTP method')
         # filter by project if passed as a query string
         project_name = cherrypy.request.params.get('project', None)
         return self._autohold_list(tenant_name, project_name)
@@ -625,7 +639,8 @@ class ZuulWebAPI(object):
                     'node_hold_expiration']):
                 raise cherrypy.HTTPError(400, 'Invalid request body')
             if count < 0:
-                raise cherrypy.HTTPError(400, "Count must be greater 0")
+                raise cherrypy.HTTPError(
+                    400, "Count must be a positive integer")
 
             project_name = project.canonical_name
 
@@ -643,7 +658,7 @@ class ZuulWebAPI(object):
             resp.headers['Access-Control-Allow-Origin'] = '*'
             return True
         else:
-            raise cherrypy.HTTPError(405)
+            raise cherrypy.HTTPError(405, 'Invalid HTTP method')
 
     def _autohold(self, tenant_name, project_name, job_name, ref_filter,
                   reason, count, node_hold_expiration):
@@ -712,7 +727,7 @@ class ZuulWebAPI(object):
         elif cherrypy.request.method == 'DELETE':
             return self._autohold_delete(tenant_name, request_id)
         else:
-            raise cherrypy.HTTPError(405)
+            raise cherrypy.HTTPError(405, 'Invalid HTTP method')
 
     def _autohold_info(self, tenant_name, request_id):
         request = self._get_autohold_request(tenant_name, request_id)
@@ -772,7 +787,7 @@ class ZuulWebAPI(object):
         if tenant_name != hold_request.tenant:
             # return 404 rather than 403 to avoid leaking tenant info
             raise cherrypy.HTTPError(
-                404, 'Hold request {request_id} not found.')
+                404, f'Hold request {request_id} not found.')
 
         return hold_request
 
@@ -856,7 +871,7 @@ class ZuulWebAPI(object):
         tenant = self._getTenantOrRaise(tenant_name)
         authorized = self._is_authorized(tenant, claims)
         if not authorized:
-            raise cherrypy.HTTPError(403)
+            raise cherrypy.HTTPError(403, "insufficient authorizations")
 
     def _is_authorized(self, tenant, claims):
         # First, check for zuul.admin override
@@ -1590,7 +1605,7 @@ class ZuulWebAPI(object):
             tenant_name, pipeline_name, project_name, branch_name)
         job = item.current_build_set.jobs.get(job_name)
         if not job:
-            raise cherrypy.HTTPError(404)
+            raise cherrypy.HTTPError(404, "Job not found")
 
         uuid = "0" * 32
         params = zuul.executor.common.construct_build_params(
@@ -1978,6 +1993,7 @@ class ZuulWeb(object):
             '/': {
                 'request.dispatch': route_map,
                 'tools.stats.on': True,
+                'error_page.default': error_as_json,
             }
         }
         cherrypy.config.update({

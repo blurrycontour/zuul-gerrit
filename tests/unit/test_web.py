@@ -852,6 +852,9 @@ class TestWeb(BaseTestWeb):
     def test_web_404_on_unknown_tenant(self):
         resp = self.get_url("api/tenant/non-tenant/status")
         self.assertEqual(404, resp.status_code)
+        error = resp.json()
+        self.assertEqual(404, error['error'], error)
+        self.assertEqual("Unknown tenant", error['description'], error)
 
     def test_autohold_info_404_on_invalid_id(self):
         resp = self.get_url("api/tenant/tenant-one/autohold/12345")
