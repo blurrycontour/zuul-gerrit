@@ -8095,6 +8095,7 @@ class IncludeBranchesTestCase(ZuulTestCase):
 
         self.assertHistory(history1 + history2 + history3, ordered=False)
 
+        old = self.scheds.first.sched.tenant_layout_state.get('tenant-one')
         # Merge a change to the excluded feature branch.
         B.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
@@ -8102,6 +8103,9 @@ class IncludeBranchesTestCase(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertHistory(history1 + history2 + history3 + history4,
                            ordered=False)
+        new = self.scheds.first.sched.tenant_layout_state.get('tenant-one')
+        # Verify we haven't performed a tenant reconfiguration
+        self.assertTrue(old == new)
 
 
 class TestIncludeBranchesProject(IncludeBranchesTestCase):
