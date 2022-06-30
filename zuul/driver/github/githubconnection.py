@@ -613,9 +613,12 @@ class GithubEventProcessor(object):
         project = self.connection.source.getProject(project_name)
 
         # Save all protected branches
-        old_protected_branches = set(
-            self.connection._branch_cache.getProjectBranches(
-                project_name, True))
+        try:
+            old_protected_branches = set(
+                self.connection._branch_cache.getProjectBranches(
+                    project_name, True))
+        except LookupError:
+            old_protected_branches = set()
         # Update the project banches
         self.log.debug('Updating branches for %s after '
                        'branch protection rule "%s" was %s',
