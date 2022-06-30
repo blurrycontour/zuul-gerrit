@@ -208,9 +208,9 @@ class ZKBranchCacheMixin:
         """
         # Figure out which queries we have a cache for
         protected_branches = self._branch_cache.getProjectBranches(
-            project.name, True)
+            project.name, True, default=None)
         all_branches = self._branch_cache.getProjectBranches(
-            project.name, False)
+            project.name, False, default=None)
 
         # Update them if we have them
         if protected_branches is not None:
@@ -238,24 +238,26 @@ class ZKBranchCacheMixin:
         :returns: The list of branch names.
         """
         exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
+        branches = None
+
         if self._branch_cache:
-            branches = self._branch_cache.getProjectBranches(
-                project.name, exclude_unprotected, min_ltime)
-        else:
-            # Handle the case where tenant validation doesn't use the cache
-            branches = None
+            try:
+                branches = self._branch_cache.getProjectBranches(
+                    project.name, exclude_unprotected, min_ltime)
+            except LookupError:
+                if self.read_only:
+                    # A scheduler hasn't attempted to fetch them yet
+                    raise ReadOnlyBranchCacheError(
+                        "Will not fetch project branches as read-only is set")
+                else:
+                    branches = None
 
-        if branches:
+        if branches is not None:
             return sorted(branches)
-
-        if self.read_only:
-            if branches is None:
-                # A scheduler hasn't attempted to fetch them yet
-                raise ReadOnlyBranchCacheError(
-                    "Will not fetch project branches as read-only is set")
+        elif self.read_only:
             # A scheduler has previously attempted a fetch, but got
-            # the empty list due to an error; we can't retry since
-            # we're read-only
+            # the None due to an error; we can't retry since we're
+            # read-only.
             raise RuntimeError(
                 "Will not fetch project branches as read-only is set")
 
@@ -265,14 +267,12 @@ class ZKBranchCacheMixin:
         except Exception:
             # We weren't able to get the branches.  We need to tell
             # future schedulers to try again but tell zuul-web that we
-            # tried and failed.  Set the branches to the empty list to
-            # indicate that we have performed a fetch and retrieved no
-            # data.  Any time we encounter the empty list in the
-            # cache, we will try again (since it is not reasonable to
-            # have a project with no branches).
+            # tried and failed.  Set the branches to None to indicate
+            # that we have performed a fetch and retrieved no data.  Any
+            # time we encounter None in the cache, we will try again.
             if self._branch_cache:
                 self._branch_cache.setProjectBranches(
-                    project.name, exclude_unprotected, [])
+                    project.name, exclude_unprotected, None)
             raise
         self.log.info("Got branches for %s" % project.name)
 
@@ -313,7 +313,8 @@ class ZKBranchCacheMixin:
             # cache, so we never clear it.
 
             branches = self._branch_cache.getProjectBranches(
-                project_name, True)
+                project_name, True, default=None)
+
             if not branches:
                 branches = []
 

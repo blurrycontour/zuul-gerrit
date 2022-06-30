@@ -613,9 +613,13 @@ class GithubEventProcessor(object):
         project = self.connection.source.getProject(project_name)
 
         # Save all protected branches
-        old_protected_branches = set(
-            self.connection._branch_cache.getProjectBranches(
-                project_name, True))
+        cached_branches = self.connection._branch_cache.getProjectBranches(
+            project_name, True, default=None)
+
+        if cached_branches is None:
+            raise RuntimeError(f"No branches for project {project_name}")
+        old_protected_branches = set(cached_branches)
+
         # Update the project banches
         self.log.debug('Updating branches for %s after '
                        'branch protection rule "%s" was %s',
