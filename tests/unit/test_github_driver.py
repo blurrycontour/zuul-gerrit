@@ -1202,7 +1202,7 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual(1, len(A.comments))
         self.assertFalse(A.is_merged)
         self.assertIn('This change is unable to merge '
-                      'due to a missing requirement.',
+                      'due to a missing merge requirement.',
                       A.comments[0])
 
     # This test case verifies that no reconfiguration happens if a branch was

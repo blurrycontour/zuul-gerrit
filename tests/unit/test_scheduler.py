@@ -1921,7 +1921,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(2, len(A.messages))
         self.assertEqual(A.data['status'], 'NEW')
         self.assertIn('This change is unable to merge '
-                      'due to a missing requirement.',
+                      'due to a missing merge requirement.',
                       A.messages[1])
 
     @simple_layout('layouts/nonvoting-job-approval.yaml')

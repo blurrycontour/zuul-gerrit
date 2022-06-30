@@ -2012,7 +2012,7 @@ class PipelineManager(metaclass=ABCMeta):
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
         elif item.wasDequeuedMissingRequirements():
-            log.debug("Dequeued missing requirements")
+            log.debug("Dequeued missing merge requirements")
             action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
