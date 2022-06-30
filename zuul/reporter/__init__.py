@@ -35,8 +35,19 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         self._action = action
 
     @abc.abstractmethod
-    def report(self, item):
-        """Send the compiled report message."""
+    def report(self, item, phase1=True, phase2=True):
+        """Send the compiled report message
+
+        Two-phase reporting may be enabled if one or the other of the
+        `phase1` or `phase2` arguments is False.
+
+        Phase1 should report everything except the actual merge action.
+        Phase2 should report only the merge action.
+
+        :arg phase1 bool: Whether to enable phase1 reporting
+        :arg phase2 bool: Whether to enable phase2 reporting
+
+        """
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be

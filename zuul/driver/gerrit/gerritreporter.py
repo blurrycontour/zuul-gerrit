@@ -35,7 +35,7 @@ class GerritReporter(BaseReporter):
         self._checks_api = action.pop('checks-api', None)
         self._labels = action
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         """Send a message to gerrit."""
         log = get_annotated_logger(self.log, item.event)
 
@@ -70,7 +70,8 @@ class GerritReporter(BaseReporter):
 
         return self.connection.review(item, message, self._submit,
                                       self._labels, self._checks_api,
-                                      comments, zuul_event_id=item.event)
+                                      comments, phase1, phase2,
+                                      zuul_event_id=item.event)
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be
