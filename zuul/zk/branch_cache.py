@@ -134,13 +134,22 @@ class BranchCache:
             with locked(self.rlock):
                 self.cache.refresh(self.zk_context)
 
-        protected_branches = self.cache.protected.get(project_name)
-        remainder_branches = self.cache.remainder.get(project_name)
+        protected_branches = None
+        try:
+            protected_branches = self.cache.protected[project_name]
+        except KeyError:
+            if exclude_unprotected:
+                raise LookupError(f"No branches for project {project_name}")
 
         if exclude_unprotected:
             if protected_branches is not None:
                 return protected_branches
         else:
+            try:
+                remainder_branches = self.cache.remainder[project_name]
+            except KeyError:
+                raise LookupError(f"No branches for project {project_name}")
+
             if remainder_branches is not None:
                 return (protected_branches or []) + remainder_branches
 
@@ -154,7 +163,7 @@ class BranchCache:
         :param bool exclude_unprotected:
             Whether this is a list of all or only protected branches.
         :param list[str] branches:
-            The list of branches
+            The list of branches or None to indicate a fetch error.
         """
 
         with locked(self.wlock):
@@ -162,13 +171,13 @@ class BranchCache:
                 if exclude_unprotected:
                     self.cache.protected[project_name] = branches
                     remainder_branches = self.cache.remainder.get(project_name)
-                    if remainder_branches:
+                    if remainder_branches and branches:
                         remainder = list(set(remainder_branches) -
                                          set(branches))
                         self.cache.remainder[project_name] = remainder
                 else:
                     protected_branches = self.cache.protected.get(project_name)
-                    if protected_branches:
+                    if protected_branches and branches:
                         remainder = list(set(branches) -
                                          set(protected_branches))
                     else:
