@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "106d8fcf_cbdf26f1",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-30T23:27:01Z",
+      "side": 1,
+      "message": "Don\u0027t we need to catch the LookupError here too? Or does raising an error properly finish the processing necessary here? It seems that the newly_protected and newly_unprotected values would be wrong if old_proected_branches is an empty set due to the LookupError as well. Maybe we should raise early if we just want to stop processing.\n\nSeperately do we need to handle the case where we attempt set(None) which is a TypeError: \u0027NoneType\u0027 object is not iterable?",
+      "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48dcf08f_911f4a27",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-06-30T23:27:01Z",
+      "side": 1,
+      "message": "I think we can/should simplify the code here. If protected_branches is None we\u0027ll return None at the end of the function. Instead we should be able to simplify. Either return early here omitting the is not None check or something like:\n\n  if not exclude_unprotected:\n      # AKA include unprotected\n      try:\n          remainder_branches \u003d self.cache.remainder[project_name]\n      except KeyError:\n          raise LookupError(f\"No branches for project {project_name}\")\n      if remainder_branches is not None:\n          return (protected_branches or []) + remainder_branches\n  return None\n  \nThen we only process remainder branches if necessary and fall through and return none otherwise. A bit easier to follow when None is returned and when we raise the exception.",
+      "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
