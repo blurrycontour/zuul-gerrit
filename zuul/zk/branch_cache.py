@@ -120,6 +120,9 @@ class BranchCache:
                            min_ltime=-1):
         """Get the branch names for the given project.
 
+        Raises a LookupError if the cache doesn't contain any branches
+        for the project.
+
         :param str project_name:
             The project for which the branches are returned.
         :param bool exclude_unprotected:
@@ -127,24 +130,30 @@ class BranchCache:
         :param int min_ltime:
             The minimum cache ltime to consider the cache valid.
 
-        :returns: The list of branch names, or None if the cache
-            cannot satisfy the request.
+        :returns: The list of branch names, or None if there was
+            an error when fetching the branches.
         """
         if self.ltime < min_ltime:
             with locked(self.rlock):
                 self.cache.refresh(self.zk_context)
 
-        protected_branches = self.cache.protected.get(project_name)
-        remainder_branches = self.cache.remainder.get(project_name)
+        protected_branches = None
+        try:
+            protected_branches = self.cache.protected[project_name]
+        except KeyError:
+            if exclude_unprotected:
+                raise LookupError(f"No branches for project {project_name}")
 
-        if exclude_unprotected:
-            if protected_branches is not None:
-                return protected_branches
-        else:
+        if not exclude_unprotected:
+            try:
+                remainder_branches = self.cache.remainder[project_name]
+            except KeyError:
+                raise LookupError(f"No branches for project {project_name}")
+
             if remainder_branches is not None:
                 return (protected_branches or []) + remainder_branches
 
-        return None
+        return protected_branches
 
     def setProjectBranches(self, project_name, exclude_unprotected, branches):
         """Set the branch names for the given project.
@@ -154,7 +163,7 @@ class BranchCache:
         :param bool exclude_unprotected:
             Whether this is a list of all or only protected branches.
         :param list[str] branches:
-            The list of branches
+            The list of branches or None to indicate a fetch error.
         """
 
         with locked(self.wlock):
@@ -162,13 +171,13 @@ class BranchCache:
                 if exclude_unprotected:
                     self.cache.protected[project_name] = branches
                     remainder_branches = self.cache.remainder.get(project_name)
-                    if remainder_branches:
+                    if remainder_branches and branches:
                         remainder = list(set(remainder_branches) -
                                          set(branches))
                         self.cache.remainder[project_name] = remainder
                 else:
                     protected_branches = self.cache.protected.get(project_name)
-                    if protected_branches:
+                    if protected_branches and branches:
                         remainder = list(set(branches) -
                                          set(protected_branches))
                     else:
