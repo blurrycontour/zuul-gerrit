@@ -50,6 +50,24 @@
       "message": "I\u0027m having trouble following that logic.  You say \"if protected_branches is None we\u0027ll return None\", but if remainder_branches in not None, then we can return something other than None even if protected branches is None.  Am I missing something?\n\n(Basically: run through this code with: exclude_unprotected\u003dTrue; protected_branches\u003dNone; remainder_branches\u003d[\u0027master\u0027];)",
       "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9246521e_8970b039",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-01T00:25:36Z",
+      "side": 1,
+      "message": "The remaining branches handling is in an else block to the if exclude_unprotected: condition. That means the block here is exclusive to processing remaining branches.\n\nif exclude_unprotected \u003d\u003d True then we skip over the else block when protected_branches is None and return None at the end of the method. I think we can simplify that by just checking if we need to handle remaining branches else return None.",
+      "parentUuid": "4e7d94a3_c3315204",
+      "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
