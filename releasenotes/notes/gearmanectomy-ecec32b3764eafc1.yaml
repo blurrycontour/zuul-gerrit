@@ -8,4 +8,4 @@ upgrade:
 
     Commands such as `zuul enqueue` which were previously executed via
     Gearman may still be used by creating an authentication token and
-    adding a `web` section to zuul.conf.
+    adding a `webclient` section to zuul.conf.

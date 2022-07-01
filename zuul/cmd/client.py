@@ -609,7 +609,7 @@ class Client(zuul.cmd.ZuulApp):
                                     self.args.auth_token)
         else:
             print('Unable to find a way to connect to Zuul, add a '
-                  '"web" section to your configuration file')
+                  '"webclient" section to your configuration file')
             sys.exit(1)
         if server is None:
             print('Missing "server" configuration value')
