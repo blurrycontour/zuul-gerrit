@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "70579fe081b6c7fe293ed1542d7e493c9640fce4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1571947_a7965859",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-01T15:30:26Z",
+      "side": 1,
+      "message": "Not a minus one, but I think a reasonable thing to consider: I think this is the only place we actually use LookupError.  We could simplify a bunch of calling sites by adding in a \"want_exceptions\" argument, false by default, true here.",
+      "revId": "70579fe081b6c7fe293ed1542d7e493c9640fce4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
