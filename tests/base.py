@@ -2130,6 +2130,7 @@ class FakeGitlabMergeRequest(object):
         self.state = 'opened'
         self.is_merged = False
         self.merge_status = 'can_be_merged'
+        self.squash_merge = None
         self.labels = []
         self.notes = []
         self.url = "https://%s/%s/merge_requests/%s" % (
@@ -2168,9 +2169,10 @@ class FakeGitlabMergeRequest(object):
         self.state = 'closed'
         self._updateTimeStamp()
 
-    def mergeMergeRequest(self):
+    def mergeMergeRequest(self, squash=None):
         self.state = 'merged'
         self.is_merged = True
+        self.squash_merge = squash
         self._updateTimeStamp()
         self.merged_at = self.updated_at
 

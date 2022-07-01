@@ -233,7 +233,10 @@ class GitlabWebServer(object):
 
             def put_mr_merge(self, data, project, mr):
                 mr = self._get_mr(project, mr)
-                mr.mergeMergeRequest()
+                squash = None
+                if data and isinstance(data, dict):
+                    squash = data.get('squash')
+                mr.mergeMergeRequest(squash)
                 self.send_data({'state': 'merged'})
 
             def put_mr_update(self, data, project, mr):
