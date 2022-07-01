@@ -36,6 +36,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0e153cd_fb7ca40b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-01T15:30:22Z",
+      "side": 1,
+      "message": "I think the key thing to note about updateProjectBranches is that it doesn\u0027t want to perform more queries than necessary.  In particular, we don\u0027t want it to look up unprotected branches if there are no tenants that use unprotected branches.  That\u0027s why it checks to see if there is a cache entry for each of the two forks and only runs that query if there is.\n\nIf one of the forks is null, it doesn\u0027t have the information needed to know whether that query is necessary or not (the exclude_unprotected argument to getProjectBranches supplies that information in that case, so it knows whether it should perform a query).",
+      "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48dcf08f_911f4a27",
