@@ -572,7 +572,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                     self.log.error("Removing request params: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
-                    self.log.execption(
+                    self.log.exception(
                         "Unable to delete request params %s", path)
         except Exception:
             self.log.exception(
@@ -585,7 +585,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                     self.log.error("Removing request result: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
-                    self.log.execption(
+                    self.log.exception(
                         "Unable to delete request params %s", result_id)
             for result_id in lost_data:
                 try:
@@ -594,7 +594,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                         "Removing request result data: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
-                    self.log.execption(
+                    self.log.exception(
                         "Unable to delete request params %s", result_id)
         except Exception:
             self.log.exception(
@@ -608,7 +608,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                         self.log.error("Removing stale lock: %s", lock_path)
                         self.kazoo_client.delete(lock_path, recursive=True)
                 except Exception:
-                    self.log.execption(
+                    self.log.exception(
                         "Unable to delete lock %s", path)
         except Exception:
             self.log.exception("Error cleaning up locks %s", self)

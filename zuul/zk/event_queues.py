@@ -423,7 +423,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
                     self.log.error("Removing side channel data: %s", path)
                     self.kazoo_client.delete(path, recursive=True)
                 except Exception:
-                    self.log.execption(
+                    self.log.exception(
                         "Unable to delete side channel data %s", path)
         except Exception:
             self.log.exception("Error cleaning up event queue %s", self)
