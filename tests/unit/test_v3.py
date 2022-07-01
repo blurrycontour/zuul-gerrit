@@ -1479,6 +1479,38 @@ class TestInRepoConfig(ZuulTestCase):
                       "A should have failed the check pipeline")
         self.assertHistory([])
 
+    def test_dynamic_nonexistent_job_dependency(self):
+        # Tests that a reference to a nonexistent job dependency is an
+        # error.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - project-test1:
+                        dependencies:
+                          - name: non-existent-job
+                            soft: true
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('Job non-existent-job not defined', A.messages[0],
+                      "A should have failed the check pipeline")
+        self.assertNotIn('freezing', A.messages[0])
+        self.assertHistory([])
+
     def test_dynamic_config_new_patchset(self):
         self.executor_server.hold_jobs_in_build = True
 
