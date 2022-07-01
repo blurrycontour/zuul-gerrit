@@ -5397,10 +5397,12 @@ class QueueItem(zkobject.ZKObject):
         return False
 
     def getBlobKeys(self):
+        job_graph = self.current_build_set.job_graph
+        if not job_graph:
+            return set()
         # Return a set of blob keys used by this item
         # for each job in the frozen job graph
         keys = set()
-        job_graph = self.current_build_set.job_graph
         for job in job_graph.getJobs():
             for pb in job.all_playbooks:
                 for secret in pb['secrets'].values():
