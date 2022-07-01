@@ -86,6 +86,23 @@
       "parentUuid": "9246521e_8970b039",
       "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06af7692_774873a9",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-01T00:47:35Z",
+      "side": 1,
+      "message": "That update looks equivalent to me.",
+      "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
