@@ -493,17 +493,16 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         # ZUUL: store fail_json_kwargs and fail later in finally
         fail_json_kwargs = dict(rc=257, msg=to_native(e), exception=traceback.format_exc(), cmd=clean_args)
     finally:
-        if t:
-            with Console(zuul_log_id) as console:
-                if t.is_alive():
-                    console.addLine("[Zuul] standard output/error still open "
-                                    "after child exited")
-                if fail_json_kwargs:
-                    # we hit an exception and need to use the rc from
-                    # fail_json_kwargs
-                    rc = fail_json_kwargs['rc']
+        with Console(zuul_log_id) as console:
+            if t and t.is_alive():
+                console.addLine("[Zuul] standard output/error still open "
+                                "after child exited")
+            if fail_json_kwargs:
+                # we hit an exception and need to use the rc from
+                # fail_json_kwargs
+                rc = fail_json_kwargs['rc']
 
-                console.addLine("[Zuul] Task exit code: %s\n" % rc)
+            console.addLine("[Zuul] Task exit code: %s\n" % rc)
 
         if fail_json_kwargs:
             self.fail_json(**fail_json_kwargs)
