@@ -68,6 +68,24 @@
       "parentUuid": "4e7d94a3_c3315204",
       "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "deb25ccb_cb757e61",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-01T00:29:31Z",
+      "side": 1,
+      "message": "Oh wait I think I see what you might have been trying to get at. Remaining branches isn\u0027t the problem it is returning the protected_branches properly. My example should be:\n\n  if not exclude_unprotected:\n      # AKA include unprotected\n      try:\n          remainder_branches \u003d self.cache.remainder[project_name]\n      except KeyError:\n          raise LookupError(f\"No branches for project {project_name}\")\n      if remainder_branches is not None:\n          return (protected_branches or []) + remainder_branches\n  return protected_branches",
+      "parentUuid": "9246521e_8970b039",
+      "revId": "e8b5a1c7dc6ebcc917e63658d74d6173426676ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
