@@ -13,6 +13,7 @@
 # under the License.
 
 import os
+import threading
 import textwrap
 from unittest import mock
 
@@ -867,3 +868,52 @@ class TestGerritFake(ZuulTestCase):
         # The Gerrit connection method filters out the queried change
         ret = self.fake_gerrit._getSubmittedTogether(C1, None)
         self.assertEqual(ret, [(4, 1)])
+
+
+class TestGerritConnection(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_zuul_query_ltime(self):
+        # Add a lock around the event queue iterator so that we can
+        # ensure that multiple events arrive before the first is
+        # processed.
+        lock = threading.Lock()
+
+        orig_iterEvents = self.fake_gerrit.gerrit_event_connector.\
+            event_queue._iterEvents
+
+        def _iterEvents(*args, **kw):
+            with lock:
+                return orig_iterEvents(*args, **kw)
+
+        self.patch(self.fake_gerrit.gerrit_event_connector.event_queue,
+                   '_iterEvents', _iterEvents)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        B.addApproval('Code-Review', 2)
+        # Hold the connection queue processing so these events get
+        # processed together
+        with lock:
+            self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.fake_gerrit.addEvent(B.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+        self.assertHistory([])
+        self.assertEqual(A.queried, 1)
+        self.assertEqual(B.queried, 1)
+        with lock:
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name="project-merge", result="SUCCESS", changes="1,1"),
+            dict(name="project-test1", result="SUCCESS", changes="1,1"),
+            dict(name="project-test2", result="SUCCESS", changes="1,1"),
+            dict(name="project-merge", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project-test1", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project-test2", result="SUCCESS", changes="1,1 2,1"),
+        ], ordered=False)
+        self.assertEqual(A.queried, 3)
+        self.assertEqual(B.queried, 2)

@@ -103,10 +103,12 @@ class GerritChangeData(object):
     SSH = 1
     HTTP = 2
 
-    def __init__(self, fmt, data, related=None, files=None):
+    def __init__(self, fmt, data, related=None, files=None,
+                 zuul_query_ltime=None):
         self.format = fmt
         self.data = data
         self.files = files
+        self.zuul_query_ltime = zuul_query_ltime
 
         if fmt == self.SSH:
             self.parseSSH(data)
@@ -329,19 +331,20 @@ class GerritEventConnector(threading.Thread):
 
             self.connection.clearConnectionCacheOnBranchEvent(event)
 
-        self._getChange(event)
+        self._getChange(event, connection_event.zuul_event_ltime)
         self.connection.logEvent(event)
         self.connection.sched.addTriggerEvent(
             self.connection.driver_name, event
         )
 
-    def _getChange(self, event):
+    def _getChange(self, event, connection_event_ltime):
         # Grab the change if we are managing the project or if it exists in the
         # cache as it may be a dependency
         if event.change_number:
             refresh = True
             change_key = self.connection.source.getChangeKey(event)
-            if self.connection._change_cache.get(change_key) is None:
+            change = self.connection._change_cache.get(change_key)
+            if change is None:
                 refresh = False
                 for tenant in self.connection.sched.abide.tenants.values():
                     # TODO(fungi): it would be better to have some simple means
@@ -353,6 +356,13 @@ class GerritEventConnector(threading.Thread):
                             event.project_name))):
                         refresh = True
                         break
+            else:
+                # We have a cache entry for this change Get the
+                # query ltime for the cache entry; if it's after the
+                # event ltime, we don't need to refresh.
+                if (change.zuul_query_ltime and
+                    change.zuul_query_ltime > connection_event_ltime):
+                    refresh = False
 
             if refresh:
                 # Call _getChange for the side effect of updating the
@@ -1418,15 +1428,20 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def queryChange(self, number, event=None):
         for attempt in range(3):
+            # Get a query ltime -- any events before this point should be
+            # included in our change data.
+            zuul_query_ltime = self.sched.zk_client.getCurrentLtime()
             try:
                 if self.session:
                     data, related, files = self.queryChangeHTTP(
                         number, event=event)
                     return GerritChangeData(GerritChangeData.HTTP,
-                                            data, related, files)
+                                            data, related, files,
+                                            zuul_query_ltime=zuul_query_ltime)
                 else:
                     data = self.queryChangeSSH(number, event=event)
-                    return GerritChangeData(GerritChangeData.SSH, data)
+                    return GerritChangeData(GerritChangeData.SSH, data,
+                                            zuul_query_ltime=zuul_query_ltime)
             except Exception:
                 if attempt >= 3:
                     raise
