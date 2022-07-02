@@ -35,8 +35,10 @@ class GerritChange(Change):
         self.approvals = []
         self.missing_labels = set()
         self.commit = None
+        self.zuul_query_ltime = None
 
     def update(self, data, connection):
+        self.zuul_query_ltime = data.zuul_query_ltime
         if data.format == data.SSH:
             self.updateFromSSH(data.data, connection)
         else:
@@ -51,6 +53,7 @@ class GerritChange(Change):
             "approvals": self.approvals,
             "missing_labels": list(self.missing_labels),
             "commit": self.commit,
+            "zuul_query_ltime": self.zuul_query_ltime,
         })
         return d
 
@@ -62,6 +65,7 @@ class GerritChange(Change):
         self.approvals = data["approvals"]
         self.missing_labels = set(data["missing_labels"])
         self.commit = data.get("commit")
+        self.zuul_query_ltime = data.get("zuul_query_ltime")
 
     def updateFromSSH(self, data, connection):
         if self.patchset is None:
