@@ -1344,6 +1344,8 @@ class TestWebMultiTenant(BaseTestWeb):
 
     def test_tenant_add_remove(self):
         "Test that tenants are correctly added/removed to/from the layout"
+        # Disable tenant list caching
+        self.web.web.api.cache_expiry = 0
         resp = self.get_url("api/tenants")
         data = resp.json()
         self.assertEqual(sorted(d["name"] for d in data),

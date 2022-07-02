@@ -1845,6 +1845,7 @@ class ZuulWeb(object):
 
         route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
+        self.api = api
         route_map.connect('api', '/api',
                           controller=api, action='index')
         route_map.connect('api', '/api/info',
