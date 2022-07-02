@@ -1947,6 +1947,15 @@ class TestBranchCache(ZooKeeperBaseTestCase):
             data1['project1']['all']
         )
 
+    def test_branch_cache_lookup_error(self):
+        # Test that a missing branch cache entry results in a LookupError
+        conn = DummyConnection()
+        cache = BranchCache(self.zk_client, conn, self.component_registry)
+        self.assertRaises(
+            LookupError,
+            lambda: cache.getProjectBranches('project1', True)
+        )
+
 
 class TestConfigurationErrorList(ZooKeeperBaseTestCase):
     def test_config_error_list(self):
