@@ -65,8 +65,25 @@ class GerritReporter(BaseReporter):
 
         log.debug("Report change %s, params %s, message: %s, comments: %s",
                   item.change, self.config, message, comments)
-        item.change._ref_sha = item.change.project.source.getRefSha(
-            item.change.project, 'refs/heads/' + item.change.branch)
+        if phase2:
+            # If any item in the bundle for the same project+branch
+            # has a ref_sha, let's use that
+            changes = set([item.change])
+            if item.bundle:
+                for i in item.bundle.items:
+                    changes.add(i.change)
+            ref_sha = None
+            for other_change in changes:
+                if (other_change.project == item.change.project and
+                    other_change.branch == item.change.branch and
+                    hasattr(other_change, '_ref_sha')):
+                    ref_sha = other_change._ref_sha
+                    break
+            # Otherwise, get the current head of the branch
+            if not ref_sha:
+                ref_sha = item.change.project.source.getRefSha(
+                    item.change.project, 'refs/heads/' + item.change.branch)
+            item.change._ref_sha = ref_sha
 
         return self.connection.review(item, message, self._submit,
                                       self._labels, self._checks_api,
