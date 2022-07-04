@@ -29,9 +29,9 @@ export const addApiError = error => {
     url: (error && error.request && error.request.responseURL) || error.url,
     type: 'error',
   }
-  if (error.response) {
-    d.text = error.response.statusText
-    d.status = error.response.status
+  if (error) {
+    d.text = error.error < 500 ? "Error" : "Server Error"
+    d.status = error.description
   } else {
     d.status = 'Unable to fetch URL, check your network connectivity,'
       + ' browser plugins, ad-blockers, or try to refresh this page'
