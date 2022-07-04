@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8f8632d_575a33d0",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1381,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-04T13:59:59Z",
+      "side": 1,
+      "message": "Can remove comment.",
+      "revId": "b3c998e7c116d2b74efd791c7b9d78e727005564",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
