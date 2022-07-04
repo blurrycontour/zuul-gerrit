@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b52a2fd_9ee10859",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1382,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-04T13:57:01Z",
+      "side": 1,
+      "message": "This test doesn\u0027t hit the tenant list endpoint.",
+      "revId": "3caeca15f891c3b158a280f9aaeb255e8d0f7cd3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
