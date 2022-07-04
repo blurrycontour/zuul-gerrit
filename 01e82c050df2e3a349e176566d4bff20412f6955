@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "557de336_ae7ee5fb",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-04T14:06:16Z",
+      "side": 1,
+      "message": "Does the current 5xx error page include the traceback in production?",
+      "revId": "01e82c050df2e3a349e176566d4bff20412f6955",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
