@@ -40,6 +40,7 @@ export default (state = {
         status: action.status,
       }
     case STATUS_FETCH_FAIL:
+      console.log(action)
       return {
         isFetching: false,
         status: state.status,

@@ -14,15 +14,20 @@
 
 import { fetchConfigErrors } from '../api'
 
-export function fetchConfigErrorsAction (tenant) {
+export function fetchConfigErrorsAction(tenant) {
   return (dispatch) => {
     return fetchConfigErrors(tenant.apiPrefix)
       .then(response => {
-        dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
-          errors: response.data})
+        dispatch({
+          type: 'FETCH_CONFIGERRORS_SUCCESS',
+          errors: response.data
+        })
       })
       .catch(error => {
-        throw (error)
+        dispatch({
+          type: 'CONFIGERRORS_FETCH_FAIL',
+          notification: error.response.data
+        })
       })
   }
 }
