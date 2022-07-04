@@ -260,6 +260,8 @@ class TestWeb(BaseTestWeb):
 
     def test_web_tenants(self):
         "Test that we can retrieve JSON status info"
+        # Disable tenant list caching
+        self.web.web.api.cache_expiry = 0
         self.add_base_changes()
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -1376,6 +1378,8 @@ class TestEmptyConfig(BaseTestWeb):
     def test_empty_config_startup(self):
         # Test that we can bootstrap a tenant with an empty config
 
+        # Disable tenant list caching
+        self.web.web.api.cache_expiry = 0
         resp = self.get_url("api/tenant/tenant-one/jobs").json()
         self.assertEqual(len(resp), 1)
         self.commitConfigUpdate(
