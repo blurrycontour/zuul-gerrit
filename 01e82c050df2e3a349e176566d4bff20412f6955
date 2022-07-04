@@ -16,6 +16,24 @@
       "message": "Does the current 5xx error page include the traceback in production?",
       "revId": "01e82c050df2e3a349e176566d4bff20412f6955",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09cd5b40_d3795393",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-07-04T15:06:23Z",
+      "side": 1,
+      "message": "This is the generic 500 error we currently see:\n\n  500 Internal Server Error\n  \n  The server encountered an unexpected condition which prevented it from fulfilling the request.\n\nI\u0027ve just checked my patch by forcing a raise, and traceback seems to be always set to None, so this is actually useless.\n\nThinking about it, it\u0027s probably better to keep the tracebacks for admin eyes only anyway. So instead I added in PS8 the zuul_request_id to the payload if available, so that an admin can eventually find the specific event in the logs.",
+      "parentUuid": "557de336_ae7ee5fb",
+      "revId": "01e82c050df2e3a349e176566d4bff20412f6955",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
