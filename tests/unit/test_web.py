@@ -289,7 +289,11 @@ class TestWeb(BaseTestWeb):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        data = self.get_url("api/tenants").json()
+        for _ in iterate_timeout(10, "queue size to drop to 0"):
+            data = self.get_url("api/tenants").json()
+            if data[0]['queue'] == 0:
+                break
+
         self.assertEqual('tenant-one', data[0]['name'])
         self.assertEqual(3, data[0]['projects'])
         self.assertEqual(0, data[0]['queue'])
@@ -302,7 +306,10 @@ class TestWeb(BaseTestWeb):
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        data = self.get_url("api/tenants").json()
+        for _ in iterate_timeout(10, "queue size to count live item"):
+            data = self.get_url("api/tenants").json()
+            if data[0]['queue'] == 1:
+                break
 
         self.assertEqual('tenant-one', data[0]['name'])
         self.assertEqual(3, data[0]['projects'])
@@ -1362,10 +1369,11 @@ class TestWebMultiTenant(BaseTestWeb):
         self.assertNotIn('tenant-three', self.web.web.abide.tenants)
         self.assertIn('tenant-four', self.web.web.abide.tenants)
 
-        resp = self.get_url("api/tenants")
-        data = resp.json()
-        self.assertEqual(sorted(d["name"] for d in data),
-                         sorted(["tenant-one", "tenant-two", "tenant-four"]))
+        for _ in iterate_timeout(10, "tenant list to be updated"):
+            data = self.get_url("api/tenants").json()
+            if (sorted(["tenant-one", "tenant-two", "tenant-four"])
+                == sorted(d["name"] for d in data)):
+                break
 
 
 class TestEmptyConfig(BaseTestWeb):
@@ -1381,8 +1389,10 @@ class TestEmptyConfig(BaseTestWeb):
             'config/empty-config/git/common-config/new-zuul.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
-        resp = self.get_url("api/tenant/tenant-one/jobs").json()
-        self.assertEqual(len(resp), 3)
+        for _ in iterate_timeout(10, "new jobs to be listed"):
+            resp = self.get_url("api/tenant/tenant-one/jobs").json()
+            if len(resp) == 3:
+                break
 
 
 class TestWebSecrets(BaseTestWeb):
