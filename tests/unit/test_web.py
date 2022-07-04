@@ -260,6 +260,8 @@ class TestWeb(BaseTestWeb):
 
     def test_web_tenants(self):
         "Test that we can retrieve JSON status info"
+        # Disable tenant list caching
+        self.web.web.api.cache_expiry = 0
         self.add_base_changes()
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -1376,6 +1378,7 @@ class TestEmptyConfig(BaseTestWeb):
     def test_empty_config_startup(self):
         # Test that we can bootstrap a tenant with an empty config
 
+        # Disable tenant list caching
         resp = self.get_url("api/tenant/tenant-one/jobs").json()
         self.assertEqual(len(resp), 1)
         self.commitConfigUpdate(
@@ -1383,6 +1386,14 @@ class TestEmptyConfig(BaseTestWeb):
             'config/empty-config/git/common-config/new-zuul.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
+
+        layout_scheduler = self.scheds.first.sched.local_layout_state.get(
+            'tenant-one')
+        for _ in iterate_timeout(10, "local layout of zuul-web to be updated"):
+            layout_web = self.web.web.local_layout_state.get('tenant-one')
+            if layout_web == layout_scheduler:
+                break
+
         resp = self.get_url("api/tenant/tenant-one/jobs").json()
         self.assertEqual(len(resp), 3)
 
