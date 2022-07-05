@@ -28,6 +28,13 @@
     - name: Install managed ansible versions
       command: /usr/local/bin/zuul-manage-ansible -v
       become: yes
+      environment:
+        # This appears to be necessary because without it the virtualenvs
+        # that virtualenv creates are not actually virtualenvs. They are just
+        # aliases for the root python installation instead. Then we try to
+        # install multiple ansible versions to the root (via multiple fake
+        # venvs) and the installation fails due to conflicts.
+        SETUPTOOLS_USE_DISTUTILS: stdlib
 
     - name: Copy inventory
       copy:
