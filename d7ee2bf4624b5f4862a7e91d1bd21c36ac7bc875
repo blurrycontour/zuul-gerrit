@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e15c7c57_0baddac3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-05T16:45:48Z",
+      "side": 1,
+      "message": "Would it be more correct to set _ref_sha for change2 to the sha for change1? I suppose that presents the problem of needing to understand the tree relationship between changes within a project branch? Might also be inaccurate if there are intermediate merge commits?\n\nMostly looking at _waitForRefSha() and it seems we could wait an insufficient amount of time if one but not all of the changes in the bundle merge.",
+      "revId": "d7ee2bf4624b5f4862a7e91d1bd21c36ac7bc875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
