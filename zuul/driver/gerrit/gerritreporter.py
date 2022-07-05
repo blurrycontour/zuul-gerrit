@@ -16,6 +16,7 @@ import logging
 import voluptuous as v
 
 from zuul.driver.gerrit.gerritsource import GerritSource
+from zuul.driver.gerrit.gerritmodel import GerritChange
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Change
 from zuul.reporter import BaseReporter
@@ -65,8 +66,28 @@ class GerritReporter(BaseReporter):
 
         log.debug("Report change %s, params %s, message: %s, comments: %s",
                   item.change, self.config, message, comments)
-        item.change._ref_sha = item.change.project.source.getRefSha(
-            item.change.project, 'refs/heads/' + item.change.branch)
+        if phase2 and self._submit and not hasattr(item.change, '_ref_sha'):
+            # If we're starting to submit a bundle, save the current
+            # ref sha for every item in the bundle.
+            changes = set([item.change])
+            if item.bundle:
+                for i in item.bundle.items:
+                    changes.add(i.change)
+
+            # Store a dict of project,branch -> sha so that if we have
+            # duplicate project/branches, we only query once.
+            ref_shas = {}
+            for other_change in changes:
+                if not isinstance(other_change, GerritChange):
+                    continue
+                key = (other_change.project, other_change.branch)
+                ref_sha = ref_shas.get(key)
+                if not ref_sha:
+                    ref_sha = other_change.project.source.getRefSha(
+                        other_change.project,
+                        'refs/heads/' + other_change.branch)
+                    ref_shas[key] = ref_sha
+                other_change._ref_sha = ref_sha
 
         return self.connection.review(item, message, self._submit,
                                       self._labels, self._checks_api,

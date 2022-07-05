@@ -1079,6 +1079,7 @@ class GerritWebServer(object):
                     # One of the changes in this topic isn't
                     # ready to merge
                     return self._409()
+                changes_to_merge = set(change.data['number'])
                 if fake_gerrit._fake_submit_whole_topic:
                     results = fake_gerrit._test_get_submitted_together(change)
                     for record in results:
@@ -1088,11 +1089,13 @@ class GerritWebServer(object):
                             # One of the changes in this topic isn't
                             # ready to merge
                             return self._409()
+                        changes_to_merge.add(candidate.data['number'])
                 message = None
                 labels = {}
-                fake_gerrit._test_handle_review(
-                    int(change.data['number']), message, True, labels,
-                    False, True)
+                for change_number in changes_to_merge:
+                    fake_gerrit._test_handle_review(
+                        int(change_number), message, True, labels,
+                        False, True)
                 self.send_response(200)
                 self.end_headers()
 
