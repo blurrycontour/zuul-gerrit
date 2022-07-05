@@ -16,6 +16,23 @@
       "message": "Would it be more correct to set _ref_sha for change2 to the sha for change1? I suppose that presents the problem of needing to understand the tree relationship between changes within a project branch? Might also be inaccurate if there are intermediate merge commits?\n\nMostly looking at _waitForRefSha() and it seems we could wait an insufficient amount of time if one but not all of the changes in the bundle merge.",
       "revId": "d7ee2bf4624b5f4862a7e91d1bd21c36ac7bc875",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed0e739c_3937c248",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-05T17:20:10Z",
+      "side": 1,
+      "message": "The merge commits is the reason we don\u0027t wait for an expected sha, just for the sha to be different than it was before the merge started.\n\nNot sure I follow your second paragraph -- but the idea in that method is we wait for like 5 minutes for the branch tip to be different.  But we also don\u0027t call that method if the change doesn\u0027t show as being merged in Gerrit.\n\nSo if we have a 2 change bundle, then we:\n1) Store the branch ref for all changes in the bundle\n\n2) Submit change 1\n3) Check that Gerrit says change 1 is merged\n4) Check that the branch ref is different from what we saved in #1\n\n5) Submit change 2 (it will return a 409 conflict error because it\u0027s already merged, but that\u0027s okay)\n6) Check that Gerrit says change 2 is merged (it is)\n7) Check tat the branch ref is different from what we saved in #1\n\nNow, having written all that, I see that we\u0027re not storing everything in step 1, so I\u0027m going to update this with a new revision.",
+      "revId": "d7ee2bf4624b5f4862a7e91d1bd21c36ac7bc875",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
