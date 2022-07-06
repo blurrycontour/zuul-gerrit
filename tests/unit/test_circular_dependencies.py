@@ -1661,6 +1661,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_failed_job(self):
+        self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -1679,6 +1680,16 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
 
+        # If we don't make sure these jobs finish first, then one of
+        # the items may complete before the other and cause Zuul to
+        # abort the project*-job on the other item (with a "bundle
+        # failed to merge" error).
+        self.waitUntilSettled()
+        self.executor_server.release('project1-job')
+        self.executor_server.release('project2-job')
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'NEW')
