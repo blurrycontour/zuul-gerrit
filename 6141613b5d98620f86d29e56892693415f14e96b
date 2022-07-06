@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3c1507a_6b3a676a",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-06T18:31:13Z",
+      "side": 1,
+      "message": "Should this be False? We\u0027ve already set it to True above.",
+      "range": {
+        "startLine": 1691,
+        "startChar": 50,
+        "endLine": 1691,
+        "endChar": 54
+      },
+      "revId": "6141613b5d98620f86d29e56892693415f14e96b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
