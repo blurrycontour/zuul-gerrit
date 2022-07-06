@@ -3282,3 +3282,25 @@ class TestWebStartup(ZuulTestCase):
         # If the config didn't load correctly, we won't have the jobs
         jobs = self.get_url("api/tenant/tenant-one/jobs").json()
         self.assertEqual(len(jobs), 10)
+
+
+class TestWebUnprotectedBranches(BaseWithWeb):
+    config_file = 'zuul-github-driver.conf'
+    tenant_config_file = 'config/unprotected-branches/main.yaml'
+
+    def test_no_protected_branches(self):
+        """Regression test to check that zuul-web doesn't display
+        config errors when no protected branch exists."""
+        self.startWebServer()
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+
+        project2 = tenant.untrusted_projects[1]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+
+        # project2 should have no parsed branch
+        self.assertEqual(0, len(tpc2.parsed_branch_config.keys()))
+
+        # Zuul-web should not display any config errors
+        config_errors = self.get_url(
+            "api/tenant/tenant-one/config-errors").json()
+        self.assertEqual(len(config_errors), 0)

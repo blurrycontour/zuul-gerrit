@@ -21,6 +21,9 @@ from zuul.zk.locks import SessionAwareReadLock, SessionAwareWriteLock, locked
 
 from kazoo.exceptions import NoNodeError
 
+# Default marker to raise an exception on cache miss in getProjectBranches()
+RAISE_EXCEPTION = object()
+
 
 class BranchCacheZKObject(ShardedZKObject):
     """Store the branch cache in ZK
@@ -41,6 +44,9 @@ class BranchCacheZKObject(ShardedZKObject):
 
     If a project is absent from the dict, it needs to be queried from
     the source.
+
+    If there was an error fetching the branches, None will be stored
+    as a sentinel value.
 
     When performing an exclude_unprotected query, remove any duplicate
     branches from remaider to save space.  When determining the full
@@ -117,8 +123,23 @@ class BranchCache:
                         self.cache.remainder.pop(p, None)
 
     def getProjectBranches(self, project_name, exclude_unprotected,
-                           min_ltime=-1):
+                           min_ltime=-1, default=RAISE_EXCEPTION):
         """Get the branch names for the given project.
+
+        Checking the branch cache we need to distinguish three different
+        cases:
+
+            1. cache miss (not queried yet)
+            2. cache hit (including empty list of branches)
+            3. error when fetching branches
+
+        If the cache doesn't contain any branches for the project and no
+        default value is provided a LookupError is raised.
+
+        If there was an error fetching the branches, the return value
+        will be None.
+
+        Otherwise the list of branches will be returned.
 
         :param str project_name:
             The project for which the branches are returned.
@@ -126,35 +147,54 @@ class BranchCache:
             Whether to return all or only protected branches.
         :param int min_ltime:
             The minimum cache ltime to consider the cache valid.
+        :param any default:
+            Optional default value to return if no cache entry exits.
 
-        :returns: The list of branch names, or None if the cache
-            cannot satisfy the request.
+        :returns: The list of branch names, or None if there was
+            an error when fetching the branches.
         """
         if self.ltime < min_ltime:
             with locked(self.rlock):
                 self.cache.refresh(self.zk_context)
 
-        protected_branches = self.cache.protected.get(project_name)
-        remainder_branches = self.cache.remainder.get(project_name)
+        protected_branches = None
+        try:
+            protected_branches = self.cache.protected[project_name]
+        except KeyError:
+            if exclude_unprotected:
+                if default is RAISE_EXCEPTION:
+                    raise LookupError(
+                        f"No branches for project {project_name}")
+                else:
+                    return default
 
-        if exclude_unprotected:
-            if protected_branches is not None:
-                return protected_branches
-        else:
+        if not exclude_unprotected:
+            try:
+                remainder_branches = self.cache.remainder[project_name]
+            except KeyError:
+                if default is RAISE_EXCEPTION:
+                    raise LookupError(
+                        f"No branches for project {project_name}")
+                else:
+                    return default
+
             if remainder_branches is not None:
                 return (protected_branches or []) + remainder_branches
 
-        return None
+        return protected_branches
 
     def setProjectBranches(self, project_name, exclude_unprotected, branches):
         """Set the branch names for the given project.
+
+        Use None as a sentinel value for the branches to indicate that
+        there was a fetch error.
 
         :param str project_name:
             The project for the branches.
         :param bool exclude_unprotected:
             Whether this is a list of all or only protected branches.
         :param list[str] branches:
-            The list of branches
+            The list of branches or None to indicate a fetch error.
         """
 
         with locked(self.wlock):
@@ -162,13 +202,13 @@ class BranchCache:
                 if exclude_unprotected:
                     self.cache.protected[project_name] = branches
                     remainder_branches = self.cache.remainder.get(project_name)
-                    if remainder_branches:
+                    if remainder_branches and branches:
                         remainder = list(set(remainder_branches) -
                                          set(branches))
                         self.cache.remainder[project_name] = remainder
                 else:
                     protected_branches = self.cache.protected.get(project_name)
-                    if protected_branches:
+                    if protected_branches and branches:
                         remainder = list(set(branches) -
                                          set(protected_branches))
                     else:

@@ -1834,9 +1834,9 @@ class TestBranchCache(ZooKeeperBaseTestCase):
             sorted(cache.getProjectBranches('project1', True)),
             test_data['project1']['protected']
         )
-        self.assertEqual(
-            cache.getProjectBranches('project1', False),
-            None,
+        self.assertRaises(
+            LookupError,
+            lambda: cache.getProjectBranches('project1', False)
         )
 
         cache.setProjectBranches('project1', False,
@@ -1862,21 +1862,21 @@ class TestBranchCache(ZooKeeperBaseTestCase):
             },
         }
 
-        self.assertEqual(
-            cache.getProjectBranches('project1', True),
-            None
+        self.assertRaises(
+            LookupError,
+            lambda: cache.getProjectBranches('project1', True)
         )
-        self.assertEqual(
-            cache.getProjectBranches('project1', False),
-            None
+        self.assertRaises(
+            LookupError,
+            lambda: cache.getProjectBranches('project1', False)
         )
 
         # Test the other order; all followed by protected-only
         cache.setProjectBranches('project1', False,
                                  test_data['project1']['all'])
-        self.assertEqual(
-            cache.getProjectBranches('project1', True),
-            None
+        self.assertRaises(
+            LookupError,
+            lambda: cache.getProjectBranches('project1', True)
         )
         self.assertEqual(
             sorted(cache.getProjectBranches('project1', False)),
