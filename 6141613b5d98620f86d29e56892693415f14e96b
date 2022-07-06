@@ -22,6 +22,23 @@
       },
       "revId": "6141613b5d98620f86d29e56892693415f14e96b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2485cfb2_39a48b03",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-06T18:32:01Z",
+      "side": 1,
+      "message": "yep; just happens to work because the next release will release the last batch",
+      "revId": "6141613b5d98620f86d29e56892693415f14e96b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
