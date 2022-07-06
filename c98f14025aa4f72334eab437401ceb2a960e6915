@@ -46,6 +46,30 @@
       },
       "revId": "c98f14025aa4f72334eab437401ceb2a960e6915",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1fae849_96285539",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-06T16:12:10Z",
+      "side": 1,
+      "message": "Oh right. None is the default and the error value. Only the default would change by setting it to [] but the error value could be None.",
+      "parentUuid": "85cdecf4_8e84c92b",
+      "range": {
+        "startLine": 316,
+        "startChar": 36,
+        "endLine": 316,
+        "endChar": 48
+      },
+      "revId": "c98f14025aa4f72334eab437401ceb2a960e6915",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
