@@ -849,3 +849,52 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
 
         # Check if there is a secret leak
         self.assertFalse('test_secret' in build_doc['job_vars'])
+
+
+class TestConnectionsBranchCache(ZuulTestCase):
+    config_file = "zuul-gerrit-github.conf"
+    tenant_config_file = 'config/multi-driver/main.yaml'
+
+    def test_branch_cache_fetch_error(self):
+        # Test that a fetch error stores the right value in the branch cache
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        connection = self.scheds.first.connections.connections['github']
+        source = connection.source
+        project = source.getProject('org/project1')
+
+        # Patch the fetch method so that it fails
+        orig = connection._fetchProjectBranches
+
+        def fail(*args, **kw):
+            raise Exception("Unable to fetch branches")
+        self.patch(connection, '_fetchProjectBranches', fail)
+
+        # Clear the branch cache so we start with nothing
+        connection.clearBranchCache()
+
+        # Verify that we raise an error when we try to get branches
+        # for a missing project
+        self.assertRaises(
+            Exception,
+            lambda: connection.getProjectBranches(project, tenant))
+        # This should happen again (ie, we should retry since we don't
+        # have an entry)
+        self.assertRaises(
+            Exception,
+            lambda: connection.getProjectBranches(project, tenant))
+
+        # Restore the normal fetch method and verify that the cache
+        # works as expected
+        self.patch(connection, '_fetchProjectBranches', orig)
+        branches = connection.getProjectBranches(project, tenant)
+        self.assertEqual(['master'], branches)
+
+        # Ensure that the empty list of branches is valid and is not
+        # seen as an error
+        newproject = source.getProject('org/newproject')
+        connection.addProject(newproject)
+        tpc = zuul.model.TenantProjectConfig(newproject)
+        tpc.exclude_unprotected_branches = True
+        tenant.addUntrustedProject(tpc)
+        branches = connection.getProjectBranches(newproject, tenant)
+        self.assertEqual([], branches)
