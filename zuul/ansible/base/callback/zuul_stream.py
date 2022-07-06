@@ -502,6 +502,13 @@ class CallbackModule(default.CallbackModule):
         else:
             status = 'ok'
 
+        if 'ansible_loop_var' in result_dict:
+            loop_var = result_dict['ansible_loop_var']
+        else:
+            # TODO is this fallback necessary is ansible_loop_var
+            # always present?
+            loop_var = 'item'
+
         if result_dict.get('msg', '').startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
@@ -512,7 +519,7 @@ class CallbackModule(default.CallbackModule):
             else:
                 self._log_message(
                     result=result,
-                    msg=json.dumps(result_dict['item'],
+                    msg=json.dumps(result_dict[loop_var],
                                    indent=2, sort_keys=True),
                     status=status)
         else:
@@ -521,10 +528,12 @@ class CallbackModule(default.CallbackModule):
                 hostname = self._get_hostname(result)
                 self._log("%s | %s " % (hostname, line))
 
-            if isinstance(result_dict['item'], str):
+            if isinstance(result_dict[loop_var], str):
                 self._log_message(
                     result,
-                    "Item: {item} Runtime: {delta}".format(**result_dict))
+                    "Item: {loop_var} Runtime: {delta}".format(
+                        loop_var=result_dict[loop_var],
+                        delta=result_dict['delta']))
             else:
                 self._log_message(
                     result,
@@ -538,13 +547,20 @@ class CallbackModule(default.CallbackModule):
         result_dict = dict(result._result)
         self._process_result_for_localhost(result, is_task=False)
 
+        if 'ansible_loop_var' in result_dict:
+            loop_var = result_dict['ansible_loop_var']
+        else:
+            # TODO is this fallback necessary is ansible_loop_var
+            # always present?
+            loop_var = 'item'
+
         if result_dict.get('msg', '').startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
                                          'win_command', 'win_shell'):
             self._log_message(
                 result=result,
-                msg="Item: {item}".format(item=result_dict['item']),
+                msg="Item: {loop_var}".format(loop_var=result_dict[loop_var]),
                 status='ERROR',
                 result_dict=result_dict)
         else:
@@ -555,7 +571,8 @@ class CallbackModule(default.CallbackModule):
 
             # self._log("Result: %s" % (result_dict))
             self._log_message(
-                result, "Item: {item} Result: {rc}".format(**result_dict))
+                result, "Item: {loop_var} Result: {rc}".format(
+                    loop_var=result_dict[loop_var], rc=result_dict['rc']))
 
         if self._deferred_result:
             self._process_deferred(result)
