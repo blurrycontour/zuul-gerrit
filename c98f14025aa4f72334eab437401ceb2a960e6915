@@ -22,6 +22,30 @@
       },
       "revId": "c98f14025aa4f72334eab437401ceb2a960e6915",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85cdecf4_8e84c92b",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-06T16:10:19Z",
+      "side": 1,
+      "message": "I think that wouldn\u0027t work as branches can still be None in the error case. The default is only returned when there is a cache miss.",
+      "parentUuid": "1999592f_b541a8de",
+      "range": {
+        "startLine": 316,
+        "startChar": 36,
+        "endLine": 316,
+        "endChar": 48
+      },
+      "revId": "c98f14025aa4f72334eab437401ceb2a960e6915",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
