@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b160e3e_afd5672a",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 510,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-06T22:54:51Z",
+      "side": 1,
+      "message": "Nit: shorter as:\n\nloop_var \u003d result_dict.get(\u0027ansible_loop_var\u0027, \u0027item\u0027)",
+      "revId": "50d68152cf302d6c54fe1f21a0acdeab821cff05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a1b157d_492f62a0",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-06T22:54:51Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "50d68152cf302d6c54fe1f21a0acdeab821cff05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
