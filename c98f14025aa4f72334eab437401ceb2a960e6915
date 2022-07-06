@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1999592f_b541a8de",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-06T16:07:18Z",
+      "side": 1,
+      "message": "Nit: You should be able to set the default to [] here and then drop the block on lines 318-319.",
+      "range": {
+        "startLine": 316,
+        "startChar": 36,
+        "endLine": 316,
+        "endChar": 48
+      },
+      "revId": "c98f14025aa4f72334eab437401ceb2a960e6915",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
