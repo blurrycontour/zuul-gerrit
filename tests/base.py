@@ -79,6 +79,7 @@ from zuul.model import (
 from zuul.driver.zuul import ZuulDriver
 from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
+from zuul.driver.gitea import GiteaDriver
 from zuul.driver.github import GithubDriver
 from zuul.driver.timer import TimerDriver
 from zuul.driver.sql import SQLDriver
@@ -103,6 +104,7 @@ from psutil import Popen
 import zuul.driver.gerrit.gerritsource as gerritsource
 import zuul.driver.gerrit.gerritconnection as gerritconnection
 import zuul.driver.git.gitwatcher as gitwatcher
+import zuul.driver.github.giteaconnection as giteaconnection
 import zuul.driver.github.githubconnection as githubconnection
 import zuul.driver.pagure.pagureconnection as pagureconnection
 import zuul.driver.gitlab.gitlabconnection as gitlabconnection
@@ -323,6 +325,30 @@ class GitlabDriverMock(GitlabDriver):
         server = config.get('server', 'gitlab.com')
         db = self.changes.setdefault(server, {})
         connection = FakeGitlabConnection(
+            self, name, config,
+            changes_db=db,
+            upstream_root=self.upstream_root)
+        setattr(self.registry, 'fake_' + name, connection)
+        registerProjects(connection.source.name, connection,
+                         self.config)
+        return connection
+
+
+class GiteaDriverMock(GiteaDriver):
+    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
+                 config: ConfigParser, upstream_root: str,
+                 additional_event_queues):
+        super(GiteaDriverMock, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.config = config
+        self.upstream_root = upstream_root
+        self.additional_event_queues = additional_event_queues
+
+    def getConnection(self, name, config):
+        server = config.get('server', 'gitea.com')
+        db = self.changes.setdefault(server, {})
+        connection = FakeGiteaConnection(
             self, name, config,
             changes_db=db,
             upstream_root=self.upstream_root)
@@ -1970,6 +1996,28 @@ class FakePagureConnection(pagureconnection.PagureConnection):
 
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
+
+
+class FakeGiteaConnection(giteaconnection.GiteaConnection):
+    """A Fake Gitea connection for use in tests.
+
+    This subclasses
+    :py:class:`~zuul.connection.gitea.GiteaConnection` to add the
+    ability for tests to add changes to the fake Gitea it represents.
+    """
+
+    log = logging.getLogger("zuul.test.FakeGiteaConnection")
+    _poller_class = FakeGerritPoller
+    _ref_watcher_class = FakeGerritRefWatcher
+
+    def __init__(self, driver, connection_name, connection_config,
+                 changes_db=None, upstream_root=None, poller_event=None,
+                 ref_watcher_event=None):
+        super(FakeGiteaConnection, self).__init__(driver, connection_name,
+                                                  connection_config)
+
+    def onStop(self):
+        super().onStop()
 
 
 FakeGitlabBranch = namedtuple('Branch', ('name', 'protected'))
