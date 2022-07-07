@@ -295,6 +295,11 @@ class TestStreaming(TestStreamingBase):
         match = r.search(self.streaming_data[None])
         self.assertNotEqual(match, None)
 
+        # Check that we logged loop_var contents properly
+        pattern = r'ok: "(one|two|three)"'
+        m = re.search(pattern, self.streaming_data[None])
+        self.assertNotEqual(m, None)
+
     def runWSClient(self, port, build_uuid):
         client = WSClient(port, build_uuid)
         client.event.wait()
