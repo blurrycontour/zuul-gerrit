@@ -1,0 +1,30 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gitea:
+        - event: pull_request
+          action:
+            - opened
+            - changed
+            - reopened
+    success:
+    failure:
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: project-test2
+    run: playbooks/project-test2.yaml
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - project-test1
