@@ -23,6 +23,7 @@ from zuul.driver.sql.sqlreporter import SQLReporter
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
+import zuul.driver.gitea
 import zuul.driver.github
 import zuul.driver.smtp
 import zuul.driver.timer
@@ -53,6 +54,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.zuul.ZuulDriver())
         self.registerDriver(zuul.driver.gerrit.GerritDriver())
         self.registerDriver(zuul.driver.git.GitDriver())
+        self.registerDriver(zuul.driver.gitea.GiteaDriver())
         self.registerDriver(zuul.driver.github.GithubDriver())
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
         self.registerDriver(zuul.driver.timer.TimerDriver())
