@@ -1,0 +1,11 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gitea:
+        - event: gt_pull_request
+          action:
+            - opened
+            - changed
+            - reopened
+        - event: gt_push
