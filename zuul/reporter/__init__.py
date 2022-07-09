@@ -257,9 +257,13 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         # Extract the report elements from an item
         config = self.connection.sched.config
         jobs_fields = []
+        skipped = 0
         for job in item.getJobs():
             build = item.current_build_set.getBuild(job.name)
             (result, url) = item.formatJobResult(job)
+            if result == 'SKIPPED':
+                skipped += 1
+                continue
             if not job.voting:
                 voting = ' (non-voting)'
             else:
@@ -300,12 +304,15 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             success_message = job.success_message
             jobs_fields.append(
                 (name, url, result, error, elapsed, voting, success_message))
-        return jobs_fields
+        return jobs_fields, skipped
 
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
         ret = ''
-        jobs_fields = self._getItemReportJobsFields(item)
+        jobs_fields, skipped = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
             ret += '- %s%s : %s%s%s%s\n' % job_fields[:6]
+        if skipped:
+            jobtext = 'job' if skipped == 1 else 'jobs'
+            ret += 'Skipped %i %s\n' % (skipped, jobtext)
         return ret
