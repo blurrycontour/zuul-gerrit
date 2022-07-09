@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 import 'moment-duration-format'
+import { Button } from '@patternfly/react-core'
 
 
 class ChangePanel extends React.Component {
@@ -30,9 +31,11 @@ class ChangePanel extends React.Component {
   constructor () {
     super()
     this.state = {
-      expanded: false
+      expanded: false,
+      showSkipped: false,
     }
     this.onClick = this.onClick.bind(this)
+    this.toggleSkippedJobs = this.toggleSkippedJobs.bind(this)
     this.clicked = false
   }
 
@@ -120,12 +123,13 @@ class ChangePanel extends React.Component {
   }
 
   renderProgressBar (change) {
-    let jobPercent = (100 / change.jobs.length).toFixed(2)
+    const interesting_jobs = change.jobs.filter(j => this.jobStrResult(j) !== 'skipped')
+    let jobPercent = (100 / interesting_jobs.length).toFixed(2)
     return (
       <div className='progress zuul-change-total-result'>
         {change.jobs.map((job, idx) => {
           let result = this.jobStrResult(job)
-          if (['queued', 'waiting'].includes(result)) {
+          if (['queued', 'waiting', 'skipped'].includes(result)) {
             return ''
           }
           let className = ''
@@ -144,7 +148,6 @@ class ChangePanel extends React.Component {
               className = ' progress-bar-warning'
               break
             case 'paused':
-            case 'skipped':
               className = ' progress-bar-info'
               break
             default:
@@ -302,15 +305,39 @@ class ChangePanel extends React.Component {
       </span>)
   }
 
+  toggleSkippedJobs (e) {
+    // Skip middle mouse button
+    if (e.button === 1) {
+      return
+    }
+    this.setState({ showSkipped: !this.state.showSkipped })
+  }
+
   renderJobList (jobs, times) {
+    const [buttonText, interestingJobs] = this.state.showSkipped ?
+          ["Hide", jobs] :
+          ["Show", jobs.filter(j => this.jobStrResult(j) !== 'skipped')]
+    const skippedJobCount = jobs.length - interestingJobs.length
+
     return (
-      <ul className='list-group zuul-patchset-body'>
-        {jobs.map((job, idx) => (
-          <li key={idx} className='list-group-item zuul-change-job'>
-            {this.renderJob(job, times.jobs[job.name])}
-          </li>
-        ))}
-      </ul>)
+      <>
+        <ul className='list-group zuul-patchset-body'>
+          {interestingJobs.map((job, idx) => (
+            <li key={idx} className='list-group-item zuul-change-job'>
+              {this.renderJob(job, times.jobs[job.name])}
+            </li>
+          ))}
+          {(this.state.showSkipped || skippedJobCount) ? (
+            <li key='last' className='list-group-item zuul-change-job'>
+              <Button variant="link" className='zuul-skipped-jobs-button'
+                      onClick={this.toggleSkippedJobs}>
+                {buttonText} {skippedJobCount ? skippedJobCount : ''} skipped job{skippedJobCount === 1 ? '' : 's'}
+              </Button>
+            </li>
+          ) : ''}
+        </ul>
+      </>
+    )
   }
 
   calculateTimes (change) {
