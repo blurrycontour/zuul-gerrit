@@ -189,6 +189,11 @@ a.refresh {
     font-size: small;
 }
 
+.zuul-skipped-jobs-button {
+    font-size: small;
+    padding: 0;
+}
+
 .zuul-non-voting-desc {
     font-size: smaller;
 }
