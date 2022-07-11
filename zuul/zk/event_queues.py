@@ -776,7 +776,7 @@ class TriggerEventQueue(ZooKeeperEventQueue):
         self._put(data)
 
     def __iter__(self):
-        for data, ack_ref, _ in self._iterEvents():
+        for data, ack_ref, zstat in self._iterEvents():
             try:
                 if (data["driver_name"] is None and
                         data["event_type"] == "SupercedeEvent"):
@@ -793,6 +793,9 @@ class TriggerEventQueue(ZooKeeperEventQueue):
             event = event_class.fromDict(event_data)
             event.ack_ref = ack_ref
             event.driver_name = data["driver_name"]
+            # Initialize the logical timestamp if not valid
+            if event.zuul_event_ltime is None:
+                event.zuul_event_ltime = zstat.creation_transaction_id
             yield event
 
 
@@ -803,6 +806,28 @@ class TenantTriggerEventQueue(TriggerEventQueue):
         queue_root = TENANT_TRIGGER_ROOT.format(
             tenant=tenant_name)
         super().__init__(client, queue_root, connections)
+        self.metadata = {}
+
+    def _setQueueMetadata(self):
+        encoded_data = json.dumps(
+            self.metadata, sort_keys=True).encode("utf-8")
+        self.kazoo_client.set(self.queue_root, encoded_data)
+
+    def refreshMetadata(self):
+        data, zstat = self.kazoo_client.get(self.queue_root)
+        try:
+            self.metadata = json.loads(data)
+        except json.JSONDecodeError:
+            self.metadata = {}
+
+    @property
+    def last_reconfigure_event_ltime(self):
+        return self.metadata.get('last_reconfigure_event_ltime', -1)
+
+    @last_reconfigure_event_ltime.setter
+    def last_reconfigure_event_ltime(self, val):
+        self.metadata['last_reconfigure_event_ltime'] = val
+        self._setQueueMetadata()
 
     @classmethod
     def createRegistry(cls, client, connections):

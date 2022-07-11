@@ -1044,6 +1044,7 @@ class Client(zuul.cmd.ZuulApp):
                 tenant_name=args.tenant,
                 hostname='admin command',
                 last_reconfigured=int(time.time()),
+                last_reconfigure_event_ltime=-1,
                 uuid=uuid4().hex,
                 branch_cache_min_ltimes={},
                 ltime=ps._zstat.last_modified_transaction_id,

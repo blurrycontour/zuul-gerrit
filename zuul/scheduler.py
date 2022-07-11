@@ -860,9 +860,14 @@ class Scheduler(threading.Thread):
             self.log.exception("Exception reporting runtime stats")
 
     def reconfigureTenant(self, tenant, project, trigger_event):
+        if trigger_event:
+            trigger_event_ltime = trigger_event.zuul_event_ltime
+        else:
+            trigger_event_ltime = None
         self.log.debug("Submitting tenant reconfiguration event for "
-                       "%s due to event %s in project %s",
-                       tenant.name, trigger_event, project)
+                       "%s due to event %s in project %s, ltime %s",
+                       tenant.name, trigger_event, project,
+                       trigger_event_ltime)
         branch = trigger_event and trigger_event.branch
         event = TenantReconfigureEvent(
             tenant.name, project.canonical_name, branch,
@@ -870,6 +875,7 @@ class Scheduler(threading.Thread):
         if trigger_event:
             event.branch_cache_ltimes[trigger_event.connection_name] = (
                 trigger_event.branch_cache_ltime)
+            event.trigger_event_ltime = trigger_event_ltime
         self.management_events[tenant.name].put(event, needs_result=False)
 
     def fullReconfigureCommandHandler(self):
@@ -970,7 +976,7 @@ class Scheduler(threading.Thread):
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
                         ctx = self.createZKContext(tlock, self.log)
-                        self._reconfigureTenant(ctx, min_ltimes, tenant)
+                        self._reconfigureTenant(ctx, min_ltimes, -1, tenant)
                         self._reportInitialStats(tenant)
                     else:
                         self.local_layout_state[tenant_name] = layout_state
@@ -1422,6 +1428,7 @@ class Scheduler(threading.Thread):
                     ctx = self.createZKContext(lock, self.log)
                     if tenant is not None:
                         self._reconfigureTenant(ctx, min_ltimes,
+                                                -1,
                                                 tenant, old_tenant)
                     else:
                         self._reconfigureDeleteTenant(ctx, old_tenant)
@@ -1485,6 +1492,7 @@ class Scheduler(threading.Thread):
                 tenant = self.abide.tenants[event.tenant_name]
                 ctx = self.createZKContext(lock, self.log)
                 self._reconfigureTenant(ctx, min_ltimes,
+                                        event.trigger_event_ltime,
                                         tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
         self.log.info("Tenant reconfiguration complete for %s (duration: %s "
@@ -1639,7 +1647,8 @@ class Scheduler(threading.Thread):
                 request)
             self.cancelJob(build_set, request_job)
 
-    def _reconfigureTenant(self, context, min_ltimes, tenant,
+    def _reconfigureTenant(self, context, min_ltimes,
+                           last_reconfigure_event_ltime, tenant,
                            old_tenant=None):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
@@ -1666,10 +1675,29 @@ class Scheduler(threading.Thread):
             for s in self.connections.getSources()
         }
 
+        # Make sure last_reconfigure_event_ltime never goes backward
+        old_layout_state = self.tenant_layout_state.get(tenant.name)
+        if old_layout_state:
+            if (old_layout_state.last_reconfigure_event_ltime >
+                last_reconfigure_event_ltime):
+                self.log.debug("Setting layout state last reconfigure ltime "
+                               "to previous ltime %s which is newer than %s",
+                               old_layout_state.last_reconfigure_event_ltime,
+                               last_reconfigure_event_ltime)
+                last_reconfigure_event_ltime =\
+                    old_layout_state.last_reconfigure_event_ltime
+        if last_reconfigure_event_ltime < 0:
+            last_reconfigure_event_ltime = self.zk_client.getCurrentLtime()
+            self.log.debug("Setting layout state last reconfigure ltime "
+                           "to current ltime %s", last_reconfigure_event_ltime)
+        else:
+            self.log.debug("Setting layout state last reconfigure ltime "
+                           "to %s", last_reconfigure_event_ltime)
         layout_state = LayoutState(
             tenant_name=tenant.name,
             hostname=self.hostname,
             last_reconfigured=int(time.time()),
+            last_reconfigure_event_ltime=last_reconfigure_event_ltime,
             uuid=tenant.layout.uuid,
             branch_cache_min_ltimes=branch_cache_min_ltimes,
         )
@@ -2178,6 +2206,8 @@ class Scheduler(threading.Thread):
                             "Unable to refresh pipeline change list for %s",
                             pipeline.name)
 
+                # Get the ltime of the last reconfiguration event
+                self.trigger_events[tenant.name].refreshMetadata()
                 for event in self.trigger_events[tenant.name]:
                     log = get_annotated_logger(self.log, event.zuul_event_id)
                     log.debug("Forwarding trigger event %s", event)
@@ -2265,8 +2295,12 @@ class Scheduler(threading.Thread):
             # or a branch was just created or deleted.  Clear
             # out cached data for this project and perform a
             # reconfiguration.
+            self.trigger_events[tenant.name].last_reconfigure_event_ltime =\
+                event.zuul_event_ltime
             self.reconfigureTenant(tenant, change.project, event)
 
+        event.min_reconfigure_ltime = self.trigger_events[
+            tenant.name].last_reconfigure_event_ltime
         for pipeline in tenant.layout.pipelines.values():
             if (
                 pipeline.manager.eventMatches(event, change)
@@ -2281,6 +2315,21 @@ class Scheduler(threading.Thread):
             if self._stopped:
                 return
             log = get_annotated_logger(self.log, event.zuul_event_id)
+            if not isinstance(event, SupercedeEvent):
+                local_state = self.local_layout_state[tenant.name]
+                last_ltime = local_state.last_reconfigure_event_ltime
+                # The event tells us the ltime of the most recent
+                # reconfiguration event up to that point.  If our local
+                # layout state wasn't generated by an event after that
+                # time, then we are too out of date to process this event.
+                # Abort now and wait for an update.
+                if (event.min_reconfigure_ltime > -1 and
+                    event.min_reconfigure_ltime > last_ltime):
+                    log.debug("Trigger event minimum reconfigure ltime of %s "
+                              "newer than current reconfigure ltime of %s, "
+                              "aborting early",
+                              event.min_reconfigure_ltime, last_ltime)
+                    return
             log.debug("Processing trigger event %s", event)
             try:
                 if isinstance(event, SupercedeEvent):

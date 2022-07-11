@@ -50,8 +50,9 @@ from tests.base import (
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.layout import LayoutState
+from zuul.zk.locks import management_queue_lock
 
-EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {})
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
 
 
 class TestSchedulerSSL(SSLZuulTestCase):
@@ -4212,6 +4213,56 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])
+
+    @simple_layout('layouts/trigger-sequence.yaml')
+    def test_live_reconfiguration_trigger_sequence(self):
+        # Test that events arriving after an event that triggers a
+        # reconfiguration are handled after the reconfiguration
+        # completes.
+
+        in_repo_conf = "[{project: {tag: {jobs: [post-job]}}}]"
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        sched = self.scheds.first.sched
+        # Hold the management queue so that we don't process any
+        # reconfiguration events yet.
+        with management_queue_lock(
+                self.zk_client, 'tenant-one', blocking=False
+        ):
+            with sched.run_handler_lock:
+                A.setMerged()
+                # Submit two events while no processing is happening:
+                # A change merged event that will trigger a reconfiguration
+                self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+
+                # And a tag event which should only run a job after
+                # the config change above is in effect.
+                event = self.fake_gerrit.addFakeTag(
+                    'org/project', 'master', 'foo')
+                self.fake_gerrit.addEvent(event)
+
+            # Wait for the tenant trigger queue to empty out, and for
+            # us to have a tenant management as well as a pipeline
+            # trigger event.  At this point, we should be deferring
+            # the trigger event until the management event is handled.
+            for _ in iterate_timeout(60, 'queues'):
+                with sched.run_handler_lock:
+                    if sched.trigger_events['tenant-one'].hasEvents():
+                        continue
+                    if not sched.pipeline_trigger_events[
+                            'tenant-one']['tag'].hasEvents():
+                        continue
+                    if not sched.management_events['tenant-one'].hasEvents():
+                        continue
+                    break
+
+        # Now we can resume and process the reconfiguration event
+        sched.wake_event.set()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='post-job', result='SUCCESS'),
         ])
 
     @simple_layout('layouts/repo-deleted.yaml')
