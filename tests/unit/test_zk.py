@@ -1290,7 +1290,7 @@ class TestLayoutStore(ZooKeeperBaseTestCase):
             "github": 456,
         }
         state = LayoutState("tenant", "hostname", 0, layout_uuid,
-                            branch_cache_min_ltimes)
+                            branch_cache_min_ltimes, -1)
         store["tenant"] = state
         self.assertEqual(state, store["tenant"])
         self.assertNotEqual(state.ltime, -1)
@@ -1301,9 +1301,9 @@ class TestLayoutStore(ZooKeeperBaseTestCase):
     def test_ordering(self):
         layout_uuid = uuid.uuid4().hex
         state_one = LayoutState("tenant", "hostname", 1, layout_uuid,
-                                {}, ltime=1)
+                                {}, -1, ltime=1)
         state_two = LayoutState("tenant", "hostname", 2, layout_uuid,
-                                {}, ltime=2)
+                                {}, -1, ltime=2)
 
         self.assertGreater(state_two, state_one)
 
@@ -1312,9 +1312,9 @@ class TestLayoutStore(ZooKeeperBaseTestCase):
         min_ltimes = defaultdict(lambda x: -1)
         min_ltimes['foo'] = 1
         state_one = LayoutState("tenant", "hostname", 1, uuid.uuid4().hex,
-                                {}, ltime=1)
+                                {}, -1, ltime=1)
         state_two = LayoutState("tenant", "hostname", 2, uuid.uuid4().hex,
-                                {}, ltime=2)
+                                {}, -1, ltime=2)
         store.setMinLtimes(state_one, min_ltimes)
         store.setMinLtimes(state_two, min_ltimes)
         store['tenant'] = state_one

@@ -26,7 +26,7 @@ from zuul.zk.layout import LayoutState
 from tests.base import ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
 
-EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {})
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
 
 
 class TestPagureDriver(ZuulTestCase):

@@ -49,12 +49,15 @@ class LayoutState:
     """
 
     def __init__(self, tenant_name, hostname, last_reconfigured, uuid,
-                 branch_cache_min_ltimes, ltime=-1):
+                 branch_cache_min_ltimes, last_reconfigure_event_ltime,
+                 ltime=-1):
         self.uuid = uuid
         self.ltime = ltime
         self.tenant_name = tenant_name
         self.hostname = hostname
         self.last_reconfigured = last_reconfigured
+        self.last_reconfigure_event_ltime =\
+            last_reconfigure_event_ltime
         self.branch_cache_min_ltimes = branch_cache_min_ltimes
 
     def toDict(self):
@@ -62,6 +65,8 @@ class LayoutState:
             "tenant_name": self.tenant_name,
             "hostname": self.hostname,
             "last_reconfigured": self.last_reconfigured,
+            "last_reconfigure_event_ltime":
+            self.last_reconfigure_event_ltime,
             "uuid": self.uuid,
             "branch_cache_min_ltimes": self.branch_cache_min_ltimes,
         }
@@ -74,6 +79,7 @@ class LayoutState:
             data["last_reconfigured"],
             data.get("uuid"),
             data.get("branch_cache_min_ltimes"),
+            data.get("last_reconfigure_event_ltime", -1),
             data.get("ltime", -1),
         )
 

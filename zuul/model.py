@@ -5910,6 +5910,7 @@ class TenantReconfigureEvent(ManagementEvent):
         self.tenant_name = tenant_name
         self.project_branches = set([(project_name, branch_name)])
         self.branch_cache_ltimes = {}
+        self.trigger_event_ltime = -1
         self.merged_events = []
 
     def __ne__(self, other):
@@ -5931,6 +5932,8 @@ class TenantReconfigureEvent(ManagementEvent):
                 self.branch_cache_ltimes.get(connection_name, ltime), ltime)
         self.zuul_event_ltime = max(self.zuul_event_ltime,
                                     other.zuul_event_ltime)
+        self.trigger_event_ltime = max(self.trigger_event_ltime,
+                                       other.trigger_event_ltime)
         self.merged_events.append(other)
 
     def toDict(self):
@@ -5938,6 +5941,7 @@ class TenantReconfigureEvent(ManagementEvent):
         d["tenant_name"] = self.tenant_name
         d["project_branches"] = list(self.project_branches)
         d["branch_cache_ltimes"] = self.branch_cache_ltimes
+        d["trigger_event_ltime"] = self.trigger_event_ltime
         return d
 
     @classmethod
@@ -5953,6 +5957,7 @@ class TenantReconfigureEvent(ManagementEvent):
             tuple(pb) for pb in data["project_branches"]
         )
         event.branch_cache_ltimes = data.get("branch_cache_ltimes", {})
+        event.trigger_event_ltime = data.get("trigger_event_ltime", -1)
         return event
 
 
@@ -6289,6 +6294,9 @@ class TriggerEvent(AbstractEvent):
         self.branch_deleted = False
         self.branch_protected = True
         self.ref = None
+        # For reconfiguration sequencing
+        self.min_reconfigure_ltime = -1
+        self.zuul_event_ltime = None
         # For management events (eg: enqueue / promote)
         self.tenant_name = None
         self.project_hostname = None
@@ -6326,6 +6334,8 @@ class TriggerEvent(AbstractEvent):
             "branch_deleted": self.branch_deleted,
             "branch_protected": self.branch_protected,
             "ref": self.ref,
+            "min_reconfigure_ltime": self.min_reconfigure_ltime,
+            "zuul_event_ltime": self.zuul_event_ltime,
             "tenant_name": self.tenant_name,
             "project_hostname": self.project_hostname,
             "project_name": self.project_name,
@@ -6358,6 +6368,8 @@ class TriggerEvent(AbstractEvent):
         self.branch_deleted = d["branch_deleted"]
         self.branch_protected = d["branch_protected"]
         self.ref = d["ref"]
+        self.min_reconfigure_ltime = d.get("min_reconfigure_ltime", -1)
+        self.zuul_event_ltime = d.get("zuul_event_ltime", None)
         self.tenant_name = d["tenant_name"]
         self.project_hostname = d["project_hostname"]
         self.project_name = d["project_name"]
