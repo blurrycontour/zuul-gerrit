@@ -256,6 +256,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def executeMergeJob(self, merge_request, params):
         result = None
+        start = time.monotonic()
         if merge_request.job_type == MergeRequest.MERGE:
             result = self.merge(merge_request, params)
         elif merge_request.job_type == MergeRequest.CAT:
@@ -264,6 +265,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             result = self.refstate(merge_request, params)
         elif merge_request.job_type == MergeRequest.FILES_CHANGES:
             result = self.fileschanges(merge_request, params)
+        end = time.monotonic()
+        result['elapsed_time'] = end - start
         return result
 
     def cat(self, merge_request, args):
@@ -376,6 +379,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         item_in_branches = result.get("item_in_branches", [])
         files = result.get("files", {})
         errors = result.get("errors", [])
+        elapsed_time = result.get("elapsed_time")
 
         log.info(
             "Merge %s complete, merged: %s, updated: %s, commit: %s, "
@@ -407,7 +411,9 @@ class BaseMergeServer(metaclass=ABCMeta):
             )
             if merge_request.job_type == MergeRequest.FILES_CHANGES:
                 event = FilesChangesCompletedEvent(
-                    merge_request.build_set_uuid, files
+                    merge_request.build_set_uuid,
+                    files,
+                    elapsed_time,
                 )
             else:
                 event = MergeCompletedEvent(
@@ -420,6 +426,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                     repo_state,
                     item_in_branches,
                     errors,
+                    elapsed_time,
                 )
 
             def put_complete_event(log, merge_request, event):

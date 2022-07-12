@@ -1817,18 +1817,27 @@ class PipelineManager(metaclass=ABCMeta):
             # We're the second of the files/merger pair, report the stat
             self.reportPipelineTiming('merge_request_time',
                                       build_set.configured_time)
+        if event.elapsed_time:
+            self.reportPipelineTiming('merger_files_changes_op_time',
+                                      event.elapsed_time, elapsed=True)
 
     def onMergeCompleted(self, event, build_set):
         if build_set.merge_state == build_set.COMPLETE:
             self._onGlobalRepoStateCompleted(event, build_set)
             self.reportPipelineTiming('repo_state_time',
                                       build_set.repo_state_request_time)
+            if event.elapsed_time:
+                self.reportPipelineTiming('merger_repo_state_op_time',
+                                          event.elapsed_time, elapsed=True)
         else:
             self._onMergeCompleted(event, build_set)
             if build_set.files_state == build_set.COMPLETE:
                 # We're the second of the files/merger pair, report the stat
                 self.reportPipelineTiming('merge_request_time',
                                           build_set.configured_time)
+            if event.elapsed_time:
+                self.reportPipelineTiming('merger_merge_op_time',
+                                          event.elapsed_time, elapsed=True)
 
     def _onMergeCompleted(self, event, build_set):
 
@@ -2120,7 +2129,7 @@ class PipelineManager(metaclass=ABCMeta):
         except Exception:
             self.log.exception("Exception reporting pipeline stats")
 
-    def reportPipelineTiming(self, key, start, end=None):
+    def reportPipelineTiming(self, key, start, end=None, elapsed=False):
         if not self.sched.statsd:
             return
         if not start:
@@ -2130,5 +2139,8 @@ class PipelineManager(metaclass=ABCMeta):
         pipeline = self.pipeline
         tenant = pipeline.tenant
         stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
-        dt = (end - start) * 1000
+        if elapsed:
+            dt = start
+        else:
+            dt = (end - start) * 1000
         self.sched.statsd.timing(f'{stats_key}.{key}', dt)
