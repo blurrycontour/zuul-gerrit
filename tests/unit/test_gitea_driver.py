@@ -15,6 +15,7 @@
 
 import re
 import socket
+import yaml
 
 from zuul.lib import strings
 from tests.base import ZuulTestCase, simple_layout
@@ -236,6 +237,40 @@ class TestGiteaDriver(ZuulTestCase):
                 'success': {'context': 'tenant-one/check'}
             },
             self.fake_gitea.statuses[A.head_sha])
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_with_dyn_reconf(self):
+
+        zuul_yaml = [
+            {'job': {
+                'name': 'project-test3',
+                'run': 'job.yaml'
+            }},
+            {'project': {
+                'check': {
+                    'jobs': [
+                        'project-test3'
+                    ]
+                }
+            }}
+        ]
+        playbook = "- hosts: all\n  tasks: []"
+
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A')
+        A.addCommit(
+            {'.zuul.yaml': yaml.dump(zuul_yaml),
+             'job.yaml': playbook}
+        )
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test3').result)
 
 
 class TestGiteaWebhook(ZuulTestCase):
