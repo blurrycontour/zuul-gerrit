@@ -12,12 +12,15 @@
     failure:
       gitea:
         comment: true
+        status: "failure"
     start:
       gitea:
         comment: true
+        status: "pending"
     success:
       gitea:
         comment: true
+        status: "success"
 
 - job:
     name: base

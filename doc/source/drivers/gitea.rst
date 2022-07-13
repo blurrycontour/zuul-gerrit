@@ -136,6 +136,12 @@ is taken from the pipeline.
    :ref:`reporter<reporters>` attributes support the following
    attributes:
 
+   .. attr:: status
+
+      String value (``pending``, ``success``, ``failure``, ``error``,
+      ``warning``) that the reporter should set as the commit status on
+      Gitea.
+
    .. attr:: comment
       :default: true
 
