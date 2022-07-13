@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
 import socket
 
 from zuul.lib import strings
@@ -155,6 +156,40 @@ class TestGiteaDriver(ZuulTestCase):
                 {'name': 'project-test2', 'changes': '1,%s' % pr_tip2}
             ], ordered=False
         )
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_reporter_comment(self):
+
+        initial_comment = "This is the\nPR initial_comment."
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A', initial_comment=initial_comment)
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        p1 = self.getJobFromHistory('project-test1')
+        p2 = self.getJobFromHistory('project-test2')
+
+        self.assertEqual('SUCCESS', p1.result)
+        self.assertEqual('SUCCESS', p2.result)
+
+        # TODO(gtema): how to get fake build duration?
+        expected_comment = re.compile(
+            (
+                rf"Build succeeded.*"
+                rf"- \[project-test1 \]\(build/{p1.uuid}\): {p1.result} in .*"
+                rf"- \[project-test2 \]\(build/{p2.uuid}\): {p2.result} in .*"
+            ),
+            flags=re.DOTALL
+        )
+        # Verify start reporter
+        self.assertIn('Starting check jobs.', A.comments)
+        # Verify success reporter
+        found_match = False
+        for comment in A.comments:
+            if expected_comment.search(comment):
+                found_match = True
+                break
+        self.assertTrue(found_match)
 
 
 class TestGiteaWebhook(ZuulTestCase):
