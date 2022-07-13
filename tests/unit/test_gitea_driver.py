@@ -29,6 +29,7 @@ class TestGiteaDriver(ZuulTestCase):
         initial_comment = "This is the\nPR initial_comment."
         A = self.fake_gitea.openFakePullRequest(
             'org/project', 'master', 'A', initial_comment=initial_comment)
+        expected_pr_message = "%s\n\n%s" % (A.subject, initial_comment)
         self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
@@ -45,8 +46,115 @@ class TestGiteaDriver(ZuulTestCase):
         self.assertEquals('https://fakegitea.com/org/project/pulls/1',
                           zuulvars['items'][0]['change_url'])
         self.assertEqual(zuulvars["message"],
-                         strings.b64encode(initial_comment))
+                         strings.b64encode(expected_pr_message))
         self.assertEqual(2, len(self.history))
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_closed(self):
+
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A')
+
+        self.fake_gitea.emitEvent(A.getPullRequestClosedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_reopened(self):
+
+        initial_comment = "This is the\nPR initial_comment."
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A', initial_comment=initial_comment)
+        expected_pr_message = "%s\n\n%s" % (A.subject, initial_comment)
+        self.fake_gitea.emitEvent(A.getPullRequestReopenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+
+        job = self.getJobFromHistory('project-test2')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual(str(A.number), zuulvars['change'])
+        self.assertEqual(str(A.head_sha), zuulvars['patchset'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEquals('https://fakegitea.com/org/project/pulls/1',
+                          zuulvars['items'][0]['change_url'])
+        self.assertEqual(zuulvars["message"],
+                         strings.b64encode(expected_pr_message))
+        self.assertEqual(2, len(self.history))
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_edited(self):
+
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestEditedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_updated(self):
+
+        A = self.fake_gitea.openFakePullRequest('org/project', 'master', 'A')
+        pr_tip1 = A.head_sha
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+        self.assertHistory(
+            [
+                {'name': 'project-test1', 'changes': '1,%s' % pr_tip1},
+                {'name': 'project-test2', 'changes': '1,%s' % pr_tip1},
+            ], ordered=False
+        )
+
+        self.fake_gitea.emitEvent(A.getPullRequestUpdatedEvent())
+        pr_tip2 = A.head_sha
+        self.waitUntilSettled()
+        self.assertEqual(4, len(self.history))
+        self.assertHistory(
+            [
+                {'name': 'project-test1', 'changes': '1,%s' % pr_tip1},
+                {'name': 'project-test2', 'changes': '1,%s' % pr_tip1},
+                {'name': 'project-test1', 'changes': '1,%s' % pr_tip2},
+                {'name': 'project-test2', 'changes': '1,%s' % pr_tip2}
+            ], ordered=False
+        )
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_updated_builds_aborted(self):
+
+        A = self.fake_gitea.openFakePullRequest('org/project', 'master', 'A')
+        pr_tip1 = A.head_sha
+
+        self.executor_server.hold_jobs_in_build = True
+
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.fake_gitea.emitEvent(A.getPullRequestUpdatedEvent())
+        pr_tip2 = A.head_sha
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory(
+            [
+                {'name': 'project-test1', 'result': 'ABORTED',
+                 'changes': '1,%s' % pr_tip1},
+                {'name': 'project-test2', 'result': 'ABORTED',
+                 'changes': '1,%s' % pr_tip1},
+                {'name': 'project-test1', 'changes': '1,%s' % pr_tip2},
+                {'name': 'project-test2', 'changes': '1,%s' % pr_tip2}
+            ], ordered=False
+        )
 
 
 class TestGiteaWebhook(ZuulTestCase):
