@@ -32,6 +32,7 @@ class GiteaTrigger(BaseTrigger):
                 trigger=self,
                 types=to_list(trigger['event']),
                 actions=to_list(trigger.get('action')),
+                comments=to_list(trigger.get('comment')),
                 refs=to_list(trigger.get('ref')),
             )
             efilters.append(f)
@@ -46,6 +47,7 @@ def getSchema():
                 'gt_pull_request',
                 'gt_push')),
         'action': scalar_or_list(str),
+        'comment': scalar_or_list(str),
     }
 
     return gitea_trigger
