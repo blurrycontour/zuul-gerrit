@@ -123,6 +123,20 @@ the following options.
 
          Pull request reopened.
 
+      .. value:: comment
+
+         Comment added to pull request.
+
+   .. attr:: comment
+
+      This is only used for ``gt_pull_request`` and ``comment`` actions.  It
+      accepts a list of regexes that are searched for in the comment
+      string. If any of these regexes matches a portion of the comment
+      string the trigger is matched.  ``comment: retrigger`` will
+      match when comments containing 'retrigger' somewhere in the
+      comment text are added to a pull request.
+
+
 Reporter Configuration
 ----------------------
 Zuul reports back to Gitea via Gitea API. Available reports include a PR
