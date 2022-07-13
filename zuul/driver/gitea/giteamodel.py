@@ -22,6 +22,7 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 
 class PullRequest(Change):
+
     def __init__(self, project):
         super(PullRequest, self).__init__(project)
         self.pr = None
@@ -32,6 +33,20 @@ class PullRequest(Change):
         self.files = []
         self.labels = []
         self.draft = None
+
+    def __repr__(self):
+        r = ['<Change 0x%x' % id(self)]
+        if self.project:
+            r.append('project: %s' % self.project)
+        if self.number:
+            r.append('number: %s' % self.number)
+        if self.patchset:
+            r.append('patchset: %s' % self.patchset)
+        if self.updated_at:
+            r.append('updated: %s' % self.updated_at)
+        if self.open:
+            r.append('state: open')
+        return ' '.join(r) + '>'
 
     def isUpdateOf(self, other):
         if (self.project == other.project and
@@ -92,6 +107,11 @@ class GiteaTriggerEvent(TriggerEvent):
             r.append('%s,%s' % (self.change_number, self.patch_number))
         return ' '.join(r)
 
+    def isPatchsetCreated(self):
+        if self.type == 'gt_pull_request':
+            return self.action in ['opened', 'changed']
+        return False
+
 
 class GiteaEventFilter(EventFilter):
     def __init__(self, connection_name, trigger, types=None, actions=None,
@@ -113,11 +133,11 @@ class GiteaEventFilter(EventFilter):
         if self.types:
             ret += ' types: %s' % ', '.join(self.types)
         if self.actions:
-            ret += ' actions: %s' % ', '.join(self.actions)        
+            ret += ' actions: %s' % ', '.join(self.actions)
         if self._refs:
             ret += ' refs: %s' % ', '.join(self._refs)
         if self.ignore_deletes:
-            ret += ' ignore_deletes: %s' % self.ignore_deletes        
+            ret += ' ignore_deletes: %s' % self.ignore_deletes
         ret += '>'
 
         return ret
