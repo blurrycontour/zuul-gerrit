@@ -115,13 +115,15 @@ class GiteaTriggerEvent(TriggerEvent):
 
 class GiteaEventFilter(EventFilter):
     def __init__(self, connection_name, trigger, types=None, actions=None,
-                 refs=None, ignore_deletes=True):
+                 comments=None, refs=None, ignore_deletes=True):
 
         super().__init__(connection_name, trigger)
 
         self._refs = refs
         self.types = types if types is not None else []
-        self.actions = actions or []
+        self.actions = actions if actions is not None else []
+        self._comments = comments if comments is not None else []
+        self.comments = [re.compile(x) for x in self._comments]
         refs = refs if refs is not None else []
         self.refs = [re.compile(x) for x in refs]
         self.ignore_deletes = ignore_deletes
@@ -134,6 +136,8 @@ class GiteaEventFilter(EventFilter):
             ret += ' types: %s' % ', '.join(self.types)
         if self.actions:
             ret += ' actions: %s' % ', '.join(self.actions)
+        if self._comments:
+            ret += ' comments: %s' % ', '.join(self._comments)
         if self._refs:
             ret += ' refs: %s' % ', '.join(self._refs)
         if self.ignore_deletes:
@@ -172,6 +176,14 @@ class GiteaEventFilter(EventFilter):
             if (event.action == action):
                 matches_action = True
         if self.actions and not matches_action:
+            return False
+
+        matches_comment_re = False
+        for comment_re in self.comments:
+            if (event.comment is not None and
+                comment_re.search(event.comment)):
+                matches_comment_re = True
+        if self.comments and not matches_comment_re:
             return False
 
         return True
