@@ -8,7 +8,11 @@
             - opened
             - reopened
             - changed
+        - event: gt_pull_request
+          action: comment
+          comment: (?i)^\s*recheck\s*$
         - event: gt_push
+
     failure:
       gitea:
         comment: true
