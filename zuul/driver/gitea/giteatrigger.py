@@ -48,6 +48,7 @@ def getSchema():
                 'gt_push')),
         'action': scalar_or_list(str),
         'comment': scalar_or_list(str),
+        'ref': scalar_or_list(str),
     }
 
     return gitea_trigger

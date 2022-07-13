@@ -123,6 +123,15 @@ the following options.
 
          Pull request reopened.
 
+   .. attr:: ref
+
+      This is only used for ``gt_push`` events. This
+      field is treated as a regular expression and
+      multiple refs may be listed, eg. ``refs/tags/bar``.
+      Gitea reported reference is then matched against
+      the regular expression.
+
+
 Reporter Configuration
 ----------------------
 Zuul reports back to Gitea via Gitea API. Available reports include a PR
