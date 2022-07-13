@@ -2109,16 +2109,19 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
         if match:
             pr = self._get_pr(match)
             return {
+                'number': pr.number,
                 'body': pr.body,
-                'branch': pr.branch,
-                'subject': pr.subject,
-                'status': pr.status,
+                'title': pr.subject,
+                'state': pr.status,
                 'updated_at': pr.last_updated,
                 'comments': len(pr.comments),
                 'base': {
-                    'ref': pr.branch
+                    'ref': pr.branch,
+                    'repo': {'full_name': pr.project},
                 },
                 'head': {
+                    'sha': pr.head_sha,
+                    'repo': {'full_name': pr.project},
                 },
                 'user': {
                     'login': 'test_user'

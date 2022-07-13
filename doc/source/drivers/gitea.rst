@@ -112,23 +112,15 @@ the following options.
 
       .. value:: changed
 
-         Pull request synchronized.
+         Pull request synchronized (new commit or body update).
 
       .. value:: closed
 
          Pull request closed.
 
-      .. value:: comment
+      .. value:: reopened
 
-         Comment added to pull request.
-
-      .. value:: status
-
-         Status set on pull request.
-
-      .. value:: tagged
-
-         Tag metadata set on pull request.
+         Pull request reopened.
 
 
 Reference pipelines configuration

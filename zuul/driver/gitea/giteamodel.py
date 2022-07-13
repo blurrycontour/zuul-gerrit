@@ -22,6 +22,7 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 
 class PullRequest(Change):
+
     def __init__(self, project):
         super(PullRequest, self).__init__(project)
         self.pr = None
@@ -32,6 +33,20 @@ class PullRequest(Change):
         self.files = []
         self.labels = []
         self.draft = None
+
+    def __repr__(self):
+        r = ['<Change 0x%x' % id(self)]
+        if self.project:
+            r.append('project: %s' % self.project)
+        if self.number:
+            r.append('number: %s' % self.number)
+        if self.patchset:
+            r.append('patchset: %s' % self.patchset)
+        if self.updated_at:
+            r.append('updated: %s' % self.updated_at)
+        if self.open:
+            r.append('state: open')
+        return ' '.join(r) + '>'
 
     def isUpdateOf(self, other):
         if (self.project == other.project and
@@ -91,6 +106,11 @@ class GiteaTriggerEvent(TriggerEvent):
         if self.change_number:
             r.append('%s,%s' % (self.change_number, self.patch_number))
         return ' '.join(r)
+
+    def isPatchsetCreated(self):
+        if self.type == 'gt_pull_request':
+            return self.action in ['opened', 'changed']
+        return False
 
 
 class GiteaEventFilter(EventFilter):
