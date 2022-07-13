@@ -643,10 +643,10 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         log.info('Got PR %s#%s', project_name, number)
         return pr
 
-    # def commentPull(self, project, number, message):
-    #     gitea = self.get_project_api_client(project)
-    #     gitea.comment_pull(number, message)
-    #     self.log.info("Commented on PR %s#%s", project, number)
+    def commentPull(self, project, number, message):
+        gitea = self.get_project_api_client(project)
+        gitea.comment_pull(number, message)
+        self.log.info("Commented on PR %s#%s", project, number)
 
     # def setCommitStatus(self, project, sha, state, url='',
     #                     description='', context=''):

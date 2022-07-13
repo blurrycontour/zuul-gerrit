@@ -9,6 +9,15 @@
             - reopened
             - changed
         - event: gt_push
+    failure:
+      gitea:
+        comment: true
+    start:
+      gitea:
+        comment: true
+    success:
+      gitea:
+        comment: true
 
 - job:
     name: base
