@@ -10,3 +10,4 @@
     success:
       gitea:
         comment: true
+        status: "success"

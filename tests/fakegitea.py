@@ -57,7 +57,8 @@ class FakeGiteaConnection(giteaconnection.GiteaConnection):
     def get_project_api_client(self, project):
         client = FakeGiteaAPIClient(
             self.baseurl, None, project,
-            pull_requests_db=self.pull_requests)
+            pull_requests_db=self.pull_requests,
+            statuses_db=self.statuses)
         return client
 
     def getGitUrl(self, project):
@@ -97,11 +98,12 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
     log = logging.getLogger("zuul.test.FakeGiteaAPIClient")
 
     def __init__(self, baseurl, api_token, project,
-                 pull_requests_db={}):
+                 pull_requests_db=None, statuses_db=None):
         super(FakeGiteaAPIClient, self).__init__(
             baseurl, api_token, project)
         self.session = None
         self.pull_requests = pull_requests_db
+        self.statuses = statuses_db
         self.return_post_error = None
 
     def gen_error(self, verb, custom_only=False):
@@ -168,8 +170,19 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
         if match:
             pr = self._get_pr(match)
             pr.addComment(params['body'])
+            return {}, 200, "", "POST"
 
-        return {}, 200, "", "POST"
+        match = re.match(r'.+/api/v1/repos/(.+)/statuses/(.+)$', url)
+        if match:
+            sha = match.group(2)
+            status = self.statuses.setdefault(sha, dict())
+            status[params['state']] = dict(
+                context=params.get('context')
+            )
+            self.statuses[sha] = status
+            return {}, 200, "", "POST"
+
+        return {}, 404, "", "POST"
 
 
 class FakePullRequest(object):

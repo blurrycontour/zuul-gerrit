@@ -191,6 +191,28 @@ class TestGiteaDriver(ZuulTestCase):
                 break
         self.assertTrue(found_match)
 
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_reporter_status(self):
+
+        initial_comment = "This is the\nPR initial_comment."
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A', initial_comment=initial_comment)
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        p1 = self.getJobFromHistory('project-test1')
+        p2 = self.getJobFromHistory('project-test2')
+
+        self.assertEqual('SUCCESS', p1.result)
+        self.assertEqual('SUCCESS', p2.result)
+
+        self.assertDictEqual(
+            {
+                'pending': {'context': 'tenant-one/check'},
+                'success': {'context': 'tenant-one/check'}
+            },
+            self.fake_gitea.statuses[A.head_sha])
+
 
 class TestGiteaWebhook(ZuulTestCase):
     config_file = 'zuul-gitea-driver.conf'
