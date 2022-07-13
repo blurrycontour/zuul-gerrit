@@ -66,12 +66,14 @@ class FakeGiteaConnection(giteaconnection.GiteaConnection):
 
     def emitEvent(self, event, use_zuulweb=False, project=None,
                   wrong_token=False):
-        name, data = event
+        name, subtype, data = event
         payload = json.dumps(data).encode('utf8')
         secret = self.connection_config['webhook_secret']
         signature = giteaconnection._sign_request(payload, secret)
         headers = {'x-gitea-signature': signature,
                    'x-gitea-event': name}
+        if subtype:
+            headers['x-gitea-event-type'] = subtype
         if use_zuulweb:
             return requests.post(
                 'http://127.0.0.1:%s/api/connection/%s/payload'
@@ -175,6 +177,8 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
         match = re.match(r'.+/api/v1/repos/(.+)/statuses/(.+)$', url)
         if match:
             sha = match.group(2)
+            if sha == 'None':
+                return {}, 500, "", "POST"
             status = self.statuses.setdefault(sha, dict())
             status[params['state']] = dict(
                 context=params.get('context')
@@ -248,7 +252,29 @@ class FakePullRequest(object):
         }
         if action == 'edited':
             data['changes'] = {'body': {'from': 'dummy'}}
-        return (name, data)
+        return (name, 'pull_request', data)
+
+    def _getIssueCommentEvent(self, action, body):
+        name = 'issue_comment'
+        data = {
+            'action': action,
+            'issue': {
+                'number': self.number,
+                'title': self.subject,
+                'updated_at': self.last_updated,
+            },
+            'repository': {
+                'full_name': self.project,
+            },
+            'comment': {
+                'body': body,
+            },
+            'sender': {
+                'login': 'fake_zuul_user'
+            },
+            'is_pull': True,
+        }
+        return (name, 'pull_request_comment', data)
 
     def _getRepo(self):
         repo_path = os.path.join(self.upstream_root, self.project)
@@ -327,3 +353,12 @@ class FakePullRequest(object):
     def addComment(self, message):
         self.comments.append(message)
         self._updateTimeStamp()
+
+    def getPullRequestCommentCreatedEvent(self, comment):
+        return self._getIssueCommentEvent('created', comment)
+
+    def getPullRequestCommentDeletedEvent(self, comment):
+        return self._getIssueCommentEvent('deleted', comment)
+
+    def getPullRequestInitialCommentEvent(self, comment):
+        return self._getPullRequestEvent('edited')

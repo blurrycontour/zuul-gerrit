@@ -67,9 +67,6 @@ class GiteaReporter(BaseReporter):
                 elif (hasattr(item.change, 'newrev') and
                         item.change.newrev is not None):
                     self.setCommitStatus(item)
-            if hasattr(item.change, 'number'):
-                if self._create_comment:
-                    self.addPullComment(item)
         # Comments, labels, and merges can only be performed on pull requests.
         # If the change is not a pull request (e.g. a push) skip them.
         if hasattr(item.change, 'number'):
