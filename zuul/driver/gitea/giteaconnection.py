@@ -648,14 +648,14 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         gitea.comment_pull(number, message)
         self.log.info("Commented on PR %s#%s", project, number)
 
-    # def setCommitStatus(self, project, sha, state, url='',
-    #                     description='', context=''):
-    #     gitea = self.get_project_api_client(project)
-    #     gitea.set_commit_status(
-    #         sha, state, url, description, context)
-    #     self.log.info("Set commit CI flag status : %s" % description)
-    #     # Wait for 1 second as flag timestamp is by second
-    #     time.sleep(1)
+    def setCommitStatus(self, project, sha, state, url='',
+                        description='', context=''):
+        gitea = self.get_project_api_client(project)
+        gitea.set_commit_status(
+            sha, state, url, description, context)
+        self.log.info("Set commit CI flag status : %s" % description)
+        # Wait for 1 second as flag timestamp is by second
+        time.sleep(1)
 
     # def mergePull(self, project, number,
     #               commit_message='', sha=None, method='merge',
