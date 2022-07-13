@@ -136,6 +136,13 @@ the following options.
       match when comments containing 'retrigger' somewhere in the
       comment text are added to a pull request.
 
+   .. attr:: ref
+
+      This is only used for ``gt_push`` events. This
+      field is treated as a regular expression and
+      multiple refs may be listed, eg. ``refs/tags/bar``.
+      Gitea reported reference is then matched against
+      the regular expression.
 
 Reporter Configuration
 ----------------------

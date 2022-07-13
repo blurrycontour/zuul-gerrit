@@ -11,7 +11,6 @@
         - event: gt_pull_request
           action: comment
           comment: (?i)^\s*recheck\s*$
-        - event: gt_push
 
     failure:
       gitea:
@@ -26,6 +25,15 @@
         comment: true
         status: "success"
 
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    trigger:
+      gitea:
+        - event: gt_push
+          ref: ^refs/heads/.*$
+
 - job:
     name: base
     parent: null
@@ -39,9 +47,16 @@
     name: project-test2
     run: playbooks/project-test2.yaml
 
+- job:
+    name: project-post-job
+    run: playbooks/project-post.yaml
+
 - project:
     name: org/project
     check:
       jobs:
         - project-test1
         - project-test2
+    post:
+      jobs:
+        - project-post-job
