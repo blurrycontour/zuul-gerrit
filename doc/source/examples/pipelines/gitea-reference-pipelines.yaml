@@ -11,3 +11,13 @@
       gitea:
         comment: true
         status: "success"
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    precedence: low
+    trigger:
+      gitea:
+        - event: gt_push
+          ref: ^refs/heads/.*$
