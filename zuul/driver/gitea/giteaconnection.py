@@ -224,7 +224,6 @@ class GiteaEventConnector(threading.Thread):
         # NotifyNewPullRequest
         event = self._event_base(body)
         event.type = 'gt_pull_request'
-        event.action = body['action']
 
         pr_body = body['pull_request']
         base = pr_body.get('base')
@@ -240,6 +239,13 @@ class GiteaEventConnector(threading.Thread):
         event.branch = base.get('ref')
         event.ref = "refs/pull/" + str(pr_body.get('number')) + "/head"
         event.patch_number = head.get('sha')
+
+        if body['action'] in ['edited', 'synchronized']:
+            # "edited" is when title or body are changed
+            # "synchronized" is raised when new commit added
+            event.action = 'changed'
+        else:
+            event.action = body['action']
 
         return event
 
@@ -277,6 +283,14 @@ class GiteaAPIClient:
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'GET'
 
+    def post(self, url, params=None):
+        self.log.info(
+            "Posting on resource %s, params (%s) ..." % (url, params))
+        ret = self.session.post(url, data=params, headers=self.headers)
+        self.log.debug("POST returned (code: %s): %s" % (
+            ret.status_code, ret.text))
+        return ret.json(), ret.status_code, ret.url, 'POST'
+
     def get_repo_branches(self):
         path = 'repos/%s/branches' % self.project
         resp = self.get(self.base_url + path)
@@ -288,6 +302,38 @@ class GiteaAPIClient:
         resp = self.get(self.base_url + path)
         self._manage_error(*resp)
         return resp[0]
+
+    def comment_pull(self, number, message):
+        params = {"body": message}
+        path = 'repos/%s/issues/%s/comments' % (self.project, number)
+        resp = self.post(self.base_url + path, params)
+        self._manage_error(*resp)
+        return resp[0]
+
+    def set_commit_status(self, sha, state, url, description, context):
+        params = {
+            "state": state,
+            "context": context,
+            "description": description,
+            "target_url": url
+        }
+        path = 'repos/%s/statuses/%s' % (self.project, sha)
+        resp = self.post(self.base_url + path, params)
+        self._manage_error(*resp)
+        return resp[0]
+
+#    def merge_pr(self, commit_message='', sha=None, method='merge'):
+#        params = {
+#            "Do": merge_method,
+#        }
+#        if commit_message:
+#            params["MergeMessageId"] = commit_message
+#        if sha:
+#            params["head_commit_id"] = sha
+#        path = 'repos/%s/pulls/%s/merge' % (self.project, number)
+#        resp = self.post(self.base_url + path, params)
+#        self._manage_error(*resp)
+#        return resp[0]
 
 
 class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
@@ -428,6 +474,7 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         number = int(change_key.stable_id)
         change = self._change_cache.get(change_key)
         if change and not refresh:
+            log.debug("Getting change from cache %s" % str(change_key))
             return change
         project = self.source.getProject(change_key.project_name)
         if not change:
@@ -595,6 +642,28 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         pr = gitea.get_pr(number)
         log.info('Got PR %s#%s', project_name, number)
         return pr
+
+    # def commentPull(self, project, number, message):
+    #     gitea = self.get_project_api_client(project)
+    #     gitea.comment_pull(number, message)
+    #     self.log.info("Commented on PR %s#%s", project, number)
+
+    # def setCommitStatus(self, project, sha, state, url='',
+    #                     description='', context=''):
+    #     gitea = self.get_project_api_client(project)
+    #     gitea.set_commit_status(
+    #         sha, state, url, description, context)
+    #     self.log.info("Set commit CI flag status : %s" % description)
+    #     # Wait for 1 second as flag timestamp is by second
+    #     time.sleep(1)
+
+    # def mergePull(self, project, number,
+    #               commit_message='', sha=None, method='merge',
+    #               zuul_event_id=None):
+    #     log = get_annotated_logger(self.log, zuul_event_id)
+    #     gitea = self.get_project_api_client(project)
+    #     gitea.merge_pr(number, commit_message, sha, method)
+    #     log.debug("Merged PR %s#%s", project, number)
 
 
 class GiteaWebController(BaseWebController):
