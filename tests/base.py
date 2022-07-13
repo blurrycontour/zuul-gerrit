@@ -104,7 +104,6 @@ from psutil import Popen
 import zuul.driver.gerrit.gerritsource as gerritsource
 import zuul.driver.gerrit.gerritconnection as gerritconnection
 import zuul.driver.git.gitwatcher as gitwatcher
-import zuul.driver.gitea.giteaconnection as giteaconnection
 import zuul.driver.github.githubconnection as githubconnection
 import zuul.driver.pagure.pagureconnection as pagureconnection
 import zuul.driver.gitlab.gitlabconnection as gitlabconnection
@@ -348,7 +347,7 @@ class GiteaDriverMock(GiteaDriver):
     def getConnection(self, name, config):
         server = config.get('server', 'gitea.test')
         db = self.changes.setdefault(server, {})
-        connection = FakeGiteaConnection(
+        connection = tests.fakegitea.FakeGiteaConnection(
             self, name, config,
             changes_db=db,
             upstream_root=self.upstream_root)
@@ -1996,129 +1995,6 @@ class FakePagureConnection(pagureconnection.PagureConnection):
 
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
-
-
-class FakeGiteaConnection(giteaconnection.GiteaConnection):
-    """A Fake Gitea connection for use in tests.
-
-    This subclasses
-    :py:class:`~zuul.connection.gitea.GiteaConnection` to add the
-    ability for tests to add changes to the fake Gitea it represents.
-    """
-
-    log = logging.getLogger("zuul.test.FakeGiteaConnection")
-
-    def __init__(self, driver, connection_name, connection_config,
-                 changes_db=None, upstream_root=None):
-        super(FakeGiteaConnection, self).__init__(
-            driver, connection_name, connection_config)
-        self.connection_name = connection_name
-        self.pr_number = 0
-        self.pull_requests = changes_db
-        self.statuses = {}
-        self.upstream_root = upstream_root
-
-    def setZuulWebPort(self, port):
-        self.zuul_web_port = port
-
-    def get_project_api_client(self, project):
-        client = FakeGiteaAPIClient(
-            self.baseurl, None, project,
-            pull_requests_db=self.pull_requests)
-        return client
-
-    def getGitUrl(self, project):
-        return 'file://' + os.path.join(self.upstream_root, project.name)
-
-    def emitEvent(self, event, use_zuulweb=False, project=None,
-                  wrong_token=False):
-        name, data = event
-        payload = json.dumps(data).encode('utf8')
-        secret = self.connection_config['webhook_secret']
-        signature = giteaconnection._sign_request(payload, secret)
-        headers = {'x-gitea-signature': signature,
-                   'x-gitea-event': name}
-        if use_zuulweb:
-            return requests.post(
-                'http://127.0.0.1:%s/api/connection/%s/payload'
-                % (self.zuul_web_port, self.connection_name),
-                data=payload, headers=headers)
-        else:
-            data = {'headers': headers, 'payload': data}
-            self.event_queue.put(data)
-            return data
-
-    def openFakePullRequest(self, project, branch, subject, files=[],
-                            initial_comment=None):
-        self.pr_number += 1
-        pull_request = tests.fakegitea.FakePullRequest(
-            self, self.pr_number, project, branch,
-            subject, self.upstream_root,
-            files=files, initial_comment=initial_comment)
-        self.pull_requests.setdefault(
-            project, {})[str(self.pr_number)] = pull_request
-        return pull_request
-
-
-class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
-    log = logging.getLogger("zuul.test.FakeGiteaAPIClient")
-
-    def __init__(self, baseurl, api_token, project,
-                 pull_requests_db={}):
-        super(FakeGiteaAPIClient, self).__init__(
-            baseurl, api_token, project)
-        self.session = None
-        self.pull_requests = pull_requests_db
-
-    def gen_error(self, verb, custom_only=False):
-        if verb == 'POST' and self.return_post_error:
-            return {
-                'error': self.return_post_error['error'],
-                'error_code': self.return_post_error['error_code']
-            }, 401, "", 'POST'
-            self.return_post_error = None
-        if not custom_only:
-            return {
-                'error': 'some error',
-                'error_code': 'some error code'
-            }, 503, "", verb
-
-    def _get_pr(self, match):
-        project, number = match.groups()
-        pr = self.pull_requests.get(project, {}).get(number)
-        if not pr:
-            return self.gen_error("GET")
-        return pr
-
-    def get(self, url):
-        self.log.debug("Getting resource %s ..." % url)
-
-        match = re.match(r'.+/api/v1/repos/(.+)/pulls/(\d+)$', url)
-        if match:
-            pr = self._get_pr(match)
-            return {
-                'number': pr.number,
-                'body': pr.body,
-                'title': pr.subject,
-                'state': pr.status,
-                'updated_at': pr.last_updated,
-                'comments': len(pr.comments),
-                'base': {
-                    'ref': pr.branch,
-                    'repo': {'full_name': pr.project},
-                },
-                'head': {
-                    'sha': pr.head_sha,
-                    'repo': {'full_name': pr.project},
-                },
-                'user': {
-                    'login': 'test_user'
-                }
-            }, 200, "", "GET"
-
-        match = re.match('.+/api/v1/repos/(.+)/branches$', url)
-        if match:
-            return [{'name': 'master'}], 200, "", "GET"
 
 
 FakeGitlabBranch = namedtuple('Branch', ('name', 'protected'))
