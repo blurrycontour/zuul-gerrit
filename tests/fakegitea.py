@@ -325,6 +325,11 @@ class FakePullRequest(object):
     def _updateTimeStamp(self):
         self.last_updated = str(int(time.time()))
 
+    def addCommit(self, files={}, delete_files=None):
+        """Adds a commit on top of the actual PR head."""
+        self._addCommitToRepo(files=files, delete_files=delete_files)
+        self._updateTimeStamp()
+
     def getPRHeadSha(self):
         repo = self._getRepo()
         return repo.references[self.getPRReference()].commit.hexsha
