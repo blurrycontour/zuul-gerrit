@@ -123,6 +123,26 @@ the following options.
 
          Pull request reopened.
 
+Reporter Configuration
+----------------------
+Zuul reports back to Gitea via Gitea API. Available reports include a PR
+comment containing the build results, a commit status on start, success and
+failure. Status name, description, and context
+is taken from the pipeline.
+
+.. attr:: pipeline.<reporter>.<gitea source>
+
+   To report to Gitea, the dictionaries passed to any of the pipeline
+   :ref:`reporter<reporters>` attributes support the following
+   attributes:
+
+   .. attr:: comment
+      :default: true
+
+      Boolean value that determines if the reporter should add a
+      comment to the pipeline status to the Gitea Pull Request. Only
+      used for Pull Request based items.
+
 
 Reference pipelines configuration
 ---------------------------------

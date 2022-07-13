@@ -14,16 +14,18 @@
 # under the License.
 
 from zuul.driver import (
-    Driver, ConnectionInterface, SourceInterface, TriggerInterface
+    Driver, ConnectionInterface, ReporterInterface, SourceInterface,
+    TriggerInterface
 )
 from zuul.driver.gitea import giteaconnection
 from zuul.driver.gitea import giteamodel
+from zuul.driver.gitea import giteareporter
 from zuul.driver.gitea import giteasource
 from zuul.driver.gitea import giteatrigger
 
 
 class GiteaDriver(Driver, ConnectionInterface, SourceInterface,
-                  TriggerInterface):
+                  TriggerInterface, ReporterInterface):
     name = "gitea"
 
     def getConnection(self, name, config):
@@ -32,14 +34,21 @@ class GiteaDriver(Driver, ConnectionInterface, SourceInterface,
     def getTrigger(self, connection, config=None):
         return giteatrigger.GiteaTrigger(self, connection, config)
 
-    def getSource(self, connection):
-        return giteasource.GiteaSource(self, connection)
-
     def getTriggerSchema(self):
         return giteatrigger.getSchema()
 
     def getTriggerEventClass(self):
         return giteamodel.GiteaTriggerEvent
+
+    def getSource(self, connection):
+        return giteasource.GiteaSource(self, connection)
+
+    def getReporter(self, connection, pipeline, config=None):
+        return giteareporter.GiteaReporter(
+            self, connection, pipeline, config)
+
+    def getReporterSchema(self):
+        return giteareporter.getSchema()
 
     def getRequireSchema(self):
         return {}
