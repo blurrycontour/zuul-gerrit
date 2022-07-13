@@ -38,6 +38,7 @@ class GiteaSource(BaseSource):
         raise NotImplementedError()
 
     def getChangeKey(self, event):
+        self.log.debug("getChangeKey for %s" % (event))
         connection_name = self.connection.connection_name
         if event.change_number:
             return ChangeKey(connection_name, event.project_name,
@@ -64,6 +65,7 @@ class GiteaSource(BaseSource):
                                          event=event)
 
     def getChangeByURL(self, url, event):
+        raise NotImplementedError()
         return None
 
     def getChangesDependingOn(self, change, projects, tenant):
@@ -92,10 +94,11 @@ class GiteaSource(BaseSource):
         raise NotImplementedError()
 
     def getRequireFilters(self, config):
-        return []
+        raise NotImplementedError()
 
     def getRejectFilters(self, config):
-        return []
+        raise NotImplementedError()
 
     def getRefForChange(self, change):
-        return "refs/pull/%s/head" % change
+        raise NotImplementedError()
+        # return "refs/pull/%s/head" % change

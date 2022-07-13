@@ -7,3 +7,6 @@
           action:
             - opened
         - event: gt_push
+    success:
+      gitea:
+        comment: true
