@@ -74,10 +74,11 @@ class FakePullRequest(object):
                         'full_name': self.project
                     }
                 },
-                'status': self.status,
+                'state': self.status,
                 'title': self.subject,
                 'body': self.body,
                 'sha': self.sha,
+                'updated_at': self.last_updated,
             },
             'repository': {
                 'full_name': self.project,
@@ -86,6 +87,8 @@ class FakePullRequest(object):
                 'login': 'fake_zuul_user'
             }
         }
+        if action == 'edited':
+            data['changes'] = {'body': {'from': 'dummy'}}
         return (name, data)
 
     def _getRepo(self):
@@ -146,3 +149,18 @@ class FakePullRequest(object):
 
     def getPullRequestOpenedEvent(self):
         return self._getPullRequestEvent('opened')
+
+    def getPullRequestReopenedEvent(self):
+        return self._getPullRequestEvent('reopened')
+
+    def getPullRequestClosedEvent(self):
+        return self._getPullRequestEvent('closed')
+
+    def getPullRequestUpdatedEvent(self):
+        self._addCommitToRepo()
+        self._updateTimeStamp()
+
+        return self._getPullRequestEvent('synchronized')
+
+    def getPullRequestEditedEvent(self):
+        return self._getPullRequestEvent('edited')
