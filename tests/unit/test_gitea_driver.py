@@ -158,6 +158,29 @@ class TestGiteaDriver(ZuulTestCase):
         )
 
     @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_commented(self):
+
+        A = self.fake_gitea.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestCommentedEvent('I like that change'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestCommentedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(4, len(self.history))
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestInitialCommentEvent('Initial comment edited'))
+        self.waitUntilSettled()
+        self.assertEqual(6, len(self.history))
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
     def test_pull_request_reporter_comment(self):
 
         initial_comment = "This is the\nPR initial_comment."
@@ -190,6 +213,7 @@ class TestGiteaDriver(ZuulTestCase):
                 found_match = True
                 break
         self.assertTrue(found_match)
+        self.assertEqual(2, len(A.comments))
 
     @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
     def test_pull_request_reporter_status(self):

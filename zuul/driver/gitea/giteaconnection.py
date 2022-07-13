@@ -109,7 +109,8 @@ class GiteaEventConnector(threading.Thread):
         self._process_event = threading.Event()
         self.event_handler_mapping = {
             'push': self._event_push,
-            'pull_request': self._event_pull_request
+            'pull_request': self._event_pull_request,
+            'issue_comment': self._event_issue_comment,
         }
 
     def stop(self):
@@ -161,6 +162,7 @@ class GiteaEventConnector(threading.Thread):
         log.debug("Received payload: %s", json_body)
 
         event_type = headers.get('x-gitea-event')
+        event_sub_type = headers.get('x-gitea-event-type')
         log.debug("Received event: %s", event_type)
 
         if event_type not in self.event_handler_mapping:
@@ -172,7 +174,8 @@ class GiteaEventConnector(threading.Thread):
             log.info("Handling event: %s" % event_type)
 
         try:
-            event = self.event_handler_mapping[event_type](json_body)
+            event = self.event_handler_mapping[event_type](
+                json_body, event_sub_type)
         except Exception:
             log.exception(
                 'Exception when handling event: %s' % event_type)
@@ -201,7 +204,7 @@ class GiteaEventConnector(threading.Thread):
 
         return event
 
-    def _event_push(self, body):
+    def _event_push(self, body, event_sub_type=None):
         """ Handles push event """
         # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
         # NotifyNewPullRequest
@@ -218,7 +221,7 @@ class GiteaEventConnector(threading.Thread):
 
         return event
 
-    def _event_pull_request(self, body):
+    def _event_pull_request(self, body, event_sub_type=None):
         """ Handles pull request opened event """
         # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
         # NotifyNewPullRequest
@@ -248,6 +251,34 @@ class GiteaEventConnector(threading.Thread):
             event.action = body['action']
 
         return event
+
+    def _event_issue_comment(self, body, event_sub_type=None):
+        """ Handles issue (pull request) comments """
+        # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
+        # NotifyNewPullRequest
+        event = self._event_base(body)
+        event.type = 'gt_pull_request'
+
+        # Process PullRequest related comment
+        if event_sub_type == 'pull_request_comment' and body.get('is_pull'):
+            issue_body = body['issue']
+            repo = body['repository']
+
+            event.title = issue_body.get('title')
+            event.project_name = repo.get('full_name')
+            # Sounds weird, but issue nr == PR nr
+            event.change_number = issue_body.get('number')
+            event.change_url = self.connection.getPullUrl(event.project_name,
+                                                          event.change_number)
+
+            event.comment = body['comment'].get('body')
+            event.action = 'comment'
+
+            pr = self.connection.getPull(
+                event.project_name, event.change_number)
+            event.patch_number = pr['head']['sha']
+
+            return event
 
 
 class GiteaAPIClientException(Exception):
