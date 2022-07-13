@@ -95,6 +95,30 @@ class FakeGiteaConnection(giteaconnection.GiteaConnection):
             project, {})[str(self.pr_number)] = pull_request
         return pull_request
 
+    def getGitPushEvent(self, project):
+        name = 'push'
+        repo_path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(repo_path)
+        headsha = repo.head.commit.hexsha
+        data = {
+            'ref': 'refs/heads/master',
+            'before': '1' * 40,
+            'after': headsha,
+            'commits': [],
+            'repository': {'full_name': project},
+        }
+        return (name, 'push', data)
+
+    def getGitBranchEvent(self, project, branch, type, rev):
+        name = type
+        data = {
+            'ref': branch,
+            'ref_type': 'branch',
+            'sha': rev,
+            'repository': {'full_name': project},
+        }
+        return (name, type, data)
+
 
 class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
     log = logging.getLogger("zuul.test.FakeGiteaAPIClient")

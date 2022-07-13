@@ -109,6 +109,8 @@ class GiteaEventConnector(threading.Thread):
         self._process_event = threading.Event()
         self.event_handler_mapping = {
             'push': self._event_push,
+            'create': self._event_create,
+            'delete': self._event_delete,
             'pull_request': self._event_pull_request,
             'issue_comment': self._event_issue_comment,
         }
@@ -216,8 +218,7 @@ class GiteaEventConnector(threading.Thread):
         event.oldrev = body['before']
         event.type = 'gt_push'
         event.commits = body.get('commits')
-
-        self.connection.clearConnectionCacheOnBranchEvent(event)
+        event.branch_updated = True
 
         return event
 
@@ -274,6 +275,41 @@ class GiteaEventConnector(threading.Thread):
             event.comment = body['comment'].get('body')
             event.action = 'comment'
 
+            return event
+
+    def _event_create(self, body, event_sub_type=None):
+        """ Handles create event """
+        # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
+        # NotifyCreate
+        event = self._event_base(body)
+        ref_type = body.get('ref_type')
+        if ref_type == 'branch':
+            event.type = 'gt_push'
+            # Here ref is branch name
+            # getChangeKey require ref to be set
+            event.ref = f"refs/heads/{body['ref']}"
+            event.branch = body['ref']
+            event.oldrev = '0' * 40
+            event.newrev = body['sha']
+
+            self.connection.clearConnectionCacheOnBranchEvent(event)
+            return event
+
+    def _event_delete(self, body, event_sub_type=None):
+        """ Handles delete event """
+        # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
+        # NotifyDelete
+        event = self._event_base(body)
+        ref_type = body.get('ref_type')
+        if ref_type == 'branch':
+            event.type = 'gt_push'
+            # Here ref is branch name
+            # getChangeKey require ref to be set
+            event.ref = f"refs/heads/{body['ref']}"
+            event.branch = body['ref']
+            event.newrev = '0' * 40
+
+            self.connection.clearConnectionCacheOnBranchEvent(event)
             return event
 
 
@@ -553,6 +589,10 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.newrev = change_key.newrev
         # Build the url pointing to this tag/release on Gitea.
         change.url = self.getGitwebUrl(project, sha=change.newrev, tag=tag)
+        # Gitea does not send changed files in the events.
+        # Explicitly set files to None and let the pipelines processor
+        # call the merger asynchronuously
+        change.files = None
         if hasattr(event, 'commits'):
             change.files = self.getPushedFileNames(event)
         try:
@@ -579,8 +619,10 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.oldrev = change_key.oldrev
         change.newrev = change_key.newrev
         change.url = self.getGitwebUrl(project, sha=change.newrev)
-        if hasattr(event, 'commits'):
-            change.files = self.getPushedFileNames(event)
+        # Gitea does not send changed files in the events.
+        # Explicitly set files to None and let the pipelines processor
+        # call the merger asynchronuously
+        change.files = None
         try:
             self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
@@ -603,8 +645,9 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.oldrev = change_key.oldrev
         change.newrev = change_key.newrev
         change.url = self.getGitwebUrl(project, sha=change.newrev)
-        if hasattr(event, 'commits'):
-            change.files = self.getPushedFileNames(event)
+        # Gitea does not send changed files in the events.
+        # Explicitly set files to None and let the pipelines processor
+        # call the merger asynchronuously
         try:
             self._change_cache.set(change_key, change)
         except ConcurrentUpdateError:
