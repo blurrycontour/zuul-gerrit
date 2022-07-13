@@ -13,13 +13,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import git
+import os
 import re
 import socket
 import yaml
 
 from zuul.lib import strings
+from zuul.zk.layout import LayoutState
+
 from tests.base import ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
+
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
 
 
 class TestGiteaDriver(ZuulTestCase):
@@ -276,6 +282,111 @@ class TestGiteaDriver(ZuulTestCase):
                          self.getJobFromHistory('project-test2').result)
         self.assertEqual('SUCCESS',
                          self.getJobFromHistory('project-test3').result)
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_ref_updated(self):
+
+        event = self.fake_gitea.getGitPushEvent('org/project')
+        expected_newrev = event[2]['after']
+        expected_oldrev = event[2]['before']
+        self.fake_gitea.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-post-job').result)
+
+        job = self.getJobFromHistory('project-post-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/heads/master', zuulvars['ref'])
+        self.assertEqual('post', zuulvars['pipeline'])
+        self.assertEqual('project-post-job', zuulvars['job'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEqual(
+            'https://fakegitea.com/org/project/commit/%s' % zuulvars['newrev'],
+            zuulvars['change_url'])
+        self.assertEqual(expected_newrev, zuulvars['newrev'])
+        self.assertEqual(expected_oldrev, zuulvars['oldrev'])
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_ref_created(self):
+
+        self.create_branch('org/project', 'stable-1.0')
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        newrev = repo.commit('refs/heads/stable-1.0').hexsha
+        event = self.fake_gitea.getGitBranchEvent(
+            'org/project', 'stable-1.0', 'create', newrev)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        self.fake_gitea.emitEvent(event)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        # New timestamp should be greater than the old timestamp
+        self.assertLess(old, new)
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-post-job').result)
+        job = self.getJobFromHistory('project-post-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/heads/stable-1.0', zuulvars['ref'])
+        self.assertEqual('post', zuulvars['pipeline'])
+        self.assertEqual('project-post-job', zuulvars['job'])
+        self.assertEqual('stable-1.0', zuulvars['branch'])
+        self.assertEqual(newrev, zuulvars['newrev'])
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_ref_deleted(self):
+
+        event = self.fake_gitea.getGitBranchEvent(
+            'org/project', 'stable-1.0', type='delete', rev='0' * 40)
+        self.fake_gitea.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_ref_updated_and_tenant_reconfigure(self):
+
+        self.waitUntilSettled()
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+
+        zuul_yaml = [
+            {'job': {
+                'name': 'project-post-job2',
+                'run': 'job.yaml'
+            }},
+            {'project': {
+                'post': {
+                    'jobs': [
+                        'project-post-job2'
+                    ]
+                }
+            }}
+        ]
+        playbook = "- hosts: all\n  tasks: []"
+        self.create_commit(
+            'org/project',
+            {'.zuul.yaml': yaml.dump(zuul_yaml),
+             'job.yaml': playbook},
+            message='Add InRepo configuration'
+        )
+        event = self.fake_gitea.getGitPushEvent('org/project')
+        self.fake_gitea.emitEvent(event)
+        self.waitUntilSettled()
+
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        # New timestamp should be greater than the old timestamp
+        self.assertLess(old, new)
+
+        self.assertHistory(
+            [{'name': 'project-post-job'},
+             {'name': 'project-post-job2'},
+            ], ordered=False
+        )
 
 
 class TestGiteaWebhook(ZuulTestCase):
