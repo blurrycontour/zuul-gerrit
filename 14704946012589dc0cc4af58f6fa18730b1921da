@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f315b9b4_209715ff",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1382,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T17:19:06Z",
+      "side": 1,
+      "message": "You copy this exception handler so many times it seems like we could improve on that.\n\nMaybe either another method that does this, or an argument to _getTenantOrRaise (like: check_for_ready\u003dFalse -- and that should probably be the default and the one place where we care that it\u0027s ready should explicitly set it to true).",
+      "revId": "14704946012589dc0cc4af58f6fa18730b1921da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
