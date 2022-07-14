@@ -16,6 +16,23 @@
       "message": "Here\u0027s the backtrace we see in gdb for a stuck ansible-playbook process:\n\n\n```\n#0  __lll_lock_wait_private (futex\u003d0x7f068c02cc20 \u003clock\u003e) at ./lowlevellock.c:35\n#1  0x00007f068bf88869 in __GI___nss_database_lookup2 (database\u003ddatabase@entry\u003d0x7f068bff6318 \"group\", alternate_name\u003dalternate_name@entry\u003d0x0, defconfig\u003ddefconfig@entry\u003d0x7f068bff489f \"files\", \n    ni\u003d0x7f068c02cbd8 \u003c__nss_group_database\u003e) at nsswitch.c:122\n#2  0x00007f068bf8a1e4 in __GI___nss_group_lookup2 (ni\u003dni@entry\u003d0x7fff1e591318, fct_name\u003dfct_name@entry\u003d0x7f068bff45b0 \"getgrnam_r\", fct2_name\u003dfct2_name@entry\u003d0x0, fctp\u003dfctp@entry\u003d0x7fff1e591328)\n    at XXX-lookup.c:60\n#3  0x00007f068bf31d8b in __getgrnam_r (name\u003dname@entry\u003d0x7f068bff31dc \"tty\", resbuf\u003dresbuf@entry\u003d0x7fff1e5917d0, buffer\u003dbuffer@entry\u003d0x7fff1e5913a0 \"\\260sċ\\006\\177\", buflen\u003d1024, \n    result\u003dresult@entry\u003d0x7fff1e5917c8) at ../nss/getXXbyYY_r.c:269\n#4  0x00007f068bf9fc17 in grantpt (fd\u003dfd@entry\u003d9) at ../sysdeps/unix/grantpt.c:152\n#5  0x00007f068be3d94e in __GI_openpty (amaster\u003d0x7fff1e593958, aslave\u003d0x7fff1e59395c, name\u003d0x0, termp\u003d0x0, winp\u003d0x0) at openpty.c:103\n```",
       "revId": "feca15157d37ad3d30001e146e312157b519ad5d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18e00131_dc185fa9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-07-14T14:12:00Z",
+      "side": 1,
+      "message": "And ansible-playbooks runs openpty here:\n\nhttps://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/connection/ssh.py#L908\nhttps://github.com/ansible/ansible/blob/devel/lib/ansible/executor/task_executor.py#L1191",
+      "revId": "feca15157d37ad3d30001e146e312157b519ad5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
