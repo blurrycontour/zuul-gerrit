@@ -33,6 +33,23 @@
       "message": "If anyone was running this as root before they\u0027d need to do a similar chown step for the certs and so on. Do you think that is worth a release note to cover the change?",
       "revId": "9ff2afdad4c621c0020149a8c45dd4556e83a329",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c40d2a4e_a227e54d",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T20:42:36Z",
+      "side": 1,
+      "message": "Not a bad idea.",
+      "revId": "9ff2afdad4c621c0020149a8c45dd4556e83a329",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
