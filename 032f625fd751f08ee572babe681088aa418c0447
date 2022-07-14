@@ -1,0 +1,251 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b30f066f_1bbe8239",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "Love.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97b30b6b_33094f85",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "nit: a/the plan",
+      "range": {
+        "startLine": 8,
+        "startChar": 38,
+        "endLine": 8,
+        "endChar": 42
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "664fb173_62c6b633",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "That seems like a lovely win - as there is no way today to validate that a node label is real or not.",
+      "range": {
+        "startLine": 48,
+        "startChar": 48,
+        "endLine": 50,
+        "endChar": 14
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2b262c7_1179d80e",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "FWIW - maybe another point, or maybe not - is that people have from time to time expressed a desire to use something other than dib to build images. Zuul ultimately doesn\u0027t care what is used to create an image file - and Zuul jobs can kind of do whatever you want them to do. So it adds flexibility without also having to invent a new execution mechanism in nodepool.",
+      "range": {
+        "startLine": 57,
+        "startChar": 34,
+        "endLine": 57,
+        "endChar": 61
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6039229c_2bb01bff",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "Yolanda would be so happy.",
+      "range": {
+        "startLine": 59,
+        "startChar": 21,
+        "endLine": 59,
+        "endChar": 48
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70df031c_ea715c9e",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "The case described below is about images missing from zuul\u0027s zk state. There isn\u0027t anything for discovering that a remote image is missing when we had previously uploaded it, updating the state and re-emitting the zuul trigger, is there?",
+      "range": {
+        "startLine": 105,
+        "startChar": 65,
+        "endLine": 106,
+        "endChar": 8
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52909554_09b8c043",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "Some image formats are harder than others. Would it be possible to have a parent job build the raw image and a child job do the raw-to-format conversion? Thinking about using a fedora node to build a fedora image and then an ubuntu node to convert it to vhd. Granted - the fedora image could just podman run a vhd-util container",
+      "range": {
+        "startLine": 124,
+        "startChar": 54,
+        "endLine": 127,
+        "endChar": 24
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1628ca6_f2bda5ee",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "This could get fun with builder nodes being far away from the storage system that is near to the zuul-launcher.",
+      "range": {
+        "startLine": 181,
+        "startChar": 25,
+        "endLine": 181,
+        "endChar": 67
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e71a4b9_e052a7a6",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "Does an image with a failed validation indicate to zuul that it should emit the event for needing one of these images?",
+      "range": {
+        "startLine": 224,
+        "startChar": 1,
+        "endLine": 224,
+        "endChar": 29
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45579aac_abaddfb8",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "This spec describes a build job storing the location of the image in an artifact. Potentially instead of an artifact, in the case of snapshots, it could store the location of the image id in the cloud? Then the upload step can be a no-op but could trigger the validation workflow and the internal data upkeep.\n\nThis could likely be very achievable for people with only one cloud.",
+      "range": {
+        "startLine": 277,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 34
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d86a4e6e_8e1933f9",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2022-07-14T18:27:21Z",
+      "side": 1,
+      "message": "awww. you know it would be totally cool to have job use an new image and depend-on the change to add the image to the system. ;)",
+      "range": {
+        "startLine": 356,
+        "startChar": 0,
+        "endLine": 356,
+        "endChar": 16
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
