@@ -69,8 +69,13 @@ COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 
+RUN echo 'APT::Default-Release "stable";' >> /etc/apt/apt.conf.d/99defaultrelease
+RUN echo "deb     http://ftp.de.debian.org/debian/    testing main contrib non-free" > /etc/apt/sources.list.d/testing.list
+RUN echo "deb-src http://ftp.de.debian.org/debian/    testing main contrib non-free" >> /etc/apt/sources.list.d/testing.list
+
 RUN apt-get update \
   && apt-get install -y skopeo \
+  && apt-get -t testing install -y libc-bin \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
