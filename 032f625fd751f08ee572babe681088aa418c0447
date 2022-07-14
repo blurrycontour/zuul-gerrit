@@ -64,6 +64,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "540230a8_0f4c4503",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Yeah, that can become a config error now instead of a runtime error.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2b262c7_1179d80e",
@@ -83,6 +100,23 @@
         "endLine": 57,
         "endChar": 61
       },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03c06ac9_23673d97",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Yes absolutely; I figure we\u0027ll have roles in zuul-jobs for running diskimage builder, but folks can do whatever to split out an image file.",
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -133,6 +167,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3062b93c_0001a2f6",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Correct, I wasn\u0027t anticipating doing that.  But I think that would be possible.  We can have it periodically audit all parts of the system, and if an upload is missing, re-upload (and revalidate it -- but we\u0027d have to be careful to make sure the \"in-service\" flag is a one-way state transition -- we don\u0027t take images out of service once they go in).",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52909554_09b8c043",
@@ -152,6 +203,23 @@
         "endLine": 127,
         "endChar": 24
       },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2284f436_ad6e6f3d",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Oh interesting.  I think that would work with what\u0027s written here without any changes.  You\u0027d just make sure both the parent and child jobs had the image name matcher so they both run, then the parent job can return the raw image artifact, and the child job can fetch that and do the conversion and return the vhd artifact.  The zuul reporter would look at all the jobs for artifacts, so it would see both.  And if the parent job returned an intermediate artifact the child job used but the zuul driver isn\u0027t configured to look for, that\u0027s fine too, it\u0027ll just ignore that.",
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -179,6 +247,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e38f45f5_2b1b0984",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Yes, there may be more really long network transfers in this system than we see right now with the builders.  A site like opendev with multiple options for storing image files might want to carefully select what object storage to use for them.  Also consider gzipping them and uploading them with an appropriate content-encoding header, etc.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e71a4b9_e052a7a6",
@@ -198,6 +283,23 @@
         "endLine": 224,
         "endChar": 29
       },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a36a7099_03d699ee",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Yes, I think at that point we should emit an image-delete event, probably wait until that image is cleaned up (so that we don\u0027t pile up a bunch of bad images in the object storage system) then emit another build-image event.\n\nPerhaps there should be a configurable interval too, so we might wait an extra X hours?",
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -225,6 +327,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a46c6b1_10c14dcc",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Well, what I was trying to get at here is that we should let zuul-launcher perform the actual API call to make the snapshot.  So the job runs on a node and does a bunch of stuff to the filesystem.  Then, instead of having the job call \"openstack image create\" or whatever (since that would need credentials in a zuul secret), we would just have the job end, and then zuul-launcher will perform that api call before deleting the node.  Then that image location gets stored in ZK.\n\nMostly, I described the above so that Zuul secrets with cloud creds aren\u0027t needed in the job.\n\nHaving said all that, I agree your process would work as well, with fewer changes needed in Zuul, just with the caveat about the creds needed to make the snapshot.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d86a4e6e_8e1933f9",
@@ -244,6 +363,23 @@
         "endLine": 356,
         "endChar": 16
       },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99f75ecf_856173f9",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-14T21:20:03Z",
+      "side": 1,
+      "message": "Yeah it would... I\u0027ve been thinking about that and it just seems messy though because we still want images to be \"global\".\n\nI mean, we could totally have a repo where we have \"image\" stanzas like below.  Let\u0027s use opendev as an example.  We could have \"opendev/images\" with that configuration in it.  And then we could include opendev/images in every tenant (but with \u0027include: [image]\u0027 in most tenants, and only include jobs, etc, in the \"opendev\" tenant).  Then every tenant gets access to those images.  If a tenant has extra \"image\" definitions, it gets access to those extra images as well.  For example, let\u0027s say we have an \"openstack/images\" repo where we make special devstack images for openstack.  So far so good.\n\nSo what if we have:\n\nopendev/images: has a \"debian-unstable\" image\nopenstack/images: has a \"devstack\" image\nzuul/images: decides to define its own \"devstack\" image\n\nSince our image names are global, we have a name conflict and it\u0027s a bit tricky to resolve because the actual image exists outside of the context of a tenant (I\u0027m taking it for granted we don\u0027t want to build/upload copies of images for each tenant).\n\nMaybe what we could do is, internally, we go ahead and use the canonical name.  So in ZooKeeper, we store image information at:\n\n/zuul/images/opendev.org%2fopendev%fimages%2fdebian-unstable/...\n\nAnd then when we go to run a job, we use the configuration objects in that tenant to resolve the label down to an image, and whatever repo defines that devstack image we use the full canonical image name.  So if the job says to use the \"devstack\" label and the \"devstack\" label says to use the \"devstack\" image, if that job is running in the openstack tenant, it\u0027s going to get the \"opendev.org/openstack/images/devstack\" and if a job runs in the zuul tenant, it\u0027s going to get \"opendev.org/zuul/images/devstack\".  Which is probably what each expects.\n\nThat might actually work.",
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
