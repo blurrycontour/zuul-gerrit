@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "290143e2_50da8713",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-14T20:36:34Z",
+      "side": 1,
+      "message": "Does the ",
+      "revId": "9ff2afdad4c621c0020149a8c45dd4556e83a329",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad1d7d57_39c2f8a9",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-14T20:36:34Z",
+      "side": 1,
+      "message": "If anyone was running this as root before they\u0027d need to do a similar chown step for the certs and so on. Do you think that is worth a release note to cover the change?",
+      "revId": "9ff2afdad4c621c0020149a8c45dd4556e83a329",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

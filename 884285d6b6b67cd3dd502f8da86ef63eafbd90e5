@@ -33,6 +33,24 @@
       "message": "The default configuration is to start as root and drop priveleges, so that it can get port 79.\n\nIf a user wants to avoid that, they can do so by specifying some config options.\n\nWe also might be able to do something with caps to avoid it.\n\nBut at least for now, this still gets us to a point where all the zuul processes run as non-root in the default configuration without any special configuration from operators.",
       "revId": "884285d6b6b67cd3dd502f8da86ef63eafbd90e5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0da394a_475e4472",
+        "filename": "Dockerfile",
+        "patchSetId": 8
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-14T20:36:34Z",
+      "side": 1,
+      "message": "It listens on port 79 by default so needs root to open that socket then it can drop privs.",
+      "parentUuid": "8e0838cf_219dbac5",
+      "revId": "884285d6b6b67cd3dd502f8da86ef63eafbd90e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
