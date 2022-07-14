@@ -69,7 +69,11 @@ COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 
+RUN echo 'APT::Default-Release "stable";' >> /etc/apt/apt.conf.d/99defaultrelease
+RUN echo "deb     http://deb.debian.org/debian/    bookworm main contrib non-free" > /etc/apt/sources.list.d/testing.list
+
 RUN apt-get update \
+  && apt-get -t bookworm install -y libc-bin \
   && apt-get install -y skopeo \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
