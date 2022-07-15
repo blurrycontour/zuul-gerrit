@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import time
 import logging
 import voluptuous as v
 
@@ -134,47 +133,48 @@ class GiteaReporter(BaseReporter):
         project = item.change.project.name
         pr_number = item.change.number
         sha = item.change.patchset
-        self.log.debug('Reporting change %s, params %s, merging via API',
-                       item.change, self.config)
-        message = self._formatMergeMessage(item.change)
+        self.log.debug(
+            f"Reporting change {item.change}, params {self.config}, "
+            f"merging via API"
+        )
+        error_message = None
 
-        for i in [1, 2]:
-            try:
-                self.connection.mergePull(
-                    project, pr_number, message, sha=sha,
-                    method=merge_mode,
-                    zuul_event_id=item.event)
-                item.change.is_merged = True
-                return
-            except MergeFailure:
-                self.log.exception(
-                    'Merge attempt of change %s  %s/2 failed.' %
-                    (item.change, i), exc_info=True)
-                if i == 1:
-                    time.sleep(2)
+        try:
+            self.connection.mergePull(
+                project, pr_number,
+                merge_title=item.change.title,
+                merge_message=self._formatMergeMessage(item.change),
+                sha=sha, method=merge_mode,
+                zuul_event_id=item.event)
+            item.change.is_merged = True
+            return
+        except MergeFailure as e:
+            self.log.exception(
+                'Merge attempt of change %s failed.' %
+                item.change, exc_info=True)
+            error_message = str(e)
         self.log.warning(
-            'Merge of change %s failed after 2 attempts, giving up' %
+            'Merge of change %s failed, giving up' %
             item.change)
-
-    def _formatMergeMessage(self, change):
-        message = []
-        if change.title:
-            message.append(change.title)
-        if change.body_text:
-            message.append(change.body_text)
-        merge_message = "\n\n".join(message)
-        if change.reviews:
-            review_users = []
-            for r in change.reviews:
-                name = r['by']['name']
-                email = r['by']['email']
-                review_users.append('Reviewed-by: {} <{}>'.format(name, email))
-            merge_message += '\n\n'
-            merge_message += '\n'.join(review_users)
-        return merge_message
+        # Be friendly and report the failure as PR comment.
+        self.addPullComment(item, f"Merging failed:\n\n{error_message}")
+        raise MergeFailure(error_message)
 
     def getSubmitAllowNeeds(self):
         return []
+
+    def _formatMergeMessage(self, change):
+        merge_message = ''
+        if change.reviews:
+            review_users = []
+            for r in change.reviews:
+                name = r['user']['full_name']
+                if not name:
+                    name = r['user']['login']
+                email = r['user']['email']
+                review_users.append('Reviewed-by: {} <{}>'.format(name, email))
+            merge_message += '\n'.join(review_users)
+        return merge_message
 
 
 def getSchema():

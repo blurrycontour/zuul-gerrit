@@ -28,11 +28,15 @@ class PullRequest(Change):
         self.pr = None
         self.updated_at = None
         self.title = None
-        self.body_text = None
         self.reviews = []
         self.files = []
         self.labels = []
         self.draft = None
+        self.required_contexts = set()
+        self.require_status_check = False
+        self.required_approvals = 0
+        self.contexts = set()
+        self.branch_protected = False
 
     def __repr__(self):
         r = ['<Change 0x%x' % id(self)]
@@ -63,10 +67,14 @@ class PullRequest(Change):
             "pr": self.pr,
             "updated_at": self.updated_at,
             "title": self.title,
-            "body_text": self.body_text,
             "reviews": list(self.reviews),
             "labels": self.labels,
             "draft": self.draft,
+            "required_contexts": list(self.required_contexts),
+            "required_approvals": int(self.required_approvals),
+            "required_status_check": self.require_status_check,
+            "contexts": list(self.contexts),
+            "branch_protected": self.branch_protected,
         })
         return d
 
@@ -75,10 +83,15 @@ class PullRequest(Change):
         self.pr = data.get("pr")
         self.updated_at = data.get("updated_at")
         self.title = data.get("title")
-        self.body_text = data.get("body_text")
         self.reviews = data.get("reviews", [])
         self.labels = data.get("labels", [])
         self.draft = data.get("draft")
+        self.required_contexts = set(data.get("required_contexts", []))
+        self.required_approvals = int(data.get("required_approvals", 0))
+        self.required_status_check = bool(
+            data.get("required_status_check", False))
+        self.contexts = set(tuple(c) for c in data.get("contexts", []))
+        self.branch_protected = data.get("branch_protected", False)
 
 
 class GiteaTriggerEvent(TriggerEvent):
