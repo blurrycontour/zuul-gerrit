@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "526cd215_c58986db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "PS2 moves the configuration from the tenant config to in-repo config.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97b30b6b_33094f85",
@@ -31,6 +48,30 @@
       "writtenOn": "2022-07-14T18:27:21Z",
       "side": 1,
       "message": "nit: a/the plan",
+      "range": {
+        "startLine": 8,
+        "startChar": 38,
+        "endLine": 8,
+        "endChar": 42
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ba2bae6_04af9494",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97b30b6b_33094f85",
       "range": {
         "startLine": 8,
         "startChar": 38,
@@ -81,6 +122,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7395ecc0_02f8fe5e",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "664fb173_62c6b633",
+      "range": {
+        "startLine": 48,
+        "startChar": 48,
+        "endLine": 50,
+        "endChar": 14
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2b262c7_1179d80e",
@@ -121,6 +186,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f76ac547_876be0e8",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f2b262c7_1179d80e",
+      "range": {
+        "startLine": 57,
+        "startChar": 34,
+        "endLine": 57,
+        "endChar": 61
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6039229c_2bb01bff",
@@ -134,6 +223,30 @@
       "writtenOn": "2022-07-14T18:27:21Z",
       "side": 1,
       "message": "Yolanda would be so happy.",
+      "range": {
+        "startLine": 59,
+        "startChar": 21,
+        "endLine": 59,
+        "endChar": 48
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83b52d42_d3f52918",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6039229c_2bb01bff",
       "range": {
         "startLine": 59,
         "startChar": 21,
@@ -184,6 +297,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69dcd06d_afd9c709",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "70df031c_ea715c9e",
+      "range": {
+        "startLine": 105,
+        "startChar": 65,
+        "endLine": 106,
+        "endChar": 8
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52909554_09b8c043",
@@ -220,6 +357,30 @@
       "writtenOn": "2022-07-14T21:20:03Z",
       "side": 1,
       "message": "Oh interesting.  I think that would work with what\u0027s written here without any changes.  You\u0027d just make sure both the parent and child jobs had the image name matcher so they both run, then the parent job can return the raw image artifact, and the child job can fetch that and do the conversion and return the vhd artifact.  The zuul reporter would look at all the jobs for artifacts, so it would see both.  And if the parent job returned an intermediate artifact the child job used but the zuul driver isn\u0027t configured to look for, that\u0027s fine too, it\u0027ll just ignore that.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a77238e5_820f629f",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "52909554_09b8c043",
+      "range": {
+        "startLine": 124,
+        "startChar": 54,
+        "endLine": 127,
+        "endChar": 24
+      },
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -264,6 +425,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79645d4d_075b9755",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d1628ca6_f2bda5ee",
+      "range": {
+        "startLine": 181,
+        "startChar": 25,
+        "endLine": 181,
+        "endChar": 67
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e71a4b9_e052a7a6",
@@ -300,6 +485,30 @@
       "writtenOn": "2022-07-14T21:20:03Z",
       "side": 1,
       "message": "Yes, I think at that point we should emit an image-delete event, probably wait until that image is cleaned up (so that we don\u0027t pile up a bunch of bad images in the object storage system) then emit another build-image event.\n\nPerhaps there should be a configurable interval too, so we might wait an extra X hours?",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "108a4e0d_ddfc4925",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6e71a4b9_e052a7a6",
+      "range": {
+        "startLine": 224,
+        "startChar": 1,
+        "endLine": 224,
+        "endChar": 29
+      },
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -362,6 +571,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50264ec8_0802b56d",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "45579aac_abaddfb8",
+      "range": {
+        "startLine": 277,
+        "startChar": 0,
+        "endLine": 277,
+        "endChar": 34
+      },
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d86a4e6e_8e1933f9",
@@ -398,6 +631,30 @@
       "writtenOn": "2022-07-14T21:20:03Z",
       "side": 1,
       "message": "Yeah it would... I\u0027ve been thinking about that and it just seems messy though because we still want images to be \"global\".\n\nI mean, we could totally have a repo where we have \"image\" stanzas like below.  Let\u0027s use opendev as an example.  We could have \"opendev/images\" with that configuration in it.  And then we could include opendev/images in every tenant (but with \u0027include: [image]\u0027 in most tenants, and only include jobs, etc, in the \"opendev\" tenant).  Then every tenant gets access to those images.  If a tenant has extra \"image\" definitions, it gets access to those extra images as well.  For example, let\u0027s say we have an \"openstack/images\" repo where we make special devstack images for openstack.  So far so good.\n\nSo what if we have:\n\nopendev/images: has a \"debian-unstable\" image\nopenstack/images: has a \"devstack\" image\nzuul/images: decides to define its own \"devstack\" image\n\nSince our image names are global, we have a name conflict and it\u0027s a bit tricky to resolve because the actual image exists outside of the context of a tenant (I\u0027m taking it for granted we don\u0027t want to build/upload copies of images for each tenant).\n\nMaybe what we could do is, internally, we go ahead and use the canonical name.  So in ZooKeeper, we store image information at:\n\n/zuul/images/opendev.org%2fopendev%fimages%2fdebian-unstable/...\n\nAnd then when we go to run a job, we use the configuration objects in that tenant to resolve the label down to an image, and whatever repo defines that devstack image we use the full canonical image name.  So if the job says to use the \"devstack\" label and the \"devstack\" label says to use the \"devstack\" image, if that job is running in the openstack tenant, it\u0027s going to get the \"opendev.org/openstack/images/devstack\" and if a job runs in the zuul tenant, it\u0027s going to get \"opendev.org/zuul/images/devstack\".  Which is probably what each expects.\n\nThat might actually work.",
+      "revId": "032f625fd751f08ee572babe681088aa418c0447",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "874fc1ea_5efcc1ee",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-15T00:27:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d86a4e6e_8e1933f9",
+      "range": {
+        "startLine": 356,
+        "startChar": 0,
+        "endLine": 356,
+        "endChar": 16
+      },
       "revId": "032f625fd751f08ee572babe681088aa418c0447",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
