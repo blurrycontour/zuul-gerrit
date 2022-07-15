@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b45598f_fe4db293",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-15T17:50:30Z",
+      "side": 1,
+      "message": "I think this is worth a try if it makes the Zuul images run Ansible 5 more reliably.",
+      "revId": "92ffabf218c9e05d447499856e2a877fddef9ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
