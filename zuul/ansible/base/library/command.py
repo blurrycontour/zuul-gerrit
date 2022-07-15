@@ -255,7 +255,7 @@ from ansible.module_utils.six import (
 from ansible.module_utils.six.moves import shlex_quote
 
 
-LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
+LOG_STREAM_FILE = '/tmp/zuul-console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
 # List to save stdout log lines in as we collect them
 _log_lines = []
@@ -267,6 +267,7 @@ class Console(object):
 
     def __enter__(self):
         self.logfile = open(self.logfile_name, 'ab', buffering=0)
+        print("----> %s" % self.logfile)
         return self
 
     def __exit__(self, etype, value, tb):
@@ -290,7 +291,9 @@ class Console(object):
 def follow(fd, log_uuid):
     newline_warning = False
     with Console(log_uuid) as console:
+        console.addLine("Console logging started")
         while True:
+            console.addLine("-1-")
             line = fd.readline()
             if not line:
                 break

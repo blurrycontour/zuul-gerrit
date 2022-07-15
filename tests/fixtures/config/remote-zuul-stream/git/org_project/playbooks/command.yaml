@@ -5,13 +5,13 @@
 
 - hosts: all
   tasks:
-    # Create unwritable /tmp/console-None.log
+    # Create unwritable /tmp/zuul-console-None.log
     # This ensures that no further task can write to it without failing.
-    # A task trying to write to /tmp/console-None.log is considered broken
+    # A task trying to write to /tmp/zuul-console-None.log is considered broken
     # because zuul_log_id is missing.
-    - name: Create unwritable /tmp/console-None.log
+    - name: Create unwritable /tmp/zuul-console-None.log
       file:
-        path: /tmp/console-None.log
+        path: /tmp/zuul-console-None.log
         state: touch
         mode: 0444
       run_once: True
