@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "47c77f97_7c5fc864",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-15T22:12:59Z",
+      "side": 1,
+      "message": "An update to this. This code was initially adopted from ansible and I suspect the behavior you see here was also ansible behavior. However, more modern ansible appears to apply some heuristics to santize no_log values out of the variables it is returning. This is also problematic as it means collisions can be exploited to determine secret info.\n\nI\u0027m not sure what the right approach is here, but just letting the info through and trying to apply sanitization both seem to be insufficiently safe to me.",
+      "parentUuid": "3e435fd5_405818e3",
+      "revId": "3ea21f66aeba383b33223b6a295134fb1391391e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94996fc5_a4a9e0e4",
         "filename": "zuul/ansible/base/library/command.py",
         "patchSetId": 2
