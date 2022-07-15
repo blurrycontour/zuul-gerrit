@@ -149,15 +149,19 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
         project, number = match.groups()
         pr = self.pull_requests.get(project, {}).get(number)
         if not pr:
-            return self.gen_error("GET")
+            return {}, 404, "", 'GET'
         return pr
 
-    def get(self, url):
+    def get(self, url, params=None):
         self.log.debug("Getting resource %s ..." % url)
 
         match = re.match(r'.+/api/v1/repos/(.+)/pulls/(\d+)$', url)
         if match:
             pr = self._get_pr(match)
+            if type(pr) == tuple:
+                # Got error
+                return pr
+            self.log.error(f"PR = {pr}")
             return {
                 'number': pr.number,
                 'body': pr.body,
@@ -165,6 +169,7 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
                 'state': pr.status,
                 'updated_at': pr.last_updated,
                 'comments': len(pr.comments),
+                'mergeable': True,
                 'base': {
                     'ref': pr.branch,
                     'repo': {'full_name': pr.project},
@@ -173,14 +178,66 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
                     'sha': pr.head_sha,
                     'repo': {'full_name': pr.project},
                 },
+                'html_url': f'https://fakegitea.com/'
+                            f'{pr.project}/pulls/{pr.number}',
                 'user': {
                     'login': 'test_user'
                 }
             }, 200, "", "GET"
 
+        match = re.match('.+/api/v1/repos/(.+)/branches/(.+)$', url)
+        if match:
+            branch = {
+                "name": match.group(2),
+                "commit": {
+                },
+                "protected": True,
+                "required_approvals": 0,
+                "enable_status_check": False,
+                "status_check_contexts": None,
+                "user_can_push": False,
+                "user_can_merge": True,
+                "effective_branch_protection_name": ""
+            }
+
+            return branch, 200, "", "GET"
+
+        match = re.match(r'.+/api/v1/repos/issues/search$', url)
+        if match:
+            return [{
+                'number': '2',
+                'body': 'fake',
+                'title': 'Depends-On: '
+                         'https://fakegitea.com/org/project/issues/1',
+                'state': 'open',
+                'repository': {
+                    'full_name': 'org/project',
+                },
+            }], 200, "", "GET"
+
+        return {}, 404, "", "GET"
+
+    def list(self, url, params=None):
+        self.log.debug("Listing resource %s ..." % url)
+
         match = re.match('.+/api/v1/repos/(.+)/branches$', url)
         if match:
-            return [{'name': 'master'}], 200, "", "GET"
+            return [{'name': 'master'}]
+
+        match = re.match(r'.+/api/v1/repos/issues/search$', url)
+        if match:
+            return [{
+                'number': '2',
+                'body': 'fake',
+                'title': 'Depends-On: '
+                         'https://fakegitea.com/org/project/issues/1',
+                'state': 'open',
+                'repository': {
+                    'full_name': 'org/project',
+                },
+            }]
+
+        return []
 
     def post(self, url, params=None):
 
@@ -210,7 +267,17 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
             self.statuses[sha] = status
             return {}, 200, "", "POST"
 
-        return {}, 404, "", "POST"
+        match = re.match(r'.+/api/v1/repos/(.+)/pulls/(.+)/merge$', url)
+        if match:
+            pr = self._get_pr(match)
+            pr.status = 'closed'
+            pr.is_merged = True
+            pr.merge_mode = params.get('Do')
+            pr.merge_title = params.get('MergeTitleField')
+            pr.merge_message = params.get('MergeMessageField')
+            return {}, 200, "", "POST"
+
+        return '', 404, "", "POST"
 
 
 class FakePullRequest(object):
@@ -239,6 +306,10 @@ class FakePullRequest(object):
         self.url = "https://%s/%s/pulls/%s" % (
             self.gitea.server, self.project, self.number)
         self.pr_ref = self._createPRRef()
+        self.is_merged = False
+        self.merge_mode = None
+        self.merge_title = None
+        self.merge_message = None
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
@@ -261,6 +332,7 @@ class FakePullRequest(object):
                         'full_name': self.project
                     }
                 },
+                'mergeable': True,
                 'state': self.status,
                 'title': self.subject,
                 'body': self.body,

@@ -388,6 +388,50 @@ class TestGiteaDriver(ZuulTestCase):
             ], ordered=False
         )
 
+    @simple_layout('layouts/gate-gitea.yaml', driver='gitea')
+    def test_pull_request_merged(self):
+
+        initial_comment = "This is the\nPR initial_comment."
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A', initial_comment=initial_comment)
+        expected_pr_message = "%s\n\n%s" % (A.subject, initial_comment)
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+
+        job = self.getJobFromHistory('project-test2')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual(str(A.number), zuulvars['change'])
+        self.assertEqual(str(A.head_sha), zuulvars['patchset'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEquals('https://fakegitea.com/org/project/pulls/1',
+                          zuulvars['items'][0]['change_url'])
+        self.assertEqual(zuulvars["message"],
+                         strings.b64encode(expected_pr_message))
+        self.assertEqual(2, len(self.history))
+        self.assertTrue(A.is_merged)
+        self.assertEqual(A.merge_title, A.subject)
+        self.assertIsNone(A.merge_message)
+        self.assertEqual(A.merge_mode, "merge")
+
+    @simple_layout('layouts/gate-gitea-squash.yaml', driver='gitea')
+    def test_pull_request_merged_squash(self):
+
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual(2, len(self.history))
+        self.assertTrue(A.is_merged)
+        self.assertEqual(A.merge_title, A.subject)
+        self.assertIsNone(A.merge_message)
+        self.assertEqual(A.merge_mode, "squash")
+
 
 class TestGiteaWebhook(ZuulTestCase):
     config_file = 'zuul-gitea-driver.conf'
