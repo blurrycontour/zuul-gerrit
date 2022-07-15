@@ -33,10 +33,12 @@ from zuul.connection import (
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag
+from zuul.exceptions import MergeFailure
 from zuul.driver.gitea.giteamodel import PullRequest, GiteaTriggerEvent
 from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
     AbstractChangeCache,
+    ChangeKey,
     ConcurrentUpdateError,
 )
 from zuul.zk.event_queues import ConnectionEventQueue
@@ -95,7 +97,7 @@ class GiteaEventConnector(threading.Thread):
     """Move events from Gitea into the scheduler"""
 
     # NOTE(gtema): all webhooks are currently not
-    # ducomented. They are revese-engineered from the
+    # documented. They are revese-engineered from the
     # source code and real gitea server.
 
     log = logging.getLogger("zuul.GiteaEventConnector")
@@ -187,10 +189,21 @@ class GiteaEventConnector(threading.Thread):
             event.zuul_event_id = zuul_event_id
             event.timestamp = timestamp
             event.project_hostname = self.connection.canonical_hostname
+            change = None
             if event.change_number:
                 change_key = self.connection.source.getChangeKey(event)
-                self.connection._getChange(change_key, refresh=True,
-                                           event=event)
+                change = self.connection._getChange(
+                    change_key, refresh=True, event=event)
+
+            # If this event references a branch and we're excluding
+            # unprotected branches, we might need to check whether the
+            # branch is now protected.
+            if hasattr(event, "branch") and event.branch:
+                protected = None
+                if change:
+                    protected = change.branch_protected
+                self.connection.checkBranchCache(
+                    event.project_name, event, protected=protected)
 
             self.connection.logEvent(event)
             self.connection.sched.addTriggerEvent(
@@ -243,6 +256,7 @@ class GiteaEventConnector(threading.Thread):
         event.branch = base.get('ref')
         event.ref = "refs/pull/" + str(pr_body.get('number')) + "/head"
         event.patch_number = head.get('sha')
+        event.url = pr_body.get('url')
 
         if body['action'] in ['edited', 'synchronized']:
             # "edited" is when title or body are changed
@@ -278,6 +292,10 @@ class GiteaEventConnector(threading.Thread):
 
             event.comment = body['comment'].get('body')
             event.action = 'comment'
+            # Gitea does not report head sha in the comments webhook
+            pr = self.connection.getPull(
+                event.project_name, event.change_number)
+            event.patch_number = pr['head']['sha']
 
             return event
 
@@ -317,7 +335,7 @@ class GiteaAPIClient:
     # is usually outdated and returns objects instead of
     # dicts, what makes it harder to us in testing
 
-    def __init__(self, baseurl, api_token, project):
+    def __init__(self, baseurl, api_token, project=None):
         self.session = requests.Session()
         self.api_token = api_token
         self.base_url = '%s/api/v1/' % baseurl
@@ -328,31 +346,75 @@ class GiteaAPIClient:
         if code < 400:
             return
         else:
-            raise GiteaAPIClientException(
-                "Unable to %s on %s (code: %s) due to: %s" % (
+            if type(data) == dict and 'message' in data:
+                message = data['message']
+            else:
+                message = "Unable to %s on %s (code: %s) due to: %s" % (
                     verb, url, code, data
-                ))
+                )
+            raise GiteaAPIClientException(message)
 
-    def get(self, url):
+    def get(self, url, params=None):
         self.log.debug("Getting resource %s ..." % url)
-        ret = self.session.get(url, headers=self.headers)
+        ret = self.session.get(url, headers=self.headers, params=params)
         self.log.debug("GET returned (code: %s): %s" % (
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'GET'
 
+    def list(self, url, params=None):
+        self.log.debug("Listing resource %s ..." % url)
+        if not params:
+            params = dict()
+        total_count = 0
+        fetched = 0
+        page = 1
+        while True:
+            ret = self.session.get(
+                url, headers=self.headers, params=params)
+            self.log.debug("LIST returned (code: %s, page: %s): %s" % (
+                ret.status_code, page, ret.text))
+            self._manage_error({}, ret.status_code, ret.url, 'LIST')
+            total_count = int(ret.headers.get('X-Total-Count', 0))
+            try:
+                data = ret.json()
+            except requests.exceptions.JSONDecodeError:
+                raise GiteaAPIClientException(
+                    f"Unable to process list response for {url}. "
+                    f"List type is expected"
+                )
+
+            if type(data) == list:
+                for rec in data:
+                    yield rec
+                    fetched += 1
+                if fetched == total_count:
+                    return
+                else:
+                    page += 1
+                    params['page'] = page
+            else:
+                raise GiteaAPIClientException(
+                    f"Unable to process list response for {url}. "
+                    f"List type is expected"
+                )
+
     def post(self, url, params=None):
         self.log.info(
             "Posting on resource %s, params (%s) ..." % (url, params))
-        ret = self.session.post(url, data=params, headers=self.headers)
+        ret = self.session.post(url, json=params, headers=self.headers)
         self.log.debug("POST returned (code: %s): %s" % (
             ret.status_code, ret.text))
-        return ret.json(), ret.status_code, ret.url, 'POST'
+        try:
+            data = ret.json()
+        except requests.exceptions.JSONDecodeError:
+            data = ret.text
+        return data, ret.status_code, ret.url, 'POST'
 
-    def get_repo_branches(self):
+    def list_repo_branches(self):
         path = 'repos/%s/branches' % self.project
-        resp = self.get(self.base_url + path)
-        self._manage_error(*resp)
-        return resp[0]
+        resp = list(self.list(self.base_url + path))
+        self.log.debug(f"Got branches {resp}")
+        return resp
 
     def get_pr(self, number):
         path = 'repos/%s/pulls/%s' % (self.project, number)
@@ -379,18 +441,56 @@ class GiteaAPIClient:
         self._manage_error(*resp)
         return resp[0]
 
-#    def merge_pr(self, commit_message='', sha=None, method='merge'):
-#        params = {
-#            "Do": merge_method,
-#        }
-#        if commit_message:
-#            params["MergeMessageId"] = commit_message
-#        if sha:
-#            params["head_commit_id"] = sha
-#        path = 'repos/%s/pulls/%s/merge' % (self.project, number)
-#        resp = self.post(self.base_url + path, params)
-#        self._manage_error(*resp)
-#        return resp[0]
+    def get_repo_branch(self, branch):
+        path = 'repos/%s/branches/%s' % (self.project, branch)
+        resp = self.get(self.base_url + path)
+        self._manage_error(*resp)
+        return resp[0]
+
+    def merge_pr(
+        self, number, merge_title=None, merge_message=None,
+        sha=None, method='merge'
+    ):
+        params = {
+            "Do": method,
+        }
+        if merge_title:
+            params["MergeTitleField"] = merge_title
+        if merge_message:
+            params["MergeMessageField"] = merge_message
+        if sha:
+            params["head_commit_id"] = sha
+        path = 'repos/%s/pulls/%s/merge' % (self.project, number)
+        resp = self.post(self.base_url + path, params)
+        self._manage_error(*resp)
+        return resp[0]
+
+    def search_issues(self, **params):
+        path = 'repos/issues/search'
+        resp = list(self.list(self.base_url + path, params=params))
+        return resp
+
+    def list_pr_reviews(self, number):
+        path = 'repos/%s/pulls/%s/reviews' % (self.project, number)
+        resp = list(self.list(self.base_url + path))
+        reviews = []
+        for review in resp:
+            if (
+                review.get('state') == 'APPROVED'
+                and review.get('official', False)
+                and not review.get('stale', False)
+                and not review.get('dismissed', False)
+            ):
+                reviews.append(review)
+        return reviews
+
+    def list_commit_statuses(self, sha, state=None):
+        path = 'repos/%s/commits/%s/statuses' % (self.project, sha)
+        params = dict()
+        if state:
+            params['state'] = 'state'
+        resp = list(self.list(self.base_url + path))
+        return resp
 
 
 class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
@@ -502,17 +602,27 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.projects[project.name] = project
 
     def _fetchProjectBranches(self, project, exclude_unprotected):
-        self.log.debug(f"Fetching project {project} branches")
+        self.log.debug(
+            f"Fetching project {project} branches "
+            f"with exclude_unprotected={exclude_unprotected}"
+        )
         gitea = self.get_project_api_client(project.name)
-        branches = gitea.get_repo_branches()
+        branches = gitea.list_repo_branches()
         result = []
         if not exclude_unprotected:
             result = [x['name'] for x in branches]
         else:
             result = [x['name'] for x in branches if x['protected']]
 
-        self.log.info("Got branches for %s" % project.name)
+        self.log.info("Got branches for %s: %s" % (project.name, result))
         return result
+
+    def isBranchProtected(
+        self, project_name, branch_name, zuul_event_id=None
+    ):
+        gitea = self.get_project_api_client(project_name)
+        branch = gitea.get_repo_branch(branch_name)
+        return branch.get('protected', False)
 
     def getChange(self, change_key, refresh=False, event=None):
         if change_key.connection_name != self.connection_name:
@@ -532,12 +642,9 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change = self._change_cache.get(change_key)
         if change and not refresh:
             log.debug("Getting change from cache %s" % str(change_key))
-            # During deserialization we may get strings instead of objects
-            # PR Commented event is not coming with patchset, need to refetch
-            # the change.
-            if change.patchset is not None and change.patchset != 'None':
-                return change
+            return change
         project = self.source.getProject(change_key.project_name)
+        url = None
         if not change:
             if not event:
                 self.log.error("Change %s not found in cache and no event",
@@ -660,12 +767,6 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.commit_id = change.pr.get('head').get('sha')
         change.patchset = change.pr.get('head').get('sha')
         change.owner = change.pr.get('user').get('login')
-        # Don't overwrite the files list. The change object is bound to a
-        # specific revision and thus the changed files won't change. This is
-        # important if we got the files later because of the 300 files limit.
-        if not change.files:
-            # TODO(gtema): gitea does not give nice list with files
-            change.files = None
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
 
@@ -677,7 +778,42 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 message = change.title
         change.message = message
         change.updated_at = change.pr.get('updated_at')
+        change.can_merge = change.pr.get('mergeable')
+        # Files changes are not part of the Pull Request data
+        change.files = None
+        change.url = change.pr.get('html_url')
+        change.uris = [change.url]
+
+        # Gather data for mergeability checks
+        self._updateCanMergeInfo(change, event)
         return change
+
+    def _updateCanMergeInfo(self, change, event):
+        # NOTE: Gitea has ``mergeable`` attribute, but similarly to GitHub
+        # driver it can not be used for checking branch protection rules.
+        # We need to recalculate some bits on our side.
+        gitea = self.get_project_api_client(change.project)
+        if change.title.lower().startswith("wip"):
+            change.draft = True
+        branch_info = gitea.get_repo_branch(change.branch)
+        if (
+            not (change.can_merge and branch_info.get('user_can_merge', False))
+        ):
+            change.can_merge = False
+            self.log.info(
+                f"Change {change} can not merge because "
+                f"zuul is not allowed to.")
+        change.branch_protected = branch_info.get('protected', False)
+        change.required_status_check = branch_info.get(
+            'enable_status_check', False)
+        change.required_contexts = set(
+            branch_info.get('status_check_contexts', []) or [])
+        change.required_approvals = int(
+            branch_info.get('required_approvals', 0))
+        change.reviews = gitea.list_pr_reviews(change.number)
+        change.contexts = set([x.get('context') for x in
+                               gitea.list_commit_statuses(
+                                   change.patchset, state='success')])
 
     def _gitTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
@@ -726,13 +862,119 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         # Wait for 1 second as flag timestamp is by second
         time.sleep(1)
 
-    # def mergePull(self, project, number,
-    #               commit_message='', sha=None, method='merge',
-    #               zuul_event_id=None):
-    #     log = get_annotated_logger(self.log, zuul_event_id)
-    #     gitea = self.get_project_api_client(project)
-    #     gitea.merge_pr(number, commit_message, sha, method)
-    #     log.debug("Merged PR %s#%s", project, number)
+    def canMerge(self, change, allow_needs, event=None, allow_refresh=False):
+        log = get_annotated_logger(self.log, event)
+
+        if allow_refresh:
+            self._updateCanMergeInfo(change, event)
+
+        can_merge = True
+        if change.draft:
+            can_merge = False
+        if not change.can_merge:
+            can_merge = False
+
+        if change.branch_protected:
+            # NOTE: it does not make much sense to reimplement complete
+            # branch protection rules analysis on Zuul side. For now
+            # only look whether at least enough approvals are given.
+            if (
+                change.required_approvals > 0
+                and len(change.reviews) < change.required_approvals
+            ):
+                log.debug(
+                    f"Change {change} can not merge because "
+                    f"it is not approved")
+                can_merge = False
+
+            if change.required_status_check:
+                if (
+                    change.required_contexts
+                    and change.required_contexts - change.contexts
+                ):
+                    can_merge = False
+                if len(change.contexts) == 0:
+                    can_merge = False
+                log.debug(
+                    f"Change {change} can not merge because "
+                    f"it is not having required checks")
+
+        return can_merge
+
+    def mergePull(self, project, number,
+                  merge_title=None, merge_message=None, sha=None,
+                  method='merge', zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        gitea = self.get_project_api_client(project)
+        try:
+            gitea.merge_pr(
+                number, merge_title=merge_title, merge_message=merge_message,
+                sha=sha, method=method)
+            log.debug("Merged PR %s#%s", project, number)
+        except GiteaAPIClientException as e:
+            raise MergeFailure(e)
+        log.debug("Merged PR %s#%s", project, number)
+
+    def getChangesDependingOn(self, change, projects, tenant):
+        changes = []
+        if not change.uris:
+            return changes
+        if not projects:
+            # We aren't in the context of a change queue and we just
+            # need to query all installations of this tenant. This currently
+            # only happens if certain features of the zuul trigger are
+            # used; generally it should be avoided.
+            projects = [p for p in tenant.all_projects
+                        if p.connection_name == self.connection_name]
+        # Otherwise we use the input projects list and look for changes in the
+        # supplied projects.
+        gitea = self.get_project_api_client(None)
+        keys = set()
+        # TODO: Max of 5 OR operators can be used per query and
+        # query can be max of 256 characters long
+        # If making changes to this pattern you may need to update
+        # tests/fakegitea.py
+        pattern = ' OR '.join(['"Depends-On: %s"' % x for x in change.uris])
+        params = dict(
+            q=pattern,
+            type='pulls',
+            state='open'
+        )
+        # Repeat the search for each client (project)
+        for pr in gitea.search_issues(**params):
+            proj = pr['repository'].get('full_name')
+            num = pr['number']
+            sha = None
+            # This is not a ChangeKey
+            key = (proj, num, sha)
+            # A single tenant could have multiple projects with the same
+            # name on different sources. Ensure we use the canonical name
+            # to handle that case.
+            s_project = self.source.getProject(proj)
+            trusted, t_project = tenant.getProject(
+                s_project.canonical_name)
+            # ignore projects zuul doesn't know about
+            if not t_project:
+                continue
+            if key in keys:
+                continue
+            self.log.debug("Found PR %s/%s needs %s/%s" %
+                           (proj, num, change.project.name,
+                            change.number))
+            keys.add(key)
+        self.log.debug("Ran search issues: %s", params)
+        for key in keys:
+            (proj, num, sha) = key
+            dep_change_key = ChangeKey(self.connection_name, proj,
+                                       'PullRequest', str(num), str(sha))
+            try:
+                change = self._getChange(dep_change_key)
+                changes.append(change)
+            except Exception:
+                self.log.warning(
+                    f"Change {key} is having Depends-On, "
+                    f"but can not be fetched. Ignoring.")
+        return changes
 
 
 class GiteaWebController(BaseWebController):

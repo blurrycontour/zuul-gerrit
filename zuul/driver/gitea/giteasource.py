@@ -14,6 +14,9 @@
 # under the License.
 
 import logging
+import re
+import urllib
+
 from zuul.source import BaseSource
 from zuul.model import Project
 from zuul.zk.change_cache import ChangeKey
@@ -32,10 +35,18 @@ class GiteaSource(BaseSource):
         raise NotImplementedError()
 
     def isMerged(self, change, head=None):
-        raise NotImplementedError()
+        """Determine if change is merged."""
+        if not change.number:
+            # Not a pull request, considering merged.
+            return True
+        return change.is_merged
 
     def canMerge(self, change, allow_needs, event=None, allow_refresh=False):
-        raise NotImplementedError()
+        """Determine if change can merge."""
+        if not change.number:
+            # Not a pull request, considering merged.
+            return True
+        return self.connection.canMerge(change, allow_needs, event=event)
 
     def getChangeKey(self, event):
         self.log.debug("getChangeKey for %s" % (event))
@@ -64,9 +75,34 @@ class GiteaSource(BaseSource):
         return self.connection.getChange(change_key, refresh=refresh,
                                          event=event)
 
+    change_re = re.compile(r"/(.*?)/(.*?)/pulls/(\d+)[\w]*")
+
     def getChangeByURL(self, url, event):
-        raise NotImplementedError()
-        return None
+        self.log.debug("getChangeByURL %s [%s]" % (url, event))
+        try:
+            parsed = urllib.parse.urlparse(url)
+        except ValueError:
+            return None
+        m = self.change_re.match(parsed.path)
+        if not m:
+            return None
+        org = m.group(1)
+        proj = m.group(2)
+        try:
+            num = int(m.group(3))
+        except ValueError:
+            return None
+        pull = self.connection.getPull(
+            '%s/%s' % (org, proj), int(num), event=event)
+        if not pull:
+            return None
+        proj = pull.get('base').get('repo').get('full_name')
+        change_key = ChangeKey(self.connection.connection_name, proj,
+                               'PullRequest',
+                               str(num),
+                               pull.get('head').get('sha'))
+        change = self.connection._getChange(change_key, event=event)
+        return change
 
     def getChangesDependingOn(self, change, projects, tenant):
         return self.connection.getChangesDependingOn(change, projects, tenant)
