@@ -58,6 +58,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9adf9129_3d7fcf11",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-07-15T16:51:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19d61b77_344cd028",
+      "range": {
+        "startLine": 73,
+        "startChar": 54,
+        "endLine": 73,
+        "endChar": 61
+      },
+      "revId": "feca15157d37ad3d30001e146e312157b519ad5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0a8f82e_c934de9f",
@@ -75,6 +99,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dee6b690_5c23f486",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-07-15T16:51:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0a8f82e_c934de9f",
+      "revId": "feca15157d37ad3d30001e146e312157b519ad5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ea77cec_e14887f6",
@@ -88,6 +130,24 @@
       "writtenOn": "2022-07-15T15:45:47Z",
       "side": 1,
       "message": "After each of the earlier package installs (including skopeo just above) we log lines like:\n\n  Processing triggers for libc-bin (2.31-13+deb11u3) ...\n  \nBut when we install libc-bin 2.33-7 that doesn\u0027t seem to happen. I half wonder if we shouldn\u0027t install libc-bin prior to skopeo so that the skopeo install can trigger any of those triggers for newer libc-bin?",
+      "revId": "feca15157d37ad3d30001e146e312157b519ad5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14a3ae2a_9fc85232",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2022-07-15T16:51:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ea77cec_e14887f6",
       "revId": "feca15157d37ad3d30001e146e312157b519ad5d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
