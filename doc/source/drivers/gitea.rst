@@ -11,6 +11,14 @@ interact with site-local installations of Gitea.
 Configure Gitea
 ---------------
 
+Zuul interacts with projects hosted on Gitea by:
+
+- receiving events via web-hooks
+- performing actions via the API
+
+web-hooks
+^^^^^^^^^
+
 Each project to be integrated with Zuul needs:
 
 - "Web hook target URL" set to
@@ -20,6 +28,28 @@ Each project to be integrated with Zuul needs:
 
 In Gitea it is possible to set webhooks on the repository, organization or
 system level.
+
+API
+^^^
+
+Gitea currently does not support restricting API token
+permissions. Neither it supports bot accounts. Because of
+that special care should be taken configuring Zuul.
+
+It is strongly recommented to create separate user for
+Zuul API access. This user should not have admin access
+to any project it manages, since in this case it is
+possible to accidentially bypass branch protection
+policies. Instead it should have only write permission on
+every project it manages. Branch protection rules can not
+be enforced for accounts with Admin permissions.
+
+The API token must be created in user "Settings" >
+"Applications" > "Generate New Token".
+
+When branch protections are used it is recommended to
+ensure only Zuul user is whitelisted to perform the merge
+("Branch protection" > "Enable Merge Whitelist").
 
 Connection Configuration
 ------------------------
@@ -170,9 +200,44 @@ is taken from the pipeline.
       comment to the pipeline status to the Gitea Pull Request. Only
       used for Pull Request based items.
 
+   .. attr:: merge
+      :default: false
+
+      Boolean value that determines if the reporter should merge the
+      pull reqeust. Only used for Pull Request based items.
+
 
 Reference pipelines configuration
 ---------------------------------
+
+Branch protection rules
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The rules prevent Pull requests to be merged on defined branches if they are
+not met. For instance a branch might require that specific status are marked
+as ``success`` before allowing the merge of the Pull request.
+
+Zuul provides the attribute tenant.untrusted-projects.exclude-unprotected-branches.
+This attribute is by default set to ``false`` but we recommend to set it to
+``true`` for the whole tenant. By doing so Zuul will benefit from:
+
+ - exluding in-repo development branches used to open Pull requests. This will
+   prevent Zuul to fetch and read useless branches data to find Zuul
+   configuration files.
+ - reading protection rules configuration from the Gitea API for a given branch
+   to define whether a Pull request must enter the gate pipeline. As of now
+   Zuul only takes in account "Required approvals count" and "Enable Status Check".
+
+With the use of the reference pipelines below, the Zuul project recommends to
+set the minimum following settings:
+
+ - attribute tenant.untrusted-projects.exclude-unprotected-branches to ``true``
+   in the tenant (main.yaml) configuration file.
+ - on each Gitea repository, activate the branch protections rules and
+   configure the name of the protected branches. Furthermore set "Enable status
+   checks" and check the status labels checkboxes (at least
+   ```<tenant>/check```) that must be marked as success in order for Zuul to
+   make the Pull request enter the gate pipeline to be merged.
 
 Here is an example of standard pipelines you may want to define:
 
