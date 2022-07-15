@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89540af4_f507bad3",
+        "filename": "Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-15T16:39:17Z",
+      "side": 1,
+      "message": "I think this \u0027testing\u0027 string needs to be \u0027bookworm\u0027 now to match the apt source list entry.",
+      "range": {
+        "startLine": 76,
+        "startChar": 16,
+        "endLine": 76,
+        "endChar": 23
+      },
+      "revId": "7efca48fa5f60d1bfbf15d7a029fa32ce474132f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
