@@ -24,7 +24,7 @@ import subprocess
 import threading
 import time
 
-LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
+LOG_STREAM_FILE = '/tmp/zuul-console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
 
 
