@@ -13,6 +13,18 @@
         status: "success"
 
 - pipeline:
+    name: gate
+    manager: dependent
+    trigger:
+      gitea:
+        - event: gt_pull_request
+          action: comment
+          comment: merge_me
+    success:
+      gitea:
+        merge: true
+ 
+- pipeline:
     name: post
     post-review: true
     manager: independent
