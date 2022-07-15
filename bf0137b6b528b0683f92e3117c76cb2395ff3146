@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ef3b4a6_b517f3da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-07-15T00:40:17Z",
+      "side": 1,
+      "message": "Thanks, the proposal looks really good to me.",
+      "revId": "bf0137b6b528b0683f92e3117c76cb2395ff3146",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
