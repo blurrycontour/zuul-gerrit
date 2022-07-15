@@ -16,6 +16,23 @@
       "message": "Thanks, the proposal looks really good to me.",
       "revId": "bf0137b6b528b0683f92e3117c76cb2395ff3146",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a925c6e_40b755a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-15T01:11:21Z",
+      "side": 1,
+      "message": "Broadly this seems like the logical thing to do; -1 just for visibility of comments on dib testing here:\n\nOne thing I\u0027d like to see covered as a work-item is decoupling dib testing from nodepool too.  Currently dib image build+boot testing is based on having nodepool-builder run the build and nodepool-launcher upload it to a devstack-based test environment.\n\nThe broadness of this testing has been of mutual benefit to both sides of the dib/nodepool equation; although the trade-off is that it is slow, and there is some tension between the projects as to \"why is my \u003cdib|nodepool\u003e change blocked on \u003cnodepool|dib\u003e\" (usually this is a real problem, but not always).\n\nWith the validation steps covered in here, we can set up something that we test the zuul built images before making them live; but I don\u0027t think this is appropriate for speculative testing of the more generic image changes that come into dib.  \n\nWhat I think dib wants to keep is the end-to-end build+boot cloud test.  Because this has also traditionally been a openstacksdk and glean (i.e. metadata) proxy test, it seems worth nothing that we think keeping the \"push to a devstack\" part of the testing is useful (rather than say, just booting in a qemu instance by hand, or using virt-manager or something)?\n\nThe easiest path is thus, I guess, to keep the extant environment, but to excise nodepool from the dib boot tests; call dib directly in the tests to produce the images (remove nodepool-builder) and upload/boot the images directly (remove nodepool-launcher) rather than having nodepool do it.  I\u0027d call this a moderate amount of work, as we\u0027re replicating a lot of things nodepool handles for us like networking setup etc.  That could happen more or less asynchronously, but would need to be done before retirement of nodepool.\n\nThe other option would be to integrate zuul\u0027s new image handling into this testing, in the same way nodepool does now; basically converting dib testing to brings up a zuul to talk to devstack and use that to build, push and boot the test images.  This does have the benefit of being a very good test, but the downside of sounding very complicated.\n\nso; tldr\n\n- dibs boot testing of common platforms builds and pushes into a devstack cloud.\n- propose we agree that this is still quite useful given what it\u0027s trying to verify (that changes boot and communicate in a openstack cloud).\n- note that nodepool needs to be excised from this testing\n- decide if we replace that in dib with a bespoke build/upload step, or try to setup a zuul environment to mostly replicate the complete end-to-end testing that happens with nodepool.\n",
+      "revId": "bf0137b6b528b0683f92e3117c76cb2395ff3146",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
