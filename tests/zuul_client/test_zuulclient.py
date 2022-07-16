@@ -629,3 +629,64 @@ class TestZuulClientBuildInfo(TestZuulClientQueryData,
                 x['url'] == 'http://example.com/docs'
                 for x in artifacts),
             output)
+
+
+class TestZuulClientJobGraph(BaseTestWeb):
+    def _split_pretty_table(self, output):
+        lines = output.decode().split('\n')
+        headers = [x.strip() for x in lines[1].split('|') if x != '']
+        # Trim headers and last line of the table
+        return [dict(zip(headers,
+                         [x.strip() for x in l.split('|') if x != '']))
+                for l in lines[3:-2]]
+
+    def test_job_graph(self):
+        """Test the job-graph command"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'job-graph',
+             '--tenant', 'tenant-one',
+             '--pipeline', 'check',
+             '--project', 'org/project1',
+             '--branch', 'master',
+             ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, (output, err))
+        results = self._split_pretty_table(output)
+        expected = [
+            {'Job': 'project-merge', 'Dependencies': ''},
+            {'Job': 'project-test1', 'Dependencies': 'project-merge'},
+            {'Job': 'project-test2', 'Dependencies': 'project-merge'},
+            {'Job': 'project1-project2-integration',
+             'Dependencies': 'project-merge'}
+        ]
+        self.assertEqual(results, expected)
+
+    def test_job_graph_dot(self):
+        """Test the job-graph command dot output"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--format', 'dot',
+             '--zuul-url', self.base_url,
+             'job-graph',
+             '--tenant', 'tenant-one',
+             '--pipeline', 'check',
+             '--project', 'org/project1',
+             '--branch', 'master',
+             ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, (output, err))
+        expected = textwrap.dedent('''\
+        digraph job_graph {
+          rankdir=LR;
+          node [shape=box];
+          "project-merge";
+          "project-merge" -> "project-test1";
+          "project-merge" -> "project-test2";
+          "project-merge" -> "project1-project2-integration";
+        }
+        ''').encode('utf8')
+        self.assertEqual(output.strip(), expected.strip())
