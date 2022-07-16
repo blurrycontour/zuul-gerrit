@@ -689,3 +689,31 @@ class TestZuulClientJobGraph(BaseTestWeb):
         }
         ''').encode('utf8')
         self.assertEqual(output.strip(), expected.strip())
+
+
+class TestZuulClientFreezeJob(BaseTestWeb):
+    def test_freeze_job(self):
+        """Test the freeze-job command"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'freeze-job',
+             '--tenant', 'tenant-one',
+             '--pipeline', 'check',
+             '--project', 'org/project1',
+             '--branch', 'master',
+             '--job', 'project-test1',
+             ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, (output, err))
+        output = output.decode('utf8')
+        for s in [
+                'Job: project-test1',
+                'Branch: master',
+                'Ansible Version:',
+                'Workspace Scheme: golang',
+                ('gerrit:common-config:playbooks/project-test1.yaml'
+                 '@master [trusted]'),
+        ]:
+            self.assertIn(s, output)
