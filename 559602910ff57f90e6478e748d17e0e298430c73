@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af5aa344_257ae0e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-17T23:43:32Z",
+      "side": 1,
+      "message": "We have been seeing a similar issue on OpenDev system-config jobs too.  I managed to catch one of the jobs that gets stuck and times out, and inside the executor ansible-playbook run we get a backtrace that goes into grantpt()\n\nhttps://paste.opendev.org/show/bJrkQjbKbUmSx4jGHC7i/\n\nthis strongly suggests the same problems as described in the changelog.  with this additional confirmation, merging this seems prudent.",
+      "revId": "559602910ff57f90e6478e748d17e0e298430c73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
