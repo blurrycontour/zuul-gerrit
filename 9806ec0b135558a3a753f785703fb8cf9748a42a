@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e339db36_e8f5cf47",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2299,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-18T14:03:53Z",
+      "side": 1,
+      "message": "Should we maybe update the `last_reconfigure_event_ltime` after we\u0027ve triggered the tenant reconfig?\n\nJust thinking about what happens when something goes wrong during sending of the trigger event. I think the trigger event processing would be stuck and needs to be fixed by a full tenant reconfiguration to create a new layout state.",
+      "revId": "9806ec0b135558a3a753f785703fb8cf9748a42a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
