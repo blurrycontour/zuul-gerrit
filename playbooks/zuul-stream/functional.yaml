@@ -1,3 +1,4 @@
+#stamp
 - hosts: controller
   tasks:
     - name: Set python path fact
