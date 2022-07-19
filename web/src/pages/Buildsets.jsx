@@ -18,7 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { PageSection, PageSectionVariants, Pagination } from '@patternfly/react-core'
 
-import { fetchBuildsets } from '../api'
+import { fetchBuildsets, HandleApiErrors } from '../api'
 import {
   buildQueryString,
   FilterToolbar,
@@ -32,6 +32,7 @@ class BuildsetsPage extends React.Component {
     tenant: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
+    dispatch: PropTypes.func
   }
 
   constructor(props) {
@@ -132,6 +133,9 @@ class BuildsetsPage extends React.Component {
         })
       }
     )
+      .catch(error => {
+        HandleApiErrors(error, this.props.dispatch)
+      })
   }
 
   componentDidMount() {

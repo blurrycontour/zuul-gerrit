@@ -16,10 +16,12 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { CubeIcon } from '@patternfly/react-icons'
 
 import Project from '../containers/project/Project'
 import { fetchProjectIfNeeded } from '../actions/project'
 import { Fetchable } from '../containers/Fetching'
+import { EmptyPage } from '../containers/Errors'
 
 
 class ProjectPage extends React.Component {
@@ -35,33 +37,39 @@ class ProjectPage extends React.Component {
       this.props.tenant, this.props.match.params.projectName, force))
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Project | ' + this.props.match.params.projectName
     if (this.props.tenant.name) {
       this.updateData()
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData()
     }
   }
 
-  render () {
-    const { remoteData } = this.props
-    const tenantProjects = remoteData.projects[this.props.tenant.name]
+  render() {
+    const { remoteData, tenant } = this.props
+    const tenantProjects = remoteData.projects[tenant.name]
     const projectName = this.props.match.params.projectName
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <PageSection style={{paddingRight: '5px'}}>
+        <PageSection style={{ paddingRight: '5px' }}>
           <Fetchable
             isFetching={remoteData.isFetching}
             fetchCallback={this.updateData}
           />
         </PageSection>
-        {tenantProjects && tenantProjects[projectName] &&
-         <Project project={tenantProjects[projectName]} />}
+        {tenantProjects && tenantProjects[projectName]
+          ? <Project project={tenantProjects[projectName]} />
+          : <EmptyPage
+            title="This project does not exist"
+            icon={CubeIcon}
+            linkTarget={`${tenant.linkPrefix}/projects`}
+            linkText="Show all projects"
+          />}
       </PageSection>
     )
   }

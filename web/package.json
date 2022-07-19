@@ -7,6 +7,9 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@patternfly/react-charts": "^6.51.5",
     "@patternfly/react-core": "^4.198.5",
     "@patternfly/react-table": "^4.67.5",

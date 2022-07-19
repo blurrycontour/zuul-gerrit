@@ -29,7 +29,7 @@ import {
   AngleDoubleUpIcon,
   BanIcon,
 } from '@patternfly/react-icons'
-import { dequeue, dequeue_ref, promote } from '../../api'
+import { dequeue, dequeue_ref, promote, HandleApiErrors } from '../../api'
 import { addDequeueError, addPromoteError } from '../../actions/adminActions'
 
 import { addNotification } from '../../actions/notifications'
@@ -70,6 +70,9 @@ class Change extends React.Component {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })
         .catch(error => {
+          HandleApiErrors(error, this.props.dispatch)
+        })
+        .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
       // pre-merge, ie we have a change id
@@ -77,6 +80,9 @@ class Change extends React.Component {
       dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId, user.token)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          HandleApiErrors(error, this.props.dispatch)
         })
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
@@ -125,6 +131,9 @@ class Change extends React.Component {
       promote(tenant.apiPrefix, pipeline.name, [changeId,], user.token)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          HandleApiErrors(error, this.props.dispatch)
         })
         .catch(error => {
           this.props.dispatch(addPromoteError(error))

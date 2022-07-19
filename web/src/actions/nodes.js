@@ -37,7 +37,12 @@ const fetchNodes = (tenant) => dispatch => {
   dispatch(requestNodes())
   return API.fetchNodes(tenant.apiPrefix)
     .then(response => dispatch(receiveNodes(tenant.name, response.data)))
-    .catch(error => dispatch(failedNodes(error)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedNodes(error))
+    })
 }
 
 const shouldFetchNodes = (tenant, state) => {

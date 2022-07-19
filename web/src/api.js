@@ -14,6 +14,8 @@
 
 import Axios from 'axios'
 
+import { userError, serverError } from './actions/apiErrors'
+
 function getHomepageUrl(url) {
   //
   // Discover serving location from href.
@@ -101,6 +103,22 @@ function getStreamUrl(apiPrefix) {
     .replace(/(http)(s)?:\/\//, 'ws$2://') + 'console-stream'
   // console.log('Stream url is ', streamUrl)
   return streamUrl
+}
+
+function HandleApiErrors(error, dispatch, handle_404 = true) {
+  let root_code = error.response.status
+  let HTTP_AUTH_ERRORS = [401, 403]
+  switch (true) {
+    case (root_code > 499):
+      dispatch(serverError(error))
+      break
+    case (!HTTP_AUTH_ERRORS.includes(root_code) && handle_404):
+      dispatch(userError(error))
+      break
+    // re-throw auth-related errors so they're handled as toasts
+    default:
+      throw (error)
+  }
 }
 
 // Direct APIs
@@ -326,4 +344,5 @@ export {
   enqueue,
   enqueue_ref,
   promote,
+  HandleApiErrors
 }

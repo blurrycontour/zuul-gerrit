@@ -66,6 +66,7 @@ import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearNotification } from './actions/notifications'
 import { fetchConfigErrorsAction } from './actions/configErrors'
+import { apiErrorReset } from './actions/apiErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 import { configureAuthFromTenant, configureAuthFromInfo } from './actions/auth'
@@ -90,12 +91,15 @@ class App extends React.Component {
 
   renderMenu() {
     const { tenant } = this.props
+    const resetApiError = () => {
+      this.props.dispatch(apiErrorReset())
+    }
     if (tenant.name) {
       return (
         <Nav aria-label="Nav" variant="horizontal">
           <NavList>
             {this.menu.filter(item => item.title).map(item => (
-              <NavItem itemId={item.to} key={item.to}>
+              <NavItem itemId={item.to} key={item.to} onClick={resetApiError}>
                 <NavLink
                   to={tenant.linkPrefix + item.to}
                   activeClassName="pf-c-nav__link pf-m-current"
@@ -212,11 +216,13 @@ class App extends React.Component {
 
   handleComponentsLink = () => {
     const { history } = this.props
+    this.props.dispatch(apiErrorReset())
     history.push('/components')
   }
 
   handleApiLink = () => {
     const { history } = this.props
+    this.props.dispatch(apiErrorReset())
     history.push('/openapi')
   }
 
@@ -226,6 +232,7 @@ class App extends React.Component {
 
   handleTenantLink = () => {
     const { history, tenant } = this.props
+    this.props.dispatch(apiErrorReset())
     history.push(tenant.defaultRoute)
   }
 
@@ -448,6 +455,7 @@ class App extends React.Component {
         logoComponent={Link}
         headerTools={pageHeaderTools}
         topNav={nav}
+        onClick={() => { this.props.dispatch(apiErrorReset()) }}
       />
     )
 

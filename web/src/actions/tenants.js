@@ -37,7 +37,12 @@ const fetchTenants = () => dispatch => {
   dispatch(requestTenants())
   return API.fetchTenants()
     .then(response => dispatch(receiveTenants(response.data)))
-    .catch(error => dispatch(failedTenants(error)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedTenants(error))
+    })
 }
 
 const shouldFetchTenants = state => {

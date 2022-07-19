@@ -19,7 +19,7 @@ import { connect } from 'react-redux'
 import 'moment-duration-format'
 import { PageSection, PageSectionVariants, Pagination } from '@patternfly/react-core'
 
-import { fetchBuilds } from '../api'
+import { fetchBuilds, HandleApiErrors } from '../api'
 import {
   buildQueryString,
   FilterToolbar,
@@ -34,6 +34,7 @@ class BuildsPage extends React.Component {
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
+    dispatch: PropTypes.func
   }
 
   constructor(props) {
@@ -177,6 +178,9 @@ class BuildsPage extends React.Component {
         itemCount: finalItemCount,
       })
     })
+      .catch(error => {
+        HandleApiErrors(error, this.props.dispatch)
+      })
   }
 
   componentDidMount() {
