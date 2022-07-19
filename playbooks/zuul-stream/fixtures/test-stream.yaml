@@ -1,3 +1,14 @@
+- name: Start zuul stream daemon
+  hosts: node
+  tasks:
+
+    # NOTE : the playbook runs with ZUUL_CONSOLE_PORT=19887 so that we
+    # test with the zuul_console from the Zuul checkout, and not the
+    # one started by test infrastructure.
+    - name: Start zuul_console on non-default port
+      zuul_console:
+        port: 19887
+
 - name: Run some commands to show that logging works
   hosts: node
   tasks:
