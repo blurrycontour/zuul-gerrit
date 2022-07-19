@@ -62,3 +62,21 @@
 
     - name: Print binary data
       command: echo -e '\x80abc'
+
+    - name: Find tmp files
+      find:
+        paths: /tmp
+      register: _tmp_files
+
+    - name: Dump tmp files
+      debug:
+        var: _tmp_files
+
+    - name: slurp
+      slurp:
+        src: /tmp/log.txt
+      register: _slurp
+
+    - name: dbg
+      debug:
+        msg: "{{ _slurp['content'] | b64decode }}"
