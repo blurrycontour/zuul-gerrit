@@ -71,7 +71,13 @@ const fetchProject = (tenant, project) => dispatch => {
   return API.fetchProject(tenant.apiPrefix, project)
     .then(response => dispatch(receiveProject(
       tenant.name, project, response.data)))
-    .catch(error => dispatch(failedProject(error)))
+    .catch(error => {
+      // Let 404s be handled by the project page
+      API.HandleApiErrors(error, dispatch, false)
+    })
+    .catch(error => {
+      dispatch(failedProject(error))
+    })
 }
 
 const shouldFetchProject = (tenant, projectName, state) => {

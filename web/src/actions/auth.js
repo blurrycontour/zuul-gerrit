@@ -14,6 +14,7 @@
 
 
 import * as API from '../api'
+import { serverError } from './apiErrors'
 
 export const AUTH_CONFIG_REQUEST = 'AUTH_CONFIG_REQUEST'
 export const AUTH_CONFIG_SUCCESS = 'AUTH_CONFIG_SUCCESS'
@@ -63,8 +64,8 @@ const authConfigSuccess = (json, auth_params) => ({
 })
 
 const authConfigFail = error => ({
-    type: AUTH_CONFIG_FAIL,
-    error
+  type: AUTH_CONFIG_FAIL,
+  error
 })
 
 export const configureAuthFromTenant = (tenantName) => (dispatch) => {
@@ -76,16 +77,23 @@ export const configureAuthFromTenant = (tenantName) => (dispatch) => {
         createAuthParamsFromJson(response.data)))
     })
     .catch(error => {
-      dispatch(authConfigFail(error))
+      switch (true) {
+        // Handle 4XX errors as notifications
+        case error.response.status >= 500:
+          dispatch(serverError(error))
+          break
+        default:
+          dispatch(authConfigFail(error))
+      }
     })
 }
 
 export const configureAuthFromInfo = (info) => (dispatch) => {
   try {
     dispatch(authConfigSuccess(
-      {info: info},
-      createAuthParamsFromJson({info: info})))
-  } catch(error) {
-      dispatch(authConfigFail(error))
+      { info: info },
+      createAuthParamsFromJson({ info: info })))
+  } catch (error) {
+    dispatch(authConfigFail(error))
   }
 }

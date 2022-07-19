@@ -29,10 +29,11 @@ import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
 import { Fetchable } from '../containers/Fetching'
 import { removeHash } from '../Misc'
-
+import ApiErrorPage from './ApiError'
 
 class StatusPage extends React.Component {
   static propTypes = {
+    apiErrors: PropTypes.object,
     location: PropTypes.object,
     tenant: PropTypes.object,
     preferences: PropTypes.object,
@@ -55,7 +56,7 @@ class StatusPage extends React.Component {
     }
   }
 
-  constructor () {
+  constructor() {
     super()
 
     this.timer = null
@@ -82,9 +83,11 @@ class StatusPage extends React.Component {
   updateData = (force) => {
     if (force || (this.visible && this.props.preferences.autoReload)) {
       this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
-        .then(() => {if (this.props.preferences.autoReload && this.visible) {
-          this.timer = setTimeout(this.updateData, 5000)
-        }})
+        .then(() => {
+          if (this.props.preferences.autoReload && this.visible) {
+            this.timer = setTimeout(this.updateData, 5000)
+          }
+        })
     }
     // Clear any running timer
     if (this.timer) {
@@ -93,7 +96,7 @@ class StatusPage extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Status'
     this.loadState()
     if (this.props.tenant.name) {
@@ -102,19 +105,19 @@ class StatusPage extends React.Component {
     window.addEventListener('storage', this.loadState)
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData(true)
     }
     // If the user just enabled auto-reload
     if (this.props.preferences.autoReload &&
-        !prevProps.preferences.autoReload &&
-        !this.timer) {
+      !prevProps.preferences.autoReload &&
+      !this.timer) {
       this.updateData(true)
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.timer) {
       clearTimeout(this.timer)
       this.timer = null
@@ -133,7 +136,7 @@ class StatusPage extends React.Component {
     } else {
       removeHash()
     }
-    this.setState({filter: filter})
+    this.setState({ filter: filter })
   }
 
   handleKeyPress = (e) => {
@@ -145,7 +148,7 @@ class StatusPage extends React.Component {
   }
 
   handleCheckBox = (e) => {
-    this.setState({expanded: e.target.checked})
+    this.setState({ expanded: e.target.checked })
     localStorage.setItem('zuul_expand_by_default', e.target.checked)
   }
 
@@ -163,7 +166,7 @@ class StatusPage extends React.Component {
     }
   }
 
-  renderStatusHeader (status) {
+  renderStatusHeader(status) {
     return (
       <p>
         Queue lengths: <span>{status.trigger_event_queue ?
@@ -176,7 +179,7 @@ class StatusPage extends React.Component {
     )
   }
 
-  renderStatusFooter (status) {
+  renderStatusFooter(status) {
     return (
       <React.Fragment>
         <p>Zuul version: <span>{status.zuul_version}</span></p>
@@ -188,8 +191,11 @@ class StatusPage extends React.Component {
     )
   }
 
-  render () {
-    const { remoteData } = this.props
+  render() {
+    const { remoteData, apiErrors } = this.props
+    if (apiErrors.error) {
+      return <ApiErrorPage />
+    }
     const { filter, expanded } = this.state
     const status = remoteData.status
     const statusControl = (
@@ -204,11 +210,11 @@ class StatusPage extends React.Component {
           {filter && (
             <FormControl.Feedback>
               <span
-                onClick={() => {this.setFilter('')}}
-                style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
+                onClick={() => { this.setFilter('') }}
+                style={{ cursor: 'pointer', zIndex: 10, pointerEvents: 'auto' }}
               >
                 <Icon type='pf' title='Clear filter' name='delete' />
-              &nbsp;
+                &nbsp;
               </span>
             </FormControl.Feedback>
           )}
@@ -223,7 +229,7 @@ class StatusPage extends React.Component {
     )
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{display: 'flex', float: 'right'}}>
+        <div style={{ display: 'flex', float: 'right' }}>
           <Fetchable
             isFetching={remoteData.isFetching}
             fetchCallback={this.updateData}
@@ -248,6 +254,7 @@ class StatusPage extends React.Component {
 }
 
 export default connect(state => ({
+  apiErrors: state.apiErrors,
   preferences: state.preferences,
   tenant: state.tenant,
   timezone: state.timezone,

@@ -24,7 +24,7 @@ export const BUILD_FETCH_FAIL = 'BUILD_FETCH_FAIL'
 
 export const BUILDSET_FETCH_REQUEST = 'BUILDSET_FETCH_REQUEST'
 export const BUILDSET_FETCH_SUCCESS = 'BUILDSET_FETCH_SUCCESS'
-export const BUILDSET_FETCH_FAIL =    'BUILDSET_FETCH_FAIL'
+export const BUILDSET_FETCH_FAIL = 'BUILDSET_FETCH_FAIL'
 
 export const BUILD_OUTPUT_REQUEST = 'BUILD_OUTPUT_FETCH_REQUEST'
 export const BUILD_OUTPUT_SUCCESS = 'BUILD_OUTPUT_FETCH_SUCCESS'
@@ -67,7 +67,7 @@ export function renderTree(tenant, build, path, obj, textRenderer, defaultRender
 
   if ('children' in obj && obj.children) {
     node.nodes = obj.children.map(
-      n => renderTree(tenant, build, path+obj.name+'/', n,
+      n => renderTree(tenant, build, path + obj.name + '/', n,
         textRenderer, defaultRenderer))
   }
   if (obj.mimetype === 'application/directory') {
@@ -102,7 +102,7 @@ export function didTaskFail(task) {
   return false
 }
 
-export function hasInterestingKeys (obj, keys) {
+export function hasInterestingKeys(obj, keys) {
   return Object.entries(obj).filter(
     ([k, v]) => (keys.includes(k) && v !== '')
   ).length > 0
@@ -110,7 +110,7 @@ export function hasInterestingKeys (obj, keys) {
 
 export function findLoopLabel(item) {
   const label = item._ansible_item_label
-  return typeof(label) === 'string' ? label : ''
+  return typeof (label) === 'string' ? label : ''
 }
 
 export function shouldIncludeKey(key, value, ignore_underscore, included) {
@@ -128,14 +128,14 @@ export function shouldIncludeKey(key, value, ignore_underscore, included) {
   return true
 }
 
-export function makeTaskPath (path) {
+export function makeTaskPath(path) {
   return path.join('/')
 }
 
-export function taskPathMatches (ref, test) {
+export function taskPathMatches(ref, test) {
   if (test.length < ref.length)
     return false
-  for (let i=0; i < ref.length; i++) {
+  for (let i = 0; i < ref.length; i++) {
     if (ref[i] !== test[i])
       return false
   }
@@ -172,7 +172,7 @@ export const receiveBuildOutput = (buildId, output) => {
           play.tasks.forEach(task => {
             if (task.hosts[host]) {
               if (task.hosts[host].results &&
-                  task.hosts[host].results.length > 0) {
+                task.hosts[host].results.length > 0) {
                 task.hosts[host].results.forEach(result => {
                   if (taskFailed(result)) {
                     result.name = task.task.name
@@ -251,8 +251,10 @@ export const receiveBuildManifest = (buildId, manifest) => {
   return {
     type: BUILD_MANIFEST_SUCCESS,
     buildId: buildId,
-    manifest: {tree: manifest.tree, index: index,
-      index_links: manifest.index_links},
+    manifest: {
+      tree: manifest.tree, index: index,
+      index_links: manifest.index_links
+    },
     receivedAt: Date.now()
   }
 }
@@ -295,10 +297,16 @@ export function fetchBuild(tenant, buildId, state) {
       const response = await API.fetchBuild(tenant.apiPrefix, buildId)
       dispatch(receiveBuild(buildId, response.data))
     } catch (error) {
-      dispatch(failedBuild(buildId, error, tenant.apiPrefix))
-      // Raise the error again, so fetchBuildAllInfo() doesn't call the
-      // remaining fetch methods.
-      throw error
+      // Intercept API errors first
+      try {
+        // do not handle 404s to display the EmptyPage instead
+        API.HandleApiErrors(error, dispatch, false)
+      } catch (error) {
+        dispatch(failedBuild(buildId, error, tenant.apiPrefix))
+        // Raise the error again, so fetchBuildAllInfo() doesn't call the
+        // remaining fetch methods.
+        throw error
+      }
     }
   }
 }
@@ -328,27 +336,37 @@ function fetchBuildOutput(buildId, state) {
       dispatch(receiveBuildOutput(buildId, response.data))
     } catch (error) {
       if (!error.request) {
-        dispatch(failedBuildOutput(buildId, error, url))
-        // Raise the error again, so fetchBuildAllInfo() doesn't call the
-        // remaining fetch methods.
-        throw error
+        // Intercept API errors first
+        try {
+          API.HandleApiErrors(error, dispatch)
+        } catch (error) {
+          dispatch(failedBuildOutput(buildId, error, url))
+          // Raise the error again, so fetchBuildAllInfo() doesn't call the
+          // remaining fetch methods.
+          throw error
+        }
       }
       try {
         // Try without compression
         const response = await Axios.get(url + 'job-output.json')
         dispatch(receiveBuildOutput(buildId, response.data))
       } catch (error) {
-        dispatch(failedBuildOutput(buildId, error, url))
-        // Raise the error again, so fetchBuildAllInfo() doesn't call the
-        // remaining fetch methods.
-        throw error
+        // Intercept API errors first
+        try {
+          API.HandleApiErrors(error, dispatch)
+        } catch (error) {
+          dispatch(failedBuildOutput(buildId, error, url))
+          // Raise the error again, so fetchBuildAllInfo() doesn't call the
+          // remaining fetch methods.
+          throw error
+        }
       }
     }
   }
 }
 
 export function fetchBuildManifest(buildId, state) {
-  return async function(dispatch) {
+  return async function (dispatch) {
     // In case the value is already set in our local state, directly resolve the
     // promise. A null value means that the manifest could not be found for this
     // build id.
@@ -369,10 +387,15 @@ export function fetchBuildManifest(buildId, state) {
         try {
           const response = await Axios.get(artifact.url)
           return dispatch(receiveBuildManifest(buildId, response.data))
-        } catch(error) {
-          // Show the error since we expected a manifest but did not
-          // receive it.
-          dispatch(failedBuildManifest(buildId, error, artifact.url))
+        } catch (error) {
+          // Intercept API errors first
+          try {
+            API.HandleApiErrors(error, dispatch)
+          } catch (error) {
+            // Show the error since we expected a manifest but did not
+            // receive it.
+            dispatch(failedBuildManifest(buildId, error, artifact.url))
+          }
         }
       }
     }
@@ -398,7 +421,12 @@ export function fetchBuildAllInfo(tenant, buildId, logfileName) {
         dispatch(fetchLogfile(buildId, logfileName, getState()))
       }
     } catch (error) {
-      dispatch(failedBuild(buildId, error, tenant.apiPrefix))
+      // Intercept API errors first
+      try {
+        API.HandleApiErrors(error, dispatch)
+      } catch (error) {
+        dispatch(failedBuild(buildId, error, tenant.apiPrefix))
+      }
     }
   }
 }
@@ -421,13 +449,19 @@ const failedBuildset = (buildsetId, error) => ({
 })
 
 export function fetchBuildset(tenant, buildsetId) {
-  return async function(dispatch) {
+  return async function (dispatch) {
     dispatch(requestBuildset())
     try {
       const response = await API.fetchBuildset(tenant.apiPrefix, buildsetId)
       dispatch(receiveBuildset(buildsetId, response.data))
     } catch (error) {
-      dispatch(failedBuildset(buildsetId, error))
+      // Intercept API errors first
+      try {
+        // do not handle 404s to display the EmptyPage instead
+        API.HandleApiErrors(error, dispatch, false)
+      } catch (error) {
+        dispatch(failedBuildset(buildsetId, error))
+      }
     }
   }
 }

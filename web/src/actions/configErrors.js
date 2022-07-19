@@ -12,17 +12,24 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { fetchConfigErrors } from '../api'
+import { fetchConfigErrors, HandleApiErrors } from '../api'
 
-export function fetchConfigErrorsAction (tenant) {
+export function fetchConfigErrorsAction(tenant) {
   return (dispatch) => {
     return fetchConfigErrors(tenant.apiPrefix)
       .then(response => {
-        dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
-          errors: response.data})
+        dispatch({
+          type: 'FETCH_CONFIGERRORS_SUCCESS',
+          errors: response.data
+        })
       })
       .catch(error => {
-        throw (error)
+        if (error.response) {
+          HandleApiErrors(error, dispatch)
+        }
+        else {
+          throw (error)
+        }
       })
   }
 }

@@ -38,6 +38,9 @@ const fetchJobs = (tenant) => dispatch => {
   dispatch(requestJobs())
   return API.fetchJobs(tenant.apiPrefix)
     .then(response => dispatch(receiveJobs(tenant.name, response.data)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
     .catch(error => dispatch(failedJobs(error)))
 }
 

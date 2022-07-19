@@ -37,7 +37,12 @@ const fetchChange = (tenant, changeId) => dispatch => {
   dispatch(requestChange())
   return API.fetchChangeStatus(tenant.apiPrefix, changeId)
     .then(response => dispatch(receiveChange(response.data)))
-    .catch(error => dispatch(failedChange(error)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedChange(error))
+    })
 }
 
 const shouldFetchChange = state => {

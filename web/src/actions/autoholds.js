@@ -41,7 +41,12 @@ export const fetchAutoholds = (tenant) => dispatch => {
   dispatch(requestAutoholds())
   return API.fetchAutoholds(tenant.apiPrefix)
     .then(response => dispatch(receiveAutoholds(tenant.name, response.data)))
-    .catch(error => dispatch(failedAutoholds(error)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedAutoholds(error))
+    })
 }
 
 const shouldFetchAutoholds = (tenant, state) => {
@@ -85,5 +90,11 @@ export const fetchAutohold = (tenant, requestId) => dispatch => {
   dispatch(requestAutohold())
   return API.fetchAutohold(tenant.apiPrefix, requestId)
     .then(response => dispatch(receiveAutohold(tenant.name, response.data)))
-    .catch(error => dispatch(failedAutohold(error)))
+    .catch(error => {
+      // do not handle 404s to display the EmptyPage instead
+      API.HandleApiErrors(error, dispatch, false)
+    })
+    .catch(error => {
+      dispatch(failedAutohold(error))
+    })
 }

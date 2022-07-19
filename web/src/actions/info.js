@@ -16,7 +16,7 @@ import * as API from '../api'
 
 export const INFO_FETCH_REQUEST = 'INFO_FETCH_REQUEST'
 export const INFO_FETCH_SUCCESS = 'INFO_FETCH_SUCCESS'
-export const INFO_FETCH_FAIL    = 'INFO_FETCH_FAIL'
+export const INFO_FETCH_FAIL = 'INFO_FETCH_FAIL'
 
 export const fetchInfoRequest = () => ({
   type: INFO_FETCH_REQUEST
@@ -40,14 +40,21 @@ const fetchInfo = () => dispatch => {
       dispatch(fetchInfoSuccess(response.data))
     })
     .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
       dispatch(fetchInfoFail(error))
-      setTimeout(() => {dispatch(fetchInfo())}, 5000)
+      setTimeout(() => { dispatch(fetchInfo()) }, 5000)
     })
 }
 
 const shouldFetchInfo = state => {
   const info = state.info
+  const apiErrors = state.apiErrors
   if (!info) {
+    if (apiErrors.error) {
+      return false
+    }
     return true
   }
   if (info.isFetching) {

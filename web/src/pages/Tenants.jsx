@@ -37,10 +37,12 @@ import { Fetching } from '../containers/Fetching'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { IconProperty } from '../Misc'
+import ApiErrorPage from './ApiError'
 
 class TenantsPage extends React.Component {
   static propTypes = {
     remoteData: PropTypes.object,
+    apiErrors: PropTypes.object,
     dispatch: PropTypes.func
   }
 
@@ -57,9 +59,12 @@ class TenantsPage extends React.Component {
   componentDidUpdate() { }
 
   render() {
-    const { remoteData } = this.props
+    const { remoteData, apiErrors } = this.props
     if (remoteData.isFetching) {
       return <Fetching />
+    }
+    if (apiErrors.error) {
+      return <ApiErrorPage />
     }
 
     const tenants = remoteData.tenants.map((tenant) => {
@@ -133,4 +138,4 @@ class TenantsPage extends React.Component {
   }
 }
 
-export default connect(state => ({ remoteData: state.tenants }))(TenantsPage)
+export default connect(state => ({ remoteData: state.tenants, apiErrors: state.apiErrors }))(TenantsPage)

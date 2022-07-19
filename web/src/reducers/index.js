@@ -14,6 +14,7 @@
 
 import { combineReducers } from 'redux'
 
+import apiErrors from './apiErrors'
 import auth from './auth'
 import autoholds from './autoholds'
 import configErrors from './configErrors'
@@ -38,6 +39,7 @@ import timezone from './timezone'
 import user from './user'
 
 const reducers = {
+  apiErrors,
   auth,
   autoholds,
   build,
