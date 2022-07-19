@@ -462,6 +462,8 @@ class Pipeline(object):
 
     @property
     def queues(self):
+        if not self.state:
+            return []
         return self.state.queues
 
     @property
