@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e151be2_79811437",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-19T23:53:58Z",
+      "side": 1,
+      "message": "\u003e Patch Set 10:\n\u003e This will always be subject to a DoS since there\u0027s basically no access control on zuul_console.  An attacker would be able to remove the streaming logs of an attack in progress if they can access the streaming port.\n\nTrue but you need to know the uuid \u0026 taskid, and I think that the log message that tells you that only makes it to the executor logs?",
+      "revId": "53fb231106fd39d8e2237e264acb97195dadc114",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
