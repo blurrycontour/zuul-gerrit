@@ -652,6 +652,10 @@ of item.
                         {{ zuul.resources['node-name'].pod }}:src/
                     no_log: true
 
+   .. var:: node_priority
+
+      The priority of this job's node. Lower numbers correspond to higher
+      priority
 
 .. var:: zuul_success
 
