@@ -168,9 +168,30 @@ class Server(object):
 
     def handleOneConnection(self, conn):
         log_uuid = self.get_command(conn)
+
         # use path split to make use the input isn't trying to be clever
         # and construct some path like /tmp/console-/../../something
         log_uuid = os.path.split(log_uuid.rstrip())[-1]
+
+        # Remote side has finished with this file, clean it up
+        if log_uuid.startswith("f:"):
+            try:
+                log_uuid = log_uuid[2:]
+                os.unlink(self.path.format(log_uuid=log_uuid))
+                f = open('/tmp/log.txt', 'a')
+                f.write("Cleared %s\n" % self.path.format(log_uuid=log_uuid))
+                f.close()
+            except Exception:
+                # NOTE(ianw): something could have cleared out /tmp?
+                # Doesn't seem fatal.
+                pass
+
+        # Before we had "f:" (finish) commands (handled above), the
+        # only command recevied was the bare uuid.  more recent
+        # zuul_stream calls will give us "s:" (start) but assume
+        # anything else is the bare uuid
+        if log_uuid.startswith("s:"):
+            log_uuid = log_uuid[2:]
 
         # FIXME: this won't notice disconnects until it tries to send
         console = None
