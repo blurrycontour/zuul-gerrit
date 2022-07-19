@@ -206,6 +206,46 @@ is taken from the pipeline.
       Boolean value that determines if the reporter should merge the
       pull reqeust. Only used for Pull Request based items.
 
+Requirements Configuration
+--------------------------
+
+As described in :attr:`pipeline.require` pipelines may specify that items
+meet certain conditions in order to be enqueued into the pipeline. These
+conditions vary according to the source of the project in question.
+
+.. code-block:: yaml
+
+   pipeline:
+     require:
+       gitea:
+         open: true
+
+This indicates that changes originating from the Gitea connection must be
+in the *opened* state (not merged yet).
+
+.. attr:: pipeline.require.<gitea source>
+
+   The dictionary passed to the GitLab pipeline `require` attribute
+   supports the following attributes:
+
+   .. attr:: open
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the Merge Request must be open in order to be enqueued.
+
+   .. attr:: merged
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the Merge Request must be merged or not in order to be enqueued.
+
+   .. attr:: approved
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the Merge Request must be approved or not in order to be enqueued.
+
+   .. attr:: labels
+
+      A list of labels a Merge Request must have in order to be enqueued.
 
 Reference pipelines configuration
 ---------------------------------
