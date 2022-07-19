@@ -395,6 +395,7 @@ class TestGiteaDriver(ZuulTestCase):
         A = self.fake_gitea.openFakePullRequest(
             'org/project', 'master', 'A', initial_comment=initial_comment)
         expected_pr_message = "%s\n\n%s" % (A.subject, initial_comment)
+        A.addReview(state='APPROVED')
         self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
@@ -415,7 +416,7 @@ class TestGiteaDriver(ZuulTestCase):
         self.assertEqual(2, len(self.history))
         self.assertTrue(A.is_merged)
         self.assertEqual(A.merge_title, A.subject)
-        self.assertIsNone(A.merge_message)
+        self.assertEqual(A.merge_message, "Reviewed-by: tester <fake_mail>")
         self.assertEqual(A.merge_mode, "merge")
 
     @simple_layout('layouts/gate-gitea-squash.yaml', driver='gitea')
@@ -423,14 +424,83 @@ class TestGiteaDriver(ZuulTestCase):
 
         A = self.fake_gitea.openFakePullRequest(
             'org/project', 'master', 'A')
+        A.addReview(state='APPROVED')
         self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
         self.assertEqual(2, len(self.history))
         self.assertTrue(A.is_merged)
         self.assertEqual(A.merge_title, A.subject)
-        self.assertIsNone(A.merge_message)
+        self.assertEqual(A.merge_message, "Reviewed-by: tester <fake_mail>")
         self.assertEqual(A.merge_mode, "squash")
+
+    @simple_layout('layouts/requirements-gitea.yaml', driver='gitea')
+    def test_require_state(self):
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project1', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        # Close PR
+        A.closePullRequest()
+
+        # A recheck on closed PR does not trigger the job
+        self.fake_gitea.emitEvent(
+            A.getPullRequestCommentCreatedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        # Reopen PR
+        A.reopenPullRequest()
+
+        # A recheck on reopened does trigger the job
+        self.fake_gitea.emitEvent(
+            A.getPullRequestCommentCreatedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+        # Merge it
+        A.mergePullRequest()
+
+        # A recheck on merged PR does not trigger the job
+        self.fake_gitea.emitEvent(
+            A.getPullRequestCommentCreatedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+    @simple_layout('layouts/requirements-gitea.yaml', driver='gitea')
+    def test_require_approval(self):
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project2', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.addReview(state='APPROVED')
+        self.fake_gitea.emitEvent(A.getPullRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/requirements-gitea.yaml', driver='gitea')
+    def test_require_label(self):
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project3', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        # Only one required label is there
+        A.labels = ['gateit', 'useless']
+        self.fake_gitea.emitEvent(A.getPullRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        # Only one required label is there
+        A.labels = ['gateit', 'another_label']
+        self.fake_gitea.emitEvent(A.getPullRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
 
 
 class TestGiteaWebhook(ZuulTestCase):

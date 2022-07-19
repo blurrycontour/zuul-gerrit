@@ -17,6 +17,8 @@ import logging
 import re
 import urllib
 
+from zuul.driver.gitea.giteamodel import GiteaRefFilter
+from zuul.driver.util import scalar_or_list, to_list
 from zuul.source import BaseSource
 from zuul.model import Project
 from zuul.zk.change_cache import ChangeKey
@@ -130,11 +132,47 @@ class GiteaSource(BaseSource):
         raise NotImplementedError()
 
     def getRequireFilters(self, config):
-        raise NotImplementedError()
+        f = GiteaRefFilter(
+            connection_name=self.connection.connection_name,
+            open=config.get('open'),
+            merged=config.get('merged'),
+            approved=config.get('approved'),
+            labels=to_list(config.get('labels')),
+        )
+        return [f]
 
     def getRejectFilters(self, config):
-        raise NotImplementedError()
+        f = GiteaRefFilter(
+            connection_name=self.connection.connection_name,
+            open=config.get('open'),
+            merged=config.get('merged'),
+            approved=config.get('approved'),
+            labels=to_list(config.get('labels')),
+        )
+        return [f]
 
     def getRefForChange(self, change):
         raise NotImplementedError()
         # return "refs/pull/%s/head" % change
+
+
+# Require model
+def getRequireSchema():
+    require = {
+        'open': bool,
+        'merged': bool,
+        'approved': bool,
+        'labels': scalar_or_list(str)
+    }
+    return require
+
+
+# Reject model
+def getRejectSchema():
+    reject = {
+        'open': bool,
+        'merged': bool,
+        'approved': bool,
+        'labels': scalar_or_list(str)
+    }
+    return reject

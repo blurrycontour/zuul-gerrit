@@ -265,6 +265,8 @@ class GiteaEventConnector(threading.Thread):
         else:
             event.action = body['action']
 
+        event.labels = [l["name"] for l in body.get('labels', [])]
+
         return event
 
     def _event_issue_comment(self, body, event_sub_type=None):
@@ -374,7 +376,7 @@ class GiteaAPIClient:
             self.log.debug("LIST returned (code: %s, page: %s): %s" % (
                 ret.status_code, page, ret.text))
             self._manage_error({}, ret.status_code, ret.url, 'LIST')
-            total_count = int(ret.headers.get('X-Total-Count', 0))
+            total_count = int(ret.headers.get('x-total-count', 0))
             try:
                 data = ret.json()
             except requests.exceptions.JSONDecodeError:
@@ -387,7 +389,9 @@ class GiteaAPIClient:
                 for rec in data:
                     yield rec
                     fetched += 1
-                if fetched == total_count:
+                # Do bit more then simple fetched == total_count due to
+                # eventual bugs
+                if fetched >= total_count or len(data) == 0:
                     return
                 else:
                     page += 1
@@ -770,6 +774,12 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
 
+        # Never change the is_merged attribute back to unmerged. This is
+        # crucial so this cannot race with mergePull wich sets this attribute
+        # after a successful merge.
+        if not change.is_merged:
+            change.is_merged = change.pr.get('merged')
+
         message = change.pr.get("body") or ""
         if change.title:
             if message:
@@ -783,6 +793,7 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.files = None
         change.url = change.pr.get('html_url')
         change.uris = [change.url]
+        change.labels = change.pr.get('labels')
 
         # Gather data for mergeability checks
         self._updateCanMergeInfo(change, event)
@@ -815,6 +826,12 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                gitea.list_commit_statuses(
                                    change.patchset, state='success')])
 
+        if (
+            len(change.reviews) >= change.required_approvals
+        ):
+            self.log.debug("Change is approved")
+            change.approved = True
+
     def _gitTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
@@ -845,6 +862,8 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         log = get_annotated_logger(self.log, event=event)
         gitea = self.get_project_api_client(project_name)
         pr = gitea.get_pr(number)
+        # Normalize labels
+        pr['labels'] = [l['name'] for l in pr.get('labels', [])]
         log.info('Got PR %s#%s', project_name, number)
         return pr
 
