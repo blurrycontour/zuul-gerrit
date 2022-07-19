@@ -16,6 +16,24 @@
       "message": "Whether accidental or not, it did prevent us from merging changes that would break when running against an existing zuul_console server (which is what happens on static nodes; the process never dies).  Would it be worth adding an explicit test with the old behavior for that?",
       "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2808b59e_383c46f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-19T23:51:19Z",
+      "side": 1,
+      "message": "I guess we can run it without the port override to talk to talk to the executors version.  It feels like a bit of an abstraction breaker.  I\u0027ll propose in a follow-on to keep the idea separate",
+      "parentUuid": "eea9c566_83360fc0",
+      "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
