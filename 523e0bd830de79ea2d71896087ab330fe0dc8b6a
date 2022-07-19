@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7f07bf4_0fdedff1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-19T23:26:36Z",
+      "side": 1,
+      "message": "An alternative is to have a tmp cleaner on long-running static nodes.  That\u0027s... probably a good idea anyway.",
+      "revId": "523e0bd830de79ea2d71896087ab330fe0dc8b6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffbd46fd_67eac626",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-19T23:26:36Z",
+      "side": 1,
+      "message": "Never have bare exceptions.",
+      "revId": "523e0bd830de79ea2d71896087ab330fe0dc8b6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad6fdc9f_afba69f9",
+        "filename": "zuul/ansible/base/library/zuul_console.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-19T23:26:36Z",
+      "side": 1,
+      "message": "Never have bare exceptions.",
+      "revId": "523e0bd830de79ea2d71896087ab330fe0dc8b6a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
