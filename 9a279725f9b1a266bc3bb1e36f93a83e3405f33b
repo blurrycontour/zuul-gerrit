@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cd03644_885fe355",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1047,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-19T23:55:50Z",
+      "side": 1,
+      "message": "Does the default of -1 here imply that the use of -1 is a long term part of this synchronization protocol? We don\u0027t expect Zuul v7 to assume a stronger contract?",
+      "revId": "9a279725f9b1a266bc3bb1e36f93a83e3405f33b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31bcee21_cb4c0ed2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2336,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-19T23:55:50Z",
+      "side": 1,
+      "message": "Do we need any sort of delay here to prevent us from immedaitely trying to process the pipeline trigger queue potentially starving the reconfiguration work that will allow us to proceed?",
+      "revId": "9a279725f9b1a266bc3bb1e36f93a83e3405f33b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
