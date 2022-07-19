@@ -51,7 +51,7 @@ class GiteaDriver(Driver, ConnectionInterface, SourceInterface,
         return giteareporter.getSchema()
 
     def getRequireSchema(self):
-        return {}
+        return giteasource.getRequireSchema()
 
     def getRejectSchema(self):
-        return {}
+        return giteasource.getRejectSchema()
