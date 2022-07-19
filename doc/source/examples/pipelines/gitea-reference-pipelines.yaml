@@ -1,6 +1,9 @@
 - pipeline:
     name: check
     manager: independent
+    require:
+      gitea:
+        open: true
     trigger:
       gitea:
         - event: gt_pull_request
@@ -15,6 +18,12 @@
 - pipeline:
     name: gate
     manager: dependent
+    require:
+      gitea:
+        open: true
+        approved: true
+        labels:
+          - gateit
     trigger:
       gitea:
         - event: gt_pull_request
@@ -33,3 +42,18 @@
       gitea:
         - event: gt_push
           ref: ^refs/heads/.*$
+
+- pipeline:
+    name: promote
+    post-review: true
+    manager: supercedent
+    precedence: high
+    require:
+      gitea:
+        merged: true
+    success:
+      gitea:
+        comment: true
+    failure:
+      gitea:
+        comment: true

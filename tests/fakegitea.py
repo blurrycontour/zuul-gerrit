@@ -166,10 +166,11 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
                 'number': pr.number,
                 'body': pr.body,
                 'title': pr.subject,
-                'state': pr.status,
+                'state': pr.state,
                 'updated_at': pr.last_updated,
                 'comments': len(pr.comments),
                 'mergeable': True,
+                'merged': pr.is_merged,
                 'base': {
                     'ref': pr.branch,
                     'repo': {'full_name': pr.project},
@@ -182,7 +183,8 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
                             f'{pr.project}/pulls/{pr.number}',
                 'user': {
                     'login': 'test_user'
-                }
+                },
+                'labels': [{'name': x} for x in pr.labels],
             }, 200, "", "GET"
 
         match = re.match('.+/api/v1/repos/(.+)/branches/(.+)$', url)
@@ -192,7 +194,7 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
                 "commit": {
                 },
                 "protected": True,
-                "required_approvals": 0,
+                "required_approvals": 1,
                 "enable_status_check": False,
                 "status_check_contexts": None,
                 "user_can_push": False,
@@ -236,6 +238,15 @@ class FakeGiteaAPIClient(giteaconnection.GiteaAPIClient):
                     'full_name': 'org/project',
                 },
             }]
+
+        match = re.match(r'.+/api/v1/repos/(.+)/pulls/(\d+)/reviews$', url)
+        if match:
+            pr = self._get_pr(match)
+            if type(pr) == tuple:
+                # Got error
+                return pr
+            self.log.error(f"PR = {pr}")
+            return pr.reviews
 
         return []
 
@@ -296,10 +307,11 @@ class FakePullRequest(object):
         self.subject = subject
         self.upstream_root = upstream_root
         self.number_of_commits = 0
-        self.status = 'open'
+        self.state = 'open'
         self.body = initial_comment
         self.comments = []
         self.files = {}
+        self.labels = []
         self.sha = None
         self.head_sha = self.sha
         self.upstream_root = upstream_root
@@ -310,6 +322,7 @@ class FakePullRequest(object):
         self.merge_mode = None
         self.merge_title = None
         self.merge_message = None
+        self.reviews = []
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
@@ -333,7 +346,7 @@ class FakePullRequest(object):
                     }
                 },
                 'mergeable': True,
-                'state': self.status,
+                'state': self.state,
                 'title': self.subject,
                 'body': self.body,
                 'sha': self.sha,
@@ -344,7 +357,10 @@ class FakePullRequest(object):
             },
             'sender': {
                 'login': 'fake_zuul_user'
-            }
+            },
+            'labels': [
+                {'name': x} for x in self.labels
+            ],
         }
         if action == 'edited':
             data['changes'] = {'body': {'from': 'dummy'}}
@@ -420,6 +436,27 @@ class FakePullRequest(object):
 
     def _updateTimeStamp(self):
         self.last_updated = str(int(time.time()))
+
+    def closePullRequest(self):
+        self.state = 'closed'
+        self._updateTimeStamp()
+
+    def mergePullRequest(self):
+        self.state = 'closed'
+        self.is_merged = True
+        self._updateTimeStamp()
+
+    def reopenPullRequest(self):
+        self.state = 'open'
+        self.is_merged = False
+        self._updateTimeStamp()
+
+    def addReview(self, state='APPROVED', official=True):
+        self.reviews.append({
+            'state': state,
+            'official': official,
+            'user': {'full_name': 'tester', 'email': 'fake_mail'},
+        })
 
     def addCommit(self, files={}, delete_files=None):
         """Adds a commit on top of the actual PR head."""

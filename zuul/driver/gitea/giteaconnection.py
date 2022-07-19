@@ -265,6 +265,8 @@ class GiteaEventConnector(threading.Thread):
         else:
             event.action = body['action']
 
+        event.labels = [l["name"] for l in body.get('labels', [])]
+
         return event
 
     def _event_issue_comment(self, body, event_sub_type=None):
@@ -783,6 +785,7 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.files = None
         change.url = change.pr.get('html_url')
         change.uris = [change.url]
+        change.labels = change.pr.get('labels')
 
         # Gather data for mergeability checks
         self._updateCanMergeInfo(change, event)
@@ -815,6 +818,12 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                gitea.list_commit_statuses(
                                    change.patchset, state='success')])
 
+        if (
+            len(change.reviews) >= change.required_approvals
+        ):
+            self.log.debug("Change is approved")
+            change.approved = True
+
     def _gitTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
@@ -845,6 +854,8 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         log = get_annotated_logger(self.log, event=event)
         gitea = self.get_project_api_client(project_name)
         pr = gitea.get_pr(number)
+        # Normalize labels
+        pr['labels'] = [l['name'] for l in pr.get('labels', [])]
         log.info('Got PR %s#%s', project_name, number)
         return pr
 
