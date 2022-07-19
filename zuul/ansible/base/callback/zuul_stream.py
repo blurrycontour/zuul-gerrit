@@ -159,7 +159,8 @@ class CallbackModule(default.CallbackModule):
                 logger_retries += 1
                 time.sleep(0.1)
                 continue
-            msg = "%s\n" % log_id
+            # "s:" means "start" sending me this uuid
+            msg = "s:%s\n" % log_id
             s.send(msg.encode("utf-8"))
             buff = s.recv(4096)
             buffering = True
@@ -174,6 +175,17 @@ class CallbackModule(default.CallbackModule):
                     done = self._log_streamline(
                         host, line.decode("utf-8", "backslashreplace"))
                     if done:
+                        # Attempt to re-establish and signal we are
+                        # done with this uuid, so the remote end can
+                        # clean up
+                        try:
+                            s = socket.create_connection((ip, port), 5)
+                            msg = "f:%s\n" % log_id
+                            s.send(msg.encode("utf-8"))
+                            s.close()
+                        except:
+                            # Don't worry if we can't signal this
+                            pass
                         return
                 else:
                     more = s.recv(4096)
