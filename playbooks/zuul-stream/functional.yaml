@@ -12,6 +12,9 @@
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
+        # Setup by test-stream.yaml so we start a new zuul_console
+        # from this checkout.
+        ZUUL_CONSOLE_PORT: 19887
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
@@ -23,6 +26,7 @@
       register: failed_results
       failed_when: "failed_results.rc != 2"
       environment:
+        ZUUL_CONSOLE_PORT: 19887
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
