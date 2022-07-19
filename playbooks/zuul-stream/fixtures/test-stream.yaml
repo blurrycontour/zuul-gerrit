@@ -62,3 +62,15 @@
 
     - name: Print binary data
       command: echo -e '\x80abc'
+
+    - name: Find any console log files
+      find:
+        paths: /tmp
+        patterns: 'zuul-console-*.log'
+      register: _tmp_files
+
+    # We check this list in zuul-stream/functional.yaml to make sure
+    # we're cleaning up console log files.
+    - name: Dump tmp files
+      debug:
+        var: _tmp_files
