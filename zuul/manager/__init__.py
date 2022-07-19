@@ -202,7 +202,10 @@ class PipelineManager(metaclass=ABCMeta):
         items = [i for i in items
                  if i.change.project in queue and
                  i.live]
-        index = items.index(item)
+        try:
+            index = items.index(item)
+        except ValueError:
+            index = 0
         # Quantize on a logarithmic scale so that we don't constantly
         # needlessly adjust thousands of node requests.
         # If we're in the top 10 changes, return the accurate number.
