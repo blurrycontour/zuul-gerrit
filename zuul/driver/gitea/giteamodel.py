@@ -15,7 +15,8 @@
 
 import re
 
-from zuul.model import Change, TriggerEvent, EventFilter
+from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
+from zuul.model import FalseWithReason
 
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -37,6 +38,7 @@ class PullRequest(Change):
         self.required_approvals = 0
         self.contexts = set()
         self.branch_protected = False
+        self.approved = None
 
     def __repr__(self):
         r = ['<Change 0x%x' % id(self)]
@@ -50,6 +52,8 @@ class PullRequest(Change):
             r.append('updated: %s' % self.updated_at)
         if self.open:
             r.append('state: open')
+        if self.approved:
+            r.append('approved: true')
         return ' '.join(r) + '>'
 
     def isUpdateOf(self, other):
@@ -75,6 +79,7 @@ class PullRequest(Change):
             "required_status_check": self.require_status_check,
             "contexts": list(self.contexts),
             "branch_protected": self.branch_protected,
+            "approved": self.approved
         })
         return d
 
@@ -92,6 +97,7 @@ class PullRequest(Change):
             data.get("required_status_check", False))
         self.contexts = set(tuple(c) for c in data.get("contexts", []))
         self.branch_protected = data.get("branch_protected", False)
+        self.approved = bool(data.get("approved"))
 
 
 class GiteaTriggerEvent(TriggerEvent):
@@ -198,5 +204,55 @@ class GiteaEventFilter(EventFilter):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
             return False
+
+        return True
+
+
+# The RefFilter should be understood as RequireFilter (it maps to
+# pipeline requires definition)
+class GiteaRefFilter(RefFilter):
+    def __init__(self, connection_name,
+                 open=None, merged=None,
+                 approved=None, labels=None):
+        RefFilter.__init__(self, connection_name)
+        self.open = open
+        self.merged = merged
+        self.approved = approved
+        self.labels = labels or []
+
+    def __repr__(self):
+        ret = '<GiteaRefFilter connection_name: %s ' % self.connection_name
+        if self.open is not None:
+            ret += ' open: %s' % self.open
+        if self.merged is not None:
+            ret += ' merged: %s' % self.merged
+        if self.approved is not None:
+            ret += ' approved: %s' % self.approved
+        if self.labels is not None:
+            ret += ' labels: %s' % self.labels
+        ret += '>'
+        return ret
+
+    def matches(self, change):
+        if self.open is not None:
+            if change.open != self.open:
+                return FalseWithReason("Change state %s does not match %s" % (
+                    self.open, change.open))
+
+        if self.merged is not None:
+            if change.is_merged != self.merged:
+                return FalseWithReason("Change state %s does not match %s" % (
+                    self.merged, change.is_merged))
+
+        if self.approved is not None:
+            if change.approved != self.approved:
+                return FalseWithReason("Approved %s does not match %s" % (
+                    self.approved, change.approved))
+
+        # required labels are ANDed
+        for label in self.labels:
+            if label not in change.labels:
+                return FalseWithReason("Labels %s does not match %s" % (
+                    self.labels, change.labels))
 
         return True
