@@ -7,14 +7,46 @@
         # the python version of the platform is changed.
         python_path: "/usr/local/lib/python3.10/dist-packages"
 
-    - name: Run ansible that should succeed
+    - name: Run ansible that should succeed against testing console
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
+        -e "new_console=true"
+        src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
+      environment:
+        # Setup by test-stream.yaml so we start a new zuul_console
+        # from this checkout.
+        ZUUL_CONSOLE_PORT: 19887
+        ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
+        ZUUL_JOBDIR: "{{ ansible_user_dir}}"
+        PYTHONPATH: "{{ python_path }}"
+
+    - name: Save output
+      shell: |
+          mv job-output.txt job-output-success-19887.txt
+          mv job-output.json job-output-success-19887.json
+
+    - name: Run ansible that should succeed against extant console
+      command: >
+        /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
+        -e "new_console=false"
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
+
+    - name: Save output
+      shell: |
+          mv job-output.txt job-output-success-19885.txt
+          mv job-output.json job-output-success-19885.json
+
+    - name: Validate outputs
+      include_tasks: validate.yaml
+      loop:
+        - job-output-success-19887.txt
+        - job-output-success-19885.txt
+
+    # failure case
 
     - name: Run ansible playbook that should fail
       command: >
@@ -23,55 +55,22 @@
       register: failed_results
       failed_when: "failed_results.rc != 2"
       environment:
+        ZUUL_CONSOLE_PORT: 19887
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
 
-    - name: Validate output - setupvar
+    - name: Save output
       shell: |
-        egrep "^.*\| node1 \|\s+\"setupvar\": {" job-output.txt
-        egrep "^.*\| node2 \|\s+\"setupvar\": {" job-output.txt
-
-    - name: Validate output - shell task
-      shell: |
-        egrep "^.*\| node1 \| 1: lo:" job-output.txt
-        egrep "^.*\| node2 \| 1: lo:" job-output.txt
-
-    - name: Validate output - loop with items
-      shell: |
-        egrep "^.+\| node1 \| ok: Item: item1" job-output.txt
-        egrep "^.+\| node1 \| ok: Item: item2" job-output.txt
-        egrep "^.+\| node1 \| ok: Item: item3" job-output.txt
-        egrep "^.+\| node2 \| ok: Item: item1" job-output.txt
-        egrep "^.+\| node2 \| ok: Item: item2" job-output.txt
-        egrep "^.+\| node2 \| ok: Item: item3" job-output.txt
-
-    - name: Validate output - loop with complex items
-      shell: |
-        egrep "^.+\| node1 \| ok: Item: Runtime" job-output.txt
-        egrep "^.+\| node2 \| ok: Item: Runtime" job-output.txt
-
-    - name: Validate output - failed shell task
-      shell: |
-        egrep "^.+\| node1 \| Exception: Test module failure exception task" job-output.txt
-        egrep "^.+\| node2 \| Exception: Test module failure exception task" job-output.txt
-
-    - name: Validate output - item loop with exception
-      shell: |
-        egrep "^.+\| node1 \| Exception: Test module failure exception loop" job-output.txt
-        egrep "^.+\| node2 \| Exception: Test module failure exception loop" job-output.txt
+          mv job-output.txt job-output-failure.txt
+          mv job-output.json job-output-failure.json
 
     - name: Validate output - failure shell task with exception
       shell: |
-        egrep "^.+\| node1 \| Exception: Test module failure exception fail-task" job-output.txt
-        egrep "^.+\| node2 \| Exception: Test module failure exception fail-task" job-output.txt
+        egrep "^.+\| node1 \| Exception: Test module failure exception fail-task" job-output-failure.txt
+        egrep "^.+\| node2 \| Exception: Test module failure exception fail-task" job-output-failure.txt
 
     - name: Validate output - failure item loop with exception
       shell: |
-        egrep "^.+\| node1 \| Exception: Test module failure exception fail-loop" job-output.txt
-        egrep "^.+\| node2 \| Exception: Test module failure exception fail-loop" job-output.txt
-
-    - name: Validate output - binary data
-      shell: |
-        egrep "^.*\| node1 \| \\\\x80abc" job-output.txt
-        egrep "^.*\| node2 \| \\\\x80abc" job-output.txt
+        egrep "^.+\| node1 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
+        egrep "^.+\| node2 \| Exception: Test module failure exception fail-loop" job-output-failure.txt

@@ -1,0 +1,38 @@
+- name: Validate output - setupvar
+  shell: |
+    egrep "^.*\| node1 \|\s+\"setupvar\": {" {{ item }}
+    egrep "^.*\| node2 \|\s+\"setupvar\": {" {{ item }}
+
+- name: Validate output - shell task
+  shell: |
+    egrep "^.*\| node1 \| 1: lo:" {{ item }}
+    egrep "^.*\| node2 \| 1: lo:" {{ item }}
+
+- name: Validate output - loop with items
+  shell: |
+    egrep "^.+\| node1 \| ok: Item: item1" {{ item }}
+    egrep "^.+\| node1 \| ok: Item: item2" {{ item }}
+    egrep "^.+\| node1 \| ok: Item: item3" {{ item }}
+    egrep "^.+\| node2 \| ok: Item: item1" {{ item }}
+    egrep "^.+\| node2 \| ok: Item: item2" {{ item }}
+    egrep "^.+\| node2 \| ok: Item: item3" {{ item }}
+
+- name: Validate output - loop with complex items
+  shell: |
+    egrep "^.+\| node1 \| ok: Item: Runtime" {{ item }}
+    egrep "^.+\| node2 \| ok: Item: Runtime" {{ item }}
+
+- name: Validate output - failed shell task
+  shell: |
+    egrep "^.+\| node1 \| Exception: Test module failure exception task" {{ item }}
+    egrep "^.+\| node2 \| Exception: Test module failure exception task" {{ item }}
+
+- name: Validate output - item loop with exception
+  shell: |
+    egrep "^.+\| node1 \| Exception: Test module failure exception loop" {{ item }}
+    egrep "^.+\| node2 \| Exception: Test module failure exception loop" {{ item }}
+
+- name: Validate output - binary data
+  shell: |
+    egrep "^.*\| node1 \| \\\\x80abc" {{ item }}
+    egrep "^.*\| node2 \| \\\\x80abc" {{ item }}
