@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Jobs are now passed the `zuul.node_priority` variable so that they can
+    determine their priority relative to other jobs. This can be useful for
+    jobs that allocate resources that support a priority mechanism to ensure
+    that the job priority is preserved when the resource is allocated.

@@ -75,6 +75,7 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     zuul_params['items'] = dependent_changes
     zuul_params['child_jobs'] = list(item.current_build_set.job_graph.
                                      getDirectDependentJobs(job.name))
+    zuul_params['node_priority'] = item.getNodePriority()
 
     params = dict()
     params['job_ref'] = job.getPath()

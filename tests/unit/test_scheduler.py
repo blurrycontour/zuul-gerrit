@@ -4284,6 +4284,40 @@ class TestScheduler(ZuulTestCase):
             self.assertEqual(results.get(build.uuid, ''),
                              build.parameters['zuul'].get('jobtags'))
 
+    def test_node_priority(self):
+        "Test node priority"
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        for build in self.builds:
+            change = int(build.parameters['zuul']['items'][-1]['change'])
+            self.assertEqual(build.parameters['zuul']['node_priority'], change - 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     def test_timer_template(self):
         "Test that a periodic job is triggered"
         # This test can not use simple_layout because it must start
