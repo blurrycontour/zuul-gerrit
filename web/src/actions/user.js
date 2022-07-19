@@ -67,6 +67,9 @@ export const fetchUserACL = (tenant, user) => (dispatch) => {
   return API.fetchUserAuthorizations(apiPrefix, user.token)
     .then(response => dispatch(fetchUserACLSuccess(response.data)))
     .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
       dispatch(fetchUserACLFail(error))
     })
 }

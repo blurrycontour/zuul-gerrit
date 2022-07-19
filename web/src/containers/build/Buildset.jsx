@@ -42,7 +42,7 @@ import 'moment-duration-format'
 
 import { buildExternalLink, IconProperty } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon } from './Misc'
-import { enqueue, enqueue_ref } from '../../api'
+import { enqueue, enqueue_ref, HandleApiErrors } from '../../api'
 import { addNotification, addApiError } from '../../actions/notifications'
 import { ChartModal } from '../charts/ChartModal'
 import BuildsetGanttChart from '../charts/GanttChart'
@@ -192,6 +192,9 @@ function Buildset({ buildset, timezone, tenant, user }) {
             }))
         })
         .catch(error => {
+          HandleApiErrors(error, dispatch)
+        })
+        .catch(error => {
           dispatch(addApiError(error))
         })
     } else {
@@ -205,6 +208,9 @@ function Buildset({ buildset, timezone, tenant, user }) {
               status: '',
               url: '',
             }))
+        })
+        .catch(error => {
+          HandleApiErrors(error, dispatch)
         })
         .catch(error => {
           dispatch(addApiError(error))

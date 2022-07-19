@@ -17,7 +17,7 @@ import yaml from 'js-yaml'
 
 export const OPENAPI_FETCH_REQUEST = 'OPENAPI_FETCH_REQUEST'
 export const OPENAPI_FETCH_SUCCESS = 'OPENAPI_FETCH_SUCCESS'
-export const OPENAPI_FETCH_FAIL    = 'OPENAPI_FETCH_FAIL'
+export const OPENAPI_FETCH_FAIL = 'OPENAPI_FETCH_FAIL'
 
 export const fetchOpenApiRequest = () => ({
   type: OPENAPI_FETCH_REQUEST
@@ -59,8 +59,11 @@ const fetchOpenApi = (whiteLabel) => dispatch => {
   return API.fetchOpenApi()
     .then(response => dispatch(fetchOpenApiSuccess(response.data, whiteLabel)))
     .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
       dispatch(fetchOpenApiFail(error))
-      setTimeout(() => {dispatch(fetchOpenApi())}, 5000)
+      setTimeout(() => { dispatch(fetchOpenApi()) }, 5000)
     })
 }
 

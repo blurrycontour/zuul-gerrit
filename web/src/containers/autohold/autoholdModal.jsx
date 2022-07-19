@@ -25,7 +25,7 @@ import {
     TextInput
 } from '@patternfly/react-core'
 
-import { autohold } from '../../api'
+import { autohold, HandleApiErrors } from '../../api'
 import { addAutoholdError } from '../../actions/adminActions'
 import { addNotification } from '../../actions/notifications'
 import { fetchAutoholds } from '../../actions/autoholds'
@@ -78,6 +78,9 @@ const AutoholdModal = props => {
                         status: '',
                         url: '',
                     }))
+            })
+            .catch(error => {
+                HandleApiErrors(error, dispatch)
             })
             .catch(error => {
                 dispatch(addAutoholdError(error))

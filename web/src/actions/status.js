@@ -17,6 +17,7 @@ import * as API from '../api'
 export const STATUS_FETCH_REQUEST = 'STATUS_FETCH_REQUEST'
 export const STATUS_FETCH_SUCCESS = 'STATUS_FETCH_SUCCESS'
 export const STATUS_FETCH_FAIL = 'STATUS_FETCH_FAIL'
+export const STATUS_FETCH_STOP = 'STATUS_FETCH_STOP'
 
 export const requestStatus = () => ({
   type: STATUS_FETCH_REQUEST
@@ -33,6 +34,10 @@ const failedStatus = error => ({
   error
 })
 
+const stopStatus = () => ({
+  type: STATUS_FETCH_STOP
+})
+
 // Create fake delay
 //function sleeper(ms) {
 //  return function(x) {
@@ -44,7 +49,13 @@ const fetchStatus = (tenant) => dispatch => {
   dispatch(requestStatus())
   return API.fetchStatus(tenant.apiPrefix)
     .then(response => dispatch(receiveStatus(response.data)))
-    .catch(error => dispatch(failedStatus(error)))
+    .catch(error => {
+      dispatch(stopStatus())
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedStatus(error))
+    })
 }
 
 const shouldFetchStatus = state => {

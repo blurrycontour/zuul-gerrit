@@ -34,7 +34,11 @@ export function fetchComponents() {
       const response = await API.fetchComponents()
       dispatch(receiveComponents(response.data))
     } catch (error) {
-      dispatch(failedComponents(error))
+      try {
+        API.HandleApiErrors(error, dispatch)
+      } catch (error) {
+        dispatch(failedComponents(error))
+      }
     }
   }
 }

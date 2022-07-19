@@ -14,10 +14,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
+import ApiErrorPage from '../pages/ApiError'
 
 
 class ErrorBoundary extends React.Component {
   static propTypes = {
+    apiErrors: PropTypes.object,
     children: PropTypes.object,
   }
 
@@ -25,19 +29,27 @@ class ErrorBoundary extends React.Component {
     hasError: false
   }
 
-  componentDidCatch() {
+  componentDidCatch(error, errorInfo) {
     this.setState({
       hasError: true
     })
   }
 
   render() {
+    // Catch api errors first
+    if (this.props.apiErrors.error) {
+      return <ApiErrorPage />
+    }
     if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>
+      return (<>
+        <h1>Something went wrong.</h1>
+        <p>See the browser's console log for more details.</p></>)
     }
 
     return this.props.children
   }
 }
 
-export default ErrorBoundary
+export default connect(state => ({
+  apiErrors: state.apiErrors,
+}))(ErrorBoundary)
