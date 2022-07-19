@@ -38,7 +38,12 @@ const fetchProjects = (tenant) => dispatch => {
   dispatch(requestProjects())
   return API.fetchProjects(tenant.apiPrefix)
     .then(response => dispatch(receiveProjects(tenant.name, response.data)))
-    .catch(error => dispatch(failedProjects(error)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedProjects(error))
+    })
 }
 
 const shouldFetchProjects = (tenant, state) => {

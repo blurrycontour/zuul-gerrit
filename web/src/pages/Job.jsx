@@ -16,9 +16,12 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { AnsibleTowerIcon } from '@patternfly/react-icons'
 
 import Job from '../containers/job/Job'
 import { fetchJobIfNeeded } from '../actions/job'
+
+import { EmptyPage } from '../containers/Errors'
 
 
 class JobPage extends React.Component {
@@ -34,27 +37,34 @@ class JobPage extends React.Component {
       this.props.tenant, this.props.match.params.jobName, force))
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Job | ' + this.props.match.params.jobName
     if (this.props.tenant.name) {
       this.updateData()
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name ||
-       this.props.match.params.jobName !== prevProps.match.params.jobName) {
+      this.props.match.params.jobName !== prevProps.match.params.jobName) {
       this.updateData()
     }
   }
 
-  render () {
-    const { remoteData } = this.props
-    const tenantJobs = remoteData.jobs[this.props.tenant.name]
+  render() {
+    const { remoteData, tenant } = this.props
+    const tenantJobs = remoteData.jobs[tenant.name]
     const jobName = this.props.match.params.jobName
     return (
       <PageSection variant={PageSectionVariants.light}>
-        {tenantJobs && tenantJobs[jobName] && <Job job={tenantJobs[jobName]} />}
+        {tenantJobs && tenantJobs[jobName]
+          ? <Job job={tenantJobs[jobName]} />
+          : <EmptyPage
+            title="This job does not exist"
+            icon={AnsibleTowerIcon}
+            linkTarget={`${tenant.linkPrefix}/jobs`}
+            linkText="Show all jobs"
+          />}
       </PageSection>
     )
   }

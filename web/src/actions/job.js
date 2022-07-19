@@ -39,7 +39,13 @@ const fetchJob = (tenant, jobname) => dispatch => {
   dispatch(requestJob())
   return API.fetchJob(tenant.apiPrefix, jobname)
     .then(response => dispatch(receiveJob(tenant.name, jobname, response.data)))
-    .catch(error => dispatch(failedJob(error)))
+    .catch(error => {
+      // do not handle 404s to display the EmptyPage instead
+      API.HandleApiErrors(error, dispatch, false)
+    })
+    .catch(error => {
+      dispatch(failedJob(error))
+    })
 }
 
 const shouldFetchJob = (tenant, jobname, state) => {

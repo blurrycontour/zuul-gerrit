@@ -38,7 +38,12 @@ const fetchLabels = (tenant) => dispatch => {
   dispatch(requestLabels())
   return API.fetchLabels(tenant.apiPrefix)
     .then(response => dispatch(receiveLabels(tenant.name, response.data)))
-    .catch(error => dispatch(failedLabels(error)))
+    .catch(error => {
+      API.HandleApiErrors(error, dispatch)
+    })
+    .catch(error => {
+      dispatch(failedLabels(error))
+    })
 }
 
 const shouldFetchLabels = (tenant, state) => {

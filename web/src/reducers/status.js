@@ -16,7 +16,8 @@ import { TENANT_SET } from '../actions/tenant'
 import {
   STATUS_FETCH_FAIL,
   STATUS_FETCH_REQUEST,
-  STATUS_FETCH_SUCCESS
+  STATUS_FETCH_SUCCESS,
+  STATUS_FETCH_STOP
 } from '../actions/status'
 
 export default (state = {
@@ -25,6 +26,7 @@ export default (state = {
 }, action) => {
   switch (action.type) {
     case TENANT_SET:
+    case STATUS_FETCH_STOP:
       return {
         isFetching: false,
         status: null,
