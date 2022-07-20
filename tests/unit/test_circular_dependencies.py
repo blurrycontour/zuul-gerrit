@@ -1703,6 +1703,42 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 3)
 
+    @simple_layout('layouts/job-dedup-noop.yaml')
+    def test_job_deduplication_noop(self):
+        # Test that we don't deduplicate noop (there's no good reason
+        # to do so)
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        # It's tricky to get info about a noop build, but the jobs in
+        # the report have the build UUID, so we make sure it's
+        # different.
+        a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l][0]
+        b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l][0]
+        self.assertNotEqual(a_noop, b_noop)
+
     @simple_layout('layouts/job-dedup-retry.yaml')
     def test_job_deduplication_retry(self):
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
