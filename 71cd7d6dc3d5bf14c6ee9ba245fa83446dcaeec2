@@ -52,6 +52,24 @@
       "parentUuid": "2808b59e_383c46f0",
       "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0693717d_33110bca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-20T00:38:42Z",
+      "side": 1,
+      "message": "I wrote a bit about this on https://review.opendev.org/850270 but in short, zuul_console runs forever on static nodes, and also serves multiple jobs at once.  Making an interface change between it and the console plugin (or callback plugin) should take that into account.  This job failing was (accidentally?) showing us that problem.",
+      "parentUuid": "eea9c566_83360fc0",
+      "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
