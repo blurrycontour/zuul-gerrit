@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ddf06310_3feb085b",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1047,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-20T00:05:45Z",
+      "side": 1,
+      "message": "Yes, I expect that to continue to mean \"this layout has no information about a minimum required time\".",
+      "parentUuid": "3cd03644_885fe355",
+      "revId": "9a279725f9b1a266bc3bb1e36f93a83e3405f33b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "31bcee21_cb4c0ed2",
         "filename": "zuul/scheduler.py",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-19T23:55:50Z",
       "side": 1,
       "message": "Do we need any sort of delay here to prevent us from immedaitely trying to process the pipeline trigger queue potentially starving the reconfiguration work that will allow us to proceed?",
+      "revId": "9a279725f9b1a266bc3bb1e36f93a83e3405f33b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d437e135_6f173785",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2336,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-20T00:05:45Z",
+      "side": 1,
+      "message": "We will go back to the loop where we iterate over every pipeline in the tenant.  If we are the only scheduler, then we will process that pipeline up to the event time and reach this same point and return early; we\u0027ll eventually get to the point where we finish the tenant and process the tenant reconfig event.\n\nIf we\u0027re in a multi-scheduler system, then in the best case, another scheduler is sitting on that reconfig event right now and trying to get the tenant write lock.  There\u0027s a special short-circuit in the pipeline loop that will exit early if someone\u0027s waiting to reconfigure the tenant.  So we\u0027ll stop processing the rest of the tenant very quickly and let that other scheduler proceed.\n\nIf we\u0027re in a multi-scheduler system and another scheduler hasn\u0027t gotten around to that event yet, we\u0027ll behave like the first case until it does, then we\u0027ll behave like the second.\n\nThat\u0027s what I like most about this change -- it preserves the parallelism as much as possible until it really needs to stop and do the reconfiguration.",
+      "parentUuid": "31bcee21_cb4c0ed2",
       "revId": "9a279725f9b1a266bc3bb1e36f93a83e3405f33b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
