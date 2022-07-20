@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0745adb8_acdfd44e",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 658,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-20T22:29:31Z",
+      "side": 1,
+      "message": "A more accurate description would be:\n\nThe relative priority of this queue item\u0027s node requests compared to other items in the same pipeline in the same tenant at the time the build request for this job was enqueued (though the value here does not reflect whether this tenant actually has the relative_priority feature enabled).",
+      "revId": "6ed659409b78d79f3a50a54cdd38d3a7ad4689c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc6bb9db_b0c3572d",
+        "filename": "releasenotes/notes/node_priority-ffa7f9bd0e348694.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-20T22:29:31Z",
+      "side": 1,
+      "message": "This is using the relative priority calculation, but it uses it regardless of whether or not relative priority is enabled for a tenant, so it won\u0027t match what we pass to Nodepool.  That may be a little counter-intuitive for some folks.\n\nAlso, since it\u0027s intended for use by Nodepool it has some intentional optimizations that shouldn\u0027t make a difference for that use case but could be confusing; it quantizes the values at certain levels.\n\nThe number is intended to change frequently until Nodepool actually allocates a node.  The fact that it\u0027s frozen in place when the build is enqueued means it won\u0027t work the same way in a build.  Imagine a job that happens to start with a very low priority.  Circumstances change and it\u0027s at the top of the queue now.  But other items right behind it start and they actually have a higher priority.  In short, I think it\u0027s potentially dangerous to use this in a job, and I think it should be limited and retained for its intended use as an internal value.",
+      "revId": "6ed659409b78d79f3a50a54cdd38d3a7ad4689c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
