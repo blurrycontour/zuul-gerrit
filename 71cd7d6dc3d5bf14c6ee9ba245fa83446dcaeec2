@@ -34,6 +34,24 @@
       "parentUuid": "eea9c566_83360fc0",
       "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e08c8ca_da518ce5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-20T00:07:12Z",
+      "side": 1,
+      "message": "Actually, that brings me back to the initial problem.\n\nWhen I changed the name of the streaming file name in I199313e1fff567b176020ced1d8e92c5059012cd, it was not working because the command.py would write it out to \"zuul-console-*\" but the extant zuul_console process was looking for \"console-*\".\n\nSo I\u0027m not sure it\u0027s valid to test command.py from the Zuul checkout against executor\u0027s version of zuul_console, as they share assumptions?",
+      "parentUuid": "2808b59e_383c46f0",
+      "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
