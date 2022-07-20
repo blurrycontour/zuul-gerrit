@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fafd876b_b65b0ba9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-20T21:40:08Z",
+      "side": 1,
+      "message": "If the item isn\u0027t in the queue currently then it can at best be added at the end of the queue? I think we may want to return something more like len(items) or maybe len(items) -1 here to approximate that value.",
+      "revId": "3f74a83bef6dc58d385225decd51d58469afa340",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
