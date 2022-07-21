@@ -21,6 +21,11 @@
         PYTHONPATH: "{{ python_path }}"
       register: _success_output
 
+    - name: Save raw output to file
+      copy:
+        content: '{{ _success_output.stdout }}'
+        dest: 'console-job-output-success-19887.txt'
+
     - name: Save output
       shell: |
           mv job-output.txt job-output-success-19887.txt
@@ -43,6 +48,12 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
+      register: _success_output
+
+    - name: Save raw output to file
+      copy:
+        content: '{{ _success_output.stdout }}'
+        dest: 'console-job-output-success-19885.txt'
 
     - name: Save output
       shell: |

@@ -36,3 +36,17 @@
   shell: |
     egrep "^.*\| node1 \| \\\\x80abc" {{ item }}
     egrep "^.*\| node2 \| \\\\x80abc" {{ item }}
+
+# Streamer puts out a line like
+#  [node1] Starting to log 916b2084-4bbb-80e5-248e-000000000016-1-node1 for task TASK: Print binary data
+# One of the tasks in job-output shows find: results;
+# the console file for this task should not be there.
+- name: Validate temporary files removed
+  shell: |
+    for f in $(grep 'Starting to log' console-{{ item }} | awk '{print $5}'); do
+      echo "Checking ${f}"
+      if grep -q '"path": "/tmp/console-'${f}'.log"' {{ item }}; then
+        echo "*** /tmp/${f}.log still exists"
+        exit 1
+      fi
+    done
