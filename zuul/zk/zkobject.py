@@ -43,6 +43,7 @@ class ZKContext:
         self.cumulative_write_znodes = 0
         self.cumulative_read_bytes = 0
         self.cumulative_write_bytes = 0
+        self.build_references = False
 
     def sessionIsValid(self):
         return ((not self.lock or self.lock.is_still_valid()) and
