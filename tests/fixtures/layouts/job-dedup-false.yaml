@@ -39,6 +39,7 @@
 - job:
     name: common-job
     deduplicate: false
+    pre-run: playbooks/pre.yaml
     required-projects:
       - org/project1
       - org/project2
