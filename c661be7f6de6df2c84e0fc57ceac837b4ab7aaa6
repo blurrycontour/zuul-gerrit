@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cfa7a5e_19464865",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-21T08:28:29Z",
+      "side": 1,
+      "message": "\u003e Patch Set 11: Code-Review-1\n\u003e \n\u003e If I\u0027m reading this right, this has one-way compatability: new server can work with old or new client.  But the new client assumes a new server.\n\u003e \n\u003e Long-running zuul_console processes will not understand the new syntax being sent to them, which means when users upgrade Zuul, any static nodes will no longer get console output.  The test I suggest in https://review.opendev.org/850269 would show the problem (and this stack without that change would incidentally fail because of it).\n\u003e \n\u003e Keep in mind as you consider solutions to this that static nodes may serve multiple jobs simultaneously, so we can\u0027t simply kill and restart zuul_console at the start of every job.\n\u003e \n\u003e I don\u0027t have an immediate solution to suggest, but I do think that since this change is explicitly in service of long-running static nodes, we should probably give them some consideration.\n\nThis now uses a protocol scheme to avoid these issues",
+      "revId": "c661be7f6de6df2c84e0fc57ceac837b4ab7aaa6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
