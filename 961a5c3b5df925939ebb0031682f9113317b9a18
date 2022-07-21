@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78d737b8_495bf2cd",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-21T12:43:17Z",
+      "side": 1,
+      "message": "Given the use case of a shared repository that is part of multiple tenants and defines some generic labels/images and a provider, we should allow for attaching additional, tenant specific labels to an existing provider pool.\n\nOtherwise each tenant would need a separate provider and/or pool config for its own labels.",
+      "revId": "961a5c3b5df925939ebb0031682f9113317b9a18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe6b557a_6bba3960",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-21T12:43:17Z",
+      "side": 1,
+      "message": "nit: Since providers will probably be configured in the Zuul config similar to the connections, we don\u0027t have to name the driver here.",
+      "revId": "961a5c3b5df925939ebb0031682f9113317b9a18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
