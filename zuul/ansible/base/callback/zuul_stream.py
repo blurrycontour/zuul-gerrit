@@ -129,37 +129,57 @@ class CallbackModule(default.CallbackModule):
             else:
                 self._display.display(msg)
 
+    def _read_log_connect(ip, port):
+        try:
+            s = socket.create_connection((ip, port), 5)
+            # Disable the socket timeout after we have successfully
+            # connected to accomodate the fact that jobs may not be writing
+            # logs continously. Without this we can easily trip the 5
+            # second timeout.
+            s.settimeout(None)
+            return s
+        except socket.timeout:
+            self._log(
+                "Timeout exception waiting for the logger. "
+                "Please check connectivity to [%s:%s]"
+                % (ip, port), executor=True)
+            self._log_streamline(
+                "localhost",
+                "Timeout exception waiting for the logger. "
+                "Please check connectivity to [%s:%s]"
+                % (ip, port))
+            return
+        except Exception:
+            if logger_retries % 10 == 0:
+                self._log("[%s] Waiting on logger" % host,
+                          executor=True, debug=True)
+            logger_retries += 1
+            time.sleep(0.1)
+            continue
+
     def _read_log(self, host, ip, port, log_id, task_name, hosts):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
         logger_retries = 0
         while True:
-            try:
-                s = socket.create_connection((ip, port), 5)
-                # Disable the socket timeout after we have successfully
-                # connected to accomodate the fact that jobs may not be writing
-                # logs continously. Without this we can easily trip the 5
-                # second timeout.
-                s.settimeout(None)
-            except socket.timeout:
-                self._log(
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, port), executor=True)
-                self._log_streamline(
-                    "localhost",
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, port))
-                return
-            except Exception:
-                if logger_retries % 10 == 0:
-                    self._log("[%s] Waiting on logger" % host,
-                              executor=True, debug=True)
-                logger_retries += 1
-                time.sleep(0.1)
-                continue
-            msg = "%s\n" % log_id
+            s = _self.read_log_connect(ip, port)
+            version = 0
+
+            # Find out what version we are running
+            s.send(b'v:')
+            buff = s.recv(1024).decode('utf-8').strip()
+            if buff == '[Zuul] Log not found':
+                s.close()
+                s = _read_log_connect(ip, port)
+            else:
+                version = int(buff)
+            self._log('[%s] Reports streaming version: %d' % (host, version))
+
+            if version >= 1:
+                msg = 's:%s\n' % log_id
+            else:
+                msg = '%s\n' % log_id
+
             s.send(msg.encode("utf-8"))
             buff = s.recv(4096)
             buffering = True
