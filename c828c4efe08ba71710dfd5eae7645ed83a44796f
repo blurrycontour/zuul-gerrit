@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e75a3b45_9c400762",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-21T23:29:53Z",
+      "side": 1,
+      "message": "Good catch; I think that was an accidental deletion.",
+      "parentUuid": "a8f7fd3a_6a3851b6",
+      "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a996e4b_e7c53153",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-21T18:32:25Z",
       "side": 1,
       "message": "It might be easier to follow by doing:\n  \n  let [buttonText, interesting_jobs] \u003d this.state.show_skipped ?\n    [\"Hide\", jobs] :\n    [\"Show\", jobs.filter(j \u003d\u003e this.JobStrResult(j) !\u003d\u003d \u0027skipped\u0027]\n    \nThat way we don\u0027t have to filter the list twice. Though it seems like you got it right :-)",
+      "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce83fc83_7d409d13",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-21T23:29:53Z",
+      "side": 1,
+      "message": "I really like that, but there\u0027s a nuance -- we use the skipped_jobs list to determine how many there are so that when we are hiding them, we know whether we should display the \"Show X skipped jobs\" button, and also what \"X\" should be in that case.\n\nBut, if we\u0027re okay with not knowing the number of skipped jobs when we\u0027re hiding them, then we can eliminate the second loop.  I\u0027m okay with that (We\u0027ll display \"Show 3 skipped jobs\" / \"Hide skipped jobs\").  We know whether to display it because state.showSkipped will be true even if the jobs list is the full list.\n\nI\u0027ll also update all the variable names for style.  :)",
+      "parentUuid": "8a996e4b_e7c53153",
       "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
