@@ -211,6 +211,16 @@ class CallbackModule(default.CallbackModule):
                 done = self._log_streamline(
                     host, line.decode("utf-8", "backslashreplace"))
                 if done:
+                    if self._zuul_console_version > 0:
+                        try:
+                            # reestablish connection and tell console to
+                            # clean up
+                            s = self._read_log_connect(host, ip, port)
+                            s.send(f'f:{log_id}\n'.encode('utf-8'))
+                            s.close()
+                        except Exception:
+                            # Don't worry if this fails
+                            pass
                     return
             else:
                 more = s.recv(4096)
