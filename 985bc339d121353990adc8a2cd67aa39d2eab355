@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce661276_23f682a7",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-21T20:41:06Z",
+      "side": 1,
+      "message": "Nit but if we are fixing up docs to be more accurate probably worth addressing. This should be \u0027later\u0027.",
+      "range": {
+        "startLine": 34,
+        "startChar": 44,
+        "endLine": 34,
+        "endChar": 50
+      },
+      "revId": "985bc339d121353990adc8a2cd67aa39d2eab355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5cf669a_f0dddc10",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-21T20:41:06Z",
+      "side": 1,
+      "message": "Previously these two logging lines and the addTriggerEvent call were made without the lock being held. Is it intentional that we hold the lock through these calls now?",
+      "revId": "985bc339d121353990adc8a2cd67aa39d2eab355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
