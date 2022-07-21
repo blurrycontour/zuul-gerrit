@@ -70,6 +70,24 @@
       "parentUuid": "eea9c566_83360fc0",
       "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41babd26_b3d01fa1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-21T00:35:16Z",
+      "side": 1,
+      "message": "PS 7 has modified this to run against both the zuul_console from the executor and the one from the zuul checkout.",
+      "parentUuid": "0693717d_33110bca",
+      "revId": "71cd7d6dc3d5bf14c6ee9ba245fa83446dcaeec2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
