@@ -21,6 +21,11 @@
         PYTHONPATH: "{{ python_path }}"
       register: _success_output
 
+    - name: Save raw output to file
+      copy:
+        content: '{{ _success_output.stdout }}'
+        dest: 'console-job-output-success-19887.txt'
+
     - name: Save output
       shell: |
           mv job-output.txt job-output-success-19887.txt
@@ -31,6 +36,20 @@
         that:
           - "'[node1] Reports streaming version: 1' in _success_output.stdout"
 
+      # Streamer puts out a line like
+      #  [node1] Starting to log 916b2084-4bbb-80e5-248e-000000000016-1-node1 for task TASK: Print binary data
+      # One of the tasks in job-output shows find: results;
+      # the console file for this task should not be there.
+      - name: Validate temporary files removed
+        shell: |
+          for f in $(grep 'Starting to log' console-job-output-success-19887.txt | awk '{print $5}'); do
+            echo "Checking ${f}"
+            if grep -q '"path": "/tmp/console-'${f}'.log"' job-output-success-19887.txt; then
+              echo "*** /tmp/${f}.log still exists"
+              exit 1
+            fi
+          done
+            
     # NOTE(ianw) 2022-07 : we deliberatly have this second step to run
     # against the console setup by the infrastructure executor in the
     # job pre playbooks as a backwards compatability sanity check.
@@ -43,6 +62,12 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
+      register: _success_output
+
+    - name: Save raw output to file
+      copy:
+        content: '{{ _success_output.stdout }}'
+        dest: 'console-job-output-success-19885.txt'
 
     - name: Save output
       shell: |
