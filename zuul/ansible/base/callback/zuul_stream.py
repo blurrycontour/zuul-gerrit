@@ -48,6 +48,7 @@ from zuul.ansible import paths
 from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
+LOG_STREAM_VERSION = 0
 
 
 def zuul_filter_result(result):
@@ -129,9 +130,7 @@ class CallbackModule(default.CallbackModule):
             else:
                 self._display.display(msg)
 
-    def _read_log(self, host, ip, port, log_id, task_name, hosts):
-        self._log("[%s] Starting to log %s for task %s"
-                  % (host, log_id, task_name), job=False, executor=True)
+    def _read_log_connect(self, ip, port):
         logger_retries = 0
         while True:
             try:
@@ -141,6 +140,7 @@ class CallbackModule(default.CallbackModule):
                 # logs continously. Without this we can easily trip the 5
                 # second timeout.
                 s.settimeout(None)
+                return s
             except socket.timeout:
                 self._log(
                     "Timeout exception waiting for the logger. "
@@ -159,7 +159,30 @@ class CallbackModule(default.CallbackModule):
                 logger_retries += 1
                 time.sleep(0.1)
                 continue
-            msg = "%s\n" % log_id
+
+    def _read_log(self, host, ip, port, log_id, task_name, hosts):
+        self._log("[%s] Starting to log %s for task %s"
+                  % (host, log_id, task_name), job=False, executor=True)
+        while True:
+            s = self._read_log_connect(ip, port)
+            version = 0
+
+            # Find out what version we are running
+            s.send(f'v:{LOG_STREAM_VERSION}\n'.encode('utf-8'))
+            buff = s.recv(1024).decode('utf-8').strip()
+            if buff == '[Zuul] Log not found':
+                s.close()
+                s = _read_log_connect(ip, port)
+            else:
+                version = int(buff)
+            self._log('[%s] Reports streaming version: %d' % (host, version),
+                      job=False, executor=True)
+
+            if version >= 1:
+                msg = 's:%s\n' % log_id
+            else:
+                msg = '%s\n' % log_id
+
             s.send(msg.encode("utf-8"))
             buff = s.recv(4096)
             buffering = True

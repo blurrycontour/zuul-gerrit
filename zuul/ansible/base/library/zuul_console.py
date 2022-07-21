@@ -24,6 +24,15 @@ import subprocess
 import threading
 import time
 
+# NOTE: There is currently one linkage between zuul_console.py and
+# command.py override plugin; they have to agree where the console log
+# files are being written out (LOG_STREAM_FILE).  There may be other
+# reasons in the future.  However, static nodes may be running an old
+# version of this, and we want new executors to be able to talk to
+# them.  So if anything changes, we can establish what each side wants
+# by this protocol number.
+ZUUL_CONSOLE_PROTO_VERSION=1
+
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
 
@@ -162,15 +171,38 @@ class Server(object):
                 ret = buffer.decode('utf-8')
                 x = ret.find('\n')
                 if x > 0:
-                    return ret[:x]
+                    return ret[:x].strip()
             except UnicodeDecodeError:
                 pass
 
     def handleOneConnection(self, conn):
-        log_uuid = self.get_command(conn)
+        # protocol
+        #  v:<ver>    get version number, <ver> is remote
+        #  s:<uuid>   send logs for <uuid>
+
+        while True:
+            command = self.get_command(conn)
+            if command.startswith('v:'):
+                # NOTE(ianw) : remote sends its version.  We currently
+                # don't have anything to do with this value, so ignore
+                # for now.
+                conn.send(f'{ZUUL_CONSOLE_PROTO_VERSION}\n'.encode('utf-8'))
+                continue
+            elif command.startswith('s:'):
+                log_uuid = command[2:]
+                break
+            else:
+                # NOTE(ianw): 2022-07-21 In releases < 6.1.0 the streaming
+                # side would just send a raw uuid and nothing else; so by
+                # default assume that is what is coming in here.  We can
+                # remove this fallback when we decide it is no longer
+                # necessary.
+                log_uuid = command
+                break
+
         # use path split to make use the input isn't trying to be clever
         # and construct some path like /tmp/console-/../../something
-        log_uuid = os.path.split(log_uuid.rstrip())[-1]
+        log_uuid = os.path.split(log_uuid)[-1]
 
         # FIXME: this won't notice disconnects until it tries to send
         console = None
