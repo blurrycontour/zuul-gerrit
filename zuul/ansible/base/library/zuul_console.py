@@ -24,6 +24,14 @@ import subprocess
 import threading
 import time
 
+# This is the version we report to the zuul_stream callback.  It is
+# expected that this (zuul_console) process can be long-lived, so if
+# there are updates this ensures a later streaming callback can still
+# talk to us.
+ZUUL_CONSOLE_PROTO_VERSION = 1
+# This is the template for the file name of the log-file written out
+# by the command.py override command in the executor's Ansible
+# install.
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
 
@@ -162,15 +170,38 @@ class Server(object):
                 ret = buffer.decode('utf-8')
                 x = ret.find('\n')
                 if x > 0:
-                    return ret[:x]
+                    return ret[:x].strip()
             except UnicodeDecodeError:
                 pass
 
     def handleOneConnection(self, conn):
-        log_uuid = self.get_command(conn)
+        # V1 protocol
+        # -----------
+        #  v:<ver>    get version number, <ver> is remote version
+        #  s:<uuid>   send logs for <uuid>
+        while True:
+            command = self.get_command(conn)
+            if command.startswith('v:'):
+                # NOTE(ianw) : remote sends its version.  We currently
+                # don't have anything to do with this value, so ignore
+                # for now.
+                conn.send(f'{ZUUL_CONSOLE_PROTO_VERSION}\n'.encode('utf-8'))
+                continue
+            elif command.startswith('s:'):
+                log_uuid = command[2:]
+                break
+            else:
+                # NOTE(ianw): 2022-07-21 In releases < 6.1.0 the streaming
+                # side would just send a raw uuid and nothing else; so by
+                # default assume that is what is coming in here.  We can
+                # remove this fallback when we decide it is no longer
+                # necessary.
+                log_uuid = command
+                break
+
         # use path split to make use the input isn't trying to be clever
         # and construct some path like /tmp/console-/../../something
-        log_uuid = os.path.split(log_uuid.rstrip())[-1]
+        log_uuid = os.path.split(log_uuid)[-1]
 
         # FIXME: this won't notice disconnects until it tries to send
         console = None
