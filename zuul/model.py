@@ -742,7 +742,40 @@ class PipelineState(zkobject.ZKObject):
             "queues": queues,
             "old_queues": old_queues,
         })
+        if context.build_references:
+            self._fixBuildReferences(data)
+            context.build_references = False
         return data
+
+    def _fixBuildReferences(self, data):
+        # Reconcile duplicate builds; if we find any DuplicateBuild
+        # objects, look up the actual builds and replace
+        build_map = {}
+        to_replace_dicts = []
+        to_replace_lists = []
+        for queue in data['queues'] + data['old_queues']:
+            for item in queue.queue:
+                buildset = item.current_build_set
+                for build_uuid, build in buildset.builds.items():
+                    if isinstance(build, BuildReference):
+                        to_replace_dicts.append((buildset.builds,
+                                                 build_uuid,
+                                                 build._path))
+                    else:
+                        build_map[build.getPath()] = build
+                for job_name, build_list in buildset.retry_builds.items():
+                    for build in build_list:
+                        if isinstance(build, BuildReference):
+                            to_replace_lists.append((build_list,
+                                                     build,
+                                                     build._path))
+                        else:
+                            build_map[build.getPath()] = build
+        for (build_dict, build_uuid, build_path) in to_replace_dicts:
+            build_dict[build_uuid] = build_map[build_path]
+        for (build_list, build, build_path) in to_replace_lists:
+            idx = build_list.index(build)
+            build_list[idx] = build_map[build_path]
 
     def _getKnownItems(self):
         items = []
@@ -3424,6 +3457,11 @@ class BuildRequest(JobRequest):
         )
 
 
+class BuildReference:
+    def __init__(self, _path):
+        self._path = _path
+
+
 class Build(zkobject.ZKObject):
     """A Build is an instance of a single execution of a Job.
 
@@ -3852,6 +3890,13 @@ class BuildSet(zkobject.ZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
+    def _isMyBuild(self, build_path):
+        parts = build_path.split('/')
+        buildset_uuid = parts[-5]
+        if buildset_uuid == self.uuid:
+            return True
+        return False
+
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
         # Set our UUID so that getPath() returns the correct path for
@@ -3944,8 +3989,13 @@ class BuildSet(zkobject.ZKObject):
                         if not build.result:
                             build.refresh(context)
                     else:
-                        build = Build.fromZK(
-                            context, build_path, job=job, build_set=self)
+                        if not self._isMyBuild(build_path):
+                            build = BuildReference(build_path)
+                            context.build_references = True
+                        else:
+                            build = Build.fromZK(
+                                context, build_path, _path=build_path,
+                                job=job, build_set=self)
                     builds[job_name] = build
 
                 for retry_path in data["retry_builds"].get(job_name, []):
@@ -3954,8 +4004,12 @@ class BuildSet(zkobject.ZKObject):
                         # Retry builds never change.
                         pass
                     else:
-                        retry_build = Build.fromZK(
-                            context, retry_path, job=job, build_set=self)
+                        if not self._isMyBuild(retry_path):
+                            retry_build = BuildReference(retry_path)
+                            context.build_references = True
+                        else:
+                            retry_build = Build.fromZK(
+                                context, retry_path, job=job, build_set=self)
                     retry_builds[job_name].append(retry_build)
 
         data.update({
