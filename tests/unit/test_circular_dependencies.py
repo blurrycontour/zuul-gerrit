@@ -1703,6 +1703,73 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 3)
 
+    @simple_layout('layouts/job-dedup-false.yaml')
+    def test_job_deduplication_false_failed_job(self):
+        # Test that if we are *not* deduplicating jobs, we don't
+        # duplicate the result on two different builds.
+        # The way we check that is to retry the common-job between two
+        # items, but only once, and only on one item.  The other item
+        # should be unaffected.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        # If we don't make sure these jobs finish first, then one of
+        # the items may complete before the other and cause Zuul to
+        # abort the project*-job on the other item (with a "bundle
+        # failed to merge" error).
+        self.waitUntilSettled()
+        for build in self.builds:
+            if build.name == 'common-job' and build.project == 'org/project1':
+                break
+        else:
+            raise Exception("Unable to find build")
+        build.should_retry = True
+
+        # Store a reference to the queue items so we can inspect their
+        # internal attributes later to double check the retry build
+        # count is correct.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['gate']
+        items = pipeline.getAllItems()
+        self.assertEqual(len(items), 2)
+
+        self.executor_server.release('project1-job')
+        self.executor_server.release('project2-job')
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertHistory([
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result=None, changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 5)
+        self.assertEqual(items[0].change.project.name, 'org/project2')
+        self.assertEqual(len(items[0].current_build_set.retry_builds), 0)
+        self.assertEqual(items[1].change.project.name, 'org/project1')
+        self.assertEqual(len(items[1].current_build_set.retry_builds), 1)
+
     @simple_layout('layouts/job-dedup-noop.yaml')
     def test_job_deduplication_noop(self):
         # Test that we don't deduplicate noop (there's no good reason

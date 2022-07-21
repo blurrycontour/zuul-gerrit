@@ -3091,6 +3091,8 @@ class FakeBuild(object):
         self.paused = False
         self.aborted = False
         self.requeue = False
+        self.should_fail = False
+        self.should_retry = False
         self.created = time.time()
         self.changes = None
         items = self.parameters['zuul']['items']
@@ -3162,6 +3164,8 @@ class FakeBuild(object):
         return result
 
     def shouldFail(self):
+        if self.should_fail:
+            return True
         changes = self.executor_server.fail_tests.get(self.name, [])
         for change in changes:
             if self.hasChanges(change):
@@ -3169,6 +3173,8 @@ class FakeBuild(object):
         return False
 
     def shouldRetry(self):
+        if self.should_retry:
+            return True
         entries = self.executor_server.retry_tests.get(self.name, [])
         for entry in entries:
             if self.hasChanges(entry['change']):
