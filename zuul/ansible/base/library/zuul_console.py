@@ -174,11 +174,17 @@ class Server(object):
             except UnicodeDecodeError:
                 pass
 
+    def _clean_uuid(self, log_uuid):
+        # use path split to make use the input isn't trying to be clever
+        # and construct some path like /tmp/console-/../../something
+        return os.path.split(log_uuid)[-1]
+
     def handleOneConnection(self, conn):
         # V1 protocol
         # -----------
         #  v:<ver>    get version number, <ver> is remote version
         #  s:<uuid>   send logs for <uuid>
+        #  f:<uuid>   finalise/cleanup <uuid>
         while True:
             command = self.get_command(conn)
             if command.startswith('v:'):
@@ -187,8 +193,16 @@ class Server(object):
                 # for now.
                 conn.send(f'{ZUUL_CONSOLE_PROTO_VERSION}\n'.encode('utf-8'))
                 continue
+            elif command.startswith('f:'):
+                log_uuid = self._clean_uuid(command[2:])
+                try:
+                    os.unlink(self.path.format(log_uuid=log_uuid))
+                except Exception:
+                    # something might have cleaned /tmp
+                    pass
+                continue
             elif command.startswith('s:'):
-                log_uuid = command[2:]
+                log_uuid = self._clean_uuid(command[2:])
                 break
             else:
                 # NOTE(ianw): 2022-07-21 In releases < 6.1.0 the streaming
@@ -196,12 +210,8 @@ class Server(object):
                 # default assume that is what is coming in here.  We can
                 # remove this fallback when we decide it is no longer
                 # necessary.
-                log_uuid = command
+                log_uuid = self._clean_uuid(command)
                 break
-
-        # use path split to make use the input isn't trying to be clever
-        # and construct some path like /tmp/console-/../../something
-        log_uuid = os.path.split(log_uuid)[-1]
 
         # FIXME: this won't notice disconnects until it tries to send
         console = None
