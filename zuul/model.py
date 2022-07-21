@@ -3463,6 +3463,7 @@ class Build(zkobject.ZKObject):
             held=False,
             zuul_event_id=None,
             build_request_ref=None,
+            deduplicated_item=None,
         )
 
     def serialize(self, context):
@@ -3481,6 +3482,7 @@ class Build(zkobject.ZKObject):
             "held": self.held,
             "zuul_event_id": self.zuul_event_id,
             "build_request_ref": self.build_request_ref,
+            "deduplicated_item": self.deduplicated_item,
         }
         if COMPONENT_REGISTRY.model_api < 5:
             data["_result_data"] = (self._result_data.getPath()
@@ -3538,6 +3540,18 @@ class Build(zkobject.ZKObject):
                         data['_' + job_data_key] = JobData.fromZK(
                             context, job_data['path'])
         return data
+
+    def copy(self, context, job, build_set, other_item):
+        for job_data_key in self.job_data_attributes:
+            if getattr(self, job_data_key, None):
+                raise Exception("Unable to copy build with result data")
+        other = Build()
+        other._set(**other.deserialize(self.serialize(context), context))
+        other._set(job=job, build_set=build_set,
+                   deduplicated_item=other_item.uuid)
+        data = other._trySerialize(context)
+        other._save(context, data, create=True)
+        return other
 
     def getPath(self):
         return f"{self.job.getPath()}/build/{self.uuid}"
@@ -4861,7 +4875,11 @@ class QueueItem(zkobject.ZKObject):
             if other_build and not this_build:
                 log.info("Deduplicating build of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
-                self.addBuild(other_build)
+                context = self.pipeline.manager.current_context
+                this_build = other_build.copy(context, job=job,
+                                              build_set=build_set,
+                                              other_item=other_item)
+                self.addBuild(this_build)
                 job._set(_ready_to_run=False)
 
     def findJobsToRun(self, semaphore_handler):

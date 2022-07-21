@@ -2460,7 +2460,7 @@ class Scheduler(threading.Thread):
         else:
             self.log.error("Unable to handle event %s", event)
 
-    def _getBuildSetFromPipeline(self, event, pipeline):
+    def _getBuildSetFromPipeline(self, event, pipeline, multiple=False):
         log = get_annotated_logger(
             self.log,
             event=getattr(event, "zuul_event_id", None),
@@ -2473,95 +2473,79 @@ class Scheduler(threading.Thread):
             )
             return
 
+        ret = []
         for item in pipeline.getAllItems():
             # If the provided buildset UUID doesn't match any current one,
             # we assume that it's not current anymore.
             if item.current_build_set.uuid == event.build_set_uuid:
-                return item.current_build_set
+                if multiple:
+                    ret.append(item.current_build_set)
+                else:
+                    return item.current_build_set
 
+        if ret:
+            return ret
         log.warning("Build set %s is not current", event.build_set_uuid)
 
-    def _getBuildFromPipeline(self, event, pipeline):
+    def _getBuildsFromPipeline(self, event, pipeline):
         log = get_annotated_logger(
             self.log, event.zuul_event_id, build=event.build_uuid)
-        build_set = self._getBuildSetFromPipeline(event, pipeline)
-        if not build_set:
-            return
+        ret = []
+        for item in pipeline.getAllItems():
+            build = item.current_build_set.getBuild(event.job_name)
+            if not build:
+                continue
 
-        build = build_set.getBuild(event.job_name)
-        # Verify that the build uuid matches the one of the result
-        if not build:
-            log.debug(
-                "Build %s could not be found in the current buildset",
-                event.build_uuid)
-            return
+            if not build.uuid == event.build_uuid:
+                continue
 
-        # Verify that the build UUIDs match since we looked up the build by
-        # its job name. In case of a retried build, we might already have a new
-        # build in the buildset.
-        # TODO (felix): Not sure if that reasoning is correct, but I think it
-        # shouldn't harm to have such an additional safeguard.
-        if not build.uuid == event.build_uuid:
-            log.debug(
-                "Build UUID %s doesn't match the current build's UUID %s",
-                event.build_uuid, build.uuid)
-            return
-
-        return build
+            ret.append(build)
+        return ret
 
     def _doBuildStartedEvent(self, event, pipeline):
-        build = self._getBuildFromPipeline(event, pipeline)
-        if not build:
-            return
+        for build in self._getBuildsFromPipeline(event, pipeline):
+            with build.activeContext(pipeline.manager.current_context):
+                build.start_time = event.data["start_time"]
 
-        with build.activeContext(pipeline.manager.current_context):
-            build.start_time = event.data["start_time"]
-
-            log = get_annotated_logger(
-                self.log, build.zuul_event_id, build=build.uuid)
-            try:
-                change = build.build_set.item.change
-                estimate = self.times.getEstimatedTime(
-                    pipeline.tenant.name,
-                    change.project.name,
-                    getattr(change, 'branch', None),
-                    build.job.name)
-                if not estimate:
-                    estimate = 0.0
-                build.estimated_time = estimate
-            except Exception:
-                log.exception("Exception estimating build time:")
-        pipeline.manager.onBuildStarted(build)
+                log = get_annotated_logger(
+                    self.log, build.zuul_event_id, build=build.uuid)
+                try:
+                    change = build.build_set.item.change
+                    estimate = self.times.getEstimatedTime(
+                        pipeline.tenant.name,
+                        change.project.name,
+                        getattr(change, 'branch', None),
+                        build.job.name)
+                    if not estimate:
+                        estimate = 0.0
+                    build.estimated_time = estimate
+                except Exception:
+                    log.exception("Exception estimating build time:")
+            pipeline.manager.onBuildStarted(build)
 
     def _doBuildStatusEvent(self, event, pipeline):
-        build = self._getBuildFromPipeline(event, pipeline)
-        if not build:
-            return
-
-        # Allow URL to be updated
-        build.updateAttributes(pipeline.manager.current_context,
-                               url=event.data.get('url', build.url))
+        for build in self._getBuildsFromPipeline(event, pipeline):
+            # Allow URL to be updated
+            build.updateAttributes(pipeline.manager.current_context,
+                                   url=event.data.get('url', build.url))
 
     def _doBuildPausedEvent(self, event, pipeline):
-        build = self._getBuildFromPipeline(event, pipeline)
-        if not build:
-            return
+        for build in self._getBuildsFromPipeline(event, pipeline):
+            # Setting paused is deferred to event processing stage to avoid a race
+            # with child job skipping.
+            with build.activeContext(pipeline.manager.current_context):
+                build.paused = True
+                build.setResultData(
+                    event.data.get("data", {}),
+                    event.data.get("secret_data", {}))
 
-        # Setting paused is deferred to event processing stage to avoid a race
-        # with child job skipping.
-        with build.activeContext(pipeline.manager.current_context):
-            build.paused = True
-            build.setResultData(
-                event.data.get("data", {}),
-                event.data.get("secret_data", {}))
-
-        pipeline.manager.onBuildPaused(build)
+            pipeline.manager.onBuildPaused(build)
 
     def _doBuildCompletedEvent(self, event, pipeline):
         log = get_annotated_logger(
             self.log, event.zuul_event_id, build=event.build_uuid)
-        build = self._getBuildFromPipeline(event, pipeline)
-        if not build:
+        builds = self._getBuildsFromPipeline(event, pipeline)
+        if not builds:
             self.log.error(
                 "Unable to find build %s. Creating a fake build to clean up "
                 "build resources.",
@@ -2600,67 +2584,69 @@ class Scheduler(threading.Thread):
             # an incomplete (fake) build object to the pipeline manager.
             return
 
-        event_result = event.data
+        for build in builds:
+            event_result = event.data
 
-        result = event_result.get("result")
-        result_data = event_result.get("data", {})
-        secret_result_data = event_result.get("secret_data", {})
-        warnings = event_result.get("warnings", [])
+            result = event_result.get("result")
+            result_data = event_result.get("data", {})
+            secret_result_data = event_result.get("secret_data", {})
+            warnings = event_result.get("warnings", [])
 
-        log.info("Build complete, result %s, warnings %s", result, warnings)
+            log.info("Build complete, result %s, warnings %s", result, warnings)
 
-        with build.activeContext(pipeline.manager.current_context):
-            build.error_detail = event_result.get("error_detail")
+            with build.activeContext(pipeline.manager.current_context):
+                build.error_detail = event_result.get("error_detail")
 
-            if result is None:
-                build.retry = True
-            if result == "ABORTED":
-                # Always retry if the executor just went away
-                build.retry = True
-            # TODO: Remove merger_failure in v6.0
-            if result in ["MERGE_CONFLICT", "MERGER_FAILURE"]:
-                # The build result MERGE_CONFLICT is a bit misleading here
-                # because when we got here we know that there are no merge
-                # conflicts. Instead this is most likely caused by some
-                # infrastructure failure. This can be anything like connection
-                # issue, drive corruption, full disk, corrupted git cache, etc.
-                # This may or may not be a recoverable failure so we should
-                # retry here respecting the max retries. But to be able to
-                # distinguish from RETRY_LIMIT which normally indicates pre
-                # playbook failures we keep the build result after the max
-                # attempts.
-                if build.build_set.getTries(
-                        build.job.name) < build.job.attempts:
+                if result is None:
                     build.retry = True
+                if result == "ABORTED":
+                    # Always retry if the executor just went away
+                    build.retry = True
+                # TODO: Remove merger_failure in v6.0
+                if result in ["MERGE_CONFLICT", "MERGER_FAILURE"]:
+                    # The build result MERGE_CONFLICT is a bit misleading here
+                    # because when we got here we know that there are no merge
+                    # conflicts. Instead this is most likely caused by some
+                    # infrastructure failure. This can be anything like connection
+                    # issue, drive corruption, full disk, corrupted git cache, etc.
+                    # This may or may not be a recoverable failure so we should
+                    # retry here respecting the max retries. But to be able to
+                    # distinguish from RETRY_LIMIT which normally indicates pre
+                    # playbook failures we keep the build result after the max
+                    # attempts.
+                    if build.build_set.getTries(
+                            build.job.name) < build.job.attempts:
+                        build.retry = True
 
-            if build.retry:
-                result = "RETRY"
+                if build.retry:
+                    result = "RETRY"
 
-            # If the build was canceled, we did actively cancel the job so
-            # don't overwrite the result and don't retry.
-            if build.canceled:
-                result = build.result or "CANCELED"
-                build.retry = False
+                # If the build was canceled, we did actively cancel the job so
+                # don't overwrite the result and don't retry.
+                if build.canceled:
+                    result = build.result or "CANCELED"
+                    build.retry = False
 
-            build.end_time = event_result["end_time"]
-            build.setResultData(result_data, secret_result_data)
-            build.build_set.updateAttributes(
-                pipeline.manager.current_context,
-                warning_messages=build.build_set.warning_messages + warnings)
-            build.held = event_result.get("held")
+                build.end_time = event_result["end_time"]
+                build.setResultData(result_data, secret_result_data)
+                build.build_set.updateAttributes(
+                    pipeline.manager.current_context,
+                    warning_messages=build.build_set.warning_messages + warnings)
+                build.held = event_result.get("held")
 
-            build.result = result
+                build.result = result
 
-        self._reportBuildStats(build)
+            self._reportBuildStats(build)
 
-        self._cleanupCompletedBuild(build)
-        try:
-            self.sql.reportBuildEnd(
-                build, tenant=pipeline.tenant.name, final=(not build.retry))
-        except Exception:
-            log.exception("Error reporting build completion to DB:")
+            self._cleanupCompletedBuild(build)
+            try:
+                if not build.deduplicated_item:
+                    self.sql.reportBuildEnd(
+                        build, tenant=pipeline.tenant.name, final=(not build.retry))
+            except Exception:
+                log.exception("Error reporting build completion to DB:")
 
-        pipeline.manager.onBuildCompleted(build)
+            pipeline.manager.onBuildCompleted(build)
 
     def _cleanupCompletedBuild(self, build):
         # TODO (felix): Returning the nodes doesn't work in case the buildset

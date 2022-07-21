@@ -1679,7 +1679,8 @@ class PipelineManager(metaclass=ABCMeta):
     def onBuildStarted(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         log.debug("Build %s started", build)
-        self.sql.reportBuildStart(build)
+        if not build.deduplicated_item:
+            self.sql.reportBuildStart(build)
         self.reportPipelineTiming('job_wait_time',
                                   build.execute_time, build.start_time)
         if not build.build_set.item.first_job_start_time:
@@ -1763,50 +1764,21 @@ class PipelineManager(metaclass=ABCMeta):
                      build, item)
             return
 
-        # If the build was for deduplicated jobs, apply the results to
-        # all the items that use this build.
-        build_in_items = [item]
-        if item.bundle:
-            for other_item in item.bundle.items:
-                if other_item in build_in_items:
-                    continue
-                if other_item.current_build_set.getBuild(build.job.name):
-                    other_build = other_item.current_build_set.getBuild(
-                        build.job.name)
-                    if other_build is build:
-                        build_in_items.append(other_item)
-        for item in build_in_items:
-            # We don't care about some actions below if this build
-            # isn't in the current buildset, so determine that before
-            # it is potentially removed with setResult.
-            if item.current_build_set.getBuild(build.job.name) is not build:
-                current = False
-            else:
-                current = True
-            item.setResult(build)
-            log.debug("Item %s status is now:\n %s", item, item.formatStatus())
-
-            if not current:
-                continue
-            build_set = item.current_build_set
-
-            if build.retry:
-                if build_set.getJobNodeSetInfo(build.job.name):
-                    build_set.removeJobNodeSetInfo(build.job.name)
-
-                # in case this was a paused build we need to retry all
-                # child jobs
-                self._resetDependentBuilds(build_set, build)
-
-            self._resumeBuilds(build_set)
-
-            if (build_set.fail_fast and
-                build.failed and build.job.voting and not build.retry):
-                # If fail-fast is set and the build is not successful
-                # cancel all remaining jobs.
-                log.debug("Build %s failed and fail-fast enabled, canceling "
-                          "running builds", build)
-                self._cancelRunningBuilds(build_set)
+        item.setResult(build)
+        log.debug("Item %s status is now:\n %s", item, item.formatStatus())
+        if build.retry:
+            if build.build_set.getJobNodeSetInfo(build.job.name):
+                build.build_set.removeJobNodeSetInfo(build.job.name)
+            # in case this was a paused build we need to retry all child jobs
+            self._resetDependentBuilds(build.build_set, build)
+        self._resumeBuilds(build.build_set)
+        if (item.current_build_set.fail_fast and
+            build.failed and build.job.voting and not build.retry):
+            # If fail-fast is set and the build is not successful
+            # cancel all remaining jobs.
+            log.debug("Build %s failed and fail-fast enabled, canceling "
+                      "running builds", build)
+            self._cancelRunningBuilds(build.build_set)
 
         return True
 
