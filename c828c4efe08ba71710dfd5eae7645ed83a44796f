@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8f7fd3a_6a3851b6",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-07-21T18:32:25Z",
+      "side": 1,
+      "message": "I think we should keep the \u0027progress-bar-info\u0027 class for pause, or remove the `case \u0027paused\u0027` line.",
+      "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a996e4b_e7c53153",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-07-21T18:32:25Z",
+      "side": 1,
+      "message": "It might be easier to follow by doing:\n  \n  let [buttonText, interesting_jobs] \u003d this.state.show_skipped ?\n    [\"Hide\", jobs] :\n    [\"Show\", jobs.filter(j \u003d\u003e this.JobStrResult(j) !\u003d\u003d \u0027skipped\u0027]\n    \nThat way we don\u0027t have to filter the list twice. Though it seems like you got it right :-)",
+      "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
