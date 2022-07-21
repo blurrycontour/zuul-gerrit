@@ -69,6 +69,24 @@
       "parentUuid": "8a996e4b_e7c53153",
       "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e95035e_e41ad734",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-07-21T23:58:26Z",
+      "side": 1,
+      "message": "I see, then I guess we could always use `const skippedJobCount \u003d jobs.filter(j \u003d\u003e this.jobStrResult(j) \u003d\u003d\u003d \u0027skipped\u0027).length`, but what you proposed looks good to me.",
+      "parentUuid": "ce83fc83_7d409d13",
+      "revId": "c828c4efe08ba71710dfd5eae7645ed83a44796f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
