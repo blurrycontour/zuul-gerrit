@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "744ef34b_7cf06b3a",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-22T16:21:09Z",
+      "side": 1,
+      "message": "Super minor nit. Elsewhere we compare with \u003e\u003d 1. If the versions end up as 0.x one would trip but not the other. I don\u0027t think this is likely to happen so just a nit.\n\nThis would also require casting the str to a float instead of an int.",
+      "revId": "f54f771ec3fcb7c92c14dacd11e0a9ed90958b6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cc9cf4a_efa79a16",
+        "filename": "zuul/ansible/base/library/zuul_console.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-22T16:21:09Z",
+      "side": 1,
+      "message": "Is this meant to be \u0027sure\u0027 ?",
+      "range": {
+        "startLine": 178,
+        "startChar": 33,
+        "endLine": 178,
+        "endChar": 36
+      },
+      "revId": "f54f771ec3fcb7c92c14dacd11e0a9ed90958b6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
