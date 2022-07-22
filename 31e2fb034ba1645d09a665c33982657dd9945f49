@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "632a9249_a5663968",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-22T16:10:39Z",
+      "side": 1,
+      "message": "Why not keep the LOG_STREAM_VERSION and CONSOLE_PROTO_VERSION in sync when we start? It is a bit weird to me that one initializes at version 0 and the other 1.",
+      "revId": "31e2fb034ba1645d09a665c33982657dd9945f49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e3066f9_fb5afbd9",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-22T16:10:39Z",
+      "side": 1,
+      "message": "Should we try except this int conversion here and treat it as an older zuul too? In theory this isn\u0027t necessary, but it is network traffic so may be a good idea?",
+      "revId": "31e2fb034ba1645d09a665c33982657dd9945f49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
