@@ -29,7 +29,7 @@ class FunctionalZuulStreamMixIn:
         self.log_console_port = 19000 + int(
             self.ansible_core_version.split('.')[1])
         self.executor_server.log_console_port = self.log_console_port
-        self.wait_timeout = 120
+        self.wait_timeout = 150
         self.fake_nodepool.remote_ansible = True
 
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
