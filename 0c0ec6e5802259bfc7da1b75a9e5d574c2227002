@@ -51,6 +51,23 @@
       "parentUuid": "9c991092_f0f87881",
       "revId": "0c0ec6e5802259bfc7da1b75a9e5d574c2227002",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f678ddca_c65fcad1",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-22T22:20:12Z",
+      "side": 1,
+      "message": "It\u0027s definitely not meant to be configurable.\n\nThere will still be times that files will be left behind (for instance, when a job is aborted).\n\nIf you really want to ensure proper cleanup, perhaps the console streaming daemon could act as a tmp reaper.  That might obviate the need for the protocol complexity (but it\u0027s nice to have a protocol anyway).",
+      "revId": "0c0ec6e5802259bfc7da1b75a9e5d574c2227002",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
