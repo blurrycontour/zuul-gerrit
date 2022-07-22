@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e66c0d5b_92296829",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-22T21:14:59Z",
+      "side": 1,
+      "message": "ahh thanks, good catch; yes i missed which ones are symlinked and not\n\nOn testing -- I want to do a full test after https://review.opendev.org/#/q/I823156dc2bcae91bd6d9770bd1520aa55ad875b4 is applied to the opendev zuul executors.\n\ncurrently, the opendev zuul_console leaves behind /tmp/console-* files.  when we have merged and deployed changes to stop that happening, we can simply add a test to the playbook that /tmp is free of console-* files.",
+      "parentUuid": "e40817b1_1af78b8c",
+      "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "282e2274_f0714cbc",
         "filename": "zuul/ansible/2.9/library/command.py",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-22T16:30:17Z",
       "side": 1,
       "message": "Someone that runs Zuul on windows (and other remotes) will need to chime in, but is this platform independent? I don\u0027t actually know if the console streamer works at all on those platforms. It may be the case that this is already linux/unix specific.",
+      "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4548c83f_78450c56",
+        "filename": "zuul/ansible/2.9/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-22T21:14:59Z",
+      "side": 1,
+      "message": "zuul_stream.py already exits with no streaming on windows; see\n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/ansible/base/callback/zuul_stream.py#L280",
+      "parentUuid": "282e2274_f0714cbc",
       "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
