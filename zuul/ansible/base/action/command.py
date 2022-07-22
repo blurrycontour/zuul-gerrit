@@ -25,15 +25,21 @@ class ActionModule(command.ActionModule):
         if self._task.action in (
                 'command', 'shell',
                 'ansible.builtin.command', 'ansible.builtin.shell'):
-            # Get a unique key for ZUUL_LOG_ID_MAP.  ZUUL_LOG_ID_MAP
-            # is read-only since we are forked.  Use it to add a
-            # counter to the log id so that if we run the same task
-            # more than once, we get a unique log file.  See comments
-            # in paths.py for details.
-            log_host = paths._sanitize_filename(
-                task_vars.get('inventory_hostname'))
-            key = "%s-%s" % (self._task._uuid, log_host)
-            count = paths.ZUUL_LOG_ID_MAP.get(key, 0)
-            self._task.args['zuul_log_id'] = "%s-%s-%s" % (
-                self._task._uuid, count, log_host)
+            # This is a bit lame, but we do not log loops in the
+            # zuul_stream.py callback.  This allows us to not write
+            # out command.py output to files that will never be read.
+            if 'ansible_loop_var' in task_vars:
+                self._task.args['zuul_log_id'] = 'in-loop-ignore'
+            else:
+                # Get a unique key for ZUUL_LOG_ID_MAP.  ZUUL_LOG_ID_MAP
+                # is read-only since we are forked.  Use it to add a
+                # counter to the log id so that if we run the same task
+                # more than once, we get a unique log file.  See comments
+                # in paths.py for details.
+                log_host = paths._sanitize_filename(
+                    task_vars.get('inventory_hostname'))
+                key = "%s-%s" % (self._task._uuid, log_host)
+                count = paths.ZUUL_LOG_ID_MAP.get(key, 0)
+                self._task.args['zuul_log_id'] = "%s-%s-%s" % (
+                    self._task._uuid, count, log_host)
         return super(ActionModule, self).run(tmp, task_vars)
