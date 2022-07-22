@@ -14,9 +14,9 @@ Timers don't require a special connection or driver. Instead they can
 simply be used by listing ``timer`` as the trigger.
 
 This trigger will run based on a cron-style time specification.  It
-will enqueue an event into its pipeline for every project defined in
-the configuration.  Any job associated with the pipeline will run in
-response to that event.
+will enqueue an event into its pipeline for every project and branch
+defined in the configuration.  Any job associated with the pipeline
+will run in response to that event.
 
 .. attr:: pipeline.trigger.timer
 
@@ -27,9 +27,9 @@ response to that event.
 
       The time specification in cron syntax.  Only the 5 part syntax
       is supported, not the symbolic names.  Example: ``0 0 * * *``
-      runs at midnight. The first weekday is Monday.
-      An optional 6th part specifies seconds.  The optional 7th part
-      specifies a jitter in seconds. This advances or delays the
-      trigger randomly, limited by the specified value.
-      Example ``0 0 * * * * 60`` runs at midnight with a +/- 60
-      seconds jitter.
+      runs at midnight. The first weekday is Monday.  An optional 6th
+      part specifies seconds.  The optional 7th part specifies a
+      jitter in seconds. This delays the trigger randomly, limited by
+      the specified value.  Example ``0 0 * * * * 60`` runs at
+      midnight or randomly up to 60 seconds later.  The jitter is
+      applied individually to each project-branch combination.
