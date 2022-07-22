@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "57dabbcd_c1f80df0",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-22T21:54:39Z",
+      "side": 1,
+      "message": "I guess I was trying to make the point they are independent, in that the streaming side wants to know what the remote side is (so it can send finalise messages) and the remote side wants to know what the console side is (so it knows what files to look for, see I199313e1fff567b176020ced1d8e92c5059012cd).\n\nIf you feel strongly it can be bumped; as noted I199313e1fff567b176020ced1d8e92c5059012cd is an actual use of this feature",
+      "parentUuid": "632a9249_a5663968",
+      "revId": "31e2fb034ba1645d09a665c33982657dd9945f49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e3066f9_fb5afbd9",
         "filename": "zuul/ansible/base/callback/zuul_stream.py",
         "patchSetId": 10
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-22T16:10:39Z",
       "side": 1,
       "message": "Should we try except this int conversion here and treat it as an older zuul too? In theory this isn\u0027t necessary, but it is network traffic so may be a good idea?",
+      "revId": "31e2fb034ba1645d09a665c33982657dd9945f49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6ec0fb0_d42f4824",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-22T21:54:39Z",
+      "side": 1,
+      "message": "In this case I think it\u0027s better to not fall-back and just fail, to avoid us getting into the situation where we\u0027ve somehow started sending the wrong thing but didn\u0027t notice.  I do get the \"be strict in what sending, generous in receiving\" but since we control both sides, I think we\u0027re better keeping it strict.",
+      "parentUuid": "5e3066f9_fb5afbd9",
       "revId": "31e2fb034ba1645d09a665c33982657dd9945f49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
