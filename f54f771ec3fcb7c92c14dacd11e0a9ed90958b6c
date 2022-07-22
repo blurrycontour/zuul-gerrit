@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c3dfa096_0324979c",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-22T21:58:46Z",
+      "side": 1,
+      "message": "I was definitely of the thought that the versions are integers only",
+      "parentUuid": "744ef34b_7cf06b3a",
+      "revId": "f54f771ec3fcb7c92c14dacd11e0a9ed90958b6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0cc9cf4a_efa79a16",
         "filename": "zuul/ansible/base/library/zuul_console.py",
         "patchSetId": 20
@@ -31,6 +49,30 @@
       "writtenOn": "2022-07-22T16:21:09Z",
       "side": 1,
       "message": "Is this meant to be \u0027sure\u0027 ?",
+      "range": {
+        "startLine": 178,
+        "startChar": 33,
+        "endLine": 178,
+        "endChar": 36
+      },
+      "revId": "f54f771ec3fcb7c92c14dacd11e0a9ed90958b6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf1179c6_23599b9f",
+        "filename": "zuul/ansible/base/library/zuul_console.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-07-22T21:58:46Z",
+      "side": 1,
+      "message": "it is, will fix if rerolled",
+      "parentUuid": "0cc9cf4a_efa79a16",
       "range": {
         "startLine": 178,
         "startChar": 33,
