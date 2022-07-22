@@ -69,6 +69,24 @@
       "parentUuid": "282e2274_f0714cbc",
       "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61a46926_16cd7b27",
+        "filename": "zuul/ansible/2.9/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-22T22:30:26Z",
+      "side": 1,
+      "message": "That disables streaming on a winrm connection, but it doesn\u0027t address streaming to a windows host over an ssh connection.  I don\u0027t know if anyone does that, and I don\u0027t know if it\u0027s possible.  My guess is \"no\" to the first and \"yes if you have a full posix (eg cygwin) environment\" to the second, but I have not researched this.  However, I think the use of os.devnull is good enough for our purposes here.  FWIW, we also assume \"/tmp\" exists and don\u0027t do any special platform handling for that.",
+      "parentUuid": "282e2274_f0714cbc",
+      "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
