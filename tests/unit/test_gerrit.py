@@ -699,6 +699,7 @@ class TestPolling(ZuulTestCase):
                                            files=file_dict)
         A.setMerged()
         self.waitForPoll('gerrit')
+        self.waitUntilSettled()
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         B.setCheck('zuul:check', reset=True)

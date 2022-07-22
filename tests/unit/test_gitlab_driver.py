@@ -28,7 +28,7 @@ from tests.base import ZuulTestCase, ZuulWebFixture
 
 from testtools.matchers import MatchesRegex
 
-EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {})
+EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
 
 
 class TestGitlabWebhook(ZuulTestCase):
