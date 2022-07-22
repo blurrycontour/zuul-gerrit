@@ -48,7 +48,7 @@ from zuul.ansible import paths
 from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
-LOG_STREAM_VERSION = 0
+LOG_STREAM_VERSION = 1
 
 
 def zuul_filter_result(result):

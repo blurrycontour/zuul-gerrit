@@ -68,7 +68,7 @@
     - name: Find any console log files
       find:
         paths: /tmp
-        patterns: 'console-*.log'
+        patterns: 'zuul-console-*.log'
       register: _tmp_files
 
     # We check this list in zuul-stream/functional.yaml to make sure

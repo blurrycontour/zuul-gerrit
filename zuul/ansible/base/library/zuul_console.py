@@ -31,8 +31,10 @@ import time
 ZUUL_CONSOLE_PROTO_VERSION = 1
 # This is the template for the file name of the log-file written out
 # by the command.py override command in the executor's Ansible
-# install.
+# install.  If the remote end reports > 0, it is writing to a file
+# prefixed with "zuul"
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
+LOG_STREAM_FILE_V1 = '/tmp/zuul-console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
 
 
@@ -87,6 +89,7 @@ class Server(object):
         s.listen(1)
 
         self.socket = s
+        self.remote_version = 0
 
     def accept(self):
         conn, addr = self.socket.accept()
@@ -188,10 +191,11 @@ class Server(object):
         while True:
             command = self.get_command(conn)
             if command.startswith('v:'):
-                # NOTE(ianw) : remote sends its version.  We currently
-                # don't have anything to do with this value, so ignore
-                # for now.
+                self.remote_version = int(command[2:])
                 conn.send(f'{ZUUL_CONSOLE_PROTO_VERSION}\n'.encode('utf-8'))
+
+                if self.remote_version > 0:
+                    self.path = LOG_STREAM_FILE_V1
                 continue
             elif command.startswith('f:'):
                 log_uuid = self._clean_uuid(command[2:])
@@ -335,7 +339,8 @@ def main():
                 msg="Could not kill zuul_console pid",
                 exceptions=[str(e)])
 
-        for fn in glob.glob(LOG_STREAM_FILE.format(log_uuid='*')):
+        for fn in (glob.glob(LOG_STREAM_FILE.format(log_uuid='*')) +
+                   glob.glob(LOG_STREAM_FILE_V1.format(log_uuid='*'))):
             try:
                 os.unlink(fn)
             except Exception as e:
