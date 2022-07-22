@@ -255,7 +255,7 @@ from ansible.module_utils.six import (
 from ansible.module_utils.six.moves import shlex_quote
 
 
-LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
+LOG_STREAM_FILE = '/tmp/zuul-console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
 # List to save stdout log lines in as we collect them
 _log_lines = []

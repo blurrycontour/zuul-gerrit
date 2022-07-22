@@ -44,7 +44,7 @@
       shell: |
         for f in $(grep 'Starting to log' console-job-output-success-19887.txt | awk '{print $5}'); do
           echo "Checking ${f}"
-          if grep -q '"path": "/tmp/console-'${f}'.log"' job-output-success-19887.txt; then
+          if grep -q '"path": "/tmp/zuul-console-'${f}'.log"' job-output-success-19887.txt; then
             echo "*** /tmp/${f}.log still exists"
             exit 1
           fi
