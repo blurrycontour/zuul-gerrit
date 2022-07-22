@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e40817b1_1af78b8c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-22T16:30:17Z",
+      "side": 1,
+      "message": "zuul/ansible/2.8/library/command.py and zuul/ansible/5/library/command.py (this second file is a symlink to zuul/ansible/base/library/command.py) both exist as well but this change only modified zuul/ansible/2.9//library/command.py. -1 for this issue.\n\nMaybe we should add loops to the testing and ensure the testing properly cleans up for us?",
+      "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "282e2274_f0714cbc",
+        "filename": "zuul/ansible/2.9/library/command.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-22T16:30:17Z",
+      "side": 1,
+      "message": "Someone that runs Zuul on windows (and other remotes) will need to chime in, but is this platform independent? I don\u0027t actually know if the console streamer works at all on those platforms. It may be the case that this is already linux/unix specific.",
+      "revId": "59e4db60bdd7f4ddde0b2dd83775b19b119dfd24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
