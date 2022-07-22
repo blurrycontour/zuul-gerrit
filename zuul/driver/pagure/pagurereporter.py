@@ -67,9 +67,12 @@ class PagureReporter(BaseReporter):
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
         ret = ''
-        jobs_fields = self._getItemReportJobsFields(item)
+        jobs_fields, skipped = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
             ret += '- [%s](%s) : %s%s%s%s\n' % job_fields[:6]
+        if skipped:
+            jobtext = 'job' if skipped == 1 else 'jobs'
+            ret += 'Skipped %i %s\n' % (skipped, jobtext)
         return ret
 
     def addPullComment(self, item, comment=None):

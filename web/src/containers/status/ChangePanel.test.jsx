@@ -16,6 +16,7 @@ import React from 'react'
 import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { create } from 'react-test-renderer'
+import { Button } from '@patternfly/react-core'
 
 import { setTenantAction } from '../../actions/tenant'
 import configureStore from '../../store'
@@ -45,6 +46,8 @@ it('change panel render multi tenant links', () => {
   const jobLink = application.root.findByType(Link)
   expect(jobLink.props.to).toEqual(
     '/t/tenant-one/stream/42')
+  const skipButton = application.root.findAllByType(Button)
+  expect(skipButton === undefined)
 })
 
 it('change panel render white-label tenant links', () => {
@@ -60,4 +63,29 @@ it('change panel render white-label tenant links', () => {
   const jobLink = application.root.findByType(Link)
   expect(jobLink.props.to).toEqual(
     '/stream/42')
+  const skipButton = application.root.findAllByType(Button)
+  expect(skipButton === undefined)
+})
+
+it('change panel skip jobs', () => {
+  const fakeChange = {
+    project: 'org-project',
+    jobs: [{
+      name: 'job-name',
+      url: 'stream/42',
+      result: 'skipped'
+    }]
+  }
+
+  const store = configureStore()
+  store.dispatch(setTenantAction('tenant-one', true))
+  const application = create(
+    <Provider store={store}>
+      <Router>
+        <ChangePanel change={fakeChange} globalExpanded={true} />
+      </Router>
+    </Provider>
+  )
+  const skipButton = application.root.findByType(Button)
+  expect(skipButton.props.children.includes('skipped job'))
 })
