@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8f2b5bd_8dda4ed0",
+        "filename": "doc/source/examples/keycloak/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-07-22T14:50:58Z",
+      "side": 0,
+      "message": "the docker repo hasn\u0027t been updated in 6 months",
+      "revId": "cd07f45d8cdf1a7538ed1343ada4f8b3e03e4d57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

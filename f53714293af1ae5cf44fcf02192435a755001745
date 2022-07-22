@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c7d17e7_35661a55",
+        "filename": "doc/source/howtos/openid-with-keycloak.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2022-07-22T14:50:58Z",
+      "side": 1,
+      "message": "https://github.com/jpadilla/pyjwt/issues/722",
+      "range": {
+        "startLine": 83,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 49
+      },
+      "revId": "f53714293af1ae5cf44fcf02192435a755001745",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
