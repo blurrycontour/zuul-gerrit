@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf86ccf2_c78411ac",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-23T22:28:04Z",
+      "side": 1,
+      "message": "Good point, I\u0027ll elaborate on the configuration syntax a bit and make sure we can do that.",
+      "parentUuid": "78d737b8_495bf2cd",
+      "revId": "961a5c3b5df925939ebb0031682f9113317b9a18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe6b557a_6bba3960",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-21T12:43:17Z",
       "side": 1,
       "message": "nit: Since providers will probably be configured in the Zuul config similar to the connections, we don\u0027t have to name the driver here.",
+      "revId": "961a5c3b5df925939ebb0031682f9113317b9a18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0305216_0ac669ec",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-23T22:28:04Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "fe6b557a_6bba3960",
       "revId": "961a5c3b5df925939ebb0031682f9113317b9a18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
