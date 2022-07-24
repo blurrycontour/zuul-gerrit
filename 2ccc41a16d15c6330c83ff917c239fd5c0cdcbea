@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11aa2752_a849f4d3",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-07-24T11:51:06Z",
+      "side": 1,
+      "message": "I think what\u0027s missing here is how can we define which launcher can work with which provider. We have the use case that our nodepool-builders are disjoint (some are for onprem some for aws) and the images we build should not cross the onprem/aws boundary.\n\nI guess one way could be by only having a subset of connections specified in the individual zuul.conf files and ignoring all providers that link to an unknown connection.\n\nA second way could be to list all connections in the [zuul-launcher] section that should be serviced by a launcher.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aaa8a9a_91dbc9d7",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-07-24T11:51:06Z",
+      "side": 1,
+      "message": "Here few thoughts while thinking about our use cases.\n\nOur users should not have/need knowledge about the instnace flavors that are used/available in the backend. Having the possibility to define virtual flavors could achieve that. \n\nMany of our labels are specified by our projects to run in specific regions aka providers. It could be tedious to have labels and provider/pool attachments distributed. I think it might make sense to also allow to specify the pools that should serve a label directly on the label. In order to achieve that we\u0027d need to allow specifying the image, virtual flavor (I think this would likely be required for this use case) and possibly further information on the label stanza.\n\nWe also need to restrict the available flavors that are available to tenants. This could also achieved by defining virtual labels and somehow restrict defining them via the tenant config to certain repos via the include/exclude of object types in the tenant config. In order to facilitate the config it might make sense to define default includes/excludes on a tenant (e.g. exclude by default certain nodepool object types) and enable them specifically on certain repos that are intended to hold nodepool config.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4d85d32_f50ec454",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-07-24T11:51:06Z",
+      "side": 1,
+      "message": "It would also be great to have config-drive (we need to enable this on every onprem image) also as a global flag on the openstack provider or pool. But I think that\u0027s useful independent of this spec.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d6835bf_92ce5df6",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-07-24T11:51:06Z",
+      "side": 1,
+      "message": "We have tenants with ~100 images that are very hard to switch as a big bang. I think we\u0027d need a more fine grained way of switching on a label-by-label basis.\n\nMaybe we could do that by placing node-requests for known labels in /zuul/node-requests and unknown labels in /nodepool until the tenant is marked fully migrated which would then also enable e.g. label validation in job config.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
