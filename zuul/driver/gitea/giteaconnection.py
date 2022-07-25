@@ -260,10 +260,14 @@ class GiteaEventConnector(threading.Thread):
         event.patch_number = head.get('sha')
         event.url = pr_body.get('url')
 
-        if body['action'] in ['edited', 'synchronized']:
+        if body['action'] == 'synchronized':
             # "edited" is when title or body are changed
             # "synchronized" is raised when new commit added
             event.action = 'changed'
+        elif body['action'] == 'edited':
+            event.action = 'edited'
+            if 'body' in body.get('changes', {}):
+                event.message_edited = True
         else:
             event.action = body['action']
 

@@ -167,6 +167,10 @@ the following options.
 
          Pull request labels updated.
 
+      .. value:: edited
+
+         Pull request modified (title, body)
+
       A :value:`pipeline.trigger.<gitea
       source>.event.gt_pull_request_review` event will have associated
       action(s) to trigger from. The supported actions are:

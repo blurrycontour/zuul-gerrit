@@ -57,11 +57,12 @@ class PullRequest(Change):
         return ' '.join(r) + '>'
 
     def isUpdateOf(self, other):
-        if (self.project == other.project and
-            hasattr(other, 'number') and self.number == other.number and
-            hasattr(other, 'patchset') and self.patchset != other.patchset and
-            hasattr(other, 'updated_at') and
-            self.updated_at > other.updated_at):
+        if (self.project == other.project
+            and hasattr(other, 'number') and self.number == other.number
+            and hasattr(other, 'patchset') and self.patchset != other.patchset
+        ):
+            # NOTE(gtema): on PR sync updated_at is not representing date of
+            # last commit
             return True
         return False
 
@@ -106,17 +107,20 @@ class GiteaTriggerEvent(TriggerEvent):
         super(GiteaTriggerEvent, self).__init__()
         self.title = None
         self.action = None
+        self.message_edited = None
 
     def toDict(self):
         d = super().toDict()
         d["title"] = self.title
         d["action"] = self.action
+        d["message_edited"] = self.message_edited
         return d
 
     def updateFromDict(self, d):
         super().updateFromDict(d)
         self.title = d["title"]
         self.action = d["action"]
+        self.message_edited = d["message_edited"]
 
     def _repr(self):
         r = [super(GiteaTriggerEvent, self)._repr()]
@@ -130,6 +134,14 @@ class GiteaTriggerEvent(TriggerEvent):
         if self.type == 'gt_pull_request':
             return self.action in ['opened', 'changed']
         return False
+
+    def isChangeAbandoned(self):
+        if self.type == 'gt_pull_request':
+            return 'closed' == self.action
+        return False
+
+    def isMessageChanged(self):
+        return bool(self.message_edited)
 
 
 class GiteaEventFilter(EventFilter):
