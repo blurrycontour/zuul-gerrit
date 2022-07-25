@@ -33,6 +33,24 @@
       "message": "Is pagure.io really the right value here?",
       "revId": "e3574da4c9ee8272a85705a376c2adc3b16a6eb1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66f9a4d6_bbe8bbcd",
+        "filename": "doc/source/examples/pipelines/gitea-reference-pipelines.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-07-25T09:44:44Z",
+      "side": 1,
+      "message": "Sure not. While trying to get the best of existing drivers it is not surprise something gets this way ;-)\nThanks",
+      "parentUuid": "9c4c5d3c_07ba786b",
+      "revId": "e3574da4c9ee8272a85705a376c2adc3b16a6eb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
