@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd0ae64f_7d65cc76",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T17:26:48Z",
+      "side": 1,
+      "message": "How about we add a command line argument to zuul-launcher telling it to limit to a set of connections?  (eg \"zuul-launcher --provider rackspace --provider ovh\")  I suggest that so that we can keep all connections in zuul.conf (we recently had issues with zuul-web needing extra connection info which it didn\u0027t otherwise use in order to fully parse the configuration; I could see something similar happening here).\n\nOr we could add \"enabled\u003dfalse\" to connections which would tell that launcher not to handle that connection.\n\nIn summary, 3 options:\n1) List connections in [zuul-launcher]\n2) Command line argument\n3) Enabled flag in [connection foo] sections\n\nI think we can do [(1 xor 3) or 2].  But really, having only one way to do it would be best.  I lean toward only doing #2.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9aaa8a9a_91dbc9d7",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-07-24T11:51:06Z",
       "side": 1,
       "message": "Here few thoughts while thinking about our use cases.\n\nOur users should not have/need knowledge about the instnace flavors that are used/available in the backend. Having the possibility to define virtual flavors could achieve that. \n\nMany of our labels are specified by our projects to run in specific regions aka providers. It could be tedious to have labels and provider/pool attachments distributed. I think it might make sense to also allow to specify the pools that should serve a label directly on the label. In order to achieve that we\u0027d need to allow specifying the image, virtual flavor (I think this would likely be required for this use case) and possibly further information on the label stanza.\n\nWe also need to restrict the available flavors that are available to tenants. This could also achieved by defining virtual labels and somehow restrict defining them via the tenant config to certain repos via the include/exclude of object types in the tenant config. In order to facilitate the config it might make sense to define default includes/excludes on a tenant (e.g. exclude by default certain nodepool object types) and enable them specifically on certain repos that are intended to hold nodepool config.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d474a86_e9aa9c49",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T17:26:48Z",
+      "side": 1,
+      "message": "I feel like I don\u0027t have enough information from this comment to fully understand what you want.  I think most of the confusion comes from your use of the word \"users\" and where you want to draw the line on what they know and don\u0027t know.\n\nSo far, this spec isn\u0027t designed to really change any of that.  Right now, in order to update the nodepool configuration, you need to know everything about the clouds nodepool is using.  A Zuul user doesn\u0027t need to know that -- their only interface with nodepool is the \"label\" concept.  The idea is that the Zuul/Nodepool system operator tells them what labels are available.  (If some or all of the Zuul users also happen to understand the clouds and the nodepool configuration, that\u0027s fine of course, but it\u0027s not necessary.)\n\nFundamentally, the idea is that a Zuul user doesn\u0027t have to know anything more about the test resource configuration than a label.  That\u0027s the unit of abstraction.\n\nWith this spec, nothing about that has to change -- all of these are new configuration objects, and they can be restricted to only be loaded from certain repos.  So users can still use abstract/opaque labels to specify what resources they want, and the people responsible for the current nodepool configuration can still be responsible for it by maintaining the repos with these new configuration objects in them.\n\nHaving said all that, of course we can change things, but I think in order to do that, we should start from a common point and work from there.  Given that the current system is designed to be mantained by people who know all the details of the clouds and provide labels to end users, what do you want to change starting from that point?\n\nMaybe we could define some specific use cases.\n\nRegarding the last point -- it is already the case that any Zuul configuration object can be included or excluded from any repo, and tenants can specify default sets for include/exclude (and in fact, you can make any arbitrary grouping of projects with a given include/exclude set).  That would certainly be true for every new configuration object as well, so anything included in this spec.  That is absolutely the basis for access control for all of this.",
       "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +86,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39d3372a_ffe13c5f",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T17:26:48Z",
+      "side": 1,
+      "message": "Yeah, I think we could add a default flag for that.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d6835bf_92ce5df6",
@@ -65,6 +116,23 @@
       "writtenOn": "2022-07-24T11:51:06Z",
       "side": 1,
       "message": "We have tenants with ~100 images that are very hard to switch as a big bang. I think we\u0027d need a more fine grained way of switching on a label-by-label basis.\n\nMaybe we could do that by placing node-requests for known labels in /zuul/node-requests and unknown labels in /nodepool until the tenant is marked fully migrated which would then also enable e.g. label validation in job config.",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5241cf8_a1019336",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T17:26:48Z",
+      "side": 1,
+      "message": "Why does the number of images affect whether a tenant switches or not?  You can have all the images ready to go before switching the tenant over (because the image builds can be done before handling any node requests).  And in general, you can switch a smaller tenant over first to verify that node requests are working correctly.\n\nThe label validation is needed for more than just the job config, it\u0027s also needed for provider config, etc.  Even today, it\u0027s a Nodepool config error for a provider to have a label entry for a label that doesn\u0027t exist.  So if we made the presence of a label in a tenant be an indication of whether we use old or new requests, we would need to extend that to the pool configuration as well.  So basically, to turn on a label in a tenant, you would have to add both the \"label\" object and also add that label to a pool.\n\nGiven that it\u0027s anticipated that many label and pool definitions would be kept in a central repo that is added to multiple tenants, this behavior (even just the \"label\" behavior alone) really means that under your proposal, switching to the new system would be label-by-label but for all tenants at once, unless you combined the two, so that there was a tri-state tenant flag:\n\n1) Old requests only\n2) New requests for known labels, otherwise old requests\n3) New requests only (validation enabled)\n\nThen you could start with all tenants at #1, then switch a small tenant to #2 and add some labels, then switch a large tenant to #2 and add more labels until they are all using new requests, then switch all tenants to #2 then #3.\n\nIs that what you had in mind?",
       "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
