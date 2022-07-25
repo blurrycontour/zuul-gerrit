@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afd6e7d5_1c6f417d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4012,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-25T20:01:36Z",
+      "side": 1,
+      "message": "Should we add _path to the init list of attributes on the Build class? This is the sort of thing that python3.11 takes advantage of to be quicker.",
+      "revId": "908fc7c4bf07401a53aa437b2306362d87f4eb9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b9e9b69_857912f4",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4027,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-25T20:01:36Z",
+      "side": 1,
+      "message": "Why do we not set _path in the retry case?",
+      "revId": "908fc7c4bf07401a53aa437b2306362d87f4eb9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
