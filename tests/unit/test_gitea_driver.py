@@ -192,6 +192,16 @@ class TestGiteaDriver(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(6, len(self.history))
 
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_label_updated(self):
+
+        A = self.fake_gitea.openFakePullRequest('org/project', 'master', 'A')
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestLabelUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
     @simple_layout('layouts/reviews-gitea.yaml', driver='gitea')
     def test_pull_request_reviewed(self):
 
