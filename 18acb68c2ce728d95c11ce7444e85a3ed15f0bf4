@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14420397_d5a99bed",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-25T09:36:31Z",
+      "side": 1,
+      "message": "nit: I think this should be BuildReference",
+      "range": {
+        "startLine": 751,
+        "startChar": 53,
+        "endLine": 751,
+        "endChar": 67
+      },
+      "revId": "18acb68c2ce728d95c11ce7444e85a3ed15f0bf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "811493e4_1d62680e",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-25T09:36:31Z",
+      "side": 1,
+      "message": "I think we should have some sanity checks here to ensure that all build references were replaced.\n\nI can imagine there are cases where the referenced build is no longer in ZK e.g. because of a partially reported bundle (ZK connection interrupted or other exceptions that would abort the pipeline processing). This could lead to a broken pipeline state that would require manual intervention to fix.",
+      "revId": "18acb68c2ce728d95c11ce7444e85a3ed15f0bf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
