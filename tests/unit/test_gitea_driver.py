@@ -192,6 +192,29 @@ class TestGiteaDriver(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(6, len(self.history))
 
+    @simple_layout('layouts/reviews-gitea.yaml', driver='gitea')
+    def test_pull_request_reviewed(self):
+
+        A = self.fake_gitea.openFakePullRequest('org/project', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestReviewRejectedEvent("I don't like that change"))
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestReviewApprovedEvent("I like that change"))
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        self.fake_gitea.emitEvent(
+            A.getPullRequestReviewCommentEvent("mergeme"))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
     @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
     def test_pull_request_reporter_comment(self):
 

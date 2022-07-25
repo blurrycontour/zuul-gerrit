@@ -29,6 +29,9 @@
         - event: gt_pull_request
           action: comment
           comment: merge_me
+        - event: gt_pull_request_review
+          action: submitted
+          state: approved
     success:
       gitea:
         merge: true
