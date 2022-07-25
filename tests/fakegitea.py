@@ -500,3 +500,36 @@ class FakePullRequest(object):
 
     def getPullRequestInitialCommentEvent(self, comment):
         return self._getPullRequestEvent('edited')
+
+    def getPullRequestReviewApprovedEvent(self, review):
+        (_, _, data) = self._getPullRequestEvent('reviewed')
+        data['review'] = dict(
+            content=review
+        )
+        return (
+            'pull_request_approved',
+            'pull_request_review_approved',
+            data
+        )
+
+    def getPullRequestReviewRejectedEvent(self, review):
+        (_, _, data) = self._getPullRequestEvent('reviewed')
+        data['review'] = dict(
+            content=review
+        )
+        return (
+            'pull_request_rejected',
+            'pull_request_review_rejected',
+            data
+        )
+
+    def getPullRequestReviewCommentEvent(self, review):
+        (_, _, data) = self._getPullRequestEvent('reviewed')
+        data['review'] = dict(
+            content=review,
+        )
+        return (
+            'issue_comment',
+            'pull_request_comment',
+            data
+        )
