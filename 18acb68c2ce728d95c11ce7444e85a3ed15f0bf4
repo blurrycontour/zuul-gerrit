@@ -39,6 +39,24 @@
       "message": "I think we should have some sanity checks here to ensure that all build references were replaced.\n\nI can imagine there are cases where the referenced build is no longer in ZK e.g. because of a partially reported bundle (ZK connection interrupted or other exceptions that would abort the pipeline processing). This could lead to a broken pipeline state that would require manual intervention to fix.",
       "revId": "18acb68c2ce728d95c11ce7444e85a3ed15f0bf4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44ffccff_256347b9",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 778,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T14:03:59Z",
+      "side": 1,
+      "message": "Probably the best thing to do in that case would be to remove the build.  Presumably the scheduler will correct the situation (either by continuing to dequeue the item or continue to create a new buildset).",
+      "parentUuid": "811493e4_1d62680e",
+      "revId": "18acb68c2ce728d95c11ce7444e85a3ed15f0bf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
