@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae48bf81_912e61c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2022-07-25T08:19:23Z",
+      "side": 1,
+      "message": "Seems that there is some code left over which was only used for development.",
+      "revId": "e3574da4c9ee8272a85705a376c2adc3b16a6eb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c4c5d3c_07ba786b",
+        "filename": "doc/source/examples/pipelines/gitea-reference-pipelines.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2022-07-25T08:19:23Z",
+      "side": 1,
+      "message": "Is pagure.io really the right value here?",
+      "revId": "e3574da4c9ee8272a85705a376c2adc3b16a6eb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
