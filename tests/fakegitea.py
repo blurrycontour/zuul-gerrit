@@ -326,7 +326,7 @@ class FakePullRequest(object):
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
-    def _getPullRequestEvent(self, action):
+    def _getPullRequestEvent(self, action, changes=None):
         name = 'pull_request'
         data = {
             'action': action,
@@ -363,7 +363,8 @@ class FakePullRequest(object):
             ],
         }
         if action == 'edited':
-            data['changes'] = {'body': {'from': 'dummy'}}
+            if changes:
+                data['changes'] = changes
         return (name, 'pull_request', data)
 
     def _getIssueCommentEvent(self, action, body):
@@ -481,12 +482,12 @@ class FakePullRequest(object):
 
     def getPullRequestUpdatedEvent(self):
         self._addCommitToRepo()
-        self._updateTimeStamp()
+        # self._updateTimeStamp()
 
         return self._getPullRequestEvent('synchronized')
 
-    def getPullRequestEditedEvent(self):
-        return self._getPullRequestEvent('edited')
+    def getPullRequestEditedEvent(self, changes=None):
+        return self._getPullRequestEvent('edited', changes=changes)
 
     def addComment(self, message):
         self.comments.append(message)
