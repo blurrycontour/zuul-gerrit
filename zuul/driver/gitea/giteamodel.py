@@ -57,11 +57,12 @@ class PullRequest(Change):
         return ' '.join(r) + '>'
 
     def isUpdateOf(self, other):
-        if (self.project == other.project and
-            hasattr(other, 'number') and self.number == other.number and
-            hasattr(other, 'patchset') and self.patchset != other.patchset and
-            hasattr(other, 'updated_at') and
-            self.updated_at > other.updated_at):
+        if (self.project == other.project
+            and hasattr(other, 'number') and self.number == other.number
+            and hasattr(other, 'patchset') and self.patchset != other.patchset
+        ):
+            # NOTE(gtema): on PR sync updated_at is not representing date of
+            # last commit
             return True
         return False
 
