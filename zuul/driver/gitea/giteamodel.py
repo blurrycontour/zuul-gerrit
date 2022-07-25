@@ -134,7 +134,8 @@ class GiteaTriggerEvent(TriggerEvent):
 
 class GiteaEventFilter(EventFilter):
     def __init__(self, connection_name, trigger, types=None, actions=None,
-                 comments=None, refs=None, ignore_deletes=True):
+                 comments=None, refs=None, states=None,
+                 ignore_deletes=True):
 
         super().__init__(connection_name, trigger)
 
@@ -146,6 +147,7 @@ class GiteaEventFilter(EventFilter):
         refs = refs if refs is not None else []
         self.refs = [re.compile(x) for x in refs]
         self.ignore_deletes = ignore_deletes
+        self.states = states if states else []
 
     def __repr__(self):
         ret = '<GiteaEventFilter'
@@ -161,6 +163,8 @@ class GiteaEventFilter(EventFilter):
             ret += ' refs: %s' % ', '.join(self._refs)
         if self.ignore_deletes:
             ret += ' ignore_deletes: %s' % self.ignore_deletes
+        if self.states:
+            ret += ' states: %s' % ', '.join(self.states)
         ret += '>'
 
         return ret
@@ -175,7 +179,8 @@ class GiteaEventFilter(EventFilter):
             if etype == event.type:
                 matches_type = True
         if self.types and not matches_type:
-            return False
+            return FalseWithReason("Type %s doesn't match %s" % (
+                self.types, event.type))
 
         # refs are ORed
         matches_ref = False
@@ -184,18 +189,20 @@ class GiteaEventFilter(EventFilter):
                 if ref.match(event.ref):
                     matches_ref = True
         if self.refs and not matches_ref:
-            return False
+            return FalseWithReason("Refs %s doesn't match %s" % (
+                self.refs, event.refs))
         if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
             # If the updated ref has an empty git sha (all 0s),
             # then the ref is being deleted
-            return False
+            return FalseWithReason("Ref deleteions are ignored")
 
         matches_action = False
         for action in self.actions:
             if (event.action == action):
                 matches_action = True
         if self.actions and not matches_action:
-            return False
+            return FalseWithReason("Action %s doesn't match %s" % (
+                self.actions, event.action))
 
         matches_comment_re = False
         for comment_re in self.comments:
@@ -203,7 +210,13 @@ class GiteaEventFilter(EventFilter):
                 comment_re.search(event.comment)):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
-            return False
+            return FalseWithReason("Comments %s doesn't match %s" % (
+                self.comments, event.comment))
+
+        # states are ORed
+        if self.states and event.state not in self.states:
+            return FalseWithReason("States %s doesn't match %s" % (
+                self.states, event.state))
 
         return True
 
