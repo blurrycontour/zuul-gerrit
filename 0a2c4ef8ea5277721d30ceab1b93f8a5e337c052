@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffb4e1b6_e7ed6c07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2022-07-25T11:24:58Z",
+      "side": 1,
+      "message": "Only minor things found.",
+      "revId": "0a2c4ef8ea5277721d30ceab1b93f8a5e337c052",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ee358f1_a749eb30",
+        "filename": "doc/source/drivers/gitea.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2022-07-25T11:24:58Z",
+      "side": 1,
+      "message": "interacts ^^",
+      "revId": "0a2c4ef8ea5277721d30ceab1b93f8a5e337c052",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6010b89_c18b3c1d",
+        "filename": "zuul/driver/gitea/giteaconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2022-07-25T11:24:58Z",
+      "side": 1,
+      "message": "documented",
+      "revId": "0a2c4ef8ea5277721d30ceab1b93f8a5e337c052",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
