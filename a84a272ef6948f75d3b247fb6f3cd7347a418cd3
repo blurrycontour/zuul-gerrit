@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd9b208b_97fa79a6",
+        "filename": "tests/fixtures/layouts/job-dedup-false.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-25T18:55:57Z",
+      "side": 1,
+      "message": "I guess the empty pre run playbook is required to enable retrying?",
+      "revId": "a84a272ef6948f75d3b247fb6f3cd7347a418cd3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3614014_cdebf2df",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1775,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-25T18:55:57Z",
+      "side": 1,
+      "message": "Nit it looks like this is just doing a dict.get() call which will return None of there isn\u0027t a value in the dict. Instead of calling getBuild twice can we rewrite this as:\n\n  other_build \u003d other_item.current_build_set.getBuild(build.job.name)\n  if other_build is not None and other_build is build:\n      build_in_items.append(other_item)",
+      "revId": "a84a272ef6948f75d3b247fb6f3cd7347a418cd3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
