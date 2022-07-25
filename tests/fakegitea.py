@@ -501,6 +501,9 @@ class FakePullRequest(object):
     def getPullRequestInitialCommentEvent(self, comment):
         return self._getPullRequestEvent('edited')
 
+    def getPullRequestLabelUpdatedEvent(self):
+        return self._getPullRequestEvent('label_updated')
+
     def getPullRequestReviewApprovedEvent(self, review):
         (_, _, data) = self._getPullRequestEvent('reviewed')
         data['review'] = dict(
