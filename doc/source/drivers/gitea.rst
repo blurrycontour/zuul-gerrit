@@ -129,6 +129,8 @@ the following options.
 
       .. value:: gt_pull_request
 
+      .. value:: gt_pull_request_review
+
       .. value:: gt_push
 
    .. attr:: action
@@ -157,6 +159,18 @@ the following options.
 
          Comment added to pull request.
 
+      .. value:: reviewed
+
+         Review added to pull request.
+
+      A :value:`pipeline.trigger.<gitea
+      source>.event.gt_pull_request_review` event will have associated
+      action(s) to trigger from. The supported actions are:
+
+      .. value:: submitted
+
+         Pull request review added.
+
    .. attr:: comment
 
       This is only used for ``gt_pull_request`` and ``comment`` actions.  It
@@ -173,6 +187,14 @@ the following options.
       multiple refs may be listed, eg. ``refs/tags/bar``.
       Gitea reported reference is then matched against
       the regular expression.
+
+   .. attr:: state
+
+      This is only used for ``gt_pull_request_review`` events.  It
+      accepts a list of strings each of which is matched to the review
+      state, which can be one of ``approved``, ``comment`` or
+      ``request_changes``.
+
 
 Reporter Configuration
 ----------------------
