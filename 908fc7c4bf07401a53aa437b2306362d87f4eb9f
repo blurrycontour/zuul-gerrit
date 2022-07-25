@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c610178_b2790523",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4012,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T20:18:57Z",
+      "side": 1,
+      "message": "Oops, we don\u0027t need it here, we can remove.",
+      "parentUuid": "afd6e7d5_1c6f417d",
+      "revId": "908fc7c4bf07401a53aa437b2306362d87f4eb9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b9e9b69_857912f4",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-25T20:01:36Z",
       "side": 1,
       "message": "Why do we not set _path in the retry case?",
+      "revId": "908fc7c4bf07401a53aa437b2306362d87f4eb9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d0bd279_2912cdc3",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4027,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-25T20:18:57Z",
+      "side": 1,
+      "message": "We don\u0027t need it in either case.",
+      "parentUuid": "0b9e9b69_857912f4",
       "revId": "908fc7c4bf07401a53aa437b2306362d87f4eb9f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
