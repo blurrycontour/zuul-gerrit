@@ -16,6 +16,24 @@
       "message": "org/project2 is not used by the test that was added. SHould it be removed? It is possible that a followon change makes use of this I suppose.",
       "revId": "0ea1d16e5563cecea0e3b0949211bc50a42c841a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bfcc796_caa77cf3",
+        "filename": "tests/fixtures/layouts/job-dedup-noop.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-25T20:28:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5593d21a_2c71d986",
+      "revId": "0ea1d16e5563cecea0e3b0949211bc50a42c841a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
