@@ -114,6 +114,8 @@ class GiteaEventConnector(threading.Thread):
             'create': self._event_create,
             'delete': self._event_delete,
             'pull_request': self._event_pull_request,
+            'pull_request_approved': self._event_pull_review,
+            'pull_request_rejected': self._event_pull_review,
             'issue_comment': self._event_issue_comment,
         }
 
@@ -269,6 +271,39 @@ class GiteaEventConnector(threading.Thread):
 
         return event
 
+    def _event_pull_review(self, body, event_sub_type=None):
+        """ Handles pull request review event """
+        # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
+        event = self._event_base(body)
+        event.type = 'gt_pull_request_review'
+        # NOTE: gitea does not currently emit event when review is dismissed
+        event.action = 'submitted'
+
+        pr_body = body['pull_request']
+        base = pr_body.get('base')
+        base_repo = base.get('repo')
+        head = pr_body.get('head')
+
+        event.title = pr_body.get('title')
+        event.project_name = base_repo.get('full_name')
+        event.change_number = pr_body.get('number')
+        event.change_url = self.connection.getPullUrl(event.project_name,
+                                                      event.change_number)
+        event.updated_at = pr_body.get('updated_at')
+        event.branch = base.get('ref')
+        event.ref = "refs/pull/" + str(pr_body.get('number')) + "/head"
+        event.patch_number = head.get('sha')
+        event.url = pr_body.get('url')
+
+        if event_sub_type == "pull_request_review_rejected":
+            event.state = "request_changes"
+        elif event_sub_type == "pull_request_review_approved":
+            event.state = "approved"
+
+        event.labels = [l["name"] for l in body.get('labels', [])]
+
+        return event
+
     def _event_issue_comment(self, body, event_sub_type=None):
         """ Handles issue (pull request) comments """
         # https://github.com/go-gitea/gitea/blob/main/modules/notification/webhook/webhook.go
@@ -298,6 +333,36 @@ class GiteaEventConnector(threading.Thread):
             pr = self.connection.getPull(
                 event.project_name, event.change_number)
             event.patch_number = pr['head']['sha']
+
+            return event
+        elif (
+            event_sub_type == 'pull_request_comment'
+            and body.get('action') == 'reviewed'
+        ):
+            # PR review comment
+            event.type = 'gt_pull_request_review'
+            # NOTE: gitea does not currently emit event when
+            # review is dismissed
+            event.action = 'submitted'
+            event.state = 'comment'
+
+            pr_body = body['pull_request']
+            base = pr_body.get('base')
+            base_repo = base.get('repo')
+            head = pr_body.get('head')
+
+            event.title = pr_body.get('title')
+            event.project_name = base_repo.get('full_name')
+            event.change_number = pr_body.get('number')
+            event.change_url = self.connection.getPullUrl(event.project_name,
+                                                          event.change_number)
+            event.updated_at = pr_body.get('updated_at')
+            event.branch = base.get('ref')
+            event.ref = "refs/pull/" + str(pr_body.get('number')) + "/head"
+            event.patch_number = head.get('sha')
+            event.url = pr_body.get('url')
+
+            event.comment = body['review'].get('content')
 
             return event
 
