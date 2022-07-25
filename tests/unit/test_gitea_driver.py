@@ -101,10 +101,21 @@ class TestGiteaDriver(ZuulTestCase):
         self.fake_gitea.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual('SUCCESS',
-                         self.getJobFromHistory('project-test1').result)
-        self.assertEqual('SUCCESS',
-                         self.getJobFromHistory('project-test2').result)
+        # Simple "edited" event does not trigger job
+        self.assertEqual(0, len(self.history))
+
+        self.fake_gitea.emitEvent(A.getPullRequestEditedEvent({
+            'title': {'from': 'old'}
+        }))
+        self.waitUntilSettled()
+        # Changing title event does not trigger job
+        self.assertEqual(0, len(self.history))
+
+        self.fake_gitea.emitEvent(A.getPullRequestEditedEvent(
+            changes={'body': {'from': 'old'}}))
+        self.waitUntilSettled()
+        # Changing pr message (initial comment) by default does not trigger job
+        self.assertEqual(0, len(self.history))
 
     @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
     def test_pull_request_updated(self):
@@ -186,11 +197,6 @@ class TestGiteaDriver(ZuulTestCase):
             A.getPullRequestCommentDeletedEvent('recheck'))
         self.waitUntilSettled()
         self.assertEqual(4, len(self.history))
-
-        self.fake_gitea.emitEvent(
-            A.getPullRequestInitialCommentEvent('Initial comment edited'))
-        self.waitUntilSettled()
-        self.assertEqual(6, len(self.history))
 
     @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
     def test_pull_request_label_updated(self):
@@ -466,6 +472,42 @@ class TestGiteaDriver(ZuulTestCase):
         self.assertEqual(A.merge_title, A.subject)
         self.assertEqual(A.merge_message, "Reviewed-by: tester <fake_mail>")
         self.assertEqual(A.merge_mode, "squash")
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_dequeue_pull_abandoned(self):
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.fake_gitea.emitEvent(A.getPullRequestClosedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(2, len(self.history))
+        self.assertEqual(2, self.countJobResults(self.history, 'ABORTED'))
+
+    @simple_layout('layouts/basic-gitea.yaml', driver='gitea')
+    def test_pull_request_dequeue_updated(self):
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gitea.openFakePullRequest(
+            'org/project', 'master', 'A')
+        self.fake_gitea.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.fake_gitea.emitEvent(A.getPullRequestUpdatedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(4, len(self.history))
+        self.assertEqual(2, self.countJobResults(self.history, 'ABORTED'))
 
     @simple_layout('layouts/requirements-gitea.yaml', driver='gitea')
     def test_require_state(self):
