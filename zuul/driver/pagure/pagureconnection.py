@@ -622,7 +622,7 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self.log.error("Change %s not found in cache and no event",
                                change_key)
             if event:
-                url = event.change_url
+                url = event.get("change_url")
             change = PullRequest(project.name)
             change.project = project
             change.number = number
