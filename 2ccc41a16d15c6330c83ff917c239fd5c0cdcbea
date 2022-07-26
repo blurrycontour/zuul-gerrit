@@ -53,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "def7784d_76fc6da8",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2022-07-26T15:01:29Z",
+      "side": 1,
+      "message": "I think command line args are just fine. We do essentially the same with our config generation script for nodepool.",
+      "parentUuid": "cd0ae64f_7d65cc76",
+      "revId": "2ccc41a16d15c6330c83ff917c239fd5c0cdcbea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9aaa8a9a_91dbc9d7",
