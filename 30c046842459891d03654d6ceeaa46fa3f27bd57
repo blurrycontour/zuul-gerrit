@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "388389fb_3f3f7607",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-26T14:25:20Z",
+      "side": 1,
+      "message": "Given a root span for a trace, you can serialize/deserialize its trace context so that other systems can make child traces from it.  But the deserialization doesn\u0027t give you the root span, it gives you the trace context for the root span, which is only useful for creating child spans, not for emitting the root span itself.  The issue is that our root spans start on one host and end on another, and there isn\u0027t a way to serialize the span itself.  Here\u0027s what we want to do:\n\n1) Start root span on scheduler A\n2) Send trace context to merger\n3) Merger emits child span\n4) End root span on scheduler B and emit root span\n\nThat would work if we only had one scheduler, because the root span could be kept in memory.  But with multiple schedulers, and no way to serialize/deserialize the root span, we can\u0027t transfer the root span from step 1 to step 4.  So we need to augment the SDK somehow.\n\nWe could implement span serialization ourselves, but we don\u0027t actually need to do that, all we really need is the trace id, root span id, and timestamp of when the root span started.  I guess it is a form of serialization, but it\u0027s verify lightweight (we will only store that info, and not everything else like the list of errors, logs, events, etc).",
+      "parentUuid": "aa0249a1_4213bcf3",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fba1cc24_d5b5cf4f",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-07-26T14:07:59Z",
       "side": 1,
       "message": "Maybe something else worth exploring is how we want to configure this. When I wrote the initial prototype there was quite some config necessary depending on which exporter was used. But maybe that\u0027s a non-issue if we only support the OLTP exporter.",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "862d45be_a63b89d4",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-26T14:25:20Z",
+      "side": 1,
+      "message": "Yeah, with only the OLTP exporter, it\u0027s a pretty small set of config options (just what you\u0027d expect: host, port, maybe protocol).  I don\u0027t see us needing more than an ini section with a few options.",
+      "parentUuid": "fba1cc24_d5b5cf4f",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
