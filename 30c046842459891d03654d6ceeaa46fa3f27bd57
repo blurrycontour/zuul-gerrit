@@ -16,6 +16,23 @@
       "message": "Is this also true for the trace ID? Usually the trace ID is what connects all the spans and you can definitely propagate the trace context (which has the trace ID) and create a new span from that.\n\nI think a missing piece is that you can (de-)serialize a span, which we probably need.",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fba1cc24_d5b5cf4f",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-07-26T14:07:59Z",
+      "side": 1,
+      "message": "Maybe something else worth exploring is how we want to configure this. When I wrote the initial prototype there was quite some config necessary depending on which exporter was used. But maybe that\u0027s a non-issue if we only support the OLTP exporter.",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
