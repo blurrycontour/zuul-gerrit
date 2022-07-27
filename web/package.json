@@ -13,6 +13,7 @@
     "@softwarefactory-project/re-ansi": "^0.5.0",
     "axios": "^0.26.0",
     "broadcast-channel": "^4.5.0",
+    "d3-graphviz": "2.6.1",
     "js-yaml": "^3.13.0",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
