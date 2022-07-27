@@ -20,11 +20,24 @@ import * as d3 from 'd3'
 import { makeJobGraphKey, fetchJobGraphIfNeeded } from '../../actions/jobgraph'
 import { graphviz } from 'd3-graphviz'
 
-function makeDot(jobGraph) {
-  let ret = 'digraph job_graph {'
+import { getHomepageUrl } from '../../api'
+
+function makeDot(tenant, pipeline, project, branch, jobGraph) {
+  let ret = 'digraph job_graph {\n'
   ret += '  rankdir=LR;\n'
   ret += '  node [shape=box];\n'
   jobGraph.forEach((job) => {
+    const searchParams = new URLSearchParams('')
+    searchParams.append('pipeline', pipeline)
+    searchParams.append('project', project.name)
+    searchParams.append('job', job.name)
+    searchParams.append('branch', branch)
+    const url = (getHomepageUrl() + tenant.linkPrefix +
+                 'freeze-job?' + searchParams.toString())
+    // Escape ampersands to get it through graphviz and d3; these will
+    // appear unescaped in the DOM.
+    const escaped_url = url.replace(/&/g, '&amp;')
+    ret += '  "' + job.name + '" [URL="' + escaped_url + '"];\n'
     if (job.dependencies.length) {
       job.dependencies.forEach((dep) => {
         let soft = ''
@@ -33,8 +46,6 @@ function makeDot(jobGraph) {
         }
         ret += '  "' + dep.name + '" -> "' + job.name + '"' + soft + ';\n'
       })
-    } else {
-      ret += '  "' + job.name + '";\n'
     }
   })
   ret += '}\n'
@@ -80,16 +91,16 @@ function JobGraphDisplay(props) {
     fetchJobGraphIfNeeded(tenant, project.name, pipeline, branch)
   }, [fetchJobGraphIfNeeded, tenant, project, pipeline, branch])
 
-  const tenantJobGraph = props.jobgraph.jobGraphs[props.tenant.name]
+  const tenantJobGraph = props.jobgraph.jobGraphs[tenant.name]
   const jobGraphKey = makeJobGraphKey(props.project.name,
                                       props.pipeline,
                                       props.branch)
   const jobGraph = tenantJobGraph ? tenantJobGraph[jobGraphKey] : undefined
   useEffect(() => {
     if (jobGraph) {
-      setDot(makeDot(jobGraph))
+      setDot(makeDot(tenant, pipeline, project, branch, jobGraph))
     }
-  }, [jobGraph])
+  }, [tenant, pipeline, project, branch, jobGraph])
   return (
     <>
       {dot && <GraphViz dot={dot}/>}

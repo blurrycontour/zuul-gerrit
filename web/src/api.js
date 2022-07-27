@@ -130,6 +130,13 @@ function fetchStatus(apiPrefix) {
 function fetchChangeStatus(apiPrefix, changeId) {
   return Axios.get(apiUrl + apiPrefix + 'status/change/' + changeId)
 }
+function fetchFreezeJob(apiPrefix, pipelineName, projectName, branchName, jobName) {
+  return Axios.get(apiUrl + apiPrefix +
+                   'pipeline/' + pipelineName +
+                   '/project/' + projectName +
+                   '/branch/' + branchName +
+                   '/freeze-job/' + jobName)
+}
 function fetchBuild(apiPrefix, buildId) {
   return Axios.get(apiUrl + apiPrefix + 'build/' + buildId)
 }
@@ -149,6 +156,9 @@ function fetchBuildsets(apiPrefix, queryString) {
     path += '?' + queryString.slice(1)
   }
   return Axios.get(apiUrl + apiPrefix + path)
+}
+function fetchPipelines(apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'pipelines')
 }
 function fetchProject(apiPrefix, projectName) {
   return Axios.get(apiUrl + apiPrefix + 'project/' + projectName)
@@ -312,6 +322,8 @@ export {
   fetchBuilds,
   fetchBuildset,
   fetchBuildsets,
+  fetchFreezeJob,
+  fetchPipelines,
   fetchProject,
   fetchProjects,
   fetchJob,
