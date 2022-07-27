@@ -309,6 +309,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         _, data_uuid = self._loadKey(value)
         return self._get(key, data_uuid, zstat)
 
+    def getFromInternalCache(self, key):
+        return self._change_cache.get(key._hash)
+
     def _get_from_key_hash(self, key_hash):
         cache_path = self._cachePath(key_hash)
         try:

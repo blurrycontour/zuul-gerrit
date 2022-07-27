@@ -235,6 +235,25 @@ class PipelineManager(metaclass=ABCMeta):
             resolved_changes.append(change)
         return resolved_changes
 
+    def validateCache(self):
+        sources = {}
+        items = list(self._change_cache.items())
+        for (ref, change) in items:
+            if change is None:
+                continue
+            key = ChangeKey.fromReference(ref)
+            source = sources.get(key.connection_name)
+            if source is None:
+                source = self.sched.connections.getSource(
+                    key.connection_name)
+                sources[key.connection_name] = source
+            current_change = source.getInternalCachedChange(key)
+            if current_change is not change:
+                del self._change_cache[ref]
+            # Note: do not update with this change because we have not
+            # refreshed it from ZooKeeper correctly; all we know is
+            # that our old object was out of date.
+
     def _maintainCache(self):
         active_layout_uuids = set()
         referenced_change_keys = set()

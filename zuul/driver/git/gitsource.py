@@ -52,6 +52,9 @@ class GitSource(BaseSource):
         return self.connection.getChange(change_key, refresh=refresh,
                                          event=event)
 
+    def getInternalCachedChange(self, change_key):
+        return self.connection._change_cache.getFromInternalCache(change_key)
+
     def getChangeByURL(self, url, event):
         return None
 

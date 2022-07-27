@@ -80,6 +80,18 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
+    def getInternalCachedChange(self, change_key):
+        """Get the change from the internal ChangeCache
+
+        This should only be used to renconcile Change objects with the
+        internal ChangeCache.  If we have a Change object for the
+        change_key in the ChangeCache, return that, otherwise None.
+
+        Do not update or refresh the change cache, and locking is not
+        necessary.
+        """
+
+    @abc.abstractmethod
     def getChangeByURL(self, url, event):
         """Get the change corresponding to the supplied URL.
 
