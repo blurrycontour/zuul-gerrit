@@ -16,6 +16,24 @@
       "message": "Is it sufficient to know both changes were merged by sched1 to know the cache was properly cleared and rebuilt? Or is it possible that the stale cache would be valid?\n\nIn particular we didn\u0027t update either change during the period of time that sched1 missed so I wonder if the entries there would still be valid and we could merge code here successfully even without clearing?",
       "revId": "a61ec1bb5f92e4e3b84741df434e2de32b540fac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d92674b0_fda616b2",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-07-27T21:14:17Z",
+      "side": 1,
+      "message": "Ah, sorry for the missing context.  Without this fix, what happens is that we enqueue the old Change object from the first pass because we pull it from the cache (since we\u0027re enqueing a dependency, it comes from the pipeline cache).  Then we start reporting and therefore updating the change objects from within the pipeline processing.  Since we\u0027re updating them, we try to put them in the ZK change cache, and that fails because the Change object we\u0027re passing in is not the Python Change object that is in the ZK change cache.  It throws an exception and the pipeline processing bails.\n\nThis is the exception it hits: https://opendev.org/zuul/zuul/src/branch/master/zuul/zk/change_cache.py#L409-L413\n\nSo tl;dr -- it is sufficient because sched1 tries to write an update to the change as it\u0027s reporting and that update causes the cache collision.",
+      "parentUuid": "10f0b48e_334e6589",
+      "revId": "a61ec1bb5f92e4e3b84741df434e2de32b540fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
