@@ -18,6 +18,7 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import Project from '../containers/project/Project'
+import JobGraph from '../containers/jobgraph/JobGraph'
 import { fetchProjectIfNeeded } from '../actions/project'
 import { Fetchable } from '../containers/Fetching'
 
@@ -61,7 +62,11 @@ class ProjectPage extends React.Component {
           />
         </PageSection>
         {tenantProjects && tenantProjects[projectName] &&
-         <Project project={tenantProjects[projectName]} />}
+         <>
+           <Project project={tenantProjects[projectName]} />
+           <JobGraph project={tenantProjects[projectName]} />
+         </>
+        }
       </PageSection>
     )
   }
