@@ -13,6 +13,7 @@
 // under the License.
 
 import ComponentsPage from './pages/Components'
+import FreezeJobPage from './pages/FreezeJob'
 import StatusPage from './pages/Status'
 import ChangeStatusPage from './pages/ChangeStatus'
 import ProjectPage from './pages/Project'
@@ -77,6 +78,10 @@ const routes = () => [
     title: 'Buildsets',
     to: '/buildsets',
     component: BuildsetsPage
+  },
+  {
+    to: '/freeze-job',
+    component: FreezeJobPage
   },
   {
     to: '/status/change/:changeId',

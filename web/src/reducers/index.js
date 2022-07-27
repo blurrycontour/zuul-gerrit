@@ -19,6 +19,7 @@ import autoholds from './autoholds'
 import configErrors from './configErrors'
 import change from './change'
 import component from './component'
+import freezejob from './freezejob'
 import notifications from './notifications'
 import build from './build'
 import info from './info'
@@ -30,6 +31,7 @@ import logfile from './logfile'
 import nodes from './nodes'
 import openapi from './openapi'
 import project from './project'
+import pipelines from './pipelines'
 import projects from './projects'
 import preferences from './preferences'
 import status from './status'
@@ -45,6 +47,7 @@ const reducers = {
   change,
   component,
   configErrors,
+  freezejob,
   notifications,
   info,
   job,
@@ -54,6 +57,7 @@ const reducers = {
   logfile,
   nodes,
   openapi,
+  pipelines,
   project,
   projects,
   status,
