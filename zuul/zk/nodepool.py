@@ -12,6 +12,7 @@
 
 import json
 import logging
+import os
 import time
 from enum import Enum
 from typing import Optional, List
@@ -43,7 +44,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
     Class implementing Nodepool related ZooKeeper interface.
     """
     NODES_ROOT = "/nodepool/nodes"
-    LAUNCHER_ROOT = "/nodepool/launchers"
+    COMPONENT_ROOT = "/nodepool/components"
     REQUEST_ROOT = '/nodepool/requests'
     REQUEST_LOCK_ROOT = "/nodepool/requests-lock"
     HOLD_REQUEST_ROOT = '/zuul/hold-requests'
@@ -95,9 +96,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self._node_tree.close()
             self._node_tree = None
 
-    def _launcherPath(self, launcher):
-        return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
-
     def _nodePath(self, node):
         return "%s/%s" % (self.NODES_ROOT, node)
 
@@ -113,15 +111,15 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         :returns: A list of Launcher objects, or empty list if none are found.
         """
+        root_path = os.path.join(self.COMPONENT_ROOT, 'pool')
         try:
-            launcher_ids = self.kazoo_client\
-                .get_children(self.LAUNCHER_ROOT)
+            pools = self.kazoo_client.get_children(root_path)
         except NoNodeError:
             return []
 
         objs = []
-        for launcher in launcher_ids:
-            path = self._launcherPath(launcher)
+        for pool in pools:
+            path = os.path.join(root_path, pool)
             try:
                 data, _ = self.kazoo_client.get(path)
             except NoNodeError:

@@ -3668,7 +3668,7 @@ class FakeSMTP(object):
 class FakeNodepool(object):
     REQUEST_ROOT = '/nodepool/requests'
     NODE_ROOT = '/nodepool/nodes'
-    LAUNCHER_ROOT = '/nodepool/launchers'
+    COMPONENT_ROOT = '/nodepool/components'
 
     log = logging.getLogger("zuul.test.FakeNodepool")
 
@@ -3732,10 +3732,11 @@ class FakeNodepool(object):
             self.fulfillRequest(req)
 
     def registerLauncher(self, labels=["label1"], id="FakeLauncher"):
-        path = os.path.join(self.LAUNCHER_ROOT, id)
+        path = os.path.join(self.COMPONENT_ROOT, 'pool', id)
         data = {'id': id, 'supported_labels': labels}
         self.client.create(
-            path, json.dumps(data).encode('utf8'), makepath=True)
+            path, json.dumps(data).encode('utf8'),
+            ephemeral=True, makepath=True, sequence=True)
 
     def getNodeRequests(self):
         try:
