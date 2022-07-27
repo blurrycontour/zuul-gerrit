@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10f0b48e_334e6589",
+        "filename": "tests/unit/test_sos.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-07-27T20:38:59Z",
+      "side": 1,
+      "message": "Is it sufficient to know both changes were merged by sched1 to know the cache was properly cleared and rebuilt? Or is it possible that the stale cache would be valid?\n\nIn particular we didn\u0027t update either change during the period of time that sched1 missed so I wonder if the entries there would still be valid and we could merge code here successfully even without clearing?",
+      "revId": "a61ec1bb5f92e4e3b84741df434e2de32b540fac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
