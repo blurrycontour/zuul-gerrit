@@ -16,11 +16,10 @@ import React, { useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as d3 from 'd3'
+import { useHistory } from 'react-router-dom'
 
 import { makeJobGraphKey, fetchJobGraphIfNeeded } from '../../actions/jobgraph'
 import { graphviz } from 'd3-graphviz'
-
-import { getHomepageUrl } from '../../api'
 
 function makeDot(tenant, pipeline, project, branch, jobGraph) {
   let ret = 'digraph job_graph {\n'
@@ -32,8 +31,11 @@ function makeDot(tenant, pipeline, project, branch, jobGraph) {
     searchParams.append('project', project.name)
     searchParams.append('job', job.name)
     searchParams.append('branch', branch)
-    const url = (getHomepageUrl() + tenant.linkPrefix +
-                 'freeze-job?' + searchParams.toString())
+    // This will appear in the DOM as an "a href=" but we will
+    // manipulate the DOM later to add an onClick callback to make
+    // this an internal link.
+    const url = (tenant.linkPrefix +
+                 '/freeze-job?' + searchParams.toString())
     // Escape ampersands to get it through graphviz and d3; these will
     // appear unescaped in the DOM.
     const escaped_url = url.replace(/&/g, '&amp;')
@@ -53,6 +55,8 @@ function makeDot(tenant, pipeline, project, branch, jobGraph) {
 }
 
 function GraphViz(props) {
+  const history = useHistory()
+
   useEffect(() => {
     const gv = graphviz('#graphviz')
           .options({
@@ -72,7 +76,13 @@ function GraphViz(props) {
       gv._translation.y = val
       gv._originalTransform.y = val
     }
-  }, [props.dot])
+
+    // Mutate the links to be internal links
+    d3.select('.zuul-job-graph').selectAll('.node a').on('click', event => {
+      d3.event.preventDefault()
+      history.push(event.attributes['xlink:href'])
+    })
+  }, [props.dot, history])
 
   return (
     <div className="zuul-job-graph" id="graphviz"/>
