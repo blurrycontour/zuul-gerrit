@@ -694,6 +694,11 @@ class PipelineState(zkobject.ZKObject):
         return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
+        # We may have old change objects in the pipeline cache, so
+        # make sure they are the same objects we would get from the
+        # source change cache.
+        self.pipeline.manager.clearCache()
+
         data = super().deserialize(raw, context)
         existing_queues = {
             q.getPath(): q for q in self.queues + self.old_queues

@@ -235,6 +235,9 @@ class PipelineManager(metaclass=ABCMeta):
             resolved_changes.append(change)
         return resolved_changes
 
+    def clearCache(self):
+        self._change_cache.clear()
+
     def _maintainCache(self):
         active_layout_uuids = set()
         referenced_change_keys = set()
