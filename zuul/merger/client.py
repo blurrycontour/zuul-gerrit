@@ -159,7 +159,9 @@ class MergeClient(object):
                 "via result event for %s", merge_request)
             if merge_request.job_type == MergeRequest.FILES_CHANGES:
                 event = FilesChangesCompletedEvent(
-                    merge_request.build_set_uuid, files=None
+                    merge_request.build_set_uuid,
+                    files=None,
+                    elapsed_time=None,
                 )
             else:
                 event = MergeCompletedEvent(
@@ -172,6 +174,7 @@ class MergeClient(object):
                     repo_state=None,
                     item_in_branches=None,
                     errors=None,
+                    elapsed_time=None,
                 )
             try:
                 self.result_events[merge_request.tenant_name][

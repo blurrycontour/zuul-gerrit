@@ -110,7 +110,27 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          operation(s).  This will always include a request to a Zuul
          merger to speculatively merge the change, but it may also
          include a second request submitted in parallel to identify
-         the files altered by the change.
+         the files altered by the change.  Includes
+         :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.merger_merge_op_time`
+         and
+         :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.merger_files_changes_op_time`.
+
+      .. stat:: merger_merge_op_time
+         :type: timer
+
+         The amount of time the merger spent performing a merge
+         operation.  This does not include any of the round-trip time
+         from the scheduler to the merger, or any other merge
+         operations.
+
+      .. stat:: merger_files_changes_op_time
+         :type: timer
+
+         The amount of time the merger spent performing a files-changes
+         operation to detect changed files (this is sometimes
+         performed if the source does not provide this information).
+         This does not include any of the round-trip time from the
+         scheduler to the merger, or any other merge operations.
 
       .. stat:: layout_generation_time
          :type: timer
@@ -128,7 +148,17 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
          The amount of time waiting for a secondary Zuul merger
          operation to collect additional information about the repo
-         state of required projects.
+         state of required projects.  Includes
+         :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.merger_repo_state_op_time`.
+
+      .. stat:: merger_repo_state_op_time
+         :type: timer
+
+         The amount of time the merger spent performing a repo state
+         operation to collect additional information about the repo
+         state of required projects.  This does not include any of the
+         round-trip time from the scheduler to the merger, or any
+         other merge operations.
 
       .. stat:: node_request_time
          :type: timer

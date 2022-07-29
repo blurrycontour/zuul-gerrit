@@ -6253,12 +6253,13 @@ class MergeCompletedEvent(ResultEvent):
     :arg dict repo_state: The starting repo state before the merge.
     :arg list item_in_branches: A list of branches in which the final
         commit in the merge list appears (changes without refs).
-    :arg list errors: A list of error message strings
+    :arg list errors: A list of error message strings.
+    :arg float elapsed_time: Elapsed time of merge op in seconds.
     """
 
     def __init__(self, request_uuid, build_set_uuid, merged, updated,
                  commit, files, repo_state, item_in_branches,
-                 errors):
+                 errors, elapsed_time):
         self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.merged = merged
@@ -6268,6 +6269,7 @@ class MergeCompletedEvent(ResultEvent):
         self.repo_state = repo_state or {}
         self.item_in_branches = item_in_branches or []
         self.errors = errors or []
+        self.elapsed_time = elapsed_time
 
     def __repr__(self):
         return ('<MergeCompletedEvent job: %s buildset: %s merged: %s '
@@ -6287,6 +6289,7 @@ class MergeCompletedEvent(ResultEvent):
             "repo_state": dict(self.repo_state),
             "item_in_branches": list(self.item_in_branches),
             "errors": list(self.errors),
+            "elapsed_time": self.elapsed_time,
         }
 
     @classmethod
@@ -6301,6 +6304,7 @@ class MergeCompletedEvent(ResultEvent):
             dict(data.get("repo_state", {})),
             list(data.get("item_in_branches", [])),
             list(data.get("errors", [])),
+            data.get("elapsed_time"),
         )
 
 
@@ -6309,16 +6313,19 @@ class FilesChangesCompletedEvent(ResultEvent):
 
     :arg BuildSet build_set: The build_set which is ready.
     :arg list files: List of files changed.
+    :arg float elapsed_time: Elapsed time of merge op in seconds.
     """
 
-    def __init__(self, build_set_uuid, files):
+    def __init__(self, build_set_uuid, files, elapsed_time):
         self.build_set_uuid = build_set_uuid
         self.files = files or []
+        self.elapsed_time = elapsed_time
 
     def toDict(self):
         return {
             "build_set_uuid": self.build_set_uuid,
             "files": list(self.files),
+            "elapsed_time": self.elapsed_time,
         }
 
     @classmethod
@@ -6326,6 +6333,7 @@ class FilesChangesCompletedEvent(ResultEvent):
         return cls(
             data.get("build_set_uuid"),
             list(data.get("files", [])),
+            data.get("elapsed_time"),
         )
 
 

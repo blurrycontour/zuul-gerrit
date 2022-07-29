@@ -452,6 +452,7 @@ class TestScheduler(ZuulTestCase):
                 'zuul.tenant.tenant-one.reconfiguration_time',
                 'zuul.tenant.tenant-one.pipeline.gate.event_enqueue_time',
                 'zuul.tenant.tenant-one.pipeline.gate.merge_request_time',
+                'zuul.tenant.tenant-one.pipeline.gate.merger_merge_op_time',
                 'zuul.tenant.tenant-one.pipeline.gate.job_freeze_time',
                 'zuul.tenant.tenant-one.pipeline.gate.node_request_time',
                 'zuul.tenant.tenant-one.pipeline.gate.job_wait_time',
