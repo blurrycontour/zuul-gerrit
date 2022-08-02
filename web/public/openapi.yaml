@@ -474,11 +474,9 @@ components:
           description: The event id
           type: string
         item_ahead:
-          description: The list of events ahead
-          items:
-            type: string
-          type: array
-        item_behind:
+          description: The event ahead
+          type: string
+        items_behind:
           description: The list of events behind
           items:
             type: string
