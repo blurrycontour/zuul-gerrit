@@ -520,6 +520,8 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       requests is better.  Ideally, there will be no `failed`
       requests.
 
+.. stat:: zuul.nodepool
+
    .. stat:: current_requests
       :type: gauge
 
