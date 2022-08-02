@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bd4ef1c6_84224376",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-02T13:28:19Z",
+      "side": 1,
+      "message": "Could the existing logging infrastructure be replaced by a console exporter? That is how the tracing library works in Rust, and it\u0027s quite useful because the same message are used for both console output and for opentelemetry service like jaeger.\n\nOtherwise, isn\u0027t this spec going to duplicate the existing work done on logging?",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aa0249a1_4213bcf3",
         "filename": "doc/source/developer/specs/tracing.rst",
         "patchSetId": 1
@@ -67,6 +84,23 @@
       "side": 1,
       "message": "Yeah, with only the OLTP exporter, it\u0027s a pretty small set of config options (just what you\u0027d expect: host, port, maybe protocol).  I don\u0027t see us needing more than an ini section with a few options.",
       "parentUuid": "fba1cc24_d5b5cf4f",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39d8a092_7e0a44de",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-02T13:28:19Z",
+      "side": 1,
+      "message": "It seems like opentelemetry-python metrics are compatible with prometheus client, and perhaps it would be preferable to migrate the existing gauge to use the same object for both use-case?",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
