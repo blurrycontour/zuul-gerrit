@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a82d096f_a6f83c3f",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "Nit: \"analysis\"",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd4ef1c6_84224376",
@@ -32,6 +49,91 @@
       "side": 1,
       "message": "This spec says that we will only use OpenTelemetry for emitting spans, not logs; we\u0027ll continue to use the existing python logging framework for that.  I definitely don\u0027t want to duplicate log infrastructure.\n\n(It\u0027s perfectly fine to only emit spans with Open Telemetry, and ignore the logs (and metrics) it supports.)",
       "parentUuid": "bd4ef1c6_84224376",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2e819a6_0b1ee47a",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "Nit: \"metadata\"",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "203b029e_a64bbd63",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "Nit: elswhere you capitalize as \"IDs\"",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f33e20ec_d697fb4c",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "Was this meant to be underlined?",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80f60c04_d0d5dcd8",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "And this?",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8724b949_923e11f0",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "Is the plan for node requests to be represented here as well (at least the scheduler-side of issuing the request and then eventually receiving an assignment or not, and any reissuing)? At a minimum, being able to suss out which launcher(s) handled a request without needing to dig in the scheduler log would be nice, though if the traces also cover nodepool itself this could be even more useful.",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -102,6 +204,23 @@
       "side": 1,
       "message": "Yeah, with only the OLTP exporter, it\u0027s a pretty small set of config options (just what you\u0027d expect: host, port, maybe protocol).  I don\u0027t see us needing more than an ini section with a few options.",
       "parentUuid": "fba1cc24_d5b5cf4f",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d813751_932c8d0f",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-02T16:02:38Z",
+      "side": 1,
+      "message": "Would this be segmented by tenant, in order to accommodate tenant-specific access controls and avoid leaking information about one to users who have access to another?",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
