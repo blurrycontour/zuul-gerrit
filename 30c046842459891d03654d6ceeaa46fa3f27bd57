@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82681fb4_87532264",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-02T20:56:44Z",
+      "side": 1,
+      "message": "I should really turn on flyspell.",
+      "parentUuid": "a82d096f_a6f83c3f",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd4ef1c6_84224376",
@@ -106,6 +124,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "88344272_d82f1e70",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-02T20:56:44Z",
+      "side": 1,
+      "message": "This is the next level of topic under Spans.  So the Tree is:\n\nTracing\n+ Proposed Solution\n+ + Spans\n+ + + Event Ingestion\n+ + + Tenant Event Processing\n...",
+      "parentUuid": "f33e20ec_d697fb4c",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "80f60c04_d0d5dcd8",
         "filename": "doc/source/developer/specs/tracing.rst",
         "patchSetId": 1
@@ -134,6 +170,24 @@
       "writtenOn": "2022-08-02T16:02:38Z",
       "side": 1,
       "message": "Is the plan for node requests to be represented here as well (at least the scheduler-side of issuing the request and then eventually receiving an assignment or not, and any reissuing)? At a minimum, being able to suss out which launcher(s) handled a request without needing to dig in the scheduler log would be nice, though if the traces also cover nodepool itself this could be even more useful.",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3886e3cc_2cb7c062",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-02T20:56:44Z",
+      "side": 1,
+      "message": "Yes for the scheduler view of a node request as you describe.  I believe we should be able to associate the launcher that fulfilled the request (also, if we want, all the launchers that declined it) with the span.\n\nWe could also forward the span information to Nodepool so that it can open up its own spans, but I\u0027m not anticipating that right now in this spec.  At least partly because I have another spec I\u0027m working on that would fold Nodepool into Zuul.\n\nIf we retain Nodepool as a separate app, I expect us to extend tracing support to it eventually.  If we fold it into Zuul, we\u0027ll probably do the same.\n\nBut to keep things simple for now, let\u0027s just say this covers the \"scheduler view\" of a node request.",
+      "parentUuid": "8724b949_923e11f0",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -225,6 +279,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce9c893e_f03e737e",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-02T20:56:44Z",
+      "side": 1,
+      "message": "We can include the metadata about the tenant so that anyone with tooling capable of acting on that has the information, but I\u0027m unaware of the ability of any systems that present tracing data to limit it like that (maybe Kibana could?).  That\u0027s probably a good caveat to include if we add any deployment suggestions.",
+      "parentUuid": "2d813751_932c8d0f",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39d8a092_7e0a44de",
@@ -238,6 +310,24 @@
       "writtenOn": "2022-08-02T13:28:19Z",
       "side": 1,
       "message": "It seems like opentelemetry-python metrics are compatible with prometheus client, and perhaps it would be preferable to migrate the existing gauge to use the same object for both use-case?",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3efdf30_6180a9f5",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-02T20:56:44Z",
+      "side": 1,
+      "message": "I agree there may be an opportunity for future consolidation.  But I don\u0027t want to encode that in this spec so that we keep all the functions separate for the moment.",
+      "parentUuid": "39d8a092_7e0a44de",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
