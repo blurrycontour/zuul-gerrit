@@ -1384,7 +1384,7 @@ class TestGithubDriver(ZuulTestCase):
         # now check if the merge was done via rebase
         merges = [report for report in self.fake_github.github_data.reports
                   if report[2] == 'merge']
-        assert(len(merges) == 1 and merges[0][3] == 'squash')
+        assert (len(merges) == 1 and merges[0][3] == 'squash')
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
     def test_invalid_event(self):

@@ -1470,7 +1470,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         # for large projects like nova
         alldata = []
         chunk, more_changes = _query_chunk(query, event)
-        while(chunk):
+        while chunk:
             alldata.extend(chunk)
             if more_changes is None:
                 # continue sortKey based (before Gerrit 2.9)

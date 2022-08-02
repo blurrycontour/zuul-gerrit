@@ -3735,7 +3735,7 @@ class ExecutorServer(BaseMergeServer):
                 sensor.reportStats(self.statsd, base_key)
 
     def finishJob(self, unique):
-        del(self.job_workers[unique])
+        del self.job_workers[unique]
         self.log.debug(
             "Finishing Job: %s, queue(%d): %s",
             unique,
