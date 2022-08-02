@@ -73,6 +73,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7e93b10e_565644c5",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-02T23:31:59Z",
+      "side": 1,
+      "message": "What would be missing from the span that only appears in logs? I understand we don\u0027t want to trace low level debug messages, but shouldn\u0027t most of the important logs be part of the trace?",
+      "parentUuid": "0ff22820_9db506e9",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a2e819a6_0b1ee47a",
         "filename": "doc/source/developer/specs/tracing.rst",
         "patchSetId": 1
