@@ -33,6 +33,40 @@
       "message": "recheck unstable test",
       "revId": "98a026ab81847bb70b54933d905115899ad4e762",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e768a3b2_201585b4",
+        "filename": "doc/source/drivers/gitea.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-02T13:36:51Z",
+      "side": 1,
+      "message": "That does not seems to be used. Should the default be nothing, and let the ssh client picks the default key, or should it better be `~/.ssh/id_rsa` ?",
+      "revId": "98a026ab81847bb70b54933d905115899ad4e762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab027c39_bdc8b351",
+        "filename": "zuul/driver/gitea/giteamodel.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-02T13:36:51Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be `list(self.labels)` ? The deserialize below seems to assume it is a list.",
+      "revId": "98a026ab81847bb70b54933d905115899ad4e762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
