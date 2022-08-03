@@ -10,11 +10,15 @@ Nodepool
 ~~~~~~~~
 
 In order to run all but the simplest jobs, Zuul uses a companion
-program, Nodepool, to supply the nodes (whether dynamic cloud
-instances or static hardware) used by jobs.  Before starting Zuul,
-ensure you have Nodepool installed and any images you require built.
-Zuul only makes one requirement of these nodes: that it be able to log
-in given a username and ssh private key.
+program `Nodepool <https://opendev.org/zuul/nodepool>`__ to supply the
+nodes (whether dynamic cloud instances or static hardware) used by
+jobs.  Before starting Zuul, ensure you have Nodepool installed and
+any images you require built.
+
+Zuul must be able to able to log into the nodes provisioned by
+nodepool with a given username and ssh private key.  Executors should
+also be able to talk to nodes on TCP port 19885 for log streaming; see
+:ref:`zuul_console_streaming`.
 
 ZooKeeper
 ~~~~~~~~~
