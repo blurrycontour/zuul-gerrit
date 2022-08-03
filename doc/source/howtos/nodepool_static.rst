@@ -15,9 +15,9 @@ the following requirements:
 
 * Must be reachable by Zuul executors and have SSH access enabled.
 * Must have a user that Zuul can use for SSH.
-* Must have Python 2 installed for Ansible.
-* Must be reachable by Zuul executors over TCP port 19885 (console log
-  streaming).
+* Must have an Ansible supported Python installed
+* Must be reachable by Zuul executors over TCP port 19885 for console
+  log streaming.  See :ref:`zuul_console_streaming`
 
 When setting up your nodepool.yaml file, you will need the host keys
 for each node for the ``host-key`` value. This can be obtained with
@@ -40,7 +40,7 @@ nodes.  Place this file in ``/etc/nodepool/nodepool.yaml``:
      - host: localhost
 
    labels:
-     - name: ubuntu-xenial
+     - name: ubuntu-jammy
 
    providers:
      - name: static-vms
@@ -49,11 +49,11 @@ nodes.  Place this file in ``/etc/nodepool/nodepool.yaml``:
          - name: main
            nodes:
              - name: 192.168.1.10
-               labels: ubuntu-xenial
+               labels: ubuntu-jammy
                host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGXqY02bdYqg1BcIf2x08zs60rS6XhlBSQ4qE47o5gb"
                username: zuul
              - name: 192.168.1.11
-               labels: ubuntu-xenial
+               labels: ubuntu-jammy
                host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGXqY02bdYqg1BcIf2x08zs60rS6XhlBSQ5sE47o5gc"
                username: zuul
    EOF"
