@@ -5621,6 +5621,8 @@ class Ref(object):
         tpc = tenant.project_configs.get(self.project.canonical_name)
         if tpc is None:
             return False
+        if not tpc.load_classes:
+            return False
         if hasattr(self, 'branch'):
             if tpc.isAlwaysDynamicBranch(self.branch):
                 return True
