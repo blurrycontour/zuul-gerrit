@@ -109,6 +109,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c987b5b9_83961289",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-03T12:16:45Z",
+      "side": 1,
+      "message": "Thank you for the details, that makes sense to me. I hope we\u0027ll be able to consolidate telemetry and logging in the future, and starting with span sounds great.",
+      "parentUuid": "788f0bf1_bbcc07a8",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a2e819a6_0b1ee47a",
         "filename": "doc/source/developer/specs/tracing.rst",
         "patchSetId": 1
