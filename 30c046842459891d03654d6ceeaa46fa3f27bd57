@@ -91,6 +91,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "788f0bf1_bbcc07a8",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-03T00:49:07Z",
+      "side": 1,
+      "message": "OpenTelemetry describes a system for exporting three types of data: traces, metrics, logs.  This spec only proposes that we use the OpenTelemetry protocol to export spans, not log messages or metrics (since we already have infrastructure for the others).\n\nOpenTelemetry spans can also have event information (which can look a little bit like a log entry from a data structure point of view, but might be rendered visually as a span with no duration).  We can associate some events with spans but we shouldn\u0027t over-use that (See the \"Events and Exceptions\" section in this spec).\n\nI do think a lot of the interesting information in logs will appear in spans (request ids, etc), but it will be in a different form, so I don\u0027t think there needs to be overlap with logs.  If we say that, for example, the beginning and ending of a merge request span is redundant with the existing log entries, we\u0027re probably talking about 10-20 log invocations that would be redundant with spans out of the 1400 log invocations Zuul currently has.\n\nIt is possible that we could decide that using OpenTelemetry to export log entries instead of the python logging library, however, there are many different ways people are configuring logging right now (console, file, elasticsearch, splunk, etc) all of which we would need to continue to support, preferably without requiring any additional tooling.  I think it would be best to get some experience with OpenTelemetry for tracing before we decide to ask it to do more.",
+      "parentUuid": "7e93b10e_565644c5",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a2e819a6_0b1ee47a",
         "filename": "doc/source/developer/specs/tracing.rst",
         "patchSetId": 1
