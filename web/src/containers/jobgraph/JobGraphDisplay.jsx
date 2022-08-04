@@ -77,6 +77,10 @@ function GraphViz(props) {
       gv._originalTransform.y = val
     }
 
+    // Disable scroll wheel zooming because it interferes with window
+    // scrolling
+    gv.zoomSelection().on("wheel.zoom", null)
+
     // Mutate the links to be internal links
     d3.select('.zuul-job-graph').selectAll('.node a').on('click', event => {
       d3.event.preventDefault()
