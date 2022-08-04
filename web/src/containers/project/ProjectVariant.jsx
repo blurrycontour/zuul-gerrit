@@ -18,64 +18,68 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 
-class ProjectVariant extends React.Component {
-  static propTypes = {
-    tenant: PropTypes.object,
-    variant: PropTypes.object.isRequired
+function ProjectVariant(props) {
+  const { tenant, variant } = props
+  const rows = []
+
+  rows.push({label: 'Merge mode', value: variant.merge_mode})
+
+  if (variant.templates.length > 0) {
+    const templateList = (
+      <ul className='list-group'>
+        {variant.templates.map((item, idx) => (
+          <li className='list-group-item' key={idx}>{item}</li>))}
+      </ul>
+    )
+    rows.push({label: 'Templates', value: templateList})
   }
 
-  render () {
-    const { tenant, variant } = this.props
-    const rows = []
-
-    rows.push({label: 'Merge mode', value: variant.merge_mode})
-
-    if (variant.templates.length > 0) {
-      const templateList = (
+  variant.pipelines.forEach(pipeline => {
+    // TODO: either adds job link anchor to load the right variant
+    // and/or show the job variant config in a modal?
+    const jobList = (
+      <React.Fragment>
+        {pipeline.queue_name && (
+          <p><strong>Queue: </strong> {pipeline.queue_name} </p>)}
         <ul className='list-group'>
-          {variant.templates.map((item, idx) => (
-            <li className='list-group-item' key={idx}>{item}</li>))}
+          {pipeline.jobs.map((item, idx) => (
+            <li className='list-group-item' key={idx}>
+              <Link to={tenant.linkPrefix + '/job/' + item[0].name}>
+                {item[0].name}
+              </Link>
+            </li>
+          ))}
         </ul>
-      )
-      rows.push({label: 'Templates', value: templateList})
-    }
-
-    variant.pipelines.forEach(pipeline => {
-      // TODO: either adds job link anchor to load the right variant
-      // and/or show the job variant config in a modal?
-      const jobList = (
-        <React.Fragment>
-          {pipeline.queue_name && (
-            <p><strong>Queue: </strong> {pipeline.queue_name} </p>)}
-          <ul className='list-group'>
-            {pipeline.jobs.map((item, idx) => (
-              <li className='list-group-item' key={idx}>
-                <Link to={tenant.linkPrefix + '/job/' + item[0].name}>
-                  {item[0].name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </React.Fragment>
-      )
-      rows.push({label: pipeline.name + ' jobs', value: jobList})
-    })
-
-    return (
-      <div>
-        <table className='table table-striped table-bordered'>
-          <tbody>
-            {rows.map(item => (
-              <tr key={item.label}>
-                <td style={{width: '10%'}}>{item.label}</td>
-                <td>{item.value}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      </React.Fragment>
     )
+    rows.push({label: pipeline.name + ' jobs', value: jobList})
+  })
+
+  return (
+    <div>
+      <table className='table table-striped table-bordered'>
+        <tbody>
+          {rows.map(item => (
+            <tr key={item.label}>
+              <td style={{width: '10%'}}>{item.label}</td>
+              <td>{item.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+ProjectVariant.propTypes = {
+  tenant: PropTypes.object,
+  variant: PropTypes.object.isRequired
+}
+
+function mapStateToProps(state) {
+  return {
+    tenant: state.tenant,
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ProjectVariant)
+export default connect(mapStateToProps)(ProjectVariant)
