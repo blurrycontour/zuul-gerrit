@@ -16,6 +16,24 @@
       "message": "I guess we could also set the zoom option to false?",
       "revId": "af80f8dfdc7edbf65d69e969e8eb866987e66d21",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a609f5b_7eea2b36",
+        "filename": "web/src/containers/jobgraph/JobGraphDisplay.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-05T17:12:54Z",
+      "side": 1,
+      "message": "That would disable it entirely (and also panning).  This way we can still pan and zoom with double-click/shift-double-click.  That can be really important with some job graphs.  :)",
+      "parentUuid": "32249585_d770b607",
+      "revId": "af80f8dfdc7edbf65d69e969e8eb866987e66d21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
