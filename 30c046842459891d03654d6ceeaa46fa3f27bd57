@@ -248,6 +248,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6a2fe777_9fdc452a",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-05T17:02:29Z",
+      "side": 1,
+      "message": "Does this mean any incomplete spans (system crash or extremely slow processing) won\u0027t be visible?",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aa0249a1_4213bcf3",
         "filename": "doc/source/developer/specs/tracing.rst",
         "patchSetId": 1
@@ -347,6 +364,23 @@
       "side": 1,
       "message": "We can include the metadata about the tenant so that anyone with tooling capable of acting on that has the information, but I\u0027m unaware of the ability of any systems that present tracing data to limit it like that (maybe Kibana could?).  That\u0027s probably a good caveat to include if we add any deployment suggestions.",
       "parentUuid": "2d813751_932c8d0f",
+      "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00ae8f83_1bd257d0",
+        "filename": "doc/source/developer/specs/tracing.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-05T17:02:29Z",
+      "side": 1,
+      "message": "Does this also affect how we package zuul? I\u0027m not sure PBR is used with any C compilation steps currently, but I think that would be necessary to build our protobuf definitions? Or are the sufficiently abstract that the existing libs define and build them and we just shove data into them?",
       "revId": "30c046842459891d03654d6ceeaa46fa3f27bd57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
