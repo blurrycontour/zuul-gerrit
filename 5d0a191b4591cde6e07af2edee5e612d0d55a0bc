@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11c30c99_eea3f3f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-08-08T14:15:11Z",
+      "side": 1,
+      "message": "review comments addressed in https://review.opendev.org/c/zuul/zuul/+/852433 to avoid full stack updates and loosing precious reviews",
+      "revId": "5d0a191b4591cde6e07af2edee5e612d0d55a0bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
