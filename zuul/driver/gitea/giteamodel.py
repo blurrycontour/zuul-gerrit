@@ -50,7 +50,7 @@ class PullRequest(Change):
             "title": self.title,
             "body_text": self.body_text,
             "reviews": list(self.reviews),
-            "labels": self.labels,
+            "labels": list(self.labels),
             "draft": self.draft,
         })
         return d

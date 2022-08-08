@@ -76,7 +76,6 @@ The supported options in ``zuul.conf`` connections are:
       without modification from the driver.
 
    .. attr:: sshkey
-      :default: ~/.id_rsa
 
       Path to SSH key to use (Used if **cloneurl** is ssh)
 
