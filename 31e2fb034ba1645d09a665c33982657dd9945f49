@@ -38,6 +38,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "90b6ecac_327f2f66",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-08-08T15:48:48Z",
+      "side": 1,
+      "message": "This should be at least 6.3.0 now I guess",
+      "range": {
+        "startLine": 178,
+        "startChar": 54,
+        "endLine": 178,
+        "endChar": 59
+      },
+      "revId": "31e2fb034ba1645d09a665c33982657dd9945f49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e3066f9_fb5afbd9",
         "filename": "zuul/ansible/base/callback/zuul_stream.py",
         "patchSetId": 10
