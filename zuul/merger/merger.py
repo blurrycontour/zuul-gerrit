@@ -733,10 +733,10 @@ class Repo(object):
             return
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Set remote url to %s", redact_url(url))
-        self.remote_url = url
         self._git_set_remote_url(
             self.createRepoObject(zuul_event_id),
             self.remote_url)
+        self.remote_url = url
 
     def mapLine(self, commit, filename, lineno, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
