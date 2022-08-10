@@ -733,9 +733,20 @@ class Repo(object):
             return
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Set remote url to %s", redact_url(url))
-        self._git_set_remote_url(
-            self.createRepoObject(zuul_event_id),
-            self.remote_url)
+        repo = self.createRepoObject(zuul_event_id),
+        for attempt in range(1, 4):
+            self._git_set_remote_url(repo, self.remote_url)
+            # Verify that the remote URL was updated as GitPython
+            # seems to silently swallow some errors.
+            if repo.remotes.origin.config_reader.get_value("url") != url:
+                log.error(
+                    "Remote URL wasn't correctly updated (%s/3)",
+                    attempt)
+            else:
+                break
+        else:
+            raise RuntimeError(
+                f"Unable to update remote URL {redact_url(url)}")
         self.remote_url = url
 
     def mapLine(self, commit, filename, lineno, zuul_event_id=None):
