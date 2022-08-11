@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "c1b2fa55988b3f22b392086fe003bde2444ebbdc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf413432_29031032",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-11T23:24:06Z",
+      "side": 1,
+      "message": "Taking corvus\u0027 prior review as just updated the version tag in the comment",
+      "revId": "c1b2fa55988b3f22b392086fe003bde2444ebbdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
