@@ -3157,6 +3157,10 @@ class ExecutorServer(BaseMergeServer):
         self.allow_unzoned = get_default(self.config, 'executor',
                                          'allow_unzoned', False)
 
+        # If this executor has no zone configured it is implicitly unzoned
+        if self.zone is None:
+            self.allow_unzoned = True
+
         # Those attributes won't change, so it's enough to set them once on the
         # component info.
         self.component_info.zone = self.zone

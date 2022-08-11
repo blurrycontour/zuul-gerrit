@@ -226,6 +226,18 @@ class TestSchedulerZoneFallback(ZuulTestCase):
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged per zone"
         self.hold_jobs_in_queue = True
+
+        # Validate that the reported executor stats are correct. Since
+        # the executor accepts zoned and unzoned job it should be counted
+        # in both metrics.
+        self.assertReportedStat(
+            'zuul.executors.online', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.unzoned.online', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.zone.test-provider_vpn.online',
+            value='1', kind='g')
+
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))

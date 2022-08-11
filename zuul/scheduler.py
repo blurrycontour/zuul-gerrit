@@ -438,12 +438,12 @@ class Scheduler(threading.Thread):
         mergers_online = 0
 
         for executor_component in self.component_registry.all("executor"):
-            if executor_component.allow_unzoned or not executor_component.zone:
+            if executor_component.allow_unzoned:
                 if executor_component.state == BaseComponent.RUNNING:
                     executors_unzoned_online += 1
                 if executor_component.accepting_work:
                     executors_unzoned_accepting += 1
-            else:
+            if executor_component.zone:
                 zone_stats = zoned_executor_stats.setdefault(
                     executor_component.zone,
                     executor_stats_default.copy())
