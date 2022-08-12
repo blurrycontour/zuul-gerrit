@@ -4237,7 +4237,7 @@ class QueueItem(zkobject.ZKObject):
             pipeline=None,
             queue=None,
             change=None,  # a ref
-            dequeued_needing_change=False,
+            dequeued_needing_change=None,
             dequeued_missing_requirements=False,
             current_build_set=None,
             item_ahead=None,
@@ -4405,11 +4405,14 @@ class QueueItem(zkobject.ZKObject):
         self.current_build_set.updateAttributes(
             self.pipeline.manager.current_context, result=result)
 
-    def warning(self, msg):
+    def warning(self, msgs):
         with self.current_build_set.activeContext(
                 self.pipeline.manager.current_context):
-            self.current_build_set.warning_messages.append(msg)
-        self.log.info(msg)
+            if not isinstance(msgs, list):
+                msgs = [msgs]
+            for msg in msgs:
+                self.current_build_set.warning_messages.append(msg)
+                self.log.info(msg)
 
     def freezeJobGraph(self, layout, context,
                        skip_file_matcher,
@@ -4583,7 +4586,7 @@ class QueueItem(zkobject.ZKObject):
 
     def cannotMergeBundle(self):
         if self.bundle:
-            return self.bundle.cannot_merge
+            return bool(self.bundle.cannot_merge)
         return False
 
     def didMergerFail(self):
@@ -4595,7 +4598,7 @@ class QueueItem(zkobject.ZKObject):
         return []
 
     def wasDequeuedNeedingChange(self):
-        return self.dequeued_needing_change
+        return bool(self.dequeued_needing_change)
 
     def wasDequeuedMissingRequirements(self):
         return self.dequeued_missing_requirements
@@ -5118,10 +5121,10 @@ class QueueItem(zkobject.ZKObject):
         self.setResult(fakebuild)
         return fakebuild
 
-    def setDequeuedNeedingChange(self):
+    def setDequeuedNeedingChange(self, msg):
         self.updateAttributes(
             self.pipeline.manager.current_context,
-            dequeued_needing_change=True)
+            dequeued_needing_change=msg)
         self._setAllJobsSkipped()
 
     def setDequeuedMissingRequirements(self):
@@ -5494,7 +5497,7 @@ class Bundle:
         self.items = []
         self.started_reporting = False
         self.failed_reporting = False
-        self.cannot_merge = False
+        self.cannot_merge = None
 
     def __repr__(self):
         return '<Bundle 0x{:x} {}'.format(id(self), self.items)
