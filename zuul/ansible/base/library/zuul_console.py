@@ -185,7 +185,8 @@ class Server(object):
                 # NOTE(ianw) : remote sends its version.  We currently
                 # don't have anything to do with this value, so ignore
                 # for now.
-                conn.send(f'{ZUUL_CONSOLE_PROTO_VERSION}\n'.encode('utf-8'))
+                cmd = '%s\n' % (ZUUL_CONSOLE_PROTO_VERSION)
+                conn.send(cmd.encode('utf-8'))
                 continue
             elif command.startswith('s:'):
                 log_uuid = command[2:]
