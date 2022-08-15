@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27a06891_ae949195",
+        "filename": "doc/source/howtos/nodepool_static.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-15T14:37:07Z",
+      "side": 1,
+      "message": "Please don\u0027t link to the developer docs from the user docs.  That\u0027s too much information to give users, and there\u0027s only one practical think for them to know: I\u0027m guessing you are interested in having the information about files left over.  I suggest copying/reworking a few sentences from the last paragraph(s) here.  Basically, tell them that Zuul uses tmp files with a certain name pattern and tries to clean them up but can\u0027t always and that\u0027s important for static nodes.\n\nActually, I think it may make more sense to move this section to the Nodepool section in doc/source/installation, make the change I suggested above, then link to there from here.",
+      "revId": "2fccb2192fe26cc097586204766f3229279031b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "085c307d_55a81343",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-15T14:37:07Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "2fccb2192fe26cc097586204766f3229279031b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
