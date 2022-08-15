@@ -1,0 +1,93 @@
+- hosts: all
+  tasks:
+
+    - name: Install docker
+      include_role:
+        name: ensure-docker
+
+    - name: Install test requirements
+      become: yes
+      package:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - netcat-openbsd
+
+    - name: Setup build environment
+      block:
+
+        - name: Create directory
+          file:
+            name: '{{ ansible_user_dir }}/docker'
+            state: directory
+
+        - name: Copy support files
+          copy:
+            src: '{{ item }}'
+            dest: '{{ ansible_user_dir }}/docker'
+          loop:
+            - 'Dockerfile'
+            - 'command-args.json'
+            - 'zuul_console-args.json'
+            - 'console-1234abc.log'
+
+        - name: Copy files from source for testing
+          copy:
+            src: '{{ ansible_user_dir }}/src/opendev.org/zuul/zuul/zuul/ansible/{{ item[0] }}'
+            dest: '{{ ansible_user_dir }}/docker/{{ item[1] }}'
+            remote_src: yes
+          loop:
+            - [ 'base/library/zuul_console.py', 'zuul_console.py' ]
+            - [ '2.8/library/command.py', 'command_2.8.py' ]
+            - [ '2.9/library/command.py', 'command_2.9.py' ]
+            - [ '5/library/command.py', 'command_5.py' ]
+
+    - name: Run build
+      shell: |
+        pushd {{ ansible_user_dir }}/docker
+        docker build --target zuul_console -t zuul_console .
+        docker build --target command_2.8 -t command_2.8 .
+        docker build --target command_2.9 -t command_2.9 .
+        docker build --target command_5 -t command_5 .
+      args:
+        executable: /bin/bash
+
+    - name: Get output
+      shell: |
+        docker run -p 19886:19886 zuul_console &
+        sleep 5
+        docker ps
+        echo "v:1" | nc localhost 19886
+        echo "s:1234abc" | nc localhost 19886
+      register: _socat_output
+
+    - name: Verify communication
+      assert:
+        that: "'This is a sample console log' in _socat_output.stdout"
+
+    - name: Run 2.8 command tests
+      shell: |
+        docker run command_2.8
+      register: _28_output
+
+    - name: Check 2.8 output
+      assert:
+        that: "'Hello this is a command' in _28_output.stdout"
+
+    - name: Run 2.9 command tests
+      shell: |
+        docker run command_2.9
+      register: _29_output
+
+    - name: Check 2.9 output
+      assert:
+        that: "'Hello this is a command' in _29_output.stdout"
+
+    - name: Run 5 command tests
+      shell: |
+        docker run command_5
+      register: _5_output
+
+    - name: Check 5 output
+      assert:
+        that: "'Hello this is a command' in _5_output.stdout"
