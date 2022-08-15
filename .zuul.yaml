@@ -1,3 +1,12 @@
+- job:
+    name: zuul-console-regression
+    nodeset: ubuntu-jammy
+    run: playbooks/zuul-console-regression/run.yaml
+    files:
+      - zuul/ansible/.*
+      - zuul/lib/ansible*
+      - playbooks/zuul-console-regression
+
 - nodeset:
     name: zuul-functional-temp-master
     nodes:
@@ -313,6 +322,7 @@
             files:
               - web/.*
             nodeset: ubuntu-jammy
+        - zuul-console-regression
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
         - zuul-stream-functional-5
