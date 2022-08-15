@@ -10,7 +10,7 @@
     - name: Run ansible that should succeed against testing console
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
-        -e "new_console=true"
+        -vvv -e "new_console=true"
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
         # Setup by test-stream.yaml so we start a new zuul_console
