@@ -7,6 +7,10 @@
         # the python version of the platform is changed.
         python_path: "/usr/local/lib/python3.10/dist-packages"
 
+    - name: Double check inventory
+      command: >-
+          cat {{ ansible_user_dir }}/inventory.yaml
+
     - name: Run ansible that should succeed against testing console
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
