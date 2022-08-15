@@ -1,0 +1,45 @@
+- hosts: all
+  tasks:
+
+    - name: Install docker
+      include_role:
+        name: ensure-docker
+
+    - name: Setup build environment
+      block:
+
+        - name: Create directory
+          file:
+            name: '{{ ansible_user_dir }}/docker'
+            state: directory
+
+        - name: Copy support files
+          copy:
+            src: '{{ item }}'
+            dest: '{{ ansible_user_dir }}/docker'
+          loop:
+            - 'Dockerfile'
+            - 'args.json'
+            - 'console-1234abc.log'
+
+    - name: Run build
+      shell: |
+        pushd {{ ansible_user_dir }}/docker
+        cp  {{ ansible_user_dir }}/src/opendev.org/zuul/zuul/zuul/ansible/base/library/zuul_console.py .
+        docker build -t zuul_console .
+      args:
+        executable: /bin/bash
+
+    - name: Run zuul_console
+      shell: |
+        docker run --network=host zuul_console &
+
+    - name: Get output
+      shell: |
+        echo "v:1" | socat TCP:localhost:19885 -
+        echo "s:1234abc" | socat TCP:localhost:19885 -
+      register: _socat_output
+
+    - name: Verify communication
+      assert:
+        that: "'This is a sample console log' in _socat_output.stdout"
