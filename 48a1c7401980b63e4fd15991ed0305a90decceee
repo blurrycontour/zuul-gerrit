@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "48a1c7401980b63e4fd15991ed0305a90decceee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16e6ccb6_8364ead0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-08-15T07:33:31Z",
+      "side": 1,
+      "message": "It looks like this change did not help in updating the remote URL. We also see other exceptions related to this change:\n\n2022-08-15 02:03:18,615 ERROR zuul.ExecutorServer: [e: c2273a58654e47d48a8b0def10a2c525] [build: e475e56728c744728d2ac899d4dcd2da] Got exception while updating repo github/foobar/zuul-trusted\nTraceback (most recent call last):\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/executor/server.py\", line 3533, in _innerUpdateLoop\n    self.merger.updateRepo(\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 938, in updateRepo\n    repo \u003d self.getRepo(connection_name, project_name,\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 915, in getRepo\n    repo.setRemoteUrl(url)\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 743, in setRemoteUrl\n    self._git_set_remote_url(self.createRepoObject(zuul_event_id), url)\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 311, in _git_set_remote_url\n    repo.git.remote(\"set-url\", \"origin\", url)\n  File \"/opt/zuul/lib/python3.10/site-packages/git/cmd.py\", line 542, in \u003clambda\u003e\n    return lambda *args, **kwargs: self._call_process(name, *args, **kwargs)\n  File \"/opt/zuul/lib/python3.10/site-packages/git/cmd.py\", line 1005, in _call_process\n    return self.execute(call, **exec_kwargs)\n  File \"/opt/zuul/lib/python3.10/site-packages/git/cmd.py\", line 822, in execute\n    raise GitCommandError(command, status, stderr_value, stdout_value)\ngit.exc.GitCommandError: Cmd(\u0027git\u0027) failed due to: exit code(2)\n  cmdline: git remote set-url origin https://x-access-token:\u003credacted\u003e@example.com/foobar/zuul-trusted\n  stderr: \u0027error: No such remote \u0027origin\u0027\u0027\n  \n  \nCreated https://review.opendev.org/c/zuul/zuul/+/853144 to force-set the remote URL each time in order to reduce the impact of the issue.",
+      "revId": "48a1c7401980b63e4fd15991ed0305a90decceee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
