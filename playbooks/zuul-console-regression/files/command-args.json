@@ -1,0 +1,6 @@
+{"ANSIBLE_MODULE_ARGS": {
+    "argv": ["echo", "Hello this is a command"],
+    "zuul_log_id": "12345abc",
+    "_uses_shell": true
+  }
+}
