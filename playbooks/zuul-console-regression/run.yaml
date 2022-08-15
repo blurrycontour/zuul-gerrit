@@ -1,0 +1,33 @@
+- hosts: all
+  tasks:
+
+    - name: Install docker
+      include_role:
+        name: ensure-docker
+
+    - name: Setup build environment
+      block:
+
+        - name: Create directory
+          file:
+            name: '{{ ansible_user_dir }}/docker'
+            state: directory
+
+        - name: Copy support files
+          copy:
+            src: '{{ item }}'
+            dest: '{{ ansible_user_dir }}/docker'
+          loop:
+            - 'Dockerfile'
+            - 'args.json'
+
+    - name: Run build
+      shell: |
+        pushd {{ ansible_user_dir }}/docker
+        cp  {{ ansible_user_dir }}/src/opendev.org/zuul/zuul/zuul/ansible/base/library/zuul_console.py .
+        docker build -t zuul_console .
+
+    - name: Run zuul_console
+      shell: |
+        docker run --network=host zuul_console &
+
