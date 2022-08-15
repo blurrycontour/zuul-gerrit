@@ -2416,6 +2416,7 @@ class Job(ConfigObject):
         d = {}
         d['name'] = self.name
         d['branches'] = self._branches
+        d['branch_filters'] = self._branch_filters
         d['override_checkout'] = self.override_checkout
         d['files'] = self._files
         d['irrelevant_files'] = self._irrelevant_files
@@ -2485,6 +2486,8 @@ class Job(ConfigObject):
             success_message=None,
             branch_matcher=None,
             _branches=(),
+            branch_filter_matcher=None,
+            _branch_filters=(),
             file_matcher=None,
             _files=(),
             irrelevant_file_matcher=None,  # skip-if
@@ -2802,6 +2805,13 @@ class Job(ConfigObject):
         self._branches = [x._regex for x in matchers]
         self.branch_matcher = change_matcher.MatchAny(matchers)
 
+    def setBranchFilterMatcher(self, branches):
+        self._branch_filters = branches
+        matchers = []
+        for b in branches:
+            matchers.append(change_matcher.BranchMatcher(b))
+        self.branch_filter_matcher = change_matcher.MatchAny(matchers)
+
     def setFileMatcher(self, files):
         # Set the file matcher to match any of the change files
         self._files = files
@@ -3044,6 +3054,12 @@ class Job(ConfigObject):
 
         if self.branch_matcher and not self.branch_matcher.matches(
                 branch_change):
+            return False
+        return True
+
+    def changeMatchesBranchFilter(self, chaneg):
+        if self.branch_filter_matcher and \
+           not self.branch_filter_matcher(change):
             return False
         return True
 
@@ -7636,6 +7652,30 @@ class Layout(object):
                                    "Job {jobname} did not match files".
                                    format(jobname=jobname), indent=2)
                     continue
+
+            if not skip_file_matcher and \
+               not frozen_job.changeMatchesBranchFilter(change):
+                if frozen_job.match_on_config_updates:
+                    updates_job_config = item.updatesJobConfig(
+                        frozen_job, self)
+
+                if updates_job_config:
+                    # Log the reason we're ignoring the file matcher
+                    log.debug("The configuration of job %s is "
+                              "changed by %s; ignoring branch matcher",
+                              repr(frozen_job), change)
+                    add_debug_line(debug_messages,
+                                   "The configuration of job {jobname} is "
+                                   "changed; ignoring branch matcher".
+                                   format(jobname=jobname), indent=2)
+                else:
+                    log.debug("Job %s did not match branch in %s",
+                              repr(frozen_job), change)
+                    add_debug_line(debug_messages,
+                                   "Job {jobname} did not match branch".
+                                   format(jobname=jobname), indent=2)
+                    continue
+
             if frozen_job.abstract:
                 raise Exception("Job %s is abstract and may not be "
                                 "directly run" %
