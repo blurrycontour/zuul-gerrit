@@ -36,11 +36,6 @@
         # venvs) and the installation fails due to conflicts.
         SETUPTOOLS_USE_DISTUTILS: stdlib
 
-    - name: Copy inventory
-      copy:
-        src: "{{ zuul.executor.log_root }}/zuul-info/inventory.yaml"
-        dest: "{{ ansible_user_dir }}/inventory.yaml"
-
     - name: Copy ansible.cfg
       template:
         src: templates/ansible.cfg.j2
@@ -48,3 +43,9 @@
 
     - name: Generate logging config
       command: python3 src/opendev.org/zuul/zuul/zuul/ansible/logconfig.py
+
+    - name: Setup 2.7 container environment
+      include_tasks: 2.7-container.yaml
+
+    - name: Setup inventory
+      include_tasks: create-inventory.yaml
