@@ -10,7 +10,7 @@
     - name: Run ansible that should succeed against testing console
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
-        -e "new_console=true"
+        -vvv -e "new_console=true"
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
         # Setup by test-stream.yaml so we start a new zuul_console
@@ -19,6 +19,7 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
+        ZUUL_CONSOLE_STREAM_LOCALHOST: 1
       register: _success_output
 
     - name: Save raw output to file
@@ -53,10 +54,13 @@
     # NOTE(ianw) 2022-07 : we deliberatly have this second step to run
     # against the console setup by the infrastructure executor in the
     # job pre playbooks as a backwards compatability sanity check.
+    # The py27 container job (node3) is not running an existing
+    # console streamer, so that will not output anything -- limit this
+    # out.
     - name: Run ansible that should succeed against extant console
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
-        -e "new_console=false"
+        -e "new_console=false" --limit="node1,node2"
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
