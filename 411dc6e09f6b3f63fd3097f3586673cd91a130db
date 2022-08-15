@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1c0eba7_0bd128a1",
+        "filename": "playbooks/zuul-console-regression/files/Dockerfile",
+        "patchSetId": 20
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-15T18:49:58Z",
+      "side": 1,
+      "message": "Each of these commands is ansible version specific but above we install the latest version of ansible and run that against all of these.\n\nI suspect that may matter less due to the reduced scope of testing. We aren\u0027t running it through ansible directly. But it might be a good idea for compatibility reasons to test command_2.8.py against ansible 2.8 and so on.",
+      "revId": "411dc6e09f6b3f63fd3097f3586673cd91a130db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
