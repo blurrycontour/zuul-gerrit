@@ -49,6 +49,8 @@ from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
 LOG_STREAM_VERSION = 0
+#
+LOG_STREAM_LOCALHOST = int(os.environ.get("ZUUL_CONSOLE_STREAM_LOCALHOST", 0))
 
 
 def zuul_filter_result(result):
@@ -135,12 +137,14 @@ class CallbackModule(default.CallbackModule):
         logger_retries = 0
         while True:
             try:
+                self._log("Opening connection to %s:%s" % (ip, port))
                 s = socket.create_connection((ip, port), 5)
                 # Disable the socket timeout after we have successfully
                 # connected to accomodate the fact that jobs may not be writing
                 # logs continously. Without this we can easily trip the 5
                 # second timeout.
                 s.settimeout(None)
+                self._log("Socket %s:%s done" % (ip, port))
                 return s
             except socket.timeout:
                 self._log(
@@ -169,6 +173,7 @@ class CallbackModule(default.CallbackModule):
         if s is None:
             # Can't connect; _read_log_connect() already logged an
             # error for us, just bail
+            self._log("[%s] no connect" % host)
             return
 
         # Find out what version we are running against
@@ -315,13 +320,15 @@ class CallbackModule(default.CallbackModule):
             hosts = self._get_task_hosts(task)
             for host, inventory_hostname in hosts:
                 port = LOG_STREAM_PORT
-                if host in ('localhost', '127.0.0.1'):
+                if (host in ('localhost', '127.0.0.1') and
+                    not LOG_STREAM_LOCALHOST):
                     # Don't try to stream from localhost
                     continue
                 ip = play_vars[host].get(
                     'ansible_host', play_vars[host].get(
                         'ansible_inventory_host'))
-                if ip in ('localhost', '127.0.0.1'):
+                if (ip in ('localhost', '127.0.0.1') and
+                    not LOG_STREAM_LOCALHOST):
                     # Don't try to stream from localhost
                     continue
                 if play_vars[host].get('ansible_connection') in ('winrm',):
