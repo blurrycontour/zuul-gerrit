@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de9a7836_d2f9cdd6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-15T01:20:39Z",
+      "side": 1,
+      "message": "I think I have a handle on a regression test for this, which I\u0027ll keep working on.  \n\nGiven the time, I\u0027m going to take the liberty of merging this with one review (thanks tristan!), because I think we should try to unbreak OpenDev on this asap and I think I\u0027ll have to restart the executors (or at least have them pull this new console file).  The other change to delete the streaming files has merged ontop of the original this, making a revert now have to deal with both.  If we have to we can, but I think starting with this is the simpler approach.",
+      "revId": "3037ce79a1d33595e3a6d72fe22eba027deba2ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
