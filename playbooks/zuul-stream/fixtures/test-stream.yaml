@@ -11,6 +11,9 @@
         port: 19887
       when: new_console | default(false)
 
+    - name: Show running processes
+      command: ps -aefww
+
 - name: Run some commands to show that logging works
   hosts: node
   tasks:
