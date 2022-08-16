@@ -16,6 +16,23 @@
       "message": "It might be nice to check that jobList has proper content before pushing the row. Looks like on opendev projects get an empty check jobs list for some reason. This isn\u0027t a regression though so a followup is fine.",
       "revId": "8494ebf397115a86ad222417d0a66baa08e5721a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "019b6cf4_f4e7a482",
+        "filename": "web/src/containers/project/ProjectVariant.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-16T17:29:15Z",
+      "side": 1,
+      "message": "I think that\u0027s *technically* correct (though maybe confusing), since in opendev we add every opendev-hosted project to the check pipeline with an empty jobs list (in the tenant config project using a \".*\" project stanza).  We do that so that new projects can get syntax error reports with their first zuul.yaml changes.\n\nIn other words, that is conveying the information \"this project stanza configures this project to participate in the check pipeline but does not configure it to run any jobs\".\n\nMaybe there\u0027s another way we want to convey that information though.",
+      "revId": "8494ebf397115a86ad222417d0a66baa08e5721a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
