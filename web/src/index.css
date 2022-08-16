@@ -443,3 +443,9 @@ details.foldable[open] summary::before {
         );
     }
 }
+
+/* The box size calculation compared to the text size seems off, but
+   this looks better */
+.zuul-job-graph text {
+    font-size: 12px;
+}

@@ -159,6 +159,13 @@ function fetchProjects(apiPrefix) {
 function fetchJob(apiPrefix, jobName) {
   return Axios.get(apiUrl + apiPrefix + 'job/' + jobName)
 }
+function fetchJobGraph(apiPrefix, projectName, pipelineName, branchName) {
+  return Axios.get(apiUrl + apiPrefix +
+                   'pipeline/' + pipelineName +
+                   '/project/' + projectName +
+                   '/branch/' + branchName +
+                   '/freeze-jobs')
+}
 function fetchJobs(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'jobs')
 }
@@ -308,6 +315,7 @@ export {
   fetchProject,
   fetchProjects,
   fetchJob,
+  fetchJobGraph,
   fetchJobs,
   fetchLabels,
   fetchNodes,

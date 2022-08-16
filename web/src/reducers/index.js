@@ -23,6 +23,7 @@ import notifications from './notifications'
 import build from './build'
 import info from './info'
 import job from './job'
+import jobgraph from './jobgraph'
 import jobs from './jobs'
 import labels from './labels'
 import logfile from './logfile'
@@ -47,6 +48,7 @@ const reducers = {
   notifications,
   info,
   job,
+  jobgraph,
   jobs,
   labels,
   logfile,
