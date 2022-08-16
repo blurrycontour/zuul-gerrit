@@ -19,6 +19,7 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
+        ZUUL_CONSOLE_STREAM_LOCALHOST: 1
       register: _success_output
 
     - name: Save raw output to file
@@ -31,10 +32,14 @@
           mv job-output.txt job-output-success-19887.txt
           mv job-output.json job-output-success-19887.json
 
+    # This log ensures that we have communicated with each streamer
+    # and it has reported back.
     - name: Check protocol version
       assert:
         that:
           - "'[node1] Reports streaming version: 1' in _success_output.stdout"
+          - "'[node2] Reports streaming version: 1' in _success_output.stdout"
+          - "'[node3] Reports streaming version: 1' in _success_output.stdout"
 
     # Streamer puts out a line like
     #  [node1] Starting to log 916b2084-4bbb-80e5-248e-000000000016-1-node1 for task TASK: Print binary data
@@ -53,10 +58,13 @@
     # NOTE(ianw) 2022-07 : we deliberatly have this second step to run
     # against the console setup by the infrastructure executor in the
     # job pre playbooks as a backwards compatability sanity check.
+    # The py27 container job (node3) is not running an existing
+    # console streamer, so that will not output anything -- limit this
+    # out.
     - name: Run ansible that should succeed against extant console
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
-        -e "new_console=false"
+        -e "new_console=false" --limit="node1,node2"
         src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/test-stream.yaml
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
@@ -81,6 +89,8 @@
         - { node: 'node2', filename: 'job-output-success-19887.txt' }
         - { node: 'node1', filename: 'job-output-success-19885.txt' }
         - { node: 'node2', filename: 'job-output-success-19885.txt' }
+        # node3 only listen on 19887
+        - { node: 'node3', filename: 'job-output-success-19887.txt' }
 
     # failure case
 
@@ -105,8 +115,10 @@
       shell: |
         egrep "^.+\| node1 \| Exception: Test module failure exception fail-task" job-output-failure.txt
         egrep "^.+\| node2 \| Exception: Test module failure exception fail-task" job-output-failure.txt
+        egrep "^.+\| node3 \| Exception: Test module failure exception fail-task" job-output-failure.txt
 
     - name: Validate output - failure item loop with exception
       shell: |
         egrep "^.+\| node1 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
         egrep "^.+\| node2 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
+        egrep "^.+\| node3 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
