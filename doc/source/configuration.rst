@@ -1,5 +1,7 @@
 :title: Configuration
 
+.. _configuration:
+
 Configuration
 =============
 

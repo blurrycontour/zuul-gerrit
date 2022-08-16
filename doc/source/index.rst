@@ -33,6 +33,7 @@ System, the remainder of the sections will be useful.
    about
    tutorials/quick-start
    project-config
+   config/index
    job-content
    admin
    rest-api
