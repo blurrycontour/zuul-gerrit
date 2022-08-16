@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63fe5a51_43b48bc9",
+        "filename": "web/src/containers/project/ProjectVariant.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-16T17:05:30Z",
+      "side": 1,
+      "message": "It might be nice to check that jobList has proper content before pushing the row. Looks like on opendev projects get an empty check jobs list for some reason. This isn\u0027t a regression though so a followup is fine.",
+      "revId": "8494ebf397115a86ad222417d0a66baa08e5721a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
