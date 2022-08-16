@@ -42,9 +42,10 @@
     # the console file for this task should not be there.
     - name: Validate temporary files removed
       shell: |
-        for f in $(grep 'Starting to log' console-job-output-success-19887.txt | awk '{print $5}'); do
+        logfile=console-job-output-success-19887.txt
+        for f in $(grep 'Starting to log' ${logfile} | awk '{print $5}'); do
           echo "Checking ${f}"
-          if grep -q '"path": "/tmp/console-'${f}'.log"' job-output-success-19887.txt; then
+          if grep -q '"path": "/tmp/console-'${f}'.log"' ${logfile}; then
             echo "*** /tmp/${f}.log still exists"
             exit 1
           fi
