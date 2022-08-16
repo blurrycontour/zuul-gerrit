@@ -49,6 +49,8 @@ from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
 LOG_STREAM_VERSION = 0
+#
+LOG_STREAM_LOCALHOST = int(os.environ.get("ZUUL_CONSOLE_STREAM_LOCALHOST", 0))
 
 
 def zuul_filter_result(result):
@@ -315,13 +317,15 @@ class CallbackModule(default.CallbackModule):
             hosts = self._get_task_hosts(task)
             for host, inventory_hostname in hosts:
                 port = LOG_STREAM_PORT
-                if host in ('localhost', '127.0.0.1'):
+                if (host in ('localhost', '127.0.0.1') and
+                    not LOG_STREAM_LOCALHOST):
                     # Don't try to stream from localhost
                     continue
                 ip = play_vars[host].get(
                     'ansible_host', play_vars[host].get(
                         'ansible_inventory_host'))
-                if ip in ('localhost', '127.0.0.1'):
+                if (ip in ('localhost', '127.0.0.1') and
+                    not LOG_STREAM_LOCALHOST):
                     # Don't try to stream from localhost
                     continue
                 if play_vars[host].get('ansible_connection') in ('winrm',):
