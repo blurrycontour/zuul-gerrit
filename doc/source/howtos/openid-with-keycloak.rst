@@ -73,6 +73,19 @@ Finally, go back to the clients list and pick the ``zuul`` client again. Click
 on ``Client Scopes``, and add the ``zuul_aud`` scope to the ``Assigned Default
 Client Scopes``.
 
+Configuring JWT signing algorithms
+..................................
+
+.. note::
+
+  Skip this step if you are using a keycloak version prior to 18.0.
+
+Due to current limitations with the pyJWT library, Zuul does not support every default
+signing algorithm used by Keycloak.
+
+Go to `my_realm->Settings->Keys`, then choose `rsa-enc-generated` (this should be mapped
+to "RSA-OAEP") if available. Then set `enabled` to false and save your changes.
+
 (Optional) Set up a social identity provider
 ............................................
 

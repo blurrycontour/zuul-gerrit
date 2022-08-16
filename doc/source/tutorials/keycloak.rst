@@ -28,6 +28,15 @@ to `/etc/hosts`.  Make sure you have a line that looks like this:
 
    127.0.0.1 localhost keycloak
 
+If you are using podman, you need to add the following option in $HOME/.config/containers/containers.conf:
+
+.. code-block::
+
+   [containers]
+   no_hosts=true
+
+This way your /etc/hosts settings will not interfere with podman's networking.
+
 Restart Zuul Containers
 -----------------------
 
@@ -37,14 +46,14 @@ that we can update Zuul's configuration to add authentication.
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   sudo -E docker-compose -p zuul-tutorial down
+   sudo -E docker-compose-compose -p zuul-tutorial down
 
 Restart the containers with a new Zuul configuration.
 
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   ZUUL_TUTORIAL_CONFIG="./keycloak/etc_zuul/" sudo -E docker-compose -p zuul-tutorial up -d
+   ZUUL_TUTORIAL_CONFIG="./keycloak/etc_zuul/" sudo -E docker-compose-compose -p zuul-tutorial up -d
 
 This tells docker-compose to use these Zuul `config files
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples/keycloak>`_.
@@ -58,7 +67,7 @@ with this command:
 .. code-block:: shell
 
    cd zuul/doc/source/examples/keycloak
-   sudo -E docker-compose -p zuul-tutorial-keycloak up -d
+   sudo -E docker-compose-compose -p zuul-tutorial-keycloak up -d
 
 Once Keycloak is running, you can visit the web interface at
 http://localhost:8082/
