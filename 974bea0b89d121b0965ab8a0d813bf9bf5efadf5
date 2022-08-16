@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 4: Code-Review-1\n\u003e \n\u003e The config_writer has a heavier impact than the config_reader since it writes lock files on disk, etc.  Could we change this to use a config_reader to check the value is correct after writing and then raise an error or try again?\n\nYep, that makes sense. This was just an attempt to stop the bleeding by making sure that the remote URL is always updated. Unfortunately, by force setting the remote URL we see the following types of exceptions:\n\n2022-08-16 07:40:49,462 ERROR zuul.ExecutorServer: [e: 42b52280-1d36-11ed-8a99-ec41e699af6b] [build: deb1e3a0653d4e858c671e7f9eb90f3c] Got exception while updating repo github/org/project\nTraceback (most recent call last):\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/executor/server.py\", line 3533, in _innerUpdateLoop\n    self.merger.updateRepo(\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 937, in updateRepo\n    repo \u003d self.getRepo(connection_name, project_name,\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 914, in getRepo\n    repo.setRemoteUrl(url)\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 742, in setRemoteUrl\n    self._git_set_remote_url(self.createRepoObject(zuul_event_id), url)\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py\", line 311, in _git_set_remote_url\n    with repo.remotes.origin.config_writer as config_writer:\n  File \"/opt/zuul/lib/python3.10/site-packages/git/remote.py\", line 883, in config_writer\n    writer \u003d self.repo.config_writer()\n  File \"/opt/zuul/lib/python3.10/site-packages/git/repo/base.py\", line 470, in config_writer\n    return GitConfigParser(self._get_config_path(config_level), read_only\u003dFalse)\n  File \"/opt/zuul/lib/python3.10/site-packages/git/config.py\", line 288, in __init__\n    self._acquire_lock()\n  File \"/opt/zuul/lib/python3.10/site-packages/git/config.py\", line 306, in _acquire_lock\n    self._lock._obtain_lock()\n  File \"/opt/zuul/lib/python3.10/site-packages/git/util.py\", line 756, in _obtain_lock\n    return self._obtain_lock_or_raise()\n  File \"/opt/zuul/lib/python3.10/site-packages/git/util.py\", line 739, in _obtain_lock_or_raise\n    raise IOError(\"Lock for file %r did already exist, delete %r in case the lock is illegal\" %\nOSError: Lock for file \u0027/var/cache/zuul-executor/git/github/org/org%project/.git/config\u0027 did already exist, delete \u0027/var/cache/zuul-executor/git/github.com/org/org%project/.git/config.lock\u0027 in case the lock is illegal\n\nIt looks like we are still accessing the repository on disk concurrently w/o holding the repo lock.",
       "revId": "974bea0b89d121b0965ab8a0d813bf9bf5efadf5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa281f0e_4564d292",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-08-16T09:04:13Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "974bea0b89d121b0965ab8a0d813bf9bf5efadf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
