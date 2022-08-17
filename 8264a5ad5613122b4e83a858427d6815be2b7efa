@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e367e6e1_dbbb51e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2022-08-17T16:06:55Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e The index for configuration objects is https://zuul-ci.org/docs/zuul/latest/project-config.html\n\nI saw that, however, I ended up on https://zuul-ci.org/docs/zuul/latest/config/job.html and was surprised when I could navigate up a level and find a list of all config object docs. You\u0027ll note that I actually provided a link to the project-config document in the new doc and this new doc is really only a pretty directory listing. Perhaps you\u0027d rather I moved \u0027/project-config\u0027 to \u0027/config/index\u0027?",
+      "revId": "8264a5ad5613122b4e83a858427d6815be2b7efa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
