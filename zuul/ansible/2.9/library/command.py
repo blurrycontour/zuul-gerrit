@@ -168,7 +168,15 @@ _log_lines = []
 
 class Console(object):
     def __init__(self, log_uuid):
-        self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
+        # The streamer currently will not ask us for output from
+        # loops.  This flag uuid was set in the action plugin if this
+        # call was part of a loop.  This avoids us leaving behind
+        # files that will never be read, but also means no other
+        # special-casing for any of this path.
+        if log_uuid == 'in-loop-ignore':
+            self.logfile_name = os.devnull
+        else:
+            self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
 
     def __enter__(self):
         self.logfile = open(self.logfile_name, 'ab', buffering=0)
