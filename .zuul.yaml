@@ -55,6 +55,12 @@
       zuul_ansible_version: 5
 
 - job:
+    name: zuul-stream-functional-6
+    parent: zuul-stream-functional
+    vars:
+      zuul_ansible_version: 6
+
+- job:
     name: zuul-tox
     description: |
       Zuul unit tests with ZooKeeper running
@@ -320,6 +326,7 @@
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
         - zuul-stream-functional-5
+        - zuul-stream-functional-6
         - zuul-tox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
@@ -350,6 +357,7 @@
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
         - zuul-stream-functional-5
+        - zuul-stream-functional-6
         - zuul-tox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
