@@ -885,6 +885,11 @@ class TestExecutorFacts5(BaseTestExecutorFacts):
     ansible_major_minor = '2.12'
 
 
+class TestExecutorFacts6(BaseTestExecutorFacts):
+    tenant_config_file = 'config/executor-facts/main6.yaml'
+    ansible_major_minor = '2.13'
+
+
 class BaseTestAnsibleCallbackConfigs(AnsibleZuulTestCase):
     config_file = 'zuul-executor-ansible-callback.conf'
 
@@ -949,6 +954,11 @@ class TestAnsibleCallbackConfigs29(BaseTestAnsibleCallbackConfigs):
 class TestAnsibleCallbackConfigs5(BaseTestAnsibleCallbackConfigs):
     tenant_config_file = 'config/ansible-callbacks/main5.yaml'
     ansible_major_minor = '2.12'
+
+
+class TestAnsibleCallbackConfigs6(BaseTestAnsibleCallbackConfigs):
+    tenant_config_file = 'config/ansible-callbacks/main6.yaml'
+    ansible_major_minor = '2.13'
 
 
 class TestExecutorEnvironment(AnsibleZuulTestCase):
