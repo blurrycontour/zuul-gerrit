@@ -10,3 +10,4 @@
         - ansible-version28-inventory
         - ansible-version29-inventory
         - ansible-version5-inventory
+        - ansible-version6-inventory

@@ -238,3 +238,12 @@ class TestZuulStream5(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     def setUp(self):
         super().setUp()
         self._setUp()
+
+
+class TestZuulStream6(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+    ansible_version = '6'
+    ansible_core_version = '2.13'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
