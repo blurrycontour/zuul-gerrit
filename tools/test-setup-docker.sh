@@ -1,6 +1,14 @@
 #!/bin/bash
 
-set -eu
+# This runs ZooKeeper and databases in docker containers, which are
+# required for tests.
+
+# This setup needs to be run as a user that can run docker or podman, or by
+# setting $ROOTCMD to a user substitution tool like "sudo" in the calling
+# environment.
+
+set -xeu
+ROOTCMD=${ROOTCMD:-}
 
 cd $(dirname $0)
 SCRIPT_DIR="$(pwd)"
@@ -29,9 +37,9 @@ fi
 MYSQL="${DOCKER} exec zuul-test-mysql mysql  -u root -pinsecure_worker"
 
 if [ "${COMPOSE}" == "docker-compose" ]; then
-  docker-compose rm -sf
+  ${ROOTCMD} docker-compose rm -sf
 else
-  podman-compose down
+  ${ROOTCMD} podman-compose down
 fi
 
 CA_DIR=$SCRIPT_DIR/ca
@@ -39,15 +47,14 @@ CA_DIR=$SCRIPT_DIR/ca
 mkdir -p $CA_DIR
 $SCRIPT_DIR/zk-ca.sh $CA_DIR zuul-test-zookeeper
 
-export USER_ID=$(id -u)
-${COMPOSE} up -d
+${ROOTCMD} USER_ID=$(id -u) ${COMPOSE} up -d
 
 echo "Waiting for mysql"
-timeout 30 bash -c "until ${MYSQL} -e 'show databases'; do sleep 0.5; done"
+timeout 30 bash -c "until ${ROOTCMD} ${MYSQL} -e 'show databases'; do sleep 0.5; done"
 echo
 
 echo "Setting up permissions for zuul tests"
-${MYSQL} -e "GRANT ALL PRIVILEGES ON *.* TO 'openstack_citest'@'%' identified by 'openstack_citest' WITH GRANT OPTION;"
-${MYSQL} -u openstack_citest -popenstack_citest -e "SET default_storage_engine=MYISAM; DROP DATABASE IF EXISTS openstack_citest; CREATE DATABASE openstack_citest CHARACTER SET utf8;"
+${ROOTCMD} ${MYSQL} -e "GRANT ALL PRIVILEGES ON *.* TO 'openstack_citest'@'%' identified by 'openstack_citest' WITH GRANT OPTION;"
+${ROOTCMD} ${MYSQL} -u openstack_citest -popenstack_citest -e "SET default_storage_engine=MYISAM; DROP DATABASE IF EXISTS openstack_citest; CREATE DATABASE openstack_citest CHARACTER SET utf8;"
 
 echo "Finished"
