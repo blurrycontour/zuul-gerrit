@@ -140,3 +140,12 @@
           label: ubuntu-xenial
     ansible-version: '5'
     run: playbooks/ansible-version.yaml
+
+- job:
+    name: ansible-version6-inventory
+    nodeset:
+      nodes:
+        - name: ubuntu-xenial
+          label: ubuntu-xenial
+    ansible-version: '6'
+    run: playbooks/ansible-version.yaml
