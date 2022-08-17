@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dbb1782_4a59ed4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-08-17T12:51:24Z",
+      "side": 1,
+      "message": "This was already implemented in https://review.opendev.org/c/zuul/zuul/+/836313",
+      "revId": "521b1c3920b7235bf055312d58e183076fa167c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
