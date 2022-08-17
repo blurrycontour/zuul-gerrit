@@ -1,3 +1,6 @@
+- queue:
+    name: zuul
+
 - nodeset:
     name: zuul-functional-temp-master
     nodes:
@@ -286,6 +289,7 @@
     nodeset: ubuntu-jammy
 
 - project:
+    queue: zuul
     vars:
       node_version: 16
       release_python: python3
