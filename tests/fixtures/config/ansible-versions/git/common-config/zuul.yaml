@@ -60,6 +60,14 @@
       test_ansible_version_major: 2
       test_ansible_version_minor: 12
 
+- job:
+    name: ansible-6
+    parent: ansible-version
+    ansible-version: 6
+    vars:
+      test_ansible_version_major: 2
+      test_ansible_version_minor: 13
+
 - project:
     name: common-config
     check:
@@ -68,6 +76,7 @@
         - ansible-28
         - ansible-29
         - ansible-5
+        - ansible-6
 
 - project:
     name: org/project
@@ -77,3 +86,4 @@
         - ansible-28
         - ansible-29
         - ansible-5
+        - ansible-6
