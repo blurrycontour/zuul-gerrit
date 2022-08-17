@@ -3,6 +3,12 @@ body {
   padding: 0;
 }
 
+/* Make the H2 header inline-block so that the refresh icon/button can
+   share space with it floating on the right. */
+h2 {
+    display: inline-block;
+}
+
 .pf-c-title {
     padding-bottom: 10px;
 }

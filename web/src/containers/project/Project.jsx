@@ -1,4 +1,5 @@
 // Copyright 2018 Red Hat, Inc
+// Copyright 2022 Acme Gating, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,68 +13,44 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import * as React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Nav,
-  NavItem,
-  TabContainer,
-  TabPane,
-  TabContent,
-} from 'patternfly-react'
+  Tabs,
+  Tab,
+} from '@patternfly/react-core'
 
 import ProjectVariant from './ProjectVariant'
 
 
-class Project extends React.Component {
-  static propTypes = {
-    project: PropTypes.object.isRequired,
-  }
+function Project(props) {
+  const [variantIdx, setVariantIdx] = useState(0)
+  const { project } = props
 
-  state = {
-    variantIdx: 0,
-  }
-
-  renderVariantTitle (variant, selected) {
-    let title = variant.default_branch
-    if (selected) {
-      title = <strong>{title}</strong>
-    }
+  function renderVariantTitle (variant) {
+    let title = variant.source_context.project === project.name ?
+        variant.source_context.branch : variant.source_context.project
     return title
   }
 
-  render () {
-    const { project } = this.props
-    const { variantIdx } = this.state
+  return (
+    <React.Fragment>
+      <Tabs activeKey={variantIdx}
+            onSelect={(event, tabIndex) => setVariantIdx(tabIndex)}
+            isBox>
+        {project.configs.map((variant, idx) => (
+          <Tab key={idx} eventKey={idx}
+               title={renderVariantTitle(variant)}>
+            <ProjectVariant variant={variant} />
+          </Tab>
+        ))}
+      </Tabs>
+    </React.Fragment>
+  )
+}
 
-    return (
-      <React.Fragment>
-        <h2>{project.canonical_name}</h2>
-        <TabContainer id="zuul-project">
-          <div>
-            <Nav bsClass="nav nav-tabs nav-tabs-pf">
-              {project.configs.map((variant, idx) => (
-                <NavItem
-                  key={idx}
-                  onClick={() => this.setState({variantIdx: idx})}>
-                  <div>
-                    {this.renderVariantTitle(variant, variantIdx === idx)}
-                  </div>
-                </NavItem>
-              ))}
-            </Nav>
-            <TabContent>
-              <TabPane>
-                {project.configs[variantIdx] && (
-                  <ProjectVariant variant={project.configs[variantIdx]} />
-                )}
-              </TabPane>
-            </TabContent>
-          </div>
-        </TabContainer>
-      </React.Fragment>
-    )
-  }
+Project.propTypes = {
+  project: PropTypes.object.isRequired,
 }
 
 export default Project
