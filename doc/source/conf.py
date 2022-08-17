@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,15 +11,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys, os, datetime
+import datetime
+import os
+import sys
 import subprocess
 import re
+
 from zuul import version
 
 # The minimum version to link to
 min_version = (3, 3, 0)
 
 sys.path.insert(0, os.path.abspath('../..'))
+
 # -- General configuration ----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -51,8 +54,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Zuul'
-copyright = u'2012-%s, Zuul project contributors' % datetime.date.today().year
+project = 'Zuul'
+copyright = '2012-%s, Zuul project contributors' % datetime.date.today().year
 
 doc_root = os.environ.get('ZUUL_DOC_ROOT', '/docs/%s' % (project.lower()))
 
@@ -66,13 +69,7 @@ add_module_names = True
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-# -- Options for HTML output --------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  Major themes that come with
-# Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = "sphinx_rtd_theme"
-# This adds a <link rel=canonical> tag
-html_baseurl = f'https://zuul-ci.org{doc_root}/latest'
+# -- Version metadata configuration -------------------------------------------
 
 if version.is_release:
     current_version = version.release_string
@@ -93,13 +90,21 @@ except subprocess.CalledProcessError:
 
 interesting_tags = []
 for tag in output.splitlines():
-    if re.match('^\d+\.\d+\.\d+$', tag):
+    if re.match(r'^\d+\.\d+\.\d+$', tag):
         parts = tuple(map(int, tag.split('.')))
         if parts < min_version:
             continue
         interesting_tags.append((parts, tag))
 for parts, tag in reversed(sorted(interesting_tags, key=lambda x: x[0])):
     versions.append((tag, f'{doc_root}/{tag}/'))
+
+# -- Options for HTML output --------------------------------------------------
+
+# The theme to use for HTML and HTML Help pages.  Major themes that come with
+# Sphinx are currently 'default' and 'sphinxdoc'.
+html_theme = 'sphinx_rtd_theme'
+# This adds a <link rel=canonical> tag
+html_baseurl = f'https://zuul-ci.org{doc_root}/latest'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -132,26 +137,22 @@ templates_path = ['_templates']
 # of the sidebar.
 html_logo = '_static/logo.svg'
 
-# Output file base name for HTML help builder.
-htmlhelp_basename = '%sdoc' % project
+# -- Options for LaTeX output -------------------------------------------------
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-    ('index',
-     '%s.tex' % project,
-     u'%s Documentation' % project,
-     u'Zuul contributors', 'manual'),
+    (
+        'index',
+        f'{project}.tex',
+        f'{project} Documentation',
+        'Zuul contributors',
+        'manual',
+    ),
 ]
 
-# Example configuration for intersphinx: refer to the Python standard library.
-#intersphinx_mapping = {'http://docs.python.org/': None}
-
-# The name of an image file (within the static path) to use as favicon of the
-# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
-#html_favicon = None
+# -- Options for zuul-sphinx extension ----------------------------------------
 
 # Additional Zuul role paths
 zuul_role_paths = []
