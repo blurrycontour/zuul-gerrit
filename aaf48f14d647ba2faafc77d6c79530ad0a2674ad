@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3eab96e_70fc4119",
+        "filename": "playbooks/zuul-stream/functional.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-17T23:21:56Z",
+      "side": 1,
+      "message": "actually i think i\u0027ve confused myself, and this is searchign the right thing.  i should make this clearer",
+      "revId": "aaf48f14d647ba2faafc77d6c79530ad0a2674ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
