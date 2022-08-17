@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d1f60c1a_c0767807",
+        "filename": "doc/source/howtos/nodepool_static.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-17T06:58:33Z",
+      "side": 1,
+      "message": "I\u0027ve added a section in here that is more user-focsed, and linked to that as suggested.",
+      "parentUuid": "27a06891_ae949195",
+      "revId": "2fccb2192fe26cc097586204766f3229279031b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "085c307d_55a81343",
         "filename": "doc/source/installation.rst",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2022-08-15T14:37:07Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "2fccb2192fe26cc097586204766f3229279031b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c28ea2a_00e3bf26",
+        "filename": "doc/source/installation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-17T06:58:33Z",
+      "side": 1,
+      "message": "This now links to the user-focused section metioned above",
+      "parentUuid": "085c307d_55a81343",
       "revId": "2fccb2192fe26cc097586204766f3229279031b0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
