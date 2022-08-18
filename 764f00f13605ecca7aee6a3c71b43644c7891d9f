@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41232e6b_f7bf9b6d",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-18T21:48:25Z",
+      "side": 1,
+      "message": "Is this line redundant with line 902?",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed928248_c47aeb04",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-18T21:48:25Z",
+      "side": 1,
+      "message": "Does it make sense to hold the lock for all the approvals so that we can see each of them is queried once and then the jobs run?",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdfe8cfa_b2ddfba6",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-18T21:48:25Z",
+      "side": 1,
+      "message": "I think this does introduce a subtle behavior difference. For certain events if the change had updated after the event we would have processed the change in an updated fashion. But now we\u0027ll process the previous version.\n\nI think this is actually more correct this way. But do we need to make note of that?",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
