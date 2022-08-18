@@ -43,6 +43,7 @@ import threading
 import time
 
 from ansible.plugins.callback import default
+from ansible.module_utils._text import to_text
 from zuul.ansible import paths
 
 from zuul.ansible import logconfig
@@ -93,7 +94,6 @@ class CallbackModule(default.CallbackModule):
     CALLBACK_NAME = 'zuul_stream'
 
     def __init__(self):
-
         super(CallbackModule, self).__init__()
         self._task = None
         self._daemon_running = False
@@ -121,7 +121,13 @@ class CallbackModule(default.CallbackModule):
         self._logger = logging.getLogger('zuul.executor.ansible')
 
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
-        msg = msg.rstrip()
+        # ensure msg is a string; e.g.
+        #
+        # debug:
+        #   msg: '{{ var }}'
+        #
+        # may not be!
+        msg = to_text(msg).rstrip()
         if job:
             now = ts or datetime.datetime.now()
             self._logger.info("{now} | {msg}".format(now=now, msg=msg))
@@ -492,8 +498,7 @@ class CallbackModule(default.CallbackModule):
         if result._task.loop and 'results' in result_dict:
             # items have their own events
             pass
-
-        elif result_dict.get('msg', '').startswith('MODULE FAILURE'):
+        elif to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action == 'debug':
             # this is a debug statement, handle it special
@@ -512,7 +517,7 @@ class CallbackModule(default.CallbackModule):
             # user provided. Note that msg may be a multi line block quote
             # so we handle that here as well.
             if keyname == 'msg':
-                msg_lines = result_dict['msg'].rstrip().split('\n')
+                msg_lines = to_text(result_dict['msg']).rstrip().split('\n')
                 for msg_line in msg_lines:
                     self._log(msg=msg_line)
             else:
@@ -554,7 +559,7 @@ class CallbackModule(default.CallbackModule):
         # changes.
         loop_var = result_dict.get('ansible_loop_var', 'item')
 
-        if result_dict.get('msg', '').startswith('MODULE FAILURE'):
+        if to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
                                          'win_command', 'win_shell'):
@@ -597,7 +602,7 @@ class CallbackModule(default.CallbackModule):
         # changes.
         loop_var = result_dict.get('ansible_loop_var', 'item')
 
-        if result_dict.get('msg', '').startswith('MODULE FAILURE'):
+        if to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
                                          'win_command', 'win_shell'):

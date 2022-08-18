@@ -13,3 +13,12 @@
         that:
           - test_ansible_version_major == ansible_version.major
           - test_ansible_version_minor == ansible_version.minor
+
+    # This makes sure that the log streamer handles "msg:" tags
+    # with a dictionary in a loop correctly
+    - name: Loop ansible version
+      debug:
+        msg: '{{ ansible_version }}'
+      loop:
+        - 1
+        - 2

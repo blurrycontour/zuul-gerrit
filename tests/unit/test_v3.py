@@ -7965,6 +7965,14 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-5', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+        # Ensure we are not seeing any failures in the callbacks, that come
+        # out something like
+        #  Ansible output: b'TASK [Print ansible version msg={{ ansible_version }}] *************************'
+        #  Ansible output: b'[WARNING]: Failure using method (v2_runner_on_ok) in callback plugin'
+        #  Ansible output: b'(<ansible.plugins.callback.zuul_stream.CallbackModule object at'
+        #  Ansible output: b"0x7f502760b490>): 'dict' object has no attribute 'startswith'"
+
+        self.assertNotIn("[WARNING]: Failure using method (", job_output)
 
 class TestReturnWarnings(AnsibleZuulTestCase):
     tenant_config_file = 'config/return-warnings/main.yaml'
