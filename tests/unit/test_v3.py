@@ -7953,6 +7953,10 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
         """
         Tests that jobs run with the requested ansible version.
         """
+        logger = logging.getLogger('zuul.AnsibleJob')
+        output = io.StringIO()
+        logger.addHandler(logging.StreamHandler(output))
+
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -7964,6 +7968,16 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-29', result='SUCCESS', changes='1,1'),
             dict(name='ansible-5', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+        # Ensure we are not seeing any failures in the callbacks, that come
+        # out in logging like
+        #  [WARNING]: Failure using method (v2_runner_on_ok) in callback plugin
+        #  (<ansible.plugins.callback.zuul_stream.CallbackModule object at'
+        #  ...
+        # This match should be generic enough to find any callback
+        # failure like this.
+        self.assertNotIn("[WARNING]: Failure using method (",
+                         output.getvalue())
 
 
 class TestReturnWarnings(AnsibleZuulTestCase):
