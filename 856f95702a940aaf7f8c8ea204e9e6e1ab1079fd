@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db125ac7_01c5288b",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 724,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-18T22:04:53Z",
+      "side": 1,
+      "message": "It seems that msg may be None (the default value) and we seem to check if not msg below on line 733. Should this conversion be guarded around a None value? Otherwise we might convert None to \"None\" ?",
+      "revId": "856f95702a940aaf7f8c8ea204e9e6e1ab1079fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
