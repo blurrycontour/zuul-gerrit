@@ -137,10 +137,7 @@ class FunctionalZuulStreamMixIn:
             #  0x7f89f72a20b0>): 'dict' object has no attribute 'startswith'"
             #  Callback Exception:
             #  ...
-
-            # NOTE(ianw) 2022-08-24 : deliberately catching a debug:
-            # failure, will be fixed in a follow-on
-            self.assertIn('[WARNING]: Failure using method', console_output)
+            self.assertNotIn('[WARNING]: Failure using method', console_output)
 
             text = self._get_job_output(build)
             self.assertLogLine(
