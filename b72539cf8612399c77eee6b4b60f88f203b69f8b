@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "804341f4_537f292c",
+        "filename": "playbooks/zuul-stream/create-inventory.yaml",
+        "patchSetId": 29
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-18T22:23:57Z",
+      "side": 1,
+      "message": "Is this register necessary? It doesn\u0027t seem to be used later.",
+      "revId": "b72539cf8612399c77eee6b4b60f88f203b69f8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
