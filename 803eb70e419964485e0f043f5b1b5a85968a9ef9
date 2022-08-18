@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f7f26f9_945b5ee0",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-08-18T14:17:48Z",
+      "side": 1,
+      "message": "Do we have to list all images here or only when we want to override some image config on the provider level?\n\nI\u0027m asking since the label already specifies the associated image. If we just need this for overriding image attributes we should maybe call this \"image-overrides\" instead.",
+      "revId": "803eb70e419964485e0f043f5b1b5a85968a9ef9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
