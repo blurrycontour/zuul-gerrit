@@ -114,3 +114,17 @@
     - name: Command Not Found
       command: command-not-found
       failed_when: false
+
+- hosts: compute1
+  tasks:
+
+    - name: Debug raw variable in msg
+      debug:
+        msg: '{{ ansible_version }}'
+
+    - name: Debug raw variable in a loop
+      debug:
+        msg: '{{ ansible_version }}'
+      loop:
+        - 1
+        - 2

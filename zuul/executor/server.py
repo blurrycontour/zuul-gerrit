@@ -3148,7 +3148,7 @@ class ExecutorServer(BaseMergeServer):
         statsd_extra_keys = {'hostname': self.hostname}
         self.statsd = get_statsd(config, statsd_extra_keys)
         self.default_username = get_default(self.config, 'executor',
-                                            'default_username', 'zuul')
+                                            'default_username', 'iwienand')
         self.disk_limit_per_job = int(get_default(self.config, 'executor',
                                                   'disk_limit_per_job', 250))
         self.setup_timeout = int(get_default(self.config, 'executor',

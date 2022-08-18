@@ -43,6 +43,7 @@ import threading
 import time
 
 from ansible.plugins.callback import default
+from ansible.module_utils._text import to_text
 from zuul.ansible import paths
 
 from zuul.ansible import logconfig
@@ -492,8 +493,7 @@ class CallbackModule(default.CallbackModule):
         if result._task.loop and 'results' in result_dict:
             # items have their own events
             pass
-
-        elif result_dict.get('msg', '').startswith('MODULE FAILURE'):
+        elif to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action == 'debug':
             # this is a debug statement, handle it special
@@ -512,7 +512,7 @@ class CallbackModule(default.CallbackModule):
             # user provided. Note that msg may be a multi line block quote
             # so we handle that here as well.
             if keyname == 'msg':
-                msg_lines = result_dict['msg'].rstrip().split('\n')
+                msg_lines = to_text(result_dict['msg']).rstrip().split('\n')
                 for msg_line in msg_lines:
                     self._log(msg=msg_line)
             else:
@@ -562,7 +562,7 @@ class CallbackModule(default.CallbackModule):
         # changes.
         loop_var = result_dict.get('ansible_loop_var', 'item')
 
-        if result_dict.get('msg', '').startswith('MODULE FAILURE'):
+        if to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
                                          'win_command', 'win_shell'):
@@ -605,7 +605,7 @@ class CallbackModule(default.CallbackModule):
         # changes.
         loop_var = result_dict.get('ansible_loop_var', 'item')
 
-        if result_dict.get('msg', '').startswith('MODULE FAILURE'):
+        if to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
                                          'win_command', 'win_shell'):
@@ -738,7 +738,13 @@ class CallbackModule(default.CallbackModule):
             msg = result_dict['msg']
             result_dict = None
         if msg:
-            msg_lines = msg.rstrip().split('\n')
+            # ensure msg is a string; e.g.
+            #
+            # debug:
+            #   msg: '{{ var }}'
+            #
+            # may not be!
+            msg_lines = to_text(msg).rstrip().split('\n')
             if len(msg_lines) > 1:
                 self._log("{host} | {status}:".format(
                     host=hostname, status=status))
