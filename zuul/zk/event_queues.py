@@ -909,7 +909,7 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
         self._put({'event_data': data})
 
     def __iter__(self):
-        for data, ack_ref, _ in self._iterEvents():
+        for data, ack_ref, zstat in self._iterEvents():
             if not data:
                 self.log.warning("Malformed event found: %s", data)
                 self._remove(ack_ref.path)
@@ -918,6 +918,7 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
             event = model.ConnectionEvent.fromDict(
                 data.get('event_data', data))
             event.ack_ref = ack_ref
+            event.zuul_event_ltime = zstat.creation_transaction_id
             yield event
 
 
