@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "47cb84c2_a02b7547",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-19T17:08:35Z",
+      "side": 1,
+      "message": "The first batch of approvals added is 3 events that result in 2 queries, which verifies this change is working as expected.  You\u0027re right that the lock isn\u0027t needed for the second batch of approvals since it\u0027s a batch size of one.  But I do think we want to verify the query count before that to make sure it isn\u0027t 3 (as it would have been before this change).  I\u0027ll add comments to explain the query count.",
+      "parentUuid": "ed928248_c47aeb04",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdfe8cfa_b2ddfba6",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
