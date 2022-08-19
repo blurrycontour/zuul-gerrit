@@ -16,6 +16,24 @@
       "message": "actually i think i\u0027ve confused myself, and this is searchign the right thing.  i should make this clearer",
       "revId": "aaf48f14d647ba2faafc77d6c79530ad0a2674ad",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9314a348_78550cc9",
+        "filename": "playbooks/zuul-stream/functional.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-19T00:02:49Z",
+      "side": 1,
+      "message": "I have; this test is valid.  It\u0027s checking the job-output.txt against the captured console output (stdout) where the log output comes.\n\nWhat confused me was the interaction with I4f4660c3c0b0f170561c14940cc159dc43eadc79.  I was wondering how this test passed when that wasn\u0027t merged.  However, this test doesn\u0027t actually pick up those files -- as we don\u0027t have any log output recording them.",
+      "parentUuid": "a3eab96e_70fc4119",
+      "revId": "aaf48f14d647ba2faafc77d6c79530ad0a2674ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
