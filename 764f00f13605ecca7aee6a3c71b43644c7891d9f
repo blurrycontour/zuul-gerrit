@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3c7635e5_5cac8a02",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-19T16:37:50Z",
+      "side": 1,
+      "message": "I think so.  I think we could remove this line, but it\u0027s harmless.",
+      "parentUuid": "41232e6b_f7bf9b6d",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ed928248_c47aeb04",
         "filename": "tests/unit/test_gerrit.py",
         "patchSetId": 1
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2d3bf7b3_3365f7ae",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-19T16:37:50Z",
+      "side": 1,
+      "message": "I\u0027m not sure I follow this question, can you elaborate?",
+      "parentUuid": "ed928248_c47aeb04",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdfe8cfa_b2ddfba6",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -48,6 +84,24 @@
       "writtenOn": "2022-08-18T21:48:25Z",
       "side": 1,
       "message": "I think this does introduce a subtle behavior difference. For certain events if the change had updated after the event we would have processed the change in an updated fashion. But now we\u0027ll process the previous version.\n\nI think this is actually more correct this way. But do we need to make note of that?",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d06166b_e321ed3f",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-19T16:37:50Z",
+      "side": 1,
+      "message": "I agree.  I don\u0027t think we\u0027ve described this behavior in detail in the docs, so I\u0027m not sure it warrants a release note (especially since we\u0027re making things more \"technically correct\").",
+      "parentUuid": "bdfe8cfa_b2ddfba6",
       "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
