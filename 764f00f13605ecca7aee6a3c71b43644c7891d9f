@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "48bc6a89_2f966344",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-19T16:41:34Z",
+      "side": 1,
+      "message": "To clarify I mean instead of holding the lock in two locations  (line 899 and then line 907) with assertions between them, do we (also) need to do a single hold of the lock that allows all the changes to enqueue together at once and then assert the changes are queried once?\n\nIn particular I think after the first set of assertions (line 906) nothing has entered the gate pipeline yet because the parent change is not approved. We then approve the parent change with the lock, but that is a single event so the lock isn\u0027t doing much? We then assert the number of queries which seems higher than expected (2 new queries for A and 1 new query for B).",
+      "parentUuid": "ed928248_c47aeb04",
+      "revId": "764f00f13605ecca7aee6a3c71b43644c7891d9f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bdfe8cfa_b2ddfba6",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
