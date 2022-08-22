@@ -5343,6 +5343,11 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIn('Error merging gerrit/org/project', B.messages[0])
         self.assertNotIn('logs.example.com', B.messages[0])
         self.assertNotIn('SKIPPED', B.messages[0])
+        buildsets = list(
+            self.scheds.first.connections.connections[
+                'database'].getBuildsets())
+        self.assertEqual(buildsets[0].result, 'MERGE_CONFLICT')
+        self.assertIn('This change or one of', buildsets[0].message)
 
     def test_submit_failure(self):
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -5356,6 +5361,33 @@ For CI problems and help debugging, contact ci@example.org"""
             self.scheds.first.connections.connections[
                 'database'].getBuildsets())
         self.assertEqual(buildsets[0].result, 'MERGE_FAILURE')
+
+    @simple_layout('layouts/timer-freeze-job-failure.yaml')
+    def test_periodic_freeze_job_failure(self):
+        self.waitUntilSettled()
+
+        for x in iterate_timeout(30, 'buildset complete'):
+            buildsets = list(
+                self.scheds.first.connections.connections[
+                    'database'].getBuildsets())
+            if buildsets:
+                break
+        self.assertEqual(buildsets[0].result, 'CONFIG_ERROR')
+        self.assertIn('Job project-test2 depends on project-test1 '
+                      'which was not run', buildsets[0].message)
+
+    @simple_layout('layouts/freeze-job-failure.yaml')
+    def test_freeze_job_failure(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        buildsets = list(
+            self.scheds.first.connections.connections[
+                'database'].getBuildsets())
+        self.assertEqual(buildsets[0].result, 'CONFIG_ERROR')
+        self.assertIn('Job project-test2 depends on project-test1 '
+                      'which was not run', buildsets[0].message)
 
     @simple_layout('layouts/nonvoting-pipeline.yaml')
     def test_nonvoting_pipeline(self):

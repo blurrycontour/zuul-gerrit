@@ -135,6 +135,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             'failure': self._formatItemReportFailure,
             'merge-conflict': self._formatItemReportMergeConflict,
             'merge-failure': self._formatItemReportMergeFailure,
+            'config-error': self._formatItemReportConfigError,
             'no-jobs': self._formatItemReportNoJobs,
             'disabled': self._formatItemReportDisabled,
             'dequeue': self._formatItemReportDequeue,
@@ -221,6 +222,13 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportMergeFailure(self, item, with_jobs=True):
         return 'This change was not merged by the code review system.\n'
+
+    def _formatItemReportConfigError(self, item, with_jobs=True):
+        if item.getConfigErrors():
+            msg = str(item.getConfigErrors()[0].error)
+        else:
+            msg = "Unknown configuration error"
+        return msg
 
     def _formatItemReportNoJobs(self, item, with_jobs=True):
         status_url = get_default(self.connection.sched.config,

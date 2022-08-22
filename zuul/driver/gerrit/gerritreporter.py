@@ -36,6 +36,9 @@ class GerritReporter(BaseReporter):
         self._checks_api = action.pop('checks-api', None)
         self._labels = action
 
+    def __repr__(self):
+        return f"<GerritReporter: {self._action}>"
+
     def report(self, item, phase1=True, phase2=True):
         """Send a message to gerrit."""
         log = get_annotated_logger(self.log, item.event)
