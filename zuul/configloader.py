@@ -1227,7 +1227,6 @@ class PipelineParser(object):
                     'failure-message': str,
                     'start-message': str,
                     'merge-conflict-message': str,
-                    'merge-failure-message': str,
                     'enqueue-message': str,
                     'no-jobs-message': str,
                     'footer-message': str,
@@ -1250,8 +1249,8 @@ class PipelineParser(object):
         pipeline['reject'] = self.getDriverSchema('reject')
         pipeline['trigger'] = vs.Required(self.getDriverSchema('trigger'))
         for action in ['enqueue', 'start', 'success', 'failure',
-                       'merge-conflict', 'merge-failure', 'no-jobs',
-                       'disabled', 'dequeue', 'config-error']:
+                       'merge-conflict', 'no-jobs', 'disabled',
+                       'dequeue', 'config-error']:
             pipeline[action] = self.getDriverSchema('reporter')
         return vs.Schema(pipeline)
 
@@ -1267,15 +1266,12 @@ class PipelineParser(object):
         pipeline.precedence = precedence
         pipeline.failure_message = conf.get('failure-message',
                                             "Build failed.")
-        # TODO: Remove in Zuul v6.0
-        backwards_compat_merge_message = conf.get(
-            'merge-failure-message', "Merge Failed.\n\nThis change or one "
+        pipeline.merge_conflict_message = conf.get(
+            'merge-conflict-message', "Merge Failed.\n\nThis change or one "
             "of its cross-repo dependencies was unable to be "
             "automatically merged with the current state of its "
             "repository. Please rebase the change and upload a new "
             "patchset.")
-        pipeline.merge_conflict_message = conf.get(
-            'merge-conflict-message', backwards_compat_merge_message)
 
         pipeline.success_message = conf.get('success-message',
                                             "Build succeeded.")
@@ -1297,8 +1293,6 @@ class PipelineParser(object):
         # TODO: Remove in Zuul v6.0
         # Make a copy to manipulate for backwards compat.
         conf_copy = conf.copy()
-        if 'merge-failure' in conf_copy and 'merge-conflict' not in conf_copy:
-            conf_copy['merge-conflict'] = conf_copy['merge-failure']
 
         for conf_key, action in self.reporter_actions.items():
             reporter_set = []

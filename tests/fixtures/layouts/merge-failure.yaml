@@ -23,7 +23,7 @@
     name: gate
     manager: dependent
     failure-message: Build failed.  For information on how to proceed, see http://wiki.example.org/Test_Failures
-    merge-failure-message: The merge failed! For more information...
+    merge-conflict-message: The merge failed! For more information...
     trigger:
       gerrit:
         - event: comment-added
@@ -36,7 +36,7 @@
     failure:
       gerrit:
         Verified: -2
-    merge-failure:
+    merge-conflict:
       gerrit:
         Verified: -1
       smtp:
