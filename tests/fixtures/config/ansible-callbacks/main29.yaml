@@ -1,6 +1,6 @@
 - tenant:
     name: tenant-one
-    default-ansible-version: SETME
+    default-ansible-version: '2.9'
     source:
       gerrit:
         config-projects:

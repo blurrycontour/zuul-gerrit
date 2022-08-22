@@ -3733,9 +3733,9 @@ class TestInRepoJoin(ZuulTestCase):
 class FunctionalAnsibleMixIn(object):
     # A temporary class to hold new tests while others are disabled
 
+    # These should be overridden in child classes.
     tenant_config_file = 'config/ansible/main.yaml'
-    # This should be overriden in child classes.
-    ansible_version = '2.9'
+    ansible_major_minor = 'X.Y'
 
     def test_playbook(self):
         # This test runs a bit long and needs extra time.
@@ -3826,6 +3826,7 @@ class FunctionalAnsibleMixIn(object):
             self.assertEqual(build_bubblewrap.result, 'SUCCESS')
 
     def test_repo_ansible(self):
+        self.executor_server.keep_jobdir = True
         A = self.fake_gerrit.addFakeChange('org/ansible', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -3835,18 +3836,25 @@ class FunctionalAnsibleMixIn(object):
         self.assertHistory([
             dict(name='hello-ansible', result='SUCCESS', changes='1,1'),
         ])
+        build = self.getJobFromHistory('hello-ansible', result='SUCCESS')
+        with open(build.jobdir.job_output_file) as f:
+            output = f.read()
+            self.assertIn(f'Ansible version={self.ansible_major_minor}', output)
 
 
 class TestAnsible28(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
-    ansible_version = '2.8'
+    tenant_config_file = 'config/ansible/main28.yaml'
+    ansible_major_minor = '2.8'
 
 
 class TestAnsible29(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
-    ansible_version = '2.9'
+    tenant_config_file = 'config/ansible/main29.yaml'
+    ansible_major_minor = '2.9'
 
 
 class TestAnsible5(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
-    ansible_version = '5'
+    tenant_config_file = 'config/ansible/main5.yaml'
+    ansible_major_minor = '2.12'
 
 
 class TestPrePlaybooks(AnsibleZuulTestCase):
