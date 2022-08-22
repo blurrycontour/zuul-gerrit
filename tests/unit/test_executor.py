@@ -838,8 +838,10 @@ class TestLineMapping(AnsibleZuulTestCase):
         )
 
 
-class TestExecutorFacts(AnsibleZuulTestCase):
+class BaseTestExecutorFacts(AnsibleZuulTestCase):
+    # These should be overridden in child classes.
     tenant_config_file = 'config/executor-facts/main.yaml'
+    ansible_major_minor = 'X.Y'
 
     def _get_file(self, build, path):
         p = os.path.join(build.jobdir.root, path)
@@ -861,12 +863,34 @@ class TestExecutorFacts(AnsibleZuulTestCase):
         date_time = \
             j[0]['plays'][0]['tasks'][0]['hosts']['localhost']['date_time']
         self.assertEqual(18, len(date_time))
+        build = self.getJobFromHistory('datetime-fact', result='SUCCESS')
+        with open(build.jobdir.job_output_file) as f:
+            output = f.read()
+            self.assertIn(f'Ansible version={self.ansible_major_minor}',
+                          output)
 
 
-class TestAnsibleCallbackConfigs(AnsibleZuulTestCase):
+class TestExecutorFacts28(BaseTestExecutorFacts):
+    tenant_config_file = 'config/executor-facts/main28.yaml'
+    ansible_major_minor = '2.8'
 
+
+class TestExecutorFacts29(BaseTestExecutorFacts):
+    tenant_config_file = 'config/executor-facts/main29.yaml'
+    ansible_major_minor = '2.9'
+
+
+class TestExecutorFacts5(BaseTestExecutorFacts):
+    tenant_config_file = 'config/executor-facts/main5.yaml'
+    ansible_major_minor = '2.12'
+
+
+class BaseTestAnsibleCallbackConfigs(AnsibleZuulTestCase):
     config_file = 'zuul-executor-ansible-callback.conf'
+
+    # These should be overridden in child classes.
     tenant_config_file = 'config/ansible-callbacks/main.yaml'
+    ansible_major_minor = 'X.Y'
 
     def test_ansible_callback_config(self):
         self.executor_server.keep_jobdir = True
@@ -905,6 +929,26 @@ class TestAnsibleCallbackConfigs(AnsibleZuulTestCase):
             'common-config/playbooks/callback_plugins/',
             c['callback_test_callback']['file_name'])
         self.assertTrue(os.path.isfile(callback_result_file))
+        build = self.getJobFromHistory('callback-test', result='SUCCESS')
+        with open(build.jobdir.job_output_file) as f:
+            output = f.read()
+            self.assertIn(f'Ansible version={self.ansible_major_minor}',
+                          output)
+
+
+class TestAnsibleCallbackConfigs28(BaseTestAnsibleCallbackConfigs):
+    tenant_config_file = 'config/ansible-callbacks/main28.yaml'
+    ansible_major_minor = '2.8'
+
+
+class TestAnsibleCallbackConfigs29(BaseTestAnsibleCallbackConfigs):
+    tenant_config_file = 'config/ansible-callbacks/main29.yaml'
+    ansible_major_minor = '2.9'
+
+
+class TestAnsibleCallbackConfigs5(BaseTestAnsibleCallbackConfigs):
+    tenant_config_file = 'config/ansible-callbacks/main5.yaml'
+    ansible_major_minor = '2.12'
 
 
 class TestExecutorEnvironment(AnsibleZuulTestCase):
