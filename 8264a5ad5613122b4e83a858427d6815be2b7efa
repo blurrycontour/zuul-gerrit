@@ -16,6 +16,24 @@
       "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e The index for configuration objects is https://zuul-ci.org/docs/zuul/latest/project-config.html\n\nI saw that, however, I ended up on https://zuul-ci.org/docs/zuul/latest/config/job.html and was surprised when I could navigate up a level and find a list of all config object docs. You\u0027ll note that I actually provided a link to the project-config document in the new doc and this new doc is really only a pretty directory listing. Perhaps you\u0027d rather I moved \u0027/project-config\u0027 to \u0027/config/index\u0027?",
       "revId": "8264a5ad5613122b4e83a858427d6815be2b7efa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27be2d33_0bb85236",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-22T16:25:29Z",
+      "side": 1,
+      "message": "By \"navigate up\" you mean by editing the URL?  Or is there some navigation link that we have that is broken?  Because I can\u0027t seem to find a way to get to a directory listing by clicking links in the job.html page.\n\nI\u0027m not particularly concerned with providing index pages for directories that aren\u0027t accessible by hyperlink from within our docs, so I think the costs of making changes to this outweigh the benefits.\n\nYou might ask \"Why isn\u0027t job-config.html config/index.html?\"  The answer is that configuring jobs is just one small part of configuring Zuul, and config/index.html is a bit of a misnomer.  Perhaps it should have been job-config/index.html.\n\nIf this really bothers you and you would still like to change it, then here are my thoughts:\n\nWe should not create another page which appears to be a summary of project configuration because it may be confused with the existing one which provides important context.\n\nHere are some alternatives:\n\n1) Move project-config down a level as you suggest.  Be sure to update the redirect map in zuul/zuul-website (that should be a second change that depends-on this one and we should merge them simultaneously).\n\n2) Like #1 except also rename the config/ directory to job-config/.  That\u0027s probably what should have been done originally.  This needs a few more redirects in zuul-website.\n\n3) Just add a redirect from config/$ to project-config.html in zuul-website.\n\n4) Update this change so that config/index.html is a one liner that says \"See project-config\".\n\nI still don\u0027t really like #4 and would prefer #1 or #2, or #3.",
+      "parentUuid": "e367e6e1_dbbb51e0",
+      "revId": "8264a5ad5613122b4e83a858427d6815be2b7efa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
