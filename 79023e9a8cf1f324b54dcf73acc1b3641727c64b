@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8692a67_278e359f",
+        "filename": "tools/test-setup-docker.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-08-22T17:14:22Z",
+      "side": 1,
+      "message": "Would it make more sense to default ROOTCMD to env instead? Seems like that would also address this without having sudo invoking env (since sudo expects to be able to handle envvars as arguments already).",
+      "revId": "79023e9a8cf1f324b54dcf73acc1b3641727c64b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
