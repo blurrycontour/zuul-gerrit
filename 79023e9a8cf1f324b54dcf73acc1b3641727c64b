@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "17ce704f_462c964a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-08-23T12:34:56Z",
+      "side": 1,
+      "message": "Implemented fungi\u0027s suggestion in https://review.opendev.org/c/zuul/zuul/+/854174 as I missed this change when proposing my fix.",
+      "revId": "79023e9a8cf1f324b54dcf73acc1b3641727c64b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a8692a67_278e359f",
         "filename": "tools/test-setup-docker.sh",
         "patchSetId": 1
