@@ -47,7 +47,10 @@ CA_DIR=$SCRIPT_DIR/ca
 mkdir -p $CA_DIR
 $SCRIPT_DIR/zk-ca.sh $CA_DIR zuul-test-zookeeper
 
-${ROOTCMD} USER_ID=$(id -u) ${COMPOSE} up -d
+# Run docker-compose via the 'env' command. Otherwise the USER_ID will be
+# interpreted as the command when no ROOTCMD is given. The reason for that is
+# Bash's simple command expansion.
+${ROOTCMD} env USER_ID=$(id -u) ${COMPOSE} up -d
 
 echo "Waiting for mysql"
 timeout 30 bash -c "until ${ROOTCMD} ${MYSQL} -e 'show databases'; do sleep 0.5; done"
