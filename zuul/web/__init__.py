@@ -32,6 +32,7 @@ import ssl
 import threading
 import uuid
 import prometheus_client
+import urllib.parse
 
 import zuul.executor.common
 from zuul import exceptions
@@ -1170,6 +1171,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(
         content_type='application/json; charset=utf-8', handler=json_handler)
     def job(self, tenant_name, job_name):
+        job_name = urllib.parse.unquote_plus(job_name)
         tenant = self._getTenantOrRaise(tenant_name)
         job_variants = tenant.layout.jobs.get(job_name)
         result = []
