@@ -51,8 +51,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Zuul'
-copyright = u'2012-%s, Zuul project contributors' % datetime.date.today().year
+project = 'Zuul'
+copyright = '2012-%s, Zuul project contributors' % datetime.date.today().year
 
 doc_root = os.environ.get('ZUUL_DOC_ROOT', '/docs/%s' % (project.lower()))
 
@@ -141,8 +141,8 @@ htmlhelp_basename = '%sdoc' % project
 latex_documents = [
     ('index',
      '%s.tex' % project,
-     u'%s Documentation' % project,
-     u'Zuul contributors', 'manual'),
+     '%s Documentation' % project,
+     'Zuul contributors', 'manual'),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
