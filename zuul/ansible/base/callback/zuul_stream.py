@@ -535,10 +535,18 @@ class CallbackModule(default.CallbackModule):
         elif result_dict.get('msg') == 'All items completed':
             self._log_message(result, result_dict['msg'])
         else:
-            self._log_message(
-                result,
-                "Runtime: {delta}".format(
-                    **result_dict))
+            if 'delta' in result_dict:
+                self._log_message(
+                    result,
+                    "Runtime: {delta}".format(
+                        **result_dict))
+            else:
+                # NOTE(ianw) 2022-08-24 : *Fairly* sure that you only
+                # fall into here when the call actually fails (and has
+                # not start/end time), but it is ignored by
+                # failed_when matching.
+                self._log_message(result, msg='ERROR (ignored),
+                result_dict=result_dict)
 
     def v2_runner_item_on_ok(self, result):
         result_dict = dict(result._result)
