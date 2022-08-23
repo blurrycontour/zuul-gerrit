@@ -139,9 +139,7 @@ class FunctionalZuulStreamMixIn:
             #  Callback Exception:
             #  ...
             #
-            # NOTE(ianw) 2022-08-24 : needs a couple of fixes before
-            # we can turn on.
-            self.assertIn('[WARNING]: Failure using method', console_output)
+            self.assertNotIn('[WARNING]: Failure using method', console_output)
 
             text = self._get_job_output(build)
             self.assertLogLine(
