@@ -114,3 +114,9 @@
     - name: Command Not Found
       command: command-not-found
       failed_when: false
+
+- hosts: compute1
+  tasks:
+    - name: Debug with var output
+      debug:
+        msg: '{{ ansible_version }}'
