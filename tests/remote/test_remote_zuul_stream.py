@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import io
+import logging
 import os
 import re
 import textwrap
@@ -31,6 +33,12 @@ class FunctionalZuulStreamMixIn:
         self.executor_server.log_console_port = self.log_console_port
         self.wait_timeout = 180
         self.fake_nodepool.remote_ansible = True
+        # This catches the Ansible output; rather than the callback
+        # output captured in the job log.  For example if the callback
+        # fails, there will be an error output in this stream.
+        self.logger = logging.getLogger('zuul.AnsibleJob')
+        self.console_output = io.StringIO()
+        self.logger.addHandler(logging.StreamHandler(self.console_output))
 
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
         self.assertIsNotNone(ansible_remote)
@@ -119,6 +127,21 @@ class FunctionalZuulStreamMixIn:
         with self.jobLog(job):
             build = self.history[-1]
             self.assertEqual(build.result, 'SUCCESS')
+
+            console_output = self.console_output.getvalue()
+            # This should be generic enough to match any callback
+            # plugin failures, which look something like
+            #
+            #  [WARNING]: Failure using method (v2_runner_on_ok) in \
+            #                                                  callback plugin
+            #  (<ansible.plugins.callback.zuul_stream.CallbackModule object at'
+            #  0x7f89f72a20b0>): 'dict' object has no attribute 'startswith'"
+            #  Callback Exception:
+            #  ...
+            #
+            # NOTE(ianw) 2022-08-24 : needs a couple of fixes before
+            # we can turn on.
+            self.assertIn('[WARNING]: Failure using method', console_output)
 
             text = self._get_job_output(build)
             self.assertLogLine(
