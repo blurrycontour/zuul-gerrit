@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1eee74b_3c02f758",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1174,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-23T14:32:31Z",
+      "side": 1,
+      "message": "It seems like we could also change the cherrypy controller to capture the rest of the url as the job name. That way we shouldn\u0027t have to url encode the job name.",
+      "revId": "9e88f8e5cb5f54a0f304f6b94898f943b1b53fcc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
