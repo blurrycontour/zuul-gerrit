@@ -62,7 +62,7 @@ class JobsList extends React.Component {
     const createNode = (job, extra) => ({
       text: (
         <React.Fragment>
-          <Link to={linkPrefix + job.name}>{job.name}</Link>
+          <Link to={linkPrefix + encodeURIComponent(job.name)}>{job.name}</Link>
           {extra && (<span> ({extra})</span>)}
           {job.description && (
             <span style={{marginLeft: '10px'}}>{job.description}</span>
