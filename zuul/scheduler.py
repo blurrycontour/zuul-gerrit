@@ -42,6 +42,7 @@ from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.queue import NamedQueue
 from zuul.lib.times import Times
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
+from zuul.lib.tracing import Tracing
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul import nodepool
@@ -190,6 +191,7 @@ class Scheduler(threading.Thread):
         self.daemon = True
         self.wait_for_init = wait_for_init
         self.hostname = socket.getfqdn()
+        self.tracing = Tracing(config)
         self.primed_event = threading.Event()
         # Wake up the main run loop
         self.wake_event = threading.Event()
@@ -383,7 +385,10 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping monitoring server")
         self.monitoring_server.stop()
         self.monitoring_server.join()
+        self.log.debug("Disconnecting from ZooKeeper")
         self.zk_client.disconnect()
+        self.log.debug("Stopping tracing")
+        self.tracing.stop()
 
     def runCommand(self):
         while self._command_running:
