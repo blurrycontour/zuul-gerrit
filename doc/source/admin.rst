@@ -12,5 +12,6 @@ Service Administration
    operation
    authentication
    monitoring
+   tracing
    client
    troubleshooting
