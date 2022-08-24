@@ -125,6 +125,8 @@ from zuul.lib.logutil import get_annotated_logger
 
 import tests.fakegithub
 import tests.fakegitlab
+from tests.otlp_fixture import OTLPFixture
+import opentelemetry.sdk.trace.export
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -4911,6 +4913,15 @@ class ZuulTestCase(BaseTestCase):
         if 'database' in config.sections():
             _setup_fixture(config, 'database')
 
+        if 'tracing' in config.sections():
+            self.otlp = OTLPFixture()
+            self.useFixture(self.otlp)
+            self.useFixture(fixtures.MonkeyPatch(
+                'zuul.lib.tracing.Tracing.processor_class',
+                opentelemetry.sdk.trace.export.SimpleSpanProcessor))
+            config.set('tracing', 'endpoint',
+                       f'http://localhost:{self.otlp.port}')
+
         if not self.setupSimpleLayout(config):
             tenant_config = None
             for cfg_attr in ('tenant_config', 'tenant_config_script'):
@@ -5197,6 +5208,7 @@ class ZuulTestCase(BaseTestCase):
                    and not t.name.startswith('Dummy-')
                    and not t.name.startswith('pydevd.')
                    and not t.name.startswith('ptvsd.')
+                   and not t.name.startswith('OTLPFixture_')
                    ]
         if len(threads) > 1:
             thread_map = dict(map(lambda x: (x.ident, x.name),
