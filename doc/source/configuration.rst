@@ -61,6 +61,81 @@ Statsd
       If present, this will be prefixed to all of the keys before
       transmitting to the statsd server.
 
+Tracing
+~~~~~~~
+
+.. attr:: tracing
+
+   Information about the optional OpenTelemetry tracing configuration.
+   See :ref:`tracing` for more information.
+
+   .. attr:: enabled
+      :required:
+
+      To enable tracing, set this value to ``true``.  This is the only
+      required parameter in order to export to a collector running
+      locally.
+
+   .. attr:: protocol
+      :default: grpc
+
+      The OTLP wire protocol to use.
+
+      .. value:: grpc
+
+         Use gRPC (the default).
+
+      .. value:: http/protobuf
+
+         Use HTTP with protobuf encoding.
+
+   .. attr:: endpoint
+
+      The endpoint to use.  The default is protocol specific, but
+      defaults to localhost in all cases.
+
+   .. attr:: service_name
+      :default: zuul
+
+      The service name may be specified here.  Multiple Zuul
+      installations should use different values.
+
+   .. attr:: tls_cert
+
+      The path to the PEM encoded certificate file.  Used only by
+      :value:`tracing.protocol.grpc`.
+
+   .. attr:: tls_key
+
+      The path to the PEM encoded key file.  Used only by
+      :value:`tracing.protocol.grpc`.
+
+   .. attr:: tls_ca
+
+      The path to the PEM encoded CA certificate file.  Used only by
+      :value:`tracing.protocol.grpc`.
+
+   .. attr:: certificate_file
+
+      The path to the PEM encoded certificate file used to verify the
+      endpoint.  Used only by :value:`tracing.protocol.http/protobuf`.
+
+   .. attr:: insecure
+
+      Whether to allow an insecure connection.  Used only by
+      :value:`tracing.protocol.grpc`.
+
+   .. attr:: timeout
+      :default: 10000
+
+      The timeout for outgoing data in milliseconds.
+
+   .. attr:: compression
+
+      The compression algorithm to use.  Available values depend on
+      the protocol and endpoint.  The only universally supported value
+      is ``gzip``.
+
 ZooKeeper
 ~~~~~~~~~
 
