@@ -733,10 +733,8 @@ class Repo(object):
             return
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Set remote url to %s", redact_url(url))
+        self._git_set_remote_url(self.createRepoObject(zuul_event_id), url)
         self.remote_url = url
-        self._git_set_remote_url(
-            self.createRepoObject(zuul_event_id),
-            self.remote_url)
 
     def mapLine(self, commit, filename, lineno, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -1244,11 +1242,13 @@ class Merger(object):
                         item['connection'], item['project'], repo_state,
                         item['ref'], item['newrev'])
         item = items[-1]
-        repo = self.getRepo(item['connection'], item['project'])
         # A list of branch names the last item appears in.
         item_in_branches = []
         if item.get('newrev'):
-            item_in_branches = repo.contains(item['newrev'])
+            lock = repo_locks.getRepoLock(item['connection'], item['project'])
+            with lock:
+                repo = self.getRepo(item['connection'], item['project'])
+                item_in_branches = repo.contains(item['newrev'])
         return (True, repo_state, item_in_branches)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
