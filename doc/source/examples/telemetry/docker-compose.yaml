@@ -1,0 +1,18 @@
+version: "2.1"
+
+services:
+  jaeger:
+    image: quay.io/jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # Jaeger web interface
+
+  collector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.58.0
+    volumes:
+      - ./collector-gateway.yaml:/etc/collector-gateway.yaml
+    command: ["--config=/etc/collector-gateway.yaml"]
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+    depends_on:
+      - jaeger-all-in-one
