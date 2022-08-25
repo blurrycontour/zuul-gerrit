@@ -50,6 +50,19 @@ class TaskOutput extends React.Component {
 
   renderResults(value) {
     const interesting_results = []
+
+    // This was written to assume "value" is an array of
+    // key/value mappings to output.  This seems to be a
+    // good assumption for the most part, but "package:" for
+    // whatever reason outputs a result that is just an array of
+    // strings with what packages were installed.  So, if we
+    // see an array of strings as the value, we just swizzle
+    // that into a key/value so it displays usefully.
+    const isAllStrings = value.every(i => typeof i === "string")
+    if (isAllStrings) {
+      value = [ {output: [...value]} ]
+    }
+
     value.forEach((result, idx) => {
       const keys = Object.entries(result).filter(
         ([key, value]) => shouldIncludeKey(
