@@ -33,6 +33,23 @@
       "message": "recheck test_regex_queue (py38) and test_template_queue (py310)",
       "revId": "ab71dc209940226fb8614b348b6757e0bc2fd2f8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80eda91f_e07c7216",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-08-25T19:23:26Z",
+      "side": 1,
+      "message": "recheck test_command (tox-remote)",
+      "revId": "ab71dc209940226fb8614b348b6757e0bc2fd2f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
