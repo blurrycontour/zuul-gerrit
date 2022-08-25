@@ -2443,6 +2443,7 @@ class AnsibleJob(object):
             work_root=self.jobdir.work_root,
             result_data_file=self.jobdir.result_data_file,
             inventory_file=self.jobdir.inventory)
+        zuul_vars['ansible_version'] = self.ansible_version
 
         # Add playbook_context info
         zuul_vars['playbook_context'] = dict(
