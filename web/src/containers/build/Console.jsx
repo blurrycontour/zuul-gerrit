@@ -18,17 +18,26 @@ import * as React from 'react'
 import ReAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
+
 import {
-  Icon,
-  ListView,
-  Row,
-  Col,
+  Chip,
+  DataList,
+  DataListItem,
+  DataListItemRow,
+  DataListCell,
+  DataListItemCells,
+  DataListToggle,
+  DataListContent,
+  Label,
   Modal,
-} from 'patternfly-react'
+  Popover
+} from '@patternfly/react-core'
+
 import {
   ContainerNodeIcon,
   InfoCircleIcon,
   SearchPlusIcon,
+  LinkIcon,
 } from '@patternfly/react-icons'
 
 import {
@@ -167,11 +176,11 @@ class HostTask extends React.Component {
   }
 
   open = () => {
-    this.setState({ showModal: true})
+    this.setState({showModal: true})
   }
 
   close = () => {
-    this.setState({ showModal: false})
+    this.setState({showModal: false})
   }
 
   constructor (props) {
@@ -191,52 +200,78 @@ class HostTask extends React.Component {
 
     if (taskPathMatches(taskPath, displayPath))
       this.state.showModal = true
+
+    // If it has errors, expand by default
+    this.state.expanded = this.props.errorIds.has(this.props.task.task.id)
   }
 
   render () {
-    const { hostname, task, host, taskPath, errorIds } = this.props
-
+    const { hostname, task, host, taskPath } = this.props
     const ai = []
+
+    const has_interesting_keys = hasInterestingKeys(this.props.host, INTERESTING_KEYS)
+    
+    let name = task.task.name
+    if (!name) {
+      name = host.action
+    }
+    if (task.role) {
+      name = task.role.name + ': ' + name
+    }
+
+    // NOTE(ianw) "interesting" result tasks get an expansion for
+    // direct inspection of their message/return value, etc.  Since we
+    // have some rows that expand and others that don't, the expansion
+    // button pushes things out of alignment.  This simply pads out
+    // lines without "interesting" results so they line up evenly.
+    //  https://github.com/patternfly/patternfly/issues/5055
+    // We might want to think about other ways to present this?
+    if (!has_interesting_keys) {
+      ai.push(
+        <DataListCell key='padding-icon' isIcon={true}>
+          <span style={{paddingRight: '4em'}}></span>
+        </DataListCell>
+      )
+    }
+    
+    ai.push(
+      <DataListCell key='name' width={5}>{name}</DataListCell>
+    )
+
+    ai.push(
+      <DataListCell
+        key='search-icon'
+        isIcon={true}
+        onClick={this.open}>
+        <SearchPlusIcon style={{cursor: 'pointer'}} />
+      </DataListCell>
+    )
+
     if (this.state.failed) {
       ai.push(
-        <ListView.InfoItem key="failed" title="Click for details">
-          <span className="task-details-icon" onClick={this.open}>
-            <SearchPlusIcon />
-          </span>
-          <span className="task-failed" onClick={this.open}>FAILED</span>
-        </ListView.InfoItem>)
+        <DataListCell key='state'>
+          <Label color='red' onClick={this.open}  style={{cursor: 'pointer'}}>FAILED</Label>
+        </DataListCell>)
     } else if (this.state.changed) {
       ai.push(
-        <ListView.InfoItem key="changed" title="Click for details">
-          <span className="task-details-icon" onClick={this.open}>
-            <SearchPlusIcon />
-          </span>
-          <span className="task-changed" onClick={this.open}>CHANGED</span>
-        </ListView.InfoItem>)
+        <DataListCell key='state'>
+          <Label color='orange' onClick={this.open} style={{cursor: 'pointer'}}>CHANGED</Label>
+        </DataListCell>)
     } else if (this.state.skipped) {
       ai.push(
-        <ListView.InfoItem key="skipped" title="Click for details">
-          <span className="task-details-icon" onClick={this.open}>
-            <SearchPlusIcon />
-          </span>
-          <span className="task-skipped" onClick={this.open}>SKIPPED</span>
-        </ListView.InfoItem>)
+        <DataListCell key='state'>
+          <Label color='grey' onClick={this.open} style={{cursor: 'pointer'}}>SKIPPED</Label>
+        </DataListCell>)
     } else if (this.state.ok) {
       ai.push(
-        <ListView.InfoItem key="ok" title="Click for details">
-          <span className="task-details-icon" onClick={this.open}>
-            <SearchPlusIcon />
-          </span>
-          <span className="task-ok" onClick={this.open}>OK</span>
-        </ListView.InfoItem>)
+        <DataListCell key='state'>
+          <Label color='green' onClick={this.open} style={{cursor: 'pointer'}}>OK</Label>
+        </DataListCell>)
     }
     ai.push(
-      <ListView.InfoItem key="hostname">
-        <span className="additionalinfo-icon">
-          <ContainerNodeIcon />
-        </span>
-        {hostname}
-      </ListView.InfoItem>
+      <DataListCell key='node'>
+        <Chip isReadOnly={true}><ContainerNodeIcon />&nbsp;{hostname}</Chip>
+      </DataListCell>
     )
 
     let duration = moment.duration(
@@ -248,68 +283,49 @@ class HostTask extends React.Component {
     })
 
     ai.push(
-      <ListView.InfoItem key="task-duration">
-        <span className="task-duration">{duration}</span>
-      </ListView.InfoItem>
+      <DataListCell key='task-duration'>
+        <span className='task-duration'>{duration}</span>
+      </DataListCell>
     )
 
-    const expand = errorIds.has(task.task.id)
+    const content = <TaskOutput data={this.props.host} include={INTERESTING_KEYS}/>
+    
+    const expandableItem = <DataListItem isExpanded={this.state.expanded}>
+                             <DataListItemRow>
+                               <DataListToggle
+                                 onClick={() => {this.setState({expanded: !this.state.expanded})}}
+                                 isExpanded={this.state.expanded}
+                               />
+                               <DataListItemCells dataListCells={ ai } />
+                             </DataListItemRow>
+                             <DataListContent
+                               isHidden={!this.state.expanded}>
+                               { content }
+                             </DataListContent>
+                           </DataListItem>
+                                          
+    const regularItem = <DataListItem>
+                          <DataListItemRow>
+                            <DataListItemCells dataListCells={ ai } />
+                          </DataListItemRow>
+                        </DataListItem>
 
-    let name = task.task.name
-    if (!name) {
-      name = host.action
-    }
-    if (task.role) {
-      name = task.role.name + ': ' + name
-    }
-    const has_interesting_keys = hasInterestingKeys(this.props.host, INTERESTING_KEYS)
-    let lc = undefined
-    if (!has_interesting_keys) {
-      lc = []
-    }
+    const item = has_interesting_keys ? expandableItem : regularItem
+
+    // NOTE(ianw) : This modal could be made to look way better
+    const description = <a href={'#'+makeTaskPath(taskPath)}><LinkIcon name='link' title='Permalink' /></a>
+    
     return (
-      <React.Fragment>
-        <ListView.Item
-          key='header'
-          heading={name}
-          initExpanded={expand}
-          additionalInfo={ai}
-          leftContent={lc}
-        >
-          {has_interesting_keys &&
-           <Row>
-             <Col sm={11}>
-               <pre>
-                 <TaskOutput data={this.props.host} include={INTERESTING_KEYS}/>
-               </pre>
-             </Col>
-           </Row>
-          }
-        </ListView.Item>
-        <Modal key='modal' show={this.state.showModal} onHide={this.close}
-          dialogClassName="zuul-console-task-detail">
-          <Modal.Header>
-            <button
-              className="close"
-              onClick={this.close}
-              aria-hidden="true"
-              aria-label="Close"
-            >
-              <Icon type="pf" name="close" />
-            </button>
-            <Modal.Title>{hostname}
-              <span className="zuul-console-modal-header-link">
-                <a href={'#'+makeTaskPath(taskPath)}>
-                  <Icon type="fa" name="link" title="Permalink" />
-                </a>
-              </span>
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <TaskOutput data={host}/>
-          </Modal.Body>
+      <>
+        {item}
+        <Modal
+          title={hostname}
+          isOpen={this.state.showModal}
+          onClose={this.close}
+          description={description}>
+          <TaskOutput data={host}/>
         </Modal>
-      </React.Fragment>
+      </>
     )
   }
 }
@@ -320,61 +336,102 @@ class PlayBook extends React.Component {
     errorIds: PropTypes.object,
     taskPath: PropTypes.array,
     displayPath: PropTypes.array,
+    expandAll: PropTypes.bool,
   }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      expandAll: (this.props.playbook.phase === 'run'),
+      expanded: (this.props.expandAll ||
+                 this.props.errorIds.has(this.props.playbook.phase + this.props.playbook.index) ||
+                 taskPathMatches(this.props.taskPath, this.props.displayPath)),
+      // NOTE(ianw) 2022-08-26 : These start expanded because that's
+      // what it has always done
+      playsExpanded: this.props.playbook.plays.map((play, idx) => this.makePlayId(play, idx))
+    }
+  }
+
+  makePlayId = (play, idx) => play.play.name + '-' + idx
 
   render () {
     const { playbook, errorIds, taskPath, displayPath } = this.props
 
-    const expandAll = (playbook.phase === 'run')
-    const expand = (expandAll ||
-                    errorIds.has(playbook.phase + playbook.index) ||
-                    taskPathMatches(taskPath, displayPath))
+    const togglePlays = id => {
+      const index = this.state.playsExpanded.indexOf(id)
+      const newExpanded =
+            index >= 0 ? [...this.state.playsExpanded.slice(0, index), ...this.state.playsExpanded.slice(index + 1, this.state.playsExpanded.length)] : [...this.state.playsExpanded, id]
+      this.setState({playsExpanded: newExpanded})
+    }
 
-    const ai = []
+    // This is the header for each playbook
+    let dataListCells = []
+    dataListCells.push(<DataListCell key='name' width={1}><strong>{playbook.phase[0].toUpperCase() + playbook.phase.slice(1)} playbook</strong></DataListCell>)
+    dataListCells.push(<DataListCell key='path' width={5}>{playbook.playbook}</DataListCell>)
     if (playbook.trusted) {
-      ai.push(
-        <ListView.InfoItem key="trusted" title="This playbook runs in a trusted execution context, which permits executing code on the Zuul executor and allows access to all Ansible features.">
-          <span className="additionalinfo-icon">
-            <InfoCircleIcon />
-          </span>
-          Trusted
-        </ListView.InfoItem>
-      )
+      dataListCells.push(
+        <DataListCell key='trust'>
+          <Popover bodyContent={<div>This playbook runs in a trusted execution context, which permits executing code on the Zuul executor and allows access to all Ansible features.</div>}>
+          <Label color='blue' icon={<InfoCircleIcon />}>Trusted</Label></Popover></DataListCell>)
+    } else {
+      dataListCells.push(
+        <DataListCell key='trust'>
+          <Popover bodyContent={<div>This playbook runs in an untrusted execution context.</div>}>
+          <Label color='grey' icon={<InfoCircleIcon />}>Untrusted</Label></Popover></DataListCell>)
     }
 
     return (
-      <ListView.Item
-        stacked={true}
-        additionalInfo={ai}
-        initExpanded={expand}
-        heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) + ' playbook'}
-        description={playbook.playbook}
-      >
-        {playbook.plays.map((play, idx) => (
-          <React.Fragment key={idx}>
-            <Row key='play'>
-              <Col sm={12}>
-                <strong>Play: {play.play.name}</strong>
-              </Col>
-            </Row>
-            {play.tasks.map((task, idx2) => (
-              Object.entries(task.hosts).map(([hostname, host]) => (
-                <Row key={idx2+hostname}>
-                  <Col sm={12}>
-                    <HostTask hostname={hostname}
-                      taskPath={taskPath.concat([
-                        idx.toString(), idx2.toString(), hostname])}
-                      displayPath={displayPath} task={task} host={host}
-                      errorIds={errorIds}/>
-                  </Col>
-                </Row>
-              ))))}
-          </React.Fragment>
-        ))}
-      </ListView.Item>
+      <DataListItem isExpanded={this.state.expanded}>
+
+        <DataListItemRow>
+          <DataListToggle
+            onClick={() => this.setState({expanded: !this.state.expanded})}
+            isExpanded={this.state.expanded}/>
+          <DataListItemCells
+            dataListCells={dataListCells} />
+        </DataListItemRow>
+
+        <DataListContent isHidden={!this.state.expanded}>
+
+          {playbook.plays.map((play, idx) => (
+            <DataList isCompact={true} key={this.makePlayId(play, idx)}>
+              <DataListItem isExpanded={this.state.playsExpanded.includes(this.makePlayId(play, idx))}>
+                <DataListItemRow>
+                  <DataListToggle
+                    onClick={() => togglePlays(this.makePlayId(play, idx))}
+                    isExpanded={this.state.playsExpanded.includes(this.makePlayId(play, idx))}
+                    id={this.makePlayId(play, idx)}/>
+                  <DataListItemCells dataListCells={[
+                                       <DataListCell key='play'>Play: {play.play.name}</DataListCell>
+                                     ]}
+                  />
+                </DataListItemRow>
+                <DataListContent
+                  isHidden={!this.state.playsExpanded.includes(this.makePlayId(play, idx))}>
+
+                  <DataList isCompact={true}>
+                    {play.tasks.map((task, idx2) => (
+                      Object.entries(task.hosts).map(([hostname, host]) => (
+                        <HostTask key={idx+idx2+hostname}
+                          hostname={hostname}
+                          taskPath={taskPath.concat([
+                            idx.toString(), idx2.toString(), hostname])}
+                          displayPath={displayPath} task={task} host={host}
+                          errorIds={errorIds}/>
+                      ))))}
+                  </DataList>
+
+                </DataListContent>
+              </DataListItem>
+            </DataList>
+          ))}
+
+        </DataListContent>
+      </DataListItem>
     )
   }
 }
+
 
 class Console extends React.Component {
   static propTypes = {
@@ -388,11 +445,11 @@ class Console extends React.Component {
 
     return (
       <React.Fragment>
-        <ListView key="playbooks" className="zuul-console">
+        <DataList>
           {output.map((playbook, idx) => (
             <PlayBook key={idx} playbook={playbook} taskPath={[idx.toString()]}
               displayPath={displayPath} errorIds={errorIds}/>))}
-        </ListView>
+        </DataList>
       </React.Fragment>
     )
   }
