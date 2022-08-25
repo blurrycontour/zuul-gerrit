@@ -104,6 +104,7 @@ class TestInventoryGithub(TestInventoryBase):
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
+        self.assertIn('ansible_version', z_vars)
         self.assertIn('job', z_vars)
         self.assertIn('event_id', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
@@ -137,6 +138,7 @@ class TestInventoryPythonPath(TestInventoryBase):
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
+        self.assertIn('ansible_version', z_vars)
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
@@ -167,6 +169,7 @@ class TestInventoryShellType(TestInventoryBase):
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
+        self.assertIn('ansible_version', z_vars)
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
@@ -195,6 +198,7 @@ class TestInventoryAutoPython(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertEqual(z_vars['ansible_version'], '2.8')
         self.assertEqual(z_vars['job'], 'ansible-version28-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
@@ -219,6 +223,7 @@ class TestInventoryAutoPython(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertEqual(z_vars['ansible_version'], '2.9')
         self.assertEqual(z_vars['job'], 'ansible-version29-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
@@ -243,6 +248,7 @@ class TestInventoryAutoPython(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertEqual(z_vars['ansible_version'], '5')
         self.assertEqual(z_vars['job'], 'ansible-version5-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
