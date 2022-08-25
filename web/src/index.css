@@ -291,86 +291,11 @@ pre.version {
 }
 
 /* Console */
-.zuul-console .list-group-item-header,
-.zuul-console .list-view-pf-actions,
-.zuul-console .list-view-pf-expand,
-.zuul-console .list-view-pf-main-info
+.zuul-console-datalistrow:hover
 {
-    margin-top: 1px;
-    margin-bottom: 1px;
+    box-shadow: var(--pf-c-data-list__item--m-selected--BoxShadow)
 }
-.zuul-console .list-view-pf-main-info
-{
-    padding-top: 1px;
-    padding-bottom: 1px;
-}
-.zuul-console .list-view-pf-expand
-{
-    padding: 0;
-}
-.zuul-console .list-view-pf-left
-{
-    padding-right: 17px;
-}
-.zuul-console .list-group-item-heading
-{
-    margin-bottom: 0;
-}
-.zuul-console .list-group-item-text
-{
-    margin-bottom: 0;
-}
-.zuul-console .task-skipped
-{
-    color: white;
-    background-color: #00729b;
-    width: 6em;
-    cursor: pointer;
-}
-.zuul-console .task-changed
-{
-    color: white;
-    background-color: #a28301;
-    width: 6em;
-    cursor: pointer;
-}
-.zuul-console .task-ok
-{
-    color: white;
-    background-color: #018200;
-    width: 6em;
-    cursor: pointer;
-}
-.zuul-console .task-failed
-{
-    color: white;
-    background-color: #9b0000;
-    width: 6em;
-    cursor: pointer;
-}
-.zuul-console .additionalinfo-icon
-{
-    cursor: default;
-    margin-right: 8px;
-}
-.zuul-console .task-details-icon
-{
-    cursor: pointer;
-    margin-right: 8px;
-}
-.zuul-console-modal-header-link
-{
-    margin-left: 2em;
-    font-size: 18px;
-}
-.zuul-console-task-detail
-{
-    width: 80%;
-}
-.zuul-console-task-result
-{
-    padding-left: 4em;
-}
+
 pre.zuul-log-output
 {
     overflow-x: auto;
