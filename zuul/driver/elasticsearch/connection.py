@@ -113,7 +113,6 @@ class ElasticsearchConnection(BaseConnection):
             source['@timestamp'] = datetime.utcfromtimestamp(
                 int(source['start_time'])).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             d['_index'] = index
-            d['_type'] = 'zuul'
             d['_op_type'] = 'index'
             d['_source'] = source
             yield d
