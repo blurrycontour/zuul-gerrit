@@ -16,6 +16,23 @@
       "message": "tox-remote failed on test_command",
       "revId": "5ba09ada30c28c6550a035785c37080b043b561c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c99bfc8_d686d0ad",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-26T20:54:25Z",
+      "side": 1,
+      "message": "Please make the link more specific.",
+      "revId": "5ba09ada30c28c6550a035785c37080b043b561c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
