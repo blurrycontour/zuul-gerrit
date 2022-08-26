@@ -33,6 +33,23 @@
       "message": "Please make the link more specific.",
       "revId": "5ba09ada30c28c6550a035785c37080b043b561c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29d95ba3_84295633",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-26T20:58:22Z",
+      "side": 1,
+      "message": "It\u0027s important to have meaningful text for links.  When screen readers list links on a page, they read the highlighted text, and \"these docs\" doesn\u0027t help convey what the link is for.  But \"apscheduler documentation\" is more meaningful.",
+      "revId": "5ba09ada30c28c6550a035785c37080b043b561c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
