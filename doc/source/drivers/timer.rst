@@ -30,13 +30,16 @@ Zuul implements the timer using `apscheduler`_, Please check the
 
       The time specification in cron syntax.  Only the 5 part syntax
       is supported, not the symbolic names.  Example: ``0 0 * * *``
-      runs at midnight. The first weekday is Monday (0), and the last
-      is Sunday (6).  Be aware this does differ from slightly from cron.
+      runs at midnight.
       An optional 6th part specifies seconds.  The optional 7th part specifies
       a jitter in seconds. This delays the trigger randomly, limited by
       the specified value.  Example ``0 0 * * * * 60`` runs at
       midnight or randomly up to 60 seconds later.  The jitter is
       applied individually to each project-branch combination.
+
+   .. warning::
+       Be aware the day-of-week value differs from from cron.
+       The first weekday is Monday (0), and the last is Sunday (6).
 
 
 .. _apscheduler: https://apscheduler.readthedocs.io/
