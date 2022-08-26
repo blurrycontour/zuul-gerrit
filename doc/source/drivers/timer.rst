@@ -27,8 +27,9 @@ will run in response to that event.
 
       The time specification in cron syntax.  Only the 5 part syntax
       is supported, not the symbolic names.  Example: ``0 0 * * *``
-      runs at midnight. The first weekday is Monday.  An optional 6th
-      part specifies seconds.  The optional 7th part specifies a
+      runs at midnight. The first weekday is Monday (0), and the last
+      is Sunday (6)  This does diff from slightly from cron.  An optional
+      6th part specifies seconds.  The optional 7th part specifies a
       jitter in seconds. This delays the trigger randomly, limited by
       the specified value.  Example ``0 0 * * * * 60`` runs at
       midnight or randomly up to 60 seconds later.  The jitter is
