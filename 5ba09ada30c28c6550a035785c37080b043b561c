@@ -50,6 +50,24 @@
       "message": "It\u0027s important to have meaningful text for links.  When screen readers list links on a page, they read the highlighted text, and \"these docs\" doesn\u0027t help convey what the link is for.  But \"apscheduler documentation\" is more meaningful.",
       "revId": "5ba09ada30c28c6550a035785c37080b043b561c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90af4f90_6b67a070",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 12898
+      },
+      "writtenOn": "2022-08-26T20:59:16Z",
+      "side": 1,
+      "message": "Happy to.  Suggestions on where you like it to point?\n\nOr do you want the link text to be more speciifc?\n\nPerhaps:\n\nZuul implements the timer using `apscheduler`_, Please consulte `the apscheduler trigger`_  docs for more information.\n\n?",
+      "parentUuid": "3c99bfc8_d686d0ad",
+      "revId": "5ba09ada30c28c6550a035785c37080b043b561c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
