@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac7309fc_87a24f64",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2022-08-26T09:53:14Z",
+      "side": 1,
+      "message": "Missing \".\" after \"(6)\". Also the next sentence seems broken, maybe\n\"This does differ slighty from cron.\"\n\nMaybe also link to the documentation of the implementation that zuul is using, or would that become too complicated?",
+      "revId": "b565cad0d8fcc4c6b7c422eaf8c12cd40ae534ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
