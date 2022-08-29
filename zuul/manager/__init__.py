@@ -22,6 +22,7 @@ from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
+import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
     PipelinePostConfigEvent,
@@ -29,6 +30,8 @@ from zuul.model import (
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk.locks import pipeline_lock
+
+from opentelemetry import trace
 
 
 class DynamicChangeQueueContextManager(object):
@@ -578,7 +581,13 @@ class PipelineManager(metaclass=ABCMeta):
 
             log.info("Adding change %s to queue %s in %s" %
                      (change, change_queue, self.pipeline))
-            item = change_queue.enqueueChange(change, event)
+            if enqueue_time is None:
+                enqueue_time = time.time()
+            span_info = tracing.startSavedSpan(
+                'QueueItem', start_time=enqueue_time)
+            item = change_queue.enqueueChange(change, event,
+                                              span_info=span_info,
+                                              enqueue_time=enqueue_time)
             self.updateBundle(item, change_queue, cycle)
 
             with item.activeContext(self.current_context):
@@ -746,6 +755,15 @@ class PipelineManager(metaclass=ABCMeta):
             item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
         item.queue.dequeueItem(item)
+
+        span_attrs = {
+            'zuul_event_id': item.event.zuul_event_id,
+        }
+        for k, v in item.change.getSafeAttributes().toDict().items():
+            span_attrs['ref_' + k] = v
+        tracing.endSavedSpan(item.current_build_set.span_info)
+        tracing.endSavedSpan(item.span_info,
+                             attributes=span_attrs)
 
     def removeItem(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -967,6 +985,7 @@ class PipelineManager(metaclass=ABCMeta):
             self.reportNormalBuildsetEnd(
                 item.current_build_set, 'dequeue', final=False,
                 result='DEQUEUED')
+            tracing.endSavedSpan(item.current_build_set.span_info)
             item.resetAllBuilds()
 
         for item_behind in item.items_behind:
@@ -1340,7 +1359,9 @@ class PipelineManager(metaclass=ABCMeta):
         # isn't already set.
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
         if not build_set.ref:
-            build_set.setConfiguration(self.current_context)
+            with trace.use_span(tracing.restoreSpan(item.span_info)):
+                span_info = tracing.startSavedSpan('BuildSet')
+            build_set.setConfiguration(self.current_context, span_info)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
