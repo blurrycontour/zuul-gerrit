@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "072d9dba_67c87998",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 12898
+      },
+      "writtenOn": "2022-08-29T18:43:08Z",
+      "side": 1,
+      "message": "Docs only change cant? cause the tests to fail?\n\nhttps://zuul.opendev.org/t/zuul/build/a1755c3bfbf7404b88ae6d9920617610/log/job-output.txt#1491",
+      "revId": "b6299d45a190b06966c8b7072bd2e3b60ea6b47e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
