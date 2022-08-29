@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "98296dd5f6e27993f8ccd85dc439d3a54f66a112",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c315c920_67b5b12c",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-29T21:36:10Z",
+      "side": 1,
+      "message": "Might be good to be more specific in the ERROR message. Something like \"Error no task delta found\".",
+      "revId": "98296dd5f6e27993f8ccd85dc439d3a54f66a112",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
