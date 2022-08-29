@@ -1087,13 +1087,16 @@ class ChangeQueue(zkobject.ZKObject):
     def matches(self, project_cname, branch):
         return (project_cname, branch) in self.project_branches
 
-    def enqueueChange(self, change, event):
+    def enqueueChange(self, change, event, span_info=None, enqueue_time=None):
+        if enqueue_time is None:
+            enqueue_time = time.time()
         item = QueueItem.new(self.zk_context,
                              queue=self,
                              pipeline=self.pipeline,
                              change=change,
                              event=event,
-                             enqueue_time=time.time())
+                             span_info=span_info,
+                             enqueue_time=enqueue_time)
         self.enqueueItem(item)
         return item
 
@@ -3795,6 +3798,7 @@ class BuildSet(zkobject.ZKObject):
             tries={},
             files_state=self.NEW,
             repo_state_state=self.NEW,
+            span_info=None,
             configured=False,
             configured_time=None,  # When setConfigured was called
             start_time=None,  # When the buildset reported start
@@ -3903,6 +3907,7 @@ class BuildSet(zkobject.ZKObject):
             "fail_fast": self.fail_fast,
             "job_graph": (self.job_graph.toDict()
                           if self.job_graph else None),
+            "span_info": self.span_info,
             "configured_time": self.configured_time,
             "start_time": self.start_time,
             "repo_state_request_time": self.repo_state_request_time,
@@ -4053,7 +4058,7 @@ class BuildSet(zkobject.ZKObject):
             len(self.builds),
             self.getStateName(self.merge_state))
 
-    def setConfiguration(self, context):
+    def setConfiguration(self, context, span_info):
         with self.activeContext(context):
             # The change isn't enqueued until after it's created
             # so we don't know what the other changes ahead will be
@@ -4073,6 +4078,7 @@ class BuildSet(zkobject.ZKObject):
                 self.merger_items = [i.makeMergerItem() for i in items]
             self.configured = True
             self.configured_time = time.time()
+            self.span_info = span_info
 
     def _toChangeDict(self, item):
         # Inject bundle_id to dict if available, this can be used to decide
@@ -4242,6 +4248,7 @@ class QueueItem(zkobject.ZKObject):
             current_build_set=None,
             item_ahead=None,
             items_behind=[],
+            span_info=None,
             enqueue_time=None,
             report_time=None,
             dequeue_time=None,
@@ -4304,6 +4311,7 @@ class QueueItem(zkobject.ZKObject):
                                   self.current_build_set.getPath()),
             "item_ahead": self.item_ahead and self.item_ahead.getPath(),
             "items_behind": [i.getPath() for i in self.items_behind],
+            "span_info": self.span_info,
             "enqueue_time": self.enqueue_time,
             "report_time": self.report_time,
             "dequeue_time": self.dequeue_time,
