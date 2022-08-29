@@ -11,11 +11,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 from concurrent import futures
 
 import fixtures
 import grpc
+from opentelemetry import trace
 from opentelemetry.proto.collector.trace.v1.trace_service_pb2_grpc import (
     TraceServiceServicer,
     add_TraceServiceServicer_to_server
@@ -45,6 +45,9 @@ class OTLPFixture(fixtures.Fixture):
         self.server = grpc.server(self.executor)
         add_TraceServiceServicer_to_server(TraceServer(self), self.server)
         self.port = self.server.add_insecure_port('[::]:0')
+        # Reset global tracer provider
+        trace._TRACER_PROVIDER_SET_ONCE = trace.Once()
+        trace._TRACER_PROVIDER = None
 
     def _setUp(self):
         self.server.start()

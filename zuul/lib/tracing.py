@@ -18,10 +18,201 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import \
     OTLPSpanExporter as HTTPExporter
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace import TracerProvider, Span
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry import trace
+from opentelemetry.sdk import trace as trace_sdk
 
 from zuul.lib.config import get_default, any_to_bool
+
+
+class ZuulSpan(Span):
+    """An implementation of Span which accepts floating point
+    times and converts them to the expected nanoseconds."""
+
+    def start(self, start_time=None, parent_context=None):
+        if isinstance(start_time, float):
+            start_time = int(start_time * (10**9))
+        return super().start(start_time, parent_context)
+
+    def end(self, end_time=None):
+        if isinstance(end_time, float):
+            end_time = int(end_time * (10**9))
+        return super().end(end_time)
+
+
+# Patch the OpenTelemetry SDK Span class to return a ZuulSpan so that
+# we can supply floating point timestamps.
+trace_sdk._Span = ZuulSpan
+
+
+def _formatContext(context):
+    return {
+        'trace_id': context.trace_id,
+        'span_id': context.span_id,
+    }
+
+
+def _formatAttributes(attrs):
+    if attrs is None:
+        return None
+    return attrs.copy()
+
+
+def getSpanInfo(span, include_attributes=False):
+    """Return a dict for use in serializing a Span."""
+    links = [{'context': _formatContext(l.context),
+              'attributes': _formatAttributes(l.attributes)}
+             for l in span.links]
+    attrs = _formatAttributes(span.attributes)
+    context = span.get_span_context()
+    ret = {
+        'name': span.name,
+        'trace_id': context.trace_id,
+        'span_id': context.span_id,
+        'trace_flags': context.trace_flags,
+        'start_time': span.start_time,
+    }
+    if links:
+        ret['links'] = links
+    if attrs:
+        if not include_attributes:
+            # Avoid setting attributes when we start saved spans
+            # because we have to store them in ZooKeeper and we should
+            # minimize what we store there (especially since it is
+            # usually duplicative).  If you really need to set
+            # attributes at the start of a span (because the info is
+            # not available later), set include_attributes to True.
+            # Otherwise, we raise an error here to remind ourselves to
+            # avoid that programming pattern.
+            raise RuntimeError("Attributes were set on a saved span; "
+                               "either set them when ending the span, "
+                               "or set include_attributes=True")
+        ret['attributes'] = attrs
+    return ret
+
+
+def restoreSpan(span_info, is_remote=True):
+    """Restore a Span from the serialized dict provided by getSpanInfo
+
+    Return None if unable to serialize the span.
+    """
+    tracer = trace.get_tracer("zuul")
+    if span_info is None:
+        return trace.INVALID_SPAN
+    required_keys = {'name', 'trace_id', 'span_id', 'trace_flags'}
+    if not required_keys <= set(span_info.keys()):
+        return trace.INVALID_SPAN
+    span_context = trace.SpanContext(
+        span_info['trace_id'],
+        span_info['span_id'],
+        is_remote=is_remote,
+        trace_flags=trace.TraceFlags(span_info['trace_flags']),
+    )
+    links = []
+    for link_info in span_info.get('links', []):
+        link_context = trace.SpanContext(
+            link_info['context']['trace_id'],
+            link_info['context']['span_id'])
+        link = trace.Link(link_context, link_info['attributes'])
+        links.append(link)
+    attributes = span_info.get('attributes', {})
+
+    span = ZuulSpan(
+        name=span_info['name'],
+        context=span_context,
+        parent=None,
+        sampler=tracer.sampler,
+        resource=tracer.resource,
+        attributes=attributes,
+        span_processor=tracer.span_processor,
+        kind=trace.SpanKind.INTERNAL,
+        links=links,
+        instrumentation_info=tracer.instrumentation_info,
+        record_exception=False,
+        set_status_on_exception=True,
+        limits=tracer._span_limits,
+        instrumentation_scope=tracer._instrumentation_scope,
+    )
+    span.start(start_time=span_info['start_time'])
+
+    return span
+
+
+def startSavedSpan(*args, **kw):
+    """Start a span and serialize it
+
+    This is a convenience method which starts a span (either root
+    or child) and immediately serializes it.
+
+    Most spans in Zuul should use this method.
+    """
+    tracer = trace.get_tracer("zuul")
+    include_attributes = kw.pop('include_attributes', False)
+    span = tracer.start_span(*args, **kw)
+    return getSpanInfo(span, include_attributes)
+
+
+def endSavedSpan(span_info, end_time=None, attributes=None):
+    """End a saved span.
+
+    This is a convenience method to restore a saved span and
+    immediately end it.
+
+    Most spans in Zuul should use this method.
+    """
+    span = restoreSpan(span_info, is_remote=False)
+    if span:
+        if attributes:
+            span.set_attributes(attributes)
+        span.end(end_time=end_time)
+
+
+def getSpanContext(span):
+    """Return a dict for use in serializing a Span Context.
+
+    The span context information used here is a lightweight
+    encoding of the span information so that remote child spans
+    can be started without access to a fully restored parent.
+    This is equivalent to (but not the same format) as the
+    OpenTelemetry trace context propogator.
+    """
+    context = span.get_span_context()
+    return {
+        'trace_id': context.trace_id,
+        'span_id': context.span_id,
+        'trace_flags': context.trace_flags,
+    }
+
+
+def restoreSpanContext(span_context):
+    """Return a span with remote context information from getSpanContext.
+
+    This returns a non-recording span to use as a parent span.  It
+    avoids the necessity of fully restoring the parent span.
+    """
+    if span_context:
+        span_context = trace.SpanContext(
+            trace_id=span_context['trace_id'],
+            span_id=span_context['span_id'],
+            is_remote=True,
+            trace_flags=trace.TraceFlags(span_context['trace_flags'])
+        )
+    else:
+        span_context = trace.INVALID_SPAN_CONTEXT
+    parent = trace.NonRecordingSpan(span_context)
+    return parent
+
+
+def startSpanInContext(span_context, *args, **kw):
+    """Start a span in a saved context.
+
+    This restores a span from a saved context and starts a new child span.
+    """
+    tracer = trace.get_tracer("zuul")
+    parent = restoreSpanContext(span_context)
+    with trace.use_span(parent):
+        return tracer.start_span(*args, **kw)
 
 
 class Tracing:
@@ -33,10 +224,10 @@ class Tracing:
         service_name = get_default(config, "tracing", "service_name", "zuul")
         resource = Resource(attributes={SERVICE_NAME: service_name})
         provider = TracerProvider(resource=resource)
+        trace.set_tracer_provider(provider)
         enabled = get_default(config, "tracing", "enabled")
         if not any_to_bool(enabled):
             self.processor = None
-            self.tracer = provider.get_tracer("zuul")
             return
 
         protocol = get_default(config, "tracing", "protocol",
@@ -93,16 +284,8 @@ class Tracing:
             raise Exception(f"Unknown tracing protocol {protocol}")
         self.processor = self.processor_class(exporter)
         provider.add_span_processor(self.processor)
-        self.tracer = provider.get_tracer("zuul")
 
     def stop(self):
         if not self.processor:
             return
         self.processor.shutdown()
-
-    def test(self):
-        # TODO: remove once we have actual traces
-        if not self.tracer:
-            return
-        with self.tracer.start_as_current_span('test-trace'):
-            pass
