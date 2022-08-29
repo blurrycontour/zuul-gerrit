@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 3: Code-Review-1\n\u003e \n\u003e Looks good, just needs an entry in https://zuul-ci.org/docs/zuul/latest/job-content.html#zuul-variables\n\nDone\n\n\u003e Also, since this is going to conflict with https://review.opendev.org/853552 I\u0027d really appreciate a review of that so we can keep things moving.  :)\n\nWill do so",
       "revId": "12590a77f00fb9c7639a72c1d8f28d63951f3bba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85ca38f6_73f5d122",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-08-29T07:35:28Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "12590a77f00fb9c7639a72c1d8f28d63951f3bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
