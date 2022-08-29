@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efa9cabf_50c75c83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-29T03:58:09Z",
+      "side": 1,
+      "message": "This is moving through the release process, but I thought I\u0027d put the change in so I don\u0027t forget\n\nhttps://bugs.debian.org/cgi-bin/bugreport.cgi?bug\u003d1017777",
+      "revId": "cd016ad9e90a26c53f6e8f05a79c571add7a2c85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
