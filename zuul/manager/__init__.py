@@ -578,7 +578,13 @@ class PipelineManager(metaclass=ABCMeta):
 
             log.info("Adding change %s to queue %s in %s" %
                      (change, change_queue, self.pipeline))
-            item = change_queue.enqueueChange(change, event)
+            if enqueue_time is None:
+                enqueue_time = time.time()
+            span_info = self.sched.tracing.startSavedSpan(
+                'QueueItem', start_time=enqueue_time)
+            item = change_queue.enqueueChange(change, event,
+                                              span_info=span_info,
+                                              enqueue_time=enqueue_time)
             self.updateBundle(item, change_queue, cycle)
 
             with item.activeContext(self.current_context):
@@ -746,6 +752,9 @@ class PipelineManager(metaclass=ABCMeta):
             item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
         item.queue.dequeueItem(item)
+
+        self.sched.tracing.endSavedSpan(item.current_build_set.span_info)
+        self.sched.tracing.endSavedSpan(item.span_info)
 
     def removeItem(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -1340,7 +1349,9 @@ class PipelineManager(metaclass=ABCMeta):
         # isn't already set.
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
         if not build_set.ref:
-            build_set.setConfiguration(self.current_context)
+            parent = self.sched.tracing.restoreSpan(item.span_info)
+            span_info = self.sched.tracing.startSavedSpan('BuildSet', parent)
+            build_set.setConfiguration(self.current_context, span_info)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
