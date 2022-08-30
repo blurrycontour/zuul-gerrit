@@ -291,9 +291,38 @@ pre.version {
 }
 
 /* Console */
-.zuul-console-datalistrow:hover
+
+.zuul-console .pf-c-data-list__expandable-content {
+    border: none;
+}
+
+.zuul-console .pf-c-data-list__expandable-content-body
 {
-    box-shadow: var(--pf-c-data-list__item--m-selected--BoxShadow)
+    padding-top: calc(var(--pf-c-data-list__expandable-content-body--PaddingTop) * 0.25);
+    padding-bottom: calc(var(--pf-c-data-list__expandable-content-body--PaddingTop) * 0.25)
+}
+
+.zuul-console .pf-c-data-list {
+    border: none
+}
+
+.zuul-console .pf-c-data-list__item-row:hover
+{
+    background: var(--pf-global--BackgroundColor--light-300);
+}
+
+.zuul-console .pf-c-data-list__item {
+    border: none;
+}
+
+.zuul-console .pf-c-data-list__item-content {
+    padding-bottom: 2px !important;
+    padding-top: 0px !important
+}
+
+.zuul-console .pf-c-data-list__cell {
+    padding-top: 4px !important;
+    padding-bottom: 0px !important
 }
 
 pre.zuul-log-output
