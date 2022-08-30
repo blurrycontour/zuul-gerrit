@@ -2649,6 +2649,22 @@ class AnsibleJob(object):
             if self.proc and not self.cleanup_started:
                 self.log.debug("Abort: sending kill signal to job "
                                "process group")
+
+                for proc in psutil.process_iter():
+                    try:
+                        pid_name = proc.name()
+                        pid_cmdline = proc.cmdline()
+                        pid = proc.pid
+                        self.log.debug("%d -- %s -- %s" % (pid, pid_name, pid_cmdline))
+                        result = subprocess.run(['gdb', '-batch',
+                                                 '-ex', 'thread apply all bt',
+                                                 '-p', str(pid)])
+                        self.log.debug(result)
+                        self.log("---")
+                    except:
+                        self.log.debug("passing")
+                        pass
+
                 try:
                     pgid = os.getpgid(self.proc.pid)
                     os.killpg(pgid, signal.SIGKILL)

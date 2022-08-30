@@ -1,6 +1,7 @@
 # This is a cross-platform list tracking distribution packages needed by tests;
 # see http://docs.openstack.org/infra/bindep/ for additional information.
 
+gdb
 mysql-client [test !platform:rpm]
 mysql [test platform:rpm]
 mysql-server [test]
