@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "989df6be_749cf2a9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1500,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-30T18:22:56Z",
+      "side": 1,
+      "message": "To me, \"parent\" means git parent and this could be either git or depends-on (or same-topic) changes, so I think that might be unintentionally misleading.",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f70a4aee_a5d07f32",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-08-30T17:53:48Z",
       "side": 1,
       "message": "Should this message say \"Changes {clist} in cycle can not be merged.\" That way it is clear that it may be a child change that isn\u0027t mergeable? At least for me I always look to parents but with cycles it could be the other direction.",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "529401b3_e2d5a1eb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1582,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-30T18:22:56Z",
+      "side": 1,
+      "message": "That would work too I think -- but also note that on dep cycles, we add a bit to the message that says \"Related changes: ...\" so users can see the cycle and that\u0027s an extra indication that it is a cycle.  So I think I was trying to keep this message as brief as possible.  But I\u0027m happy to add the extra words if it makes it clearer.",
       "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +86,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65681f1d_833841ca",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-30T18:22:56Z",
+      "side": 1,
+      "message": "Two things: One: I\u0027m trying to use the boolean methods here because they really help a lot when searching the code for decisions based on these values.  Two (and more important): bundle can be None, so the accessor method helps check that dereference.\n\nAnd yes, cannot_merge was previously a boolean and is now a nullable string, so the type check is for backwards compat.",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4894a020_07234da0",
@@ -65,6 +116,23 @@
       "writtenOn": "2022-08-30T17:53:48Z",
       "side": 1,
       "message": "See above, is it possible for this to be a non str type?",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48f4e0eb_2c3f013a",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-30T18:22:56Z",
+      "side": 1,
+      "message": "Also backwards compat for a boolean that is now a nullable string.",
       "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
