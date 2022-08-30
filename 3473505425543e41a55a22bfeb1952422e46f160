@@ -33,6 +33,24 @@
       "message": "\u003e * The magnifying glass was located next to the result as a secondary indication that the result is clickable.  They don\u0027t really need to be different columns.  Is it possible to approximate the old layout?  They both also used to have a tooltip.\n\nIn PS7 I have moved these into the same cell into a flexbox, and put tooltips on each\n \n\u003e * We don\u0027t really need the untrusted label.  It\u0027s sort of the \"normal\" case, so it\u0027s not adding anything (except visual noise).  The trusted label also used to have a tooltip.\n\nThis did have a popover, but I\u0027ve converted it to a tooltip in PS7.  I\u0027ve removed the untrusted label\n\n\u003e * The font on the nodeset is still small (but the rest look better).\n\nIn PS7 I have made this the md-size font.\n\n\u003e * There\u0027s a lot of extra vertical space between rows -- enough that it\u0027s actually a bit hard to scan (though the horizontal line counteracts that a bit) and users will need to scroll a lot more to find information now.  How does it look with less vertical padding (and possibly removing the horizontal line if that gets too crowded)?\n\npatternfly really just has a \"normal/compact\" option for this, and we\u0027re already on compact.  There\u0027s quite a few padding variables going on in the various elements of the datalist that will need class overrides; simiarly pf doesn\u0027t have a single option to remove lines, but we can override classes.  \n\nI\u0027m hesitant to start fiddling at this level in this already large change.  My preference would be to start with the default PF compact layout, and we can follow-on by getting some wider feedback and come up with a more targeted change that only deals with this, where we can side-by-side compare options?",
       "revId": "3473505425543e41a55a22bfeb1952422e46f160",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d266591_48c0fc51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-30T20:46:59Z",
+      "side": 1,
+      "message": "Thanks!  I understand the hesitancy to start changing the CSS -- though we do it in several other places.  This format has 70% of the information density of the old layout, and I don\u0027t think anyone ever said that was too dense, so I do think it\u0027s worthwhile to try to get back to that level.  I also agree that doing so in a separate change that can stand or fall on its own is a good idea.",
+      "parentUuid": "11702c95_85479501",
+      "revId": "3473505425543e41a55a22bfeb1952422e46f160",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
