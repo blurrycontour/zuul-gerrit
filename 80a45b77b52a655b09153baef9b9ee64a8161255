@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6928c4af_0e158485",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1500,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-30T17:53:48Z",
+      "side": 1,
+      "message": "Would this be more clear if it said \"Parent changes {clist} are needed.\"?",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f70a4aee_a5d07f32",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1582,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-30T17:53:48Z",
+      "side": 1,
+      "message": "Should this message say \"Changes {clist} in cycle can not be merged.\" That way it is clear that it may be a child change that isn\u0027t mergeable? At least for me I always look to parents but with cycles it could be the other direction.",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbeac04c_715a586a",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-30T17:53:48Z",
+      "side": 1,
+      "message": "Is item.bundle.cannot_merge always either str or None? In that case can we simplify this block to something like:\n\n  if item.bundle.cannot_merge:\n      msg \u003d \u0027This change is part of a bundle that can not merge.\\n\u0027\n      msg +\u003d \u0027\\n\u0027 + item.bundle.cannot_merge + \u0027\\n\u0027\n      \nIs this existing check for backward compatibility with code that serialized item info prior to this change?",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4894a020_07234da0",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-30T17:53:48Z",
+      "side": 1,
+      "message": "See above, is it possible for this to be a non str type?",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
