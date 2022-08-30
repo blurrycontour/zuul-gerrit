@@ -105,6 +105,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dfea6ca1_cb1d9aaa",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-08-30T18:32:11Z",
+      "side": 1,
+      "message": "Re the above comment should this use wasDequeuedNeedingChange()?",
+      "revId": "80a45b77b52a655b09153baef9b9ee64a8161255",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4894a020_07234da0",
         "filename": "zuul/reporter/__init__.py",
         "patchSetId": 1
