@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fca271fa_df675c21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-30T01:43:49Z",
+      "side": 1,
+      "message": "\u003e Patch Set 4: Code-Review-1\n\n\u003e * The tasks have different indentations depending on whether they have carets or not.\n\nNoted inline, this is a limitation of the DataList view unfortunately [1]; it seems the workaround with PS4 works with localhost:3000 but not on the preview site (I really have no idea why...).  PS6 has a different workaround using a minimum-width inline span which looks good to me on firefox and chrome at least (both on localhost and on the preview site)\n\n[1] https://github.com/patternfly/patternfly/issues/5055",
+      "revId": "3473505425543e41a55a22bfeb1952422e46f160",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
