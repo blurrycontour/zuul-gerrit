@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "36529ccb_12278a86",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-30T00:31:22Z",
+      "side": 1,
+      "message": "I\u0027ll propose a small update fix to the comment after it merges",
+      "revId": "0887c2b85173fe6f9e756d346344f0d10e0f5cb6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a521935b_c9e6f3fc",
         "filename": "web/src/containers/build/Console.jsx",
         "patchSetId": 3
