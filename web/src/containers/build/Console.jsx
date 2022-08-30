@@ -295,7 +295,7 @@ class HostTask extends React.Component {
     const content = <TaskOutput data={this.props.host} include={INTERESTING_KEYS}/>
 
     const expandableItem = <DataListItem isExpanded={this.state.expanded}>
-                             <DataListItemRow className='zuul-console-datalistrow'>
+                             <DataListItemRow>
                                <DataListToggle
                                  onClick={() => {this.setState({expanded: !this.state.expanded})}}
                                  isExpanded={this.state.expanded}
@@ -309,7 +309,7 @@ class HostTask extends React.Component {
                            </DataListItem>
 
     const regularItem = <DataListItem>
-                          <DataListItemRow className='zuul-console-datalistrow'>
+                          <DataListItemRow>
                             <DataListItemCells dataListCells={ dataListCells } />
                           </DataListItemRow>
                         </DataListItem>
@@ -456,11 +456,19 @@ class Console extends React.Component {
 
     return (
       <React.Fragment>
-        <DataList isCompact={true} style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
-          {output.map((playbook, idx) => (
-            <PlayBook key={idx} playbook={playbook} taskPath={[idx.toString()]}
-              displayPath={displayPath} errorIds={errorIds}/>))}
-        </DataList>
+        <br />
+        <span className="zuul-console">
+          <DataList isCompact={true}
+                    style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
+            {
+              output.map((playbook, idx) => (
+                <PlayBook
+                  key={idx} playbook={playbook} taskPath={[idx.toString()]}
+                  displayPath={displayPath} errorIds={errorIds}
+                />))
+            }
+          </DataList>
+        </span>
       </React.Fragment>
     )
   }
