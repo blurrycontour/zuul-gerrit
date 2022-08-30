@@ -50,6 +50,23 @@
       "message": "recheck",
       "revId": "bccad87c84a10a83435ff9574274783268e92ba9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d36f796_cae6899a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-30T00:24:51Z",
+      "side": 1,
+      "message": "\u003e Patch Set 4: Code-Review-1\n\u003e * Either the run or failing playbook should start expanded.\n\nThis is fixed in PS5\n \n\u003e While this is less critical, this does appear to use a smaller font than everything else.  Can we keep it the same as the rest of the body text?\n\nPS6 overrides the datalist to use --pf-global--FontSize--md which should make it consistent\n \n\u003e Also, since this can\u0027t be checked in a preview build -- would you please confirm that the deep link to a task still works?\n\nYes, when I am using localhost:3000, opening the permalink on the modal page does take you directly to the result\n",
+      "revId": "bccad87c84a10a83435ff9574274783268e92ba9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
