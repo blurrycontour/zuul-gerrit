@@ -191,9 +191,13 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportFailure(self, item, with_jobs=True):
         if item.cannotMergeBundle():
-            msg = 'This change is part of a bundle that failed to merge.\n'
+            msg = 'This change is part of a bundle that can not merge.\n'
+            if isinstance(item.bundle.cannot_merge, str):
+                msg += '\n' + item.bundle.cannot_merge + '\n'
         elif item.dequeued_needing_change:
             msg = 'This change depends on a change that failed to merge.\n'
+            if isinstance(item.dequeued_needing_change, str):
+                msg += '\n' + item.dequeued_needing_change + '\n'
         elif item.dequeued_missing_requirements:
             msg = ('This change is unable to merge '
                    'due to a missing merge requirement.\n')
@@ -250,8 +254,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def _formatItemReportOtherBundleItems(self, item):
         related_changes = item.pipeline.manager.resolveChangeReferences(
             item.change.needs_changes)
-        return "Related changes:\n{}".format("\n".join(
-            c.url for c in related_changes if c is not item.change))
+        return "Related changes:\n{}\n".format("\n".join(
+            f'  - {c.url}' for c in related_changes if c is not item.change))
 
     def _getItemReportJobsFields(self, item):
         # Extract the report elements from an item

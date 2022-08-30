@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
 import textwrap
 
 from zuul.model import PromoteEvent
@@ -599,8 +600,23 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertIn("depends on a change that failed to merge",
                       A.messages[-1])
+        self.assertTrue(re.search(r'Change http://localhost:\d+/2 is needed',
+                        A.messages[-1]))
+        self.assertFalse(re.search('Change .*? can not be merged',
+                         A.messages[-1]))
+
         self.assertIn("bundle that failed.", B.messages[-1])
+        self.assertFalse(re.search('Change http://localhost:.*? is needed',
+                         B.messages[-1]))
+        self.assertFalse(re.search('Change .*? can not be merged',
+                         B.messages[-1]))
+
         self.assertIn("bundle that failed.", C.messages[-1])
+        self.assertFalse(re.search('Change http://localhost:.*? is needed',
+                         C.messages[-1]))
+        self.assertFalse(re.search('Change .*? can not be merged',
+                         C.messages[-1]))
+
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
         self.assertEqual(C.data["status"], "NEW")
@@ -2441,3 +2457,21 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertEqual(len(B.comments), 2)
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
+
+        self.assertIn("part of a bundle that can not merge",
+                      A.comments[-1])
+        self.assertTrue(
+            re.search("Change https://github.com/gh/project/pull/1 "
+                      "can not be merged",
+                      A.comments[-1]))
+        self.assertFalse(re.search('Change .*? is needed',
+                                   A.comments[-1]))
+
+        self.assertIn("part of a bundle that can not merge",
+                      B.comments[-1])
+        self.assertTrue(
+            re.search("Change https://github.com/gh/project/pull/1 "
+                      "can not be merged",
+                      B.comments[-1]))
+        self.assertFalse(re.search('Change .*? is needed',
+                                   B.comments[-1]))

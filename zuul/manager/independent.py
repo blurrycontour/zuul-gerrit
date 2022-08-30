@@ -49,12 +49,16 @@ class IndependentPipelineManager(PipelineManager):
             # Don't enqueue dependencies ahead of a non-change ref.
             return True
 
-        ret = self.checkForChangesNeededBy(change, change_queue, event,
-                                           dependency_graph=dependency_graph)
-        if ret in [True, False]:
-            return ret
-        log.debug("  Changes %s must be merged ahead of %s" % (ret, change))
-        for needed_change in ret:
+        abort, needed_changes = self.getMissingNeededChanges(
+            change, change_queue, event,
+            dependency_graph=dependency_graph)
+        if abort:
+            return False
+        if not needed_changes:
+            return True
+        log.debug("  Changes %s must be merged ahead of %s" % (
+            needed_changes, change))
+        for needed_change in needed_changes:
             # This differs from the dependent pipeline by enqueuing
             # changes ahead as "not live", that is, not intended to
             # have jobs run.  Also, pipeline requirements are always
@@ -69,22 +73,23 @@ class IndependentPipelineManager(PipelineManager):
                     return False
         return True
 
-    def checkForChangesNeededBy(self, change, change_queue, event,
+    def getMissingNeededChanges(self, change, change_queue, event,
                                 dependency_graph=None):
         log = get_annotated_logger(self.log, event)
 
         if self.pipeline.ignore_dependencies:
-            return True
+            return False, []
         log.debug("Checking for changes needed by %s:" % change)
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
         if not hasattr(change, 'needs_changes'):
             log.debug("  %s does not support dependencies" % type(change))
-            return True
+            return False, []
         if not change.needs_changes:
             log.debug("  No changes needed")
-            return True
+            return False, []
         changes_needed = []
+        abort = False
         for needed_change in self.resolveChangeReferences(
                 change.needs_changes):
             log.debug("  Change %s needs change %s:" % (
@@ -108,9 +113,7 @@ class IndependentPipelineManager(PipelineManager):
                 continue
             # This differs from the dependent pipeline check in not
             # verifying that the dependent change is mergable.
-        if changes_needed:
-            return changes_needed
-        return True
+        return abort, changes_needed
 
     def dequeueItem(self, item):
         super(IndependentPipelineManager, self).dequeueItem(item)

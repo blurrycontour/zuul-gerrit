@@ -56,8 +56,10 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             return False
         return True
 
-    def canMergeCycle(self, bundle):
-        """Check if the cycle still fulfills the pipeline's ready criteria."""
+    def getNonMergeableCycleChanges(self, bundle):
+        """Return changes in the cycle that do not fulfill
+        the pipeline's ready criteria."""
+        changes = []
         for item in bundle.items:
             source = item.change.project.source
             if not source.canMerge(
@@ -68,8 +70,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             ):
                 log = get_annotated_logger(self.log, item.event)
                 log.debug("Change %s can no longer be merged", item.change)
-                return False
-        return True
+                changes.append(item.change)
+        return changes
 
     def enqueueChangesBehind(self, change, event, quiet, ignore_requirements,
                              change_queue, history=None,
@@ -149,13 +151,17 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             # Don't enqueue dependencies ahead of a non-change ref.
             return True
 
-        ret = self.checkForChangesNeededBy(change, change_queue, event,
-                                           dependency_graph=dependency_graph,
-                                           warnings=warnings)
-        if ret in [True, False]:
-            return ret
-        log.debug("  Changes %s must be merged ahead of %s", ret, change)
-        for needed_change in ret:
+        abort, needed_changes = self.getMissingNeededChanges(
+            change, change_queue, event,
+            dependency_graph=dependency_graph,
+            warnings=warnings)
+        if abort:
+            return False
+        if not needed_changes:
+            return True
+        log.debug("  Changes %s must be merged ahead of %s",
+                  needed_changes, change)
+        for needed_change in needed_changes:
             # If the change is already in the history, but the change also has
             # a git level dependency, we need to enqueue it before the current
             # change.
@@ -169,7 +175,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                     return False
         return True
 
-    def checkForChangesNeededBy(self, change, change_queue, event,
+    def getMissingNeededChanges(self, change, change_queue, event,
                                 dependency_graph=None, warnings=None):
         log = get_annotated_logger(self.log, event)
 
@@ -178,11 +184,12 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         log.debug("Checking for changes needed by %s:" % change)
         if not hasattr(change, 'needs_changes'):
             log.debug("  %s does not support dependencies", type(change))
-            return True
+            return False, []
         if not change.needs_changes:
             log.debug("  No changes needed")
-            return True
+            return False, []
         changes_needed = []
+        abort = False
         # Ignore supplied change_queue
         with self.getChangeQueue(change, event) as change_queue:
             for needed_change in self.resolveChangeReferences(
@@ -212,10 +219,12 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                         log.debug("  " + msg)
                         if warnings is not None:
                             warnings.append(msg)
-                        return False
+                        changes_needed.append(needed_change)
+                        abort = True
                 if not needed_change.is_current_patchset:
                     log.debug("  Needed change is not the current patchset")
-                    return False
+                    changes_needed.append(needed_change)
+                    abort = True
                 if self.isChangeAlreadyInQueue(needed_change, change_queue):
                     log.debug("  Needed change is already ahead in the queue")
                     continue
@@ -229,10 +238,9 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                 # The needed change can't be merged.
                 log.debug("  Change %s is needed but can not be merged",
                           needed_change)
-                return False
-        if changes_needed:
-            return changes_needed
-        return True
+                changes_needed.append(needed_change)
+                abort = True
+        return abort, changes_needed
 
     def getFailingDependentItems(self, item, nnfi):
         if not hasattr(item.change, 'needs_changes'):

@@ -379,9 +379,16 @@ class PipelineManager(metaclass=ABCMeta):
                              dependency_graph=None):
         return True
 
-    def checkForChangesNeededBy(self, change, change_queue, event,
+    def getMissingNeededChanges(self, change, change_queue, event,
                                 dependency_graph=None):
-        return True
+        """Check that all needed changes are ahead in the queue.
+
+        Return a list of any that are missing.  If it is not possible
+        to correct the missing changes, "abort" will be true.
+
+        :returns: (abort, needed_changes)
+        """
+        return False, []
 
     def getFailingDependentItems(self, item, nnfi):
         return None
@@ -690,9 +697,11 @@ class PipelineManager(metaclass=ABCMeta):
 
         return queue_config.dependencies_by_topic
 
-    def canMergeCycle(self, bundle):
-        """Check if the cycle still fulfills the pipeline's ready criteria."""
-        return True
+    def getNonMergeableCycleChanges(self, bundle):
+
+        """Return changes in the cycle that do not fulfill
+        the pipeline's ready criteria."""
+        return []
 
     def updateBundle(self, item, change_queue, cycle):
         if not cycle:
@@ -1474,9 +1483,9 @@ class PipelineManager(metaclass=ABCMeta):
                 item.change, item.event)
         else:
             meets_reqs = True
-        needs_met = self.checkForChangesNeededBy(item.change, change_queue,
-                                                 item.event) is True
-        if not (meets_reqs and needs_met):
+        abort, needs_changes = self.getMissingNeededChanges(
+            item.change, change_queue, item.event)
+        if not (meets_reqs and not needs_changes):
             # It's not okay to enqueue this change, we should remove it.
             log.info("Dequeuing change %s because "
                      "it can no longer merge" % item.change)
@@ -1486,7 +1495,12 @@ class PipelineManager(metaclass=ABCMeta):
             elif not meets_reqs:
                 item.setDequeuedMissingRequirements()
             else:
-                item.setDequeuedNeedingChange()
+                clist = ', '.join([c.url for c in needs_changes])
+                if len(needs_changes) > 1:
+                    msg = f'Changes {clist} are needed.'
+                else:
+                    msg = f'Change {clist} is needed.'
+                item.setDequeuedNeedingChange(msg)
             if item.live:
                 try:
                     self.reportItem(item)
@@ -1558,17 +1572,22 @@ class PipelineManager(metaclass=ABCMeta):
             )
             # Before starting to merge the cycle items, make sure they
             # can still be merged, to reduce the chance of a partial merge.
-            if (
-                can_report
-                and not item.bundle.started_reporting
-                and not self.canMergeCycle(item.bundle)
-            ):
-                item.bundle.cannot_merge = True
-                failing_reasons.append("cycle can not be merged")
-                log.debug(
-                    "Dequeuing item %s because cycle can no longer merge",
-                    item
-                )
+            if can_report and not item.bundle.started_reporting:
+                non_mergeable_cycle_changes = self.getNonMergeableCycleChanges(
+                    item.bundle)
+                if non_mergeable_cycle_changes:
+                    clist = ', '.join([
+                        c.url for c in non_mergeable_cycle_changes])
+                    if len(non_mergeable_cycle_changes) > 1:
+                        msg = f'Changes {clist} can not be merged.'
+                    else:
+                        msg = f'Change {clist} can not be merged.'
+                    item.bundle.cannot_merge = msg
+                    failing_reasons.append("cycle can not be merged")
+                    log.debug(
+                        "Dequeuing item %s because cycle can no longer merge",
+                        item
+                    )
             item.bundle.started_reporting = can_report
 
         if can_report:
