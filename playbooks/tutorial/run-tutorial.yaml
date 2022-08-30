@@ -13,3 +13,6 @@
 
 - name: Run admin tutorial
   include_tasks: admin.yaml
+
+- name: Run tracing tutorial
+  include_tasks: tracing.yaml
