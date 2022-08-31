@@ -25,6 +25,12 @@ class ActionModule(command.ActionModule):
         if self._task.action in (
                 'command', 'shell',
                 'ansible.builtin.command', 'ansible.builtin.shell'):
+            task_vars:
+            skip = self._templar.template(
+                "{{hostvars['%s']['zuul_console_disabled']|default(false)}}" \
+                % task_vars['inventory_hostname'])
+            if skip:
+                raise SyntaxError
             # This is a bit lame, but we do not log loops in the
             # zuul_stream.py callback.  This allows us to not write
             # out command.py output to files that will never be read.
