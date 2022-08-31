@@ -3,3 +3,4 @@
     - zuul_return:
         data:
           foo: 'bar'
+          bar: 'foo'
