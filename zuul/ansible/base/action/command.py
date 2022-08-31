@@ -25,10 +25,15 @@ class ActionModule(command.ActionModule):
         if self._task.action in (
                 'command', 'shell',
                 'ansible.builtin.command', 'ansible.builtin.shell'):
+            skip = self._templar.template(
+                "{{hostvars['%s']['zuul_console_disabled']|default(false)}}" \
+                % task_vars['inventory_hostname'])
             # This is a bit lame, but we do not log loops in the
             # zuul_stream.py callback.  This allows us to not write
             # out command.py output to files that will never be read.
-            if 'ansible_loop_var' in task_vars:
+            if 'skip':
+                self._task_args['zuul_log_id'] = 'skip'
+            elif 'ansible_loop_var' in task_vars:
                 self._task.args['zuul_log_id'] = 'in-loop-ignore'
             else:
                 # Get a unique key for ZUUL_LOG_ID_MAP.  ZUUL_LOG_ID_MAP
