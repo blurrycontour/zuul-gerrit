@@ -270,6 +270,8 @@ class Console(object):
         # special-casing for any of this path.
         if log_uuid == 'in-loop-ignore':
             self.logfile_name = os.devnull
+        elif log_uuid == 'skip':
+            self.logfile_name = os.devnull
         else:
             self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
 
@@ -493,8 +495,8 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
     fail_json_kwargs = None
 
     try:
-        if self._debug:
-            self.log('Executing: ' + self._clean_args(args))
+        if self._debug or self._verbosity >= 3:
+            self.log('Executing %s: ' + (zuul_log_id, self._clean_args(args)))
 
         # ZUUL: Replaced the execution loop with the zuul_runner run function
 
