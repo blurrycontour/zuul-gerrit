@@ -34,6 +34,24 @@
       "parentUuid": "793f096e_89124886",
       "revId": "20e89b83cc255750fc771191c477f5c53fa5ff25",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afbd87e2_780d92d3",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-31T22:53:27Z",
+      "side": 0,
+      "message": "That is true for a single host, however, the main thread could be starting a fork for a second host at the same time in the case of a multi-node job.  I think the odds of that are small, but possible, and could show up given enough jobs run.",
+      "parentUuid": "793f096e_89124886",
+      "revId": "20e89b83cc255750fc771191c477f5c53fa5ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
