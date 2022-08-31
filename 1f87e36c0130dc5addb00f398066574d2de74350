@@ -16,6 +16,24 @@
       "message": "nit: typo: default",
       "revId": "1f87e36c0130dc5addb00f398066574d2de74350",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb90ecd0_687d1567",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-08-31T22:53:35Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "c8b6615c_0476e761",
+      "revId": "1f87e36c0130dc5addb00f398066574d2de74350",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
