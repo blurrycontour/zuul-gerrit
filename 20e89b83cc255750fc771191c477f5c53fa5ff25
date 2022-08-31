@@ -16,6 +16,24 @@
       "message": "In theory we could perhaps log this line (with executor\u003dTrue) *after* we have read the successful first input from the remote end?  At that point -- since we have accessed the logfile that would have only been written out by the worker actually starting it -- implying it\u0027s fork() is done -- we must be out of the \"danger zone\"?  \n\nAt this point, we\u0027ve only talked to the long-running zuul_console daemon -- so indeed the worker hasn\u0027t forked() yet and we are in the aforementioned \"danger zone\"",
       "revId": "20e89b83cc255750fc771191c477f5c53fa5ff25",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18f73d5d_fed9e3b4",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-08-31T22:32:00Z",
+      "side": 0,
+      "message": "\u003e indeed the worker hasn\u0027t forked() yet \n\n*maybe* hasn\u0027t finished it\u0027s fork ... if it was a strict \"hadn\u0027t\" this would have been a lot easier to debug 😊",
+      "parentUuid": "793f096e_89124886",
+      "revId": "20e89b83cc255750fc771191c477f5c53fa5ff25",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
