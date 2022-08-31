@@ -138,7 +138,6 @@ The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
       Boolean value that determines if the reporter should add zuul_returned
       vars to the exported build doc.
 
-
 For example:
 
 .. code-block:: yaml
