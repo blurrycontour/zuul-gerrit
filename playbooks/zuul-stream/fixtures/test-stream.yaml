@@ -11,6 +11,14 @@
         port: 19887
       when: new_console | default(false)
 
+- name: Run command to show skipping works
+  vars:
+    zuul_console_disabled: true
+  hosts: node
+  tasks:
+    - name: Run quiet command
+      command: echo 'This command should not stream'
+
 - name: Run some commands to show that logging works
   hosts: node
   tasks:
