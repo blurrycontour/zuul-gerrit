@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c49ad25_69f643a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35236
+      },
+      "writtenOn": "2022-08-31T22:05:15Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e This doesn\u0027t seem like the right place for this.  Variables are job-specific and it doesn\u0027t seem like the pipeline is the right place to specify them. \n\u003e \n\u003e I could see adding a boolean on the pipeline to enable or disable reporting returned variables entirely.\n\u003e \n\u003e Or I could see specifying what variables are reported on the job.\n\u003e \n\u003e Can you elaborate on the use case?\n\nCurrently, when index-returned-vars is set to true, the reporter will create a document in elasticsearch containing `zuul_return`-ed data.\nHowever, the returned data can get quite big when the pipeline contains jobs that add comment on the patchset content.\nThis impacts the performance of our ES cluster and we would like to be able to remove unwanted attributes from the build document (eg, filter out the `zuul` dict).\n",
+      "revId": "3a8a97a80d71fd1fbfe623507502caedff1c129d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
