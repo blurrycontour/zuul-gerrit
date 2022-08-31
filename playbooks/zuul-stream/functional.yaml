@@ -31,11 +31,6 @@
           mv job-output.txt job-output-success-19887.txt
           mv job-output.json job-output-success-19887.json
 
-    - name: Check protocol version
-      assert:
-        that:
-          - "'[node1] Reports streaming version: 1' in _success_output.stdout"
-
     # Streamer puts out a line like
     #  [node1] Starting to log 916b2084-4bbb-80e5-248e-000000000016-1-node1 for task TASK: Print binary data
     # One of the tasks in job-output shows find: results;
