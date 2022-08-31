@@ -11,6 +11,10 @@
         index: zuul-index
         index-vars: true
         index-returned-vars: true
+        allowed-returned-vars:
+          - foo
+        disallowed-returned-vars:
+          - bar
 
 - secret:
     name: test_secret
