@@ -91,6 +91,46 @@
         ZUUL_REMOTE_KEEP: "true"
 
 - job:
+    name: zuul-tox-remote-0
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-1
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-2
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-3
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-4
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-5
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-6
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-7
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-8
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-9
+    parent: zuul-tox-remote
+
+- job:
     name: zuul-tox-zuul-client
     parent: zuul-tox
     description: |
@@ -295,37 +335,16 @@
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-            nodeset: ubuntu-jammy
-        - zuul-tox-py38
-        - zuul-tox-py310
-        - zuul-tox-py310-multi-scheduler
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-stream-functional-5
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
+        - zuul-tox-remote-0
+        - zuul-tox-remote-1
+        - zuul-tox-remote-2
+        - zuul-tox-remote-3
+        - zuul-tox-remote-4
+        - zuul-tox-remote-5
+        - zuul-tox-remote-6
+        - zuul-tox-remote-7
+        - zuul-tox-remote-8
+        - zuul-tox-remote-9
     gate:
       jobs:
         - zuul-upload-image
