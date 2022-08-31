@@ -18,6 +18,7 @@ import logging
 import voluptuous as v
 
 from zuul.reporter import BaseReporter
+from zuul.lib.re2util import filter_allowed_disallowed
 
 
 class ElasticsearchReporter(BaseReporter):
@@ -29,6 +30,9 @@ class ElasticsearchReporter(BaseReporter):
         self.index = self.config.get('index', 'zuul')
         self.index_vars = self.config.get('index-vars')
         self.index_returned_vars = self.config.get('index-returned-vars')
+        self.allowed_returned_vars = self.config.get('allowed-returned-vars')
+        self.disallowed_returned_vars = self.config.get(
+            'disallowed-returned-vars')
 
     def report(self, item, phase1=True, phase2=True):
         """Create an entry into a database."""
@@ -103,7 +107,16 @@ class ElasticsearchReporter(BaseReporter):
                 build_doc['job_vars'] = job.variables
 
             if self.index_returned_vars:
-                build_doc['job_returned_vars'] = build.result_data
+                allowed_keys = self.allowed_returned_vars or []
+                disallowed_keys = self.disallowed_returned_vars or []
+                filtered_keys = filter_allowed_disallowed(
+                    build.result_data.keys(),
+                    allowed_keys, disallowed_keys,
+                )
+
+                build_doc['job_returned_vars'] = {
+                    key: build.result_data[key] for key in filtered_keys
+                }
 
             docs.append(build_doc)
 
@@ -118,7 +131,9 @@ def getSchema():
             {
                 'index': str,
                 'index-vars': bool,
-                'index-returned-vars': bool
+                'index-returned-vars': bool,
+                'allowed-returned-vars': [str],
+                'disallowed-returned-vars': [str]
             }
         )
     )

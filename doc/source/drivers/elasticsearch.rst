@@ -138,6 +138,19 @@ The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
       Boolean value that determines if the reporter should add zuul_returned
       vars to the exported build doc.
 
+   .. attr:: allowed-returned-vars
+      :default: []
+
+      The list of vars (as strings or :ref:`regular expressions <regex>`)
+      that will be added to the exported build doc.
+
+   .. attr:: disallowed-returned-vars
+      :default: []
+
+      The list of vars (as strings or :ref:`regular expressions <regex>`)
+      that won't be added to the exported build doc.
+      Disallowed vars are filtered after the filter of `allowed-returned-vars` and may
+      therefore be used to further restrict the set of permitted vars.
 
 For example:
 
