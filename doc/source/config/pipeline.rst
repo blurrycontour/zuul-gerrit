@@ -332,9 +332,16 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
    .. attr:: merge-conflict
 
       These reporters describe what Zuul should do if it is unable to
-      merge in the patchset. If no merge-conflict reporters are listed
-      then the ``failure`` reporters will be used to notify of
-      unsuccessful merges.
+      merge the patchset into the current state of the target
+      branch. If no merge-conflict reporters are listed then the
+      ``failure`` reporters will be used.
+
+   .. attr:: config-error
+
+      These reporters describe what Zuul should do if it encounters a
+      configuration error while trying to enqueue the item.  If no
+      config-error reporters are listed then the ``failure`` reporters
+      will be used.
 
    .. attr:: enqueue
 

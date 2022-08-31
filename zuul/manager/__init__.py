@@ -322,9 +322,10 @@ class PipelineManager(metaclass=ABCMeta):
                                (item, ret))
 
     def reportNormalBuildsetEnd(self, build_set, action, final, result=None):
-        # Report a buildset end, but only if there are jobs
-        if (build_set.job_graph and
-            len(build_set.job_graph.jobs) > 0):
+        # Report a buildset end if there are jobs or errors
+        if ((build_set.job_graph and len(build_set.job_graph.jobs) > 0) or
+            build_set.config_errors or
+            build_set.unable_to_merge):
             self.sql.reportBuildsetEnd(build_set, action,
                                        final, result)
 
@@ -2032,9 +2033,8 @@ class PipelineManager(metaclass=ABCMeta):
             item.setReportedResult('NO_JOBS')
         elif item.getConfigErrors():
             log.debug("Invalid config for change %s", item.change)
-            # TODOv3(jeblair): consider a new reporter action for this
-            action = 'merge-conflict'
-            actions = self.pipeline.merge_conflict_actions
+            action = 'config-error'
+            actions = self.pipeline.config_error_actions
             item.setReportedResult('CONFIG_ERROR')
         elif item.didMergerFail():
             log.debug("Merge conflict")

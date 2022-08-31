@@ -1176,6 +1176,7 @@ class PipelineParser(object):
         'success': 'success_actions',
         'failure': 'failure_actions',
         'merge-conflict': 'merge_conflict_actions',
+        'config-error': 'config_error_actions',
         'no-jobs': 'no_jobs_actions',
         'disabled': 'disabled_actions',
         'dequeue': 'dequeue_actions',
@@ -1250,7 +1251,7 @@ class PipelineParser(object):
         pipeline['trigger'] = vs.Required(self.getDriverSchema('trigger'))
         for action in ['enqueue', 'start', 'success', 'failure',
                        'merge-conflict', 'merge-failure', 'no-jobs',
-                       'disabled', 'dequeue']:
+                       'disabled', 'dequeue', 'config-error']:
             pipeline[action] = self.getDriverSchema('reporter')
         return vs.Schema(pipeline)
 
@@ -1317,6 +1318,10 @@ class PipelineParser(object):
         # If merge-conflict actions aren't explicit, use the failure actions
         if not pipeline.merge_conflict_actions:
             pipeline.merge_conflict_actions = pipeline.failure_actions
+
+        # If config-error actions aren't explicit, use the failure actions
+        if not pipeline.config_error_actions:
+            pipeline.config_error_actions = pipeline.failure_actions
 
         pipeline.disable_at = conf.get(
             'disable-after-consecutive-failures', None)
