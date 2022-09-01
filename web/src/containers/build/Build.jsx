@@ -273,7 +273,7 @@ function Build({ build, tenant, timezone, user }) {
       {<AutoholdModal
         showAutoholdModal={showAutoholdModal}
         setShowAutoholdModal={setShowAutoholdModal}
-        change={change}
+        change={String(change)}
         changeRef={ref}
         project={project}
         jobName={job_name}
