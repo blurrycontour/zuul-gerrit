@@ -16,6 +16,24 @@
       "message": "nit: s/endpoint/protocol/",
       "revId": "23499457c482b67087a1608ed2d387e2911b5f1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f1668e7_59edd6b5",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-01T22:35:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b9c9900_bb7b5e64",
+      "revId": "23499457c482b67087a1608ed2d387e2911b5f1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
