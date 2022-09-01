@@ -324,20 +324,29 @@ class HostTask extends React.Component {
 
     const item = interestingKeys ? expandableItem : regularItem
 
-    // TODO(ianw) : This goes in the modal; this could be made to look
-    // much better with headings and footers and whatnot.
-    const description = <a href={'#'+makeTaskPath(taskPath)}>
-                          <LinkIcon name='link' title='Permalink' />
-                        </a>
+    const modalDescription = <Flex>
+                               <FlexItem>{label}</FlexItem>
+                               <FlexItem>
+                                 <Chip isReadOnly={true} textMaxWidth='50ch'>
+                                   <span style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
+                                   <ContainerNodeIcon />&nbsp;{hostname}</span>
+                                 </Chip>
+                               </FlexItem>
+                               <FlexItem>
+                                 <a href={'#'+makeTaskPath(taskPath)}>
+                                   <LinkIcon name='link' title='Permalink' />
+                                 </a>
+                               </FlexItem>
+                             </Flex>
 
     return (
       <>
         {item}
         <Modal
-          title={hostname}
+          title={name}
           isOpen={this.state.showModal}
           onClose={this.close}
-          description={description}>
+          description={modalDescription}>
           <TaskOutput data={host}/>
         </Modal>
       </>
