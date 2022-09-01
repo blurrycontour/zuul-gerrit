@@ -414,3 +414,19 @@ details.foldable[open] summary::before {
 .zuul-job-graph text {
     font-size: 12px;
 }
+
+/* task summary */
+
+.zuul-task-summary .pf-c-data-list {
+    border: none
+}
+
+.zuul-task-summary .pf-c-data-list__item:hover
+{
+    background: var(--pf-global--BackgroundColor--light-200);
+}
+
+.zuul-task-summary .pf-c-data-list__item:hover::before
+{
+    background: var(--pf-global--active-color--400);
+}
