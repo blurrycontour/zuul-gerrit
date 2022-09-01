@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b238e7c3_a186765e",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-01T22:39:09Z",
+      "side": 1,
+      "message": "Normally yes -- but if we manage to move all of our timestamps to nanoseconds, we can drop the custom class entirely, so it might make sense to minimize what we put there.",
+      "parentUuid": "a7cce626_57f138bd",
+      "revId": "a42341b0ac2428c8e3f1d5f74ab40f2e5896810c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "69ccc86f_0ee94239",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2022-09-01T13:52:53Z",
       "side": 1,
       "message": "nit: maybe we can hide this behind a toDict() method of the Attributes class",
+      "revId": "a42341b0ac2428c8e3f1d5f74ab40f2e5896810c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40dc36c6_fec980e5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-01T22:39:09Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "69ccc86f_0ee94239",
       "revId": "a42341b0ac2428c8e3f1d5f74ab40f2e5896810c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
