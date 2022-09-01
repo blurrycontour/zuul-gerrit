@@ -16,6 +16,227 @@
       "message": "This specification seems to address the many pain points of managing build node images, I\u0027m looking forward making use of it. Thanks!",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fbc8677_15325673",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "Left some thoughts inline. I also notice that this seems to skip over leaked resource pruning. We\u0027ve seen that this is an important part of the existing nodepool services and it may be worth touching on how the new zuul-launcher (or something else?) is going to be able to deal with leaked resources.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8b52490_17c7bdbf",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "For case #2 I don\u0027t think it is currently possible to enqueue a build for a single job. Instead we have to enqueue a trigger event which will build all matching jobs. Will we update the enqueue tooling to enable us to enqueue a single build job as described for the image build trigger below? I think this will be important for manually triggered builds as we often don\u0027t want to build the world due to contention of resources when a single image needs updating.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29bdf149_f1f70924",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "One advantage of the current system compared to this proposed system is that we can keep a copy of our images long term in local build storage. At times this is also a disadvantage when we can\u0027t delete images and they build up and fill the builder disk.\n\nWith artifact uploads in opendev I believe we have a 30 day expiry. We may need to think about variable expiries for different object types like images.\n\nI don\u0027t think this is really a problem. More of a point to consider as this rolls out.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9c4e8ee_86df6364",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "Currently image builds are well spread out in OpenDev which is nice because it avoids overwhelming the storage systems in clouds when the image build completes and we shift to uploading the images. Shifting to triggering all the image builds at midnight (or relatively close using jitter) may result in undesireable thundering herds.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b0f6595_d1ab4870",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "This trigger event will identify the specific build of an image right? Otherwise we might not be verifying the correct build of an image.\n\nAdditionally this may be necessary to manually trigger a reupload of an image. For example if an upload was corrupted in the target cloud we might need to trigger a delete for a specific cloud image and then reupload it.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ec900ed_be08da0d",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "Does this imply the local launcher copy of the image is ephemeral and may be deleted aggressively? I think that may be a good idea since the images can grow to be quite large.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf60c5ca_06523f0c",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "I worry that this sort of access control isn\u0027t sufficient. In the past tenants have largely been able to self manage pipelines, but that didn\u0027t have an impact of behind the scenes cloud resources. We may need to indicate if a tenant is allowed to build images in the zuul tenant config.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdec6b3e_0be03209",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "I don\u0027t know if this is possible, but if you can download a snapshotted image after taking the snapshot then upload it to typical cloud storage the rest of the previously described process could continue to be used.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0c5a635_b89bfc2f",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "There is another goal that might be good to add which is treating requests in a more queue like fashion. Basically we know who is next in line for node type foo and instead of assigning a specific instance boot to that request we can just hand the next successful but to the next item in the queue.\n\nThis gets a little tricky when you have to deal with provider constraints for locality but I think for a lot of jobs this would make users experience a bit more predictable and expected.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0e5cbc1_598f868b",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "I think this may be at odds with my earlier suggestion of limiting which tenants can define images. Maybe we need a new privileged type of repo? In particular I do not see us wanting to allow any of our tenants in OpenDev to be able to create random images without OpenDev\u0027s review. There are too many gotchas about image format types and how to boot with networking for all the various clouds to allow people to have at it on their own. On top of that images in a cloud represent resource utilization that we\u0027ll want to manage.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68bb41fb_82b1534c",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "An example of the new connection details showing how we interface with external auth info like a clouds.yaml and various regions might be helpful. Though I suspect that is largely a mechanical mapping.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94f0f00f_e9b82bdf",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "Are we thinking other information would replace or override/supplement the default in the image definition in the case where both define this info?",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4d3ec9e_f1f06bfa",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-01T19:55:00Z",
+      "side": 1,
+      "message": "I think we should do that similar to how we only install all the extra ansible stuff in the executor image.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
