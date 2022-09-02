@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a71470a_0a5f84a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-02T16:27:22Z",
+      "side": 1,
+      "message": "Do we also need to update these two code locations:\n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/manager/__init__.py#L1958-L1965\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/reporter/__init__.py#L137",
+      "revId": "9dde360e4f71540a9a1ce9de508aa9a5e2fb1b34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
