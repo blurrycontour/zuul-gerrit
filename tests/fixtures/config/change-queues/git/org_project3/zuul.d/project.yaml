@@ -1,5 +1,5 @@
 - project:
+    queue: integrated-untrusted
     gate:
-      queue: integrated-untrusted
       jobs:
         - project-test

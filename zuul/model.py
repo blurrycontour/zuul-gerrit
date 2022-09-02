@@ -6619,7 +6619,6 @@ class ProjectPipelineConfig(ConfigObject):
     def __init__(self):
         super(ProjectPipelineConfig, self).__init__()
         self.job_list = JobList()
-        self.queue_name = None
         self.debug = False
         self.debug_messages = []
         self.fail_fast = None
@@ -6631,8 +6630,6 @@ class ProjectPipelineConfig(ConfigObject):
     def update(self, other):
         if not isinstance(other, ProjectPipelineConfig):
             raise Exception("Unable to update from %s" % (other,))
-        if self.queue_name is None:
-            self.queue_name = other.queue_name
         if other.debug:
             self.debug = other.debug
         if self.fail_fast is None:
@@ -6647,7 +6644,6 @@ class ProjectPipelineConfig(ConfigObject):
 
     def toDict(self):
         d = {}
-        d['queue_name'] = self.queue_name
         return d
 
 
