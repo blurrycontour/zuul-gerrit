@@ -29,8 +29,8 @@
 
 - project:
     name: org/project2
+    queue: integrated
     gate:
-      queue: integrated
       jobs:
         - project-test
 

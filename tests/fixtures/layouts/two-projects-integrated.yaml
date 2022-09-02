@@ -79,11 +79,10 @@
 
 - project:
     name: org/project2
+    queue: integrated
     check:
-      queue: integrated
       jobs:
         - integration
     gate:
-      queue: integrated
       jobs:
         - integration
