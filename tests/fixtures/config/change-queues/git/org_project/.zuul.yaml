@@ -4,7 +4,7 @@
     per-branch: false
 
 - project:
+    queue: integrated
     gate:
-      queue: integrated
       jobs:
         - project-test

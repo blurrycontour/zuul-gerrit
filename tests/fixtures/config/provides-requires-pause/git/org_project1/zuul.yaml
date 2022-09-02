@@ -11,6 +11,7 @@
     run: playbooks/image-user.yaml
 
 - project:
+    queue: integrated
     check:
       jobs:
         - image-builder
@@ -18,7 +19,6 @@
             dependencies:
               - image-builder
     gate:
-      queue: integrated
       jobs:
         - image-builder
         - image-user:

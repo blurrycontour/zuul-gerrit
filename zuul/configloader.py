@@ -981,8 +981,6 @@ class ProjectTemplateParser(object):
         job_list = [vs.Any(str, job)]
 
         pipeline_contents = {
-            # TODO(tobiash): Remove pipeline specific queue after deprecation
-            'queue': str,
             'debug': bool,
             'fail-fast': bool,
             'jobs': job_list
@@ -1014,8 +1012,6 @@ class ProjectTemplateParser(object):
                 continue
             project_pipeline = model.ProjectPipelineConfig()
             project_template.pipelines[pipeline_name] = project_pipeline
-            # TODO(tobiash): Remove pipeline specific queue after deprecation
-            project_pipeline.queue_name = conf_pipeline.get('queue')
             project_pipeline.debug = conf_pipeline.get('debug')
             project_pipeline.fail_fast = conf_pipeline.get(
                 'fail-fast')
@@ -1070,8 +1066,6 @@ class ProjectParser(object):
         job_list = [vs.Any(str, job)]
 
         pipeline_contents = {
-            # TODO(tobiash): Remove pipeline specific queue after deprecation
-            'queue': str,
             'debug': bool,
             'fail-fast': bool,
             'jobs': job_list

@@ -1118,11 +1118,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
                       test_var: pass
 
                 - project:
+                    queue: integrated
                     check:
                       jobs:
                         - project-vars-job
                     gate:
-                      queue: integrated
                       jobs:
                         - project-vars-job
                 """)
@@ -1314,11 +1314,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
                       test_var: pass
 
                 - project:
+                    queue: integrated
                     check:
                       jobs:
                         - project-vars-job
                     gate:
-                      queue: integrated
                       jobs:
                         - project-vars-job
                 """)

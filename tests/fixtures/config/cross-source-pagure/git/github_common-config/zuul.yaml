@@ -92,6 +92,7 @@
 
 - project:
     name: github/project1
+    queue: integrated
     check:
       jobs:
         - project-merge
@@ -102,7 +103,6 @@
         - project1-project2-integration:
             dependencies: project-merge
     gate:
-      queue: integrated
       jobs:
         - project-merge
         - project-test1:
@@ -114,6 +114,7 @@
 
 - project:
     name: pagure/project2
+    queue: integrated
     check:
       jobs:
         - project-merge
@@ -124,7 +125,6 @@
         - project1-project2-integration:
             dependencies: project-merge
     gate:
-      queue: integrated
       jobs:
         - project-merge
         - project-test1:
