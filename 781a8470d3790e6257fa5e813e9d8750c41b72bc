@@ -458,6 +458,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2ca50b47_2b9130da",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-02T15:11:54Z",
+      "side": 1,
+      "message": "Reproducing the relevant lines:\n\n469 * ``image`` stanza                                                                              \n470 * ``flavor`` stanza\n471 * ``label`` stanza\n472 * ``section`` stanza (top level)\n473 * ``image`` within ``section``\n474 * ``flavor`` within ``section``\n475 * ``provider`` stanza (top level)\n476 * ``label`` within ``provider``\n\nCurrently, given X images and Y providers, we set that flag X*Y times.  With this proposal, we could do the same by setting it using line 473.  Or we could set it only once per image (X times) by setting it using line 469.  Or we could set it once per provider (Y times) by setting it using line 475.  Or we could set it once per cloud (let\u0027s call that O(1) time) by setting using line 472 and section inheritance.",
+      "parentUuid": "27bd18e6_ba5bf4a1",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4d3ec9e_f1f06bfa",
         "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
         "patchSetId": 8
