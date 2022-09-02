@@ -16,6 +16,24 @@
       "message": "Do we also need to update these two code locations:\n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/manager/__init__.py#L1958-L1965\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/reporter/__init__.py#L137",
       "revId": "9dde360e4f71540a9a1ce9de508aa9a5e2fb1b34",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2690b5d_4c2a2536",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-02T16:32:58Z",
+      "side": 1,
+      "message": "Nope, those are the new things that we\u0027re moving this configuration out of the way of.\n\nAfter another major release, we can actually add \u0027merge-failure\u0027 back as a configuration option and allow configuring the message for the actual merge-failure reporter (this change removes the shim that lets merge-failure configure the merge-conflict reporter).",
+      "parentUuid": "9a71470a_0a5f84a1",
+      "revId": "9dde360e4f71540a9a1ce9de508aa9a5e2fb1b34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
