@@ -440,6 +440,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "27bd18e6_ba5bf4a1",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-02T06:00:46Z",
+      "side": 1,
+      "message": "Just wondering how this solves the issue of having to define/override it for every image? Can the image name be a regex and match multiple images? Otherwise it would just be defined in a different location (image stanza vs. image in section).",
+      "parentUuid": "9f8d6514_f07f0ca0",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f4d3ec9e_f1f06bfa",
         "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
         "patchSetId": 8
