@@ -51,11 +51,11 @@
 
 - project:
     name: org/project1
+    queue: integrated
     check:
       jobs:
         - image-builder
     gate:
-      queue: integrated
       jobs:
         - image-builder
         - image-user:
@@ -63,10 +63,10 @@
 
 - project:
     name: org/project2
+    queue: integrated
     check:
       jobs:
         - image-user
     gate:
-      queue: integrated
       jobs:
         - image-user

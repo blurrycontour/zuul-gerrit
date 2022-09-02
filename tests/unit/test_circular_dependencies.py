@@ -1077,11 +1077,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
         use_job = textwrap.dedent(
             """
             - project:
+                queue: integrated
                 check:
                   jobs:
                     - new-job
                 gate:
-                  queue: integrated
                   jobs:
                     - new-job
             """)
@@ -1134,11 +1134,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
                       test_var: pass
 
                 - project:
+                    queue: integrated
                     check:
                       jobs:
                         - project-vars-job
                     gate:
-                      queue: integrated
                       jobs:
                         - project-vars-job
                 """)
@@ -1330,11 +1330,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
                       test_var: pass
 
                 - project:
+                    queue: integrated
                     check:
                       jobs:
                         - project-vars-job
                     gate:
-                      queue: integrated
                       jobs:
                         - project-vars-job
                 """)

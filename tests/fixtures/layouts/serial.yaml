@@ -35,14 +35,14 @@
 
 - project:
     name: org/project1
+    queue: shared
     deploy:
-      queue: shared
       jobs:
         - job1
 
 - project:
     name: org/project2
+    queue: shared
     deploy:
-      queue: shared
       jobs:
         - job1

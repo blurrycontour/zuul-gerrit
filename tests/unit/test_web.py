@@ -776,14 +776,11 @@ class TestWeb(BaseTestWeb):
                     'merge_mode': 'merge-resolve',
                     'pipelines': [{
                         'name': 'check',
-                        'queue_name': None,
                         'jobs': jobs,
                     }, {
                         'name': 'gate',
-                        'queue_name': 'integrated-overridden',
                         'jobs': jobs,
                     }, {'name': 'post',
-                        'queue_name': None,
                         'jobs': [[
                             {'abstract': False,
                              'ansible_version': None,
