@@ -40,6 +40,39 @@ branch will not immediately produce a configuration error.
             nodes:
               - web
 
+Nodesets may also be used to express that Zuul should use the first of
+multiple alternative node configurations to run a job.  When a Nodeset
+specifies a list of :attr:`nodeset.alternatives`, Zuul will request the
+first Nodeset in the series, and if allocation fails for any reason,
+Zuul will re-attempt the request with the subsequent Nodeset and so
+on.  The first Nodeset which is sucessfully supplied by Nodepool will
+be used to run the job.  An example of such a configuration follows.
+
+.. code-block:: yaml
+
+   - nodeset:
+       name: fast-nodeset
+       nodes:
+         - label: fast-label
+           name: controller
+
+   - nodeset:
+       name: slow-nodeset
+       nodes:
+         - label: slow-label
+           name: controller
+
+   - nodeset:
+       name: fast-or-slow
+       alternatives:
+         - fast-nodeset
+         - slow-nodeset
+
+In the above example, a job that requested the `fast-or-slow` nodeset
+would receive `fast-label` nodes if a provider was able to supply
+them, otherwise it would receive `slow-label` nodes.  A Nodeset may
+specify nodes and groups, or alternative nodesets, but not both.
+
 .. attr:: nodeset
 
    A Nodeset requires two attributes:
@@ -54,7 +87,8 @@ branch will not immediately produce a configuration error.
       definition, this attribute should be omitted.
 
    .. attr:: nodes
-      :required:
+
+      This attribute is required unless `alteranatives` is supplied.
 
       A list of node definitions, each of which has the following format:
 
@@ -89,3 +123,23 @@ branch will not immediately produce a configuration error.
          The nodes that shall be part of the group. This is specified as a list
          of strings.
 
+   .. attr:: alternatives
+      :type: list
+
+      A list of alternative nodesets for which requests should be
+      attempted in series.  The first request which succeeds will be
+      used for the job.
+
+      The items in the list may be either strings, in which case they
+      refer to other Nodesets within the layout, or they may be a
+      dictionary which is a nested anonymous Nodeset definition.  The
+      two types (strings or nested definitions) may be mixed.
+
+      An alternative Nodeset definition may in turn refer to other
+      alternative nodeset definitions.  In this case, the tree of
+      definitions will be flattened in a breadth-first manner to
+      create the ordered list of alternatives.
+
+      A Nodeset which specifies alternatives may not also specify
+      nodes or groups (this attribute is exclusive with
+      :attr:`nodeset.nodes` and :attr:`nodeset.groups`.
