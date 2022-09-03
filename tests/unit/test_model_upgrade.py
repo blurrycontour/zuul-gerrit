@@ -215,6 +215,44 @@ class TestModelUpgrade(ZuulTestCase):
     # code paths are exercised in existing tests since small secrets
     # don't use the blob store.
 
+    @model_version(8)
+    def test_model_8_9(self):
+        # This excercises the upgrade to nodeset_alternates
+        first = self.scheds.first
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            if state_one:
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one):
+                break
+
+        self.fake_nodepool.pause()
+        with second.sched.layout_update_lock, second.sched.run_handler_lock:
+            A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[first])
+
+        self.model_test_component_info.model_api = 9
+        with first.sched.layout_update_lock, first.sched.run_handler_lock:
+            self.fake_nodepool.unpause()
+            self.waitUntilSettled(matcher=[second])
+
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestSemaphoreModelUpgrade(ZuulTestCase):
     tenant_config_file = 'config/semaphore/main.yaml'
