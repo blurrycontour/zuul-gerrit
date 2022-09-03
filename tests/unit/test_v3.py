@@ -2682,6 +2682,69 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Debug information:',
                       A.messages[0], "A should have debug info")
 
+    def test_nodeset_alternates_cycle(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - nodeset:
+                name: red
+                alternatives: [blue]
+            - nodeset:
+                name: blue
+                alternatives: [red]
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+                nodeset: blue
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn("cycle detected", A.messages[0])
+
+    def test_nodeset_alternates_missing_from_nodeset(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - nodeset:
+                name: red
+                alternatives: [blue]
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('nodeset "blue" was not found', A.messages[0])
+
+    def test_nodeset_alternates_missing_from_job(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                run: playbooks/project-test1.yaml
+                nodeset:
+                  alternatives: [red]
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('nodeset "red" was not found', A.messages[0])
+
     @skipIfMultiScheduler()
     # See comment in TestInRepoConfigDir.scheduler_count for further
     # details.

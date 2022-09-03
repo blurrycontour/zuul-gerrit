@@ -880,22 +880,27 @@ class PipelineManager(metaclass=ABCMeta):
         else:
             relative_priority = 0
         for job in jobs:
-            provider = self._getPausedParentProvider(build_set, job)
-            priority = self._calculateNodeRequestPriority(build_set, job)
-            tenant_name = build_set.item.pipeline.tenant.name
-            pipeline_name = build_set.item.pipeline.name
-            req = self.sched.nodepool.requestNodes(
-                build_set.uuid, job, tenant_name, pipeline_name, provider,
-                priority, relative_priority, event=item.event)
-            log.debug("Adding node request %s for job %s to item %s",
-                      req, job, item)
-            build_set.setJobNodeRequestID(job.name, req.id)
-            if req.fulfilled:
-                nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
-                build_set.jobNodeRequestComplete(req.job_name, nodeset)
-            else:
-                job.setWaitingStatus(f'node request: {req.id}')
+            self._makeNodepoolRequest(log, build_set, job, relative_priority)
         return True
+
+    def _makeNodepoolRequest(self, log, build_set, job, relative_priority,
+                             alternative=0):
+        provider = self._getPausedParentProvider(build_set, job)
+        priority = self._calculateNodeRequestPriority(build_set, job)
+        tenant_name = build_set.item.pipeline.tenant.name
+        pipeline_name = build_set.item.pipeline.name
+        item = build_set.item
+        req = self.sched.nodepool.requestNodes(
+            build_set.uuid, job, tenant_name, pipeline_name, provider,
+            priority, relative_priority, event=item.event)
+        log.debug("Adding node request %s for job %s to item %s",
+                  req, job, item)
+        build_set.setJobNodeRequestID(job.name, req.id)
+        if req.fulfilled:
+            nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
+            build_set.jobNodeRequestComplete(req.job_name, nodeset)
+        else:
+            job.setWaitingStatus(f'node request: {req.id}')
 
     def _getPausedParent(self, build_set, job):
         job_graph = build_set.job_graph
@@ -1909,17 +1914,46 @@ class PipelineManager(metaclass=ABCMeta):
                 build_set.setExtraRepoState(event.repo_state)
                 build_set.repo_state_state = build_set.COMPLETE
 
+    def _handleNodeRequestFallback(self, log, build_set, job, old_request):
+        if len(job.nodeset_alternatives) <= job.nodeset_index + 1:
+            # No alternatives to fall back upon
+            return False
+
+        # Increment the nodeset index and remove the old request
+        with job.activeContext(self.current_context):
+            job.nodeset_index = job.nodeset_index + 1
+
+        log.info("Re-attempting node request for job "
+                 f"{job.name} of item {build_set.item} "
+                 f"with nodeset alternative {job.nodeset_index}")
+
+        build_set.removeJobNodeRequestID(job.name)
+
+        # Make a new request
+        if self.sched.globals.use_relative_priority:
+            relative_priority = build_set.item.getNodePriority()
+        else:
+            relative_priority = 0
+        log = build_set.item.annotateLogger(self.log)
+        self._makeNodepoolRequest(log, build_set, job, relative_priority)
+        return True
+
     def onNodesProvisioned(self, request, nodeset, build_set):
-        # TODOv3(jeblair): handle provisioning failure here
         log = get_annotated_logger(self.log, request.event_id)
 
         self.reportPipelineTiming('node_request_time', request.created_time)
-        if nodeset is not None:
-            build_set.jobNodeRequestComplete(request.job_name, nodeset)
+        job = build_set.item.getJob(request.job_name)
+        # First see if we need to retry the request
         if not request.fulfilled:
             log.info("Node request %s: failure for %s",
                      request, request.job_name)
-            job = build_set.item.getJob(request.job_name)
+            if self._handleNodeRequestFallback(log, build_set, job, request):
+                return
+        # No more fallbacks -- tell the buildset the request is complete
+        if nodeset is not None:
+            build_set.jobNodeRequestComplete(request.job_name, nodeset)
+        # Put a fake build through the cycle to clean it up.
+        if not request.fulfilled:
             fakebuild = build_set.item.setNodeRequestFailure(job)
             try:
                 self.sql.reportBuildEnd(
