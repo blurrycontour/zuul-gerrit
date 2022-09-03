@@ -488,14 +488,26 @@ class NodeSetParser(object):
                  vs.Required('nodes'): to_list(str),
                  }
 
-        nodeset = {vs.Required('nodes'): to_list(node),
-                   'groups': to_list(group),
-                   '_source_context': model.SourceContext,
-                   '_start_mark': model.ZuulMark,
-                   }
+        real_nodeset = {vs.Required('nodes'): to_list(node),
+                        'groups': to_list(group),
+                        }
 
+        alt_nodeset = {vs.Required('alternatives'):
+                       [vs.Any(real_nodeset, str)]}
+
+        top_nodeset = {'_source_context': model.SourceContext,
+                       '_start_mark': model.ZuulMark,
+                       }
         if not anonymous:
-            nodeset[vs.Required('name')] = str
+            top_nodeset[vs.Required('name')] = str
+
+        top_real_nodeset = real_nodeset.copy()
+        top_real_nodeset.update(top_nodeset)
+        top_alt_nodeset = alt_nodeset.copy()
+        top_alt_nodeset.update(top_nodeset)
+
+        nodeset = vs.Any(top_real_nodeset, top_alt_nodeset)
+
         return vs.Schema(nodeset)
 
     def fromYaml(self, conf, anonymous=False):
@@ -503,6 +515,24 @@ class NodeSetParser(object):
             self.anon_schema(conf)
         else:
             self.schema(conf)
+
+        if 'alternatives' in conf:
+            return self.loadAlternatives(conf)
+        else:
+            return self.loadNodeset(conf)
+
+    def loadAlternatives(self, conf):
+        ns = model.NodeSet(conf.get('name'))
+        ns.source_context = conf.get('_source_context')
+        ns.start_mark = conf.get('_start_mark')
+        for alt in conf['alternatives']:
+            if isinstance(alt, str):
+                ns.addAlternative(alt)
+            else:
+                ns.addAlternative(self.loadNodeset(alt))
+        return ns
+
+    def loadNodeset(self, conf):
         ns = model.NodeSet(conf.get('name'))
         ns.source_context = conf.get('_source_context')
         ns.start_mark = conf.get('_start_mark')
@@ -2400,6 +2430,10 @@ class TenantParser(object):
 
         # Now that all the jobs are loaded, verify references to other
         # config objects.
+        for nodeset in layout.nodesets.values():
+            with reference_exceptions('nodeset', nodeset,
+                                      layout.loading_errors):
+                nodeset.validateReferences(layout)
         for jobs in layout.jobs.values():
             for job in jobs:
                 with reference_exceptions('job', job, layout.loading_errors):

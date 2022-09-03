@@ -86,3 +86,10 @@ Version 8
 :Prior Zuul version: 6.0.0
 :Description: Deduplicates jobs in dependency cycles.  Affects
               schedulers only.
+
+Version 9
+---------
+
+:Prior Zuul version: 6.3.0
+:Description: Adds nodeset_alternatives and nodeset_index to frozen job.
+              Removes nodset from frozen job.  Affects schedulers and executors.

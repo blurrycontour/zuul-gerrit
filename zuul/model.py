@@ -1383,6 +1383,7 @@ class NodeSet(ConfigObject):
         self.name = name or ''
         self.nodes = OrderedDict()
         self.groups = OrderedDict()
+        self.alternatives = []
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -1391,7 +1392,9 @@ class NodeSet(ConfigObject):
         if not isinstance(other, NodeSet):
             return False
         return (self.name == other.name and
-                self.nodes == other.nodes)
+                self.nodes == other.nodes and
+                self.groups == other.groups and
+                self.alternatives == other.alternatives)
 
     def toDict(self):
         d = {}
@@ -1402,6 +1405,12 @@ class NodeSet(ConfigObject):
         d['groups'] = []
         for group in self.groups.values():
             d['groups'].append(group.toDict())
+        d['alternatives'] = []
+        for alt in self.alternatives:
+            if isinstance(alt, NodeSet):
+                d['alternatives'].append(alt.toDict())
+            else:
+                d['alternatives'].append(alt)
         return d
 
     @classmethod
@@ -1411,6 +1420,12 @@ class NodeSet(ConfigObject):
             nodeset.addNode(Node.fromDict(node))
         for group in data["groups"]:
             nodeset.addGroup(Group.fromDict(group))
+        for alt in data.get('alternatives', []):
+            if isinstance(alt, str):
+                if isinstance(alt, str):
+                    nodeset.addAlternative(alt)
+                else:
+                    nodeset.addAlternative(NodeSet.fromDict(alt))
         return nodeset
 
     def copy(self):
@@ -1419,6 +1434,11 @@ class NodeSet(ConfigObject):
             n.addNode(Node(node.name, node.label))
         for name, group in self.groups.items():
             n.addGroup(Group(group.name, group.nodes[:]))
+        for alt in self.alternatives:
+            if isinstance(alt, str):
+                n.addAlternative(alt)
+            else:
+                n.addAlternative(alt.copy())
         return n
 
     def addNode(self, node):
@@ -1437,6 +1457,36 @@ class NodeSet(ConfigObject):
 
     def getGroups(self):
         return list(self.groups.values())
+
+    def addAlternative(self, alt):
+        self.alternatives.append(alt)
+
+    def flattenAlternatives(self, layout):
+        alts = []
+        history = []
+        self._flattenAlternatives(layout, self, alts, history)
+        return alts
+
+    def _flattenAlternatives(self, layout, nodeset,
+                             alternatives, history):
+        if isinstance(nodeset, str):
+            # This references an existing named nodeset in the layout.
+            ns = layout.nodesets.get(nodeset)
+            if ns is None:
+                raise Exception(f'The nodeset "{nodeset}" was not found.')
+        else:
+            ns = nodeset
+        if ns in history:
+            raise Exception(f'Nodeset cycle detected on "{nodeset}"')
+        history.append(ns)
+        if ns.alternatives:
+            for alt in ns.alternatives:
+                self._flattenAlternatives(layout, alt, alternatives, history)
+        else:
+            alternatives.append(ns)
+
+    def validateReferences(self, layout):
+        self.flattenAlternatives(layout)
 
     def __repr__(self):
         if self.name:
@@ -2038,7 +2088,8 @@ class FrozenJob(zkobject.ZKObject):
                   'dependencies',
                   'inheritance_path',
                   'name',
-                  'nodeset',
+                  'nodeset_alternatives',
+                  'nodeset_index',
                   'override_branch',
                   'override_checkout',
                   'post_timeout',
@@ -2149,8 +2200,8 @@ class FrozenJob(zkobject.ZKObject):
                 if not hasattr(self, k):
                     continue
             v = getattr(self, k)
-            if k == 'nodeset':
-                v = v.toDict()
+            if k == 'nodeset_alternatives':
+                v = [alt.toDict() for alt in v]
             elif k == 'dependencies':
                 # frozenset of JobDependency
                 v = [dep.toDict() for dep in v]
@@ -2173,6 +2224,9 @@ class FrozenJob(zkobject.ZKObject):
                 v = {'storage': 'local', 'data': v}
             data[k] = v
 
+        if (COMPONENT_REGISTRY.model_api < 9):
+            data['nodeset'] = data['nodeset_alternatives'][0]
+
         # Use json_dumps to strip any ZuulMark entries
         return json_dumps(data, sort_keys=True).encode("utf8")
 
@@ -2183,13 +2237,18 @@ class FrozenJob(zkobject.ZKObject):
         if 'deduplicate' not in data:
             data['deduplicate'] = 'auto'
 
-        if hasattr(self, 'nodeset'):
-            nodeset = self.nodeset
+        # MODEL_API < 9
+        if data.get('nodeset'):
+            data['nodeset_alternatives'] = [data['nodeset']]
+            data['nodeset_index'] = 0
+            del data['nodeset']
+
+        if hasattr(self, 'nodeset_alternatives'):
+            alts = self.nodeset_alternatives
         else:
-            nodeset = data.get('nodeset')
-            if nodeset:
-                nodeset = NodeSet.fromDict(nodeset)
-        data['nodeset'] = nodeset
+            alts = data.get('nodeset_alternatives', [])
+            alts = [NodeSet.fromDict(alt) for alt in alts]
+        data['nodeset_alternatives'] = alts
 
         if hasattr(self, 'dependencies'):
             data['dependencies'] = self.dependencies
@@ -2248,6 +2307,12 @@ class FrozenJob(zkobject.ZKObject):
         if isinstance(val, JobData):
             return val.data
         return val
+
+    @property
+    def nodeset(self):
+        if self.nodeset_alternatives:
+            return self.nodeset_alternatives[self.nodeset_index]
+        return None
 
     @property
     def parent_data(self):
@@ -2459,12 +2524,11 @@ class Job(ConfigObject):
             d['parent'] = self.parent
         else:
             d['parent'] = tenant.default_base_job
-        if isinstance(self.nodeset, str):
-            ns = tenant.layout.nodesets.get(self.nodeset)
-        else:
-            ns = self.nodeset
-        if ns:
-            d['nodeset'] = ns.toDict()
+        alts = self.flattenNodesetAlternatives(tenant.layout)
+        if len(alts) == 1:
+            d['nodeset'] = alts[0].toDict()
+        elif len(alts) > 1:
+            d['nodeset_alternatives'] = [x.toDict() for x in alts]
         if self.ansible_version:
             d['ansible_version'] = self.ansible_version
         else:
@@ -2629,6 +2693,17 @@ class Job(ConfigObject):
                     secrets.append(secret_value)
                     playbook['secrets'][secret_key] = len(secrets) - 1
 
+    def flattenNodesetAlternatives(self, layout):
+        nodeset = self.nodeset
+        if isinstance(nodeset, str):
+            # This references an existing named nodeset in the layout.
+            ns = layout.nodesets.get(nodeset)
+            if ns is None:
+                raise Exception(f'The nodeset "{nodeset}" was not found.')
+        else:
+            ns = nodeset
+        return ns.flattenAlternatives(layout)
+
     def freezeJob(self, context, tenant, layout, item,
                   redact_secrets_and_keys):
         buildset = item.current_build_set
@@ -2640,6 +2715,9 @@ class Job(ConfigObject):
         attributes.discard('secrets')
         attributes.discard('affected_projects')
         attributes.discard('config_hash')
+        # Nodeset alternatives are flattened at this point
+        attributes.discard('nodeset_alternatives')
+        attributes.discard('nodeset_index')
         secrets = []
         for k in attributes:
             # If this is a config object, it's frozen, so it's
@@ -2663,6 +2741,8 @@ class Job(ConfigObject):
                     for pb in v:
                         self._deduplicateSecrets(context, secrets, pb)
             kw[k] = v
+        kw['nodeset_alternatives'] = self.flattenNodesetAlternatives(layout)
+        kw['nodeset_index'] = 0
         kw['secrets'] = secrets
         kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
@@ -2735,7 +2815,7 @@ class Job(ConfigObject):
         if self._get('cleanup_run') is not None:
             self.cleanup_run = self.freezePlaybooks(self.cleanup_run, layout)
 
-    def getNodeSet(self, layout):
+    def getNodeset(self, layout):
         if isinstance(self.nodeset, str):
             # This references an existing named nodeset in the layout.
             ns = layout.nodesets.get(self.nodeset)
@@ -2752,14 +2832,14 @@ class Job(ConfigObject):
         if not self.isBase() and self.parent:
             layout.getJob(self.parent)
 
-        ns = self.getNodeSet(layout)
-        if layout.tenant.max_nodes_per_job != -1 and \
-           len(ns) > layout.tenant.max_nodes_per_job:
-            raise Exception(
-                'The job "{job}" exceeds tenant '
-                'max-nodes-per-job {maxnodes}.'.format(
-                    job=self.name,
-                    maxnodes=layout.tenant.max_nodes_per_job))
+        for ns in self.flattenNodesetAlternatives(layout):
+            if layout.tenant.max_nodes_per_job != -1 and \
+               len(ns) > layout.tenant.max_nodes_per_job:
+                raise Exception(
+                    'The job "{job}" exceeds tenant '
+                    'max-nodes-per-job {maxnodes}.'.format(
+                        job=self.name,
+                        maxnodes=layout.tenant.max_nodes_per_job))
 
         for dependency in self.dependencies:
             layout.getJob(dependency.name)
@@ -2956,7 +3036,7 @@ class Job(ConfigObject):
             self.addRoles(other.roles)
 
         # Freeze the nodeset
-        self.nodeset = self.getNodeSet(layout)
+        self.nodeset = self.getNodeset(layout)
 
         # Pass secrets to parents
         secrets_for_parents = [s for s in other.secrets if s.pass_to_parent]
