@@ -332,6 +332,11 @@ of item.
       connectivity issues then previous attempts may have been cancelled,
       and this value will be greater than 1.
 
+   .. var:: ansible_version
+
+      The version of the Ansible community package release used for executing
+      the job.
+
    .. var:: project
 
       The item's project.  This is a data structure with the following
