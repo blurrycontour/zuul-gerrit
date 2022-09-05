@@ -16,6 +16,24 @@
       "message": "The toDict() method seems to be also used by the freeze-job API. Just wondering if we want to include the alternatives there.",
       "revId": "951a6d6209b67992ff204ba3a5e6a60d9cc514e1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "269a6aa2_d6952ae6",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1406,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-05T16:40:55Z",
+      "side": 1,
+      "message": "Because it\u0027s flattened when frozen, there should never be any alternatives, so it will be unused code, but it does seem like we should include it for correctness.  I\u0027ll add that in the next PS.",
+      "parentUuid": "2071aa18_5f5ca6b1",
+      "revId": "951a6d6209b67992ff204ba3a5e6a60d9cc514e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
