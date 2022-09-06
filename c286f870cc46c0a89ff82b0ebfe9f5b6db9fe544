@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecfd9471_aaaeaa3b",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-06T22:19:45Z",
+      "side": 1,
+      "message": "-1ish: It might be worth putting a comment here indicating that this is only used for testing.  The whole \"we don\u0027t stream on localhost\" is already a bit counter-intuitive.",
+      "revId": "c286f870cc46c0a89ff82b0ebfe9f5b6db9fe544",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29d6b6e1_32021b8f",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-06T22:19:45Z",
+      "side": 1,
+      "message": "Just an aside: this does make me uncomfortable because a big part of why we created this job in the first place was that our test environment wasn\u0027t mirroring the real environment, and now we\u0027re poking a (small) hole in that.  I can\u0027t think of a better way right now though....\n\nMaybe we could run the docker container on a second node?  I know it\u0027s a little more ansible to set up... but probably not much more than what we have now.",
+      "revId": "c286f870cc46c0a89ff82b0ebfe9f5b6db9fe544",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
