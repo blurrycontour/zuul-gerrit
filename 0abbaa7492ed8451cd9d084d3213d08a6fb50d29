@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bf4f8f7_9aea65dd",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1407,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-06T07:00:34Z",
+      "side": 1,
+      "message": "`self.alternatives` is a list and not a dict",
+      "revId": "0abbaa7492ed8451cd9d084d3213d08a6fb50d29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
