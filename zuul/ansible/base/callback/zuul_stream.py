@@ -47,9 +47,17 @@ from zuul.ansible import paths
 
 from zuul.ansible import logconfig
 
-LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
 LOG_STREAM_VERSION = 0
-#
+
+# These are intended to be only used for testing:
+# - the port so we can run another instance that doesn't conflict with
+#   one setup by the test environment
+# - We don't stream from localhost because that is the executor which
+#   isn't running a console daemon.  LOG_STREAM_LOCALHOST overrides
+#   this in testing, since in combination with LOG_STREAM_PORT, we can
+#   be talking to a test console listening on a custom port on the
+#   testing node locally.
+LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
 LOG_STREAM_LOCALHOST = int(os.environ.get("ZUUL_CONSOLE_STREAM_LOCALHOST", 0))
 
 
