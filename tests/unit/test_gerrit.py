@@ -359,6 +359,25 @@ class TestGerritWeb(ZuulTestCase):
                  changes="1,1 2,1 3,1"),
         ], ordered=False)
 
+    def test_submit_failure(self):
+        # Test that we log the reason for a submit failure (403 error)
+        self.fake_gerrit._fake_submit_permission = False
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A")
+        A.addApproval('Code-Review', 2)
+        with self.assertLogs('zuul.test.FakeGerritConnection', level='INFO'
+                             ) as full_logs:
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            self.waitUntilSettled()
+            self.log.debug("Full logs:")
+            for x in full_logs.output:
+                self.log.debug(x)
+            self.assertRegexInList(
+                r'Error submitting data to gerrit on attempt 3: '
+                'Received response 403: submit not permitted',
+                full_logs.output)
+
+        self.assertEqual(A.data['status'], 'NEW')
+
 
 class TestFileComments(AnsibleZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'

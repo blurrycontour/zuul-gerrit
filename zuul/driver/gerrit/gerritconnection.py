@@ -589,6 +589,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     _poller_class = GerritPoller
     _ref_watcher_class = GitWatcher
     ref_watcher_poll_interval = 60
+    submit_retry_backoff = 10
 
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
@@ -753,7 +754,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if r.status_code == 400:
             raise HTTPBadRequestException('Received response 400: %s' % r.text)
         elif r.status_code != 200:
-            raise Exception("Received response %s" % (r.status_code,))
+            raise Exception("Received response %s: %s" % (
+                r.status_code, r.text))
         ret = None
         if r.text and len(r.text) > 4:
             try:
@@ -1315,10 +1317,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     log.exception(
                         "Bad request submitting check data to gerrit.")
                     break
-                except Exception:
-                    log.exception("Error submitting check data to gerrit, "
-                                  "attempt %s", x)
-                    time.sleep(x * 10)
+                except Exception as e:
+                    log.exception("Error submitting check data to gerrit on "
+                                  "attempt %s: %s", x, e)
+                    time.sleep(x * self.submit_retry_backoff)
 
     def review_http(self, item, message, submit, labels,
                     checks_api, file_comments, phase1, phase2,
@@ -1375,10 +1377,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                         log.exception(
                             "Bad request submitting check data to gerrit.")
                         break
-                    except Exception:
+                    except Exception as e:
                         log.exception(
-                            "Error submitting data to gerrit, attempt %s", x)
-                        time.sleep(x * 10)
+                            "Error submitting data to gerrit "
+                            "on attempt %s: %s",
+                            x, e)
+                        time.sleep(x * self.submit_retry_backoff)
         if phase2 and change.is_current_patchset and submit:
             for x in range(1, 4):
                 try:
@@ -1392,10 +1396,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     log.exception(
                         "Bad request submitting check data to gerrit.")
                     break
-                except Exception:
+                except Exception as e:
                     log.exception(
-                        "Error submitting data to gerrit, attempt %s", x)
-                    time.sleep(x * 10)
+                        "Error submitting data to gerrit on attempt %s: %s",
+                        x, e)
+                    time.sleep(x * self.submit_retry_backoff)
 
     def queryChangeSSH(self, number, event=None):
         args = '--all-approvals --comments --commit-message'
