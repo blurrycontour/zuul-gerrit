@@ -49,16 +49,10 @@ from zuul.ansible import logconfig
 
 LOG_STREAM_VERSION = 0
 
-# These are intended to be only used for testing:
-# - the port so we can run another instance that doesn't conflict with
-#   one setup by the test environment
-# - We don't stream from localhost because that is the executor which
-#   isn't running a console daemon.  LOG_STREAM_LOCALHOST overrides
-#   this in testing, since in combination with LOG_STREAM_PORT, we can
-#   be talking to a test console listening on a custom port on the
-#   testing node locally.
+# This is intended to be only used for testing where we change the
+# port so we can run another instance that doesn't conflict with one
+# setup by the test environment
 LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
-LOG_STREAM_LOCALHOST = int(os.environ.get("ZUUL_CONSOLE_STREAM_LOCALHOST", 0))
 
 
 def zuul_filter_result(result):
@@ -329,15 +323,13 @@ class CallbackModule(default.CallbackModule):
             hosts = self._get_task_hosts(task)
             for host, inventory_hostname in hosts:
                 port = LOG_STREAM_PORT
-                if (host in ('localhost', '127.0.0.1') and
-                    not LOG_STREAM_LOCALHOST):
+                if (host in ('localhost', '127.0.0.1')):
                     # Don't try to stream from localhost
                     continue
                 ip = play_vars[host].get(
                     'ansible_host', play_vars[host].get(
                         'ansible_inventory_host'))
-                if (ip in ('localhost', '127.0.0.1') and
-                    not LOG_STREAM_LOCALHOST):
+                if (ip in ('localhost', '127.0.0.1')):
                     # Don't try to stream from localhost
                     continue
                 if play_vars[host].get('ansible_connection') in ('winrm',):
