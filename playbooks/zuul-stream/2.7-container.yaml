@@ -18,4 +18,4 @@
 - name: Accept host keys
   shell: |
     ssh-keyscan -p 2022 localhost >> ~/.ssh/known_hosts
-    ssh-keyscan -p 2022 127.0.0.1 >> ~/.ssh/known_hosts
+    ssh-keyscan -p 2022 127.0.0.2 >> ~/.ssh/known_hosts

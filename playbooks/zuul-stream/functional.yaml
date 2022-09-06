@@ -19,7 +19,6 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         PYTHONPATH: "{{ python_path }}"
-        ZUUL_CONSOLE_STREAM_LOCALHOST: 1
       register: _success_output
 
     - name: Save raw output to file
