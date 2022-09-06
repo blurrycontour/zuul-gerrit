@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "46ec7ae6_cab9ce38",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-06T22:54:19Z",
+      "side": 1,
+      "message": "Sorry, I think that # indicates I meant to write something.  I\u0027ve expanded this with I75a81093283b1dfc3104f171249ed8903c79e62e",
+      "parentUuid": "ecfd9471_aaaeaa3b",
+      "revId": "c286f870cc46c0a89ff82b0ebfe9f5b6db9fe544",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "29d6b6e1_32021b8f",
         "filename": "zuul/ansible/base/callback/zuul_stream.py",
         "patchSetId": 32
@@ -31,6 +49,24 @@
       "writtenOn": "2022-09-06T22:19:45Z",
       "side": 1,
       "message": "Just an aside: this does make me uncomfortable because a big part of why we created this job in the first place was that our test environment wasn\u0027t mirroring the real environment, and now we\u0027re poking a (small) hole in that.  I can\u0027t think of a better way right now though....\n\nMaybe we could run the docker container on a second node?  I know it\u0027s a little more ansible to set up... but probably not much more than what we have now.",
+      "revId": "c286f870cc46c0a89ff82b0ebfe9f5b6db9fe544",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08d06445_d85d0daa",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-06T22:54:19Z",
+      "side": 1,
+      "message": "It took me quite a while to get this far (see 32 changesets 😊) so I\u0027m hesitant to add another layer of complexity to it here.  Hopefully the comment added with above helps with some of this.\n\nI do think it might be better to have this test running against separate individual containers from 2.7 -\u003e 3.\u003cX\u003e to individually and explicitly test each supported target python version.  Perhaps as part of that we could have them in a separate docker network?  Then they would all appear in 172.X?",
+      "parentUuid": "29d6b6e1_32021b8f",
       "revId": "c286f870cc46c0a89ff82b0ebfe9f5b6db9fe544",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
