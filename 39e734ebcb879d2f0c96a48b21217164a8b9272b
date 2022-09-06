@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4416c00_5c276c93",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-06T01:28:28Z",
+      "side": 1,
+      "message": "This LGTM from inspection, but I couldn\u0027t find any opendev jobs that seem to return anything but a string url",
+      "revId": "39e734ebcb879d2f0c96a48b21217164a8b9272b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
