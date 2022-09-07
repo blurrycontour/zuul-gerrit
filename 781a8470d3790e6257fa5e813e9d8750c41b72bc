@@ -88,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e71b08b9_004c167c",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "I think this comment is sufficient. I just wanted to make sure it was on your radar before we committed to something that may have been clunky from a manual management perspective.",
+      "parentUuid": "6074d05b_29bc34ca",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29bdf149_f1f70924",
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "Yeah, I think this actually adds flexibility.  To continue the opendev example, we don\u0027t have to use our existing log storage locations, we can set up new locations with different retention periods (and we may prefer to use a subset of the places we use for log storage).",
       "parentUuid": "29bdf149_f1f70924",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e2d63ea_918c0e0e",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "acdcd474_a1eeafae",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -158,6 +194,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7a82f54_490cb96f",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Good point, and definitely something that OpenDev should plan to do to avoid this problem.",
+      "parentUuid": "6105e627_4f2400fb",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b0f6595_d1ab4870",
@@ -193,6 +247,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2871534f_819de160",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "48f32f0a_9a73e567",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ec900ed_be08da0d",
@@ -224,6 +296,24 @@
       "side": 1,
       "message": "Yes, I envision that it would delete its local copy as soon as it has performed all the uploads that it can.",
       "parentUuid": "1ec900ed_be08da0d",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d314a8ae_3f9a727b",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6d7c8491_eedd2f8a",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -265,6 +355,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "df573a9c_ddb97d71",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "The problem is that making images that boot in the various clouds is actually quite difficult. We also have to think about uploaded image quotas. I\u0027m concerned that allowing this broadly will produce two problems:\n\n 1) Users thinking clouds don\u0027t work because they don\u0027t understand how to configure networking on boot. Or otherwise making assumptions like everything is kvm (when xen is possible).\n 2) Users adding images that they never remove when they are no longer needed. OpenDev has a difficult enough time pruning images already and I know people will leave the 10 year old ubuntu image around even though it shouldn\u0027t be used and likely isn\u0027t used. This will impact the clouds negatively through unnecessary resource consumption.\n \nI like the idea of making this configurable and then we can think about this on a tenant by tenant basis at least.",
+      "parentUuid": "b7ad0e9b_a8af89a1",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cdec6b3e_0be03209",
         "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
         "patchSetId": 8
@@ -294,6 +402,24 @@
       "side": 1,
       "message": "That might be possible in some environments; if it\u0027s supported universally, that sounds like it would be a good implementation.",
       "parentUuid": "cdec6b3e_0be03209",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd196b76_0a4193f1",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8f442f23_5e4e4369",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -333,6 +459,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdc08672_962805b5",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "I mostly wanted to call that out as addressing the confusion users have when they see jobs start ahead of theirs for the same node type would be nice. If we are going to address that this seems like a good opportunity for it.\n\nThat said I agree it is a relatively minor thing and something that we can educate users about rather than building more complexity into the tool. I\u0027m good with keeping the old node request assignment behavior instead.",
+      "parentUuid": "f67209df_b942db6c",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0e5cbc1_598f868b",
@@ -368,6 +512,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "202d413b_8f9f9aab",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "52b66f62_51656262",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68bb41fb_82b1534c",
@@ -399,6 +561,24 @@
       "side": 1,
       "message": "Yes, I think it\u0027s pretty mechanical -- I think it would look sort of like zuul\u0027s existing connections with the necessary fields from nodepool mapped in.  So zuul.conf would look like:\n```\n[connection rackspace]\ndriver\u003dopenstack\ncloud\u003drax\n```",
       "parentUuid": "68bb41fb_82b1534c",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1eb25155_75949d45",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7f123cd3_c41f8e2f",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -505,6 +685,24 @@
       "side": 1,
       "message": "That\u0027s the way I\u0027m leaning too.",
       "parentUuid": "f4d3ec9e_f1f06bfa",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "911b6b44_cc8072c8",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T16:55:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d3d78a4e_92bce4b4",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
