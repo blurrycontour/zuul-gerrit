@@ -11,6 +11,11 @@
         index: zuul-index
         index-vars: true
         index-returned-vars: true
+      elasticsearch-datastream:
+        index: zuul-datastream
+        create-index: false
+        index-vars: true
+        index-returned-vars: true
 
 - secret:
     name: test_secret
