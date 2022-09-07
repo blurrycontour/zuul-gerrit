@@ -30,6 +30,7 @@ class MQTTReporter(BaseReporter):
     def report(self, item, phase1=True, phase2=True):
         if not phase1:
             return
+        include_returned_data = self.config.get('include-returned-data')
         log = get_annotated_logger(self.log, item.event)
         log.debug("Report change %s, params %s", item.change, self.config)
         message = {
@@ -80,6 +81,10 @@ class MQTTReporter(BaseReporter):
                     'artifacts': get_artifacts_from_result_data(
                         build.result_data, logger=log)
                 })
+                if include_returned_data:
+                    rdata = build.result_data.copy()
+                    rdata.pop('zuul', None)
+                    job_informations['returned_data'] = rdata
 
                 # Report build data of retried builds if available
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
@@ -144,4 +149,8 @@ def qosValue(value):
 
 
 def getSchema():
-    return v.Schema({v.Required('topic'): topicValue, 'qos': qosValue})
+    return v.Schema({
+        v.Required('topic'): topicValue,
+        'qos': qosValue,
+        'include-returned-data': bool,
+    })
