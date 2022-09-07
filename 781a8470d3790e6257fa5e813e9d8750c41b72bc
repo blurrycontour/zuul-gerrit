@@ -654,6 +654,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5769934f_0773cdd2",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-07T17:02:14Z",
+      "side": 1,
+      "message": "ok, thanks! Missed that bit about top-level overrides.",
+      "parentUuid": "2ca50b47_2b9130da",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4d3ec9e_f1f06bfa",
