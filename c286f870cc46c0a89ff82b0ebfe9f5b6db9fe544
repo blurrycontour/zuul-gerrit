@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "33b695e2_410f7549",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 32
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-07T00:45:51Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "c286f870cc46c0a89ff82b0ebfe9f5b6db9fe544",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ecfd9471_aaaeaa3b",
         "filename": "zuul/ansible/base/callback/zuul_stream.py",
         "patchSetId": 32
