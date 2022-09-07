@@ -34,6 +34,7 @@ import project from './project'
 import pipelines from './pipelines'
 import projects from './projects'
 import preferences from './preferences'
+import semaphores from './semaphores'
 import status from './status'
 import tenant from './tenant'
 import tenants from './tenants'
@@ -60,6 +61,7 @@ const reducers = {
   pipelines,
   project,
   projects,
+  semaphores,
   status,
   tenant,
   tenants,
