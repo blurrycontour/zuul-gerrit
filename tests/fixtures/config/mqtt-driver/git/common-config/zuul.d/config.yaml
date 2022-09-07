@@ -7,11 +7,15 @@
     start:
       mqtt:
         topic: "{tenant}/zuul_start/{pipeline}/{project}/{branch}"
+        # This doesn't make sense here -- there should be no return
+        # data yet, which is why we include it in this test.
+        include-returned-data: True
     success:
       gerrit:
         Verified: 1
       mqtt:
         topic: "{tenant}/zuul_buildset/{pipeline}/{project}/{branch}"
+        include-returned-data: True
     failure:
       gerrit:
         Verified: -1

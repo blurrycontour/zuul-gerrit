@@ -681,9 +681,13 @@ class TestMQTTConnection(ZuulTestCase):
                         'type': 'container_image'
                     }}
         self.executor_server.returnData(
-            "test", A, {"zuul": {"log_url": "some-log-url",
-                                 'artifacts': [artifact],
-                                 }}
+            "test", A, {
+                "zuul": {
+                    "log_url": "some-log-url",
+                    'artifacts': [artifact],
+                },
+                'foo': 'bar',
+            }
         )
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -720,6 +724,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertEquals(test_job['dependencies'], [])
         self.assertEquals(test_job['artifacts'], [artifact])
         self.assertEquals(test_job['log_url'], 'some-log-url/')
+        self.assertEquals(test_job['returned_data'], {'foo': 'bar'})
         build_id = test_job["uuid"]
         self.assertEquals(
             test_job["web_url"],

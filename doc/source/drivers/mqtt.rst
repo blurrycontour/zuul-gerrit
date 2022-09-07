@@ -316,3 +316,9 @@ reporter. Each pipeline must provide a topic name. For example:
 
       The quality of service level to use, it can be 0, 1 or 2. Read more in this
       `guide <https://www.hivemq.com/blog/mqtt-essentials-part-6-mqtt-quality-of-service-levels>`_
+
+   .. attr:: include-returned-data
+      :default: false
+
+      If set to ``true``, Zuul will include any data returned from the
+      job via :ref:`return_values`.
