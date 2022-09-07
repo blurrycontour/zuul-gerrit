@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fe013ef_8394a185",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-09-07T18:28:40Z",
+      "side": 1,
+      "message": "Perhaps the most used method should be named `startSpan`/`endSpan`. The current `startSpan` could be renamed `startRawSpan` or something else. That way the instrumentation code is a bit shorter.",
+      "revId": "32bb41b850770b68096604da601eb5074a83bb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
