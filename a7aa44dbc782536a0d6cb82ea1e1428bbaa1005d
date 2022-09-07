@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d791dd3_6e480599",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1370,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-07T19:58:51Z",
+      "side": 1,
+      "message": "For spans like this which start and end on the same host without a context switch, we can use the regular context manager.\n\nAlso, this span should be a child span of the build span, so we should restore the build span, then use the context manager under it.  I think I had a unit test in a parent change that illustrated the process.",
+      "revId": "a7aa44dbc782536a0d6cb82ea1e1428bbaa1005d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
