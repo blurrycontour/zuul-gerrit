@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "d2d13cd76eb9b5c2d3a4daa5b7c6aab3e981a709",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09f11e66_85cb67cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-09-07T18:29:19Z",
+      "side": 1,
+      "message": "recheck for test_periodic_freeze_job_failure (should be fixed by https://review.opendev.org/c/zuul/zuul/+/856307)",
+      "revId": "d2d13cd76eb9b5c2d3a4daa5b7c6aab3e981a709",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
