@@ -80,7 +80,7 @@
         - { node: 'node1', filename: 'job-output-success-19885.txt' }
         - { node: 'node2', filename: 'job-output-success-19885.txt' }
         # node3 only listen on 19887
-        - { node: 'node3', filename: 'job-output-success-19887.txt' }
+        - { node: 'node27', filename: 'job-output-success-19887.txt' }
 
     # failure case
 
@@ -105,10 +105,10 @@
       shell: |
         egrep "^.+\| node1 \| Exception: Test module failure exception fail-task" job-output-failure.txt
         egrep "^.+\| node2 \| Exception: Test module failure exception fail-task" job-output-failure.txt
-        egrep "^.+\| node3 \| Exception: Test module failure exception fail-task" job-output-failure.txt
+        egrep "^.+\| node27 \| Exception: Test module failure exception fail-task" job-output-failure.txt
 
     - name: Validate output - failure item loop with exception
       shell: |
         egrep "^.+\| node1 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
         egrep "^.+\| node2 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
-        egrep "^.+\| node3 \| Exception: Test module failure exception fail-loop" job-output-failure.txt
+        egrep "^.+\| node27 \| Exception: Test module failure exception fail-loop" job-output-failure.txt

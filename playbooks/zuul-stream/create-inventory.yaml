@@ -19,14 +19,22 @@
         children:
           node:
             hosts:
-              node3: null
+              node27: null
+              node311: null
         hosts:
-          node3:
+          node27:
             ansible_connection: ssh
             ansible_host: 127.0.0.2
             ansible_port: 2022
             ansible_user: root
             ansible_python_interpreter: /usr/local/bin/python2.7
+          node311:
+            ansible_connection: ssh
+            ansible_host: 127.0.0.3
+            ansible_port: 2023
+            ansible_user: root
+            ansible_python_interpreter: /usr/local/bin/python3.11
+
 
 - name: Merge all facts
   set_fact:

@@ -9,8 +9,28 @@
 
   post_tasks:
 
+    - name: Install docker
+      include_role:
+        name: ensure-docker
+
     - name: Setup 2.7 container environment
-      include_tasks: 2.7-container.yaml
+      include_tasks: container.yaml
+      args:
+        container_version: 'py27'
+        container_tag: 'zuul_python27'
+        container_ssh_port: '2022'
+        container_console_port: '19887'
+        container_ssh_port: '2022'
+        container_loopback_address: '127.0.0.2'
+
+    - name: Setup 3.11 container environment
+      include_tasks: container.yaml
+      args:
+        container_version: 'py311'
+        container_tag: 'zuul_python311'
+        container_ssh_port: '2023'
+        container_console_port: '19888'
+        container_loopback_address: '127.0.0.3'
 
     - name: Setup inventory
       include_tasks: create-inventory.yaml

@@ -1,0 +1,16 @@
+- name: 'Build {{ container_version }} container environment
+  shell: |
+    pushd {{ ansible_user_dir }}/src/opendev.org/zuul/zuul/playbooks/zuul-stream/fixtures/
+    cat ~/.ssh/id_rsa.pub > authorized_keys
+    docker build -f Dockerfile.{{ container_version }} -t {{ container_tag }} .
+  args:
+    executable: /bin/bash
+
+- name: Run 2.7 container
+  shell: |
+    docker run -d -p {{ container_ssh_port }}:22 -p {{ container_console_port }}:{{ container_console_port }} {{ container_tag }}
+    docker ps
+
+- name: Accept host keys
+  shell: |
+    ssh-keyscan -p {{ container_ssh_port }} {{ container_loopback_address }} >> ~/.ssh/known_hosts
