@@ -28,6 +28,7 @@ class ElasticsearchReporter(BaseReporter):
     def __init__(self, driver, connection, config):
         super(ElasticsearchReporter, self).__init__(driver, connection, config)
         self.index = self.config.get('index', 'zuul')
+        self.create_index = self.config.get('create-index', True)
         self.index_vars = self.config.get('index-vars')
         self.index_returned_vars = self.config.get('index-returned-vars')
 
@@ -36,8 +37,13 @@ class ElasticsearchReporter(BaseReporter):
         if not phase1:
             return
         docs = []
-        index = '%s.%s-%s' % (self.index, item.pipeline.tenant.name,
-                              time.strftime("%Y.%m.%d"))
+
+        if self.create_index:
+            index = '%s.%s-%s' % (self.index, item.pipeline.tenant.name,
+                                  time.strftime("%Y.%m.%d"))
+        else:
+            index = self.index
+
         changes = [
             {
                 "project": change.project.name,
@@ -51,6 +57,7 @@ class ElasticsearchReporter(BaseReporter):
             }
             for change in item.changes
         ]
+
         buildset_doc = {
             "uuid": item.current_build_set.uuid,
             "build_type": "buildset",
@@ -138,7 +145,7 @@ class ElasticsearchReporter(BaseReporter):
             docs.append(build_doc)
 
         docs.append(buildset_doc)
-        self.connection.add_docs(docs, index)
+        self.connection.add_docs(docs, index, self.create_index)
 
 
 def getSchema():
@@ -147,6 +154,7 @@ def getSchema():
             None,
             {
                 'index': str,
+                'create-index': bool,
                 'index-vars': bool,
                 'index-returned-vars': bool
             }

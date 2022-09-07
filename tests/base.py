@@ -493,9 +493,10 @@ class FakeElasticsearchConnection(elconnection.ElasticsearchConnection):
         self.connection_name = connection_name
         self.source_it = None
 
-    def add_docs(self, source_it, index):
+    def add_docs(self, source_it, index, create_index):
         self.source_it = source_it
         self.index = index
+        self.create_index = create_index
 
 
 class BuildHistory(object):

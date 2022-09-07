@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Elasticsearch reporter's automatic index creation can now be disabled
+    by setting :attr:`pipeline.<reporter>.<elasticsearch source>.create-index` to `false`.
+    This allows to use datastreams or rollover aliases.

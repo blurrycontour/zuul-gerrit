@@ -926,6 +926,22 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
         self.assertIsInstance(doc_gen, types.GeneratorType)
         self.assertTrue('@timestamp' in list(doc_gen)[0]['_source'])
 
+    def test_elastic_reporter_disabled_index_creation(self):
+        "Test the Elasticsearch reporter with index creation disabled"
+        # Add a success result
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        indexed_docs = self.scheds.first.connections.connections[
+            'elasticsearch-datastream'].source_it
+        index = self.scheds.first.connections.connections[
+            'elasticsearch-datastream'].index
+
+        self.assertEqual(len(indexed_docs), 2)
+        # Ensure that the index isn't suffixed with the tenant and date
+        self.assertEqual(index, ('zuul-datastream'))
+
     def test_elasticsearch_secret_leak(self):
         expected_secret = [{
             'test_secret': {

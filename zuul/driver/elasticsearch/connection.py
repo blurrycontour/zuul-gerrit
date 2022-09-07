@@ -113,13 +113,14 @@ class ElasticsearchConnection(BaseConnection):
             source['@timestamp'] = datetime.utcfromtimestamp(
                 int(source['start_time'])).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             d['_index'] = index
-            d['_op_type'] = 'index'
+            d['_op_type'] = 'create'
             d['_source'] = source
             yield d
 
-    def add_docs(self, source_it, index):
+    def add_docs(self, source_it, index, create_index):
 
-        self.setIndex(index)
+        if create_index:
+            self.setIndex(index)
 
         try:
             bulk(self.es, self.gen(source_it, index))
