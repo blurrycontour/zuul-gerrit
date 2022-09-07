@@ -659,6 +659,13 @@ class PipelineState(zkobject.ZKObject):
         safe_pipeline = urllib.parse.quote_plus(pipeline.name)
         return f"/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}"
 
+    @classmethod
+    def parsePath(self, path):
+        """Return path components for use by the REST API"""
+        root, safe_tenant, pipeline, safe_pipeline = path.rsplit('/', 3)
+        return (urllib.parse.unquote_plus(safe_tenant),
+                urllib.parse.unquote_plus(safe_pipeline))
+
     def _dirtyPath(self):
         return f'{self.getPath()}/dirty'
 
@@ -3871,6 +3878,13 @@ class BuildSet(zkobject.ZKObject):
     def getPath(self):
         return f"{self.item.getPath()}/buildset/{self.uuid}"
 
+    @classmethod
+    def parsePath(self, path):
+        """Return path components for use by the REST API"""
+        item_path, bs, uuid = path.rsplit('/', 2)
+        tenant, pipeline, item_uuid = QueueItem.parsePath(item_path)
+        return (tenant, pipeline, item_uuid, uuid)
+
     def serialize(self, context):
         data = {
             # "item": self.item,
@@ -4284,6 +4298,13 @@ class QueueItem(zkobject.ZKObject):
     @classmethod
     def itemPath(cls, pipeline_path, item_uuid):
         return f"{pipeline_path}/item/{item_uuid}"
+
+    @classmethod
+    def parsePath(self, path):
+        """Return path components for use by the REST API"""
+        pipeline_path, item, uuid = path.rsplit('/', 2)
+        tenant, pipeline = PipelineState.parsePath(pipeline_path)
+        return (tenant, pipeline, uuid)
 
     def serialize(self, context):
         if isinstance(self.event, TriggerEvent):
