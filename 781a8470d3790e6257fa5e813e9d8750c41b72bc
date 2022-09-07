@@ -389,6 +389,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8e2aac4_5757dabd",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-07T17:18:08Z",
+      "side": 1,
+      "message": "Per matrix it sounds like we are all on baord with making this configurable. I don\u0027t think that needs a full respin as we appear to be in agreement.",
+      "parentUuid": "df573a9c_ddb97d71",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdec6b3e_0be03209",
