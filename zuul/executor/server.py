@@ -1274,6 +1274,7 @@ class AnsibleJob(object):
         self.executor_server.completeBuild(self.build_request, result)
 
     def _execute(self):
+        tr = self.executor_server.tracing
         args = self.arguments
         self.log.info(
             "Beginning job %s for ref %s (change %s)" % (
@@ -1371,13 +1372,15 @@ class AnsibleJob(object):
             scheme=self.scheme)
         repos = {}
         for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(
-                project['connection'],
-                project['name'],
-                process_worker=self.executor_server.process_worker)
-            repos[project['canonical_name']] = repo
+            with tr.tracer.start_span('GetRepo') as get_repo_span:
+                get_repo_span.set_attribute("project", project)
+                self.log.debug("Cloning %s/%s" % (project['connection'],
+                                                  project['name'],))
+                repo = merger.getRepo(
+                    project['connection'],
+                    project['name'],
+                    process_worker=self.executor_server.process_worker)
+                repos[project['canonical_name']] = repo
 
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
@@ -1387,12 +1390,14 @@ class AnsibleJob(object):
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
-            item_commit = self.doMergeChanges(
-                merger, merge_items, self.repo_state, restored_repos)
-            if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
-                return
+            with tr.tracer.start_span('MergeChanges') as merge_changes_span:
+                merge_changes_span.set_attribute("merge_items", merge_items)
+                item_commit = self.doMergeChanges(
+                    merger, merge_items, self.repo_state, restored_repos)
+                if item_commit is None:
+                    # There was a merge conflict and we have already sent
+                    # a work complete result, don't run any jobs
+                    return
 
         # Early abort if abort requested
         if self.aborted:
