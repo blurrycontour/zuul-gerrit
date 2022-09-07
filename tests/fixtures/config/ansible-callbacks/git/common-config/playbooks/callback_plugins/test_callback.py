@@ -15,17 +15,20 @@ DOCUMENTATION = '''
 
 
 class CallbackModule(CallbackBase):
-    CALLBACK_VERSION = 1.0
+    """
+    test callback
+    """
+    CALLBACK_VERSION = 2.0
     CALLBACK_NEEDS_WHITELIST = True
+    # aggregate means we can be loaded and not be the stdout plugin
+    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_NAME = 'test_callback'
 
     def __init__(self):
         super(CallbackModule, self).__init__()
 
-    def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys,
-                                                var_options=var_options,
-                                                direct=direct)
-
+    def set_options(self, *args, **kw):
+        super(CallbackModule, self).set_options(*args, **kw)
         self.file_name = self.get_option('file_name')
 
     def v2_on_any(self, *args, **kwargs):
