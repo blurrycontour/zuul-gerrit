@@ -45,6 +45,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.statsd import get_statsd
+from zuul.lib.tracing import Tracing
 from zuul.lib import filecomments
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.varnames import check_varnames
@@ -1363,6 +1364,10 @@ class AnsibleJob(object):
             scheme=self.scheme)
         repos = {}
         for project in args['projects']:
+            span_info = self.executor_server.tracing.startSavedSpan(
+                'ExecutorGetRepo',
+                attributes=dict(connection=project['connection'],
+                                project=project['name']))
             self.log.debug("Cloning %s/%s" % (project['connection'],
                                               project['name'],))
             repo = merger.getRepo(
@@ -1370,6 +1375,7 @@ class AnsibleJob(object):
                 project['name'],
                 process_worker=self.executor_server.process_worker)
             repos[project['canonical_name']] = repo
+            self.executor_server.tracing.endSavedSpan(span_info)
 
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
@@ -1379,8 +1385,12 @@ class AnsibleJob(object):
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
+            span_info = self.executor_server.tracing.startSavedSpan(
+                'ExecutorMergeChanges',
+                attributes=dict(merge_items=merge_items))
             item_commit = self.doMergeChanges(
                 merger, merge_items, self.repo_state, restored_repos)
+            self.executor_server.tracing.endSavedSpan(span_info)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -3126,6 +3136,7 @@ class ExecutorServer(BaseMergeServer):
         self.monitoring_server = MonitoringServer(self.config, 'executor',
                                                   self.component_info)
         self.monitoring_server.start()
+        self.tracing = Tracing(self.config)
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -3419,6 +3430,7 @@ class ExecutorServer(BaseMergeServer):
         super().stop()
         self.stopRepl()
         self.monitoring_server.stop()
+        self.tracing.stop()
         self.log.debug("Stopped")
 
     def join(self):
