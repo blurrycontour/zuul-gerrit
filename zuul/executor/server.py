@@ -45,6 +45,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.statsd import get_statsd
+from zuul.lib.tracing import Tracing
 from zuul.lib import filecomments
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.varnames import check_varnames
@@ -1099,6 +1100,15 @@ class AnsibleJob(object):
             self.thread.join()
 
     def execute(self):
+        tr = self.executor_server.tracing
+        build_span = tr.restoreSpan(self.arguments.get("span_info", None))
+        with tr.useSpan(build_span):
+            with tr.tracer.start_span('executor') as executor_span:
+                executor_span.set_attribute(
+                    'hostname', self.executor_server.hostname)
+                self.do_execute()
+
+    def do_execute(self):
         try:
             self.time_starting_build = time.monotonic()
 
@@ -1266,6 +1276,7 @@ class AnsibleJob(object):
         self.executor_server.completeBuild(self.build_request, result)
 
     def _execute(self):
+        tr = self.executor_server.tracing
         args = self.arguments
         self.log.info(
             "Beginning job %s for ref %s (change %s)" % (
@@ -1363,13 +1374,15 @@ class AnsibleJob(object):
             scheme=self.scheme)
         repos = {}
         for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(
-                project['connection'],
-                project['name'],
-                process_worker=self.executor_server.process_worker)
-            repos[project['canonical_name']] = repo
+            with tr.tracer.start_span('GetRepo') as get_repo_span:
+                get_repo_span.set_attribute("project", project)
+                self.log.debug("Cloning %s/%s" % (project['connection'],
+                                                  project['name'],))
+                repo = merger.getRepo(
+                    project['connection'],
+                    project['name'],
+                    process_worker=self.executor_server.process_worker)
+                repos[project['canonical_name']] = repo
 
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
@@ -1379,12 +1392,14 @@ class AnsibleJob(object):
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
-            item_commit = self.doMergeChanges(
-                merger, merge_items, self.repo_state, restored_repos)
-            if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
-                return
+            with tr.tracer.start_span('MergeChanges') as merge_changes_span:
+                merge_changes_span.set_attribute("merge_items", merge_items)
+                item_commit = self.doMergeChanges(
+                    merger, merge_items, self.repo_state, restored_repos)
+                if item_commit is None:
+                    # There was a merge conflict and we have already sent
+                    # a work complete result, don't run any jobs
+                    return
 
         # Early abort if abort requested
         if self.aborted:
@@ -3126,6 +3141,7 @@ class ExecutorServer(BaseMergeServer):
         self.monitoring_server = MonitoringServer(self.config, 'executor',
                                                   self.component_info)
         self.monitoring_server.start()
+        self.tracing = Tracing(self.config)
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -3419,6 +3435,7 @@ class ExecutorServer(BaseMergeServer):
         super().stop()
         self.stopRepl()
         self.monitoring_server.stop()
+        self.tracing.stop()
         self.log.debug("Stopped")
 
     def join(self):
