@@ -5372,6 +5372,17 @@ For CI problems and help debugging, contact ci@example.org"""
                     'database'].getBuildsets())
             if buildsets:
                 break
+        # Stop queuing timer triggered jobs so that the assertions
+        # below don't race against more jobs being queued.
+        self.commitConfigUpdate('org/common-config', 'layouts/no-timer.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        # If APScheduler is in mid-event when we remove the job, we
+        # can end up with one more event firing, so give it an extra
+        # second to settle.
+        time.sleep(3)
+        self.waitUntilSettled()
+
         self.assertEqual(buildsets[0].result, 'CONFIG_ERROR')
         self.assertIn('Job project-test2 depends on project-test1 '
                       'which was not run', buildsets[0].message)
