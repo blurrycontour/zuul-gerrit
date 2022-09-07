@@ -116,14 +116,20 @@ The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
       :default: zuul
 
       The Elasticsearch index to be used to index the data. To prevent
-      any name collisions between Zuul tenants, the tenant name is used as index
-      name prefix. The real index name will be:
+      any name collisions between Zuul tenants, unless `create-index` is set to `false`,
+      the tenant name is used as index name suffix. The real index name will be:
 
       .. code-block::
 
          <index-name>.<tenant-name>-<YYYY>.<MM>.<DD>
 
-      The index will be created if it does not exist.
+   .. attr:: create-index
+      :default: true
+
+      Boolean value that determines if the reporter should create an index if
+      it does not exist.
+      If set to `false`, the raw value of `index` will be used, without any suffix.
+      Use this option when using a datastream or a rollover alias.
 
    .. attr:: index-vars
       :default: false
