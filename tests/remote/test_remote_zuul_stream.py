@@ -100,13 +100,19 @@ class FunctionalZuulStreamMixIn:
         with open(path) as f:
             return f.read()
 
-    def assertLogLine(self, line, log):
-        pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| %s$'
-                   % line)
+    def _assertLogLine(self, line, log, full_match=True):
+        pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| %s%s'
+                   % (line, '$' if full_match else ''))
         log_re = re.compile(pattern, re.MULTILINE)
         m = log_re.search(log)
         if m is None:
             raise Exception("'%s' not found in log" % (line,))
+
+    def assertLogLineStartsWith(self, line, log):
+        self._assertLogLine(line, log, full_match=False)
+
+    def assertLogLine(self, line, log):
+        self._assertLogLine(line, log, full_match=True)
 
     def _getLogTime(self, line, log):
         pattern = (r'^(\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d)'
@@ -142,6 +148,7 @@ class FunctionalZuulStreamMixIn:
             self.assertNotIn('[WARNING]: Failure using method', console_output)
 
             text = self._get_job_output(build)
+
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
                 r'playbooks/command.yaml@master\]', text)
@@ -206,6 +213,20 @@ class FunctionalZuulStreamMixIn:
                                             text)
             self.assertLess((time2 - time1) / timedelta(milliseconds=1),
                             9000)
+
+            # This is from the debug: msg='{{ ansible_version }}'
+            # testing raw variable output.  To make it version
+            # agnostic, match just the start of
+            #  compute1 | ok: {'string': '2.9.27'...
+
+            # NOTE(ianw) 2022-08-24 : I don't know why the callback
+            # for debug: msg= doesn't put the hostname first like
+            # other output. Undetermined if bug or feature.
+            self.assertLogLineStartsWith(
+                r"""\{'string': '\d.""", text)
+            # ... handling loops is a different path, and that does
+            self.assertLogLineStartsWith(
+                r"""compute1 \| ok: \{'string': '\d.""", text)
 
     def test_module_exception(self):
         job = self._run_job('module_failure_exception')
