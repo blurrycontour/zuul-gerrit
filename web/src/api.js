@@ -185,6 +185,9 @@ function fetchLabels(apiPrefix) {
 function fetchNodes(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
+function fetchSemaphores(apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'semaphores')
+}
 function fetchAutoholds(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'autohold')
 }
@@ -332,6 +335,7 @@ export {
   fetchLabels,
   fetchNodes,
   fetchOpenApi,
+  fetchSemaphores,
   fetchTenants,
   fetchInfo,
   fetchComponents,

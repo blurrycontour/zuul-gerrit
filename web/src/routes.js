@@ -22,6 +22,8 @@ import JobPage from './pages/Job'
 import JobsPage from './pages/Jobs'
 import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
+import SemaphorePage from './pages/Semaphore'
+import SemaphoresPage from './pages/Semaphores'
 import AutoholdsPage from './pages/Autoholds'
 import AutoholdPage from './pages/Autohold'
 import BuildPage from './pages/Build'
@@ -68,6 +70,11 @@ const routes = () => [
     title: 'Autoholds',
     to: '/autoholds',
     component: AutoholdsPage
+  },
+  {
+    title: 'Semaphores',
+    to: '/semaphores',
+    component: SemaphoresPage
   },
   {
     title: 'Builds',
@@ -131,6 +138,10 @@ const routes = () => [
   {
     to: '/autohold/:requestId',
     component: AutoholdPage
+  },
+  {
+    to: '/semaphore/:semaphoreName',
+    component: SemaphorePage
   },
   {
     to: '/config-errors',
