@@ -45,6 +45,7 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.statsd import get_statsd
+from zuul.lib.tracing import Tracing
 from zuul.lib import filecomments
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.varnames import check_varnames
@@ -1099,6 +1100,18 @@ class AnsibleJob(object):
             self.thread.join()
 
     def execute(self):
+        if self.build_request.span_context:
+            span = self.executor_server.tracing.startSpanInContext(
+                'JobExecution',
+                self.build_request.span_context,
+                attributes={'hostname': self.executor_server.hostname})
+        else:
+            span = nullcontext()
+
+        with span:
+            self.do_execute()
+
+    def do_execute(self):
         try:
             self.time_starting_build = time.monotonic()
 
@@ -3126,6 +3139,7 @@ class ExecutorServer(BaseMergeServer):
         self.monitoring_server = MonitoringServer(self.config, 'executor',
                                                   self.component_info)
         self.monitoring_server.start()
+        self.tracing = Tracing(self.config)
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -3419,6 +3433,7 @@ class ExecutorServer(BaseMergeServer):
         super().stop()
         self.stopRepl()
         self.monitoring_server.stop()
+        self.tracing.stop()
         self.log.debug("Stopped")
 
     def join(self):
