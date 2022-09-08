@@ -3586,6 +3586,8 @@ class ExecutorServer(BaseMergeServer):
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             self.statsd.incr(base_key + '.builds')
+        # TODO: create a new span for the job her using
+        # `build_request.zuul_trace_parent` as a parent.
         self.job_workers[build_request.uuid] = self._job_class(
             self, build_request, params
         )

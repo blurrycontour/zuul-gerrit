@@ -2708,6 +2708,7 @@ class Scheduler(threading.Thread):
             build.held = event_result.get("held")
 
             build.result = result
+            self.tracing.endSavedSpan(build.span_info)
 
         self._reportBuildStats(build)
 
