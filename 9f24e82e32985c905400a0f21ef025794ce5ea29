@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b02aab1_f64ea529",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-09-08T14:14:25Z",
+      "side": 1,
+      "message": "should the span info be added to the build params?",
+      "revId": "9f24e82e32985c905400a0f21ef025794ce5ea29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
