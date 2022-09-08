@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01444479_7d605ce1",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-08T14:04:14Z",
+      "side": 1,
+      "message": "This is currently adding the full parent span info to the build request which is not necessary for creating a child span on an executor. The information about the parent span could be smaller e.g. similar to the W3C trace context:\n\n[0] https://www.w3.org/TR/trace-context/",
+      "revId": "067410f4ec271181f8a3c1af2be6f697fa2815cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
