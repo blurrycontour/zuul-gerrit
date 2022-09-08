@@ -28,7 +28,10 @@ from zuul.model import (
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.exceptions import JobRequestNotFound
+import zuul.lib.tracing as tracing
+
 from kazoo.exceptions import BadVersionError
+from opentelemetry import trace
 
 
 class ExecutorClient(object):
@@ -50,6 +53,7 @@ class ExecutorClient(object):
     def execute(self, job, nodes, item, pipeline, executor_zone,
                 dependent_changes=[], merger_items=[]):
         log = get_annotated_logger(self.log, item.event)
+        tracer = trace.get_tracer("zuul")
         uuid = str(uuid4().hex)
         log.info(
             "Execute job %s (uuid: %s) on nodes %s for change %s "
@@ -63,11 +67,18 @@ class ExecutorClient(object):
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 
+        parent_span = tracing.restoreSpan(item.current_build_set.span_info)
+        execute_time = time.time()
+        with trace.use_span(parent_span):
+            build_span = tracer.start_span("Build", start_time=execute_time)
+        build_span_info = tracing.getSpanInfo(build_span)
         build = Build.new(
             pipeline.manager.current_context,
             job=job,
             build_set=item.current_build_set,
             uuid=uuid,
+            execute_time=execute_time,
+            span_info=build_span_info,
             zuul_event_id=item.event.zuul_event_id,
         )
 
@@ -123,16 +134,17 @@ class ExecutorClient(object):
                 # Fall back to the default zone
                 executor_zone = None
 
-        request = BuildRequest(
-            uuid=uuid,
-            build_set_uuid=build.build_set.uuid,
-            job_name=job.name,
-            tenant_name=build.build_set.item.pipeline.tenant.name,
-            pipeline_name=build.build_set.item.pipeline.name,
-            zone=executor_zone,
-            event_id=item.event.zuul_event_id,
-            precedence=PRIORITY_MAP[pipeline.precedence]
-        )
+        with trace.use_span(build_span):
+            request = BuildRequest(
+                uuid=uuid,
+                build_set_uuid=build.build_set.uuid,
+                job_name=job.name,
+                tenant_name=build.build_set.item.pipeline.tenant.name,
+                pipeline_name=build.build_set.item.pipeline.name,
+                zone=executor_zone,
+                event_id=item.event.zuul_event_id,
+                precedence=PRIORITY_MAP[pipeline.precedence],
+            )
         self.executor_api.submit(request, params)
         build.updateAttributes(pipeline.manager.current_context,
                                build_request_ref=request.path)
