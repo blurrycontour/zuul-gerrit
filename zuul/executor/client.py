@@ -77,7 +77,6 @@ class ExecutorClient(object):
             "Build", parent_span, start_time=execute_time,
             attributes=attributes)
         build_span_info = self.sched.tracing.getSpanInfo(build_span)
-        build_span_context = self.sched.tracing.getSpanContext(build_span)
         build = Build.new(
             pipeline.manager.current_context,
             job=job,
@@ -140,17 +139,17 @@ class ExecutorClient(object):
                 # Fall back to the default zone
                 executor_zone = None
 
-        request = BuildRequest(
-            uuid=uuid,
-            build_set_uuid=build.build_set.uuid,
-            job_name=job.name,
-            tenant_name=build.build_set.item.pipeline.tenant.name,
-            pipeline_name=build.build_set.item.pipeline.name,
-            zone=executor_zone,
-            event_id=item.event.zuul_event_id,
-            precedence=PRIORITY_MAP[pipeline.precedence],
-            span_context=build_span_context,
-        )
+        with self.sched.tracing.useSpan(build_span):
+            request = BuildRequest(
+                uuid=uuid,
+                build_set_uuid=build.build_set.uuid,
+                job_name=job.name,
+                tenant_name=build.build_set.item.pipeline.tenant.name,
+                pipeline_name=build.build_set.item.pipeline.name,
+                zone=executor_zone,
+                event_id=item.event.zuul_event_id,
+                precedence=PRIORITY_MAP[pipeline.precedence],
+            )
         self.executor_api.submit(request, params)
         build.updateAttributes(pipeline.manager.current_context,
                                build_request_ref=request.path)
