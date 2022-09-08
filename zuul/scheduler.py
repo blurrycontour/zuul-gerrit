@@ -42,7 +42,7 @@ from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.queue import NamedQueue
 from zuul.lib.times import Times
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
-from zuul.lib.tracing import Tracing
+from zuul.lib import tracing
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul import nodepool
@@ -191,7 +191,7 @@ class Scheduler(threading.Thread):
         self.daemon = True
         self.wait_for_init = wait_for_init
         self.hostname = socket.getfqdn()
-        self.tracing = Tracing(config)
+        self.tracing = tracing.Tracing(config)
         self.primed_event = threading.Event()
         # Wake up the main run loop
         self.wake_event = threading.Event()
@@ -2708,6 +2708,14 @@ class Scheduler(threading.Thread):
             build.held = event_result.get("held")
 
             build.result = result
+
+            attributes = {
+                "uuid": build.uuid,
+                "job": build.job.name,
+                "buildset_uuid": build.build_set.item.current_build_set.uuid,
+                "zuul_event_id": build.build_set.item.event.zuul_event_id,
+            }
+            tracing.endSavedSpan(build.span_info, attributes=attributes)
 
         self._reportBuildStats(build)
 
