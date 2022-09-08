@@ -16,6 +16,24 @@
       "message": "should the span info be added to the build params?",
       "revId": "9f24e82e32985c905400a0f21ef025794ce5ea29",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b53a655_567f5578",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-08T14:16:58Z",
+      "side": 1,
+      "message": "I guess it depends if we add the full span info - in which case I\u0027d say yes - or just propagate some kind of traceparent identifier which could be small enough to be part of the build request itself.",
+      "parentUuid": "3b02aab1_f64ea529",
+      "revId": "9f24e82e32985c905400a0f21ef025794ce5ea29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
