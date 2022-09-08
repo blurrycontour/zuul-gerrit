@@ -114,8 +114,13 @@ class TestTracing(ZuulTestCase):
         self.log.debug("Received:\n%s", buildset)
         item = self.getSpan('QueueItem')
         self.log.debug("Received:\n%s", item)
+        build = self.getSpan('Build')
+        self.log.debug("Received:\n%s", build)
+        job = self.getSpan('JobExecution')
+        self.log.debug("Received:\n%s", job)
         self.assertEqual(item.trace_id, buildset.trace_id)
-        self.assertNotEqual(item.span_id, buildset.span_id)
+        self.assertEqual(item.trace_id, build.trace_id)
+        self.assertNotEqual(item.span_id, job.span_id)
         self.assertTrue(buildset.start_time_unix_nano >=
                         item.start_time_unix_nano)
         self.assertTrue(buildset.end_time_unix_nano <=

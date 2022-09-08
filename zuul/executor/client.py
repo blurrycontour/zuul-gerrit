@@ -38,6 +38,7 @@ class ExecutorClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
+        self.tracing = sched.tracing
 
         self.executor_api = self._executor_api_class(self.sched.zk_client)
         self.result_events = PipelineResultEventQueue.createRegistry(
@@ -63,11 +64,27 @@ class ExecutorClient(object):
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 
+        parent_span = self.sched.tracing.restoreSpan(
+            item.current_build_set.span_info)
+        attributes = {
+            "uuid": uuid,
+            "job": job.name,
+            "buildset_uuid": item.current_build_set.uuid,
+            "zuul_event_id": item.event.zuul_event_id,
+        }
+        execute_time = time.time()
+        build_span = self.sched.tracing.startSpan(
+            "Build", parent_span, start_time=execute_time,
+            attributes=attributes)
+        build_span_info = self.sched.tracing.getSpanInfo(build_span)
+        build_span_context = self.sched.tracing.getSpanContext(build_span)
         build = Build.new(
             pipeline.manager.current_context,
             job=job,
             build_set=item.current_build_set,
             uuid=uuid,
+            execute_time=execute_time,
+            span_info=build_span_info,
             zuul_event_id=item.event.zuul_event_id,
         )
 
@@ -131,7 +148,8 @@ class ExecutorClient(object):
             pipeline_name=build.build_set.item.pipeline.name,
             zone=executor_zone,
             event_id=item.event.zuul_event_id,
-            precedence=PRIORITY_MAP[pipeline.precedence]
+            precedence=PRIORITY_MAP[pipeline.precedence],
+            span_context=build_span_context,
         )
         self.executor_api.submit(request, params)
         build.updateAttributes(pipeline.manager.current_context,

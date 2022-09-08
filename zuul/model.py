@@ -3303,7 +3303,8 @@ class JobRequest:
 
     # This object participates in transactions, and therefore must
     # remain small and unsharded.
-    def __init__(self, uuid, precedence=None, state=None, result_path=None):
+    def __init__(self, uuid, precedence=None, state=None, result_path=None,
+                 span_context=None):
         self.uuid = uuid
         if precedence is None:
             self.precedence = 0
@@ -3316,6 +3317,8 @@ class JobRequest:
             self.state = state
         # Path to the future result if requested
         self.result_path = result_path
+        # Reference to the parent span
+        self.span_context = span_context
 
         # ZK related data not serialized
         self.path = None
@@ -3328,6 +3331,7 @@ class JobRequest:
             "state": self.state,
             "precedence": self.precedence,
             "result_path": self.result_path,
+            "span_context": self.span_context,
         }
 
     def updateFromDict(self, data):
@@ -3431,8 +3435,9 @@ class BuildRequest(JobRequest):
 
     def __init__(self, uuid, zone, build_set_uuid, job_name, tenant_name,
                  pipeline_name, event_id, precedence=None, state=None,
-                 result_path=None):
-        super().__init__(uuid, precedence, state, result_path)
+                 result_path=None, span_context=None):
+        super().__init__(
+            uuid, precedence, state, result_path, span_context)
         self.zone = zone
         self.build_set_uuid = build_set_uuid
         self.job_name = job_name
@@ -3469,7 +3474,8 @@ class BuildRequest(JobRequest):
             data["event_id"],
             precedence=data["precedence"],
             state=data["state"],
-            result_path=data["result_path"]
+            result_path=data["result_path"],
+            span_context=data.get("span_context"),
         )
 
         request.worker_info = data["worker_info"]
@@ -3527,6 +3533,7 @@ class Build(zkobject.ZKObject):
             held=False,
             zuul_event_id=None,
             build_request_ref=None,
+            span_info=None,
         )
 
     def serialize(self, context):
@@ -3545,6 +3552,7 @@ class Build(zkobject.ZKObject):
             "held": self.held,
             "zuul_event_id": self.zuul_event_id,
             "build_request_ref": self.build_request_ref,
+            "span_info": self.span_info,
         }
         if COMPONENT_REGISTRY.model_api < 5:
             data["_result_data"] = (self._result_data.getPath()
