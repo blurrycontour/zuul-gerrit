@@ -193,6 +193,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af774dd9_c8d383bd",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-08T18:02:26Z",
+      "side": 1,
+      "message": "The jobs could be defined anywhere jobs are normally defined -- but they won\u0027t do anything special like upload images unless they are attached to an image building pipeline (which has certain triggers and reporters which are able to be restricted -- see my conversation with Clark).  So the way you say \"this tenant can or can not add images\" is to supply or allow that kind of pipeline in the tenant.\n\nThe image name is... let\u0027s call it... \"implicitly unique\".  Because behind the scenes, Zuul will map that image name to an \"image\" stanza and the image stanza will always internally use a fully qualified name including the repo where it is defined.  So \"debian-unstable\" in opendev really means something like \"(opendev.org/opendev/images, debian-unstable)\".  That\u0027s described in lines 375-388).  So a single tenant can only have one \"debian-unstable\" image and Zuul will enforce that uniqueness in the usual way.  But \"debian-unstable\" in two different tenants might mean the same image, or they might not, depending on whether the debian-unstable image stanza is literally in the same repo or in a different one.\n\nFor opendev, we will almost certainly only have one definition and share it among all the tenants.  That mimics our current behavior.",
+      "parentUuid": "dee595cd_bf05f988",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9c4e8ee_86df6364",
@@ -259,6 +277,24 @@
       "writtenOn": "2022-09-08T15:23:17Z",
       "side": 1,
       "message": "While I don\u0027t think it\u0027s a reason to avoid this design, it\u0027s worth considering that these are potentially very large files and we would now be copying them back and forth over the network multiple times (as opposed to the current model where they\u0027re uploaded directly from local storage). Not only does this imply a potentially significant increase in bandwidth usage, but also provides additional opportunities for network and service issues adversely impacting those long-running file transfers, degrading the stability of the image upload.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49e8a365_4e57c69b",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-08T18:02:26Z",
+      "side": 1,
+      "message": "Yes, compared to the current system, this may add 2 transfers for an image, if a given zuul-launcher has access to all providers.  If it is scoped to fewer providers, more transfers may be needed.",
+      "parentUuid": "cfa4f3bc_bb542941",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -541,6 +577,24 @@
       "writtenOn": "2022-09-08T15:23:17Z",
       "side": 1,
       "message": "It seems like this is something which should probably be allowed or denied within the nodeset (or potentially by the consuming jobs), since some jobs may rely heavily on local connectivity between nodes.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1736f7f_ed32a309",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-08T18:02:26Z",
+      "side": 1,
+      "message": "I think at least in the initial implementation we would expect that if a provider can supply multiple labels within a nodeset, we would have it fulfill as many as possible, and only yield nodes to other providers which cannot fulfill them.  That would make the system work as it does today transparently.",
+      "parentUuid": "7abbe285_1b07b489",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
