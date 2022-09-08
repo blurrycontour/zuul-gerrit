@@ -153,6 +153,21 @@ class Tracing:
             ret['attributes'] = attrs
         return ret
 
+    def getSpanContext(self, span):
+        """Return a dict for use in serializing a Span Context.
+
+        The span context information used here is a lightweight
+        encoding of the span information so that remote child spans
+        can be started without access to a fully restored parent.
+        This is equivalent to (but not the same format) as the
+        OpenTelemetry trace context propogator.
+        """
+        return {
+            'trace_id': span.context.trace_id,
+            'span_id': span.context.span_id,
+            'trace_flags': span.context.trace_flags,
+        }
+
     def restoreSpan(self, span_info, is_remote=True):
         """Restore a Span from the serialized dict provided by getSpanInfo
 
@@ -246,3 +261,19 @@ class Tracing:
         span = self.restoreSpan(span_info, is_remote=False)
         if span:
             span.end(end_time=end_time)
+
+    def startSpanInContext(self, name, span_context, **kw):
+        """Start a span using remote context information from getSpanContext.
+
+        This is a convenience method to start a child span of a remote
+        parent span without fully restoring the parent span.
+        """
+        span_context = trace_api.SpanContext(
+            trace_id=span_context['trace_id'],
+            span_id=span_context['span_id'],
+            is_remote=True,
+            trace_flags=trace_api.TraceFlags(span_context['trace_flags'])
+        )
+        parent = trace_api.NonRecordingSpan(span_context)
+        with self.useSpan(parent):
+            return self.tracer.start_span(name, **kw)

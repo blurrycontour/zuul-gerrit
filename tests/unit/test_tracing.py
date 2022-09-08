@@ -54,11 +54,18 @@ class TestTracing(ZuulTestCase):
                              links=[link])
         child.end(end_time=time.time())
 
+        # Make sure that we can start a child span from a span
+        # context and not a full span:
+
+        span_context = tr.getSpanContext(span)
+        child = tr.startSpanInContext('child3-trace', span_context)
+        child.end(end_time=time.time())
+
         # End our root span manually.
         span.end(end_time=time.time())
 
         for _ in iterate_timeout(60, "request to arrive"):
-            if len(self.otlp.requests) == 3:
+            if len(self.otlp.requests) == 4:
                 break
         req1 = self.otlp.requests[0]
         self.log.debug("Received:\n%s", req1)
@@ -80,12 +87,18 @@ class TestTracing(ZuulTestCase):
         req3 = self.otlp.requests[2]
         self.log.debug("Received:\n%s", req3)
         span3 = req3.resource_spans[0].scope_spans[0].spans[0]
-        self.assertEqual("parent-trace", span3.name)
-        attrs = attributes_to_dict(span3.attributes)
+        self.assertEqual("child3-trace", span3.name)
+
+        req4 = self.otlp.requests[3]
+        self.log.debug("Received:\n%s", req4)
+        span4 = req4.resource_spans[0].scope_spans[0].spans[0]
+        self.assertEqual("parent-trace", span4.name)
+        attrs = attributes_to_dict(span4.attributes)
         self.assertEqual({"foo": "bar"}, attrs)
 
-        self.assertEqual(span1.trace_id, span3.trace_id)
-        self.assertEqual(span2.trace_id, span3.trace_id)
+        self.assertEqual(span1.trace_id, span4.trace_id)
+        self.assertEqual(span2.trace_id, span4.trace_id)
+        self.assertEqual(span3.trace_id, span4.trace_id)
 
     def test_tracing(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
