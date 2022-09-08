@@ -53,6 +53,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fe7b194_5f4583eb",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-09-08T15:23:17Z",
+      "side": 1,
+      "message": "Nit: are built",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8b52490_17c7bdbf",
@@ -159,6 +176,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dee595cd_bf05f988",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-09-08T15:23:17Z",
+      "side": 1,
+      "message": "Would such job definitions be limited to trusted config repos, or otherwise controlled via ACL in order to prevent arbitrary users of the system from adding images? And would the system enforce uniqueness for the image-build-name parameter (at least for non-abstract jobs)? This may be related to the tenant discussion farther down, though I\u0027m also concerned with the potential for limiting who has permission to do this within a given tenant.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9c4e8ee_86df6364",
@@ -208,6 +242,40 @@
       "side": 1,
       "message": "Good point, and definitely something that OpenDev should plan to do to avoid this problem.",
       "parentUuid": "6105e627_4f2400fb",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfa4f3bc_bb542941",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-09-08T15:23:17Z",
+      "side": 1,
+      "message": "While I don\u0027t think it\u0027s a reason to avoid this design, it\u0027s worth considering that these are potentially very large files and we would now be copying them back and forth over the network multiple times (as opposed to the current model where they\u0027re uploaded directly from local storage). Not only does this imply a potentially significant increase in bandwidth usage, but also provides additional opportunities for network and service issues adversely impacting those long-running file transfers, degrading the stability of the image upload.",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab3f0811_b9283d4d",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-09-08T15:23:17Z",
+      "side": 1,
+      "message": "This is a useful feature though, which may mitigate some of my points above.",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -456,6 +524,23 @@
       "side": 1,
       "message": "Ack",
       "parentUuid": "8f442f23_5e4e4369",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7abbe285_1b07b489",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-09-08T15:23:17Z",
+      "side": 1,
+      "message": "It seems like this is something which should probably be allowed or denied within the nodeset (or potentially by the consuming jobs), since some jobs may rely heavily on local connectivity between nodes.",
       "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
