@@ -616,6 +616,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "675b349e_088aa66c",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-08T19:49:10Z",
+      "side": 1,
+      "message": "Yep, so it should be a possible enhancement that is backwards compatible with current behaviors.",
+      "parentUuid": "245eb5a0_e9d6fb95",
+      "revId": "781a8470d3790e6257fa5e813e9d8750c41b72bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d0c5a635_b89bfc2f",
