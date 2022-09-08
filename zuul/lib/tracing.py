@@ -154,7 +154,8 @@ class Tracing:
             ret['attributes'] = attrs
         return ret
 
-    def getSpanContext(self, span):
+    @staticmethod
+    def getSpanContext(span):
         """Return a dict for use in serializing a Span Context.
 
         The span context information used here is a lightweight
@@ -163,19 +164,19 @@ class Tracing:
         This is equivalent to (but not the same format) as the
         OpenTelemetry trace context propogator.
         """
+        ctx = span.get_span_context()
         return {
-            'trace_id': span.context.trace_id,
-            'span_id': span.context.span_id,
-            'trace_flags': span.context.trace_flags,
+            'trace_id': ctx.trace_id,
+            'span_id': ctx.span_id,
+            'trace_flags': ctx.trace_flags,
         }
+        return None
 
     def restoreSpan(self, span_info, is_remote=True):
         """Restore a Span from the serialized dict provided by getSpanInfo
 
         Return None if unable to serialize the span.
         """
-        if not self.tracer:
-            return None
         if span_info is None:
             return trace_api.INVALID_SPAN
         required_keys = {'name', 'trace_id', 'span_id', 'trace_flags'}
