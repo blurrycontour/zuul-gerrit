@@ -323,6 +323,24 @@
       "parentUuid": "c8df41f4_b35a72c0",
       "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5bff6d6_2165f41a",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2528,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T23:54:36Z",
+      "side": 1,
+      "message": "Got it, so this is purely to support human visible representation. I was worried there was some mismatch in attributes that would create functional problems. But I can see where we freeze the job we don\u0027t use the toDict representation we build a new direct representation for the frozen state. So toDict here must be going straight out to API responses.",
+      "parentUuid": "3ba5e297_07545e93",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
