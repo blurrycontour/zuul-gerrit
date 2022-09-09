@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1e42f69_a8457aa2",
+        "filename": "zuul/ansible/base/action/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T19:00:43Z",
+      "side": 1,
+      "message": "This seems like overkill when trying to access a variable in an ansible module. But I don\u0027t know of a better way.",
+      "revId": "8e73c60a2dfaa647657adae24bbf240353dc2dfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19a893b2_e005240d",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T19:00:43Z",
+      "side": 1,
+      "message": "This is an extra argument now and there is only one %s in the string. I think this wants to be something like:\n\n  self.log(\u0027Executing %s: %s\u0027 % (zuul_log_id, self._clean_args(args)))\n  \nThough there may be a more efficient way of doing it by having the logging library do the interpolation.",
+      "range": {
+        "startLine": 499,
+        "startChar": 54,
+        "endLine": 499,
+        "endChar": 76
+      },
+      "revId": "8e73c60a2dfaa647657adae24bbf240353dc2dfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
