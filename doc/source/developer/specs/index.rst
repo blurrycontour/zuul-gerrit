@@ -16,11 +16,12 @@ documentation instead.
 .. toctree::
    :maxdepth: 1
 
-   tenant-scoped-admin-web-API
-   kubernetes-operator
    circular-dependencies
-   zuul-runner
-   enhanced-regional-executors
-   tenant-resource-quota
    community-matrix
+   enhanced-regional-executors
+   kubernetes-operator
+   nodepool-in-zuul
+   tenant-resource-quota
+   tenant-scoped-admin-web-API
    tracing
+   zuul-runner
