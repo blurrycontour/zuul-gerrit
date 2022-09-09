@@ -1837,6 +1837,11 @@ class AnsibleJob(object):
         if not self.jobdir.cleanup_playbooks:
             return
 
+        if not self.frozen_hostvars:
+            # Job failed before we could load the frozen hostvars.
+            # This means we can't run any cleanup playbooks.
+            return
+
         # TODO: make this configurable
         cleanup_timeout = 300
 
