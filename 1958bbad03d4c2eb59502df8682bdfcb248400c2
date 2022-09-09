@@ -59,6 +59,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bdd7680_64614f93",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T23:21:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "958a1391_8f4a30d8",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "62475ba4_7ea4edb8",
@@ -106,6 +124,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "facf1425_43c04179",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1467,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T23:21:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4707ecf1_91306b28",
+      "range": {
+        "startLine": 1467,
+        "startChar": 42,
+        "endLine": 1467,
+        "endChar": 46
+      },
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4388e1ac_36bfda7c",
@@ -137,6 +179,24 @@
       "side": 1,
       "message": "It\u0027s an API.  Several model objects have this method.  It\u0027s used in configloader.  It may do other things in the future.",
       "parentUuid": "4388e1ac_36bfda7c",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97618216_673dd677",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1489,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T23:21:01Z",
+      "side": 1,
+      "message": "It mostly just reads oddly to pass in self when self is already implicitly passed. But it makes sense when you read the method and find that it is recursive.",
+      "parentUuid": "c0abe0f1_d42da665",
       "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -176,6 +236,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2352568_befce39c",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2247,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T23:21:01Z",
+      "side": 1,
+      "message": "That is a good point. I agree it is unlikely for people to immediately start using the feature before we\u0027ve transitioned completely to the new api in a cluster.",
+      "parentUuid": "3a04d7a1_f9c69f06",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a9b024d_2ae4ab34",
@@ -207,6 +285,24 @@
       "side": 1,
       "message": "Re the first thing: the two blocks assign to different dictionary keys (nodeset vs nodeset_alternatives), so the actions aren\u0027t quite the same (not sure if that\u0027s what you meant or not).\n\nRe the second: flattenNodesetAlternatives will always return a list of Nodeset objects, so alts[0] if it exists is always a nodeset.  Nodeset implements __len__ which indicates how many nodes it has.  So these lines say:\n\nIf there is only one nodeset and it has nodes, set the \u0027nodeset\u0027 attribute to that nodeset.\nIf there is more than one nodeset, set the \u0027nodeset_alternatives\u0027 attribute to the list.\nIf there are no nodesets or the single nodeset is the empty nodeset, set no attributes.\n\nThis retains the old behavior where the nodeset attribute is not included on jobs that don\u0027t specify it.",
       "parentUuid": "1a9b024d_2ae4ab34",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8df41f4_b35a72c0",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2528,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T23:21:01Z",
+      "side": 1,
+      "message": "Thanks, I think the bit I was missing is that nodeset may not be set if it is empty. Reading the old code it seems that it wasn\u0027t set if there was no nodeset in the layout. Which is maybe equivalent here.\n\nThat said, now I\u0027m wondering why we allow FrozenJob and Job to differ when it comes to having a nodeset or nodeset_alteratives attribute. Should we try and use nodeset_alternatives everywhere for consistency? Do we not do that because the name in the yaml is still nodeset ? And if so is it safe to sometimes have a nodeset_alternatives here instead? We don\u0027t set a nodeset_alternatives below at line 2570.",
+      "parentUuid": "8b7be77a_cd438c82",
       "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
