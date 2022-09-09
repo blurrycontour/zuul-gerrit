@@ -176,6 +176,8 @@ class SQLReporter(BaseReporter):
         start = datetime.datetime.fromtimestamp(start_time,
                                                 tz=datetime.timezone.utc)
         buildset = build.build_set
+        if not buildset:
+            return
         db_buildset = db.getBuildset(
             tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
         if not db_buildset:
