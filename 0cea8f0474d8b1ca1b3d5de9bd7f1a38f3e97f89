@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13d41769_8231cd2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T19:34:30Z",
+      "side": 1,
+      "message": "As long as it\u0027s expanded by default.  The goal is to have the error message visible with zero additional clicks.",
+      "revId": "0cea8f0474d8b1ca1b3d5de9bd7f1a38f3e97f89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
