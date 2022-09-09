@@ -43,6 +43,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "958a1391_8f4a30d8",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T22:51:27Z",
+      "side": 1,
+      "message": "It tests that a scheduler can load the old data with nothing cached.",
+      "parentUuid": "26434fe6_d669bb88",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "62475ba4_7ea4edb8",
         "filename": "zuul/model.py",
         "patchSetId": 5
@@ -54,6 +72,30 @@
       "writtenOn": "2022-09-09T21:58:23Z",
       "side": 1,
       "message": "Would it make sense to make _flattenAlternatives a static class method to make the argument for recursion a little less odd? Minor nit.",
+      "range": {
+        "startLine": 1467,
+        "startChar": 42,
+        "endLine": 1467,
+        "endChar": 46
+      },
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4707ecf1_91306b28",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1467,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T22:51:27Z",
+      "side": 1,
+      "message": "I don\u0027t really see a difference either way.",
+      "parentUuid": "62475ba4_7ea4edb8",
       "range": {
         "startLine": 1467,
         "startChar": 42,
@@ -83,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0abe0f1_d42da665",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1489,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T22:51:27Z",
+      "side": 1,
+      "message": "It\u0027s an API.  Several model objects have this method.  It\u0027s used in configloader.  It may do other things in the future.",
+      "parentUuid": "4388e1ac_36bfda7c",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7bb875e7_9f473e1d",
         "filename": "zuul/model.py",
         "patchSetId": 5
@@ -100,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3a04d7a1_f9c69f06",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T22:51:27Z",
+      "side": 1,
+      "message": "The current code does mean that once sufficient numbers of nodes are API-9-capable, they will immediately start obeying the alternatives even before all components are updated.  But any \u003c9 components will still work as before.\n\nGiven that we\u0027re talking about a pretty long process with frozen jobs, etc, it doesn\u0027t seem *wrong*, per se, to start obeying alternatives for jobs that have already been frozen if they were configured that way.\n\nBut I think the thing that makes this more-or-less moot is that it seems *very* unlikely for the system to already have nodeset alternatives configured during the upgrade process since it\u0027s a new config syntax.  So this shouldn\u0027t really matter in practice.",
+      "parentUuid": "7bb875e7_9f473e1d",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1a9b024d_2ae4ab34",
         "filename": "zuul/model.py",
         "patchSetId": 5
@@ -111,6 +189,24 @@
       "writtenOn": "2022-09-09T21:58:23Z",
       "side": 1,
       "message": "I\u0027m not sure I understand the len(alts[0]) check here. We perform the same action in this block as the elif below. Can they be combined?\n\nIn particular if alts[0] is a str or a dict len(alts[0]) will report non zero value for non empty vars. And if it is a NodeSet object then len() won\u0027t apply to it?",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b7be77a_cd438c82",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2528,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T22:51:27Z",
+      "side": 1,
+      "message": "Re the first thing: the two blocks assign to different dictionary keys (nodeset vs nodeset_alternatives), so the actions aren\u0027t quite the same (not sure if that\u0027s what you meant or not).\n\nRe the second: flattenNodesetAlternatives will always return a list of Nodeset objects, so alts[0] if it exists is always a nodeset.  Nodeset implements __len__ which indicates how many nodes it has.  So these lines say:\n\nIf there is only one nodeset and it has nodes, set the \u0027nodeset\u0027 attribute to that nodeset.\nIf there is more than one nodeset, set the \u0027nodeset_alternatives\u0027 attribute to the list.\nIf there are no nodesets or the single nodeset is the empty nodeset, set no attributes.\n\nThis retains the old behavior where the nodeset attribute is not included on jobs that don\u0027t specify it.",
+      "parentUuid": "1a9b024d_2ae4ab34",
       "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
