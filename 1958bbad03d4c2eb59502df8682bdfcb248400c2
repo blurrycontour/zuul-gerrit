@@ -305,6 +305,24 @@
       "parentUuid": "8b7be77a_cd438c82",
       "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ba5e297_07545e93",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2528,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-09T23:45:23Z",
+      "side": 1,
+      "message": "A job (now, just as before) has a single nodeset.  That nodeset used to be a single, um, set of nodes.  But now it is actually an even more complex data structure which may be a set of nodes, or it may be a tree of sets of nodes.  Regardless, when we\u0027re talking about a Job representing what the user specified in the config, it merely has a nodeset.\n\nGiven that, we could just stop there and never have anything called \"nodeset_alternatives\" on the Job.\n\nHowever, when we think about what users want to see in the web UI, when you\u0027re looking at a Job in the web UI, you\u0027re looking at a visual representation of the definition.  To date, if a user specified a nodeset by name on a job, we would look up the nodeset and show the actual definition of the nodeset.  But now that nodesets are complex tree data structures, if we were to do that we would have quite a challenge to display it on the job page.  It\u0027s possible, but I don\u0027t relish the idea, and I don\u0027t think it\u0027s necessary.  I think the most useful thing for the user would be to go ahead and flatten the nodeset alternatives into a list and display them as a sequence.  Basically \"this job is defined such that it will use these nodesets in sequence\".  To accomodate this use case, we flatten the nodeset in Job.toDict.\n\nA FrozenJob is geared specifically for executing it, so we flatten everything so that we can just run through the list of possible nodesets.  It has no need of a nodeset attribute (except that we use it as a pointer to \"the current nodeset within the nodeset alternatives\").",
+      "parentUuid": "c8df41f4_b35a72c0",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
