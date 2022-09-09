@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c1eb07e_a5bf7314",
+        "filename": "doc/source/developer/model-changelog.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T21:58:23Z",
+      "side": 1,
+      "message": "Nit, typo should be \"nodeset\".",
+      "range": {
+        "startLine": 95,
+        "startChar": 22,
+        "endLine": 95,
+        "endChar": 28
+      },
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26434fe6_d669bb88",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T21:58:23Z",
+      "side": 1,
+      "message": "In this case we enqueue with the first scheduler under model api 8. Then we have the second scheduler use model api 9 to execute the job? Since we use nodepool to control when things are processed do we need two separate schedulers? I guess this ensures that we\u0027re using the new model api to process things?",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62475ba4_7ea4edb8",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1467,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T21:58:23Z",
+      "side": 1,
+      "message": "Would it make sense to make _flattenAlternatives a static class method to make the argument for recursion a little less odd? Minor nit.",
+      "range": {
+        "startLine": 1467,
+        "startChar": 42,
+        "endLine": 1467,
+        "endChar": 46
+      },
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4388e1ac_36bfda7c",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1489,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T21:58:23Z",
+      "side": 1,
+      "message": "Do we need an extra method for this?",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bb875e7_9f473e1d",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2247,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T21:58:23Z",
+      "side": 1,
+      "message": "Since we write both the nodeset_alternatives and nodeset in the serialize case that means we can override the singleton nodeset definition above if not all components are at api version 9.\n\nThis isn\u0027t a major issue, but it does point out a behavior expectation question. Should we continue to act as v8 until everything is v9 or are we ok to act like v9 here? I\u0027m concerend that reasoning through all the corner cases for v8 mixed with v9 here may be difficult and we\u0027re better off just proceeding with v8 instead for consistency with all nodes.\n\nAll that to say maybe this block from 2246-2247 needs to be in an else case for the block at 2240-2244? Then do the data conversion in 2248-2250 if necessary.",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a9b024d_2ae4ab34",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2528,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-09T21:58:23Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand the len(alts[0]) check here. We perform the same action in this block as the elif below. Can they be combined?\n\nIn particular if alts[0] is a str or a dict len(alts[0]) will report non zero value for non empty vars. And if it is a NodeSet object then len() won\u0027t apply to it?",
+      "revId": "1958bbad03d4c2eb59502df8682bdfcb248400c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
