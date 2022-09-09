@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "370f37f2_3509703c",
+        "filename": "tests/unit/test_tracing.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-09-09T11:52:46Z",
+      "side": 1,
+      "message": "nit: unnecessary empty line?",
+      "revId": "08c4b3441947a90e42cd1513669d353657f85876",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
