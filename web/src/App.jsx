@@ -31,7 +31,15 @@ import {
   ButtonVariant,
   Dropdown,
   DropdownItem,
+  Flex,
+  FlexItem,
   KebabToggle,
+  Masthead,
+  MastheadToggle,
+  MastheadMain,
+  MastheadBrand,
+  MastheadContent,
+  PageSidebar,
   Modal,
   Nav,
   NavItem,
@@ -48,9 +56,14 @@ import {
   PageHeaderTools,
   PageHeaderToolsGroup,
   PageHeaderToolsItem,
+  Toolbar,
+  ToolbarItem,
+  ToolbarGroup,
+  ToolbarContent
 } from '@patternfly/react-core'
 
 import {
+  BarsIcon,
   BellIcon,
   BookIcon,
   CodeIcon,
@@ -364,102 +377,42 @@ class App extends React.Component {
       )
     }
 
-    const pageHeaderTools = (
-      <PageHeaderTools>
-        {/* The utility navbar is only visible on desktop sizes
-            and replaced by a kebab dropdown for smaller sizes */}
-        <PageHeaderToolsGroup
-          visibility={{ default: 'hidden', lg: 'visible' }}
-        >
-          <PageHeaderToolsItem>
-            <Link to='/components'>
-              <Button variant={ButtonVariant.plain}>
-                <ServiceIcon /> Components
-              </Button>
-            </Link>
-          </PageHeaderToolsItem>
-          <PageHeaderToolsItem>
-            <Link to='/openapi'>
-              <Button variant={ButtonVariant.plain}>
-                <CodeIcon /> API
-              </Button>
-            </Link>
-          </PageHeaderToolsItem>
-          <PageHeaderToolsItem>
-            <a
-              href='https://zuul-ci.org/docs'
-              rel='noopener noreferrer'
-              target='_blank'
-            >
-              <Button variant={ButtonVariant.plain}>
-                <BookIcon /> Documentation
-              </Button>
-            </a>
-          </PageHeaderToolsItem>
-          {tenant.name && (
-            <PageHeaderToolsItem>
-              <Link to={tenant.defaultRoute}>
-                <Button variant={ButtonVariant.plain}>
-                  <strong>Tenant</strong> {tenant.name}
-                </Button>
-              </Link>
-            </PageHeaderToolsItem>
-          )}
-        </PageHeaderToolsGroup>
-        <PageHeaderToolsGroup>
-          {/* this kebab dropdown replaces the icon buttons and is hidden for
-              desktop sizes */}
-          <PageHeaderToolsItem visibility={{ lg: 'hidden' }}>
-            <Dropdown
-              isPlain
-              position="right"
-              onSelect={this.handleKebabDropdownSelect}
-              toggle={<KebabToggle onToggle={this.handleKebabDropdownToggle} />}
-              isOpen={isKebabDropdownOpen}
-              dropdownItems={kebabDropdownItems}
-            />
-          </PageHeaderToolsItem>
-        </PageHeaderToolsGroup>
-        {configErrors.length > 0 &&
-          <NotificationBadge
-            isRead={false}
-            aria-label="Notifications"
-            onClick={(e) => {
-              e.preventDefault()
-              this.setState({ showErrors: !this.state.showErrors })
-            }}
-          >
-            <BellIcon />
-          </NotificationBadge>
-        }
-        <SelectTz />
-        <ConfigModal />
-
-        {tenant.name && (<AuthContainer />)}
-      </PageHeaderTools>
+    const header = (
+      <Masthead>
+        <MastheadToggle>
+          <Button variant="plain"><BarsIcon />
+          </Button>
+        </MastheadToggle>
+        <MastheadMain>
+          <MastheadBrand>
+            <Brand src={logo} alt='Zuul logo' />
+          </MastheadBrand>
+          <MastheadContent>
+            <Toolbar isFullHeight isStatic>
+              <ToolbarContent>
+                <ToolbarGroup
+                  alignment={{ default: 'alignRight' }}
+                  spacer={{ default: 'spacerNone', md: 'spacerMd' }}>
+                  <ToolbarItem>
+                    <SelectTz />
+                  </ToolbarItem>
+                  <ToolbarItem>
+                    <ConfigModal />
+                  </ToolbarItem>
+                </ToolbarGroup>
+              </ToolbarContent>
+            </Toolbar>
+          </MastheadContent>
+        </MastheadMain>
+      </Masthead>
     )
 
     // In case we don't have an active tenant, fall back to the root URL
     const logoUrl = tenant.name ? tenant.defaultRoute : '/'
-    const pageHeader = (
-      <PageHeader
-        logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
-        logoProps={{ to: logoUrl }}
-        logoComponent={Link}
-        headerTools={pageHeaderTools}
-        topNav={nav}
-      />
-    )
 
     return (
       <React.Fragment>
-        {notifications.length > 0 && this.renderNotifications(notifications)}
-        {this.renderConfigErrors(configErrors)}
-        <Page header={pageHeader}>
-          <ErrorBoundary>
-            {this.renderContent()}
-          </ErrorBoundary>
-        </Page>
+        <Page header={header}>page content</Page>
       </React.Fragment>
     )
   }
