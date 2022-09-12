@@ -314,9 +314,10 @@ order to be enqueued into the pipeline.
 
       This requires that a certain kind of approval be present for the
       current patchset of the change (the approval could be added by
-      the event in question).  It takes several sub-parameters, all of
-      which are optional and are combined together so that there must
-      be an approval matching all specified requirements.
+      the event in question). Approval is a list of dictionaries with
+      keys listed below, all of which are optional and are combined
+      together so that there must be an approval matching all
+      specified requirements.
 
       .. attr:: username
 
