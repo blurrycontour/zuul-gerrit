@@ -70,6 +70,30 @@
       },
       "revId": "5efc9bc0b2c6e14e2c4b85cb573b7650d7870536",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30a0b092_08e80cd0",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2022-09-12T07:35:13Z",
+      "side": 1,
+      "message": "Created new PS: https://review.opendev.org/c/zuul/zuul/+/857001",
+      "parentUuid": "02f85361_9cc03d4b",
+      "range": {
+        "startLine": 98,
+        "startChar": 17,
+        "endLine": 98,
+        "endChar": 21
+      },
+      "revId": "5efc9bc0b2c6e14e2c4b85cb573b7650d7870536",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
