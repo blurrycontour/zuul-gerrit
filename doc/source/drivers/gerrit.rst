@@ -314,9 +314,10 @@ order to be enqueued into the pipeline.
 
       This requires that a certain kind of approval be present for the
       current patchset of the change (the approval could be added by
-      the event in question).  It takes several sub-parameters, all of
-      which are optional and are combined together so that there must
-      be an approval matching all specified requirements.
+      the event in question). Approval is a dictionary or a list of
+      dictionaries with attributes listed below, all of which are
+      optional and are combined together so that there must be an approval
+      matching all specified requirements.
 
       .. attr:: username
 
@@ -374,9 +375,9 @@ order to be enqueued into the pipeline.
 
    .. attr:: approval
 
-      This takes a list of approvals. If an approval matches the
-      provided criteria the change can not be entered into the
-      pipeline. It follows the same syntax as
+      This takes an approval or a list of approvals. If an approval 
+      matches the provided criteria the change can not be entered 
+      into the pipeline. It follows the same syntax as
       :attr:`pipeline.require.<gerrit source>.approval`.
 
       Example to reject a change with any negative vote:
