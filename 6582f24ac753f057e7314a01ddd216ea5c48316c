@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "328ac7eb_dc18c664",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-12T20:10:23Z",
+      "side": 1,
+      "message": "Yep, I think this made more sense before we started assuming we would always have a span.",
+      "parentUuid": "c837df92_808e117e",
+      "revId": "6582f24ac753f057e7314a01ddd216ea5c48316c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0513ca2b_84030c6b",
