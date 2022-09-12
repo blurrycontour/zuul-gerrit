@@ -95,7 +95,7 @@ class ElasticsearchConnection(BaseConnection):
     def setIndex(self, index):
         settings = {
             'mappings': {
-                'zuul': {
+                '_doc': {
                     "properties": self.properties
                 }
             }
