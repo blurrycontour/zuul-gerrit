@@ -16,6 +16,24 @@
       "message": "Technically, it\u0027s a (dict or (list of dicts)).  Many options in Zuul and this driver take this form.  Usually what we do is describe the singleton, and then say \"multiple foos may be listed\".\n\nSo if we keep that pattern here, you could just add \"multiple approvals may be listed\" to the original text.\n\nI\u0027m certainly open to other ways of describing that if it\u0027s not clear, though if we do, I think we should apply it universally (at the very least starting within this document to maintain consistency).\n\nThe main reason I\u0027m adding a -1 here is that while it\u0027s true that the original text did not sufficiently describe the parameters (because it described only one of two possibilities), this change does the same thing but only describes the other possibility.",
       "revId": "ae56f17076a4e82cdfe9848fc60da60b7db51a18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f07ed758_6943547f",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2022-09-12T22:41:32Z",
+      "side": 1,
+      "message": "\u003e The main reason I\u0027m adding a -1 here is that while it\u0027s true that the original text did not sufficiently describe the parameters (because it described only one of two possibilities), this change does the same thing but only describes the other possibility.\n\nDocumentation before this change is confusing because it contradicts to all other examples in the same document (search for \u0027approval:\u0027 on rendered HTML https://zuul-ci.org/docs/zuul/latest/drivers/gerrit.html#reference-pipelines-configuration) - all examples use \u0027list of dicts\u0027.\n\nMy second move was to check pipeline configs in zuul tests https://opendev.org/zuul/zuul/src/branch/master/tests/fixtures/config/requirements and I failed to find pipeline yaml fixture with bare dict \u0027approval\u0027.\n\nI\u0027ve modified the text to mention both (dict or list-of-dicts) cases.",
+      "parentUuid": "07fb96ac_dac83750",
+      "revId": "ae56f17076a4e82cdfe9848fc60da60b7db51a18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
