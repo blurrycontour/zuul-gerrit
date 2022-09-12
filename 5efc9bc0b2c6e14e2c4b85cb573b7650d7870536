@@ -46,6 +46,30 @@
       },
       "revId": "5efc9bc0b2c6e14e2c4b85cb573b7650d7870536",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02f85361_9cc03d4b",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2022-09-12T07:30:14Z",
+      "side": 1,
+      "message": "Could we change that in another PS please?",
+      "parentUuid": "a286dffa_7574e013",
+      "range": {
+        "startLine": 98,
+        "startChar": 17,
+        "endLine": 98,
+        "endChar": 21
+      },
+      "revId": "5efc9bc0b2c6e14e2c4b85cb573b7650d7870536",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
