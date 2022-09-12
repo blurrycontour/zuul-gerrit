@@ -184,6 +184,10 @@ class Scheduler(threading.Thread):
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
 
+    # Feature flag to enable/disable clearing of the pipeline's change
+    # cache when starting to process a pipeline.
+    _ff_clear_pipeline_cache = False
+
     def __init__(self, config, connections, app, wait_for_init,
                  testonly=False):
         threading.Thread.__init__(self)

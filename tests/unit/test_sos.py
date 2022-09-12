@@ -61,6 +61,7 @@ class TestScaleOutScheduler(ZuulTestCase):
 
         # Hold jobs in build
         sched1 = self.scheds.first
+        sched1.sched._ff_clear_pipeline_cache = True
         self.executor_server.hold_jobs_in_build = True
 
         # We need a pair of changes in order to populate the pipeline
@@ -82,6 +83,7 @@ class TestScaleOutScheduler(ZuulTestCase):
 
         # Start scheduler 2
         sched2 = self.createScheduler()
+        sched2.sched._ff_clear_pipeline_cache = True
         sched2.start()
         self.assertEqual(len(self.scheds), 2)
 

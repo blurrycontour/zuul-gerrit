@@ -236,7 +236,8 @@ class PipelineManager(metaclass=ABCMeta):
         return resolved_changes
 
     def clearCache(self):
-        self._change_cache.clear()
+        if self.sched._ff_clear_pipeline_cache:
+            self._change_cache.clear()
 
     def _maintainCache(self):
         active_layout_uuids = set()
