@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c837df92_808e117e",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-12T09:40:41Z",
+      "side": 1,
+      "message": "Should we be rather using span.get_span_context()? It seems this works also for instances of `NonRecordingSpan`.",
+      "revId": "6582f24ac753f057e7314a01ddd216ea5c48316c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0513ca2b_84030c6b",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-12T09:40:41Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we fail if we call this method without a span context? Otherwise we might accidentally create spans without a reference to the parent span.",
+      "revId": "6582f24ac753f057e7314a01ddd216ea5c48316c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
