@@ -443,7 +443,12 @@ class App extends React.Component {
     const logoUrl = tenant.name ? tenant.defaultRoute : '/'
     const pageHeader = (
       <PageHeader
-        logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
+        logo={
+          <Brand alt='Zuul logo'
+                 heights={{ default: '20px', sm: '20px', md: '40px' }}>
+            <source srcSet={logo} />
+          </Brand>
+        }
         logoProps={{ to: logoUrl }}
         logoComponent={Link}
         headerTools={pageHeaderTools}

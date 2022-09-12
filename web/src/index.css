@@ -24,12 +24,6 @@ a.refresh {
 }
 
 /* Navigation bar */
-.zuul-brand {
-    /* TODO (felix): If we can define a size in the logo.svg itself, this
-       shouldn't be necessary. */
-    height: 40px;
-}
-
 .zuul-select-tz {
     /* That's the color PF4 uses for the dropdown items in the navbar */
     color: var(--pf-global--Color--dark-100);
