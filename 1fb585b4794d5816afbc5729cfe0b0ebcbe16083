@@ -50,6 +50,24 @@
       "message": "Remove this classname since it\u0027s unused?",
       "revId": "1fb585b4794d5816afbc5729cfe0b0ebcbe16083",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0e94c18_a2023c97",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-13T22:00:44Z",
+      "side": 1,
+      "message": "Done with https://review.opendev.org/c/zuul/zuul/+/857517",
+      "parentUuid": "b8116105_9d4c5f83",
+      "revId": "1fb585b4794d5816afbc5729cfe0b0ebcbe16083",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
