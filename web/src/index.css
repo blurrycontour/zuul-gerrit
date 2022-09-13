@@ -27,7 +27,7 @@ a.refresh {
 .zuul-page .pf-c-brand {
     /* TODO (felix): If we can define a size in the logo.svg itself, this
        shouldn't be necessary. */
-    height: 40px;
+    height: 1.5em;
 }
 
 .zuul-page .pf-c-page__header {
