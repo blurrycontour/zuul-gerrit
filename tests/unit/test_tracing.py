@@ -31,6 +31,16 @@ class TestTracing(ZuulTestCase):
     config_file = 'zuul-tracing.conf'
     tenant_config_file = "config/single-tenant/main.yaml"
 
+    def _waitForSpans(self, *span_names, timeout=60,):
+        for _ in iterate_timeout(timeout, "requests to arrive"):
+            test_requests = [
+                r for r in self.otlp.requests
+                if r.resource_spans[0].scope_spans[0].spans[0].name
+                in span_names
+            ]
+            if len(test_requests) == len(span_names):
+                return test_requests
+
     def test_tracing_api(self):
         tracer = trace.get_tracer("zuul")
 
@@ -68,10 +78,10 @@ class TestTracing(ZuulTestCase):
         tracing.endSavedSpan(span_info, end_time=time.time(),
                              attributes={'endattr': 'baz'})
 
-        for _ in iterate_timeout(60, "request to arrive"):
-            if len(self.otlp.requests) == 4:
-                break
-        req1 = self.otlp.requests[0]
+        test_requests = self._waitForSpans(
+            "parent-trace", "child1-trace", "child2-trace", "child3-trace")
+
+        req1 = test_requests[0]
         self.log.debug("Received:\n%s", req1)
         attrs = attributes_to_dict(req1.resource_spans[0].resource.attributes)
         self.assertEqual({"service.name": "zuultest"}, attrs)
@@ -80,7 +90,7 @@ class TestTracing(ZuulTestCase):
         span1 = req1.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("child1-trace", span1.name)
 
-        req2 = self.otlp.requests[1]
+        req2 = test_requests[1]
         self.log.debug("Received:\n%s", req2)
         span2 = req2.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("child2-trace", span2.name)
@@ -88,12 +98,12 @@ class TestTracing(ZuulTestCase):
         attrs = attributes_to_dict(span2.links[0].attributes)
         self.assertEqual({"relationship": "prev"}, attrs)
 
-        req3 = self.otlp.requests[2]
+        req3 = test_requests[2]
         self.log.debug("Received:\n%s", req3)
         span3 = req3.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("child3-trace", span3.name)
 
-        req4 = self.otlp.requests[3]
+        req4 = test_requests[3]
         self.log.debug("Received:\n%s", req4)
         span4 = req4.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("parent-trace", span4.name)
@@ -138,10 +148,10 @@ class TestTracing(ZuulTestCase):
         # End our root span manually.
         span.end(end_time=time.time())
 
-        for _ in iterate_timeout(60, "request to arrive"):
-            if len(self.otlp.requests) == 3:
-                break
-        req1 = self.otlp.requests[0]
+        test_requests = self._waitForSpans(
+            "child1-trace", "child2-trace", "child3-trace")
+
+        req1 = test_requests[0]
         self.log.debug("Received:\n%s", req1)
         attrs = attributes_to_dict(req1.resource_spans[0].resource.attributes)
         self.assertEqual({"service.name": "zuultest"}, attrs)
@@ -150,7 +160,7 @@ class TestTracing(ZuulTestCase):
         span1 = req1.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("child1-trace", span1.name)
 
-        req2 = self.otlp.requests[1]
+        req2 = test_requests[1]
         self.log.debug("Received:\n%s", req2)
         span2 = req2.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("child2-trace", span2.name)
@@ -158,7 +168,7 @@ class TestTracing(ZuulTestCase):
         attrs = attributes_to_dict(span2.links[0].attributes)
         self.assertEqual({"relationship": "prev"}, attrs)
 
-        req3 = self.otlp.requests[2]
+        req3 = test_requests[2]
         self.log.debug("Received:\n%s", req3)
         span3 = req3.resource_spans[0].scope_spans[0].spans[0]
         self.assertEqual("child3-trace", span3.name)
@@ -181,6 +191,8 @@ class TestTracing(ZuulTestCase):
         self.log.debug("Received:\n%s", buildset)
         item = self.getSpan('QueueItem')
         self.log.debug("Received:\n%s", item)
+        merge_job = self.getSpan('Merge')
+        self.log.debug("Received:\n%s", merge_job)
         build = self.getSpan('Build')
         self.log.debug("Received:\n%s", build)
         job = self.getSpan('JobExecution')
@@ -192,6 +204,10 @@ class TestTracing(ZuulTestCase):
                         item.start_time_unix_nano)
         self.assertTrue(buildset.end_time_unix_nano <=
                         item.end_time_unix_nano)
+        self.assertTrue(merge_job.start_time_unix_nano >=
+                        buildset.start_time_unix_nano)
+        self.assertTrue(merge_job.end_time_unix_nano <=
+                        buildset.end_time_unix_nano)
         item_attrs = attributes_to_dict(item.attributes)
         self.assertTrue(item_attrs['ref_number'] == "1")
         self.assertTrue(item_attrs['ref_patchset'] == "1")
