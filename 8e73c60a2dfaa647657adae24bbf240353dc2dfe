@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e575365_1e772d02",
+        "filename": "zuul/ansible/base/action/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-13T19:10:16Z",
+      "side": 1,
+      "message": "Yeah, it was cargo-cult copying from other action plugins I found in the core and collections.  It\u0027s done in a few places.",
+      "parentUuid": "e1e42f69_a8457aa2",
+      "revId": "8e73c60a2dfaa647657adae24bbf240353dc2dfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "19a893b2_e005240d",
         "filename": "zuul/ansible/base/library/command.py",
         "patchSetId": 16
@@ -31,6 +49,30 @@
       "writtenOn": "2022-09-09T19:00:43Z",
       "side": 1,
       "message": "This is an extra argument now and there is only one %s in the string. I think this wants to be something like:\n\n  self.log(\u0027Executing %s: %s\u0027 % (zuul_log_id, self._clean_args(args)))\n  \nThough there may be a more efficient way of doing it by having the logging library do the interpolation.",
+      "range": {
+        "startLine": 499,
+        "startChar": 54,
+        "endLine": 499,
+        "endChar": 76
+      },
+      "revId": "8e73c60a2dfaa647657adae24bbf240353dc2dfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4747a056_c35eb030",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-13T19:10:16Z",
+      "side": 1,
+      "message": "Thanks!  I don\u0027t know how to actually get self._debug here set but I just changed that to use arguments.",
+      "parentUuid": "19a893b2_e005240d",
       "range": {
         "startLine": 499,
         "startChar": 54,
