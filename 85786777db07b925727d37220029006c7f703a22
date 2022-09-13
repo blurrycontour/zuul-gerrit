@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb808ad3_d48dc9e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-13T03:40:14Z",
+      "side": 1,
+      "message": "\u003e I think this introduces a usability issue with the header.  Currently the global \"tabs\" (Status, Projects, Jobs, Labels, Nodes, Autoholds, Builds, Buildsets) are always in a second line and are easily accessible ...\n\u003e This change will, at many screen widths, move those tabs into the top line inside of a small horizontally scrolling window.  \n\nThis has been resolved with https://review.opendev.org/c/zuul/zuul/+/857245 which moves this to a tertiary nav bar, which is designed to be always below the header. ",
+      "revId": "85786777db07b925727d37220029006c7f703a22",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
