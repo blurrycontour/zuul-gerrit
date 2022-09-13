@@ -3473,13 +3473,14 @@ class MergeRequest(JobRequest):
 
     def __init__(self, uuid, job_type, build_set_uuid, tenant_name,
                  pipeline_name, event_id, precedence=None, state=None,
-                 result_path=None, span_context=None):
+                 result_path=None, span_context=None, span_info=None):
         super().__init__(uuid, precedence, state, result_path, span_context)
         self.job_type = job_type
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.event_id = event_id
+        self.span_info = span_info
 
     def toDict(self):
         d = super().toDict()
@@ -3489,6 +3490,7 @@ class MergeRequest(JobRequest):
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "event_id": self.event_id,
+            "span_info": self.span_info,
         })
         return d
 
@@ -3505,6 +3507,7 @@ class MergeRequest(JobRequest):
             state=data["state"],
             result_path=data["result_path"],
             span_context=data.get("span_context"),
+            span_info=data.get("span_info"),
         )
 
     def __repr__(self):
@@ -6369,7 +6372,7 @@ class MergeCompletedEvent(ResultEvent):
 
     def __init__(self, request_uuid, build_set_uuid, merged, updated,
                  commit, files, repo_state, item_in_branches,
-                 errors, elapsed_time):
+                 errors, elapsed_time, span_info=None):
         self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.merged = merged
@@ -6380,6 +6383,7 @@ class MergeCompletedEvent(ResultEvent):
         self.item_in_branches = item_in_branches or []
         self.errors = errors or []
         self.elapsed_time = elapsed_time
+        self.span_info = span_info
 
     def __repr__(self):
         return ('<MergeCompletedEvent job: %s buildset: %s merged: %s '
@@ -6400,6 +6404,7 @@ class MergeCompletedEvent(ResultEvent):
             "item_in_branches": list(self.item_in_branches),
             "errors": list(self.errors),
             "elapsed_time": self.elapsed_time,
+            "span_info": self.span_info,
         }
 
     @classmethod
@@ -6415,6 +6420,7 @@ class MergeCompletedEvent(ResultEvent):
             list(data.get("item_in_branches", [])),
             list(data.get("errors", [])),
             data.get("elapsed_time"),
+            data.get("span_info"),
         )
 
 
@@ -6426,24 +6432,31 @@ class FilesChangesCompletedEvent(ResultEvent):
     :arg float elapsed_time: Elapsed time of merge op in seconds.
     """
 
-    def __init__(self, build_set_uuid, files, elapsed_time):
+    def __init__(self, request_uuid, build_set_uuid, files, elapsed_time,
+                 span_info=None):
+        self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.files = files or []
         self.elapsed_time = elapsed_time
+        self.span_info = span_info
 
     def toDict(self):
         return {
+            "request_uuid": self.request_uuid,
             "build_set_uuid": self.build_set_uuid,
             "files": list(self.files),
             "elapsed_time": self.elapsed_time,
+            "span_info": self.span_info,
         }
 
     @classmethod
     def fromDict(cls, data):
         return cls(
+            data.get("request_uuid"),
             data.get("build_set_uuid"),
             list(data.get("files", [])),
             data.get("elapsed_time"),
+            data.get("span_info"),
         )
 
 
