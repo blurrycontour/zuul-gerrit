@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "981bdcfe_83aec767",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-13T15:50:20Z",
+      "side": 1,
+      "message": "Do we need an assertNotIn() here for \u0027foo\u0027: \u0027bar\u0027 as well? We intentionally toggle the option on in the config fixture.",
+      "revId": "11033433ae717c04f005ba44a95749ac3152f5cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
