@@ -447,7 +447,6 @@ class App extends React.Component {
         logoProps={{ to: logoUrl }}
         logoComponent={Link}
         headerTools={pageHeaderTools}
-        topNav={nav}
       />
     )
 
@@ -455,7 +454,7 @@ class App extends React.Component {
       <React.Fragment>
         {notifications.length > 0 && this.renderNotifications(notifications)}
         {this.renderConfigErrors(configErrors)}
-        <Page className="zuul-page" header={pageHeader}>
+        <Page className="zuul-page" header={pageHeader} tertiaryNav={nav}>
           <ErrorBoundary>
             {this.renderContent()}
           </ErrorBoundary>

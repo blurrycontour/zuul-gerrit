@@ -30,6 +30,15 @@ a.refresh {
     height: 40px;
 }
 
+.zuul-page .pf-c-page__header {
+    min-height: 0;
+}
+
+.zuul-page .pf-c-page__main-nav {
+    background-color: var(--pf-global--BackgroundColor--dark-300);
+    padding-top: 0;
+}
+
 .zuul-select-tz {
     /* That's the color PF4 uses for the dropdown items in the navbar */
     color: var(--pf-global--Color--dark-100);
@@ -386,27 +395,6 @@ details.foldable summary::before {
 
 details.foldable[open] summary::before {
     content: "less";
-}
-
-/* Overwrite PF4 navbar rules to enforce the 'lg' layout of the navbar also for
-   'xl' sized screens. This will keep the navbar stacked (like it was in Zuul
-   before) and prevent PF4 to put all elements in a single line with horizontal
-   scrolling (which would look something like:
-   ZUUL | < Status Projects Jobs Labels No... > | API Documentation Tenant */
-@media screen and (min-width: 1200px) {
-    .pf-c-page__header-nav {
-        grid-column: 1/-1;
-        grid-row: 2/3;
-    }
-
-    .pf-c-page {
-        --pf-c-page__header-nav--PaddingRight: var(
-            --pf-c-page__header-nav--lg--PaddingRight
-        );
-        --pf-c-page__header-nav--PaddingLeft: var(
-            --pf-c-page__header-nav--lg--PaddingLeft
-        );
-    }
 }
 
 /* The box size calculation compared to the text size seems off, but
