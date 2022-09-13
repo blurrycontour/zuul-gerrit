@@ -2754,12 +2754,32 @@ class Scheduler(threading.Thread):
         build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
             return
+
+        tracing.endSavedSpan(
+            build_set.merger_spans.get(event.request_uuid),
+            attributes={
+                "uuid": event.request_uuid,
+                "buildset_uuid": build_set.uuid,
+                "zuul_event_id": build_set.item.event.zuul_event_id,
+            }
+        )
         pipeline.manager.onMergeCompleted(event, build_set)
 
     def _doFilesChangesCompletedEvent(self, event, pipeline):
         build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
             return
+
+        span_info = build_set.merger_spans.get(event.request_uuid)
+        if span_info:
+            span = self.tracing.restoreSpan(span_info, is_remote=False)
+            span.set_attributes({
+                "uuid": event.request_uuid,
+                "buildset_uuid": build_set.uuid,
+                "zuul_event_id": build_set.item.event.zuul_event_id,
+            })
+            span.end()
+
         pipeline.manager.onFilesChangesCompleted(event, build_set)
 
     def _doNodesProvisionedEvent(self, event, pipeline):

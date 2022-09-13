@@ -28,6 +28,7 @@ from kazoo.exceptions import NoNodeError
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib import tracing
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
 from zuul.model import (
@@ -94,6 +95,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.config = config
 
+        self.tracing = tracing.Tracing(self.config)
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
@@ -180,6 +182,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         self._merger_running = False
         self.merger_loop_wake_event.set()
         self.zk_client.disconnect()
+        self.tracing.stop()
 
     def join(self):
         self.merger_loop_wake_event.set()
@@ -204,7 +207,11 @@ class BaseMergeServer(metaclass=ABCMeta):
                 for merge_request in self.merger_api.next():
                     if not self._merger_running:
                         break
-                    self._runMergeJob(merge_request)
+
+                    with tracing.startSpanInContext(
+                            merge_request.span_context, "MergerJob",
+                            attributes={"merger": self.hostname}):
+                        self._runMergeJob(merge_request)
             except Exception:
                 self.log.exception("Error in merge thread:")
                 time.sleep(5)
@@ -411,6 +418,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             )
             if merge_request.job_type == MergeRequest.FILES_CHANGES:
                 event = FilesChangesCompletedEvent(
+                    merge_request.uuid,
                     merge_request.build_set_uuid,
                     files,
                     elapsed_time,
