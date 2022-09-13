@@ -145,6 +145,7 @@ class Tracing:
             'name': span.name,
             'trace_id': span.context.trace_id,
             'span_id': span.context.span_id,
+            'trace_flags': span.context.trace_flags,
             'start_time': span.start_time,
         }
         if links:
@@ -176,15 +177,15 @@ class Tracing:
         if not self.tracer:
             return None
         if span_info is None:
-            return None
-        required_keys = {'name', 'trace_id', 'span_id'}
+            return trace_api.INVALID_SPAN
+        required_keys = {'name', 'trace_id', 'span_id', 'trace_flags'}
         if not required_keys <= set(span_info.keys()):
-            return None
+            return trace_api.INVALID_SPAN
         span_context = trace_api.SpanContext(
             span_info['trace_id'],
             span_info['span_id'],
             is_remote=is_remote,
-            trace_flags=trace_api.TraceFlags(trace_api.TraceFlags.SAMPLED)
+            trace_flags=trace_api.TraceFlags(span_info['trace_flags']),
         )
         links = []
         for link_info in span_info.get('links', []):
@@ -268,12 +269,15 @@ class Tracing:
         This is a convenience method to start a child span of a remote
         parent span without fully restoring the parent span.
         """
-        span_context = trace_api.SpanContext(
-            trace_id=span_context['trace_id'],
-            span_id=span_context['span_id'],
-            is_remote=True,
-            trace_flags=trace_api.TraceFlags(span_context['trace_flags'])
-        )
+        if span_context:
+            span_context = trace_api.SpanContext(
+                trace_id=span_context['trace_id'],
+                span_id=span_context['span_id'],
+                is_remote=True,
+                trace_flags=trace_api.TraceFlags(span_context['trace_flags'])
+            )
+        else:
+            span_context = trace_api.INVALID_SPAN_CONTEXT
         parent = trace_api.NonRecordingSpan(span_context)
         with self.useSpan(parent):
             return self.tracer.start_span(name, **kw)
