@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aea54371_f05a0294",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-13T21:37:55Z",
+      "side": 1,
+      "message": "I don\u0027t like the idea that we may need to do this in a lot of places, so I\u0027m going to propose a change ahead of this one to handle None as input to startSpanInContext and then revert this change back to the previous patchset.",
+      "revId": "6885ce9069b0787a4660ea56ad3f76ef196451e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
