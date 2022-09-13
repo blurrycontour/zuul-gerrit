@@ -455,7 +455,7 @@ class App extends React.Component {
       <React.Fragment>
         {notifications.length > 0 && this.renderNotifications(notifications)}
         {this.renderConfigErrors(configErrors)}
-        <Page header={pageHeader}>
+        <Page className="zuul-page" header={pageHeader}>
           <ErrorBoundary>
             {this.renderContent()}
           </ErrorBoundary>
