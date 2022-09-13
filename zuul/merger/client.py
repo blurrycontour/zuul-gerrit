@@ -17,6 +17,7 @@ from uuid import uuid4
 
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+import zuul.lib.tracing as tracing
 from zuul.model import (
     FilesChangesCompletedEvent,
     MergeCompletedEvent,
@@ -27,7 +28,16 @@ from zuul.model import (
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.merger import MergerApi
 from zuul.zk.exceptions import JobRequestNotFound
+
 from kazoo.exceptions import BadVersionError, NoNodeError
+from opentelemetry import trace
+
+_JOB_TYPE_TO_SPAN_NAME = {
+    MergeRequest.MERGE: "Merge",
+    MergeRequest.CAT: "Cat",
+    MergeRequest.REF_STATE: "RefState",
+    MergeRequest.FILES_CHANGES: "FilesChanges",
+}
 
 
 class MergeClient(object):
@@ -63,26 +73,37 @@ class MergeClient(object):
         build_set_uuid = None
         tenant_name = None
         pipeline_name = None
+        parent_span = None
+        uuid = str(uuid4().hex)
+        tracer = trace.get_tracer("zuul")
 
         if build_set is not None:
             build_set_uuid = build_set.uuid
             tenant_name = build_set.item.pipeline.tenant.name
             pipeline_name = build_set.item.pipeline.name
 
-        uuid = str(uuid4().hex)
+            parent_span = tracing.restoreSpan(build_set.span_info)
+        with trace.use_span(parent_span):
+            job_span = tracer.start_span(_JOB_TYPE_TO_SPAN_NAME[job_type])
+            if build_set is not None:
+                with build_set.activeContext(
+                        build_set.item.pipeline.manager.current_context):
+                    build_set.merger_spans[uuid] = tracing.getSpanInfo(
+                        job_span)
 
         log = get_annotated_logger(self.log, event)
         log.debug("Submitting job %s with data %s", uuid, data)
 
-        request = MergeRequest(
-            uuid=uuid,
-            job_type=job_type,
-            build_set_uuid=build_set_uuid,
-            tenant_name=tenant_name,
-            pipeline_name=pipeline_name,
-            event_id=event.zuul_event_id if event else None,
-            precedence=precedence
-        )
+        with trace.use_span(job_span):
+            request = MergeRequest(
+                uuid=uuid,
+                job_type=job_type,
+                build_set_uuid=build_set_uuid,
+                tenant_name=tenant_name,
+                pipeline_name=pipeline_name,
+                event_id=event.zuul_event_id if event else None,
+                precedence=precedence
+            )
         return self.merger_api.submit(request, data,
                                       needs_result=needs_result)
 
@@ -159,6 +180,7 @@ class MergeClient(object):
                 "via result event for %s", merge_request)
             if merge_request.job_type == MergeRequest.FILES_CHANGES:
                 event = FilesChangesCompletedEvent(
+                    merge_request.uuid,
                     merge_request.build_set_uuid,
                     files=None,
                     elapsed_time=None,
