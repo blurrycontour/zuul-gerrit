@@ -114,6 +114,8 @@ class TestTracing(ZuulTestCase):
         self.log.debug("Received:\n%s", buildset)
         item = self.getSpan('QueueItem')
         self.log.debug("Received:\n%s", item)
+        merge_job = self.getSpan('Merge')
+        self.log.debug("Received:\n%s", merge_job)
         build = self.getSpan('Build')
         self.log.debug("Received:\n%s", build)
         job = self.getSpan('JobExecution')
@@ -125,6 +127,10 @@ class TestTracing(ZuulTestCase):
                         item.start_time_unix_nano)
         self.assertTrue(buildset.end_time_unix_nano <=
                         item.end_time_unix_nano)
+        self.assertTrue(merge_job.start_time_unix_nano >=
+                        buildset.start_time_unix_nano)
+        self.assertTrue(merge_job.end_time_unix_nano <=
+                        buildset.end_time_unix_nano)
         item_attrs = attributes_to_dict(item.attributes)
         self.assertTrue(item_attrs['ref_number'] == "1")
         self.assertTrue(item_attrs['ref_patchset'] == "1")

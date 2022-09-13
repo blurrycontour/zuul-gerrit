@@ -3818,6 +3818,8 @@ class BuildSet(zkobject.ZKObject):
             job_graph=None,
             jobs={},
             deduplicated_jobs=[],
+            # Mapping of merge request UUID to span info
+            merger_spans={},
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
@@ -3922,6 +3924,7 @@ class BuildSet(zkobject.ZKObject):
             "configured_time": self.configured_time,
             "start_time": self.start_time,
             "repo_state_request_time": self.repo_state_request_time,
+            "merger_spans": self.merger_spans,
             # jobs (serialize as separate objects)
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
