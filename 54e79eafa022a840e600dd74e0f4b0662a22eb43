@@ -100,6 +100,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98ae3043_915de4ab",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-14T23:59:58Z",
+      "side": 1,
+      "message": "done in https://review.opendev.org/c/zuul/zuul/+/857795",
+      "parentUuid": "6c564049_11e761dc",
+      "revId": "54e79eafa022a840e600dd74e0f4b0662a22eb43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4e531ce_15be36a8",
