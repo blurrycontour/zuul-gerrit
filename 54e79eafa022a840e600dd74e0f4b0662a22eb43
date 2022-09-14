@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61013617_c87d29de",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-14T23:47:51Z",
+      "side": 1,
+      "message": "Done in a follow-on https://review.opendev.org/c/zuul/zuul/+/857793",
+      "parentUuid": "236b2cc9_636c02c7",
+      "range": {
+        "startLine": 218,
+        "startChar": 47,
+        "endLine": 218,
+        "endChar": 62
+      },
+      "revId": "54e79eafa022a840e600dd74e0f4b0662a22eb43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d407a2ea_5f809ba4",
@@ -37,6 +61,24 @@
       "writtenOn": "2022-09-14T22:38:43Z",
       "side": 1,
       "message": "This seems to just slightly over indent the task name and status label content for me compared to those with interesting keys.\n\nThis may be related to my default browser zoom and dpi settings as I\u0027ve got a small high res display that I have to adjust settings for to make things for my eyeballs to be able to read.",
+      "revId": "54e79eafa022a840e600dd74e0f4b0662a22eb43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c398ed50_8b70025b",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-14T23:47:51Z",
+      "side": 1,
+      "message": "https://review.opendev.org/c/zuul/zuul/+/857794 is an alternative to this that uses an invisible button; let\u0027s see if that works better.",
+      "parentUuid": "d407a2ea_5f809ba4",
       "revId": "54e79eafa022a840e600dd74e0f4b0662a22eb43",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -71,6 +113,24 @@
       "writtenOn": "2022-09-14T22:38:43Z",
       "side": 1,
       "message": "I don\u0027t know enough about the javascript execution model here, but does it make sense to construct two items for every row when only one will ever be used? Is this lazy? Just thinking there may be thousands of these rows and cutting the number constructed in half may have an appreciable impact.",
+      "revId": "54e79eafa022a840e600dd74e0f4b0662a22eb43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e0eea28_a0b25834",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-14T23:47:51Z",
+      "side": 1,
+      "message": "done in https://review.opendev.org/c/zuul/zuul/+/857793",
+      "parentUuid": "e4e531ce_15be36a8",
       "revId": "54e79eafa022a840e600dd74e0f4b0662a22eb43",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
