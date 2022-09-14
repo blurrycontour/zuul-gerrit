@@ -20,6 +20,7 @@ import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
 
 import {
+  Button,
   Chip,
   DataList,
   DataListItem,
@@ -36,6 +37,7 @@ import {
 } from '@patternfly/react-core'
 
 import {
+  AngleRightIcon,
   ContainerNodeIcon,
   InfoCircleIcon,
   SearchPlusIcon,
@@ -227,17 +229,20 @@ class HostTask extends React.Component {
 
     // NOTE(ianw) 2022-08-26 since we have some rows that expand and
     // others that don't, the expansion button pushes things out of
-    // alignment.  This is based on me finding the > icon has a
-    // min-width of 40px, and then trying to find the right variable
-    // to extend the cell padding/margins the same as the toggle
-    // control.
+    // alignment.  This tries to emulate the button and then
+    // hide it.  See also:
     //   https://github.com/patternfly/patternfly/issues/5055
     // We might want to think about other ways to present this?
     if (!interestingKeys) {
       dataListCells.push(
         <DataListCell key='padding-icon' isIcon={true}
-                      style={{marginRight: 'var(--pf-c-data-list__item-control--MarginRight)'}}>
-          <span style={{display: 'inline-block', minWidth: '40px'}}></span>
+                      className='pf-c-data-list__item-control'>
+          <div className='pf-c-data-list__toggle'
+               style={{visibility: 'hidden'}}>
+            <Button disabled>
+              <AngleRightIcon />
+            </Button>
+          </div>
         </DataListCell>
       )
     }
