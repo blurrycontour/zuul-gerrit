@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ebb4d25_9c597f74",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-14T15:34:17Z",
+      "side": 1,
+      "message": "Attributes should be added when ending the span and not at the start. This way we don\u0027t have to store duplicate data in Zookeeper.",
+      "revId": "98e551590a2f466ae9f84263cd044c40b6065795",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
