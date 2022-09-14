@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0604070_5f6285b5",
+        "filename": "web/src/containers/semaphore/SemaphoreTable.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-14T00:07:28Z",
+      "side": 1,
+      "message": "This looks a bit odd, as it has an empty table and also a spinner?\n\nhttps://imgur.com/a/CTJrfzH\n\nOr is this just an artifact of the current live site not having this api endpoint?",
+      "revId": "150d3e9430e22490e249ab2d850647773277ed5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
