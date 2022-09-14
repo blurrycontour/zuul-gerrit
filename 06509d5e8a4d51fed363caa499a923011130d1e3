@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c92169b_120724e0",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-14T22:51:41Z",
+      "side": 1,
+      "message": "I think this guard may no longer be strictly necessary since yaml dicts will only let you set the queue name once per project anyway? Doesn\u0027t hurt to have it though.",
+      "revId": "06509d5e8a4d51fed363caa499a923011130d1e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
