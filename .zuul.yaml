@@ -22,6 +22,7 @@
 
 - job:
     name: zuul-stream-functional
+    ansible-version: 6
     parent: multinode
     nodeset: zuul-functional-temp-master
     pre-run: playbooks/zuul-stream/pre.yaml
@@ -62,6 +63,7 @@
 
 - job:
     name: zuul-tox
+    ansible-version: 6
     description: |
       Zuul unit tests with ZooKeeper running
     parent: tox
@@ -81,6 +83,7 @@
 
 - job:
     name: zuul-tox-remote
+    ansible-version: 6
     parent: tox
     nodeset: ubuntu-jammy
     timeout: 2700  # 45 minutes
@@ -135,6 +138,7 @@
 
 - job:
     name: zuul-build-dashboard
+    ansible-version: 6
     parent: build-javascript-deployment
     description: |
       Builds the zuul dashboard without an overridden API URL.
@@ -188,6 +192,7 @@
 # because that is where the docker-compose file is located.
 - job:
     name: zuul-quick-start
+    ansible-version: 6
     parent: opendev-buildset-registry-consumer
     description: Run the commands in the Zuul tutorial quick-start documentation.
     pre-run: playbooks/tutorial/pre.yaml
@@ -216,6 +221,7 @@
 
 - job:
     name: zuul-build-image
+    ansible-version: 6
     parent: opendev-build-docker-image
     description: Build Docker images.
     allowed-projects: zuul/zuul
@@ -256,6 +262,7 @@
 
 - job:
     name: zuul-upload-image
+    ansible-version: 6
     parent: opendev-upload-docker-image
     description: Build Docker images and upload to Docker Hub.
     allowed-projects: zuul/zuul
@@ -271,6 +278,7 @@
 
 - job:
     name: zuul-promote-image
+    ansible-version: 6
     parent: opendev-promote-docker-image
     description: Promote previously uploaded Docker images.
     allowed-projects: zuul/zuul
@@ -284,12 +292,14 @@
 
 - job:
     name: zuul-build-python-release
+    ansible-version: 6
     parent: build-python-release
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
 - job:
     name: zuul-release-python
+    ansible-version: 6
     parent: opendev-release-python
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
@@ -304,6 +314,7 @@
         - zuul-build-image
         - zuul-tox-docs
         - tox-linters:
+            ansible-version: 6
             vars:
               tox_install_bindep: false
             nodeset: ubuntu-jammy
@@ -314,10 +325,12 @@
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
         - nodejs-run-lint:
+            ansible-version: 6
             vars:
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
             nodeset: ubuntu-jammy
         - nodejs-run-test:
+            ansible-version: 6
             vars:
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
             files:
