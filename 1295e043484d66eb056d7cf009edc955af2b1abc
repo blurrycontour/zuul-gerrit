@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c44bbd68_469df9d6",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-15T09:47:56Z",
+      "side": 1,
+      "message": "With that we need to reset the global trace provider in the OTLPFixture as this can normally only be done once.\n\nhttps://opentelemetry-python.readthedocs.io/en/latest/api/trace.html?highlight\u003dset_tracer_provider#opentelemetry.trace.set_tracer_provider",
+      "revId": "1295e043484d66eb056d7cf009edc955af2b1abc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
