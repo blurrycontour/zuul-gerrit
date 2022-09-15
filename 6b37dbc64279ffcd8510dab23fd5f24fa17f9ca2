@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ac9e60c_e84b2123",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2775,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-15T09:49:14Z",
+      "side": 1,
+      "message": "This should be `tracing.restoreSpan()` (no self)",
+      "revId": "6b37dbc64279ffcd8510dab23fd5f24fa17f9ca2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
