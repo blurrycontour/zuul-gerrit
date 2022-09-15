@@ -870,16 +870,6 @@ class ExecutorFactsMixin:
                           output)
 
 
-class TestExecutorFacts28(AnsibleZuulTestCase, ExecutorFactsMixin):
-    tenant_config_file = 'config/executor-facts/main28.yaml'
-    ansible_major_minor = '2.8'
-
-
-class TestExecutorFacts29(AnsibleZuulTestCase, ExecutorFactsMixin):
-    tenant_config_file = 'config/executor-facts/main29.yaml'
-    ansible_major_minor = '2.9'
-
-
 class TestExecutorFacts5(AnsibleZuulTestCase, ExecutorFactsMixin):
     tenant_config_file = 'config/executor-facts/main5.yaml'
     ansible_major_minor = '2.12'
@@ -939,20 +929,6 @@ class AnsibleCallbackConfigsMixin:
             output = f.read()
             self.assertIn(f'Ansible version={self.ansible_major_minor}',
                           output)
-
-
-class TestAnsibleCallbackConfigs28(AnsibleZuulTestCase,
-                                   AnsibleCallbackConfigsMixin):
-    config_file = 'zuul-executor-ansible-callback.conf'
-    tenant_config_file = 'config/ansible-callbacks/main28.yaml'
-    ansible_major_minor = '2.8'
-
-
-class TestAnsibleCallbackConfigs29(AnsibleZuulTestCase,
-                                   AnsibleCallbackConfigsMixin):
-    config_file = 'zuul-executor-ansible-callback.conf'
-    tenant_config_file = 'config/ansible-callbacks/main29.yaml'
-    ansible_major_minor = '2.9'
 
 
 class TestAnsibleCallbackConfigs5(AnsibleZuulTestCase,

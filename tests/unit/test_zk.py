@@ -1352,7 +1352,7 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
             "use_relative_priority": True,
             "max_hold_expiration": 7200,
             "default_hold_expiration": 3600,
-            "default_ansible_version": "2.9",
+            "default_ansible_version": "5",
             "web_root": "/web/root",
             "web_status_url": "/web/status",
             "websocket_url": "/web/socket",
