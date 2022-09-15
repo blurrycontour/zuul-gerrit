@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4bc2373_4d11db1e",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-15T23:23:39Z",
+      "side": 1,
+      "message": "You could probably use a const with:\nconst item \u003d interestingKeys ? (\u003c...\u003e) : (\u003c...\u003e)",
+      "revId": "bb71a0d133aa74e0668e1fadb0b57d4b4c2ffe72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
