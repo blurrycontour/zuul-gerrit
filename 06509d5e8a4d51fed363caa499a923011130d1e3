@@ -16,6 +16,24 @@
       "message": "I think this guard may no longer be strictly necessary since yaml dicts will only let you set the queue name once per project anyway? Doesn\u0027t hurt to have it though.",
       "revId": "06509d5e8a4d51fed363caa499a923011130d1e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c8e67a4_f2aed660",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-15T00:17:16Z",
+      "side": 1,
+      "message": "But we may have multiple project stanzas for the same project.  Ie, this is valid:\n- project:\n    name: zuul\n    queue: red\n- project:\n    name: zuul\n    queue: blue\n\nWe should be in the red queue.",
+      "parentUuid": "6c92169b_120724e0",
+      "revId": "06509d5e8a4d51fed363caa499a923011130d1e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
