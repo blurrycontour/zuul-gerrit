@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0501ff97_a20a30c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-15T01:54:20Z",
+      "side": 1,
+      "message": "This results in an offset going the other direction. Rows with the drop down toggle have their text pushed further right of the text for rows without the toggle.",
+      "revId": "9d6d4a009828fae71a9fab5bd8ad5672836fe349",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
