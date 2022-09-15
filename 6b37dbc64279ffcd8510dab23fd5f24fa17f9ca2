@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc1faa04_4d08fe4e",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-15T14:58:14Z",
+      "side": 1,
+      "message": "This is going to cause a lot of extra zk writes.  Can we put this on the JobRequest instead?  (Then either end it on the merger when the job request is deleted, or transfer it to the result event, depending on whether you want another span for the result event.)",
+      "revId": "6b37dbc64279ffcd8510dab23fd5f24fa17f9ca2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ac9e60c_e84b2123",
