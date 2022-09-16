@@ -1512,7 +1512,7 @@ class NodeRequest(object):
 
     def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
                  job_name, labels, provider, relative_priority,
-                 event_id=None):
+                 event_id=None, span_info=None):
         self.requestor = requestor
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
@@ -1530,6 +1530,7 @@ class NodeRequest(object):
         self.id = None
         self._zk_data = {}  # Data that we read back from ZK
         self.event_id = event_id
+        self.span_info = span_info
         # Zuul internal flags (not stored in ZK so they are not
         # overwritten).
         self.failed = False
@@ -1580,6 +1581,7 @@ class NodeRequest(object):
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "job_name": self.job_name,
+            "span_info": self.span_info,
         }
         d.setdefault('node_types', self.labels)
         d.setdefault('requestor', self.requestor)
@@ -1628,6 +1630,7 @@ class NodeRequest(object):
             labels=data["node_types"],
             provider=data["provider"],
             relative_priority=data.get("relative_priority", 0),
+            span_info=requestor_data.get("span_info"),
         )
 
         request.updateFromDict(data)
