@@ -16,6 +16,23 @@
       "message": "I really like this change.",
       "revId": "7a8a979fda7b09a10600ce2c4d8d2c73a8acf985",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "207e9b83_795dfdfa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-09-16T10:49:57Z",
+      "side": 1,
+      "message": "recheck ",
+      "revId": "7a8a979fda7b09a10600ce2c4d8d2c73a8acf985",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
