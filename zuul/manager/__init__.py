@@ -887,22 +887,25 @@ class PipelineManager(metaclass=ABCMeta):
             relative_priority = item.getNodePriority()
         else:
             relative_priority = 0
-        for job in jobs:
-            provider = self._getPausedParentProvider(build_set, job)
-            priority = self._calculateNodeRequestPriority(build_set, job)
-            tenant_name = build_set.item.pipeline.tenant.name
-            pipeline_name = build_set.item.pipeline.name
-            req = self.sched.nodepool.requestNodes(
-                build_set.uuid, job, tenant_name, pipeline_name, provider,
-                priority, relative_priority, event=item.event)
-            log.debug("Adding node request %s for job %s to item %s",
-                      req, job, item)
-            build_set.setJobNodeRequestID(job.name, req.id)
-            if req.fulfilled:
-                nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
-                build_set.jobNodeRequestComplete(req.job_name, nodeset)
-            else:
-                job.setWaitingStatus(f'node request: {req.id}')
+
+        parent_span = tracing.restoreSpan(build_set.span_info)
+        with trace.use_span(parent_span):
+            for job in jobs:
+                provider = self._getPausedParentProvider(build_set, job)
+                priority = self._calculateNodeRequestPriority(build_set, job)
+                tenant_name = build_set.item.pipeline.tenant.name
+                pipeline_name = build_set.item.pipeline.name
+                req = self.sched.nodepool.requestNodes(
+                    build_set.uuid, job, tenant_name, pipeline_name, provider,
+                    priority, relative_priority, event=item.event)
+                log.debug("Adding node request %s for job %s to item %s",
+                          req, job, item)
+                build_set.setJobNodeRequestID(job.name, req.id)
+                if req.fulfilled:
+                    nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
+                    build_set.jobNodeRequestComplete(req.job_name, nodeset)
+                else:
+                    job.setWaitingStatus(f'node request: {req.id}')
         return True
 
     def _getPausedParent(self, build_set, job):
