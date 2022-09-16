@@ -20,6 +20,7 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Chip,
   DataList,
   DataListItem,
   DataListItemRow,
@@ -32,6 +33,7 @@ import {
 
 import {
   CheckCircleIcon,
+  ContainerNodeIcon,
   InfoCircleIcon,
   TimesIcon,
   TimesCircleIcon,
@@ -44,19 +46,23 @@ class BuildOutput extends React.Component {
 
   renderHosts (hosts) {
     return (
-      <Card>
-        <CardHeader>
-          <strong>Task run summary</strong>
-        </CardHeader>
-        <CardBody>
-          <DataList aria-label="Build Results">
+      <>
+        <br />
+        <div className={'zuul-task-summary'}>
+          <DataList aria-label="Build Results" isCompact={true}>
             {Object.entries(hosts).map(([host, values]) => (
               <DataListItem key={host} aria-label="Host">
                 <DataListItemRow>
                   <DataListItemCells
                     dataListCells={[
-                      <DataListCell key={host + '.name'}>{host} </DataListCell>,
-                      <DataListCell key={host + '.data'}>
+                      <DataListCell key={host + '.name'}>
+                        <Chip isReadOnly={true} textMaxWidth='50ch'>
+                          <span style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
+                            <ContainerNodeIcon />&nbsp;{host}
+                          </span>
+                        </Chip>
+                      </DataListCell>,
+                      <DataListCell key={host + '.data'} >
                         <Flex>
                           <FlexItem>
                             <Label color="green" icon={<CheckCircleIcon />}>{values.ok} OK</Label>
@@ -75,8 +81,8 @@ class BuildOutput extends React.Component {
               </DataListItem>
             ))}
           </DataList>
-        </CardBody>
-      </Card>
+        </div>
+      </>
     )
   }
 
@@ -139,6 +145,7 @@ class BuildOutput extends React.Component {
     return (
       <React.Fragment>
         {this.renderHosts(output)}
+        <br />
         {Object.entries(output)
           .filter(([, values]) => values.failed.length > 0)
           .map(([host, values]) => (values.failed.map(failed => (
