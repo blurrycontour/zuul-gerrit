@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "2c9610de2d92ace830417961faaf295bef3548a8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00836b66_643f6dc1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-16T18:18:20Z",
+      "side": 1,
+      "message": "recheck python38 test failure should be unrelated to these web updates",
+      "revId": "2c9610de2d92ace830417961faaf295bef3548a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
