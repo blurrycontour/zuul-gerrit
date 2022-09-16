@@ -72,18 +72,19 @@
 
 - project:
     name: org/project1
+    queue: integrated
     check:
       jobs:
         - image-builder
         - library-builder
         - hold
     gate:
-      queue: integrated
       jobs:
         - image-builder
 
 - project:
     name: org/project2
+    queue: integrated
     check:
       jobs:
         - image-user
@@ -91,7 +92,6 @@
         - library-user2
         - hold
     gate:
-      queue: integrated
       jobs:
         - image-user
 

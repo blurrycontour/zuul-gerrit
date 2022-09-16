@@ -187,16 +187,6 @@ pipeline.
          :attr:`job` definition.  Any attributes set on the job here
          will override previous versions of the job.
 
-      .. attr:: queue
-
-         This is the same as :attr:`project.queue` but on per pipeline
-         level for backwards compatibility reasons. If :attr:`project.queue`
-         is defined this setting is ignored.
-
-         .. note:: It is deprecated to define the queue in the pipeline
-                   configuration. Configure it on :attr:`project.queue`
-                   instead.
-
       .. attr:: debug
 
          If this is set to `true`, Zuul will include debugging
