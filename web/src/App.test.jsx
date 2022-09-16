@@ -122,8 +122,8 @@ it('renders single tenant', async () => {
   // Link should be white-label scoped
   const topMenuLinks = application.root.findAllByType(Link)
   expect(topMenuLinks[0].props.to).toEqual('/status')
-  expect(topMenuLinks[1].props.to.pathname).toEqual('/status')
-  expect(topMenuLinks[2].props.to.pathname).toEqual('/projects')
+  expect(topMenuLinks[4].props.to.pathname).toEqual('/status')
+  expect(topMenuLinks[5].props.to.pathname).toEqual('/projects')
   // Location should be /status
   expect(location.pathname).toEqual('/status')
   // Info should tell white label tenant openstack
