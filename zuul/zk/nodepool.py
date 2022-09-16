@@ -23,6 +23,7 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.lib import tracing
 from zuul.lib.jsonutil import json_dumps
 from zuul.model import HoldRequest, NodeRequest, Node
 from zuul.zk import ZooKeeperBase
@@ -456,6 +457,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
             contents of the request.
         """
         node_request.created_time = time.time()
+        node_request.span_info = tracing.startSavedSpan(
+            "RequestNodes", start_time=node_request.created_time)
         data = node_request.toDict()
 
         path = '{}/{:0>3}-'.format(self.REQUEST_ROOT, priority)
