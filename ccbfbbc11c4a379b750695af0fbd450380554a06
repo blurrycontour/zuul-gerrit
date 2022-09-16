@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "efdebb39_040c377b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-16T00:04:44Z",
+      "side": 1,
+      "message": "Nit: no need for \"feat()\", you can just say:\n  Elasticsearch: support datastreams and rollover aliases\nor\n  Support datastreams and rollover aliases in elasticsearch",
+      "revId": "ccbfbbc11c4a379b750695af0fbd450380554a06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "654dec3b_525caec4",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
