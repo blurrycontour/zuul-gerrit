@@ -107,7 +107,8 @@ class JobVariant extends React.Component {
     const jobInfos = [
       'source_context', 'builds', 'status',
       'parent', 'attempts', 'timeout', 'semaphores',
-      'nodeset', 'variables', 'override_checkout',
+      'nodeset', 'nodeset_alternatives', 'variables',
+      'override_checkout',
     ]
     jobInfos.forEach(key => {
       let label = key
@@ -173,7 +174,15 @@ class JobVariant extends React.Component {
         )
         nice_label = (<span><ClusterIcon /> Required nodes</span>)
       }
-
+      if (label === 'nodeset_alternatives') {
+        value = value.map((alt, idx) => {
+          return (<>
+                    {(idx > 0 ? <span>or</span>:<></>)}
+                    <Nodeset nodeset={alt} />
+                  </>)
+        })
+        nice_label = (<span><ClusterIcon /> Required nodes</span>)
+      }
       if (label === 'parent') {
         value = (
           <Link to={tenant.linkPrefix + '/job/' + value}>

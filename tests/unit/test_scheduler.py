@@ -36,6 +36,7 @@ from zuul.driver.gerrit import gerritreporter
 import zuul.scheduler
 import zuul.model
 import zuul.merger.merger
+from zuul.lib import yamlutil as yaml
 
 from tests.base import (
     SSLZuulTestCase,
@@ -6088,6 +6089,50 @@ For CI problems and help debugging, contact ci@example.org"""
         for node in self.fake_nodepool.getNodes():
             self.assertFalse(node['_lock'])
             self.assertEqual(node['state'], 'ready')
+
+    @simple_layout('layouts/nodeset-fallback.yaml')
+    def test_nodeset_fallback(self):
+        # Test that nodeset fallback works
+        self.executor_server.hold_jobs_in_build = True
+
+        # Verify that we get the correct number and order of
+        # alternates from our nested config.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        job = tenant.layout.getJob('check-job')
+        alts = job.flattenNodesetAlternatives(tenant.layout)
+        self.assertEqual(4, len(alts))
+        self.assertEqual('fast-nodeset', alts[0].name)
+        self.assertEqual('', alts[1].name)
+        self.assertEqual('red-nodeset', alts[2].name)
+        self.assertEqual('blue-nodeset', alts[3].name)
+
+        self.fake_nodepool.pause()
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        req = self.fake_nodepool.getNodeRequests()[0]
+        self.fake_nodepool.addFailRequest(req)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        build = self.getBuildByName('check-job')
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        inventory = yaml.safe_load(open(inv_path, 'r'))
+        label = inventory['all']['hosts']['controller']['nodepool']['label']
+        self.assertEqual('slow-label', label)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertNotIn('NODE_FAILURE', A.messages[0])
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     @simple_layout('layouts/multiple-templates.yaml')
     def test_multiple_project_templates(self):

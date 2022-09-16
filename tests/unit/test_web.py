@@ -341,6 +341,82 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(1, len(data), data)
         self.assertEqual("org/project1", data[0]['project'], data)
 
+    @simple_layout('layouts/nodeset-alternatives.yaml')
+    def test_web_find_job_nodeset_alternatives(self):
+        # test a complex nodeset
+        data = self.get_url('api/tenant/tenant-one/job/test-job').json()
+
+        self.assertEqual([
+            {'abstract': False,
+             'ansible_version': None,
+             'attempts': 3,
+             'branches': [],
+             'cleanup_run': [],
+             'deduplicate': 'auto',
+             'dependencies': [],
+             'description': None,
+             'extra_variables': {},
+             'files': [],
+             'final': False,
+             'group_variables': {},
+             'host_variables': {},
+             'intermediate': False,
+             'irrelevant_files': [],
+             'match_on_config_updates': True,
+             'name': 'test-job',
+             'nodeset_alternatives': [{'alternatives': [],
+                                       'groups': [],
+                                       'name': 'fast-nodeset',
+                                       'nodes': [{'aliases': [],
+                                                  'comment': None,
+                                                  'hold_job': None,
+                                                  'id': None,
+                                                  'label': 'fast-label',
+                                                  'name': 'controller',
+                                                  'requestor': None,
+                                                  'state': 'unknown',
+                                                  'tenant_name': None,
+                                                  'user_data': None}]},
+                                      {'alternatives': [],
+                                       'groups': [],
+                                       'name': '',
+                                       'nodes': [{'aliases': [],
+                                                  'comment': None,
+                                                  'hold_job': None,
+                                                  'id': None,
+                                                  'label': 'slow-label',
+                                                  'name': 'controller',
+                                                  'requestor': None,
+                                                  'state': 'unknown',
+                                                  'tenant_name': None,
+                                                  'user_data': None}]}],
+             'override_checkout': None,
+             'parent': 'base',
+             'post_review': None,
+             'post_run': [],
+             'pre_run': [],
+             'protected': None,
+             'provides': [],
+             'required_projects': [],
+             'requires': [],
+             'roles': [{'implicit': True,
+                        'project_canonical_name':
+                        'review.example.com/org/common-config',
+                        'target_name': 'common-config',
+                        'type': 'zuul'}],
+             'run': [],
+             'semaphores': [],
+             'source_context': {'branch': 'master',
+                                'path': 'zuul.yaml',
+                                'project': 'org/common-config'},
+             'tags': [],
+             'timeout': None,
+             'variables': {},
+             'variant_description': '',
+             'voting': True,
+             'workspace_scheme': 'golang',
+            }], data)
+
     def test_web_find_job(self):
         # can we fetch the variants for a single job
         data = self.get_url('api/tenant/tenant-one/job/project-test1').json()
@@ -384,6 +460,7 @@ class TestWeb(BaseTestWeb):
                 'match_on_config_updates': True,
                 'final': False,
                 'nodeset': {
+                    'alternatives': [],
                     'groups': [],
                     'name': '',
                     'nodes': [{'comment': None,
@@ -435,6 +512,7 @@ class TestWeb(BaseTestWeb):
                 'match_on_config_updates': True,
                 'final': False,
                 'nodeset': {
+                    'alternatives': [],
                     'groups': [],
                     'name': '',
                     'nodes': [{'comment': None,
@@ -1071,6 +1149,7 @@ class TestWeb(BaseTestWeb):
             'branch': 'master',
             'cleanup_playbooks': [],
             'nodeset': {
+                'alternatives': [],
                 'groups': [],
                 'name': '',
                 'nodes': [
@@ -1168,7 +1247,8 @@ class TestWeb(BaseTestWeb):
             'host_vars': {},
             'items': [],
             'job': 'noop',
-            'nodeset': {'groups': [], 'name': '', 'nodes': []},
+            'nodeset': {'alternatives': [],
+                        'groups': [], 'name': '', 'nodes': []},
             'override_branch': None,
             'override_checkout': None,
             'post_timeout': None,
