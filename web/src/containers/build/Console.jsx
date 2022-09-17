@@ -266,7 +266,7 @@ class HostTask extends React.Component {
           <Flex>
             <FlexItem>
               <Tooltip content={<div>Click for details</div>}>
-                <SearchPlusIcon style={{cursor: 'pointer'}} />
+                <SearchPlusIcon style={{cursor: 'pointer'}} onClick={this.open} />
               </Tooltip>
             </FlexItem>
             <FlexItem>
