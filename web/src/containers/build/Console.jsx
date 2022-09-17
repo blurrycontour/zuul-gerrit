@@ -215,7 +215,7 @@ class HostTask extends React.Component {
     // their results that show command output, etc.  These plays get
     // an expansion that shows these values without having to click
     // and bring up the full insepction modal.
-    const interestingKeys = hasInterestingKeys(this.props.host, INTERESTING_KEYS)
+    const interestingKeys = hasInterestingKeys(host, INTERESTING_KEYS)
 
     let name = task.task.name
     if (!name) {
@@ -302,27 +302,28 @@ class HostTask extends React.Component {
 
     const content = <TaskOutput data={this.props.host} include={INTERESTING_KEYS}/>
 
-    const expandableItem = <DataListItem isExpanded={this.state.expanded}>
-                             <DataListItemRow>
-                               <DataListToggle
-                                 onClick={() => {this.setState({expanded: !this.state.expanded})}}
-                                 isExpanded={this.state.expanded}
-                               />
-                               <DataListItemCells dataListCells={ dataListCells } />
-                             </DataListItemRow>
-                             <DataListContent
-                               isHidden={!this.state.expanded}>
-                               { content }
-                             </DataListContent>
-                           </DataListItem>
-
-    const regularItem = <DataListItem>
-                          <DataListItemRow>
-                            <DataListItemCells dataListCells={ dataListCells } />
-                          </DataListItemRow>
-                        </DataListItem>
-
-    const item = interestingKeys ? expandableItem : regularItem
+    let item = null
+    if (interestingKeys) {
+      item = <DataListItem isExpanded={this.state.expanded}>
+               <DataListItemRow>
+                 <DataListToggle
+                   onClick={() => {this.setState({expanded: !this.state.expanded})}}
+                   isExpanded={this.state.expanded}
+                 />
+                 <DataListItemCells dataListCells={ dataListCells } />
+               </DataListItemRow>
+               <DataListContent
+                 isHidden={!this.state.expanded}>
+                 { content }
+               </DataListContent>
+             </DataListItem>
+    } else {
+      item = <DataListItem>
+               <DataListItemRow>
+                 <DataListItemCells dataListCells={ dataListCells } />
+               </DataListItemRow>
+             </DataListItem>
+    }
 
     const modalDescription = <Flex>
                                <FlexItem>{label}</FlexItem>
