@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "291f5b01_0e621d04",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35236
+      },
+      "writtenOn": "2022-09-17T21:43:12Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3:\n\u003e \n\u003e I think it was an error to include the zuul data in the first place (it\u0027s for zuul, it\u0027s not the actual return data).  So I\u0027d go one step further -- we should pop the entire zuul entry from the dict before we report it.  That\u0027s what I just did for the mqtt reporter, and I think this should behave the same way.\n\u003e \n\u003e I\u0027d just do that and add a deprecation release note to let people know.  No one should be relying on that.\n\nI\u0027ve updated the review accordingly to your comment 👍\nThe main issue we have can be dealt by removing `zuul` data from the indexed document",
+      "revId": "8c6b87cfff410164c84a4db64ba58ff7fa31acf3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

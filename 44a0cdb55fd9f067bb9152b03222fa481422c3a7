@@ -16,6 +16,24 @@
       "message": "\u003e Patch Set 3:\n\u003e \n\u003e Maybe the es reporter should just always not report the zuul comment data?\n\nI guess that could be an option but this would be a breaking change on the reporter. Also we might need in the future to filter some other variables depending on the pipeline.\n\nThis way makes filtering zuul_return\u0027d variables opt-in and is more flexible.\n\nWhat do you think ?\n\n\n",
       "revId": "44a0cdb55fd9f067bb9152b03222fa481422c3a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56567229_905636e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35236
+      },
+      "writtenOn": "2022-09-17T21:43:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8abce0f5_489d92c9",
+      "revId": "44a0cdb55fd9f067bb9152b03222fa481422c3a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
