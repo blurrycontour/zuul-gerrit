@@ -315,9 +315,14 @@ pre.version {
     border: none
 }
 
+.zuul-console-plays .pf-c-data-list__item:nth-child(even) {
+    background: var(--pf-global--BackgroundColor--200);
+    border-radius: 5px;
+}
+
 .zuul-console .pf-c-data-list__item:hover
 {
-    background: var(--pf-global--BackgroundColor--light-200);
+    background: var(--pf-global--palette--blue-50);
 }
 
 .zuul-console .pf-c-data-list__item:hover::before
