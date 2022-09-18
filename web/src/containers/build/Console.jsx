@@ -227,26 +227,6 @@ class HostTask extends React.Component {
       name = task.role.name + ': ' + name
     }
 
-    // NOTE(ianw) 2022-08-26 since we have some rows that expand and
-    // others that don't, the expansion button pushes things out of
-    // alignment.  This tries to emulate the button and then
-    // hide it.  See also:
-    //   https://github.com/patternfly/patternfly/issues/5055
-    // We might want to think about other ways to present this?
-    if (!interestingKeys) {
-      dataListCells.push(
-        <DataListCell key='padding-icon' isIcon={true}
-                      class='pf-c-data-list__item-control'>
-          <div className='pf-c-data-list__toggle'
-               style={{visibility: 'hidden'}}>
-            <Button disabled>
-              <AngleRightIcon />
-            </Button>
-          </div>
-        </DataListCell>
-      )
-    }
-
     dataListCells.push(
       <DataListCell key='name' width={4}>{name}</DataListCell>
     )
@@ -323,11 +303,23 @@ class HostTask extends React.Component {
                </DataListContent>
              </DataListItem>
     } else {
-      item = <DataListItem>
-               <DataListItemRow>
+      // We currently have to build the data-list item/row/control manually
+      // as we don't have a way to hide the toggle.  Hopefully PF will
+      // add a prop that does this so we can get rid of this, see:
+      //   https://github.com/patternfly/patternfly/issues/5055
+      item = <li class="pf-c-data-list__item">
+               <div class="pf-c-data-list__item-row">
+                 <div class="pf-c-data-list__item-control"
+                      style={{visibility: 'hidden'}}>
+                   <div class="pf-c-data-list__toggle">
+                     <Button disabled>
+                       <AngleRightIcon />
+                     </Button>
+                   </div>
+                 </div>
                  <DataListItemCells dataListCells={ dataListCells } />
-               </DataListItemRow>
-             </DataListItem>
+               </div>
+             </li>
     }
 
     const modalDescription = <Flex>
