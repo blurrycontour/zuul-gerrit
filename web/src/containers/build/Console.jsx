@@ -428,7 +428,10 @@ class PlayBook extends React.Component {
         <DataListContent isHidden={!this.state.expanded}>
 
           {playbook.plays.map((play, idx) => (
-            <DataList isCompact={true} key={this.makePlayId(play, idx)}  style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
+            <DataList isCompact={true}
+                      key={this.makePlayId(play, idx)}
+                      className="zuul-console-plays"
+                      style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
               <DataListItem isExpanded={this.state.playsExpanded.includes(this.makePlayId(play, idx))}>
                 <DataListItemRow>
                   <DataListToggle
