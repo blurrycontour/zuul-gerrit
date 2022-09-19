@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import {
   TreeView,
 } from 'patternfly-react'
+import ReactJson from 'react-json-view'
 
 
 class Artifact extends React.Component {
@@ -32,7 +33,17 @@ class Artifact extends React.Component {
           {Object.keys(artifact.metadata).map(key => (
             <tr key={key}>
               <td>{key}</td>
-              <td style={{width:'100%'}}>{artifact.metadata[key]}</td>
+              <td style={{width:'100%'}}>
+                {typeof(artifact.metadata[key]) === 'object'?
+                 <ReactJson
+                   src={artifact.metadata[key]}
+                   name={null}
+                   collapsed={true}
+                   sortKeys={true}
+                   enableClipboard={false}
+                   displayDataTypes={false}/>
+                 :artifact.metadata[key].toString()}
+              </td>
             </tr>
           ))}
         </tbody>
