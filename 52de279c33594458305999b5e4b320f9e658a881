@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93d0960a_c6a5bb4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-19T09:21:01Z",
+      "side": 1,
+      "message": "\u003e Patch Set 8: Code-Review-1\n\u003e \n\u003e Reapplying -1 for comment above.\n\nDone",
+      "revId": "52de279c33594458305999b5e4b320f9e658a881",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
