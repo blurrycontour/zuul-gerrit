@@ -432,3 +432,7 @@ details.foldable[open] summary::before {
 {
     background: var(--pf-global--active-color--400);
 }
+
+.zuul-task-summary-failed.pf-c-card {
+    background: var(--pf-global--palette--red-50);
+}

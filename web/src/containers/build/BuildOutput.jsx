@@ -89,7 +89,7 @@ class BuildOutput extends React.Component {
   renderFailedTask (host, task) {
     const max_lines = 42
     return (
-      <Card key={host + task.zuul_log_id}>
+      <Card key={host + task.zuul_log_id} className="zuul-task-summary-failed">
         <CardHeader>
           <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
             &nbsp;Task&nbsp;<strong>{task.name}</strong>&nbsp;
