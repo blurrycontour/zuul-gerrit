@@ -29,6 +29,7 @@ import {
   DataListItemCells,
   DataListToggle,
   DataListContent,
+  Divider,
   Flex,
   FlexItem,
   Label,
@@ -232,34 +233,37 @@ class HostTask extends React.Component {
     )
 
     let label = null
+    let labelColor = null
+    let labelString = null
+
     if (this.state.failed) {
-      label = <Label color='red' onClick={this.open}
-                     style={{cursor: 'pointer'}}>FAILED</Label>
+      labelColor = 'red'
+      labelString = 'Failed'
     } else if (this.state.changed) {
-      label = <Label color='orange' onClick={this.open}
-                     style={{cursor: 'pointer'}}>CHANGED</Label>
+      labelColor = 'orange'
+      labelString = 'Changed'
     } else if (this.state.skipped) {
-      label = <Label color='grey' onClick={this.open}
-                     style={{cursor: 'pointer'}}>SKIPPED</Label>
+      labelColor = 'grey'
+      labelString = 'Skipped'
     } else if (this.state.ok) {
-      label = <Label color='green' onClick={this.open}
-                     style={{cursor: 'pointer'}}>OK</Label>
+      labelColor = 'green'
+      labelString = 'OK'
     }
 
     dataListCells.push(
       <DataListCell key='state'>
-          <Flex>
-            <FlexItem>
-              <Tooltip content={<div>Click for details</div>}>
-                <SearchPlusIcon style={{cursor: 'pointer'}} onClick={this.open} />
-              </Tooltip>
+        <Label color={labelColor} onClick={this.open}
+               style={{cursor: 'pointer'}}>
+          <Flex flexWrap={{default: 'nowrap' }}>
+            <FlexItem style={{minWidth: '7ch'}}>
+              {labelString}
             </FlexItem>
+            <Divider align={{default: 'alignRight'}} orientation={{default: 'vertical'}} />
             <FlexItem>
-              <Tooltip content={<div>Click for details</div>}>
-                {label}
-              </Tooltip>
+              <SearchPlusIcon color='var(--pf-global--Color--200)' style={{cursor: 'pointer'}} />
             </FlexItem>
           </Flex>
+        </Label>
       </DataListCell>)
 
     dataListCells.push(
@@ -325,7 +329,9 @@ class HostTask extends React.Component {
     }
 
     const modalDescription = <Flex>
-                               <FlexItem>{label}</FlexItem>
+                               <FlexItem>
+                                 <Label color={labelColor}>{labelString}</Label>
+                               </FlexItem>
                                <FlexItem>
                                  <Chip isReadOnly={true} textMaxWidth='50ch'>
                                    <span style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
