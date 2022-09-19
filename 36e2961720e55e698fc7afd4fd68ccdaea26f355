@@ -16,6 +16,24 @@
       "message": "\u003e Patch Set 2: Code-Review-2\n\u003e \n\u003e See previous comment; this is not the right approach for this.\n\nI see! The other patch looks a lot better. I see that it has not been updated since april, is there some reason for this? Is it still being worked on?",
       "revId": "36e2961720e55e698fc7afd4fd68ccdaea26f355",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af1eb996_6d7e15be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-19T23:20:58Z",
+      "side": 1,
+      "message": "It was something I started on my own initiative (not for a customer) so it has been low priority for me.  I\u0027ll try to unblock it.",
+      "parentUuid": "c92c8a8a_c4ebdd30",
+      "revId": "36e2961720e55e698fc7afd4fd68ccdaea26f355",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
