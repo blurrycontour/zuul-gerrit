@@ -62,6 +62,7 @@ def _formatAttributes(attrs):
 def getSpanInfo(span, include_attributes=False):
     """Return a dict for use in serializing a Span."""
     links = [{'context': _formatContext(l.context),
+              'is_remote': l.context.is_remote,
               'attributes': _formatAttributes(l.attributes)}
              for l in span.links]
     attrs = _formatAttributes(span.attributes)
@@ -113,7 +114,8 @@ def restoreSpan(span_info, is_remote=True):
     for link_info in span_info.get('links', []):
         link_context = trace.SpanContext(
             link_info['context']['trace_id'],
-            link_info['context']['span_id'])
+            link_info['context']['span_id'],
+            is_remote=link_info['is_remote'])
         link = trace.Link(link_context, link_info['attributes'])
         links.append(link)
     attributes = span_info.get('attributes', {})

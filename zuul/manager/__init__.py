@@ -1359,9 +1359,7 @@ class PipelineManager(metaclass=ABCMeta):
         # isn't already set.
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
         if not build_set.ref:
-            with trace.use_span(tracing.restoreSpan(item.span_info)):
-                span_info = tracing.startSavedSpan('BuildSet')
-            build_set.setConfiguration(self.current_context, span_info)
+            build_set.setConfiguration(self.current_context)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
