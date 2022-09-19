@@ -145,7 +145,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             except NoNodeError:
                 return []
 
-    def _getNodeData(self, node):
+    def getNodeData(self, node):
         """
         Get the data for a specific node.
 
@@ -281,7 +281,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         failure = False
         for node_id in getHeldNodeIDs(request):
-            node = self._getNodeData(node_id)
+            node = self.getNodeData(node_id)
             if not node or node['state'] == zuul.model.STATE_USED:
                 continue
 

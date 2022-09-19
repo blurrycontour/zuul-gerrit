@@ -1914,6 +1914,11 @@ class AnsibleJob(object):
                         private_ipv4=node.private_ipv4,
                         public_ipv6=node.public_ipv6,
                         private_ipv6=node.private_ipv6)))
+                driver_data = self.executor_server.nodepool. \
+                    zk_nodepool.getNodeData(node.id)['driver_data']
+                if 'slot' in driver_data:
+                    slot = driver_data['slot']
+                    host_vars['nodepool']['slot'] = slot
 
                 # Ansible >=2.8 introduced "auto" as an
                 # ansible_python_interpreter argument that looks up
@@ -2448,6 +2453,7 @@ class AnsibleJob(object):
             work_root=self.jobdir.work_root,
             result_data_file=self.jobdir.result_data_file,
             inventory_file=self.jobdir.inventory)
+
         zuul_vars['ansible_version'] = self.ansible_version
 
         # Add playbook_context info
