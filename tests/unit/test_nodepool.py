@@ -152,3 +152,17 @@ class TestNodepool(TestNodepoolBase):
         self.assertEqual(request1.state, 'fulfilled')
         self.assertEqual(request2.state, 'fulfilled')
         self.assertTrue(request2.state_time < request1.state_time)
+
+    def test_get_node_data(self):
+        # Test that node data is gathered correctly
+
+        request_id = 'test-id'
+        node_type = 'test-node-id'
+        request = {'tenant_name': 'test-tenant', 'requestor': 'test-requestor'}
+        node = self.fake_nodepool.makeNode(request_id, node_type, request)
+        data = self.nodepool.zk_nodepool.getNodeData(node)
+        self.assertEqual(data['allocated_to'], request_id)
+        self.assertEqual(data['type'], node_type)
+        self.assertEqual(data['tenant_name'], request['tenant_name'])
+        self.assertEqual(data['requestor'], request['requestor'])
+        self.assertEqual(data['id'], node)
