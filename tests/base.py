@@ -1031,6 +1031,11 @@ class GerritWebServer(object):
                 self.send_response(500)
                 self.end_headers()
 
+            def _403(self, msg):
+                self.send_response(403)
+                self.end_headers()
+                self.wfile.write(msg.encode('utf8'))
+
             def _404(self):
                 self.send_response(404)
                 self.end_headers()
@@ -1072,6 +1077,9 @@ class GerritWebServer(object):
                 change = self._get_change(change_id)
                 if not change:
                     return self._404()
+
+                if not fake_gerrit._fake_submit_permission:
+                    return self._403('submit not permitted')
 
                 candidate = self._get_change(change_id)
                 sr = candidate.getSubmitRecords()
@@ -1306,6 +1314,8 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self._poller_event = poller_event
         self._ref_watcher_event = ref_watcher_event
         self._fake_submit_whole_topic = False
+        self._fake_submit_permission = True
+        self.submit_retry_backoff = 0
 
     def onStop(self):
         super().onStop()
