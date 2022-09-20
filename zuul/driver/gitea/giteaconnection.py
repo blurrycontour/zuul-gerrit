@@ -843,6 +843,12 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
 
+        # Never change the is_merged attribute back to unmerged. This is
+        # crucial so this cannot race with mergePull wich sets this attribute
+        # after a successful merge.
+        if not change.is_merged:
+            change.is_merged = change.pr.get('merged')
+
         message = change.pr.get("body") or ""
         if change.title:
             if message:

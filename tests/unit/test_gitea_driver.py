@@ -520,23 +520,25 @@ class TestGiteaDriver(ZuulTestCase):
         # Close PR
         A.closePullRequest()
 
-        # A recheck does not trigger the job
+        # A recheck on closed PR does not trigger the job
         self.fake_gitea.emitEvent(
             A.getPullRequestCommentCreatedEvent('recheck'))
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
 
-        A.mergePullRequest()
-
-        # A recheck does not trigger the job
-        self.fake_gitea.emitEvent(
-            A.getPullRequestCommentCreatedEvent('recheck'))
-        self.waitUntilSettled()
-        self.assertEqual(1, len(self.history))
-
+        # Reopen PR
         A.reopenPullRequest()
 
-        # A recheck does trigger the job
+        # A recheck on reopened does trigger the job
+        self.fake_gitea.emitEvent(
+            A.getPullRequestCommentCreatedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+        # Merge it
+        A.mergePullRequest()
+
+        # A recheck on merged PR does not trigger the job
         self.fake_gitea.emitEvent(
             A.getPullRequestCommentCreatedEvent('recheck'))
         self.waitUntilSettled()
