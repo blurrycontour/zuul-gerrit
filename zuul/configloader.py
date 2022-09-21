@@ -1740,10 +1740,11 @@ class TenantParser(object):
         tenant.layout = self._parseLayout(
             tenant, parsed_config, loading_errors, layout_uuid)
 
+        tenant.semaphore_handler = SemaphoreHandler(
+            self.zk_client, self.statsd, tenant.name, tenant.layout, abide,
+            read_only=(not bool(self.scheduler))
+        )
         if self.scheduler:
-            tenant.semaphore_handler = SemaphoreHandler(
-                self.zk_client, self.statsd, tenant.name, tenant.layout, abide
-            )
             # Only call the postConfig hook if we have a scheduler as this will
             # change data in ZooKeeper. In case we are in a zuul-web context,
             # we don't want to do that.

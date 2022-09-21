@@ -1454,6 +1454,69 @@ class TestWebMultiTenant(BaseTestWeb):
                          sorted(["tenant-one", "tenant-two", "tenant-four"]))
 
 
+class TestWebGlobalSemaphores(BaseTestWeb):
+    tenant_config_file = 'config/global-semaphores-config/main.yaml'
+
+    def test_web_semaphores(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertBuilds([
+            dict(name='test-global-semaphore', changes='1,1'),
+            dict(name='test-common-semaphore', changes='1,1'),
+            dict(name='test-project1-semaphore', changes='1,1'),
+            dict(name='test-global-semaphore', changes='2,1'),
+            dict(name='test-common-semaphore', changes='2,1'),
+            dict(name='test-project2-semaphore', changes='2,1'),
+        ])
+
+        tenant1_buildset_uuid = self.builds[0].parameters['zuul']['buildset']
+        data = self.get_url('api/tenant/tenant-one/semaphores').json()
+
+        expected = [
+            {'name': 'common-semaphore',
+             'global': False,
+             'max': 10,
+             'holders': {
+                 'count': 1,
+                 'this_tenant': [
+                     {'buildset_uuid': tenant1_buildset_uuid,
+                      'job_name': 'test-common-semaphore'}
+                 ],
+                 'other_tenants': 0
+             }},
+            {'name': 'global-semaphore',
+             'global': True,
+             'max': 100,
+             'holders': {
+                 'count': 2,
+                 'this_tenant': [
+                     {'buildset_uuid': tenant1_buildset_uuid,
+                      'job_name': 'test-global-semaphore'}
+                 ],
+                 'other_tenants': 1
+             }},
+            {'name': 'project1-semaphore',
+             'global': False,
+             'max': 11,
+             'holders': {
+                 'count': 1,
+                 'this_tenant': [
+                     {'buildset_uuid': tenant1_buildset_uuid,
+                      'job_name': 'test-project1-semaphore'}
+                 ],
+                 'other_tenants': 0
+             }}
+        ]
+        self.assertEqual(expected, data)
+
+
 class TestEmptyConfig(BaseTestWeb):
     tenant_config_file = 'config/empty-config/main.yaml'
 

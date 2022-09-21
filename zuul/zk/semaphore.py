@@ -41,8 +41,12 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
     semaphore_root = "/zuul/semaphores"
     global_semaphore_root = "/zuul/global-semaphores"
 
-    def __init__(self, client, statsd, tenant_name, layout, abide):
+    def __init__(self, client, statsd, tenant_name, layout, abide,
+                 read_only=False):
         super().__init__(client)
+        if read_only:
+            statsd = None
+        self.read_only = read_only
         self.abide = abide
         self.layout = layout
         self.statsd = statsd
@@ -71,6 +75,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             self.log.exception("Unable to send semaphore stats:")
 
     def acquire(self, item, job, request_resources):
+        if self.read_only:
+            raise RuntimeError("Read-only semaphore handler")
         if not job.semaphores:
             return True
 
@@ -190,6 +196,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             break
 
     def release(self, sched, item, job, quiet=False):
+        if self.read_only:
+            raise RuntimeError("Read-only semaphore handler")
         if not job.semaphores:
             return
 
@@ -242,6 +250,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         return 1 if semaphore is None else semaphore.max
 
     def cleanupLeaks(self):
+        if self.read_only:
+            raise RuntimeError("Read-only semaphore handler")
         # MODEL_API: >1
         if COMPONENT_REGISTRY.model_api < 2:
             self.log.warning("Skipping semaphore cleanup since minimum model "

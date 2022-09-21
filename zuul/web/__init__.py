@@ -47,6 +47,7 @@ from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.model import (
     Abide,
+    BuildSet,
     Branch,
     ChangeQueue,
     DequeueEvent,
@@ -796,6 +797,7 @@ class ZuulWebAPI(object):
                                    'project/{project:.*}/branch/{branch:.*}/'
                                    'freeze-jobs',
             'pipelines': '/api/tenant/{tenant}/pipelines',
+            'semaphores': '/api/tenant/{tenant}/semaphores',
             'labels': '/api/tenant/{tenant}/labels',
             'nodes': '/api/tenant/{tenant}/nodes',
             'key': '/api/tenant/{tenant}/key/{project:.*}.pub',
@@ -1535,6 +1537,44 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(
+        content_type='application/json; charset=utf-8', handler=json_handler,
+    )
+    def semaphores(self, tenant_name):
+        tenant = self._getTenantOrRaise(tenant_name)
+        result = []
+        names = set(tenant.layout.semaphores.keys())
+        names = names.union(tenant.global_semaphores)
+        for semaphore_name in sorted(names):
+            semaphore = tenant.layout.getSemaphore(
+                self.zuulweb.abide, semaphore_name)
+            holders = tenant.semaphore_handler.semaphoreHolders(semaphore_name)
+            this_tenant = []
+            other_tenants = 0
+            for holder in holders:
+                (holder_tenant, holder_pipeline,
+                 holder_item_uuid, holder_buildset_uuid
+                 ) = BuildSet.parsePath(holder['buildset_path'])
+                if holder_tenant != tenant_name:
+                    other_tenants += 1
+                    continue
+                this_tenant.append({'buildset_uuid': holder_buildset_uuid,
+                                    'job_name': holder['job_name']})
+            sem_out = {'name': semaphore.name,
+                       'global': semaphore.global_scope,
+                       'max': semaphore.max,
+                       'holders': {
+                           'count': len(this_tenant) + other_tenants,
+                           'this_tenant': this_tenant,
+                           'other_tenants': other_tenants},
+                       }
+            result.append(sem_out)
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return result
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
     @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
     def console_stream(self, tenant):
         cherrypy.request.ws_handler.zuulweb = self.zuulweb
@@ -1864,6 +1904,8 @@ class ZuulWeb(object):
                           controller=api, action='status')
         route_map.connect('api', '/api/tenant/{tenant}/status/change/{change}',
                           controller=api, action='status_change')
+        route_map.connect('api', '/api/tenant/{tenant_name}/semaphores',
+                          controller=api, action='semaphores')
         route_map.connect('api', '/api/tenant/{tenant_name}/jobs',
                           controller=api, action='jobs')
         route_map.connect('api', '/api/tenant/{tenant_name}/job/{job_name}',
