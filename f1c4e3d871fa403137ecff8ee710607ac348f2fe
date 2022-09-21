@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "f1c4e3d871fa403137ecff8ee710607ac348f2fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1e14715_2d350237",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-21T16:46:39Z",
+      "side": 1,
+      "message": "The alignment looks good on my desktop and laptop.",
+      "revId": "f1c4e3d871fa403137ecff8ee710607ac348f2fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
