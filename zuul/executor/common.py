@@ -19,7 +19,7 @@ from zuul.lib import strings
 
 def construct_build_params(uuid, connections, job, item, pipeline,
                            dependent_changes=[], merger_items=[],
-                           redact_secrets_and_keys=True):
+                           redact_secrets_and_keys=True, detailed_event=False):
     """Returns a list of all the parameters needed to build a job.
 
     These parameters may be passed to zuul-executors (via ZK) to perform
@@ -71,6 +71,8 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     if (hasattr(item.change, 'newrev') and item.change.newrev
         and item.change.newrev != '0' * 40):
         zuul_params['newrev'] = item.change.newrev
+    if detailed_event:
+        zuul_params["event"] = item.event.toDict() if item.event else None
     zuul_params['projects'] = {}  # Set below
     zuul_params['items'] = dependent_changes
     zuul_params['child_jobs'] = list(item.current_build_set.job_graph.

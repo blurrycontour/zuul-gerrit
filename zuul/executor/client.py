@@ -17,6 +17,7 @@ import time
 from uuid import uuid4
 
 import zuul.executor.common
+from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import (
     Build,
@@ -39,6 +40,9 @@ class ExecutorClient(object):
         self.config = config
         self.sched = sched
 
+        self.detailed_event = bool(get_default(self.config, 'executor',
+                                                  'detailed_event', False))
+
         self.executor_api = self._executor_api_class(self.sched.zk_client)
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.sched.zk_client
@@ -59,7 +63,7 @@ class ExecutorClient(object):
         params = zuul.executor.common.construct_build_params(
             uuid, self.sched.connections,
             job, item, pipeline, dependent_changes, merger_items,
-            redact_secrets_and_keys=False)
+            redact_secrets_and_keys=False, detailed_event=self.detailed_event)
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 

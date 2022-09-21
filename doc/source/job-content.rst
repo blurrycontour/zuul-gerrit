@@ -316,6 +316,13 @@ of item.
 
       The name of the job being run.
 
+   .. var:: event
+
+      Details of the event that triggered this execution.
+
+      This is enabled by setting 'detailed_event' to 'true' under the
+      'executor' section of the Zuul configuration file.
+
    .. var:: event_id
 
       The UUID of the event that triggered this execution. This is mainly
