@@ -33,6 +33,24 @@
       "message": "I think technically we are sticking to a default of ansible 5 (2.12) not ansible 6 (2.13) for now? Since this is testing I don\u0027t think that is a huge deal.",
       "revId": "2d6b5c19ba2a083d4c3c1cbf656229eaf15616fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dab9fc9_4ad637c7",
+        "filename": "tests/fixtures/config/ansible-versions/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-21T19:56:21Z",
+      "side": 1,
+      "message": "Correct -- this is just a super confusing situation.  It\u0027s testing the \"default_ansible_version\" zuul.conf argument, which, in order to be an effective test, needs to be something other than the actual Zuul default version.\n\nIt\u0027s a non-default default.",
+      "parentUuid": "145dcb01_a489ac7d",
+      "revId": "2d6b5c19ba2a083d4c3c1cbf656229eaf15616fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
