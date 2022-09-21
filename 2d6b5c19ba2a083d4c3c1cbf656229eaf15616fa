@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeb3f002_ec77ec4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-21T16:00:46Z",
+      "side": 1,
+      "message": "This should get us faster testing until we add more ansible versions again right? I\u0027ll call that a win 😊",
+      "revId": "2d6b5c19ba2a083d4c3c1cbf656229eaf15616fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "145dcb01_a489ac7d",
+        "filename": "tests/fixtures/config/ansible-versions/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-21T16:00:46Z",
+      "side": 1,
+      "message": "I think technically we are sticking to a default of ansible 5 (2.12) not ansible 6 (2.13) for now? Since this is testing I don\u0027t think that is a huge deal.",
+      "revId": "2d6b5c19ba2a083d4c3c1cbf656229eaf15616fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
