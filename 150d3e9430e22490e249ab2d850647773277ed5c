@@ -16,6 +16,24 @@
       "message": "This looks a bit odd, as it has an empty table and also a spinner?\n\nhttps://imgur.com/a/CTJrfzH\n\nOr is this just an artifact of the current live site not having this api endpoint?",
       "revId": "150d3e9430e22490e249ab2d850647773277ed5c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e34e2e17_c25a5f70",
+        "filename": "web/src/containers/semaphore/SemaphoreTable.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-21T13:48:57Z",
+      "side": 1,
+      "message": "It seems like line 118 could cause that.",
+      "parentUuid": "a0604070_5f6285b5",
+      "revId": "150d3e9430e22490e249ab2d850647773277ed5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
