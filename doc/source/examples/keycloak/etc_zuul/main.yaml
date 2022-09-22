@@ -1,8 +1,8 @@
-- admin-rule:
+- authorization-rule:
     name: tenant-group
     conditions:
       - groups: "{tenant.name}-admin"
-- admin-rule:
+- authorization-rule:
     name: admin-user
     conditions:
       - preferred_username: admin

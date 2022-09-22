@@ -16,14 +16,14 @@ A project may appear in more than one tenant; this may be useful if
 you wish to use common job definitions across multiple tenants.
 
 Actions normally available to the Zuul operator only can be performed by specific
-users on Zuul's REST API, if admin rules are listed for the tenant. Admin rules
+users on Zuul's REST API if admin rules are listed for the tenant. Authorization rules
 are also defined in the tenant configuration file.
 
 The tenant configuration file is specified by the
 :attr:`scheduler.tenant_config` setting in ``zuul.conf``.  It is a
 YAML file which, like other Zuul configuration files, is a list of
-configuration objects, though only two types of objects are supported:
-``tenant`` and ``admin-rule``.
+configuration objects, though only a few types of objects (described
+below) are supported.
 
 Alternatively the :attr:`scheduler.tenant_config_script`
 can be the path to an executable that will be executed and its stdout
@@ -398,11 +398,12 @@ configuration. Some examples of tenant definitions are:
 
    .. attr:: admin-rules
 
-      A list of access rules for the tenant. These rules are checked to grant
-      privileged actions to users at the tenant level, through Zuul's REST API.
+      A list of authorization rules to be checked in order to grant
+      administrative access to the tenant through Zuul's REST API and
+      web interface.
 
-      At least one rule in the list must match for the user to be allowed the
-      privileged action.
+      At least one rule in the list must match for the user to be allowed to
+      execute privileged actions.
 
       More information on tenant-scoped actions can be found in
       :ref:`authentication`.
@@ -474,16 +475,18 @@ An example definition looks similar to the normal semaphore object:
       The maximum number of running jobs which can use this semaphore.
 
 
-.. _admin_rule_definition:
+.. _authz_rule_definition:
 
-Access Rule
------------
+Authorization Rule
+------------------
 
-An access rule is a set of conditions the claims of a user's JWT must match
-in order to be allowed to perform protected actions at a tenant's level.
+An authorization rule is a set of conditions the claims of a user's
+JWT must match in order to be allowed to perform actions at a tenant's
+level.
 
-The protected actions available at tenant level are **autohold**, **enqueue**,
-**dequeue** or **promote**.
+When an authorization rule is included in the tenant's `admin-rules`,
+the protected actions available are **autohold**, **enqueue**,
+**dequeue** and **promote**.
 
 .. note::
 
@@ -491,11 +494,11 @@ The protected actions available at tenant level are **autohold**, **enqueue**,
    an authenticator configuration where `allow_authz_override` is set to true.
    See :ref:`authentication` for more details.
 
-Below are some examples of how access rules can be defined:
+Below are some examples of how authorization rules can be defined:
 
 .. code-block:: yaml
 
-   - admin-rule:
+   - authorization-rule:
        name: affiliate_or_admin
        conditions:
          - resources_access:
@@ -503,14 +506,17 @@ Below are some examples of how access rules can be defined:
                roles: "affiliate"
            iss: external_institution
          - resources_access.account.roles: "admin"
-   - admin-rule:
+   - authorization-rule:
        name: alice_or_bob
        conditions:
          - zuul_uid: alice
          - zuul_uid: bob
 
+Zuul previously used ``admin-rule`` for these definitions.  That form
+is still permitted for backwards compatibility, but is deprecated and
+will be removed in a future version of Zuul.
 
-.. attr:: admin-rule
+.. attr:: authorization-rule
 
    The following attributes are supported:
 
@@ -591,8 +597,8 @@ Below are some examples of how access rules can be defined:
          },
         }
 
-Access Rule Templating
-----------------------
+Authorization Rule Templating
+-----------------------------
 
 The special word "{tenant.name}" can be used in conditions' values. It will be automatically
 substituted for the relevant tenant when evaluating authorizations for a given
@@ -600,7 +606,7 @@ set of claims. For example, consider the following rule:
 
 .. code-block:: yaml
 
-   - admin-rule:
+   - authorization-rule:
        name: tenant_in_groups
        conditions:
          - groups: "{tenant.name}"

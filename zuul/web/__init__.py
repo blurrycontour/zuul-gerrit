@@ -870,8 +870,8 @@ class ZuulWebAPI(object):
             (isinstance(override, list) and tenant.name in override)):
             return True
 
-        for rule_name in tenant.authorization_rules:
-            rule = self.zuulweb.abide.admin_rules.get(rule_name)
+        for rule_name in tenant.admin_rules:
+            rule = self.zuulweb.abide.authz_rules.get(rule_name)
             if not rule:
                 self.log.error('Undefined rule "%s"', rule_name)
                 continue
@@ -2145,7 +2145,7 @@ class ZuulWeb(object):
         for tenant_name in deleted_tenants:
             self.abide.clearTPCs(tenant_name)
 
-        loader.loadAdminRules(self.abide, self.unparsed_abide)
+        loader.loadAuthzRules(self.abide, self.unparsed_abide)
         loader.loadSemaphores(self.abide, self.unparsed_abide)
         loader.loadTPCs(self.abide, self.unparsed_abide)
 

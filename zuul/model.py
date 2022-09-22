@@ -7039,13 +7039,13 @@ class UnparsedAbideConfig(object):
         self.uuid = uuid4().hex
         self.ltime = -1
         self.tenants = {}
-        self.admin_rules = []
+        self.authz_rules = []
         self.semaphores = []
 
     def extend(self, conf):
         if isinstance(conf, UnparsedAbideConfig):
             self.tenants.update(conf.tenants)
-            self.admin_rules.extend(conf.admin_rules)
+            self.authz_rules.extend(conf.authz_rules)
             self.semaphores.extend(conf.semaphores)
             return
 
@@ -7063,20 +7063,27 @@ class UnparsedAbideConfig(object):
                     raise Exception("Duplicate configuration for "
                                     f"tenant {value['name']}")
                 self.tenants[value["name"]] = value
+            # TODO: remove deprecated "admin-rule"
             elif key == 'admin-rule':
-                self.admin_rules.append(value)
+                self.authz_rules.append(value)
+            elif key == 'authorization-rule':
+                self.authz_rules.append(value)
             elif key == 'global-semaphore':
                 self.semaphores.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
     def toDict(self):
-        return {
+        d = {
             "uuid": self.uuid,
             "tenants": self.tenants,
-            "admin_rules": self.admin_rules,
             "semaphores": self.semaphores,
         }
+        if (COMPONENT_REGISTRY.model_api < 10):
+            d["admin_rules"] = self.authz_rules
+        else:
+            d["authz_rules"] = self.authz_rules
+        return d
 
     @classmethod
     def fromDict(cls, data, ltime):
@@ -7084,7 +7091,9 @@ class UnparsedAbideConfig(object):
         unparsed_abide.uuid = data["uuid"]
         unparsed_abide.ltime = ltime
         unparsed_abide.tenants = data["tenants"]
-        unparsed_abide.admin_rules = data["admin_rules"]
+        unparsed_abide.authz_rules = data.get('authz_rules',
+                                              data.get('admin_rules',
+                                                       []))
         unparsed_abide.semaphores = data.get("semaphores", [])
         return unparsed_abide
 
@@ -7854,7 +7863,7 @@ class Tenant(object):
         # The per tenant default ansible version
         self.default_ansible_version = None
 
-        self.authorization_rules = []
+        self.admin_rules = []
         self.default_auth_realm = None
         self.global_semaphores = set()
 
@@ -8064,7 +8073,7 @@ class UnparsedBranchCache(object):
 
 class Abide(object):
     def __init__(self):
-        self.admin_rules = {}
+        self.authz_rules = {}
         self.semaphores = {}
         self.tenants = {}
         # tenant -> project -> list(tpcs)

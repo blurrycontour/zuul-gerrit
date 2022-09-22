@@ -47,7 +47,7 @@ from zuul.zk.sharding import (
     NODE_BYTE_SIZE_LIMIT,
 )
 from zuul.zk.components import (
-    BaseComponent, ComponentRegistry, ExecutorComponent
+    BaseComponent, ComponentRegistry, ExecutorComponent, COMPONENT_REGISTRY
 )
 from tests.base import (
     BaseTestCase, HoldableExecutorApi, HoldableMergerApi,
@@ -74,6 +74,9 @@ class ZooKeeperBaseTestCase(BaseTestCase):
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
         self.component_registry = ComponentRegistry(self.zk_client)
+        # We don't have any other component to initialize the global
+        # registry in these tests, so we do it ourselves.
+        COMPONENT_REGISTRY.create(self.zk_client)
 
 
 class TestZookeeperClient(ZooKeeperBaseTestCase):
@@ -1347,7 +1350,7 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
     def test_set_get(self):
         uac = model.UnparsedAbideConfig()
         uac.tenants = {"foo": "bar"}
-        uac.admin_rules = ["bar", "foo"]
+        uac.authz_rules = ["bar", "foo"]
         attrs = model.SystemAttributes.fromDict({
             "use_relative_priority": True,
             "max_hold_expiration": 7200,
@@ -1362,7 +1365,7 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
         uac_cached, cached_attrs = self.config_cache.get()
         self.assertEqual(uac.uuid, uac_cached.uuid)
         self.assertEqual(uac.tenants, uac_cached.tenants)
-        self.assertEqual(uac.admin_rules, uac_cached.admin_rules)
+        self.assertEqual(uac.authz_rules, uac_cached.authz_rules)
         self.assertEqual(attrs, cached_attrs)
 
     def test_cache_empty(self):
