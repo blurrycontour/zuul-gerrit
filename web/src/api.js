@@ -103,93 +103,127 @@ function getStreamUrl(apiPrefix) {
   return streamUrl
 }
 
+function getWithCorsHandling(url) {
+  // This performs a simple GET and tries to detect if CORS errors are
+  // due to proxy authentication errors.
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  // First try the request as normal
+  let res = instance.get(url).catch(err => {
+    if (err.response === undefined) {
+      // This is either a Network, DNS, or CORS error, but we can't tell which.
+      // If we're behind an authz proxy, it's possible our creds have timed out
+      // and the CORS error is because we're getting a redirect.
+      // Apache mod_auth_mellon (and possibly other authz proxies) will avoid
+      // issuing a redirect if X-Requested-With is set to 'XMLHttpRequest' and
+      // will instead issue a 403.  We can use this to detect that case.
+      instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+      let res2 = instance.get(url).catch(err2 => {
+        if (err2.response && err2.response.status === 403) {
+          // We might be getting a redirect or something else,
+          // so reload the page.
+          console.log('Received 403 after unknown error; reloading')
+          window.location.reload()
+        }
+        // If we're still getting an error, we don't know the cause,
+        // it could be a transient network error, so we won't reload, we'll just
+        // wait for it to clear.
+        throw (err2)
+      })
+      return res2
+    }
+  })
+  return res
+}
+
 // Direct APIs
 function fetchInfo() {
-  return Axios.get(apiUrl + 'info')
+  return getWithCorsHandling('info')
 }
 
 function fetchComponents() {
-  return Axios.get(apiUrl + 'components')
+  return getWithCorsHandling('components')
 }
 
 function fetchTenantInfo(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'info')
+  return getWithCorsHandling(apiPrefix + 'info')
 }
 function fetchOpenApi() {
   return Axios.get(getHomepageUrl() + 'openapi.yaml')
 }
 function fetchTenants() {
-  return Axios.get(apiUrl + 'tenants')
+  return getWithCorsHandling(apiUrl + 'tenants')
 }
 function fetchConfigErrors(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'config-errors')
+  return getWithCorsHandling(apiPrefix + 'config-errors')
 }
 function fetchStatus(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'status')
+  return getWithCorsHandling(apiPrefix + 'status')
 }
 function fetchChangeStatus(apiPrefix, changeId) {
-  return Axios.get(apiUrl + apiPrefix + 'status/change/' + changeId)
+  return getWithCorsHandling(apiPrefix + 'status/change/' + changeId)
 }
 function fetchFreezeJob(apiPrefix, pipelineName, projectName, branchName, jobName) {
-  return Axios.get(apiUrl + apiPrefix +
+  return getWithCorsHandling(apiPrefix +
                    'pipeline/' + pipelineName +
                    '/project/' + projectName +
                    '/branch/' + branchName +
                    '/freeze-job/' + jobName)
 }
 function fetchBuild(apiPrefix, buildId) {
-  return Axios.get(apiUrl + apiPrefix + 'build/' + buildId)
+  return getWithCorsHandling(apiPrefix + 'build/' + buildId)
 }
 function fetchBuilds(apiPrefix, queryString) {
   let path = 'builds'
   if (queryString) {
     path += '?' + queryString.slice(1)
   }
-  return Axios.get(apiUrl + apiPrefix + path)
+  return getWithCorsHandling(apiPrefix + path)
 }
 function fetchBuildset(apiPrefix, buildsetId) {
-  return Axios.get(apiUrl + apiPrefix + 'buildset/' + buildsetId)
+  return getWithCorsHandling(apiPrefix + 'buildset/' + buildsetId)
 }
 function fetchBuildsets(apiPrefix, queryString) {
   let path = 'buildsets'
   if (queryString) {
     path += '?' + queryString.slice(1)
   }
-  return Axios.get(apiUrl + apiPrefix + path)
+  return getWithCorsHandling(apiPrefix + path)
 }
 function fetchPipelines(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'pipelines')
+  return getWithCorsHandling(apiPrefix + 'pipelines')
 }
 function fetchProject(apiPrefix, projectName) {
-  return Axios.get(apiUrl + apiPrefix + 'project/' + projectName)
+  return getWithCorsHandling(apiPrefix + 'project/' + projectName)
 }
 function fetchProjects(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'projects')
+  return getWithCorsHandling(apiPrefix + 'projects')
 }
 function fetchJob(apiPrefix, jobName) {
-  return Axios.get(apiUrl + apiPrefix + 'job/' + jobName)
+  return getWithCorsHandling(apiPrefix + 'job/' + jobName)
 }
 function fetchJobGraph(apiPrefix, projectName, pipelineName, branchName) {
-  return Axios.get(apiUrl + apiPrefix +
+  return getWithCorsHandling(apiPrefix +
                    'pipeline/' + pipelineName +
                    '/project/' + projectName +
                    '/branch/' + branchName +
                    '/freeze-jobs')
 }
 function fetchJobs(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'jobs')
+  return getWithCorsHandling(apiPrefix + 'jobs')
 }
 function fetchLabels(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'labels')
+  return getWithCorsHandling(apiPrefix + 'labels')
 }
 function fetchNodes(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'nodes')
+  return getWithCorsHandling(apiPrefix + 'nodes')
 }
 function fetchAutoholds(apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'autohold')
+  return getWithCorsHandling(apiPrefix + 'autohold')
 }
 function fetchAutohold(apiPrefix, requestId) {
-  return Axios.get(apiUrl + apiPrefix + 'autohold/' + requestId)
+  return getWithCorsHandling(apiPrefix + 'autohold/' + requestId)
 }
 
 // token-protected API
