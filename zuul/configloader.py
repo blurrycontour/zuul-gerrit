@@ -1460,11 +1460,9 @@ class AuthorizationRuleParser(object):
         self.schema = self.getSchema()
 
     def getSchema(self):
-
         authRule = {vs.Required('name'): str,
                     vs.Required('conditions'): to_list(dict)
                    }
-
         return vs.Schema(authRule)
 
     def fromYaml(self, conf):
@@ -1654,7 +1652,7 @@ class TenantParser(object):
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
         if conf.get('admin-rules') is not None:
-            tenant.authorization_rules = conf['admin-rules']
+            tenant.admin_rules = conf['admin-rules']
         if conf.get('authentication-realm') is not None:
             tenant.default_auth_realm = conf['authentication-realm']
         if conf.get('semaphores') is not None:
@@ -2530,7 +2528,7 @@ class ConfigLoader(object):
         self.tenant_parser = TenantParser(
             connections, zk_client, scheduler, merger, keystorage,
             zuul_globals, statsd)
-        self.admin_rule_parser = AuthorizationRuleParser()
+        self.authz_rule_parser = AuthorizationRuleParser()
         self.global_semaphore_parser = GlobalSemaphoreParser()
 
     def expandConfigPath(self, config_path):
@@ -2582,11 +2580,11 @@ class ConfigLoader(object):
             self.tenant_parser.getSchema()(unparsed_abide.tenants[tenant_name])
         return unparsed_abide
 
-    def loadAdminRules(self, abide, unparsed_abide):
-        abide.admin_rules.clear()
-        for conf_admin_rule in unparsed_abide.admin_rules:
-            admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
-            abide.admin_rules[admin_rule.name] = admin_rule
+    def loadAuthzRules(self, abide, unparsed_abide):
+        abide.authz_rules.clear()
+        for conf_authz_rule in unparsed_abide.authz_rules:
+            authz_rule = self.authz_rule_parser.fromYaml(conf_authz_rule)
+            abide.authz_rules[authz_rule.name] = authz_rule
 
     def loadSemaphores(self, abide, unparsed_abide):
         abide.semaphores.clear()

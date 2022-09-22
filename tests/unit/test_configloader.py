@@ -46,7 +46,7 @@ class TestConfigLoader(ZuulTestCase):
             keystorage=sched.keystore)
         abide = Abide()
         loader.loadTPCs(abide, unparsed_abide)
-        loader.loadAdminRules(abide, unparsed_abide)
+        loader.loadAuthzRules(abide, unparsed_abide)
 
         for tenant_name in unparsed_abide.tenants:
             tlock = tenant_read_lock(self.zk_client, tenant_name)
@@ -886,7 +886,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
     tenant_config_file = 'config/tenant-parser/authorizations.yaml'
 
     def test_rules_are_loaded(self):
-        rules = self.scheds.first.sched.abide.admin_rules
+        rules = self.scheds.first.sched.abide.authz_rules
         self.assertTrue('auth-rule-one' in rules,
                         self.scheds.first.sched.abide)
         self.assertTrue('auth-rule-two' in rules,
@@ -1022,7 +1022,7 @@ class TestAuthorizationRuleParserWithTemplating(ZuulTestCase):
     tenant_config_file = 'config/tenant-parser/authorizations-templating.yaml'
 
     def test_rules_are_loaded(self):
-        rules = self.scheds.first.sched.abide.admin_rules
+        rules = self.scheds.first.sched.abide.authz_rules
         self.assertTrue('tenant-admin' in rules, self.scheds.first.sched.abide)
         self.assertTrue('tenant-admin-complex' in rules,
                         self.scheds.first.sched.abide)
@@ -1030,7 +1030,7 @@ class TestAuthorizationRuleParserWithTemplating(ZuulTestCase):
     def test_tenant_substitution(self):
         claims_1 = {'group': 'tenant-one-admin'}
         claims_2 = {'group': 'tenant-two-admin'}
-        rules = self.scheds.first.sched.abide.admin_rules
+        rules = self.scheds.first.sched.abide.authz_rules
         tenant_one = self.scheds.first.sched.abide.tenants.get('tenant-one')
         tenant_two = self.scheds.first.sched.abide.tenants.get('tenant-two')
         self.assertTrue(rules['tenant-admin'](claims_1, tenant_one))
@@ -1041,7 +1041,7 @@ class TestAuthorizationRuleParserWithTemplating(ZuulTestCase):
     def test_tenant_substitution_in_list(self):
         claims_1 = {'group': ['tenant-one-admin', 'some-other-tenant']}
         claims_2 = {'group': ['tenant-two-admin', 'some-other-tenant']}
-        rules = self.scheds.first.sched.abide.admin_rules
+        rules = self.scheds.first.sched.abide.authz_rules
         tenant_one = self.scheds.first.sched.abide.tenants.get('tenant-one')
         tenant_two = self.scheds.first.sched.abide.tenants.get('tenant-two')
         self.assertTrue(rules['tenant-admin'](claims_1, tenant_one))
@@ -1057,7 +1057,7 @@ class TestAuthorizationRuleParserWithTemplating(ZuulTestCase):
                 }
             }
         }
-        rules = self.scheds.first.sched.abide.admin_rules
+        rules = self.scheds.first.sched.abide.authz_rules
         tenant_one = self.scheds.first.sched.abide.tenants.get('tenant-one')
         tenant_two = self.scheds.first.sched.abide.tenants.get('tenant-two')
         self.assertTrue(not rules['tenant-admin-complex'](claims_2,
