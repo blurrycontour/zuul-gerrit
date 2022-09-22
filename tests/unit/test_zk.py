@@ -1347,7 +1347,7 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
     def test_set_get(self):
         uac = model.UnparsedAbideConfig()
         uac.tenants = {"foo": "bar"}
-        uac.admin_rules = ["bar", "foo"]
+        uac.authz_rules = ["bar", "foo"]
         attrs = model.SystemAttributes.fromDict({
             "use_relative_priority": True,
             "max_hold_expiration": 7200,
@@ -1362,7 +1362,7 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
         uac_cached, cached_attrs = self.config_cache.get()
         self.assertEqual(uac.uuid, uac_cached.uuid)
         self.assertEqual(uac.tenants, uac_cached.tenants)
-        self.assertEqual(uac.admin_rules, uac_cached.admin_rules)
+        self.assertEqual(uac.authz_rules, uac_cached.authz_rules)
         self.assertEqual(attrs, cached_attrs)
 
     def test_cache_empty(self):

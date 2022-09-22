@@ -1,4 +1,4 @@
-- admin-rule:
+- authorization-rule:
     name: tenant-admin
     conditions:
       - groups: "{tenant.name}"

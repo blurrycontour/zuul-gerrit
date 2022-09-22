@@ -93,3 +93,10 @@ Version 9
 :Prior Zuul version: 6.3.0
 :Description: Adds nodeset_alternatives and nodeset_index to frozen job.
               Removes nodset from frozen job.  Affects schedulers and executors.
+
+Version 10
+---------
+
+:Prior Zuul version: 6.4.0
+:Description: Renames admin_rules to authz_rules in unparsed abide.
+              Affects schedulers and web.

@@ -44,7 +44,7 @@ To enable tenant-scoped access to privileged actions, see the Zuul Web Server
 component's section.
 
 To set access rules for a tenant, see :ref:`the documentation about tenant
-definition <admin_rule_definition>`.
+definition <authz_rule_definition>`.
 
 Most of the time, only one authenticator will be needed in Zuul's configuration;
 namely the configuration matching a third party identity provider service like

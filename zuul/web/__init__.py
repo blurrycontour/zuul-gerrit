@@ -870,8 +870,8 @@ class ZuulWebAPI(object):
             (isinstance(override, list) and tenant.name in override)):
             return True
 
-        for rule_name in tenant.authorization_rules:
-            rule = self.zuulweb.abide.admin_rules.get(rule_name)
+        for rule_name in tenant.admin_rules:
+            rule = self.zuulweb.abide.authz_rules.get(rule_name)
             if not rule:
                 self.log.error('Undefined rule "%s"', rule_name)
                 continue
