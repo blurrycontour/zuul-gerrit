@@ -1313,7 +1313,7 @@ class Scheduler(threading.Thread):
 
             try:
                 abide = Abide()
-                loader.loadAdminRules(abide, unparsed_abide)
+                loader.loadAuthzRules(abide, unparsed_abide)
                 loader.loadSemaphores(abide, unparsed_abide)
                 loader.loadTPCs(abide, unparsed_abide)
                 for tenant_name in tenants_to_load:
@@ -1372,7 +1372,7 @@ class Scheduler(threading.Thread):
             for tenant_name in deleted_tenants:
                 self.abide.clearTPCs(tenant_name)
 
-            loader.loadAdminRules(self.abide, self.unparsed_abide)
+            loader.loadAuthzRules(self.abide, self.unparsed_abide)
             loader.loadSemaphores(self.abide, self.unparsed_abide)
             loader.loadTPCs(self.abide, self.unparsed_abide)
 
@@ -2044,7 +2044,7 @@ class Scheduler(threading.Thread):
                 tenant_config, from_script=script)
             self.system_config_cache.set(self.unparsed_abide, self.globals)
 
-            loader.loadAdminRules(self.abide, self.unparsed_abide)
+            loader.loadAuthzRules(self.abide, self.unparsed_abide)
             loader.loadSemaphores(self.abide, self.unparsed_abide)
             loader.loadTPCs(self.abide, self.unparsed_abide)
 
@@ -2065,7 +2065,7 @@ class Scheduler(threading.Thread):
             for tenant_name in deleted_tenants:
                 self.abide.clearTPCs(tenant_name)
 
-            loader.loadAdminRules(self.abide, self.unparsed_abide)
+            loader.loadAuthzRules(self.abide, self.unparsed_abide)
             loader.loadSemaphores(self.abide, self.unparsed_abide)
             loader.loadTPCs(self.abide, self.unparsed_abide)
 
