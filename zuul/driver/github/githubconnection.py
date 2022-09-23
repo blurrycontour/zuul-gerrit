@@ -39,11 +39,13 @@ import github3
 import github3.exceptions
 import github3.pulls
 from github3.session import AppInstallationTokenAuth
+from opentelemetry import trace
 
 from zuul.connection import (
     BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
 )
 from zuul.driver.github.graphql import GraphQLClient
+from zuul.lib import tracing
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
@@ -74,7 +76,9 @@ ANNOTATION_LEVELS = {
 }
 
 EventTuple = collections.namedtuple(
-    "EventTuple", ["timestamp", "body", "event_type", "delivery"]
+    "EventTuple", [
+        "timestamp", "span_context", "body", "event_type", "delivery"
+    ]
 )
 
 
@@ -326,10 +330,19 @@ class GithubShaCache(object):
 
 
 class GithubEventProcessor(object):
+    tracer = trace.get_tracer("zuul")
+
     def __init__(self, connector, event_tuple, connection_event):
         self.connector = connector
         self.connection = connector.connection
-        self.ts, self.body, self.event_type, self.delivery = event_tuple
+        (
+            self.ts,
+            span_context,
+            self.body,
+            self.event_type,
+            self.delivery
+        ) = event_tuple
+        self.event_span = tracing.restoreSpanContext(span_context)
         logger = logging.getLogger("zuul.GithubEventProcessor")
         self.zuul_event_id = self.delivery
         self.log = get_annotated_logger(logger, self.zuul_event_id)
@@ -341,7 +354,12 @@ class GithubEventProcessor(object):
     def run(self):
         self.log.debug("Starting event processing")
         try:
-            self._process_event()
+            attributes = {"rel": "GithubEvent"}
+            link = trace.Link(self.event_span.get_span_context(),
+                              attributes=attributes)
+            with self.tracer.start_as_current_span(
+                    "GithubEventProcessing", links=[link]):
+                self._process_event()
         except Exception:
             self.log.exception("Exception when processing event:")
         finally:
@@ -854,11 +872,13 @@ class GithubEventConnector:
 
     @staticmethod
     def _eventAsTuple(event):
+        span_context = event.get("span_context")
         body = event.get("body")
         headers = event.get("headers", {})
         event_type = headers.get('x-github-event')
         delivery = headers.get('x-github-delivery')
-        return EventTuple(time.time(), body, event_type, delivery)
+        return EventTuple(
+            time.time(), span_context, body, event_type, delivery)
 
 
 class GithubUser(Mapping):
@@ -2439,6 +2459,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 class GithubWebController(BaseWebController):
 
     log = logging.getLogger("zuul.GithubWebController")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self, zuul_web, connection):
         self.connection = connection
@@ -2470,6 +2491,7 @@ class GithubWebController(BaseWebController):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @tracer.start_as_current_span("GithubEvent")
     def payload(self):
         # Note(tobiash): We need to normalize the headers. Otherwise we will
         # have trouble to get them from the dict afterwards.
@@ -2492,7 +2514,11 @@ class GithubWebController(BaseWebController):
         # encode it as json, after decoding it as utf-8
         json_body = json.loads(body.decode('utf-8'))
 
-        data = {'headers': headers, 'body': json_body}
+        data = {
+            'headers': headers,
+            'body': json_body,
+            'span_context': tracing.getSpanContext(trace.get_current_span()),
+        }
         self.event_queue.put(data)
         return data
 
