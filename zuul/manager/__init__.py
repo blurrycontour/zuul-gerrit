@@ -584,8 +584,13 @@ class PipelineManager(metaclass=ABCMeta):
                      (change, change_queue, self.pipeline))
             if enqueue_time is None:
                 enqueue_time = time.time()
+
+            event_span = tracing.restoreSpanContext(event.span_context)
             span_info = tracing.startSavedSpan(
-                'QueueItem', start_time=enqueue_time)
+                'QueueItem',
+                start_time=enqueue_time,
+                links=[trace.Link(event_span.get_span_context())]
+            )
             item = change_queue.enqueueChange(change, event,
                                               span_info=span_info,
                                               enqueue_time=enqueue_time)
