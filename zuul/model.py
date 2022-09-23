@@ -6239,6 +6239,8 @@ class ChangeManagementEvent(ManagementEvent):
         self.oldrev = oldrev or '0000000000000000000000000000000000000000'
         self.newrev = newrev or '0000000000000000000000000000000000000000'
         self.timestamp = time.time()
+        span = trace.get_current_span()
+        self.span_context = tracing.getSpanContext(span)
 
     def toDict(self):
         d = super().toDict()
@@ -6252,12 +6254,14 @@ class ChangeManagementEvent(ManagementEvent):
         d["oldrev"] = self.oldrev
         d["newrev"] = self.newrev
         d["timestamp"] = self.timestamp
+        d["span_context"] = self.span_context
         return d
 
     def updateFromDict(self, d):
         super().updateFromDict(d)
         self.type = d.get("type")
         self.timestamp = d.get("timestamp")
+        self.span_contex = d.get("span_context")
 
     @classmethod
     def fromDict(cls, data):
