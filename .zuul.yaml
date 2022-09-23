@@ -34,21 +34,6 @@
       - playbooks/zuul-stream/.*
 
 - job:
-    name: zuul-stream-functional-2.8
-    parent: zuul-stream-functional
-    # Force executor to use same Ansible version as "controller" node so
-    # that the inventory.yaml file will be correct for that version.
-    ansible-version: 2.8
-    vars:
-      zuul_ansible_version: 2.8
-
-- job:
-    name: zuul-stream-functional-2.9
-    parent: zuul-stream-functional
-    vars:
-      zuul_ansible_version: 2.9
-
-- job:
     name: zuul-stream-functional-5
     parent: zuul-stream-functional
     vars:
@@ -323,8 +308,6 @@
             files:
               - web/.*
             nodeset: ubuntu-jammy
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
         - zuul-stream-functional-5
         - zuul-stream-functional-6
         - zuul-tox-remote
@@ -354,8 +337,6 @@
             files:
               - web/.*
             nodeset: ubuntu-jammy
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
         - zuul-stream-functional-5
         - zuul-stream-functional-6
         - zuul-tox-remote

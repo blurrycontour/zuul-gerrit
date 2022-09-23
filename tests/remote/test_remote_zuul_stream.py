@@ -25,7 +25,7 @@ from tests.base import AnsibleZuulTestCase
 class FunctionalZuulStreamMixIn:
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
     # This should be overriden in child classes.
-    ansible_version = '2.9'
+    ansible_version = '5'
 
     def _setUp(self):
         self.log_console_port = 19000 + int(
@@ -201,8 +201,6 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(
                 r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
             self.assertLogLine('PLAY RECAP', text)
-            # NOTE(pabelanger): Ansible 2.8 added new stats
-            # skipped, rescued, ignored.
             self.assertLogLine(
                 r'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0 '
                 'skipped: 0 rescued: 1 ignored: 0', text)
@@ -253,24 +251,6 @@ class FunctionalZuulStreamMixIn:
             regex = r'controller \|   "msg": "New-style module did not ' \
                 r'handle its own exit"'
             self.assertLogLine(regex, text)
-
-
-class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
-    ansible_version = '2.8'
-    ansible_core_version = '2.8'
-
-    def setUp(self):
-        super().setUp()
-        self._setUp()
-
-
-class TestZuulStream29(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
-    ansible_version = '2.9'
-    ansible_core_version = '2.9'
-
-    def setUp(self):
-        super().setUp()
-        self._setUp()
 
 
 class TestZuulStream5(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
