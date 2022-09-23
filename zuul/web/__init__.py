@@ -18,6 +18,7 @@ import socket
 from collections import defaultdict
 from contextlib import suppress
 
+from opentelemetry import trace
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
@@ -39,7 +40,7 @@ from zuul import exceptions
 from zuul.configloader import ConfigLoader
 from zuul.connection import BaseConnection, ReadOnlyBranchCacheError
 import zuul.lib.repl
-from zuul.lib import commandsocket, encryption, streamer_utils
+from zuul.lib import commandsocket, encryption, streamer_utils, tracing
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.jsonutil import ZuulJSONEncoder
 from zuul.lib.keystorage import KeyStorage
@@ -1741,6 +1742,7 @@ class StreamManager(object):
 
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self,
                  config,
@@ -1749,6 +1751,7 @@ class ZuulWeb(object):
                  info: WebInfo = None):
         self.start_time = time.time()
         self.config = config
+        self.tracing = tracing.Tracing(self.config)
         self.metrics = WebMetrics()
         self.statsd = get_statsd(config)
 
@@ -2037,6 +2040,7 @@ class ZuulWeb(object):
         self._command_running = False
         self.command_socket.stop()
         self.monitoring_server.stop()
+        self.tracing.stop()
 
     def join(self):
         self.command_thread.join()

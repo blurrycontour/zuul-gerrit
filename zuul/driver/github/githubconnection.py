@@ -39,11 +39,13 @@ import github3
 import github3.exceptions
 import github3.pulls
 from github3.session import AppInstallationTokenAuth
+from opentelemetry import trace
 
 from zuul.connection import (
     BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
 )
 from zuul.driver.github.graphql import GraphQLClient
+from zuul.lib import tracing
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
@@ -74,7 +76,9 @@ ANNOTATION_LEVELS = {
 }
 
 EventTuple = collections.namedtuple(
-    "EventTuple", ["timestamp", "body", "event_type", "delivery"]
+    "EventTuple", [
+        "timestamp", "span_context", "body", "event_type", "delivery"
+    ]
 )
 
 
@@ -326,10 +330,19 @@ class GithubShaCache(object):
 
 
 class GithubEventProcessor(object):
+    tracer = trace.get_tracer("zuul")
+
     def __init__(self, connector, event_tuple, connection_event):
         self.connector = connector
         self.connection = connector.connection
-        self.ts, self.body, self.event_type, self.delivery = event_tuple
+        (
+            self.ts,
+            span_context,
+            self.body,
+            self.event_type,
+            self.delivery
+        ) = event_tuple
+        self.event_span = tracing.restoreSpanContext(span_context)
         logger = logging.getLogger("zuul.GithubEventProcessor")
         self.zuul_event_id = self.delivery
         self.log = get_annotated_logger(logger, self.zuul_event_id)
@@ -341,7 +354,10 @@ class GithubEventProcessor(object):
     def run(self):
         self.log.debug("Starting event processing")
         try:
-            self._process_event()
+            link = trace.Link(self.event_span.get_span_context())
+            with self.tracer.start_as_current_span(
+                    "GithubEventProcessing", links=[link]):
+                self._process_event()
         except Exception:
             self.log.exception("Exception when processing event:")
         finally:
@@ -392,6 +408,7 @@ class GithubEventProcessor(object):
             # retrigger.
             self.log.exception('Exception when handling event:')
 
+        span_context = tracing.getSpanContext(trace.get_current_span())
         for event in events:
             # Note we limit parallel requests per installation id to avoid
             # triggering abuse detection.
@@ -399,6 +416,7 @@ class GithubEventProcessor(object):
                 event.delivery = self.delivery
                 event.zuul_event_id = self.delivery
                 event.timestamp = self.ts
+                event.span_context = span_context
                 project = self.connection.source.getProject(event.project_name)
                 change = None
                 if event.change_number:
@@ -854,11 +872,13 @@ class GithubEventConnector:
 
     @staticmethod
     def _eventAsTuple(event):
+        span_context = event.get("span_context")
         body = event.get("body")
         headers = event.get("headers", {})
         event_type = headers.get('x-github-event')
         delivery = headers.get('x-github-delivery')
-        return EventTuple(time.time(), body, event_type, delivery)
+        return EventTuple(
+            time.time(), span_context, body, event_type, delivery)
 
 
 class GithubUser(Mapping):
@@ -2471,30 +2491,35 @@ class GithubWebController(BaseWebController):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def payload(self):
-        # Note(tobiash): We need to normalize the headers. Otherwise we will
-        # have trouble to get them from the dict afterwards.
-        # e.g.
-        # GitHub: sent: X-GitHub-Event received: X-GitHub-Event
-        # urllib: sent: X-GitHub-Event received: X-Github-Event
-        #
-        # We cannot easily solve this mismatch as every http processing lib
-        # modifies the header casing in its own way and by specification http
-        # headers are case insensitive so just lowercase all so we don't have
-        # to take care later.
-        # Note(corvus): Don't use cherrypy's json_in here so that we
-        # can validate the signature.
-        headers = dict()
-        for key, value in cherrypy.request.headers.items():
-            headers[key.lower()] = value
-        body = cherrypy.request.body.read()
-        self._validate_signature(body, headers)
-        # We cannot send the raw body through zookeeper, so it's easy to just
-        # encode it as json, after decoding it as utf-8
-        json_body = json.loads(body.decode('utf-8'))
+        with self.tracer.start_span("GitHubEvent") as span:
+            # Note(tobiash): We need to normalize the headers. Otherwise we
+            # will have trouble to get them from the dict afterwards.
+            # e.g.
+            # GitHub: sent: X-GitHub-Event received: X-GitHub-Event
+            # urllib: sent: X-GitHub-Event received: X-Github-Event
+            #
+            # We cannot easily solve this mismatch as every http processing lib
+            # modifies the header casing in its own way and by specification
+            # http headers are case insensitive so just lowercase all so we
+            # don't have to take care later.
+            # Note(corvus): Don't use cherrypy's json_in here so that we
+            # can validate the signature.
+            headers = dict()
+            for key, value in cherrypy.request.headers.items():
+                headers[key.lower()] = value
+            body = cherrypy.request.body.read()
+            self._validate_signature(body, headers)
+            # We cannot send the raw body through zookeeper, so it's easy to
+            # just encode it as json, after decoding it as utf-8
+            json_body = json.loads(body.decode('utf-8'))
 
-        data = {'headers': headers, 'body': json_body}
-        self.event_queue.put(data)
-        return data
+            data = {
+                'headers': headers,
+                'body': json_body,
+                'span_context': self.tracing.getSpanContext(span),
+            }
+            self.event_queue.put(data)
+            return data
 
 
 def _status_as_tuple(status):
