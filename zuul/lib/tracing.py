@@ -64,7 +64,7 @@ def getSpanInfo(span, include_attributes=False):
     links = [{'context': _formatContext(l.context),
               'is_remote': l.context.is_remote,
               'attributes': _formatAttributes(l.attributes)}
-             for l in span.links]
+              for l in span.links]
     attrs = _formatAttributes(span.attributes)
     context = span.get_span_context()
     ret = {
