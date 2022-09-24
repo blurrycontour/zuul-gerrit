@@ -934,9 +934,9 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/tenant-one/autohold/12345")
         self.assertEqual(404, resp.status_code)
 
-    def test_autohold_delete_404_on_invalid_id(self):
+    def test_autohold_delete_401_on_invalid_id(self):
         resp = self.delete_url("api/tenant/tenant-one/autohold/12345")
-        self.assertEqual(404, resp.status_code)
+        self.assertEqual(401, resp.status_code)
 
     def test_autohold_info(self):
         self.addAutohold('tenant-one', 'review.example.com/org/project',
@@ -2213,6 +2213,22 @@ class TestTenantScopedWebApi(BaseTestWeb):
         # Throw a "Forbidden" error, because user is authenticated but not
         # authorized for tenant-one
         self.assertEqual(403, resp.status_code, resp.text)
+
+    def test_autohold_delete_invalid_id(self):
+        """Make sure authorization rules are applied"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        bad_token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                               algorithm='HS256')
+        resp = self.delete_url(
+            "api/tenant/tenant-one/autohold/invalidid",
+            headers={'Authorization': 'Bearer %s' % bad_token})
+        self.assertEqual(404, resp.status_code, resp.text)
 
     def test_autohold_delete(self):
         authz = {'iss': 'zuul_operator',

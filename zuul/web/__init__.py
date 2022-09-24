@@ -151,6 +151,47 @@ cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
                                               handle_options)
 
 
+class AuthInfo:
+    def __init__(self, uid, admin):
+        self.uid = uid
+        self.admin = admin
+
+
+def check_auth(require_admin=False, require_auth=False):
+    if require_admin:
+        require_auth = True
+    request = cherrypy.serving.request
+    zuulweb = request.app.root
+    if request.handler is None:
+        # handle_options has already aborted the request.
+        return
+
+    # Always set the tenant and uid variables
+    tenant_name = request.params.get('tenant_name')
+    tenant = zuulweb._getTenantOrRaise(tenant_name)
+    request.params['tenant'] = tenant
+    request.params['auth'] = None
+
+    basic_error = zuulweb._basic_auth_header_check()
+    if basic_error is not None and require_auth:
+        request.handler = None
+        return basic_error
+    claims, token_error = zuulweb._auth_token_check()
+    if token_error is not None and require_auth:
+        request.handler = None
+        return token_error
+    admin = zuulweb._is_authorized(tenant, claims)
+    if not admin and require_admin:
+        raise cherrypy.HTTPError(403)
+
+    request.params['auth'] = AuthInfo(claims['__zuul_uid_claim'],
+                                      admin)
+
+
+cherrypy.tools.check_auth = cherrypy.Tool('before_request_body',
+                                          check_auth)
+
+
 class StatsTool(cherrypy.Tool):
     def __init__(self, statsd, metrics):
         self.statsd = statsd
@@ -421,23 +462,13 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['POST', ])
-    def dequeue(self, tenant_name, project_name):
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
+    @cherrypy.tools.check_auth(require_admin=True)
+    def dequeue(self, tenant_name, project_name, tenant, auth):
         if cherrypy.request.method != 'POST':
             raise cherrypy.HTTPError(405)
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        self.isAuthorizedOrRaise(claims, tenant_name)
-        msg = 'User "%s" requesting "%s" on %s/%s'
-        self.log.info(
-            msg % (claims['__zuul_uid_claim'], 'dequeue',
-                   tenant_name, project_name))
+        self.log.info(f'User {auth.uid} requesting dequeue on '
+                      f'{tenant_name}/{project_name}')
 
-        tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
         body = cherrypy.request.json
@@ -467,23 +498,13 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['POST', ])
-    def enqueue(self, tenant_name, project_name):
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
+    @cherrypy.tools.check_auth(require_admin=True)
+    def enqueue(self, tenant_name, project_name, tenant, auth):
         if cherrypy.request.method != 'POST':
             raise cherrypy.HTTPError(405)
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        self.isAuthorizedOrRaise(claims, tenant_name)
-        msg = 'User "%s" requesting "%s" on %s/%s'
-        self.log.info(
-            msg % (claims['__zuul_uid_claim'], 'enqueue',
-                   tenant_name, project_name))
+        self.log.info(f'User {auth.uid} requesting enqueue on '
+                      f'{tenant_name}/{project_name}')
 
-        tenant = self._getTenantOrRaise(tenant_name)
         project = self._getProjectOrRaise(tenant, project_name)
 
         body = cherrypy.request.json
@@ -533,28 +554,17 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['POST', ])
-    def promote(self, tenant_name):
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
+    @cherrypy.tools.check_auth(require_admin=True)
+    def promote(self, tenant_name, tenant, auth):
         if cherrypy.request.method != 'POST':
             raise cherrypy.HTTPError(405)
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        self.isAuthorizedOrRaise(claims, tenant_name)
 
         body = cherrypy.request.json
         pipeline_name = body.get('pipeline')
         changes = body.get('changes')
 
-        msg = 'User "%s" requesting "%s" on %s/%s'
-        self.log.info(
-            msg % (claims['__zuul_uid_claim'], 'promote',
-                   tenant_name, pipeline_name))
-
-        tenant = self._getTenantOrRaise(tenant_name)
+        self.log.info(f'User {auth.uid} requesting promote on '
+                      f'{tenant_name}/{pipeline_name}')
 
         # Validate the pipeline so we can enqueue the event directly
         # in the pipeline management event queue and don't need to
@@ -574,78 +584,59 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def autohold_list(self, tenant_name, *args, **kwargs):
-        # we don't use json_in because a payload is not mandatory with GET
         _ = self._getTenantOrRaise(tenant_name)
-        if cherrypy.request.method != 'GET':
-            raise cherrypy.HTTPError(405)
         # filter by project if passed as a query string
         project_name = cherrypy.request.params.get('project', None)
         return self._autohold_list(tenant_name, project_name)
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', 'POST', ])
-    def autohold(self, tenant_name, project_name=None):
-        # we don't use json_in because a payload is not mandatory with GET
+    @cherrypy.tools.handle_options(allowed_methods=['GET', 'POST'])
+    def autohold_project_get(self, tenant_name, project_name):
         # Note: GET handling is redundant with autohold_list
         # and could be removed.
-        tenant = self._getTenantOrRaise(tenant_name)
-        if cherrypy.request.method == 'GET':
-            return self._autohold_list(tenant_name, project_name)
-        elif cherrypy.request.method == 'POST':
-            basic_error = self._basic_auth_header_check()
-            if basic_error is not None:
-                return basic_error
-            # AuthN/AuthZ
-            claims, token_error = self._auth_token_check()
-            if token_error is not None:
-                return token_error
-            self.isAuthorizedOrRaise(claims, tenant_name)
-            project = self._getProjectOrRaise(tenant, project_name)
+        return self._autohold_list(tenant_name, project_name)
 
-            msg = 'User "%s" requesting "%s" on %s/%s'
-            self.log.info(
-                msg % (claims['__zuul_uid_claim'], 'autohold',
-                       tenant_name, project_name))
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.check_auth(require_admin=True)
+    def autohold_project_post(self, tenant_name, project_name, tenant, auth):
+        project = self._getProjectOrRaise(tenant, project_name)
+        self.log.info(f'User {auth.uid} requesting autohold on '
+                      f'{tenant_name}/{project_name}')
 
-            length = int(cherrypy.request.headers['Content-Length'])
-            body = cherrypy.request.body.read(length)
-            try:
-                jbody = json.loads(body.decode('utf-8'))
-            except ValueError:
-                raise cherrypy.HTTPError(406, 'JSON body required')
+        jbody = cherrypy.request.json
 
-            # Validate the payload
-            jbody['change'] = jbody.get('change', None)
-            jbody['ref'] = jbody.get('ref', None)
-            count = jbody.get('count')
-            if jbody['change'] and jbody['ref']:
-                raise cherrypy.HTTPError(
-                    400, 'change and ref are mutually exclusive')
-            if not all(p in jbody for p in [
-                    'job', 'count', 'change', 'ref', 'reason',
-                    'node_hold_expiration']):
-                raise cherrypy.HTTPError(400, 'Invalid request body')
-            if count < 0:
-                raise cherrypy.HTTPError(400, "Count must be greater 0")
+        # Validate the payload
+        jbody['change'] = jbody.get('change', None)
+        jbody['ref'] = jbody.get('ref', None)
+        count = jbody.get('count')
+        if jbody['change'] and jbody['ref']:
+            raise cherrypy.HTTPError(
+                400, 'change and ref are mutually exclusive')
+        if not all(p in jbody for p in [
+                'job', 'count', 'change', 'ref', 'reason',
+                'node_hold_expiration']):
+            raise cherrypy.HTTPError(400, 'Invalid request body')
+        if count < 0:
+            raise cherrypy.HTTPError(400, "Count must be greater 0")
 
-            project_name = project.canonical_name
+        project_name = project.canonical_name
 
-            if jbody['change']:
-                ref_filter = project.source.getRefForChange(jbody['change'])
-            if jbody['ref']:
-                ref_filter = str(jbody['ref'])
-            else:
-                ref_filter = ".*"
-
-            self._autohold(tenant_name, project_name, jbody['job'], ref_filter,
-                           jbody['reason'], jbody['count'],
-                           jbody['node_hold_expiration'])
-            resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
-            return True
+        if jbody['change']:
+            ref_filter = project.source.getRefForChange(jbody['change'])
+        if jbody['ref']:
+            ref_filter = str(jbody['ref'])
         else:
-            raise cherrypy.HTTPError(405)
+            ref_filter = ".*"
+
+        self._autohold(tenant_name, project_name, jbody['job'], ref_filter,
+                       jbody['reason'], jbody['count'],
+                       jbody['node_hold_expiration'])
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return True
 
     def _autohold(self, tenant_name, project_name, job_name, ref_filter,
                   reason, count, node_hold_expiration):
@@ -708,16 +699,8 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', 'DELETE', ])
-    def autohold_by_request_id(self, tenant_name, request_id):
-        if cherrypy.request.method == 'GET':
-            return self._autohold_info(tenant_name, request_id)
-        elif cherrypy.request.method == 'DELETE':
-            return self._autohold_delete(tenant_name, request_id)
-        else:
-            raise cherrypy.HTTPError(405)
-
-    def _autohold_info(self, tenant_name, request_id):
-        request = self._get_autohold_request(tenant_name, request_id)
+    def autohold_get(self, tenant_name, request_id):
+        request = self._getAutoholdRequest(tenant_name, request_id)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return {
@@ -734,21 +717,13 @@ class ZuulWebAPI(object):
             'nodes': request.nodes,
         }
 
-    def _autohold_delete(self, tenant_name, request_id):
-        # We need tenant info from the request for authz
-        request = self._get_autohold_request(tenant_name, request_id)
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        self.isAuthorizedOrRaise(claims, request.tenant)
-        msg = 'User "%s" requesting "%s" on %s/%s'
-        self.log.info(
-            msg % (claims['__zuul_uid_claim'], 'autohold-delete',
-                   request.tenant, request.project))
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.check_auth(require_admin=True)
+    def autohold_delete(self, tenant_name, request_id, tenant, auth):
+        request = self._getAutoholdRequest(tenant_name, request_id)
+        self.log.info(f'User {auth.uid} requesting autohold-delete on '
+                      f'{request.tenant}/{request.project}')
 
         # User is authorized, so remove the autohold request
         self.log.debug("Removing autohold %s", request)
@@ -760,7 +735,7 @@ class ZuulWebAPI(object):
 
         cherrypy.response.status = 204
 
-    def _get_autohold_request(self, tenant_name, request_id):
+    def _getAutoholdRequest(self, tenant_name, request_id):
         hold_request = None
         try:
             hold_request = self.zk_nodepool.getHoldRequest(request_id)
@@ -831,10 +806,10 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def tenant_info(self, tenant):
+    def tenant_info(self, tenant_name):
         info = self.zuulweb.info.copy()
-        info.tenant = tenant
-        tenant_config = self.zuulweb.unparsed_abide.tenants.get(tenant)
+        info.tenant = tenant_name
+        tenant_config = self.zuulweb.unparsed_abide.tenants.get(tenant_name)
         if tenant_config is not None:
             # TODO: should we return 404 if tenant not found?
             tenant_auth_realm = tenant_config.get('authentication-realm')
@@ -854,12 +829,6 @@ class ZuulWebAPI(object):
                 self.static_cache_expiry
         resp.last_modified = self.zuulweb.start_time
         return ret
-
-    def isAuthorizedOrRaise(self, claims, tenant_name):
-        tenant = self._getTenantOrRaise(tenant_name)
-        authorized = self._is_authorized(tenant, claims)
-        if not authorized:
-            raise cherrypy.HTTPError(403)
 
     def _is_authorized(self, tenant, claims):
         # First, check for zuul.admin override
@@ -889,19 +858,11 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', ])
-    def tenant_authorizations(self, tenant_name):
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        tenant = self._getTenantOrRaise(tenant_name)
-        admin = self._is_authorized(tenant, claims)
+    @cherrypy.tools.check_auth(require_auth=True)
+    def tenant_authorizations(self, tenant_name, tenant, auth):
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return {'zuul': {'admin': admin,
+        return {'zuul': {'admin': auth.admin,
                          'scope': [tenant_name, ]}, }
 
     def _tenants(self):
@@ -1057,14 +1018,14 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    def status(self, tenant):
-        return self._getStatus(tenant)[1]
+    def status(self, tenant_name):
+        return self._getStatus(tenant_name)[1]
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def status_change(self, tenant, change):
-        payload = self._getStatus(tenant)[0]
+    def status_change(self, tenant_name, change):
+        payload = self._getStatus(tenant_name)[0]
         result_filter = ChangeFilter(change)
         return result_filter.filterPayload(payload)
 
@@ -1234,7 +1195,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def nodes(self, tenant):
+    def nodes(self, tenant_name):
         ret = []
         for node_id in self.zk_nodepool.getNodes(cached=True):
             node = self.zk_nodepool.getNode(node_id)
@@ -1245,7 +1206,7 @@ class ZuulWebAPI(object):
                     isinstance(node.user_data, dict) and
                     node.user_data.get('zuul_system') ==
                     self.system.system_id and
-                    node.tenant_name == tenant):
+                    node.tenant_name == tenant_name):
                 continue
             node_data = {}
             for key in ("id", "type", "connection_type", "external_id",
@@ -1350,15 +1311,17 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def builds(self, tenant, project=None, pipeline=None, change=None,
+    def builds(self, tenant_name, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
                limit=50, skip=0, idx_min=None, idx_max=None):
         connection = self._get_connection()
 
-        if tenant not in self.zuulweb.abide.tenants.keys():
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
+        if tenant_name not in self.zuulweb.abide.tenants.keys():
+            raise cherrypy.HTTPError(
+                404,
+                f'Tenant {tenant_name} does not exist.')
 
         # If final is None, we return all builds, both final and non-final
         if final is not None:
@@ -1374,11 +1337,12 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400, 'idx_min, idx_max must be integers')
 
         builds = connection.getBuilds(
-            tenant=tenant, project=project, pipeline=pipeline, change=change,
-            branch=branch, patchset=patchset, ref=ref, newrev=newrev,
-            uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
-            result=result, final=final, held=held, complete=complete,
-            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
+            tenant=tenant_name, project=project, pipeline=pipeline,
+            change=change, branch=branch, patchset=patchset, ref=ref,
+            newrev=newrev, uuid=uuid, job_name=job_name, voting=voting,
+            nodeset=nodeset, result=result, final=final, held=held,
+            complete=complete, limit=limit, offset=skip,
+            idx_min=_idx_min, idx_max=_idx_max)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -1387,10 +1351,10 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def build(self, tenant, uuid):
+    def build(self, tenant_name, uuid):
         connection = self._get_connection()
 
-        data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
+        data = connection.getBuilds(tenant=tenant_name, uuid=uuid, limit=1)
         if not data:
             raise cherrypy.HTTPError(404, "Build not found")
         data = self.buildToDict(data[0], data[0].buildset)
@@ -1428,11 +1392,11 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    def badge(self, tenant, project=None, pipeline=None, branch=None):
+    def badge(self, tenant_name, project=None, pipeline=None, branch=None):
         connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
-            tenant=tenant, project=project, pipeline=pipeline,
+            tenant=tenant_name, project=project, pipeline=pipeline,
             branch=branch, complete=True, limit=1)
         if not buildsets:
             raise cherrypy.HTTPError(404, 'No buildset found')
@@ -1452,7 +1416,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def buildsets(self, tenant, project=None, pipeline=None, change=None,
+    def buildsets(self, tenant_name, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
                   uuid=None, result=None, complete=None, limit=50, skip=0,
                   idx_min=None, idx_max=None):
@@ -1468,9 +1432,9 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400, 'idx_min, idx_max must be integers')
 
         buildsets = connection.getBuildsets(
-            tenant=tenant, project=project, pipeline=pipeline, change=change,
-            branch=branch, patchset=patchset, ref=ref, newrev=newrev,
-            uuid=uuid, result=result, complete=complete,
+            tenant=tenant_name, project=project, pipeline=pipeline,
+            change=change, branch=branch, patchset=patchset, ref=ref,
+            newrev=newrev, uuid=uuid, result=result, complete=complete,
             limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
 
         resp = cherrypy.response
@@ -1480,10 +1444,10 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def buildset(self, tenant, uuid):
+    def buildset(self, tenant_name, uuid):
         connection = self._get_connection()
 
-        data = connection.getBuildset(tenant, uuid)
+        data = connection.getBuildset(tenant_name, uuid)
         if not data:
             raise cherrypy.HTTPError(404, "Buildset not found")
         data = self.buildsetToDict(data, data.builds)
@@ -1532,7 +1496,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
-    def console_stream(self, tenant):
+    def console_stream(self, tenant_name):
         cherrypy.request.ws_handler.zuulweb = self.zuulweb
 
     @cherrypy.expose
@@ -1854,11 +1818,12 @@ class ZuulWeb(object):
                           controller=api, action='components')
         route_map.connect('api', '/api/tenants',
                           controller=api, action='tenants')
-        route_map.connect('api', '/api/tenant/{tenant}/info',
+        route_map.connect('api', '/api/tenant/{tenant_name}/info',
                           controller=api, action='tenant_info')
-        route_map.connect('api', '/api/tenant/{tenant}/status',
+        route_map.connect('api', '/api/tenant/{tenant_name}/status',
                           controller=api, action='status')
-        route_map.connect('api', '/api/tenant/{tenant}/status/change/{change}',
+        route_map.connect('api', '/api/tenant/{tenant_name}/status/change'
+                          '/{change}',
                           controller=api, action='status_change')
         route_map.connect('api', '/api/tenant/{tenant_name}/semaphores',
                           controller=api, action='semaphores')
@@ -1869,7 +1834,7 @@ class ZuulWeb(object):
         # if no auth configured, deactivate admin routes
         if self.authenticators.authenticators:
             # route order is important, put project actions before the more
-            # generic tenant/{tenant}/project/{project} route
+            # generic tenant/{tenant_name}/project/{project} route
             route_map.connect('api',
                               '/api/tenant/{tenant_name}/authorizations',
                               controller=api,
@@ -1879,7 +1844,15 @@ class ZuulWeb(object):
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
-                controller=api, action='autohold')
+                controller=api,
+                conditions=dict(method=['GET', 'OPTIONS']),
+                action='autohold_project_get')
+            route_map.connect(
+                'api',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
+                controller=api,
+                conditions=dict(method=['POST']),
+                action='autohold_project_post')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant_name}/project/{project_name:.*}/enqueue',
@@ -1888,9 +1861,16 @@ class ZuulWeb(object):
                 'api',
                 '/api/tenant/{tenant_name}/project/{project_name:.*}/dequeue',
                 controller=api, action='dequeue')
-        route_map.connect('api', '/api/tenant/{tenant_name}/autohold/'
-                          '{request_id}',
-                          controller=api, action='autohold_by_request_id')
+        route_map.connect('api',
+                          '/api/tenant/{tenant_name}/autohold/{request_id}',
+                          controller=api,
+                          conditions=dict(method=['GET', 'OPTIONS']),
+                          action='autohold_get')
+        route_map.connect('api',
+                          '/api/tenant/{tenant_name}/autohold/{request_id}',
+                          controller=api,
+                          conditions=dict(method=['DELETE']),
+                          action='autohold_delete')
         route_map.connect('api', '/api/tenant/{tenant_name}/autohold',
                           controller=api, action='autohold_list')
         route_map.connect('api', '/api/tenant/{tenant_name}/projects',
@@ -1915,7 +1895,7 @@ class ZuulWeb(object):
                           controller=api, action='pipelines')
         route_map.connect('api', '/api/tenant/{tenant_name}/labels',
                           controller=api, action='labels')
-        route_map.connect('api', '/api/tenant/{tenant}/nodes',
+        route_map.connect('api', '/api/tenant/{tenant_name}/nodes',
                           controller=api, action='nodes')
         route_map.connect('api', '/api/tenant/{tenant_name}/key/'
                           '{project_name:.*}.pub',
@@ -1923,17 +1903,17 @@ class ZuulWeb(object):
         route_map.connect('api', '/api/tenant/{tenant_name}/'
                           'project-ssh-key/{project_name:.*}.pub',
                           controller=api, action='project_ssh_key')
-        route_map.connect('api', '/api/tenant/{tenant}/console-stream',
+        route_map.connect('api', '/api/tenant/{tenant_name}/console-stream',
                           controller=api, action='console_stream')
-        route_map.connect('api', '/api/tenant/{tenant}/builds',
+        route_map.connect('api', '/api/tenant/{tenant_name}/builds',
                           controller=api, action='builds')
-        route_map.connect('api', '/api/tenant/{tenant}/badge',
+        route_map.connect('api', '/api/tenant/{tenant_name}/badge',
                           controller=api, action='badge')
-        route_map.connect('api', '/api/tenant/{tenant}/build/{uuid}',
+        route_map.connect('api', '/api/tenant/{tenant_name}/build/{uuid}',
                           controller=api, action='build')
-        route_map.connect('api', '/api/tenant/{tenant}/buildsets',
+        route_map.connect('api', '/api/tenant/{tenant_name}/buildsets',
                           controller=api, action='buildsets')
-        route_map.connect('api', '/api/tenant/{tenant}/buildset/{uuid}',
+        route_map.connect('api', '/api/tenant/{tenant_name}/buildset/{uuid}',
                           controller=api, action='buildset')
         route_map.connect('api', '/api/tenant/{tenant_name}/config-errors',
                           controller=api, action='config_errors')
