@@ -1506,6 +1506,24 @@ class GlobalSemaphoreParser(object):
         return semaphore
 
 
+class ApiRootParser(object):
+    def __init__(self):
+        self.log = logging.getLogger("zuul.ApiRootParser")
+        self.schema = self.getSchema()
+
+    def getSchema(self):
+        api_root = {
+            'authentication-realm': str
+        }
+        return vs.Schema(api_root)
+
+    def fromYaml(self, conf):
+        self.schema(conf)
+        api_root = model.ApiRoot(conf.get('authentication-realm'))
+        api_root.freeze()
+        return api_root
+
+
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
@@ -2530,6 +2548,7 @@ class ConfigLoader(object):
             zuul_globals, statsd)
         self.authz_rule_parser = AuthorizationRuleParser()
         self.global_semaphore_parser = GlobalSemaphoreParser()
+        self.api_root_parser = ApiRootParser()
 
     def expandConfigPath(self, config_path):
         if config_path:
@@ -2593,6 +2612,13 @@ class ConfigLoader(object):
             abide.semaphores[semaphore.name] = semaphore
 
     def loadTPCs(self, abide, unparsed_abide, tenants=None):
+        # Load the global api root too
+        if unparsed_abide.api_roots:
+            api_root_conf = unparsed_abide.api_roots[0]
+        else:
+            api_root_conf = {}
+        abide.api_root = self.api_root_parser.fromYaml(api_root_conf)
+
         if tenants:
             tenants_to_load = {t: unparsed_abide.tenants[t] for t in tenants
                                if t in unparsed_abide.tenants}
