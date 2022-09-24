@@ -417,12 +417,12 @@ configuration. Some examples of tenant definitions are:
 
       .. note::
 
-         Defining a default realm for a tenant will not invalidate access tokens
-         issued from other configured realms, especially if they match the tenant's
-         admin rules. This is intended, so that an operator can for example issue
-         an overriding access token manually. If this is an issue, it is advised
-         to add finer filtering to admin rules, for example filtering by the ``iss``
-         claim (generally equal to the issuer ID).
+         Defining a default realm for a tenant will not invalidate
+         access tokens issued from other configured realms. This is
+         intended so that an operator can issue an overriding access
+         token manually. If this is an issue, it is advised to add
+         finer filtering to admin rules, for example, filtering by the
+         ``iss`` claim (generally equal to the issuer ID).
 
    .. attr:: semaphores
 
@@ -650,3 +650,46 @@ and **tenant-two**:
      'iat': 1234556780,
      'groups': ['tenant-one', 'tenant-two'],
     }
+
+API Root
+--------
+
+Most actions in zuul-web, zuul-client, and the REST API are understood
+to be within the context of a specific tenant and therefore the
+authorization rules specified by that tenant apply.  When zuul-web is
+deployed in a multi-tenant scenario (the default), there are a few
+extra actions or API methods which are outside of the context of an
+individual tenant (for example, listing the tenants or observing the
+state of Zuul system components).  To control access to these methods,
+an `api-root` object can be used.
+
+At most one `api-root` object may appear in the tenant configuration
+file.  If more than one appears, it is an error.  If there is no
+`api-root` object, then anonymous read-only access to the tenant list
+and other root-level API methods is assumed.
+
+The ``/api/info`` endpoint is never protected by Zuul since it
+supplies the authentication information needed by the web UI.
+
+API root access is not a pre-requisite to access tenant-specific URLs.
+
+.. attr:: api-root
+
+   The following attributes are supported:
+
+   .. attr:: authentication-realm
+
+      Each authenticator defined in Zuul's configuration is associated
+      to a realm.  When authenticating through Zuul's Web User
+      Interface at the multi-tenant root, the Web UI will redirect the
+      user to this realm's authentication service. The authenticator
+      must be of the type ``OpenIDConnect``.
+
+      .. note::
+
+         Defining a default realm for the root API will not invalidate
+         access tokens issued from other configured realms.  This is
+         intended so that an operator can issue an overriding access
+         token manually. If this is an issue, it is advised to add
+         finer filtering to admin rules, for example, filtering by the
+         ``iss`` claim (generally equal to the issuer ID).

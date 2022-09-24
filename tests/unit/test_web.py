@@ -1646,6 +1646,49 @@ class TestTenantAuthRealmInfo(TestWebCapabilitiesInfo):
 
     tenant_config_file = 'config/authorization/rules-templating/main.yaml'
 
+    def test_root_info(self):
+        expected_info = self._expected_info()
+        info = self.get_url("api/info").json()
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC1'
+        self.assertEqual(expected_info, info)
+
+    def test_tenant_info(self):
+        expected_info = self._expected_info()
+        info = self.get_url("api/tenant/tenant-zero/info").json()
+        expected_info['info']['tenant'] = 'tenant-zero'
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC1'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
+        info = self.get_url("api/tenant/tenant-one/info").json()
+        expected_info['info']['tenant'] = 'tenant-one'
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC1'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
+        info = self.get_url("api/tenant/tenant-two/info").json()
+        expected_info['info']['tenant'] = 'tenant-two'
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC2'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
+
+
+class TestRootAuth(TestWebCapabilitiesInfo):
+
+    tenant_config_file = 'config/authorization/api-root/main.yaml'
+
+    def test_root_info(self):
+        expected_info = self._expected_info()
+        info = self.get_url("api/info").json()
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC2'
+        self.assertEqual(expected_info, info)
+
     def test_tenant_info(self):
         expected_info = self._expected_info()
         info = self.get_url("api/tenant/tenant-zero/info").json()
