@@ -1248,6 +1248,23 @@ class Project(object):
         return d
 
 
+class ApiRoot(ConfigObject):
+    def __init__(self, default_auth_realm=None):
+        super().__init__()
+        self.default_auth_realm = default_auth_realm
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, ApiRoot):
+            return False
+        return (self.default_auth_realm == other.default_auth_realm)
+
+    def __repr__(self):
+        return f'<ApiRoot realm={self.default_auth_realm}>'
+
+
 class Node(ConfigObject):
     """A single node for use by a job.
 
@@ -7097,12 +7114,16 @@ class UnparsedAbideConfig(object):
         self.tenants = {}
         self.authz_rules = []
         self.semaphores = []
+        self.api_roots = []
 
     def extend(self, conf):
         if isinstance(conf, UnparsedAbideConfig):
             self.tenants.update(conf.tenants)
             self.authz_rules.extend(conf.authz_rules)
             self.semaphores.extend(conf.semaphores)
+            self.api_roots.extend(conf.api_roots)
+            if len(self.api_roots) > 1:
+                raise Exception("More than one api-root object")
             return
 
         if not isinstance(conf, list):
@@ -7126,6 +7147,10 @@ class UnparsedAbideConfig(object):
                 self.authz_rules.append(value)
             elif key == 'global-semaphore':
                 self.semaphores.append(value)
+            elif key == 'api-root':
+                if self.api_roots:
+                    raise Exception("More than one api-root object")
+                self.api_roots.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -7134,6 +7159,7 @@ class UnparsedAbideConfig(object):
             "uuid": self.uuid,
             "tenants": self.tenants,
             "semaphores": self.semaphores,
+            "api_roots": self.api_roots,
         }
         if (COMPONENT_REGISTRY.model_api < 10):
             d["admin_rules"] = self.authz_rules
@@ -7151,6 +7177,7 @@ class UnparsedAbideConfig(object):
                                               data.get('admin_rules',
                                                        []))
         unparsed_abide.semaphores = data.get("semaphores", [])
+        unparsed_abide.api_roots = data.get("api_roots", [])
         return unparsed_abide
 
 
@@ -8139,6 +8166,7 @@ class Abide(object):
         self.untrusted_tpcs = defaultdict(lambda: defaultdict(list))
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
+        self.api_root = None
 
     def addConfigTPC(self, tenant_name, tpc):
         self.config_tpcs[tenant_name][tpc.project.name].append(tpc)

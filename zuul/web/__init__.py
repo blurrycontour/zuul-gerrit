@@ -801,7 +801,15 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def info(self):
-        return self._handleInfo(self.zuulweb.info)
+        info = self.zuulweb.info.copy()
+
+        root_realm = self.zuulweb.abide.api_root.default_auth_realm
+        if root_realm:
+            if (info.capabilities is not None and
+                info.capabilities.toDict().get('auth') is not None):
+                info.capabilities.capabilities['auth']['default_realm'] =\
+                    root_realm
+        return self._handleInfo(info)
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
