@@ -810,8 +810,6 @@ class ZuulWebAPI(object):
             'buildsets': '/api/tenant/{tenant}/buildsets',
             'buildset': '/api/tenant/{tenant}/buildset/{uuid}',
             'config_errors': '/api/tenant/{tenant}/config-errors',
-            # TODO(mhu) remove after next release
-            'authorizations': '/api/user/authorizations',
             'tenant_authorizations': ('/api/tenant/{tenant}'
                                       '/authorizations'),
             'autohold': '/api/tenant/{tenant}/project/{project:.*}/autohold',
@@ -887,31 +885,6 @@ class ZuulWebAPI(object):
                               uid, tenant.name, rule_name)
                 return True
         return False
-
-    # TODO(mhu) deprecated, remove next version
-    @cherrypy.expose
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options(allowed_methods=['GET', ])
-    def authorizations(self):
-        basic_error = self._basic_auth_header_check()
-        if basic_error is not None:
-            return basic_error
-        # AuthN/AuthZ
-        claims, token_error = self._auth_token_check()
-        if token_error is not None:
-            return token_error
-        try:
-            admin_tenants = self._authorizations()
-        except exceptions.AuthTokenException as e:
-            for header, contents in e.getAdditionalHeaders().items():
-                cherrypy.response.headers[header] = contents
-            cherrypy.response.status = e.HTTPError
-            return {'description': e.error_description,
-                    'error': e.error,
-                    'realm': e.realm}
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
-        return {'zuul': {'admin': admin_tenants}, }
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1914,8 +1887,6 @@ class ZuulWeb(object):
         if self.authenticators.authenticators:
             # route order is important, put project actions before the more
             # generic tenant/{tenant}/project/{project} route
-            route_map.connect('api', '/api/user/authorizations',
-                              controller=api, action='authorizations')
             route_map.connect('api', '/api/tenant/{tenant}/authorizations',
                               controller=api,
                               action='tenant_authorizations')
