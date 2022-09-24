@@ -331,27 +331,35 @@ class App extends React.Component {
 
   render() {
     const { isKebabDropdownOpen } = this.state
-    const { notifications, configErrors, tenant } = this.props
+    const { notifications, configErrors, tenant, info } = this.props
 
     const nav = this.renderMenu()
 
-    const kebabDropdownItems = [
-      <DropdownItem
-        key="components"
-        onClick={event => this.handleComponentsLink(event)}
-      >
-        <ServiceIcon /> Components
-      </DropdownItem>,
+    const kebabDropdownItems = []
+    if (!info.tenant) {
+      kebabDropdownItems.push(
+        <DropdownItem
+          key="components"
+          onClick={event => this.handleComponentsLink(event)}
+        >
+          <ServiceIcon /> Components
+        </DropdownItem>
+      )
+    }
+
+    kebabDropdownItems.push(
       <DropdownItem key="api" onClick={event => this.handleApiLink(event)}>
         <CodeIcon /> API
-      </DropdownItem>,
+      </DropdownItem>
+    )
+    kebabDropdownItems.push(
       <DropdownItem
         key="documentation"
         onClick={event => this.handleDocumentationLink(event)}
       >
         <BookIcon /> Documentation
-      </DropdownItem>,
-    ]
+      </DropdownItem>
+    )
 
     if (tenant.name) {
       kebabDropdownItems.push(
@@ -371,13 +379,15 @@ class App extends React.Component {
         <PageHeaderToolsGroup
           visibility={{ default: 'hidden', lg: 'visible' }}
         >
-          <PageHeaderToolsItem>
-            <Link to='/components'>
-              <Button variant={ButtonVariant.plain}>
-                <ServiceIcon /> Components
-              </Button>
-            </Link>
-          </PageHeaderToolsItem>
+          { (!info.tenant) &&
+            <PageHeaderToolsItem>
+              <Link to='/components'>
+                <Button variant={ButtonVariant.plain}>
+                  <ServiceIcon /> Components
+                </Button>
+              </Link>
+            </PageHeaderToolsItem>
+          }
           <PageHeaderToolsItem>
             <Link to='/openapi'>
               <Button variant={ButtonVariant.plain}>
