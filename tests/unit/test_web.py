@@ -2902,20 +2902,9 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                              data['zuul']['scope'],
                              "%s got %s" % (authz['sub'], data))
 
-            req = self.get_url('/api/tenant/tenant-two/authorizations',
+            req = self.get_url('/api/tenant/unknown/authorizations',
                                headers={'Authorization': 'Bearer %s' % token})
-            self.assertEqual(200, req.status_code, req.text)
-            data = req.json()
-            self.assertTrue('zuul' in data,
-                            "%s got %s" % (authz['sub'], data))
-            self.assertTrue('admin' in data['zuul'],
-                            "%s got %s" % (authz['sub'], data))
-            self.assertEqual('tenant-two' in test_user['zuul.admin'],
-                             data['zuul']['admin'],
-                             "%s got %s" % (authz['sub'], data))
-            self.assertEqual(['tenant-two', ],
-                             data['zuul']['scope'],
-                             "%s got %s" % (authz['sub'], data))
+            self.assertEqual(404, req.status_code, req.text)
 
     def test_authorizations_no_header(self):
         """Test that missing Authorization header results in HTTP 401"""
