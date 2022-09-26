@@ -34,6 +34,8 @@ import urllib.parse
 from typing import Dict, List
 from uuid import uuid4
 
+from opentelemetry import trace
+
 from zuul import version as zuul_version
 from zuul.connection import (
     BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
@@ -42,6 +44,7 @@ from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
+from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
 from zuul.zk.branch_cache import BranchCache
@@ -164,6 +167,7 @@ class GerritEventConnector(threading.Thread):
     )
 
     log = logging.getLogger("zuul.GerritEventConnector")
+    tracer = trace.get_tracer("zuul")
     delay = 10.0
 
     def __init__(self, connection):
@@ -207,10 +211,17 @@ class GerritEventConnector(threading.Thread):
                 self.log.debug("Connection event queue length for %s: %s",
                                self.connection.connection_name, qlen)
             for event in self.event_queue:
-                try:
-                    self._handleEvent(event)
-                finally:
-                    self.event_queue.ack(event)
+                event_span = tracing.restoreSpanContext(
+                    event.get("span_context"))
+                attributes = {"rel": "GerritEvent"}
+                link = trace.Link(event_span.get_span_context(),
+                                  attributes=attributes)
+                with self.tracer.start_as_current_span(
+                        "GerritEventProcessing", links=[link]):
+                    try:
+                        self._handleEvent(event)
+                    finally:
+                        self.event_queue.ack(event)
                 if self._stopped:
                     return
             self._connector_wake_event.wait(10)
@@ -578,6 +589,7 @@ class GerritPoller(threading.Thread):
 class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
+    tracer = trace.get_tracer("zuul")
     iolog = logging.getLogger("zuul.GerritConnection.io")
     depends_on_re = re.compile(r"^Depends-On: (I[0-9a-f]{40})\s*$",
                                re.MULTILINE | re.IGNORECASE)
@@ -1222,14 +1234,21 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if data.get('type') in GerritEventConnector.IGNORED_EVENTS:
             return
 
+        event_uuid = uuid4().hex
+        attributes = {
+            "zuul_event_id": event_uuid,
+        }
         # Gerrit events don't have an event id that could be used to globally
         # identify this event in the system so we have to generate one.
-        event = {
-            "timestamp": time.time(),
-            "zuul_event_id": str(uuid4().hex),
-            "payload": data
-        }
-        self.event_queue.put(event)
+        with self.tracer.start_span(
+                "GerritEvent", attributes=attributes) as span:
+            event = {
+                "timestamp": time.time(),
+                "zuul_event_id": event_uuid,
+                "span_context": tracing.getSpanContext(span),
+                "payload": data,
+            }
+            self.event_queue.put(event)
 
     def review(self, item, message, submit, labels, checks_api,
                file_comments, phase1, phase2, zuul_event_id=None):
