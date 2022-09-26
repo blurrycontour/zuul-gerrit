@@ -29,10 +29,13 @@ import dateutil.parser
 from urllib.parse import quote_plus
 from typing import List, Optional
 
+from opentelemetry import trace
+
 from zuul.connection import (
     BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
 )
 from zuul.web.handler import BaseWebController
+from zuul.lib import tracing
 from zuul.lib.http import ZuulHTTPAdapter
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.config import any_to_bool
@@ -65,6 +68,7 @@ class GitlabEventConnector(threading.Thread):
     """Move events from Gitlab into the scheduler"""
 
     log = logging.getLogger("zuul.GitlabEventConnector")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self, connection):
         super(GitlabEventConnector, self).__init__()
@@ -106,10 +110,15 @@ class GitlabEventConnector(threading.Thread):
     def _run(self):
         while not self._stopped:
             for event in self.event_queue:
-                try:
-                    self._handleEvent(event)
-                finally:
-                    self.event_queue.ack(event)
+                event_span = tracing.restoreSpanContext(
+                    event.get("span_context"))
+                link = trace.Link(event_span.get_span_context())
+                with self.tracer.start_as_current_span(
+                        "GitlabEventProcessing", links=[link]):
+                    try:
+                        self._handleEvent(event)
+                    finally:
+                        self.event_queue.ack(event)
                 if self._stopped:
                     return
             self._process_event.wait(10)
@@ -790,18 +799,22 @@ class GitlabWebController(BaseWebController):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def payload(self):
-        headers = dict()
-        for key, value in cherrypy.request.headers.items():
-            headers[key.lower()] = value
-        body = cherrypy.request.body.read()
-        self.log.info("Event header: %s" % headers)
-        self.log.info("Event body: %s" % body)
-        self._validate_token(headers)
-        json_payload = json.loads(body.decode('utf-8'))
+        with self.zuul_web.tracer.start_span("GitlabEvent") as span:
+            headers = dict()
+            for key, value in cherrypy.request.headers.items():
+                headers[key.lower()] = value
+            body = cherrypy.request.body.read()
+            self.log.info("Event header: %s" % headers)
+            self.log.info("Event body: %s" % body)
+            self._validate_token(headers)
+            json_payload = json.loads(body.decode('utf-8'))
 
-        data = {'payload': json_payload}
-        self.event_queue.put(data)
-        return data
+            data = {
+                'payload': json_payload,
+                'span_context': tracing.getSpanContext(span),
+            }
+            self.event_queue.put(data)
+            return data
 
 
 def getSchema():
