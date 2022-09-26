@@ -622,8 +622,9 @@ class PipelineManager(metaclass=ABCMeta):
 
             zuul_driver = self.sched.connections.drivers['zuul']
             tenant = self.pipeline.tenant
-            zuul_driver.onChangeEnqueued(
-                tenant, item.change, self.pipeline, event)
+            with trace.use_span(tracing.restoreSpan(item.span_info)):
+                zuul_driver.onChangeEnqueued(
+                    tenant, item.change, self.pipeline, event)
             self.dequeueSupercededItems(item)
             return True
 
@@ -2035,7 +2036,8 @@ class PipelineManager(metaclass=ABCMeta):
 
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
-                zuul_driver.onChangeMerged(tenant, item.change, source)
+                with trace.use_span(tracing.restoreSpan(item.span_info)):
+                    zuul_driver.onChangeMerged(tenant, item.change, source)
         elif action:
             self.reportNormalBuildsetEnd(item.current_build_set,
                                          action, final=True)
