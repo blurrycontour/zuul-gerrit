@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb970d15_9881bf71",
+        "filename": "doc/source/examples/pipelines/gitea-reference-pipelines.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "The example might also want to take action if the PR is updated? I think the action value for that is \"changed\".",
+      "revId": "976206a93157f07b03a711cd06ac32c42b9878a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de1600f5_09593a6d",
+        "filename": "tests/base.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "There was discussion about not adding new type signatures at one time. I see this is basically taken from the driver mocks above so not a big deal here.",
+      "revId": "976206a93157f07b03a711cd06ac32c42b9878a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "272001ac_d8895efe",
+        "filename": "tests/base.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4931,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "This seems like it might be overly verbose?",
+      "revId": "976206a93157f07b03a711cd06ac32c42b9878a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "750697d0_fff198b1",
+        "filename": "tests/unit/test_gitea_driver.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "Is this particular test case redundant with the one on line 27 because we\u0027re using the default use_zuulweb action here? I don\u0027t think that is a major issue but might be good to clean up to avoid confusion.",
+      "revId": "976206a93157f07b03a711cd06ac32c42b9878a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4581e5e1_08e3c45b",
+        "filename": "zuul/driver/gitea/giteaconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "What is the purpose of this re.match? Are we just trying to avoid recreating the cloneurl if it is already set properly?",
+      "revId": "976206a93157f07b03a711cd06ac32c42b9878a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

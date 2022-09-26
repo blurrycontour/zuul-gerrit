@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "97e4e983_0d2fc5e3",
+        "filename": "doc/source/drivers/gitea.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "++ to using ~/.ssh/id_rsa for consistency with client defaults.",
+      "parentUuid": "e768a3b2_201585b4",
+      "revId": "98a026ab81847bb70b54933d905115899ad4e762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ab027c39_bdc8b351",
         "filename": "zuul/driver/gitea/giteamodel.py",
         "patchSetId": 8
@@ -65,6 +83,24 @@
       "writtenOn": "2022-08-02T13:36:51Z",
       "side": 1,
       "message": "Shouldn\u0027t this be `list(self.labels)` ? The deserialize below seems to assume it is a list.",
+      "revId": "98a026ab81847bb70b54933d905115899ad4e762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0da5520e_8fe4e336",
+        "filename": "zuul/driver/gitea/giteamodel.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-26T23:11:23Z",
+      "side": 1,
+      "message": "self.labels is initialized to an empty list where are we using it as another type? I think this may already be correct.",
+      "parentUuid": "ab027c39_bdc8b351",
       "revId": "98a026ab81847bb70b54933d905115899ad4e762",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
