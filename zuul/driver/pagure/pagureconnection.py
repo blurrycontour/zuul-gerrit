@@ -23,12 +23,15 @@ import requests
 import cherrypy
 import voluptuous as v
 
+from opentelemetry import trace
+
 from zuul.connection import (
     BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
 )
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
+from zuul.lib import tracing
 from zuul.lib import dependson
 from zuul.zk.branch_cache import BranchCache
 from zuul.zk.change_cache import (
@@ -118,6 +121,7 @@ class PagureEventConnector(threading.Thread):
     """Move events from Pagure into the scheduler"""
 
     log = logging.getLogger("zuul.PagureEventConnector")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self, connection):
         super(PagureEventConnector, self).__init__()
@@ -170,10 +174,15 @@ class PagureEventConnector(threading.Thread):
     def _run(self):
         while not self._stopped:
             for event in self.event_queue:
-                try:
-                    self._handleEvent(event)
-                finally:
-                    self.event_queue.ack(event)
+                event_span = tracing.restoreSpanContext(
+                    event.get("span_context"))
+                link = trace.Link(event_span.get_span_context())
+                with self.tracer.start_as_current_span(
+                        "PagureEventProcessing", links=[link]):
+                    try:
+                        self._handleEvent(event)
+                    finally:
+                        self.event_queue.ack(event)
                 if self._stopped:
                     return
             self._process_event.wait(10)
@@ -875,23 +884,27 @@ class PagureWebController(BaseWebController):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def payload(self):
-        # https://docs.pagure.org/pagure/usage/using_webhooks.html
-        headers = dict()
-        for key, value in cherrypy.request.headers.items():
-            headers[key.lower()] = value
-        body = cherrypy.request.body.read()
-        if not self._source_whitelisted(
-                getattr(cherrypy.request.remote, 'ip'),
-                headers.get('x-forwarded-for')):
-            self._validate_signature(body, headers)
-        else:
-            self.log.info(
-                "Payload origin IP address whitelisted. Skip verify")
+        with self.zuul_web.tracer.start_span("PagureEvent") as span:
+            # https://docs.pagure.org/pagure/usage/using_webhooks.html
+            headers = dict()
+            for key, value in cherrypy.request.headers.items():
+                headers[key.lower()] = value
+            body = cherrypy.request.body.read()
+            if not self._source_whitelisted(
+                    getattr(cherrypy.request.remote, 'ip'),
+                    headers.get('x-forwarded-for')):
+                self._validate_signature(body, headers)
+            else:
+                self.log.info(
+                    "Payload origin IP address whitelisted. Skip verify")
 
-        json_payload = json.loads(body.decode('utf-8'))
-        data = {'payload': json_payload}
-        self.event_queue.put(data)
-        return data
+            json_payload = json.loads(body.decode('utf-8'))
+            data = {
+                'payload': json_payload,
+                'span_context': tracing.getSpanContext(span),
+            }
+            self.event_queue.put(data)
+            return data
 
 
 def getSchema():
