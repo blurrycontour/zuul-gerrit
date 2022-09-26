@@ -19,6 +19,7 @@ import logging
 import threading
 
 import git
+from opentelemetry import trace
 
 from zuul.driver.git.gitmodel import EMPTY_GIT_REF
 from zuul.zk.event_queues import EventReceiverElection
@@ -27,6 +28,7 @@ from zuul.zk.event_queues import EventReceiverElection
 # This class may be used by any driver to implement git head polling.
 class GitWatcher(threading.Thread):
     log = logging.getLogger("zuul.connection.git.watcher")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self, connection, baseurl, poll_delay, callback,
                  election_name="watcher"):
@@ -134,8 +136,9 @@ class GitWatcher(threading.Thread):
             self.projects_refs[project] = refs
             # Send events to the scheduler
             for event in events:
-                self.log.debug("Sending event: %s" % event)
-                self.callback(event)
+                with self.tracer.start_as_current_span("GitEvent"):
+                    self.log.debug("Sending event: %s" % event)
+                    self.callback(event)
                 self._event_count += 1
 
     def _run(self):
