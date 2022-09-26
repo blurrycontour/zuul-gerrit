@@ -22,6 +22,7 @@ from uuid import uuid4
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from opentelemetry import trace
 
 from zuul.driver import Driver, TriggerInterface
 from zuul.driver.timer import timertrigger
@@ -35,6 +36,7 @@ class TimerDriver(Driver, TriggerInterface):
     name = 'timer'
     election_root = "/zuul/scheduler/timer-election"
     log = logging.getLogger("zuul.TimerDriver")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self):
         self.apsched = BackgroundScheduler()
@@ -174,8 +176,13 @@ class TimerDriver(Driver, TriggerInterface):
             return
 
         try:
-            self._dispatchEvent(tenant, pipeline_name, project_name,
-                                branch, timespec)
+            attributes = {
+                "timespec": timespec,
+            }
+            with self.tracer.start_as_current_span(
+                    "TimerEvent", attributes=attributes):
+                self._dispatchEvent(tenant, pipeline_name, project_name,
+                                    branch, timespec)
         except Exception:
             self.stop_event.set()
             self.log.exception("Error when dispatching timer event")
