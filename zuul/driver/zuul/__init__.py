@@ -16,6 +16,8 @@ import logging
 import time
 from uuid import uuid4
 
+from opentelemetry import trace
+
 from zuul.driver import Driver, TriggerInterface
 from zuul.driver.zuul.zuulmodel import ZuulTriggerEvent
 from zuul.driver.zuul import zuulmodel
@@ -29,6 +31,7 @@ PROJECT_CHANGE_MERGED = 'project-change-merged'
 class ZuulDriver(Driver, TriggerInterface):
     name = 'zuul'
     log = logging.getLogger("zuul.ZuulTrigger")
+    tracer = trace.get_tracer("zuul")
 
     def __init__(self):
         self.parent_change_enqueued_events = {}
@@ -54,12 +57,19 @@ class ZuulDriver(Driver, TriggerInterface):
     def onChangeMerged(self, tenant, change, source):
         # Called each time zuul merges a change
         if self.project_change_merged_events.get(tenant.name):
-            try:
-                self._createProjectChangeMergedEvents(change, source)
-            except Exception:
-                self.log.exception(
-                    "Unable to create project-change-merged events for "
-                    "%s" % (change,))
+            span = trace.get_current_span()
+            link_attributes = {"rel": "ChangeMerged"}
+            link = trace.Link(span.get_span_context(),
+                              attributes=link_attributes)
+            attributes = {"event_type": PROJECT_CHANGE_MERGED}
+            with self.tracer.start_as_current_span(
+                    "ZuulEvent", links=[link], attributes=attributes):
+                try:
+                    self._createProjectChangeMergedEvents(change, source)
+                except Exception:
+                    self.log.exception(
+                        "Unable to create project-change-merged events for "
+                        "%s" % (change,))
 
     def onChangeEnqueued(self, tenant, change, pipeline, event):
         log = get_annotated_logger(self.log, event)
@@ -69,13 +79,20 @@ class ZuulDriver(Driver, TriggerInterface):
             (tenant.name, pipeline.name))
         log.debug("onChangeEnqueued %s", tenant_events)
         if tenant_events:
-            try:
-                self._createParentChangeEnqueuedEvents(
-                    change, pipeline, tenant, event)
-            except Exception:
-                log.exception(
-                    "Unable to create parent-change-enqueued events for "
-                    "%s in %s" % (change, pipeline))
+            span = trace.get_current_span()
+            link_attributes = {"rel": "ChangeEnqueued"}
+            link = trace.Link(span.get_span_context(),
+                              attributes=link_attributes)
+            attributes = {"event_type": PARENT_CHANGE_ENQUEUED}
+            with self.tracer.start_as_current_span(
+                    "ZuulEvent", links=[link], attributes=attributes):
+                try:
+                    self._createParentChangeEnqueuedEvents(
+                        change, pipeline, tenant, event)
+                except Exception:
+                    log.exception(
+                        "Unable to create parent-change-enqueued events for "
+                        "%s in %s" % (change, pipeline))
 
     def _createProjectChangeMergedEvents(self, change, source):
         changes = source.getProjectOpenChanges(
