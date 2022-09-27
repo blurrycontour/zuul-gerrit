@@ -117,7 +117,7 @@ class App extends React.Component {
   }
 
   renderContent = () => {
-    const { info, tenant } = this.props
+    const { info, tenant, auth } = this.props
     const allRoutes = []
 
     if ((window.location.origin + window.location.pathname) ===
@@ -126,7 +126,7 @@ class App extends React.Component {
       // validation is complete (it will internally redirect when complete)
       return <AuthCallbackPage/>
     }
-    if (info.isFetching) {
+    if (info.isFetching || !auth.info || auth.isFetching) {
       return <Fetching />
     }
     this.menu
@@ -189,14 +189,14 @@ class App extends React.Component {
         this.props.dispatch(tenantAction)
         if (tenantName) {
           this.props.dispatch(fetchConfigErrorsAction(tenantAction.tenant))
-          if (whiteLabel) {
-            // The app info endpoint was already a tenant info
-            // endpoint, so auth info was already provided.
-            this.props.dispatch(configureAuthFromInfo(info))
-          } else {
-            // Query the tenant info endpoint for auth info.
-            this.props.dispatch(configureAuthFromTenant(tenantName))
-          }
+        }
+        if (whiteLabel || !tenantName) {
+          // The app info endpoint was already a tenant info
+          // endpoint, so auth info was already provided.
+          this.props.dispatch(configureAuthFromInfo(info))
+        } else {
+          // Query the tenant info endpoint for auth info.
+          this.props.dispatch(configureAuthFromTenant(tenantName))
         }
       }
     }
