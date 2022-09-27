@@ -56,8 +56,14 @@ it('renders multi tenant', async () => {
   const auth_election = createLeaderElection(channel)
   api.fetchInfo.mockImplementation(
     () => Promise.resolve({data: {
-      info: {capabilities: {}}
-    }})
+      info: {
+        capabilities: {
+          auth: {
+            realms: {},
+            default_realm: null,
+          },
+        },
+      }}})
   )
   api.fetchTenants.mockImplementation(
     () => Promise.resolve({data: [{name: 'openstack'}]})
@@ -100,7 +106,14 @@ it('renders single tenant', async () => {
   const auth_election = createLeaderElection(channel)
   api.fetchInfo.mockImplementation(
     () => Promise.resolve({data: {
-      info: {capabilities: {}, tenant: 'openstack'}
+      info: {
+        capabilities: {
+          auth: {
+            realms: {},
+            default_realm: null,
+          },
+        },
+        tenant: 'openstack'}
     }})
   )
   api.fetchStatus.mockImplementation(
