@@ -69,6 +69,8 @@ import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 import { configureAuthFromTenant, configureAuthFromInfo } from './actions/auth'
+import { getHomepageUrl } from './api'
+import AuthCallbackPage from './pages/AuthCallback'
 
 class App extends React.Component {
   static propTypes = {
@@ -82,6 +84,7 @@ class App extends React.Component {
     dispatch: PropTypes.func,
     isKebabDropdownOpen: PropTypes.bool,
     user: PropTypes.object,
+    auth: PropTypes.object,
   }
 
   state = {
@@ -117,6 +120,12 @@ class App extends React.Component {
     const { info, tenant } = this.props
     const allRoutes = []
 
+    if ((window.location.origin + window.location.pathname) ===
+        (getHomepageUrl() + 'auth_callback')) {
+      // Sit on the auth callback page until login and token
+      // validation is complete (it will internally redirect when complete)
+      return <AuthCallbackPage/>
+    }
     if (info.isFetching) {
       return <Fetching />
     }
@@ -482,6 +491,7 @@ export default withRouter(connect(
     info: state.info,
     tenant: state.tenant,
     timezone: state.timezone,
-    user: state.user
+    user: state.user,
+    auth: state.auth,
   })
 )(App))
