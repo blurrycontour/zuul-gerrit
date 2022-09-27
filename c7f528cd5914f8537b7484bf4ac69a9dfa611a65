@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d8c2def_132d7928",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2491,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2022-09-27T13:51:28Z",
+      "side": 1,
+      "message": "nit: to reduce the diff, we could rename the method as `payload_traced` and introduce a new `payload` method to add the trace.",
+      "revId": "c7f528cd5914f8537b7484bf4ac69a9dfa611a65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
