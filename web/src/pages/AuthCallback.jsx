@@ -13,29 +13,50 @@
 // under the License.
 
 import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-
-import { Fetching } from '../containers/Fetching'
+import {
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateIcon,
+  Spinner,
+  Title,
+} from '@patternfly/react-core'
+import {
+  FingerprintIcon,
+} from '@patternfly/react-icons'
 
 // Several pages use the location hash in a way that would be
 // difficult to disentangle from the OIDC callback parameters.  This
 // dedicated callback page accepts the OIDC params and then internally
 // redirects to the page we saved before redirecting to the IDP.
 
-function AuthCallbackPage() {
-  let history = useHistory()
+function AuthCallbackPage(props) {
+  const history = useHistory()
+  const { user } = props
 
   useEffect(() => {
-    const redirect = localStorage.getItem('zuul_auth_redirect')
-    history.push(redirect)
-  }, [history])
+    if (user.redirect) {
+      history.push(user.redirect)
+    }
+  }, [history, user])
 
   return (
     <>
-      <div>Login successful. You will be redirected shortly...</div>
-      <Fetching />
+        <EmptyState>
+          <EmptyStateIcon icon={FingerprintIcon} />
+          <Title headingLevel="h1">Login in progress</Title>
+          <EmptyStateBody>
+            <p>
+              You will be redirected shortly...
+            </p>
+            <Spinner size="xl" />
+          </EmptyStateBody>
+        </EmptyState>
     </>
   )
 }
 
-export default AuthCallbackPage
+export default connect((state) => ({
+  user: state.user,
+}))(AuthCallbackPage)

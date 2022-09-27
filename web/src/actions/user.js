@@ -36,11 +36,12 @@ export const fetchUserACLRequest = (tenant) => ({
   tenant: tenant,
 })
 
-export const userLoggedIn = (user) => (dispatch) => {
+export const userLoggedIn = (user, redirect) => (dispatch) => {
   dispatch({
     type: USER_LOGGED_IN,
     user: user,
     token: getToken(user),
+    redirect: redirect,
   })
 }
 
