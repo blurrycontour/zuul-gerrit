@@ -52,6 +52,11 @@ configuration. Some examples of tenant definitions are:
        exclude-unprotected-branches: false
        source:
          gerrit:
+           ignored-events:
+             - cache-eviction
+             - ref-replicated
+             - ref-replication-scheduled
+             - ref-replication-done
            config-projects:
              - common-config
              - shared-jobs:
@@ -109,7 +114,7 @@ configuration. Some examples of tenant definitions are:
       dictionary key (e.g. ``gerrit`` in the example above), and the
       value is a further dictionary containing the keys below.
 
-   The next two attributes, **config-projects** and
+   The next three attributes **ignored-events**, **config-projects** and
    **untrusted-projects** provide the bulk of the information for
    tenant configuration.  They list all of the projects upon which
    Zuul will act.
