@@ -72,7 +72,7 @@
           mv job-output.txt job-output-success-19885.txt
           mv job-output.json job-output-success-19885.json
 
-    - name: Validate outputs
+    - name: Validate text outputs
       include_tasks: validate.yaml
       loop:
         - { node: 'node1', filename: 'job-output-success-19887.txt' }
@@ -81,6 +81,13 @@
         - { node: 'node2', filename: 'job-output-success-19885.txt' }
         # node3 only listen on 19887
         - { node: 'node3', filename: 'job-output-success-19887.txt' }
+
+    # This shows that zuul_console_disabled has activated and set the
+    # UUID to "skip"
+    - name: Validate json output
+      shell: |
+        egrep 'zuul_log_id": "skip"' job-output-success-19885.json
+        egrep 'zuul_log_id": "skip"' job-output-success-19887.json
 
     # failure case
 
