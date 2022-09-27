@@ -53,6 +53,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         self.connection_name = connection_name
         self.connection_config = connection_config
         self.sched = None
+        self.ignored_events = []
 
     def logEvent(self, event):
         log = get_annotated_logger(self.log, event.zuul_event_id)

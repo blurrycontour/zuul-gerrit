@@ -156,13 +156,6 @@ class GerritChangeData(object):
 class GerritEventConnector(threading.Thread):
     """Move events from Gerrit to the scheduler."""
 
-    IGNORED_EVENTS = (
-        'cache-eviction',  # evict-cache plugin
-        'ref-replicated',
-        'ref-replication-scheduled',
-        'ref-replication-done'
-    )
-
     log = logging.getLogger("zuul.GerritEventConnector")
     delay = 10.0
 
@@ -1221,7 +1214,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         #               an unrecognized event log *and* a traceback if they
         #               do not contain full project information, we skip them
         #               here to keep logs clean.
-        if data.get('type') in GerritEventConnector.IGNORED_EVENTS:
+        if data.get('type') in self.ignored_events:
+            self.log.debug("Event from Gerrit {} ignored".format(data))
             return
 
         # Gerrit events don't have an event id that could be used to globally

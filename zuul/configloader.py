@@ -1595,6 +1595,7 @@ class TenantParser(object):
     tenant_source = vs.Schema({
         'config-projects': to_list(project_or_group),
         'untrusted-projects': to_list(project_or_group),
+        'ignored-events': to_list(str),
     })
 
     def validateTenantSources(self):
@@ -1923,6 +1924,8 @@ class TenantParser(object):
         futures = []
         for source_name, conf_source in conf_tenant.get('source', {}).items():
             source = self.connections.getSource(source_name)
+            if source and source.connection:
+                source.connection.ignored_events = conf_source.get('ignored-events', [])
 
             current_include = default_include
             for conf_repo in conf_source.get('config-projects', []):
