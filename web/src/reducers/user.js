@@ -29,6 +29,7 @@ export default (state = {
   scope: [],
   isAdmin: false,
   tenant: null,
+  redirect: null,
 }, action) => {
   switch (action.type) {
     case USER_LOGGED_IN: {
@@ -36,6 +37,7 @@ export default (state = {
         isFetching: false,
         data: action.user,
         token: action.token,
+        redirect: action.redirect,
         scope: [],
         isAdmin: false
       }
@@ -45,6 +47,7 @@ export default (state = {
         isFetching: false,
         data: null,
         token: null,
+        redirect: null,
         scope: [],
         isAdmin: false
       }
