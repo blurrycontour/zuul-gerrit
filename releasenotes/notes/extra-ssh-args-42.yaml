@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    A new executor option :attr:`executor.ssh_Args` has been added to enable
+    custom ssh connection parameter.

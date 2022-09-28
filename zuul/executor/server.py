@@ -1013,6 +1013,10 @@ class AnsibleJob(object):
             self.executor_server.config,
             'executor',
             'winrm_read_timeout_sec')
+        self.extra_ssh_args = get_default(
+            self.executor_server.config,
+            'executor',
+            'ssh_args')
         self.ssh_agent = SshAgent(zuul_event_id=self.zuul_event_id,
                                   build=self.build_request.uuid)
         self.port_forwards = []
@@ -2643,10 +2647,13 @@ class AnsibleJob(object):
             # as sudo) it does not hang.
             config.write('pipelining = True\n')
             config.write('control_path_dir = %s\n' % self.jobdir.control_path)
-            ssh_args = "-o ControlMaster=auto -o ControlPersist=60s " \
-                "-o ServerAliveInterval=60 " \
-                "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
-            config.write('ssh_args = %s\n' % ssh_args)
+            ssh_args = ["-o ControlMaster=auto",
+                        "-o ControlPersist=60s",
+                        "-o ServerAliveInterval=60",
+                        "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts]
+            if self.extra_ssh_args:
+                ssh_args.append(self.extra_ssh_args)
+            config.write('ssh_args = %s\n' % " ".join(ssh_args))
 
             if self.ansible_callbacks:
                 for cb_name, cb_config in self.ansible_callbacks.items():

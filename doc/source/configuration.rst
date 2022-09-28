@@ -622,6 +622,12 @@ The following sections of ``zuul.conf`` are used by the executor:
       The timeout for WinRM read. Increase this if there are intermittent
       network issues and read timeout errors keep occurring.
 
+   .. attr:: ssh_args
+      :default: None. Extra ssh_args for the ansible connection.
+
+      Set this value to pass extra ssh argument, for example to force
+      using a FIPS cipher: `-o Ciphers=aes256-ctr`.
+
    .. _admin_sitewide_variables:
 
    .. attr:: variables
