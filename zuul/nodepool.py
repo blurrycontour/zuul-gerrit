@@ -16,6 +16,7 @@ import time
 
 from collections import defaultdict
 from zuul import model
+from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
 from zuul.zk.event_queues import (
     PipelineResultEventQueue,
@@ -100,6 +101,10 @@ class Nodepool(object):
                     continue
                 if (request.state in {model.STATE_FULFILLED,
                                       model.STATE_FAILED}):
+                    tracing.endSavedSpan(request.span_info, attributes={
+                        "request_id": request.id,
+                        "state": request.state,
+                    })
                     self._sendNodesProvisionedEvent(request)
             # Now resume normal event processing.
             self.stop_watcher_event.wait()

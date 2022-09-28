@@ -879,8 +879,11 @@ class PipelineManager(metaclass=ABCMeta):
             relative_priority = item.getNodePriority()
         else:
             relative_priority = 0
-        for job in jobs:
-            self._makeNodepoolRequest(log, build_set, job, relative_priority)
+        parent_span = tracing.restoreSpan(build_set.span_info)
+        with trace.use_span(parent_span):
+            for job in jobs:
+                self._makeNodepoolRequest(
+                    log, build_set, job, relative_priority)
         return True
 
     def _makeNodepoolRequest(self, log, build_set, job, relative_priority,
