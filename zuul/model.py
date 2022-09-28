@@ -4177,7 +4177,7 @@ class BuildSet(zkobject.ZKObject):
             len(self.builds),
             self.getStateName(self.merge_state))
 
-    def setConfiguration(self, context, span_info):
+    def setConfiguration(self, context):
         with self.activeContext(context):
             # The change isn't enqueued until after it's created
             # so we don't know what the other changes ahead will be
@@ -4197,7 +4197,6 @@ class BuildSet(zkobject.ZKObject):
                 self.merger_items = [i.makeMergerItem() for i in items]
             self.configured = True
             self.configured_time = time.time()
-            self.span_info = span_info
 
     def _toChangeDict(self, item):
         # Inject bundle_id to dict if available, this can be used to decide
@@ -4399,8 +4398,12 @@ class QueueItem(zkobject.ZKObject):
         obj._save(context, data, create=True)
         files_state = (BuildSet.COMPLETE if obj.change.files is not None
                        else BuildSet.NEW)
-        obj.updateAttributes(context, current_build_set=BuildSet.new(
-            context, item=obj, files_state=files_state))
+
+        with trace.use_span(tracing.restoreSpan(obj.span_info)):
+            buildset_span_info = tracing.startSavedSpan("BuildSet")
+            obj.updateAttributes(context, current_build_set=BuildSet.new(
+                context, item=obj, files_state=files_state,
+                span_info=buildset_span_info))
         return obj
 
     def getPath(self):
@@ -4517,11 +4520,21 @@ class QueueItem(zkobject.ZKObject):
         old_build_set = self.current_build_set
         files_state = (BuildSet.COMPLETE if self.change.files is not None
                        else BuildSet.NEW)
-        self.updateAttributes(
-            context,
-            current_build_set=BuildSet.new(context, item=self,
-                                           files_state=files_state),
-            layout_uuid=None)
+
+        with trace.use_span(tracing.restoreSpan(self.span_info)):
+            old_buildset_span = tracing.restoreSpan(old_build_set.span_info)
+            link = trace.Link(
+                old_buildset_span.get_span_context(),
+                attributes={"previous_buildset": old_build_set.uuid})
+            buildset_span_info = tracing.startSavedSpan(
+                "BuildSet", links=[link])
+
+            self.updateAttributes(
+                context,
+                current_build_set=BuildSet.new(context, item=self,
+                                               files_state=files_state,
+                                               span_info=buildset_span_info),
+                layout_uuid=None)
         old_build_set.delete(context)
 
     def addBuild(self, build):
