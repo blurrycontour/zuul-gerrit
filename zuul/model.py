@@ -33,6 +33,7 @@ import itertools
 
 from kazoo.exceptions import NodeExistsError, NoNodeError
 from cachetools.func import lru_cache
+from opentelemetry import trace
 
 from zuul.lib import yamlutil as yaml
 from zuul.lib.varnames import check_varnames
@@ -45,6 +46,7 @@ from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
 from zuul.lib.jsonutil import json_dumps
+from zuul.lib import tracing
 from zuul.zk import zkobject
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
@@ -3390,7 +3392,8 @@ class JobRequest:
 
     # This object participates in transactions, and therefore must
     # remain small and unsharded.
-    def __init__(self, uuid, precedence=None, state=None, result_path=None):
+    def __init__(self, uuid, precedence=None, state=None, result_path=None,
+                 span_context=None):
         self.uuid = uuid
         if precedence is None:
             self.precedence = 0
@@ -3403,6 +3406,12 @@ class JobRequest:
             self.state = state
         # Path to the future result if requested
         self.result_path = result_path
+        # Reference to the parent span
+        if span_context:
+            self.span_context = span_context
+        else:
+            span = trace.get_current_span()
+            self.span_context = tracing.getSpanContext(span)
 
         # ZK related data not serialized
         self.path = None
@@ -3415,12 +3424,14 @@ class JobRequest:
             "state": self.state,
             "precedence": self.precedence,
             "result_path": self.result_path,
+            "span_context": self.span_context,
         }
 
     def updateFromDict(self, data):
         self.precedence = data["precedence"]
         self.state = data["state"]
         self.result_path = data["result_path"]
+        self.span_context = data.get("span_context")
 
     @classmethod
     def fromDict(cls, data):
@@ -3428,7 +3439,8 @@ class JobRequest:
             data["uuid"],
             precedence=data["precedence"],
             state=data["state"],
-            result_path=data["result_path"]
+            result_path=data["result_path"],
+            span_context=data.get("span_context"),
         )
 
     def __lt__(self, other):
@@ -3468,8 +3480,8 @@ class MergeRequest(JobRequest):
 
     def __init__(self, uuid, job_type, build_set_uuid, tenant_name,
                  pipeline_name, event_id, precedence=None, state=None,
-                 result_path=None):
-        super().__init__(uuid, precedence, state, result_path)
+                 result_path=None, span_context=None):
+        super().__init__(uuid, precedence, state, result_path, span_context)
         self.job_type = job_type
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
@@ -3498,7 +3510,8 @@ class MergeRequest(JobRequest):
             data["event_id"],
             precedence=data["precedence"],
             state=data["state"],
-            result_path=data["result_path"]
+            result_path=data["result_path"],
+            span_context=data.get("span_context"),
         )
 
     def __repr__(self):
@@ -3518,8 +3531,8 @@ class BuildRequest(JobRequest):
 
     def __init__(self, uuid, zone, build_set_uuid, job_name, tenant_name,
                  pipeline_name, event_id, precedence=None, state=None,
-                 result_path=None):
-        super().__init__(uuid, precedence, state, result_path)
+                 result_path=None, span_context=None):
+        super().__init__(uuid, precedence, state, result_path, span_context)
         self.zone = zone
         self.build_set_uuid = build_set_uuid
         self.job_name = job_name
@@ -3556,7 +3569,8 @@ class BuildRequest(JobRequest):
             data["event_id"],
             precedence=data["precedence"],
             state=data["state"],
-            result_path=data["result_path"]
+            result_path=data["result_path"],
+            span_context=data.get("span_context"),
         )
 
         request.worker_info = data["worker_info"]
@@ -3614,6 +3628,7 @@ class Build(zkobject.ZKObject):
             held=False,
             zuul_event_id=None,
             build_request_ref=None,
+            span_info=None,
         )
 
     def serialize(self, context):
@@ -3632,6 +3647,7 @@ class Build(zkobject.ZKObject):
             "held": self.held,
             "zuul_event_id": self.zuul_event_id,
             "build_request_ref": self.build_request_ref,
+            "span_info": self.span_info,
         }
         if COMPONENT_REGISTRY.model_api < 5:
             data["_result_data"] = (self._result_data.getPath()
