@@ -821,18 +821,18 @@ Liveness Probes
 The Prometheus server also supports liveness and ready probes at the
 following URIS:
 
-.. path:: /health/live
+.. path:: health/live
 
    Returns 200 as long as the process is running.
 
-.. path:: /health/ready
+.. path:: health/ready
 
    Returns 200 if the process is in `RUNNING` or `PAUSED` states.
    Otherwise, returns 503.  Note that 503 is returned for
    `INITIALIZED`, so this may be used to determine when a component
    has completely finished loading configuration.
 
-.. path:: /health/status
+.. path:: health/status
 
    This always returns 200, but includes the component status as the
    text body of the response.
