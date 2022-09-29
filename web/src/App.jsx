@@ -340,7 +340,7 @@ class App extends React.Component {
 
   render() {
     const { isKebabDropdownOpen } = this.state
-    const { notifications, configErrors, tenant, info } = this.props
+    const { notifications, configErrors, tenant, info, auth } = this.props
 
     const nav = this.renderMenu()
 
@@ -454,7 +454,7 @@ class App extends React.Component {
         <SelectTz />
         <ConfigModal />
 
-        {tenant.name && (<AuthContainer />)}
+        {auth.info && auth.info.default_realm && (<AuthContainer />)}
       </PageHeaderTools>
     )
 
