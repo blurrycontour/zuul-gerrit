@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad649067_85028f87",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-29T19:28:30Z",
+      "side": 1,
+      "message": "Ditto about attributes.",
+      "revId": "b192d9dba1405cbaf0cc9e29632124765b67fbee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "818ded8c_86d03c63",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1243,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-29T19:28:30Z",
+      "side": 1,
+      "message": "This comment should probably be ot line 1234.",
+      "revId": "b192d9dba1405cbaf0cc9e29632124765b67fbee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
