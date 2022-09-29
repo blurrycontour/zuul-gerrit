@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "7b78fef23b73387cc84695be4a2ec3e01f2ef3ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e9e2637_41feb830",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-29T19:29:33Z",
+      "side": 1,
+      "message": "Maybe attributes.",
+      "revId": "7b78fef23b73387cc84695be4a2ec3e01f2ef3ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
