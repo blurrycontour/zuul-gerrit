@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a2c08f6_8656c341",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6264,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-29T19:20:27Z",
+      "side": 1,
+      "message": "typo",
+      "revId": "cdc5a21543ea1bf2c1b7590f22c8f77a07a23d86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "784eca81_f4877d0f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2325,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-29T19:20:27Z",
+      "side": 1,
+      "message": "It will be interesting to see what we can do with this in the query interface!",
+      "revId": "cdc5a21543ea1bf2c1b7590f22c8f77a07a23d86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
