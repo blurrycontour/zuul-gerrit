@@ -1252,6 +1252,7 @@ class ApiRoot(ConfigObject):
     def __init__(self, default_auth_realm=None):
         super().__init__()
         self.default_auth_realm = default_auth_realm
+        self.access_rules = []
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -1259,7 +1260,8 @@ class ApiRoot(ConfigObject):
     def __eq__(self, other):
         if not isinstance(other, ApiRoot):
             return False
-        return (self.default_auth_realm == other.default_auth_realm)
+        return (self.default_auth_realm == other.default_auth_realm,
+                self.access_rules == other.access_rules)
 
     def __repr__(self):
         return f'<ApiRoot realm={self.default_auth_realm}>'
@@ -7946,6 +7948,7 @@ class Tenant(object):
         # The per tenant default ansible version
         self.default_ansible_version = None
 
+        self.access_rules = []
         self.admin_rules = []
         self.default_auth_realm = None
         self.global_semaphores = set()

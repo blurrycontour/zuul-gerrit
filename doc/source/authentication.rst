@@ -2,26 +2,32 @@
 
 .. _authentication:
 
-Authenticated Actions
-=====================
+Authenticated Access
+====================
 
-Users can perform some privileged actions at the tenant level through protected
-endpoints of the REST API, if these endpoints are activated.
+Access to Zuul's REST API and web interface can optionally be
+restricted.  By default, anonymous read access to any tenant is
+permitted.  Optionally, some administrative actions may also be
+enabled and restricted to authorized users.  Additionally, individual
+tenants or the entirely system may have read-level access restricted
+to authorized users.
 
-The supported actions are **autohold**, **enqueue/enqueue-ref**,
-**dequeue/dequeue-ref** and **promote**. These are similar to the ones available
-through Zuul's CLI.
+The supported administrative actions are **autohold**,
+**enqueue/enqueue-ref**, **dequeue/dequeue-ref** and
+**promote**. These are similar to the ones available through
+Zuul's CLI.
 
-The protected endpoints require a bearer token, passed to Zuul Web Server as the
-**Authorization** header of the request. The token and this workflow follow the
-JWT standard as established in this `RFC <https://tools.ietf.org/html/rfc7519>`_.
+The protected endpoints require a bearer token, passed to Zuul Web
+Server as the **Authorization** header of the request. The token and
+this workflow follow the JWT standard as established in this `RFC
+<https://tools.ietf.org/html/rfc7519>`_.
 
 Important Security Considerations
 ---------------------------------
 
-Anybody with a valid token can perform privileged actions exposed
-through the REST API. Furthermore revoking tokens, especially when manually
-issued, is not trivial.
+Anybody with a valid administrative token can perform privileged
+actions exposed through the REST API. Furthermore revoking tokens,
+especially when manually issued, is not trivial.
 
 As a mitigation, tokens should be generated with a short time to
 live, like 10 minutes or less. If the token contains authorization Information
@@ -38,10 +44,12 @@ and tokens should be handed over with discernment.
 Configuration
 -------------
 
-.. important:: In order to use admin commands in the zuul command line interface, at least one HS256 authenticator should be configured.
+.. important:: In order to use restricted commands in the zuul command
+               line interface, at least one HS256 authenticator should
+               be configured.
 
-To enable tenant-scoped access to privileged actions, see the Zuul Web Server
-component's section.
+To enable tenant-scoped access to privileged actions or restrict
+read-level access, see the Zuul Web Server component's section.
 
 To set access rules for a tenant, see :ref:`the documentation about tenant
 definition <authz_rule_definition>`.

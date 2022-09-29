@@ -1581,7 +1581,8 @@ class TestInfo(BaseTestWeb):
                     "job_history": True,
                     "auth": {
                         "realms": {},
-                        "default_realm": None
+                        "default_realm": None,
+                        "read_protected": False,
                     }
                 },
                 "stats": {
@@ -1637,7 +1638,8 @@ class TestWebCapabilitiesInfo(TestInfo):
                     'driver': 'HS256',
                 }
             },
-            'default_realm': 'myOIDC1'
+            'default_realm': 'myOIDC1',
+            'read_protected': False,
         }
         return info
 
@@ -3494,3 +3496,84 @@ class TestWebUnprotectedBranches(BaseWithWeb):
         config_errors = self.get_url(
             "api/tenant/tenant-one/config-errors").json()
         self.assertEqual(len(config_errors), 0)
+
+
+class TestWebApiAccessRules(BaseTestWeb):
+    # Test read-level access restrictions
+    config_file = 'zuul-admin-web.conf'
+    tenant_config_file = 'config/access-rules/main.yaml'
+
+    routes = [
+        '/api/connections',
+        '/api/components',
+        '/api/tenants',
+        '/api/tenant/{tenant}/status',
+        '/api/tenant/{tenant}/status/change/{change}',
+        '/api/tenant/{tenant}/jobs',
+        '/api/tenant/{tenant}/job/{job_name}',
+        '/api/tenant/{tenant}/projects',
+        '/api/tenant/{tenant}/project/{project}',
+        ('/api/tenant/{tenant}/pipeline/{pipeline}/'
+         'project/{project}/branch/{branch}/freeze-jobs'),
+        '/api/tenant/{tenant}/pipelines',
+        '/api/tenant/{tenant}/semaphores',
+        '/api/tenant/{tenant}/labels',
+        '/api/tenant/{tenant}/nodes',
+        '/api/tenant/{tenant}/key/{project}.pub',
+        '/api/tenant/{tenant}/project-ssh-key/{project}.pub',
+        '/api/tenant/{tenant}/console-stream',
+        '/api/tenant/{tenant}/badge',
+        '/api/tenant/{tenant}/builds',
+        '/api/tenant/{tenant}/build/{uuid}',
+        '/api/tenant/{tenant}/buildsets',
+        '/api/tenant/{tenant}/buildset/{uuid}',
+        '/api/tenant/{tenant}/config-errors',
+        '/api/tenant/{tenant}/authorizations',
+        '/api/tenant/{tenant}/project/{project}/autohold',
+        '/api/tenant/{tenant}/autohold',
+        '/api/tenant/{tenant}/autohold/{request_id}',
+        '/api/tenant/{tenant}/autohold/{request_id}',
+        '/api/tenant/{tenant}/project/{project}/enqueue',
+        '/api/tenant/{tenant}/project/{project}/dequeue',
+        '/api/tenant/{tenant}/promote',
+    ]
+
+    info_routes = [
+        '/api/info',
+        '/api/tenant/{tenant}/info',
+    ]
+
+    def test_read_routes_no_token(self):
+        for route in self.routes:
+            url = route.format(tenant='tenant-one',
+                               project='org/project',
+                               change='1,1',
+                               job_name='testjob',
+                               pipeline='check',
+                               branch='master',
+                               uuid='1',
+                               request_id='1')
+            resp = self.get_url(url)
+            self.assertEqual(
+                401,
+                resp.status_code,
+                "get %s failed: %s" % (url, resp.text))
+
+    def test_read_info_routes_no_token(self):
+        for route in self.info_routes:
+            url = route.format(tenant='tenant-one',
+                               project='org/project',
+                               change='1,1',
+                               job_name='testjob',
+                               pipeline='check',
+                               branch='master',
+                               uuid='1',
+                               request_id='1')
+            resp = self.get_url(url)
+            self.assertEqual(
+                200,
+                resp.status_code,
+                "get %s failed: %s" % (url, resp.text))
+            info = resp.json()
+            self.assertTrue(
+                info['info']['capabilities']['auth']['read_protected'])

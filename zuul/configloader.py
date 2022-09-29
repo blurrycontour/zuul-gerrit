@@ -1513,13 +1513,15 @@ class ApiRootParser(object):
 
     def getSchema(self):
         api_root = {
-            'authentication-realm': str
+            'authentication-realm': str,
+            'access-rules': to_list(str),
         }
         return vs.Schema(api_root)
 
     def fromYaml(self, conf):
         self.schema(conf)
         api_root = model.ApiRoot(conf.get('authentication-realm'))
+        api_root.access_rules = conf.get('access-rules', [])
         api_root.freeze()
         return api_root
 
@@ -1639,6 +1641,7 @@ class TenantParser(object):
                   'allow-circular-dependencies': bool,
                   'default-parent': str,
                   'default-ansible-version': vs.Any(str, float),
+                  'access-rules': to_list(str),
                   'admin-rules': to_list(str),
                   'semaphores': to_list(str),
                   'authentication-realm': str,
@@ -1671,6 +1674,8 @@ class TenantParser(object):
                 conf['exclude-unprotected-branches']
         if conf.get('admin-rules') is not None:
             tenant.admin_rules = conf['admin-rules']
+        if conf.get('access-rules') is not None:
+            tenant.access_rules = conf['access-rules']
         if conf.get('authentication-realm') is not None:
             tenant.default_auth_realm = conf['authentication-realm']
         if conf.get('semaphores') is not None:
