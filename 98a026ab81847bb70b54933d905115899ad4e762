@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "16b3ff84_76e6d7f3",
+        "filename": "doc/source/drivers/gitea.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-09-29T07:42:14Z",
+      "side": 1,
+      "message": "Hmm, you are totally right. I see absolutely no place where it is being used, BUT: it is same for pagure and github driver. And somehow it even seems to work.\nLater: this one costed me quite some: https://opendev.org/zuul/zuul/src/branch/master/zuul/merger/merger.py#L910 is where it is being used and managed centrally",
+      "parentUuid": "97e4e983_0d2fc5e3",
+      "revId": "98a026ab81847bb70b54933d905115899ad4e762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ab027c39_bdc8b351",
         "filename": "zuul/driver/gitea/giteamodel.py",
         "patchSetId": 8
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "self.labels is initialized to an empty list where are we using it as another type? I think this may already be correct.",
       "parentUuid": "ab027c39_bdc8b351",
+      "revId": "98a026ab81847bb70b54933d905115899ad4e762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b022440_266dcc4f",
+        "filename": "zuul/driver/gitea/giteamodel.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-09-29T07:42:14Z",
+      "side": 1,
+      "message": "was addressed in a followup, but I merge it now here to reduce amount of changes",
+      "parentUuid": "0da5520e_8fe4e336",
       "revId": "98a026ab81847bb70b54933d905115899ad4e762",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
