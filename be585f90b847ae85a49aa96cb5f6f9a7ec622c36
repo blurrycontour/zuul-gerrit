@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4975d64d_577c3669",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-09-29T07:48:30Z",
+      "side": 1,
+      "message": "merged 858559 on top since the later one is fixing few bugs of this one",
+      "revId": "be585f90b847ae85a49aa96cb5f6f9a7ec622c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
