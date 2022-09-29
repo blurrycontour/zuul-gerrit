@@ -403,7 +403,23 @@ configuration. Some examples of tenant definitions are:
       web interface.
 
       At least one rule in the list must match for the user to be allowed to
-      execute privileged actions.
+      execute privileged actions.  A matching rule will also allow the user
+      access to the tenant in general (i.e., the rule does not need to be
+      duplicated in `access-rules`).
+
+      More information on tenant-scoped actions can be found in
+      :ref:`authentication`.
+
+   .. attr:: access-rules
+
+      A list of authorization rules to be checked in order to grant
+      read access to the tenant through Zuul's REST API and web
+      interface.
+
+      If no rules are listed, then anonymous access to the tenant is
+      permitted.  If any rules are present then at least one rule in
+      the list must match for the user to be allowed to access the
+      tenant.
 
       More information on tenant-scoped actions can be found in
       :ref:`authentication`.
@@ -693,3 +709,17 @@ API root access is not a pre-requisite to access tenant-specific URLs.
          token manually. If this is an issue, it is advised to add
          finer filtering to admin rules, for example, filtering by the
          ``iss`` claim (generally equal to the issuer ID).
+
+   .. attr:: access-rules
+
+      A list of authorization rules to be checked in order to grant
+      read access to the top-level (i.e., non-tenant-specific) portion
+      of Zuul's REST API and web interface.
+
+      If no rules are listed, then anonymous access to top-level
+      methods is permitted.  If any rules are present then at at least
+      one rule in the list must match for the user to be allowed
+      access.
+
+      More information on tenant-scoped actions can be found in
+      :ref:`authentication`.
