@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b8c96409_9e0ed32a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-09-29T19:24:55Z",
+      "side": 1,
+      "message": "Perhaps when we make links, we should include attributes to describe the link.  Like:\n\ntrace.Link(context, attributes\u003d{\u0027rel\u0027: \u0027TriggerEvent\u0027})\n\nBecause otherwise, at least in Jaeger, I\u0027m not sure that we can actually see that without following it.",
+      "revId": "cdc5a21543ea1bf2c1b7590f22c8f77a07a23d86",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6a2c08f6_8656c341",
         "filename": "zuul/model.py",
         "patchSetId": 3
