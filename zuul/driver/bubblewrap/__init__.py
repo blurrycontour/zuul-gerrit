@@ -239,7 +239,9 @@ def main(args=None):
     parser.add_argument('run_args', nargs='+')
     cli_args = parser.parse_args()
 
-    ssh_auth_sock = os.environ.get('SSH_AUTH_SOCK')
+    # The zuul-bwrap command is often run for debugging purposes. An SSH
+    # agent may not be necessary or present in that situation.
+    ssh_auth_sock = os.environ.get('SSH_AUTH_SOCK', '/dev/null')
 
     secrets = {}
     if cli_args.secret:
