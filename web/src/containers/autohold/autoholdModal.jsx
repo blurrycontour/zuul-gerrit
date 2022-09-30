@@ -64,7 +64,7 @@ const AutoholdModal = props => {
         let ah_change = change === '' ? null : change
         let ah_ref = changeRef === '' ? null : changeRef
 
-        autohold(tenant.apiPrefix, project, job_name, ah_change, ah_ref, reason, parseInt(count), parseInt(nodeHoldExpiration), user.token)
+        autohold(tenant.apiPrefix, project, job_name, ah_change, ah_ref, reason, parseInt(count), parseInt(nodeHoldExpiration))
             .then(() => {
                 /* TODO it looks like there is a delay in the registering of the autohold request
                    by the backend, meaning we sometimes do not get the newly created request after

@@ -18,11 +18,19 @@ export function fetchConfigErrorsAction (tenant) {
   return (dispatch) => {
     return fetchConfigErrors(tenant.apiPrefix)
       .then(response => {
-        dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
+        dispatch({type: 'CONFIGERRORS_FETCH_SUCCESS',
           errors: response.data})
       })
       .catch(error => {
-        throw (error)
+        dispatch({type: 'CONFIGERRORS_FETCH_FAIL',
+                  error})
+
       })
+  }
+}
+
+export function clearConfigErrorsAction () {
+  return (dispatch) => {
+    dispatch({type: 'CONFIGERRORS_CLEAR'})
   }
 }

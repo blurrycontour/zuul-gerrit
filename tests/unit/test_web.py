@@ -3551,6 +3551,7 @@ class TestWebApiAccessRules(BaseTestWeb):
         '/api/connections',
         '/api/components',
         '/api/tenants',
+        '/api/authorizations',
         '/api/tenant/{tenant}/status',
         '/api/tenant/{tenant}/status/change/{change}',
         '/api/tenant/{tenant}/jobs',
