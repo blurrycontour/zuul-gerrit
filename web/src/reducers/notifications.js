@@ -22,6 +22,7 @@ import {
 
 export default (state = [], action) => {
   // Intercept API failure
+  // TODO: Are these still used?
   if (action.notification && action.type.match(/.*_FETCH_FAIL$/)) {
     action = addApiError(action.notification)
   }
