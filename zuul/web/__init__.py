@@ -209,6 +209,7 @@ def _check_auth(require_admin=False, require_auth=False, tenant=None):
 
 def check_root_auth(**kw):
     """Use this for root-level (non-tenant) methods"""
+    cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
     request = cherrypy.serving.request
     if request.handler is None:
         # handle_options has already aborted the request.
@@ -218,6 +219,7 @@ def check_root_auth(**kw):
 
 def check_tenant_auth(**kw):
     """Use this for tenant-scoped methods"""
+    cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
     request = cherrypy.serving.request
     zuulweb = request.app.root
     if request.handler is None:
@@ -536,8 +538,6 @@ class ZuulWebAPI(object):
                 project.name, body.get('change', None), body.get('ref', None))
             self.zuulweb.pipeline_management_events[tenant_name][
                 pipeline_name].put(event)
-            resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
         else:
             raise cherrypy.HTTPError(400, 'Invalid request body')
         return True
@@ -582,8 +582,6 @@ class ZuulWebAPI(object):
         self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return True
 
     def _enqueue_ref(self, tenant, project, pipeline, ref, oldrev, newrev):
@@ -594,8 +592,6 @@ class ZuulWebAPI(object):
         self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return True
 
     @cherrypy.expose
@@ -625,8 +621,6 @@ class ZuulWebAPI(object):
         self.zuulweb.pipeline_management_events[tenant_name][
             pipeline_name].put(event)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return True
 
     @cherrypy.expose
@@ -685,8 +679,6 @@ class ZuulWebAPI(object):
         self._autohold(tenant_name, project_name, jbody['job'], ref_filter,
                        jbody['reason'], jbody['count'],
                        jbody['node_hold_expiration'])
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return True
 
     def _autohold(self, tenant_name, project_name, job_name, ref_filter,
@@ -743,8 +735,6 @@ class ZuulWebAPI(object):
                     'nodes': request.nodes,
                 })
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -753,8 +743,6 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def autohold_get(self, tenant_name, tenant, auth, request_id):
         request = self._getAutoholdRequest(tenant_name, request_id)
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {
             'id': request.id,
             'tenant': request.tenant,
@@ -891,11 +879,12 @@ class ZuulWebAPI(object):
     def _handleInfo(self, info):
         ret = {'info': info.toDict()}
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         if self.static_cache_expiry:
             resp.headers['Cache-Control'] = "public, max-age=%d" % \
                 self.static_cache_expiry
         resp.last_modified = self.zuulweb.start_time
+        # We don't wrap info methods with check_auth
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     def _isAuthorized(self, tenant, claims):
@@ -967,8 +956,6 @@ class ZuulWebAPI(object):
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth(require_auth=True)
     def tenant_authorizations(self, tenant_name, tenant, auth):
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': auth.admin,
                          'scope': [tenant_name, ]}, }
 
@@ -1009,7 +996,6 @@ class ZuulWebAPI(object):
         )
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return self.tenants_cache
 
     @cherrypy.expose
@@ -1019,8 +1005,6 @@ class ZuulWebAPI(object):
     def connections(self, auth):
         ret = [s.connection.toDict()
                for s in self.zuulweb.connections.getSources()]
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -1037,8 +1021,6 @@ class ZuulWebAPI(object):
                     "version": comp.version,
                 }
                 ret.setdefault(kind, []).append(comp_json)
-        resp = cherrypy.response
-        resp.headers["Access-Control-Allow-Origin"] = "*"
         return ret
 
     def _getStatus(self, tenant):
@@ -1070,7 +1052,6 @@ class ZuulWebAPI(object):
         )
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'application/json; charset=utf-8'
         return payload
 
@@ -1184,8 +1165,6 @@ class ZuulWebAPI(object):
                 job_output["tags"] = list(tags)
             result.append(job_output)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -1199,8 +1178,6 @@ class ZuulWebAPI(object):
              'error': e.error}
             for e in tenant.layout.loading_errors.errors
         ]
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -1216,8 +1193,6 @@ class ZuulWebAPI(object):
         for job in job_variants:
             result.append(job.toDict(tenant))
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -1236,8 +1211,6 @@ class ZuulWebAPI(object):
             pobj['type'] = "untrusted"
             result.append(pobj)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return sorted(result, key=lambda project: project["name"])
 
     @cherrypy.expose
@@ -1268,8 +1241,6 @@ class ZuulWebAPI(object):
                 config['pipelines'].append(pipeline)
             result['configs'].append(config)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -1293,8 +1264,6 @@ class ZuulWebAPI(object):
                 })
             ret.append({"name": pipeline, "triggers": triggers})
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -1311,8 +1280,6 @@ class ZuulWebAPI(object):
                 launcher.supported_labels,
                 allowed_labels, disallowed_labels))
         ret = [{'name': label} for label in sorted(labels)]
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -1338,8 +1305,6 @@ class ZuulWebAPI(object):
                         "provider", "state", "state_time", "comment"):
                 node_data[key] = getattr(node, key, None)
             ret.append(node_data)
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -1351,7 +1316,6 @@ class ZuulWebAPI(object):
 
         key = encryption.serialize_rsa_public_key(project.public_secrets_key)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
         return key
 
@@ -1364,7 +1328,6 @@ class ZuulWebAPI(object):
 
         key = f"{project.public_ssh_key}\n"
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
         return key
 
@@ -1474,8 +1437,6 @@ class ZuulWebAPI(object):
             complete=complete, limit=limit, offset=skip,
             idx_min=_idx_min, idx_max=_idx_max)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return [self.buildToDict(b, b.buildset) for b in builds]
 
     @cherrypy.expose
@@ -1490,8 +1451,6 @@ class ZuulWebAPI(object):
         if not data:
             raise cherrypy.HTTPError(404, "Build not found")
         data = self.buildToDict(data[0], data[0].buildset)
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return data
 
     def buildsetToDict(self, buildset, builds=[]):
@@ -1575,8 +1534,6 @@ class ZuulWebAPI(object):
             newrev=newrev, uuid=uuid, result=result, complete=complete,
             limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
 
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return [self.buildsetToDict(b) for b in buildsets]
 
     @cherrypy.expose
@@ -1591,8 +1548,6 @@ class ZuulWebAPI(object):
         if not data:
             raise cherrypy.HTTPError(404, "Buildset not found")
         data = self.buildsetToDict(data, data.builds)
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return data
 
     @cherrypy.expose
@@ -1630,8 +1585,6 @@ class ZuulWebAPI(object):
                            'other_tenants': other_tenants},
                        }
             result.append(sem_out)
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -1668,8 +1621,6 @@ class ZuulWebAPI(object):
             })
 
         ret = output
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -1714,8 +1665,6 @@ class ZuulWebAPI(object):
         params['secret_vars'] = job.secret_parent_data
 
         ret = params
-        resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     def _freeze_jobs(self, tenant, pipeline_name, project_name,
