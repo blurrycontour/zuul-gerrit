@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7c1354ca_86ad6a85",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-30T08:48:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad649067_85028f87",
+      "revId": "b192d9dba1405cbaf0cc9e29632124765b67fbee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "818ded8c_86d03c63",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2022-09-29T19:28:30Z",
       "side": 1,
       "message": "This comment should probably be ot line 1234.",
+      "revId": "b192d9dba1405cbaf0cc9e29632124765b67fbee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b59609a_ddc93d0f",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1243,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-30T08:48:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "818ded8c_86d03c63",
       "revId": "b192d9dba1405cbaf0cc9e29632124765b67fbee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
