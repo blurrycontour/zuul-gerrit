@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63e7f8d0_a4d0fad8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-09-30T18:00:37Z",
+      "side": 1,
+      "message": "recheck this failed in unittest but as far as I know zuul-bwrap cli tooling isn\u0027t used in unittesting.",
+      "revId": "4ea5c621b9052153cbd27c152867af668b1fee58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
