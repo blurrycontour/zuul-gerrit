@@ -76,6 +76,7 @@ from zuul.model import (
 from zuul.driver.zuul import ZuulDriver
 from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
+from zuul.driver.gitea import GiteaDriver
 from zuul.driver.github import GithubDriver
 from zuul.driver.timer import TimerDriver
 from zuul.driver.sql import SQLDriver
@@ -121,6 +122,7 @@ from zuul.lib.logutil import get_annotated_logger
 
 from tests.util import FIXTURE_DIR
 import tests.fakegerrit
+import tests.fakegitea
 import tests.fakegithub
 import tests.fakegitlab
 import tests.fakepagure
@@ -431,6 +433,27 @@ class GitlabDriverMock(GitlabDriver):
         return connection
 
 
+class GiteaDriverMock(GiteaDriver):
+    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
+                 upstream_root: str,
+                 additional_event_queues):
+        super(GiteaDriverMock, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.upstream_root = upstream_root
+        self.additional_event_queues = additional_event_queues
+
+    def getConnection(self, name, config):
+        server = config.get('server', 'gitea.test')
+        db = self.changes.setdefault(server, {})
+        connection = tests.fakegitea.FakeGiteaConnection(
+            self, name, config,
+            changes_db=db,
+            upstream_root=self.upstream_root)
+        setattr(self.registry, 'fake_' + name, connection)
+        return connection
+
+
 class TestConnectionRegistry(ConnectionRegistry):
     def __init__(self, config, test_config,
                  additional_event_queues, upstream_root,
@@ -443,6 +466,8 @@ class TestConnectionRegistry(ConnectionRegistry):
             self, test_config, upstream_root, additional_event_queues,
             poller_events, add_cleanup))
         self.registerDriver(GitDriver())
+        self.registerDriver(GiteaDriverMock(
+            self, changes, upstream_root, additional_event_queues))
         self.registerDriver(GithubDriverMock(
             self, test_config, config, upstream_root, additional_event_queues,
             git_url_with_auth))
