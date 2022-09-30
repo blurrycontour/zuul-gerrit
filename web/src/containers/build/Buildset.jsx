@@ -181,7 +181,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
     if (buildset.change === null) {
       const oldrev = '0000000000000000000000000000000000000000'
       const newrev = buildset.newrev ? buildset.newrev : '0000000000000000000000000000000000000000'
-      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline, buildset.ref, oldrev, newrev, user.token)
+      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline, buildset.ref, oldrev, newrev)
         .then(() => {
           dispatch(addNotification(
             {
@@ -196,7 +196,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
         })
     } else {
       const changeId = buildset.change + ',' + buildset.patchset
-      enqueue(tenant.apiPrefix, buildset.project, buildset.pipeline, changeId, user.token)
+      enqueue(tenant.apiPrefix, buildset.project, buildset.pipeline, changeId)
         .then(() => {
           dispatch(addNotification(
             {

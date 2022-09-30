@@ -20,6 +20,7 @@ import PropTypes from 'prop-types'
 import { matchPath, withRouter } from 'react-router'
 import { Link, NavLink, Redirect, Route, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { withAuth } from 'oidc-react'
 import {
   TimedToastNotification,
   ToastNotificationList,
@@ -65,17 +66,19 @@ import SelectTz from './containers/timezone/SelectTz'
 import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearNotification } from './actions/notifications'
-import { fetchConfigErrorsAction } from './actions/configErrors'
+import { fetchConfigErrorsAction, clearConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 import { configureAuthFromTenant, configureAuthFromInfo } from './actions/auth'
 import { getHomepageUrl } from './api'
 import AuthCallbackPage from './pages/AuthCallback'
+import AuthRequiredPage from './pages/AuthRequired'
 
 class App extends React.Component {
   static propTypes = {
     notifications: PropTypes.array,
     configErrors: PropTypes.array,
+    configErrorsReady: PropTypes.bool,
     info: PropTypes.object,
     tenant: PropTypes.object,
     timezone: PropTypes.string,
@@ -85,6 +88,7 @@ class App extends React.Component {
     isKebabDropdownOpen: PropTypes.bool,
     user: PropTypes.object,
     auth: PropTypes.object,
+    signIn: PropTypes.func,
   }
 
   state = {
@@ -116,8 +120,17 @@ class App extends React.Component {
     }
   }
 
+  isAuthReady() {
+    const { info, auth, user } = this.props
+    return !(info.isFetching ||
+             !auth.info ||
+             auth.isFetching ||
+             (user.data && user.data.isFetching) ||
+             user.isFetching)
+  }
+
   renderContent = () => {
-    const { info, tenant, auth } = this.props
+    const { tenant, auth, user } = this.props
     const allRoutes = []
 
     if ((window.location.origin + window.location.pathname) ===
@@ -126,8 +139,18 @@ class App extends React.Component {
       // validation is complete (it will internally redirect when complete)
       return <AuthCallbackPage/>
     }
-    if (info.isFetching || !auth.info || auth.isFetching) {
+    if (!this.isAuthReady()) {
       return <Fetching />
+    }
+    if (auth.info.read_protected && !user.data) {
+      console.log('Read-access login required')
+      const redirect_target = window.location.href.slice(getHomepageUrl().length)
+      localStorage.setItem('zuul_auth_redirect', redirect_target)
+      this.props.signIn()
+      return <Fetching />
+    }
+    if (auth.info.read_protected && user.scope.length<1) {
+      return <AuthRequiredPage/>
     }
     this.menu
       // Do not include '/tenants' route in white-label setup
@@ -164,9 +187,10 @@ class App extends React.Component {
 
   componentDidUpdate() {
     // This method is called when info property is updated
-    const { tenant, info } = this.props
+    const { tenant, info, auth, user, configErrorsReady } = this.props
     if (info.ready) {
-      let tenantName, whiteLabel
+      let tenantName = null
+      let whiteLabel
 
       if (info.tenant) {
         // White label
@@ -188,7 +212,7 @@ class App extends React.Component {
         const tenantAction = setTenantAction(tenantName, whiteLabel)
         this.props.dispatch(tenantAction)
         if (tenantName) {
-          this.props.dispatch(fetchConfigErrorsAction(tenantAction.tenant))
+          this.props.dispatch(clearConfigErrorsAction())
         }
         if (whiteLabel || !tenantName) {
           // The app info endpoint was already a tenant info
@@ -198,6 +222,12 @@ class App extends React.Component {
           // Query the tenant info endpoint for auth info.
           this.props.dispatch(configureAuthFromTenant(tenantName))
         }
+      }
+      if (tenant && tenant.name && !configErrorsReady && this.isAuthReady() &&
+          (!auth.info.read_protected || user.data)) {
+        // This will happen after the tenant action is complete, so we
+        // can use the "old" tenant now.
+        this.props.dispatch(fetchConfigErrorsAction(tenant))
       }
     }
   }
@@ -487,11 +517,12 @@ class App extends React.Component {
 export default withRouter(connect(
   state => ({
     notifications: state.notifications,
-    configErrors: state.configErrors,
+    configErrors: state.configErrors.errors,
+    configErrorsReady: state.configErrors.ready,
     info: state.info,
     tenant: state.tenant,
     timezone: state.timezone,
     user: state.user,
     auth: state.auth,
   })
-)(App))
+)(withAuth(App)))

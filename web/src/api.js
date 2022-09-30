@@ -14,6 +14,12 @@
 
 import Axios from 'axios'
 
+let authToken = undefined
+
+export function setAuthToken(token) {
+  authToken = token
+}
+
 function getHomepageUrl(url) {
   //
   // Discover serving location from href.
@@ -103,14 +109,25 @@ function getStreamUrl(apiPrefix) {
   return streamUrl
 }
 
-function getWithCorsHandling(url) {
+function makeRequest(url, method, data) {
+  if (method === undefined) {
+    method = 'get'
+  }
+
   // This performs a simple GET and tries to detect if CORS errors are
   // due to proxy authentication errors.
   const instance = Axios.create({
     baseURL: apiUrl
   })
+
+  if (authToken) {
+    instance.defaults.headers.common['Authorization'] = 'Bearer ' + authToken
+  }
+
+  const config = {method, url, data}
+
   // First try the request as normal
-  let res = instance.get(url).catch(err => {
+  let res = instance.request(config).catch(err => {
     if (err.response === undefined) {
       // This is either a Network, DNS, or CORS error, but we can't tell which.
       // If we're behind an authz proxy, it's possible our creds have timed out
@@ -119,7 +136,7 @@ function getWithCorsHandling(url) {
       // issuing a redirect if X-Requested-With is set to 'XMLHttpRequest' and
       // will instead issue a 403.  We can use this to detect that case.
       instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-      let res2 = instance.get(url).catch(err2 => {
+      let res2 = instance.request(config).catch(err2 => {
         if (err2.response && err2.response.status === 403) {
           // We might be getting a redirect or something else,
           // so reload the page.
@@ -133,162 +150,160 @@ function getWithCorsHandling(url) {
       })
       return res2
     }
+    throw (err)
   })
   return res
 }
 
 // Direct APIs
 function fetchInfo() {
-  return getWithCorsHandling('info')
+  return makeRequest('info')
 }
 
 function fetchComponents() {
-  return getWithCorsHandling('components')
+  return makeRequest('components')
 }
 
 function fetchTenantInfo(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'info')
+  return makeRequest(apiPrefix + 'info')
 }
+
 function fetchOpenApi() {
   return Axios.get(getHomepageUrl() + 'openapi.yaml')
 }
+
 function fetchTenants() {
-  return getWithCorsHandling(apiUrl + 'tenants')
+  return makeRequest(apiUrl + 'tenants')
 }
+
 function fetchConfigErrors(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'config-errors')
+  return makeRequest(apiPrefix + 'config-errors')
 }
+
 function fetchStatus(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'status')
+  return makeRequest(apiPrefix + 'status')
 }
+
 function fetchChangeStatus(apiPrefix, changeId) {
-  return getWithCorsHandling(apiPrefix + 'status/change/' + changeId)
+  return makeRequest(apiPrefix + 'status/change/' + changeId)
 }
+
 function fetchFreezeJob(apiPrefix, pipelineName, projectName, branchName, jobName) {
-  return getWithCorsHandling(apiPrefix +
+  return makeRequest(apiPrefix +
                    'pipeline/' + pipelineName +
                    '/project/' + projectName +
                    '/branch/' + branchName +
                    '/freeze-job/' + jobName)
 }
+
 function fetchBuild(apiPrefix, buildId) {
-  return getWithCorsHandling(apiPrefix + 'build/' + buildId)
+  return makeRequest(apiPrefix + 'build/' + buildId)
 }
+
 function fetchBuilds(apiPrefix, queryString) {
   let path = 'builds'
   if (queryString) {
     path += '?' + queryString.slice(1)
   }
-  return getWithCorsHandling(apiPrefix + path)
+  return makeRequest(apiPrefix + path)
 }
+
 function fetchBuildset(apiPrefix, buildsetId) {
-  return getWithCorsHandling(apiPrefix + 'buildset/' + buildsetId)
+  return makeRequest(apiPrefix + 'buildset/' + buildsetId)
 }
+
 function fetchBuildsets(apiPrefix, queryString) {
   let path = 'buildsets'
   if (queryString) {
     path += '?' + queryString.slice(1)
   }
-  return getWithCorsHandling(apiPrefix + path)
+  return makeRequest(apiPrefix + path)
 }
+
 function fetchPipelines(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'pipelines')
+  return makeRequest(apiPrefix + 'pipelines')
 }
+
 function fetchProject(apiPrefix, projectName) {
-  return getWithCorsHandling(apiPrefix + 'project/' + projectName)
+  return makeRequest(apiPrefix + 'project/' + projectName)
 }
+
 function fetchProjects(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'projects')
+  return makeRequest(apiPrefix + 'projects')
 }
+
 function fetchJob(apiPrefix, jobName) {
-  return getWithCorsHandling(apiPrefix + 'job/' + jobName)
+  return makeRequest(apiPrefix + 'job/' + jobName)
 }
+
 function fetchJobGraph(apiPrefix, projectName, pipelineName, branchName) {
-  return getWithCorsHandling(apiPrefix +
+  return makeRequest(apiPrefix +
                    'pipeline/' + pipelineName +
                    '/project/' + projectName +
                    '/branch/' + branchName +
                    '/freeze-jobs')
 }
+
 function fetchJobs(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'jobs')
+  return makeRequest(apiPrefix + 'jobs')
 }
+
 function fetchLabels(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'labels')
+  return makeRequest(apiPrefix + 'labels')
 }
+
 function fetchNodes(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'nodes')
+  return makeRequest(apiPrefix + 'nodes')
 }
+
 function fetchAutoholds(apiPrefix) {
-  return getWithCorsHandling(apiPrefix + 'autohold')
+  return makeRequest(apiPrefix + 'autohold')
 }
 function fetchAutohold(apiPrefix, requestId) {
-  return getWithCorsHandling(apiPrefix + 'autohold/' + requestId)
+  return makeRequest(apiPrefix + 'autohold/' + requestId)
 }
 
-// token-protected API
-function fetchUserAuthorizations(apiPrefix, token) {
-  // Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.get(apiPrefix + 'authorizations')
-    .catch(err => { console.log('An error occurred', err) })
-  // Axios.defaults.headers.common['Authorization'] = ''
-  return res
+function fetchUserAuthorizations(apiPrefix) {
+  return makeRequest(apiPrefix + 'authorizations')
 }
 
-function dequeue(apiPrefix, projectName, pipeline, change, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.post(
+function dequeue(apiPrefix, projectName, pipeline, change) {
+  return makeRequest(
     apiPrefix + 'project/' + projectName + '/dequeue',
+    'post',
     {
       pipeline: pipeline,
       change: change,
     }
   )
-  return res
 }
-function dequeue_ref(apiPrefix, projectName, pipeline, ref, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.post(
+
+function dequeue_ref(apiPrefix, projectName, pipeline, ref) {
+  return makeRequest(
     apiPrefix + 'project/' + projectName + '/dequeue',
+    'post',
     {
       pipeline: pipeline,
       ref: ref,
     }
   )
-  return res
 }
 
-function enqueue(apiPrefix, projectName, pipeline, change, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.post(
+function enqueue(apiPrefix, projectName, pipeline, change) {
+  return makeRequest(
     apiPrefix + 'project/' + projectName + '/enqueue',
+    'post',
     {
       pipeline: pipeline,
       change: change,
     }
   )
-  return res
 }
-function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.post(
+
+function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev) {
+  return makeRequest(
     apiPrefix + 'project/' + projectName + '/enqueue',
+    'post',
     {
       pipeline: pipeline,
       ref: ref,
@@ -296,16 +311,13 @@ function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev, toke
       newrev: newrev,
     }
   )
-  return res
 }
+
 function autohold(apiPrefix, projectName, job, change, ref,
-  reason, count, node_hold_expiration, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.post(
+                  reason, count, node_hold_expiration) {
+  return makeRequest(
     apiPrefix + 'project/' + projectName + '/autohold',
+    'post',
     {
       change: change,
       job: job,
@@ -315,33 +327,24 @@ function autohold(apiPrefix, projectName, job, change, ref,
       node_hold_expiration: node_hold_expiration,
     }
   )
-  return res
 }
 
-function autohold_delete(apiPrefix, requestId, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.delete(
-    apiPrefix + '/autohold/' + requestId
+function autohold_delete(apiPrefix, requestId) {
+  return makeRequest(
+    apiPrefix + '/autohold/' + requestId,
+    'delete'
   )
-  return res
 }
 
-function promote(apiPrefix, pipeline, changes, token) {
-  const instance = Axios.create({
-    baseURL: apiUrl
-  })
-  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
-  let res = instance.post(
+function promote(apiPrefix, pipeline, changes) {
+  return makeRequest(
     apiPrefix + '/promote',
+    'post',
     {
       pipeline: pipeline,
       changes: changes,
     }
   )
-  return res
 }
 
 

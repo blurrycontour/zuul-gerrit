@@ -58,14 +58,14 @@ class Change extends React.Component {
   }
 
   dequeueConfirm = () => {
-    const { tenant, user, change, pipeline } = this.props
+    const { tenant, change, pipeline } = this.props
     let projectName = change.project
     let changeId = change.id || 'N/A'
     let changeRef = change.ref
     this.setState(() => ({ showDequeueModal: false }))
     // post-merge
     if (/^[0-9a-f]{40}$/.test(changeId)) {
-      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef, user.token)
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })
@@ -74,7 +74,7 @@ class Change extends React.Component {
         })
       // pre-merge, ie we have a change id
     } else if (changeId !== 'N/A') {
-      dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId, user.token)
+      dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })
@@ -118,11 +118,11 @@ class Change extends React.Component {
   }
 
   promoteConfirm = () => {
-    const { tenant, user, change, pipeline } = this.props
+    const { tenant, change, pipeline } = this.props
     let changeId = change.id || 'NA'
     this.setState(() => ({ showPromoteModal: false }))
     if (changeId !== 'N/A') {
-      promote(tenant.apiPrefix, pipeline.name, [changeId,], user.token)
+      promote(tenant.apiPrefix, pipeline.name, [changeId,])
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })

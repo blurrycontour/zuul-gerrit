@@ -37,10 +37,12 @@ export const fetchUserACLRequest = (tenant) => ({
 })
 
 export const userLoggedIn = (user, redirect) => (dispatch) => {
+  const token = getToken(user)
+  API.setAuthToken(token)
   dispatch({
     type: USER_LOGGED_IN,
     user: user,
-    token: getToken(user),
+    token: token,
     redirect: redirect,
   })
 }
@@ -62,10 +64,10 @@ const fetchUserACLFail = error => ({
   error
 })
 
-export const fetchUserACL = (tenant, user) => (dispatch) => {
+export const fetchUserACL = (tenant) => (dispatch) => {
   dispatch(fetchUserACLRequest(tenant))
-  let apiPrefix = 'tenant/' + tenant + '/'
-  return API.fetchUserAuthorizations(apiPrefix, user.token)
+  let apiPrefix = tenant? 'tenant/' + tenant + '/' : ''
+  return API.fetchUserAuthorizations(apiPrefix)
     .then(response => dispatch(fetchUserACLSuccess(response.data)))
     .catch(error => {
       dispatch(fetchUserACLFail(error))

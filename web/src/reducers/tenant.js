@@ -14,7 +14,9 @@
 
 import { TENANT_SET } from '../actions/tenant'
 
-export default (state = {name: null}, action) => {
+// undefined name means we haven't loaded anything yet; null means
+// outside of tenant context.
+export default (state = {name: undefined}, action) => {
   switch (action.type) {
     case TENANT_SET:
       return action.tenant

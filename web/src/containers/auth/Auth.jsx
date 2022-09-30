@@ -104,8 +104,14 @@ class AuthContainer extends React.Component {
   }
 
   componentDidMount() {
+    const { user, tenant } = this.props
     this.props.userManager.events.addAccessTokenExpired(this.onAccessTokenExpired)
     this.props.userManager.events.addUserLoaded(this.onUserLoaded)
+
+    if (user.data) {
+      console.log('Refreshing ACL', user.tenant, tenant.name)
+      this.props.dispatch(fetchUserACL(tenant? tenant.name : null))
+    }
   }
 
   componentWillUnmount() {
@@ -119,7 +125,7 @@ class AuthContainer extends React.Component {
     // Make sure the token is current and the tenant is up to date.
     if (user.data && user.tenant !== tenant.name) {
       console.log('Refreshing ACL', user.tenant, tenant.name)
-      this.props.dispatch(fetchUserACL(tenant.name, user))
+      this.props.dispatch(fetchUserACL(tenant? tenant.name : null))
     }
   }
 

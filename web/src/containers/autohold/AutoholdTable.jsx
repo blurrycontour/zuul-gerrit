@@ -87,7 +87,7 @@ function AutoholdTable(props) {
   ]
 
   function handleAutoholdDelete(requestId) {
-    autohold_delete(tenant.apiPrefix, requestId, user.token)
+    autohold_delete(tenant.apiPrefix, requestId)
       .then(() => {
         dispatch(addNotification(
           {

@@ -803,6 +803,7 @@ class ZuulWebAPI(object):
             'info': '/api/info',
             'connections': '/api/connections',
             'components': '/api/components',
+            'authorizations': '/api/authorizations',
             'tenants': '/api/tenants',
             'tenant_info': '/api/tenant/{tenant}/info',
             'status': '/api/tenant/{tenant}/status',
@@ -896,7 +897,7 @@ class ZuulWebAPI(object):
         else:
             tenant_name = '*'
             admin_rules = []
-            access_rules = self.zuulweb.api_root.access_rules
+            access_rules = self.zuulweb.abide.api_root.access_rules
         override = claims.get('zuul', {}).get('admin', [])
         if (override == '*' or
             (isinstance(override, list) and tenant_name in override)):
@@ -950,6 +951,14 @@ class ZuulWebAPI(object):
                 access = admin = True
                 break
         return (access, admin)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_root_auth(require_auth=True)
+    def root_authorizations(self, auth):
+        return {'zuul': {'admin': auth.admin,
+                         'scope': ['*']}, }
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1942,6 +1951,10 @@ class ZuulWeb(object):
                               '/api/tenant/{tenant_name}/authorizations',
                               controller=api,
                               action='tenant_authorizations')
+            route_map.connect('api',
+                              '/api/authorizations',
+                              controller=api,
+                              action='root_authorizations')
             route_map.connect('api', '/api/tenant/{tenant_name}/promote',
                               controller=api, action='promote')
             route_map.connect(
