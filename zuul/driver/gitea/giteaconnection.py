@@ -35,7 +35,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag
 from zuul.exceptions import MergeFailure
 from zuul.driver.gitea.giteamodel import PullRequest, GiteaTriggerEvent
-from zuul.zk.branch_cache import BranchCache
+from zuul.zk.branch_cache import BranchCache, BranchFlag
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -672,6 +672,10 @@ class GiteaConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def addProject(self, project):
         self.projects[project.name] = project
+
+    def _getProjectBranchesRequiredFlags(
+            self, exclude_unprotected, exclude_locked):
+        return BranchFlag.PRESENT
 
     def _fetchProjectBranches(self, project, exclude_unprotected):
         self.log.debug(
