@@ -1,0 +1,35 @@
+- pipeline:
+    name: gate
+    manager: dependent
+    trigger:
+      gitea:
+        - event: gt_pull_request
+          action:
+            - opened
+            - changed
+            - reopened
+    success:
+      gitea:
+        status: success
+        merge: true
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: project-test2
+    run: playbooks/project-test2.yaml
+
+- project:
+    merge-mode: squash-merge
+    name: org/project
+    gate:
+      jobs:
+        - project-test1
+        - project-test2
