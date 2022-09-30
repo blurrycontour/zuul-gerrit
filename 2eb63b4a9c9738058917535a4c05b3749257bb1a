@@ -16,6 +16,24 @@
       "message": "Maybe attributes.",
       "revId": "2eb63b4a9c9738058917535a4c05b3749257bb1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81845120_5b353676",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-30T08:48:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a381db0_e4aaf06c",
+      "revId": "2eb63b4a9c9738058917535a4c05b3749257bb1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
