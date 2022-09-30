@@ -28,7 +28,9 @@ export default (state = {
   data: null,
   scope: [],
   isAdmin: false,
-  tenant: null,
+  // undefined tenant means we haven't loaded anything yet; null means
+  // outside of tenant context.
+  tenant: undefined,
   redirect: null,
 }, action) => {
   switch (action.type) {
@@ -39,7 +41,8 @@ export default (state = {
         token: action.token,
         redirect: action.redirect,
         scope: [],
-        isAdmin: false
+        isAdmin: false,
+        tenant: undefined,
       }
     }
     case USER_LOGGED_OUT:
@@ -49,7 +52,8 @@ export default (state = {
         token: null,
         redirect: null,
         scope: [],
-        isAdmin: false
+        isAdmin: false,
+        tenant: undefined,
       }
     case USER_ACL_REQUEST:
       return {

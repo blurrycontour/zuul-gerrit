@@ -12,10 +12,14 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-export default (state = [], action) => {
+export default (state = {errors: [], ready: false}, action) => {
   switch (action.type) {
-    case 'FETCH_CONFIGERRORS_SUCCESS':
-      return action.errors
+    case 'CONFIGERRORS_FETCH_SUCCESS':
+      return {errors: action.errors, ready: true}
+    case 'CONFIGERRORS_FETCH_FAIL':
+      return {errors: [], ready: true}
+    case 'CONFIGERRORS_CLEAR':
+      return {errors: [], ready: false}
     default:
       return state
   }
