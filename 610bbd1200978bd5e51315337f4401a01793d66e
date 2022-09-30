@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4f6f7c4_2e4b60e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2022-09-30T07:16:37Z",
+      "side": 1,
+      "message": "Included in alternative (batch) change - starting at https://review.opendev.org/c/zuul/zuul/+/859939",
+      "revId": "610bbd1200978bd5e51315337f4401a01793d66e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
