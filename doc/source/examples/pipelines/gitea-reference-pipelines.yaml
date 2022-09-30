@@ -1,0 +1,64 @@
+- pipeline:
+    name: check
+    manager: independent
+    require:
+      gitea:
+        open: true
+    trigger:
+      gitea:
+        - event: gt_pull_request
+          action:
+            - opened
+            - changed
+            - reopened
+        - event: gt_push
+    success:
+      gitea:
+        comment: true
+        status: "success"
+
+- pipeline:
+    name: gate
+    manager: dependent
+    require:
+      gitea:
+        open: true
+        approved: true
+        labels:
+          - gateit
+    trigger:
+      gitea:
+        - event: gt_pull_request
+          action: comment
+          comment: merge_me
+        - event: gt_pull_request_review
+          action: submitted
+          state: approved
+    success:
+      gitea:
+        merge: true
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    precedence: low
+    trigger:
+      gitea:
+        - event: gt_push
+          ref: ^refs/heads/.*$
+
+- pipeline:
+    name: promote
+    post-review: true
+    manager: supercedent
+    precedence: high
+    require:
+      gitea:
+        merged: true
+    success:
+      gitea:
+        comment: true
+    failure:
+      gitea:
+        comment: true
