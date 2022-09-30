@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c13096ab_a97635ea",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-30T08:48:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58ec1294_2fb0ff75",
+      "revId": "c7f528cd5914f8537b7484bf4ac69a9dfa611a65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d8c2def_132d7928",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-09-29T19:27:27Z",
       "side": 1,
       "message": "A decorator may also be an option for methods like this.",
+      "revId": "c7f528cd5914f8537b7484bf4ac69a9dfa611a65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1ebe8b6_efd0c859",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2491,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-09-30T08:48:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3843399e_5bf90fb5",
       "revId": "c7f528cd5914f8537b7484bf4ac69a9dfa611a65",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
