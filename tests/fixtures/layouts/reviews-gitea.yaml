@@ -1,0 +1,36 @@
+- pipeline:
+    name: reviews
+    manager: independent
+    trigger:
+      gitea:
+        - event: gt_pull_request_review
+          action: submitted
+          state: approved
+
+- pipeline:
+    name: selfies
+    manager: independent
+    trigger:
+      gitea:
+        - event: gt_pull_request_review
+          action: submitted
+          state: comment
+          comment: "mergeme"
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-reviews
+    run: playbooks/project-reviews.yaml
+
+- project:
+    name: org/project
+    selfies:
+      jobs:
+        - project-reviews
+    reviews:
+      jobs:
+        - project-reviews
