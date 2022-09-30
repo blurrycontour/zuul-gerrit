@@ -1,0 +1,63 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gitea:
+        - event: gt_pull_request
+          action:
+            - opened
+            - reopened
+            - changed
+            - label_updated
+        - event: gt_pull_request
+          action: comment
+          comment: (?i)^\s*recheck\s*$
+
+    failure:
+      gitea:
+        comment: true
+        status: "failure"
+    start:
+      gitea:
+        comment: true
+        status: "pending"
+    success:
+      gitea:
+        comment: true
+        status: "success"
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    trigger:
+      gitea:
+        - event: gt_push
+          ref: ^refs/heads/.*$
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: project-test2
+    run: playbooks/project-test2.yaml
+
+- job:
+    name: project-post-job
+    run: playbooks/project-post.yaml
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - project-test1
+        - project-test2
+    post:
+      jobs:
+        - project-post-job
