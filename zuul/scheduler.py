@@ -1453,6 +1453,7 @@ class Scheduler(threading.Thread):
         # This is called in the scheduler loop after another thread submits
         # a request
         if self.unparsed_abide.ltime < self.system_config_cache.ltime:
+            self.log.debug("Updating system config")
             self.updateSystemConfig()
 
         with self.layout_lock:
@@ -2394,11 +2395,14 @@ class Scheduler(threading.Thread):
             event_forwarded = False
             try:
                 if isinstance(event, TenantReconfigureEvent):
+                    self.log.debug("Processing tenant reconfiguration "
+                                   "event for tenant %s", tenant.name)
                     self._doTenantReconfigureEvent(event)
                 elif isinstance(event, (PromoteEvent, ChangeManagementEvent)):
                     event_forwarded = self._forward_management_event(event)
                 else:
-                    self.log.error("Unable to handle event %s", event)
+                    self.log.error("Unable to handle event %s for tenant %s",
+                                   event, tenant.name)
             finally:
                 if event_forwarded:
                     self.management_events[tenant.name].ackWithoutResult(
