@@ -31,6 +31,7 @@ from collections import defaultdict, OrderedDict
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from kazoo.exceptions import NotEmptyError
+from opentelemetry import trace
 
 from zuul import configloader, exceptions
 from zuul.lib import commandsocket
@@ -176,6 +177,8 @@ class Scheduler(threading.Thread):
     """
 
     log = logging.getLogger("zuul.Scheduler")
+    tracer = trace.get_tracer("zuul")
+
     _stats_interval = 30
     _semaphore_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _general_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
@@ -2217,7 +2220,14 @@ class Scheduler(threading.Thread):
                     log = get_annotated_logger(self.log, event.zuul_event_id)
                     log.debug("Forwarding trigger event %s", event)
                     try:
-                        self._forward_trigger_event(event, tenant)
+                        trigger_span = tracing.restoreSpanContext(
+                            event.span_context)
+                        with self.tracer.start_as_current_span(
+                                "TenantTriggerEventProcessing",
+                                links=[
+                                    trace.Link(trigger_span.get_span_context())
+                                ]):
+                            self._forward_trigger_event(event, tenant)
                     except Exception:
                         log.exception("Unable to forward event %s "
                                       "to tenant %s", event, tenant.name)
@@ -2310,6 +2320,11 @@ class Scheduler(threading.Thread):
 
         event.min_reconfigure_ltime = self.trigger_events[
             tenant.name].last_reconfigure_event_ltime
+
+        span = trace.get_current_span()
+        span.set_attribute("reconfigure_tenant", reconfigure_tenant)
+        event.span_context = tracing.getSpanContext(span)
+
         for pipeline in tenant.layout.pipelines.values():
             if (
                 pipeline.manager.eventMatches(event, change)

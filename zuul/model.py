@@ -6260,6 +6260,8 @@ class ChangeManagementEvent(ManagementEvent):
         self.oldrev = oldrev or '0000000000000000000000000000000000000000'
         self.newrev = newrev or '0000000000000000000000000000000000000000'
         self.timestamp = time.time()
+        span = trace.get_current_span()
+        self.span_context = tracing.getSpanContext(span)
 
     def toDict(self):
         d = super().toDict()
@@ -6273,12 +6275,14 @@ class ChangeManagementEvent(ManagementEvent):
         d["oldrev"] = self.oldrev
         d["newrev"] = self.newrev
         d["timestamp"] = self.timestamp
+        d["span_context"] = self.span_context
         return d
 
     def updateFromDict(self, d):
         super().updateFromDict(d)
         self.type = d.get("type")
         self.timestamp = d.get("timestamp")
+        self.span_context = d.get("span_context")
 
     @classmethod
     def fromDict(cls, data):
@@ -6565,6 +6569,8 @@ class TriggerEvent(AbstractEvent):
         self.arrived_at_scheduler_timestamp = None
         self.driver_name = None
         self.branch_cache_ltime = -1
+        span = trace.get_current_span()
+        self.span_context = tracing.getSpanContext(span)
 
     def toDict(self):
         return {
@@ -6599,6 +6605,7 @@ class TriggerEvent(AbstractEvent):
             ),
             "driver_name": self.driver_name,
             "branch_cache_ltime": self.branch_cache_ltime,
+            "span_context": self.span_context,
         }
 
     def updateFromDict(self, d):
@@ -6633,6 +6640,7 @@ class TriggerEvent(AbstractEvent):
         )
         self.driver_name = d["driver_name"]
         self.branch_cache_ltime = d.get("branch_cache_ltime", -1)
+        self.span_context = d.get("span_context")
 
     @property
     def canonical_project_name(self):
