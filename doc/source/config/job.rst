@@ -719,7 +719,9 @@ Here is an example of two job definitions:
    .. attr:: extra-vars
 
       A dictionary of variables to supply to Ansible with higher
-      precedence than job, host, or group vars.
+      precedence than job, host, or group vars. Note, that despite
+      the name this is not passed to Ansible using the `--extra-vars`
+      flag.
 
    .. attr:: host-vars
 
