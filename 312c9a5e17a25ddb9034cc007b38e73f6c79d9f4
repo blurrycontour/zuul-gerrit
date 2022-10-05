@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 2: Code-Review-1\n\u003e \n\u003e Can you add an expand-all button so we can have the same full overview we have now?\n\nThis is done in PS4",
       "revId": "312c9a5e17a25ddb9034cc007b38e73f6c79d9f4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8389b44c_99f642ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-05T00:13:42Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e The search doesn\u0027t seem to include the job name, only the description.\n\nIn PS4 this matches on the name",
+      "revId": "312c9a5e17a25ddb9034cc007b38e73f6c79d9f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
