@@ -757,6 +757,8 @@ class PipelineManager(metaclass=ABCMeta):
 
         span_attrs = {
             'zuul_event_id': item.event.zuul_event_id,
+            'zuul_tenant': self.pipeline.tenant.name,
+            'zuul_pipeline': self.pipeline.name,
         }
         for k, v in item.change.getSafeAttributes().toDict().items():
             span_attrs['ref_' + k] = v
