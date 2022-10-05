@@ -33,6 +33,23 @@
       "message": "\u003e Patch Set 2:\n\u003e \n\u003e The search doesn\u0027t seem to include the job name, only the description.\n\nIn PS4 this matches on the name",
       "revId": "312c9a5e17a25ddb9034cc007b38e73f6c79d9f4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b13fa6fe_302940c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-05T00:14:12Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e Not a minus 1: A shorter* text box with an (x) button to clear would be an improvement I think.\n\u003e \n\u003e * At least on wide screens.  Breakpoints may be advisable here.\n\nThe X button appears and works on PS4",
+      "revId": "312c9a5e17a25ddb9034cc007b38e73f6c79d9f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
