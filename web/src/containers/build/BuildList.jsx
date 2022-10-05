@@ -57,15 +57,24 @@ class BuildList extends React.Component {
       return self.indexOf(build) === idx
     })
 
+    let skippedJobs = builds.filter((build) => {
+      return build.result === 'SKIPPED'
+    }).map((build) => (build.job_name)
+    ).filter((build, idx, self) => {
+      return self.indexOf(build) === idx
+    })
+
     this.state = {
       visibleNonFinalBuilds: retriedJobs,
       retriedJobs: retriedJobs,
+      skippedJobs: skippedJobs,
+      showSkipped: false,
     }
   }
 
   sortedBuilds = () => {
     const { builds } = this.props
-    const { visibleNonFinalBuilds } = this.state
+    const { visibleNonFinalBuilds, showSkipped } = this.state
 
     return builds.sort((a, b) => {
       // Group builds by job name, then order by decreasing start time; this will ensure retries are together
@@ -85,6 +94,9 @@ class BuildList extends React.Component {
       }
     }).filter((build) => {
       if (build.final || visibleNonFinalBuilds.indexOf(build.job_name) >= 0) {
+        if (build.result === 'SKIPPED' && !showSkipped) {
+          return false
+        }
         return true
       }
       else {
@@ -96,6 +108,10 @@ class BuildList extends React.Component {
   handleFinalSwitch = isChecked => {
     const { retriedJobs } = this.state
     this.setState({ visibleNonFinalBuilds: (isChecked ? retriedJobs : []) })
+  }
+
+  handleSkippedSwitch = isChecked => {
+    this.setState({ showSkipped: isChecked })
   }
 
   handleToggleVisibleNonFinalBuilds = (jobName) => {
@@ -138,7 +154,7 @@ class BuildList extends React.Component {
 
   render() {
     const { tenant } = this.props
-    const { visibleNonFinalBuilds, retriedJobs } = this.state
+    const { visibleNonFinalBuilds, retriedJobs, skippedJobs, showSkipped } = this.state
 
     let retrySwitch = retriedJobs.length > 0 ?
       <FlexItem align={{ default: 'alignRight' }}>
@@ -151,10 +167,22 @@ class BuildList extends React.Component {
       </FlexItem> :
       <></>
 
+    let skippedSwitch = skippedJobs.length > 0 ?
+      <FlexItem align={{ default: 'alignRight' }}>
+        <span>Show skipped jobs &nbsp;</span>
+        <Switch
+          isChecked={showSkipped}
+          onChange={this.handleSkippedSwitch}
+          isReversed
+        />
+      </FlexItem> :
+      <></>
+
     const sortedBuilds = this.sortedBuilds()
 
     return (
       <Flex direction={{ default: 'column' }}>
+        {skippedSwitch}
         {retrySwitch}
         <FlexItem>
           <DataList
