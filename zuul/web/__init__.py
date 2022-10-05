@@ -1399,7 +1399,8 @@ class ZuulWebAPI(object):
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, nodeset=None,
                result=None, final=None, held=None, complete=None,
-               limit=50, skip=0, idx_min=None, idx_max=None):
+               limit=50, skip=0, idx_min=None, idx_max=None,
+               exclude_result=None):
         connection = self._get_connection()
 
         if tenant not in self.zuulweb.abide.tenants.keys():
@@ -1423,7 +1424,8 @@ class ZuulWebAPI(object):
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, nodeset=nodeset,
             result=result, final=final, held=held, complete=complete,
-            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
+            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max,
+            exclude_result=exclude_result)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'

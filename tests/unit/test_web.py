@@ -1783,6 +1783,45 @@ class TestBuildInfo(BaseTestWeb):
                                     "idx_min=%i" % idx_max).json()
         self.assertEqual(len(builds_query), 1, builds_query)
 
+    def test_web_list_skipped_builds(self):
+        # Test the exclude_result filter
+        # Generate some build records in the db.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.failJob('project-merge', A)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        builds = self.get_url("api/tenant/tenant-one/builds").json()
+        builds.sort(key=lambda x: x['job_name'])
+        self.assertEqual(len(builds), 3)
+        self.assertEqual(builds[0]['job_name'], 'project-merge')
+        self.assertEqual(builds[1]['job_name'], 'project-test1')
+        self.assertEqual(builds[2]['job_name'], 'project-test2')
+        self.assertEqual(builds[0]['result'], 'FAILURE')
+        self.assertEqual(builds[1]['result'], 'SKIPPED')
+        self.assertEqual(builds[2]['result'], 'SKIPPED')
+
+        builds = self.get_url("api/tenant/tenant-one/builds?"
+                              "exclude_result=SKIPPED").json()
+        self.assertEqual(len(builds), 1)
+        self.assertEqual(builds[0]['job_name'], 'project-merge')
+        self.assertEqual(builds[0]['result'], 'FAILURE')
+
+        builds = self.get_url("api/tenant/tenant-one/builds?"
+                              "result=SKIPPED&result=FAILURE").json()
+        builds.sort(key=lambda x: x['job_name'])
+        self.assertEqual(len(builds), 3)
+        self.assertEqual(builds[0]['job_name'], 'project-merge')
+        self.assertEqual(builds[1]['job_name'], 'project-test1')
+        self.assertEqual(builds[2]['job_name'], 'project-test2')
+        self.assertEqual(builds[0]['result'], 'FAILURE')
+        self.assertEqual(builds[1]['result'], 'SKIPPED')
+        self.assertEqual(builds[2]['result'], 'SKIPPED')
+
     def test_web_badge(self):
         # Generate some build records in the db.
         self.add_base_changes()
