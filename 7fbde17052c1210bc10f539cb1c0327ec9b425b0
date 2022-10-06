@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15e9af20_f7167b21",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T04:07:07Z",
+      "side": 1,
+      "message": "This does feel a little -- unreacty for the want of a better term.  One thought was that we should just match on string-ends-with \"auth_callback\" -- but I suppose that because the login site was told to redirect back to \"\u003cgetHomepageUrl\u003e/auth_callback\" it can\u0027t be anywhere else...\n\nIt makes sense that this can\u0027t be in the normal router path due to that path wanting to display lists of tenants, etc. which, as noted, may fail now.\n\nI thought about something like setting something when we get sent to the auth-site -- but then what happens if you navigate away, etc. from the auth site and don\u0027t come back properly -- you\u0027ll have a flag set that you\u0027re currently in the auth process and not be able to get rid of it.  So this makes sense to capture the fact that you\u0027re coming back from the authentication operation.\n\nIn short I can\u0027t think of a better way!",
+      "revId": "7fbde17052c1210bc10f539cb1c0327ec9b425b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "362ae6cc_52dd72cd",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T04:07:07Z",
+      "side": 1,
+      "message": "It seems that auth_callback route in /web/src/routes.js is now redundant?  that should be removed for clarity?",
+      "revId": "7fbde17052c1210bc10f539cb1c0327ec9b425b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
