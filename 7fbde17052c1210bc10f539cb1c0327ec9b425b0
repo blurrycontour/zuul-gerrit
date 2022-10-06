@@ -33,6 +33,24 @@
       "message": "It seems that auth_callback route in /web/src/routes.js is now redundant?  that should be removed for clarity?",
       "revId": "7fbde17052c1210bc10f539cb1c0327ec9b425b0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b62ebe1e_2befff33",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-06T22:35:53Z",
+      "side": 1,
+      "message": "I thought about that and was on the fence about whether it should be removed or not (something about the router component being complete).  I\u0027ll do that in a followup so the decision can stand on its own.",
+      "parentUuid": "362ae6cc_52dd72cd",
+      "revId": "7fbde17052c1210bc10f539cb1c0327ec9b425b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
