@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "1919045e2678d221757a7b4b19c2c1d8a66d3498",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cd8d158_bcee0ae0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T00:17:05Z",
+      "side": 1,
+      "message": "This looks logical.  My thinking for review was\n\n* all docs and examples updated - yes\n* no old references - no, i grepped on admin-rule and all were updated ...\n* except for one to test backwards compat -- which is done",
+      "revId": "1919045e2678d221757a7b4b19c2c1d8a66d3498",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
