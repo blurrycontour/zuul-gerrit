@@ -67,12 +67,19 @@ def getSpanInfo(span, include_attributes=False):
              for l in span.links]
     attrs = _formatAttributes(span.attributes)
     context = span.get_span_context()
+    parent_context = None
+    if span.parent:
+        parent_context = {
+            **_formatContext(span.parent),
+            "is_remote": span.parent.is_remote,
+        }
     ret = {
         'name': span.name,
         'trace_id': context.trace_id,
         'span_id': context.span_id,
         'trace_flags': context.trace_flags,
         'start_time': span.start_time,
+        'parent': parent_context,
     }
     if links:
         ret['links'] = links
@@ -119,11 +126,18 @@ def restoreSpan(span_info, is_remote=True):
         link = trace.Link(link_context, link_info['attributes'])
         links.append(link)
     attributes = span_info.get('attributes', {})
+    parent_context = None
+    if parent_info := span_info.get("parent"):
+        parent_context = trace.SpanContext(
+            parent_info['trace_id'],
+            parent_info['span_id'],
+            is_remote=parent_info['is_remote'],
+        )
 
     span = ZuulSpan(
         name=span_info['name'],
         context=span_context,
-        parent=None,
+        parent=parent_context,
         sampler=tracer.sampler,
         resource=tracer.resource,
         attributes=attributes,
