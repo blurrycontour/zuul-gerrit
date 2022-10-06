@@ -151,11 +151,7 @@ const routes = () => [
     component: ComponentsPage,
     noTenantPrefix: true,
   },
-  {
-    to: '/auth_callback',
-    component: AuthCallbackPage,
-    noTenantPrefix: true,
-  },
+  // auth_callback is handled in App.jsx
 ]
 
 export { routes }
