@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43650f1e_c0699b6b",
+        "filename": "zuul/lib/tracing.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-06T16:40:52Z",
+      "side": 1,
+      "message": "This is the first assignment expression in Zuul.  :)",
+      "revId": "bbe89422e794afa48f1c9bca117cda072ea0f0f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
