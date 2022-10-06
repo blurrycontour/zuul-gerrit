@@ -4916,7 +4916,7 @@ class QueueItem(zkobject.ZKObject):
             if data:
                 job.setArtifactData(data)
         except RequirementsError as e:
-            self.warning(str(e))
+            self.log.info(str(e))
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
                                   error_detail=str(e), result='FAILURE')
