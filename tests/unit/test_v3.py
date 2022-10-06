@@ -4999,6 +4999,17 @@ class TestDataReturn(AnsibleZuulTestCase):
             A.messages[-1])
         self.assertTrue('Skipped 1 job' in A.messages[-1])
         self.assertIn('Build succeeded', A.messages[-1])
+        connection = self.scheds.first.sched.sql.connection
+        builds = connection.getBuilds()
+        builds.sort(key=lambda x: x.job_name)
+        self.assertEqual(builds[0].job_name, 'child')
+        self.assertEqual(builds[0].error_detail,
+                         'Skipped due to child_jobs return value '
+                         'in job data-return-child-jobs')
+        self.assertEqual(builds[1].job_name, 'data-return')
+        self.assertIsNone(builds[1].error_detail)
+        self.assertEqual(builds[2].job_name, 'data-return-child-jobs')
+        self.assertIsNone(builds[2].error_detail)
 
     def test_data_return_invalid_child_job(self):
         A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')

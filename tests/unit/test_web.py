@@ -1804,6 +1804,11 @@ class TestBuildInfo(BaseTestWeb):
         self.assertEqual(builds[0]['result'], 'FAILURE')
         self.assertEqual(builds[1]['result'], 'SKIPPED')
         self.assertEqual(builds[2]['result'], 'SKIPPED')
+        self.assertIsNone(builds[0]['error_detail'])
+        self.assertEqual(builds[1]['error_detail'],
+                         'Skipped due to failed job project-merge')
+        self.assertEqual(builds[2]['error_detail'],
+                         'Skipped due to failed job project-merge')
 
         builds = self.get_url("api/tenant/tenant-one/builds?"
                               "exclude_result=SKIPPED").json()
