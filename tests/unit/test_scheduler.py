@@ -5788,7 +5788,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual(A.reported, 2)
         self.assertTrue(re.search('project-merge .* NODE_FAILURE',
                                   A.messages[1]))
-        self.assertTrue('Skipped 2 jobs' in A.messages[1])
+        self.assertTrue(
+            'Skipped due to failed job project-merge' in A.messages[1])
 
     def test_nodepool_resources(self):
         "Test that resources are reported"
@@ -6954,7 +6955,7 @@ class TestDependencyGraph(ZuulTestCase):
         self.assertHistory([
             dict(name='build', result='FAILURE', changes='1,1'),
         ], ordered=False)
-        self.assertIn('Skipped 1 job', A.messages[0])
+        self.assertIn('Skipped due to failed job build', A.messages[0])
 
 
 class TestDuplicatePipeline(ZuulTestCase):
