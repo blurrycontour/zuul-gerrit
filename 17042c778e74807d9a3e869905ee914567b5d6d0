@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cdf1563_963054b0",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T00:43:10Z",
+      "side": 0,
+      "message": "done by \"_is_authorized\"",
+      "revId": "17042c778e74807d9a3e869905ee914567b5d6d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "805a0820_2321a5d9",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T00:43:10Z",
+      "side": 0,
+      "message": "Basically, if the claim is\n\n \u0027zuul\u0027: {\n   \u0027admin\u0027: [\u0027tenant1\u0027, \u0027tenant2\u0027]\n }\n \nreturn (tenant1, tenant2) ... otherwise go through the tenant list below and return if you\u0027re authorized for that tenant.\n\nabove, the return is just looking at \"tenant in \u003cthis return value\u003e\"; so agree _is_authorized() on just the tenant in question gets us to the same point.",
+      "revId": "17042c778e74807d9a3e869905ee914567b5d6d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
