@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5485ef89_e870ab56",
+        "filename": "web/src/pages/AuthCallback.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T05:37:50Z",
+      "side": 1,
+      "message": "This is fine, it was all updated in a prior change",
+      "revId": "b28123dd4754053f55d1def95f6c457cad511ed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
