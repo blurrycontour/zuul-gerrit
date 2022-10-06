@@ -480,7 +480,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if item.current_build_set.config_errors:
                     item.setConfigErrors(item.getConfigErrors())
                 if item.dequeued_needing_change:
-                    item.setDequeuedNeedingChange()
+                    item.setDequeuedNeedingChange(item.dequeued_needing_change)
                 if item.dequeued_missing_requirements:
                     item.setDequeuedMissingRequirements()
 
@@ -1508,7 +1508,7 @@ class PipelineManager(metaclass=ABCMeta):
                      "it can no longer merge" % item.change)
             self.cancelJobs(item)
             if item.isBundleFailing():
-                item.setDequeuedBundleFailing()
+                item.setDequeuedBundleFailing('Bundle is failing')
             elif not meets_reqs:
                 item.setDequeuedMissingRequirements()
             else:
@@ -1965,7 +1965,8 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.jobNodeRequestComplete(request.job_name, nodeset)
         # Put a fake build through the cycle to clean it up.
         if not request.fulfilled:
-            build_set.item.setNodeRequestFailure(job)
+            build_set.item.setNodeRequestFailure(
+                job, f'Node request {request.id} failed')
             self._resumeBuilds(build_set)
             tenant = build_set.item.pipeline.tenant
             tenant.semaphore_handler.release(
