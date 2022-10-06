@@ -208,22 +208,25 @@ class BaseMergeServer(metaclass=ABCMeta):
                     if not self._merger_running:
                         break
 
-                    with tracing.startSpanInContext(
-                            merge_request.span_context, "MergerJob",
-                            attributes={"merger": self.hostname}):
-                        self._runMergeJob(merge_request)
+                    self._lockAndRunMergeJob(merge_request)
             except Exception:
                 self.log.exception("Error in merge thread:")
                 time.sleep(5)
                 self.merger_loop_wake_event.set()
 
+    def _lockAndRunMergeJob(self, merge_request):
+        # Lock and update the merge request
+        if not self.merger_api.lock(merge_request, blocking=False):
+            return
+        with tracing.startSpanInContext(
+                merge_request.span_context, "MergerJob",
+                attributes={"merger": self.hostname}):
+            self._runMergeJob(merge_request)
+
     def _runMergeJob(self, merge_request):
         log = get_annotated_logger(
             self.log, merge_request.event_id
         )
-        # Lock and update the merge request
-        if not self.merger_api.lock(merge_request, blocking=False):
-            return
 
         # Ensure that the request is still in state requested. This method is
         # called based on cached data and there might be a mismatch between the
