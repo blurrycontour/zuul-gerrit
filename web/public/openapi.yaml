@@ -283,6 +283,31 @@ paths:
       summary: Get a project public key
       tags:
       - tenant
+  /api/tenant/{tenant}/semaphores:
+    get:
+      operationId: list-semaphores
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: The list of semaphores
+                items:
+                  $ref: '#/components/schemas/semaphore'
+                type: array
+          description: Returns the list of semaphores
+        '404':
+          description: Tenant not found
+      summary: List available semaphores
+      tags:
+      - tenant
   /api/tenant/{tenant}/status:
     get:
       operationId: get-status
@@ -518,6 +543,46 @@ components:
           type: string
         name:
           description: The pipeline name
+          type: string
+      type: object
+    semaphore:
+      description: A semaphore
+      properties:
+        name:
+          description: The semaphore name
+          type: string
+        global:
+          description: Whether the semaphore is global
+          type: boolean
+        max:
+          description: The maximum number of holders
+          type: integer
+        holders:
+          $ref: '#/components/schemas/semaphoreHolders'
+      type: object
+    semaphoreHolders:
+      description: Information about the holders of a semaphore
+      properties:
+        count:
+          description: The number of jobs currently holding this semaphore
+          type: integer
+        this_tenant:
+          description: Holders within this tenant
+          items:
+            $ref: '#/components/schemas/semaphoreHolder'
+          type: array
+        other_tenants:
+          description: The number of jobs in other tenants currently holding this semaphore
+          type: integer
+      type: object
+    semaphoreHolder:
+      description: Information about a holder of a semaphore
+      properties:
+        buildset_uuid:
+          description: The UUID of the job's buildset
+          type: string
+        job_name:
+          description: The name of the job
           type: string
       type: object
     statusJob:

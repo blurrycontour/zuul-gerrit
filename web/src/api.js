@@ -219,6 +219,9 @@ function fetchLabels(apiPrefix) {
 function fetchNodes(apiPrefix) {
   return getWithCorsHandling(apiPrefix + 'nodes')
 }
+function fetchSemaphores(apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'semaphores')
+}
 function fetchAutoholds(apiPrefix) {
   return getWithCorsHandling(apiPrefix + 'autohold')
 }
@@ -366,6 +369,7 @@ export {
   fetchLabels,
   fetchNodes,
   fetchOpenApi,
+  fetchSemaphores,
   fetchTenants,
   fetchInfo,
   fetchComponents,
