@@ -273,7 +273,13 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         for job in item.getJobs():
             build = item.current_build_set.getBuild(job.name)
             (result, url) = item.formatJobResult(job)
-            if result == 'SKIPPED':
+            # If child_jobs is being used to skip jobs, then the user
+            # probably has an expectation that some jobs will be
+            # skipped and doesn't need to see all of them.  Otherwise,
+            # it may be a surprise and it may be better to include the
+            # job in the report.
+            if (build.error_detail and
+                'Skipped due to child_jobs' in build.error_detail):
                 skipped += 1
                 continue
             if not job.voting:

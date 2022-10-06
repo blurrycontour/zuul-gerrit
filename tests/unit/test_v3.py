@@ -6981,7 +6981,7 @@ class TestJobPause(AnsibleZuulTestCase):
             dict(name='compile', result='SUCCESS', changes='1,1'),
         ])
 
-        self.assertTrue('Skipped 1 job' in A.messages[0])
+        self.assertTrue('Skipped due to failed job pre-test' in A.messages[0])
 
     def test_job_pause_pre_skipped_child(self):
         """
@@ -7029,7 +7029,7 @@ class TestJobPause(AnsibleZuulTestCase):
             dict(name='compile', result='SUCCESS', changes='1,1'),
         ])
 
-        self.assertTrue('Skipped 1 job' in A.messages[0])
+        self.assertTrue('Skipped due to failed job pre-test' in A.messages[0])
 
     def test_job_pause_skipped_child_retry(self):
         """
@@ -7876,12 +7876,12 @@ class TestProvidesRequiresMysql(ZuulTestCase):
         self.assertEqual(
             B.messages[0].count(
                 'Job image-user requires artifact(s) images'),
-            2,
+            1,
             B.messages[0])
         self.assertEqual(
             B.messages[0].count(
                 'Job library-user requires artifact(s) libraries'),
-            2,
+            1,
             B.messages[0])
 
     @simple_layout('layouts/provides-requires-single-project.yaml')
@@ -7898,7 +7898,8 @@ class TestProvidesRequiresMysql(ZuulTestCase):
             dict(name='image-builder', result='FAILURE', changes='1,1'),
             dict(name='hold', result='SUCCESS', changes='1,1'),
         ], ordered=False)
-        self.assertTrue('Skipped 1 job' in A.messages[0])
+        self.assertTrue(
+            'Skipped due to failed job image-builder' in A.messages[0])
 
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
         B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
@@ -7916,7 +7917,7 @@ class TestProvidesRequiresMysql(ZuulTestCase):
         self.assertEqual(
             B.messages[0].count(
                 'Job image-user requires artifact(s) images'),
-            2, B.messages[0])
+            1, B.messages[0])
 
 
 class TestProvidesRequiresPostgres(TestProvidesRequiresMysql):
