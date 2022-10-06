@@ -16,7 +16,6 @@
 # under the License.
 
 import signal
-import sys
 
 import zuul.cmd
 import zuul.merger.server
@@ -34,7 +33,6 @@ class Merger(zuul.cmd.ZuulDaemonApp):
     def exit_handler(self, signum, frame):
         self.merger.stop()
         self.merger.join()
-        sys.exit(0)
 
     def run(self):
         self.handleCommands()

@@ -76,7 +76,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
     def exit_handler(self, signum, frame):
         self.sched.stop()
         self.sched.join()
-        sys.exit(0)
 
     def run(self):
         self.handleCommands()
