@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c09ea3ba_d8f21ffd",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2617,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T03:02:18Z",
+      "side": 1,
+      "message": "this seems a bit weird at first glance but model.py is ensuring this list never gets more than one entry (per the docs that it should only be set once)",
+      "revId": "ff38d5ab679bf2082c0605f1d95bbf7f82e7d915",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
