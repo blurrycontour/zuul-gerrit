@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1a3438d3_28e48adf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-06T21:51:15Z",
+      "side": 1,
+      "message": "\u003e Patch Set 5:\n\u003e \n\u003e Instead of updating the methods, how about updating the route dispatcher?\n\nAfter thinking about this; I think this doesn\u0027t achieve quite what this is going for.  Setting up a conditional match in the route dispatcher [1] will just mean that the request doesn\u0027t match and doesn\u0027t trigger the handling function call, and falls through to a 404.  What this is going for is actually matching the request, but if it has an unsupported method rejecting it with a 405\n\n[1] https://routes.readthedocs.io/en/latest/setting_up.html#conditions",
+      "revId": "9f001017dd0f96ec5afe6eb033c5d7d6cdac0c97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1ad2efa0_cfe300fd",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 5
