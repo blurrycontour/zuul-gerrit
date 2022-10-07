@@ -300,6 +300,15 @@ pre.version {
 }
 
 /* Console */
+/* NOTE(ianw) 2022-09-19 : The !important on a few items below is
+ * probably not required after CSS ordering fixes merge to
+ *  https://github.com/patternfly/patternfly-react/issues/7960
+ * We can probably pull these out after we upgrade past that.
+ */
+
+.zuul-console-task-failed {
+    background-color: var(--pf-global--palette--red-50) !important;
+}
 
 .zuul-console .pf-c-data-list__expandable-content {
     border: none;

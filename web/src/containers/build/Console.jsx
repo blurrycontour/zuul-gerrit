@@ -289,7 +289,9 @@ class HostTask extends React.Component {
 
     let item = null
     if (interestingKeys) {
-      item = <DataListItem isExpanded={this.state.expanded}>
+      item = <DataListItem
+               isExpanded={this.state.expanded}
+               className={this.state.failed ? 'zuul-console-task-failed' : ''}>
                <DataListItemRow>
                  <DataListToggle
                    onClick={() => {this.setState({expanded: !this.state.expanded})}}
