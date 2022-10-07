@@ -195,11 +195,11 @@ class TestTracing(ZuulTestCase):
         self.log.debug("Received:\n%s", merge_job)
         build = self.getSpan('Build')
         self.log.debug("Received:\n%s", build)
-        job = self.getSpan('JobExecution')
-        self.log.debug("Received:\n%s", job)
+        jobexec = self.getSpan('JobExecution')
+        self.log.debug("Received:\n%s", jobexec)
         self.assertEqual(item.trace_id, buildset.trace_id)
         self.assertEqual(item.trace_id, build.trace_id)
-        self.assertNotEqual(item.span_id, job.span_id)
+        self.assertNotEqual(item.span_id, jobexec.span_id)
         self.assertTrue(buildset.start_time_unix_nano >=
                         item.start_time_unix_nano)
         self.assertTrue(buildset.end_time_unix_nano <=
@@ -208,6 +208,14 @@ class TestTracing(ZuulTestCase):
                         buildset.start_time_unix_nano)
         self.assertTrue(merge_job.end_time_unix_nano <=
                         buildset.end_time_unix_nano)
+        self.assertEqual(jobexec.parent_span_id,
+                         build.span_id)
+        self.assertEqual(build.parent_span_id,
+                         buildset.span_id)
+        self.assertEqual(merge_job.parent_span_id,
+                         buildset.span_id)
+        self.assertEqual(buildset.parent_span_id,
+                         item.span_id)
         item_attrs = attributes_to_dict(item.attributes)
         self.assertTrue(item_attrs['ref_number'] == "1")
         self.assertTrue(item_attrs['ref_patchset'] == "1")
