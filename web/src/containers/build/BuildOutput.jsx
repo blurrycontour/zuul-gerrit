@@ -26,6 +26,7 @@ import {
   DataListItemRow,
   DataListItemCells,
   DataListCell,
+  Divider,
   Label,
   Flex,
   FlexItem,
@@ -34,10 +35,40 @@ import {
 import {
   CheckCircleIcon,
   ContainerNodeIcon,
-  InfoCircleIcon,
   TimesIcon,
   TimesCircleIcon,
 } from '@patternfly/react-icons'
+
+class BuildOutputLabel extends React.Component {
+  static propTypes = {
+    ok: PropTypes.number,
+    changed: PropTypes.number,
+    failures: PropTypes.number,
+  }
+
+  render() {
+    let color = this.props.failures ? 'red' : 'green'
+    let icon = this.props.failures ? <TimesCircleIcon /> : <CheckCircleIcon />
+    let failures = this.props.failures ? (
+      <>
+        <Divider orientation={{default: 'vertical'}} />
+        <FlexItem><strong>{this.props.failures}</strong> Failure{this.props.failures > 1 ? 's' : ''}</FlexItem>
+      </>
+    ) : null
+
+    return (
+      <Label color={color} icon={icon}>
+        <Flex>
+          <FlexItem><strong>{this.props.ok}</strong> OK</FlexItem>
+          <Divider orientation={{default: 'vertical'}} />
+          <FlexItem><strong>{this.props.changed}</strong> Changed</FlexItem>
+          { failures }
+        </Flex>
+      </Label>
+    )
+  }
+}
+
 
 class BuildOutput extends React.Component {
   static propTypes = {
@@ -63,17 +94,7 @@ class BuildOutput extends React.Component {
                         </Chip>
                       </DataListCell>,
                       <DataListCell key={host + '.data'} >
-                        <Flex>
-                          <FlexItem>
-                            <Label color="green" icon={<CheckCircleIcon />}>{values.ok} OK</Label>
-                          </FlexItem>
-                          <FlexItem>
-                            <Label color="orange" icon={<InfoCircleIcon />}>{values.changed} changed</Label>
-                          </FlexItem>
-                          <FlexItem>
-                            <Label color="red" icon={<TimesCircleIcon />}>{values.failures} failed</Label>
-                          </FlexItem>
-                        </Flex>
+                        <BuildOutputLabel ok={values.ok} changed={values.changed} failures={values.failures} />
                       </DataListCell>
                     ]}
                   />
