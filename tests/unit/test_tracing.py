@@ -193,11 +193,14 @@ class TestTracing(ZuulTestCase):
         self.log.debug("Received:\n%s", item)
         merge_job = self.getSpan('Merge')
         self.log.debug("Received:\n%s", merge_job)
+        node_request = self.getSpan('RequestNodes')
+        self.log.debug("Received:\n%s", node_request)
         build = self.getSpan('Build')
         self.log.debug("Received:\n%s", build)
         jobexec = self.getSpan('JobExecution')
         self.log.debug("Received:\n%s", jobexec)
         self.assertEqual(item.trace_id, buildset.trace_id)
+        self.assertEqual(item.trace_id, node_request.trace_id)
         self.assertEqual(item.trace_id, build.trace_id)
         self.assertNotEqual(item.span_id, jobexec.span_id)
         self.assertTrue(buildset.start_time_unix_nano >=
@@ -210,6 +213,8 @@ class TestTracing(ZuulTestCase):
                         buildset.end_time_unix_nano)
         self.assertEqual(jobexec.parent_span_id,
                          build.span_id)
+        self.assertEqual(node_request.parent_span_id,
+                         buildset.span_id)
         self.assertEqual(build.parent_span_id,
                          buildset.span_id)
         self.assertEqual(merge_job.parent_span_id,
