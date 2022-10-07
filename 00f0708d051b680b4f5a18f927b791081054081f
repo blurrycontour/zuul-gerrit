@@ -33,6 +33,23 @@
       "message": "self-approving this as trivial as it\u0027s just a comment clarification",
       "revId": "00f0708d051b680b4f5a18f927b791081054081f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22eecb26_3890ef96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-10-07T03:34:05Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "00f0708d051b680b4f5a18f927b791081054081f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
