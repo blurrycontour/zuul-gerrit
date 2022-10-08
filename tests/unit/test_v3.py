@@ -2232,6 +2232,64 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('appears multiple times', A.messages[0],
                       "A should have a syntax error reported")
 
+    def test_group_in_job_with_invalid_node(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test job
+                nodeset:
+                  nodes: []
+                  groups:
+                    - name: a_group
+                      nodes:
+                       - a_node_that_does_not_exist
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertIn('which is not defined in the nodeset', A.messages[0],
+                      "A should have a syntax error reported")
+
+    def test_duplicate_group_in_job(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test job
+                nodeset:
+                  nodes:
+                   - name: controller
+                     label: ubuntu-focal
+                  groups:
+                    - name: a_duplicate_group
+                      nodes:
+                       - controller
+                    - name: a_duplicate_group
+                      nodes:
+                       - controller
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertIn(
+            'Group names must be unique within a nodeset.',
+            A.messages[0], "A should have a syntax error reported")
+
     def test_secret_not_found_error(self):
         in_repo_conf = textwrap.dedent(
             """

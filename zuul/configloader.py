@@ -81,7 +81,7 @@ class ConfigurationSyntaxError(Exception):
 class NodeFromGroupNotFoundError(Exception):
     def __init__(self, nodeset, node, group):
         message = textwrap.dedent("""\
-        In nodeset "{nodeset}" the group "{group}" contains a
+        In {nodeset} the group "{group}" contains a
         node named "{node}" which is not defined in the nodeset.""")
         message = textwrap.fill(message.format(nodeset=nodeset,
                                                node=node, group=group))
@@ -137,7 +137,7 @@ class MaxTimeoutError(Exception):
 class DuplicateGroupError(Exception):
     def __init__(self, nodeset, group):
         message = textwrap.dedent("""\
-        In nodeset "{nodeset}" the group "{group}" appears multiple times.
+        In {nodeset} the group "{group}" appears multiple times.
         Group names must be unique within a nodeset.""")
         message = textwrap.fill(message.format(nodeset=nodeset,
                                                group=group))
@@ -476,6 +476,7 @@ class NodeSetParser(object):
     def __init__(self, pcontext):
         self.log = logging.getLogger("zuul.NodeSetParser")
         self.pcontext = pcontext
+        self.anonymous = False
         self.schema = self.getSchema(False)
         self.anon_schema = self.getSchema(True)
 
@@ -513,6 +514,7 @@ class NodeSetParser(object):
     def fromYaml(self, conf, anonymous=False):
         if anonymous:
             self.anon_schema(conf)
+            self.anonymous = True
         else:
             self.schema(conf)
 
@@ -565,10 +567,14 @@ class NodeSetParser(object):
                 raise Exception("Groups named 'localhost' are not allowed.")
             for node_name in as_list(conf_group['nodes']):
                 if node_name not in node_names:
-                    raise NodeFromGroupNotFoundError(conf['name'], node_name,
+                    nodeset_str = 'the nodeset' if self.anonymous else \
+                        'the nodeset "%s"' % conf['name']
+                    raise NodeFromGroupNotFoundError(nodeset_str, node_name,
                                                      conf_group['name'])
             if conf_group['name'] in group_names:
-                raise DuplicateGroupError(conf['name'], conf_group['name'])
+                nodeset_str = 'the nodeset' if self.anonymous else \
+                    'the nodeset "%s"' % conf['name']
+                raise DuplicateGroupError(nodeset_str, conf_group['name'])
             group = model.Group(conf_group['name'],
                                 as_list(conf_group['nodes']))
             ns.addGroup(group)
