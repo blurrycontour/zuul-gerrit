@@ -500,13 +500,13 @@ enqueued into the pipeline.
 
       .. attr:: username
 
-         If present, a code review from this username is required.  It
-         is treated as a regular expression.
+         If present, a code review from this username matches.  It is
+         treated as a regular expression.
 
       .. attr:: email
 
-         If present, a code review with this email address is
-         required.  It is treated as a regular expression.
+         If present, a code review with this email address matches.
+         It is treated as a regular expression.
 
       .. attr:: older-than
 
@@ -529,8 +529,8 @@ enqueued into the pipeline.
       .. attr:: permission
 
          If present, the author of the code review must have this
-         permission (or permissions).  The available values are
-         ``read``, ``write``, and ``admin``.
+         permission (or permissions) to match.  The available values
+         are ``read``, ``write``, and ``admin``.
 
    .. attr:: open
 
@@ -565,7 +565,7 @@ enqueued into the pipeline.
 
       Zuul does not differentiate between a status reported via
       status API or via checks API (which is also how Github behaves
-      in terms of branch protection and `status checks`__).
+      in terms of branch protection and `status checks`_).
       Thus, the status could be reported by a
       :attr:`pipeline.<reporter>.<github source>.status` or a
       :attr:`pipeline.<reporter>.<github source>.check`.
@@ -576,8 +576,6 @@ enqueued into the pipeline.
       status reported via the checks API, the app's slug will be
       used as is.
 
-   .. __: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-status-checks#types-of-status-checks-on-github
-
    .. attr:: label
 
       A string value indicating that the pull request must have the
@@ -585,16 +583,101 @@ enqueued into the pipeline.
 
 .. attr:: pipeline.reject.<github source>
 
-   The `reject` attribute is the mirror of the `require` attribute.  It
-   also accepts a dictionary under the connection name.  This
-   dictionary supports the following attributes:
+   The `reject` attribute is the mirror of the `require` attribute and
+   is used to specify pull requests which should not be enqueued into
+   a pipeline.  It accepts a dictionary under the connection name and
+   with the following attributes:
 
    .. attr:: review
 
-      This takes a list of code reviews.  If a code review matches the
-      provided criteria the pull request can not be entered into the
-      pipeline.  It follows the same syntax as
-      :attr:`pipeline.require.<github source>.review`
+      This requires that a certain kind of code review be absent for
+      the pull request (it could be removed by the event in question).
+      It takes several sub-parameters, all of which are optional and
+      are combined together so that there must not be a code review
+      matching all specified requirements.
+
+      .. attr:: username
+
+         If present, a code review from this username matches.  It is
+         treated as a regular expression.
+
+      .. attr:: email
+
+         If present, a code review with this email address matches.
+         It is treated as a regular expression.
+
+      .. attr:: older-than
+
+         If present, the code review must be older than this amount of
+         time to match.  Provide a time interval as a number with a
+         suffix of "w" (weeks), "d" (days), "h" (hours), "m"
+         (minutes), "s" (seconds).  Example ``48h`` or ``2d``.
+
+      .. attr:: newer-than
+
+         If present, the code review must be newer than this amount of
+         time to match.  Same format as "older-than".
+
+      .. attr:: type
+
+         If present, the code review must match this type (or types).
+
+         .. TODO: what types are valid?
+
+      .. attr:: permission
+
+         If present, the author of the code review must have this
+         permission (or permissions) to match.  The available values
+         are ``read``, ``write``, and ``admin``.
+
+   .. attr:: open
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the change must be open or closed in order to be rejected.
+
+   .. attr:: merged
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the change must be merged or not in order to be rejected.
+
+   .. attr:: current-patchset
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the item must be associated with the latest commit in the pull
+      request in order to be rejected.
+
+      .. TODO: this could probably be expanded upon -- under what
+         circumstances might this happen with github
+
+   .. attr:: draft
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      or not the change must be marked as a draft in GitHub in order
+      to be rejected.
+
+   .. attr:: status
+
+      A string value that corresponds with the status of the pull
+      request.  The syntax is ``user:status:value``. This can also
+      be a regular expression.
+
+      Zuul does not differentiate between a status reported via
+      status API or via checks API (which is also how Github behaves
+      in terms of branch protection and `status checks`_).
+      Thus, the status could be reported by a
+      :attr:`pipeline.<reporter>.<github source>.status` or a
+      :attr:`pipeline.<reporter>.<github source>.check`.
+
+      When a status is reported via the status API, Github will add
+      a ``[bot]`` to the name of the app that reported the status,
+      resulting in something like ``user[bot]:status:value``. For a
+      status reported via the checks API, the app's slug will be
+      used as is.
+
+   .. attr:: label
+
+      A string value indicating that the pull request must not have
+      the indicated label (or labels).
 
 Reference pipelines configuration
 ---------------------------------
