@@ -84,6 +84,10 @@ class Nodepool(object):
             del self.election
 
     def _sendNodesProvisionedEvent(self, request):
+        tracing.endSavedSpan(request.span_info, attributes={
+            "request_id": request.id,
+            "state": request.state,
+        })
         tenant_name = request.tenant_name
         pipeline_name = request.pipeline_name
         event = model.NodesProvisionedEvent(request.id, request.build_set_uuid)
@@ -101,10 +105,6 @@ class Nodepool(object):
                     continue
                 if (request.state in {model.STATE_FULFILLED,
                                       model.STATE_FAILED}):
-                    tracing.endSavedSpan(request.span_info, attributes={
-                        "request_id": request.id,
-                        "state": request.state,
-                    })
                     self._sendNodesProvisionedEvent(request)
             # Now resume normal event processing.
             self.stop_watcher_event.wait()
