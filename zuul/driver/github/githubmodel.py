@@ -455,11 +455,12 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
 
 
 class GithubRefFilter(RefFilter, GithubCommonFilter):
-    def __init__(self, connection_name, statuses=[], required_reviews=[],
-                 reject_reviews=[], open=None, merged=None,
-                 current_patchset=None, reject_open=None, reject_merged=None,
-                 reject_current_patchset=None, labels=[], reject_labels=[],
-                 reject_statuses=[]):
+    def __init__(self, connection_name, statuses=[],
+                 required_reviews=[], reject_reviews=[], open=None,
+                 merged=None, current_patchset=None, draft=None,
+                 reject_open=None, reject_merged=None,
+                 reject_current_patchset=None, reject_draft=None,
+                 labels=[], reject_labels=[], reject_statuses=[]):
         RefFilter.__init__(self, connection_name)
 
         GithubCommonFilter.__init__(self, required_reviews=required_reviews,
@@ -479,6 +480,10 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
             self.current_patchset = not reject_current_patchset
         else:
             self.current_patchset = current_patchset
+        if reject_draft is not None:
+            self.draft = not reject_draft
+        else:
+            self.draft = draft
         self.labels = labels
         self.reject_labels = reject_labels
 
@@ -496,12 +501,14 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
         if self.reject_reviews:
             ret += (' reject-reviews: %s' %
                     str(self.reject_reviews))
-        if self.open:
+        if self.open is not None:
             ret += ' open: %s' % self.open
-        if self.merged:
+        if self.merged is not None:
             ret += ' merged: %s' % self.merged
-        if self.current_patchset:
+        if self.current_patchset is not None:
             ret += ' current-patchset: %s' % self.current_patchset
+        if self.draft is not None:
+            ret += ' draft: %s' % self.draft
         if self.labels:
             ret += ' labels: %s' % self.labels
         if self.reject_labels:
@@ -521,7 +528,8 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.open != change.open:
-                    return FalseWithReason("Change is not a PR")
+                    return FalseWithReason(
+                        "Change does not match open requirement")
             else:
                 return FalseWithReason("Change is not a PR")
 
@@ -530,7 +538,8 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.merged != change.is_merged:
-                    return FalseWithReason("Change is not a PR")
+                    return FalseWithReason(
+                        "Change does not match merged requirement")
             else:
                 return FalseWithReason("Change is not a PR")
 
@@ -539,7 +548,18 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
             # and cannot possibly pass this test.
             if hasattr(change, 'number'):
                 if self.current_patchset != change.is_current_patchset:
-                    return FalseWithReason("Change is not current")
+                    return FalseWithReason(
+                        "Change does not match current-patchset requirement")
+            else:
+                return FalseWithReason("Change is not a PR")
+
+        if self.draft is not None:
+            # if a "change" has no number, it's not a change, but a push
+            # and cannot possibly pass this test.
+            if hasattr(change, 'number'):
+                if self.draft != change.draft:
+                    return FalseWithReason(
+                        "Change does not match draft requirement")
             else:
                 return FalseWithReason("Change is not a PR")
 
