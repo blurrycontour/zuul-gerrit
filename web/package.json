@@ -48,18 +48,21 @@
     "nanoid": "2.1.11"
   },
   "devDependencies": {
+    "customize-cra": "^1.0.0",
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-standard": "^4.0.1",
+    "react-app-rewired": "^2.2.1",
+    "react-app-rewired-esbuild": "^0.0.11",
     "yarn": "^1.16.0"
   },
   "scripts": {
-    "start:opendev": "REACT_APP_ZUUL_API='https://zuul.opendev.org/api/' react-scripts start",
-    "start:openstack": "REACT_APP_ZUUL_API='https://zuul.openstack.org/api/' react-scripts start",
-    "start:multi": "REACT_APP_ZUUL_API='https://softwarefactory-project.io/zuul/api/' react-scripts start",
-    "start": "react-scripts start",
-    "build": "react-scripts --max_old_space_size=4096 build",
-    "test": "react-scripts test --env=jsdom --watchAll=false",
+    "start:opendev": "REACT_APP_ZUUL_API='https://zuul.opendev.org/api/' react-app-rewired start",
+    "start:openstack": "REACT_APP_ZUUL_API='https://zuul.openstack.org/api/' react-app-rewired start",
+    "start:multi": "REACT_APP_ZUUL_API='https://softwarefactory-project.io/zuul/api/' react-app-rewired start",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired --max_old_space_size=4096 build",
+    "test": "react-app-rewired test --env=jsdom --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js --ext .jsx src",
     "lint-fix": "eslint --ext .js --ext .jsx --fix src"
