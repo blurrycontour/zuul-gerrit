@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cdc11ad_e5809ace",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6981,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-11T23:11:25Z",
+      "side": 1,
+      "message": "Can we add the skip of the test job to this assertion as well? We should record that in the DB so it should also be in the test framework history tracking? A number of similar assertions in this file and the other file could be modified as well if so.",
+      "revId": "4f97f953b37464306822d926474b15fb14d455f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ac147e6_3cdc5610",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4919,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-11T23:11:25Z",
+      "side": 1,
+      "message": "Was this change to info intentional? Using self.log makes sense but not sure if you wanted to keep the same level or not.",
+      "revId": "4f97f953b37464306822d926474b15fb14d455f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
