@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "625d2735_57c54c7a",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-11T22:50:22Z",
+      "side": 1,
+      "message": "What is the purpose of this second filter? According to the mozilla dev docs build is the current element, idx is the index of that element and self is the array we were called on. Doesn\u0027t that mean self.indexOf(build) \u003d\u003d\u003d idx is always true?",
+      "revId": "0738d31b08605c406da90009cb3e4792f2bdf029",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
