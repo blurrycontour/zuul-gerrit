@@ -92,7 +92,7 @@ not usually a problem, but on a static node these files will persist.
 
 In this situation, , Zuul can be instructed to not to create any spool
 files for ``shell`` and ``command`` tasks via setting
-``zuul_console_disable: True`` (usually via a global host variable in
+``zuul_console_disabled: True`` (usually via a global host variable in
 inventory).  Live streaming of ``shell`` and ``command`` calls will of
 course be unavailable in this case, but no spool files will be
 created.
