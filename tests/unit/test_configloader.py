@@ -27,7 +27,7 @@ from zuul.configloader import (
 from zuul.model import Abide, MergeRequest, SourceContext
 from zuul.zk.locks import tenant_read_lock
 
-from tests.base import iterate_timeout, ZuulTestCase
+from tests.base import iterate_timeout, ZuulTestCase, simple_layout
 
 
 class TestConfigLoader(ZuulTestCase):
@@ -1211,3 +1211,35 @@ class TestTenantDuplicate(TenantParserTestCase):
     def test_tenant_dupe(self):
         # The magic is in setUp
         pass
+
+
+class TestMergeMode(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+
+    def _test_default_merge_mode(self, driver_default, host):
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata(
+            f'{host}/org/project-empty')
+        self.assertEqual(driver_default, md.merge_mode)
+        md = layout.getProjectMetadata(
+            f'{host}/org/regex-empty-project-empty')
+        self.assertEqual(driver_default, md.merge_mode)
+        md = layout.getProjectMetadata(
+            f'{host}/org/regex-empty-project-squash')
+        self.assertEqual(model.MERGER_SQUASH_MERGE, md.merge_mode)
+        md = layout.getProjectMetadata(
+            f'{host}/org/regex-cherry-project-empty')
+        self.assertEqual(model.MERGER_CHERRY_PICK, md.merge_mode)
+        md = layout.getProjectMetadata(
+            f'{host}/org/regex-cherry-project-squash')
+        self.assertEqual(model.MERGER_SQUASH_MERGE, md.merge_mode)
+
+    @simple_layout('layouts/merge-mode-default.yaml')
+    def test_default_merge_mode_gerrit(self):
+        self._test_default_merge_mode(model.MERGER_MERGE_RESOLVE,
+                                      'review.example.com')
+
+    @simple_layout('layouts/merge-mode-default.yaml', driver='github')
+    def test_default_merge_mode_github(self):
+        self._test_default_merge_mode(model.MERGER_MERGE,
+                                      'github.com')
