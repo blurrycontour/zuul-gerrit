@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ffe8981_199715ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-11T13:57:36Z",
+      "side": 1,
+      "message": "If I understood everything correctly, I\u0027m fine with this. I\u0027m just thinking if it would make sense to also use \"authorization_rules\" within the Python code rather than \"authz_rules\". I often find the written-out form (is it called like that?) more speakable than the abbreviation. This is only my opinion, so no blocker.",
+      "revId": "3a0eaa1ffea1a32d4f11864485f2883194a99354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72def74b_7f5061b5",
+        "filename": "releasenotes/notes/authz-rule-55a6db54340f2e08.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-11T13:57:36Z",
+      "side": 1,
+      "message": "Just for my understanding on the difference between admin-rule and authorization-rule:\nThe admin-rule in the tenant configuration was renamed to authorization-rule because it is used to validate that a user is authorized depending on whatever criteria are specified by this rule. The tenant attribute on the other hand is still called admin-rule because it really tells that the linked authorization-rule will enable admin access to the tenant. We did that split to allow further levels of authorization on for a tenant (let\u0027s call it something like a \"moderator\" or some kind of \"privileged user\" for a tenant). Did I understand that correctly?",
+      "revId": "3a0eaa1ffea1a32d4f11864485f2883194a99354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76f2c622_3ac4c2f6",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 7930,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-11T13:57:36Z",
+      "side": 1,
+      "message": "In the Python code it looks like admin_rules and authorization_rules are just exchanged (so one becomes the other), but I assume this is more like a cleanup step to align on the new values.",
+      "revId": "3a0eaa1ffea1a32d4f11864485f2883194a99354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
