@@ -22,7 +22,9 @@ function ProjectVariant(props) {
   const { tenant, variant } = props
   const rows = []
 
-  rows.push({label: 'Merge mode', value: variant.merge_mode})
+  if (variant.merge_mode) {
+    rows.push({label: 'Merge mode', value: variant.merge_mode})
+  }
 
   if (variant.templates.length > 0) {
     const templateList = (
