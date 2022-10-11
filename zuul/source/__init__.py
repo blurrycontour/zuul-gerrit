@@ -144,6 +144,16 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
 
+    def getProjectDefaultMergeMode(self, project):
+        """Return the default merge mode for this project.
+
+        If users do not specify the merge mode for a project, this
+        mode will be used.  It may be a driver-specific default,
+        or the driver may use data from the remote system to provide
+        a project-specific default.
+        """
+        return 'merge'
+
     @abc.abstractmethod
     def getGitUrl(self, project):
         """Get the git url for a project."""
