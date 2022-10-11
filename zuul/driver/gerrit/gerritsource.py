@@ -186,6 +186,12 @@ class GerritSource(BaseSource):
     def getProjectOpenChanges(self, project):
         return self.connection.getProjectOpenChanges(project)
 
+    def getProjectDefaultMergeMode(self, project):
+        # The gerrit jgit merge operation is most closely approximated
+        # by "git merge -s resolve", so we return that as the default
+        # for the Gerrit driver.
+        return 'merge-resolve'
+
     def getProjectBranches(self, project, tenant, min_ltime=-1):
         return self.connection.getProjectBranches(project, tenant, min_ltime)
 
