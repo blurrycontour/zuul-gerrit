@@ -39,7 +39,7 @@ then
     # Avoid writing yarn into package.json.
     npm install -g --no-package-lock --no-save yarn
 fi
-if [[ ! -f zuul/web/static/status.html ]]
+if [[ ! -f zuul/web/static/index.html ]]
 then
     mkdir -p zuul/web/static
     ln -sfn ../zuul/web/static web/build
