@@ -844,6 +844,11 @@ class TestWeb(BaseTestWeb):
                 'canonical_name': 'review.example.com/org/project1',
                 'connection_name': 'gerrit',
                 'name': 'org/project1',
+                'metadata': {
+                    'default_branch': 'master',
+                    'merge_mode': 'merge-resolve',
+                    'queue_name': 'integrated',
+                },
                 'configs': [{
                     'source_context': {'branch': 'master',
                                        'path': 'zuul.yaml',
@@ -851,7 +856,7 @@ class TestWeb(BaseTestWeb):
                     'templates': [],
                     'default_branch': 'master',
                     'queue_name': 'integrated',
-                    'merge_mode': 'merge-resolve',
+                    'merge_mode': None,
                     'pipelines': [{
                         'name': 'check',
                         'jobs': jobs,
