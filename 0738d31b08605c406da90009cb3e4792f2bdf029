@@ -16,6 +16,23 @@
       "message": "What is the purpose of this second filter? According to the mozilla dev docs build is the current element, idx is the index of that element and self is the array we were called on. Doesn\u0027t that mean self.indexOf(build) \u003d\u003d\u003d idx is always true?",
       "revId": "0738d31b08605c406da90009cb3e4792f2bdf029",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62ffff32_2bb665ae",
+        "filename": "web/src/containers/build/BuildList.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-11T23:02:56Z",
+      "side": 1,
+      "message": "I copied the above cantrip to try to keep the cognitive load down since it\u0027s doing the exact same thing as above.  I agree with your analysis.",
+      "revId": "0738d31b08605c406da90009cb3e4792f2bdf029",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
