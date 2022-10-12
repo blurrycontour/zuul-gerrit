@@ -367,15 +367,17 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping nodepool")
         self.nodepool.stop()
         self.log.debug("Stopping connections")
-        # Connections may be waiting on the primed event
+        # Connections and layout update may be waiting on the primed event
         self.primed_event.set()
+        # Layout update can reconfigure connections, so make sure
+        # layout update is stopped first.
+        self.log.debug("Waiting for layout update thread")
+        self.layout_update_event.set()
+        self.layout_update_thread.join()
         self.stopConnections()
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
-        self.log.debug("Waiting for layout update thread")
-        self.layout_update_event.set()
-        self.layout_update_thread.join()
         self.stopRepl()
         self._command_running = False
         self.log.debug("Stopping command socket")
