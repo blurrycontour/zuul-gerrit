@@ -36,6 +36,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe974c3e_1099f670",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-12T07:42:31Z",
+      "side": 1,
+      "message": "Thanks for the explanation 😊",
+      "revId": "3a0eaa1ffea1a32d4f11864485f2883194a99354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72def74b_7f5061b5",
