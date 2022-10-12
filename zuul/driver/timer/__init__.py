@@ -39,6 +39,7 @@ class TimerDriver(Driver, TriggerInterface):
     tracer = trace.get_tracer("zuul")
 
     def __init__(self):
+        self.log.debug("Starting apscheduler")
         self.apsched = BackgroundScheduler()
         self.apsched.start()
         self.tenant_jobs = {}
@@ -62,12 +63,14 @@ class TimerDriver(Driver, TriggerInterface):
         self.election_thread.start()
 
     def _runElection(self):
+        self.log.debug("Starting timer election loop")
         while not self.stopped:
             try:
                 self.log.info("Running timer election")
                 self.election.run(self._electionInner)
             except Exception:
                 self.log.exception("Error in timer election:")
+        self.log.debug("Exiting timer election loop")
 
     def _electionInner(self):
         try:
@@ -77,11 +80,13 @@ class TimerDriver(Driver, TriggerInterface):
         finally:
             self.election_won = False
             self.stop_event.clear()
+            self.log.debug("Timer election tenure ended")
 
     def reconfigure(self, tenant):
         self._removeJobs(tenant)
         if not self.apsched:
             # Handle possible reuse of the driver without connection objects.
+            self.log.debug("Starting apscheduler on reconfigure")
             self.apsched = BackgroundScheduler()
             self.apsched.start()
         self._addJobs(tenant)
@@ -220,15 +225,23 @@ class TimerDriver(Driver, TriggerInterface):
                                tenant, project_name, branch)
 
     def stop(self):
+        self.log.debug("Stopping timer driver")
         self.stopped = True
         self.stop_event.set()
         if self.apsched:
+            self.log.debug("Stopping apscheduler")
             self.apsched.shutdown()
             self.apsched = None
+            self.log.debug("Stopped apscheduler")
         if self.election:
+            self.log.debug("Stopping election")
             self.election.cancel()
+            self.log.debug("Stopped election")
         if self.election_thread:
+            self.log.debug("Stopping election thread")
             self.election_thread.join()
+            self.log.debug("Stopped election thread")
+        self.log.debug("Stopped timer driver")
 
     def getTrigger(self, connection_name, config=None):
         return timertrigger.TimerTrigger(self, config)
