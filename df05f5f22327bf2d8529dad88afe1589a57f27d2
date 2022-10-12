@@ -16,6 +16,23 @@
       "message": "Why do we need a list here? Wouldn\u0027t a single api_root be sufficient?",
       "revId": "df05f5f22327bf2d8529dad88afe1589a57f27d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f00af94_b4ab0ee9",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 7125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-12T15:04:42Z",
+      "side": 1,
+      "message": "Because all zuul configuration files are lists of items, so it\u0027s possible for any number of api-root objects to be in the file.  This data structure is used to store the raw data frome the file.  We do raise an exception if the user writes more than one, but we need to store the raw data here in order to do that.",
+      "revId": "df05f5f22327bf2d8529dad88afe1589a57f27d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
