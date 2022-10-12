@@ -3964,11 +3964,6 @@ class FunctionalAnsibleMixIn(object):
                           output)
 
 
-class TestAnsible5(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
-    tenant_config_file = 'config/ansible/main5.yaml'
-    ansible_major_minor = '2.12'
-
-
 class TestAnsible6(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
     tenant_config_file = 'config/ansible/main6.yaml'
     ansible_major_minor = '2.13'
@@ -8064,7 +8059,6 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
 
         self.assertHistory([
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
-            dict(name='ansible-5', result='SUCCESS', changes='1,1'),
             dict(name='ansible-6', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
@@ -8084,7 +8078,6 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='ansible-default-zuul-conf', result='SUCCESS',
                  changes='1,1'),
-            dict(name='ansible-5', result='SUCCESS', changes='1,1'),
             dict(name='ansible-6', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 

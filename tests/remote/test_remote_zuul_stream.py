@@ -25,7 +25,7 @@ from tests.base import AnsibleZuulTestCase
 class FunctionalZuulStreamMixIn:
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
     # This should be overriden in child classes.
-    ansible_version = '5'
+    ansible_version = '6'
 
     def _setUp(self):
         self.log_console_port = 19000 + int(
@@ -251,15 +251,6 @@ class FunctionalZuulStreamMixIn:
             regex = r'controller \|   "msg": "New-style module did not ' \
                 r'handle its own exit"'
             self.assertLogLine(regex, text)
-
-
-class TestZuulStream5(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
-    ansible_version = '5'
-    ansible_core_version = '2.12'
-
-    def setUp(self):
-        super().setUp()
-        self._setUp()
 
 
 class TestZuulStream6(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
