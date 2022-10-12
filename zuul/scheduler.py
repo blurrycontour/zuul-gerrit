@@ -355,6 +355,9 @@ class Scheduler(threading.Thread):
         self._stopped = True
         self.wake_event.set()
         self.start_cleanup_thread.join()
+        self.log.debug("Waiting for layout update thread")
+        self.layout_update_event.set()
+        self.layout_update_thread.join()
         self.log.debug("Stopping apscheduler")
         self.apsched.shutdown()
         self.log.debug("Waiting for main thread")
@@ -373,9 +376,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
-        self.log.debug("Waiting for layout update thread")
-        self.layout_update_event.set()
-        self.layout_update_thread.join()
         self.stopRepl()
         self._command_running = False
         self.log.debug("Stopping command socket")
