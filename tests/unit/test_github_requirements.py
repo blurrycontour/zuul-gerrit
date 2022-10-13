@@ -503,6 +503,46 @@ class TestGithubRequirements(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
 
     @simple_layout('layouts/requirements-github.yaml', driver='github')
+    def test_require_draft(self):
+
+        A = self.fake_github.openFakePullRequest('org/project17', 'master',
+                                                 'A', draft=True)
+        # A sync event that we will keep submitting to trigger
+        sync = A.getPullRequestSynchronizeEvent()
+        self.fake_github.emitEvent(sync)
+        self.waitUntilSettled()
+
+        # PR is a draft, should enqueue
+        self.assertEqual(len(self.history), 1)
+
+        # Make the PR not a draft
+        A.draft = False
+        self.fake_github.emitEvent(sync)
+        self.waitUntilSettled()
+        # PR is not a draft, should not enqueue
+        self.assertEqual(len(self.history), 1)
+
+    @simple_layout('layouts/requirements-github.yaml', driver='github')
+    def test_reject_draft(self):
+
+        A = self.fake_github.openFakePullRequest('org/project18', 'master',
+                                                 'A', draft=True)
+        # A sync event that we will keep submitting to trigger
+        sync = A.getPullRequestSynchronizeEvent()
+        self.fake_github.emitEvent(sync)
+        self.waitUntilSettled()
+
+        # PR is a draft, should not enqueue
+        self.assertEqual(len(self.history), 0)
+
+        # Make the PR not a draft
+        A.draft = False
+        self.fake_github.emitEvent(sync)
+        self.waitUntilSettled()
+        # PR is not a draft, should enqueue
+        self.assertEqual(len(self.history), 1)
+
+    @simple_layout('layouts/requirements-github.yaml', driver='github')
     def test_pipeline_require_label(self):
         "Test pipeline requirement: label"
         A = self.fake_github.openFakePullRequest('org/project10', 'master',

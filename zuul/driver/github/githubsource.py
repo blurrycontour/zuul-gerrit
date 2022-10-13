@@ -169,6 +169,7 @@ class GithubSource(BaseSource):
             open=config.get('open'),
             merged=config.get('merged'),
             current_patchset=config.get('current-patchset'),
+            draft=config.get('draft'),
             labels=to_list(config.get('label')),
         )
         return [f]
@@ -182,6 +183,7 @@ class GithubSource(BaseSource):
             reject_open=config.get('open'),
             reject_merged=config.get('merged'),
             reject_current_patchset=config.get('current-patchset'),
+            reject_draft=config.get('draft'),
         )
         return [f]
 
@@ -207,6 +209,7 @@ def getRequireSchema():
                'open': bool,
                'merged': bool,
                'current-patchset': bool,
+               'draft': bool,
                'label': scalar_or_list(str)}
     return require
 
@@ -217,5 +220,6 @@ def getRejectSchema():
               'open': bool,
               'merged': bool,
               'current-patchset': bool,
+              'draft': bool,
               'label': scalar_or_list(str)}
     return reject

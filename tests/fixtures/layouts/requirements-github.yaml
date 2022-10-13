@@ -286,6 +286,34 @@
         comment: true
 
 - pipeline:
+    name: require_draft
+    manager: independent
+    require:
+      github:
+        draft: true
+    trigger:
+      github:
+        - event: pull_request
+          action: changed
+    success:
+      github:
+        comment: true
+
+- pipeline:
+    name: reject_draft
+    manager: independent
+    reject:
+      github:
+        draft: true
+    trigger:
+      github:
+        - event: pull_request
+          action: changed
+    success:
+      github:
+        comment: true
+
+- pipeline:
     name: require_label
     manager: independent
     require:
@@ -389,6 +417,14 @@
 - job:
     name: project16-require-check-run
     run: playbooks/project16-require-check-run.yaml
+
+- job:
+    name: project17-require-draft
+    run: playbooks/project17-require-draft.yaml
+
+- job:
+    name: project18-reject-draft
+    run: playbooks/project18-reject-draft.yaml
 
 - project:
     name: org/project1
@@ -494,3 +530,15 @@
     require_check_run:
       jobs:
         - project16-require-check-run
+
+- project:
+    name: org/project17
+    require_draft:
+      jobs:
+        - project17-require-draft
+
+- project:
+    name: org/project18
+    reject_draft:
+      jobs:
+        - project18-reject-draft

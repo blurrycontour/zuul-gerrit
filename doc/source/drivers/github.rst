@@ -551,6 +551,12 @@ enqueued into the pipeline.
       .. TODO: this could probably be expanded upon -- under what
          circumstances might this happen with github
 
+   .. attr:: draft
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      or not the change must be marked as a draft in GitHub in order
+      to be enqueued.
+
    .. attr:: status
 
       A string value that corresponds with the status of the pull
