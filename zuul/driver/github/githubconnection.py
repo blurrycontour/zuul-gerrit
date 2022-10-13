@@ -1049,15 +1049,9 @@ class GithubClientManager:
         # The version of github enterprise stays None for github.com
         self._github_version = None
 
-    def initialize(self):
         self.log.info('Authing to GitHub')
         self._authenticateGithubAPI()
         self._prime_installation_map()
-        self._initialized = True
-
-    @property
-    def initialized(self):
-        return self._initialized
 
     @property
     def usesAppAuthentication(self):
@@ -1408,9 +1402,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         return d
 
     def onLoad(self, zk_client, component_registry):
-        self.log.info('Starting GitHub connection: %s', self.connection_name)
-        self._github_client_manager.initialize()
-
         # Set the project branch cache to read only if no scheduler is
         # provided to prevent fetching the branches from the connection.
         self.read_only = not self.sched
@@ -1780,11 +1771,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
             return 'ssh://git@%s/%s.git' % (self.server, project.name)
-
-        # if app_id is configured but self.app_id is empty we are not
-        # authenticated yet against github as app
-        if not self._github_client_manager.initialized:
-            self._github_client_manager.initialize()
 
         if self.repo_cache:
             server = self.repo_cache
