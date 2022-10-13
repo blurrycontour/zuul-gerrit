@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f44bccb9_cdf72baa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-13T17:53:59Z",
+      "side": 1,
+      "message": "Is it possible to move the initialization so that it\u0027s initialized in all cases?\n(Because if we want it initialized for normal usage, and also validate-tenants, it sort of sounds we mostly want it initialized, except maybe for zuul-web?)",
+      "revId": "fb917a63e1dbfea505bd160b43b597924d381361",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
