@@ -80,6 +80,8 @@ class TimerDriver(Driver, TriggerInterface):
 
     def reconfigure(self, tenant):
         self._removeJobs(tenant)
+        if self.stopped:
+            return
         if not self.apsched:
             # Handle possible reuse of the driver without connection objects.
             self.apsched = BackgroundScheduler()
