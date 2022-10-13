@@ -872,14 +872,10 @@ class GithubClientManager:
         # The version of github enterprise stays None for github.com
         self._github_version = None
 
-    def initialize(self):
         self.log.info('Authing to GitHub')
         self._authenticateGithubAPI()
         self._prime_installation_map()
-        self._initialized = True
 
-    @property
-    def initialized(self):
         return self._initialized
 
     @property
@@ -1199,8 +1195,6 @@ class GithubConnection(CachedBranchConnection):
         return d
 
     def onLoad(self):
-        self.log.info('Starting GitHub connection: %s', self.connection_name)
-        self._github_client_manager.initialize()
         self.log.debug('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(
             self.sched.zk_client, self.connection_name
@@ -1240,11 +1234,6 @@ class GithubConnection(CachedBranchConnection):
     def getGithubClient(self,
                         project_name=None,
                         zuul_event_id=None):
-
-        # if app_id is configured but self.app_id is empty we are not
-        # authenticated yet against github as app
-        if not self._github_client_manager.initialized:
-            self._github_client_manager.initialize()
 
         return self._github_client_manager.getGithubClient(
             project_name=project_name, zuul_event_id=zuul_event_id)
@@ -1501,11 +1490,6 @@ class GithubConnection(CachedBranchConnection):
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
             return 'ssh://git@%s/%s.git' % (self.server, project.name)
-
-        # if app_id is configured but self.app_id is empty we are not
-        # authenticated yet against github as app
-        if not self._github_client_manager.initialized:
-            self._github_client_manager.initialize()
 
         if self._github_client_manager.usesAppAuthentication:
             # We may be in the context of a merger or executor here. The
