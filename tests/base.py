@@ -5491,28 +5491,49 @@ class ZuulTestCase(BaseTestCase):
         for event_queue in self.additional_event_queues:
             event_queue.join()
 
-    def __areZooKeeperEventQueuesEmpty(self, matcher=None) -> bool:
+    def __areZooKeeperEventQueuesEmpty(self, matcher=None, debug=False):
         for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
             for connection_name in sched.connections.connections:
                 if self.connection_event_queues[connection_name].hasEvents():
+                    if debug:
+                        self.log.debug(
+                            f"Connection queue {connection_name} not empty")
                     return False
             for tenant in sched.abide.tenants.values():
                 if sched.management_events[tenant.name].hasEvents():
+                    if debug:
+                        self.log.debug(
+                            f"Tenant management queue {tenant.name} not empty")
                     return False
                 if sched.trigger_events[tenant.name].hasEvents():
+                    if debug:
+                        self.log.debug(
+                            f"Tenant trigger queue {tenant.name} not empty")
                     return False
                 for pipeline_name in tenant.layout.pipelines:
                     if sched.pipeline_management_events[tenant.name][
                         pipeline_name
                     ].hasEvents():
+                        if debug:
+                            self.log.debug(
+                                "Pipeline management queue "
+                                f"{tenant.name} {pipeline_name} not empty")
                         return False
                     if sched.pipeline_trigger_events[tenant.name][
                         pipeline_name
                     ].hasEvents():
+                        if debug:
+                            self.log.debug(
+                                "Pipeline trigger queue "
+                                f"{tenant.name} {pipeline_name} not empty")
                         return False
                     if sched.pipeline_result_events[tenant.name][
                         pipeline_name
                     ].hasEvents():
+                        if debug:
+                            self.log.debug(
+                                "Pipeline result queue "
+                                f"{tenant.name} {pipeline_name} not empty")
                         return False
         return True
 
@@ -5534,7 +5555,7 @@ class ZuulTestCase(BaseTestCase):
                                self.__areAllSchedulersPrimed(matcher))
                 self._logQueueStatus(
                     self.log.error, matcher,
-                    self.__areZooKeeperEventQueuesEmpty(),
+                    self.__areZooKeeperEventQueuesEmpty(debug=True),
                     self.__areAllMergeJobsWaiting(),
                     self.__haveAllBuildsReported(),
                     self.__areAllBuildsWaiting(),
