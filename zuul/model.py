@@ -5925,6 +5925,7 @@ class Change(Branch):
         self.failed_to_merge = data.get("failed_to_merge", False)
         self.open = data.get("open")
         self.owner = data.get("owner")
+        self.topic = data.get("topic")
         self.message = data.get("message")
         self.commit_id = data.get("commit_id")
         self.base_sha = data.get("base_sha")
@@ -5947,6 +5948,7 @@ class Change(Branch):
             "failed_to_merge": self.failed_to_merge,
             "open": self.open,
             "owner": self.owner,
+            "topic": self.topic,
             "message": self.message,
             "commit_id": self.commit_id,
             "base_sha": self.base_sha,
