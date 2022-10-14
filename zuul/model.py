@@ -2300,7 +2300,7 @@ class FrozenJob(zkobject.ZKObject):
                     # The data are stored locally in this dict
                     data['_' + job_data_key] = job_data['data']
                 elif job_data['storage'] == 'offload':
-                    existing_job_data = getattr(self, job_data_key, None)
+                    existing_job_data = getattr(self, f"_{job_data_key}", None)
                     if (getattr(existing_job_data, 'hash', None) ==
                         job_data['hash']):
                         # Re-use the existing object since it's the same
