@@ -1050,14 +1050,26 @@ class ChangeQueue(zkobject.ZKObject):
                 })
 
         items_by_path = OrderedDict()
+        # This is a tuple of (x, Future), where x is None if no action
+        # needs to be taken, or a string to indicate which kind of job
+        # it was.  This structure allows us to execute async ZK reads
+        # and perform local data updates in order.
+        tpe_jobs = []
+        tpe = context.executor[ChangeQueue]
         for item_path in data["queue"]:
             item = existing_items.get(item_path)
+            items_by_path[item_path] = item
             if item:
-                item.refresh(context)
+                tpe_jobs.append((None, tpe.submit(item.refresh, context)))
             else:
-                item = QueueItem.fromZK(context, item_path,
-                                        pipeline=self.pipeline, queue=self)
-            items_by_path[item.getPath()] = item
+                tpe_jobs.append(('item', tpe.submit(
+                    QueueItem.fromZK, context, item_path,
+                    pipeline=self.pipeline, queue=self)))
+
+        for (kind, future) in tpe_jobs:
+            result = future.result()
+            if kind == 'item':
+                items_by_path[result.getPath()] = result
 
         # Resolve ahead/behind references between queue items
         for item in items_by_path.values():
@@ -4157,6 +4169,13 @@ class BuildSet(zkobject.ZKObject):
         existing_retry_builds = {b.getPath(): b
                                  for bl in self.retry_builds.values()
                                  for b in bl}
+        # This is a tuple of (kind, job_name, Future), where kind is
+        # None if no action needs to be taken, or a string to indicate
+        # which kind of job it was.  This structure allows us to
+        # execute async ZK reads and perform local data updates in
+        # order.
+        tpe_jobs = []
+        tpe = context.executor[BuildSet]
         # jobs (deserialize as separate objects)
         if data['job_graph']:
             for job_name in data['job_graph'].jobs:
@@ -4171,39 +4190,62 @@ class BuildSet(zkobject.ZKObject):
                 if job_name in self.jobs:
                     job = self.jobs[job_name]
                     if not old_build_exists:
-                        job.refresh(context)
+                        tpe_jobs.append((None, job_name,
+                                         tpe.submit(job.refresh, context)))
                 else:
                     job_path = FrozenJob.jobPath(job_name, self.getPath())
-                    job = FrozenJob.fromZK(context, job_path, buildset=self)
-                    self.jobs[job_name] = job
+                    tpe_jobs.append(('job', job_name, tpe.submit(
+                        FrozenJob.fromZK, context, job_path, buildset=self)))
 
                 if build_path:
                     build = self.builds.get(job_name)
+                    builds[job_name] = build
                     if build and build.getPath() == build_path:
                         if not build.result:
-                            build.refresh(context)
+                            tpe_jobs.append((
+                                None, job_name, tpe.submit(
+                                    build.refresh, context)))
                     else:
                         if not self._isMyBuild(build_path):
                             build = BuildReference(build_path)
                             context.build_references = True
+                            builds[job_name] = build
                         else:
-                            build = Build.fromZK(
-                                context, build_path, job=job, build_set=self)
-                    builds[job_name] = build
+                            tpe_jobs.append((
+                                'build', job_name, tpe.submit(
+                                    Build.fromZK, context, build_path,
+                                    build_set=self)))
 
                 for retry_path in data["retry_builds"].get(job_name, []):
                     retry_build = existing_retry_builds.get(retry_path)
                     if retry_build and retry_build.getPath() == retry_path:
                         # Retry builds never change.
-                        pass
+                        retry_builds[job_name].append(retry_build)
                     else:
                         if not self._isMyBuild(retry_path):
                             retry_build = BuildReference(retry_path)
                             context.build_references = True
+                            retry_builds[job_name].append(retry_build)
                         else:
-                            retry_build = Build.fromZK(
-                                context, retry_path, job=job, build_set=self)
-                    retry_builds[job_name].append(retry_build)
+                            tpe_jobs.append((
+                                'retry', job_name, tpe.submit(
+                                    Build.fromZK, context, retry_path,
+                                    build_set=self)))
+
+        for (kind, job_name, future) in tpe_jobs:
+            result = future.result()
+            if kind == 'job':
+                self.jobs[job_name] = result
+            elif kind == 'build':
+                # We normally set the job on the constructor, but we
+                # may not have had it in time.  At this point though,
+                # the job future is guaranteed to have completed, so
+                # we can look it up now.
+                result._set(job=self.jobs[job_name])
+                builds[job_name] = result
+            elif kind == 'retry':
+                result._set(job=self.jobs[job_name])
+                retry_builds[job_name].append(result)
 
         data.update({
             "builds": builds,

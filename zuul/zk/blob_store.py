@@ -134,15 +134,14 @@ class BlobStore:
                 return key
 
             # make a new context based on the old one
-            locked_context = ZKContext(self.context.client, lock,
-                                       self.context.stop_event,
-                                       self.context.log)
-
-            self._retry(
-                locked_context,
-                self._retryableSave,
-                locked_context, path, flag, data)
-            self.context.updateStatsFromOtherContext(locked_context)
+            with ZKContext(self.context.client, lock,
+                           self.context.stop_event,
+                           self.context.log) as locked_context:
+                self._retry(
+                    locked_context,
+                    self._retryableSave,
+                    locked_context, path, flag, data)
+                self.context.updateStatsFromOtherContext(locked_context)
         return key
 
     def delete(self, key, ltime):
@@ -158,18 +157,18 @@ class BlobStore:
                     blocking=True
             ) as lock:
                 # make a new context based on the old one
-                locked_context = ZKContext(self.context.client, lock,
-                                           self.context.stop_event,
-                                           self.context.log)
+                with ZKContext(self.context.client, lock,
+                               self.context.stop_event,
+                               self.context.log) as locked_context:
 
-                # Double check that it hasn't been used since we
-                # decided to delete it
-                data, zstat = self._retry(locked_context,
-                                          self.context.client.get,
-                                          flag)
-                if zstat.last_modified_transaction_id < ltime:
-                    self._retry(locked_context, self.context.client.delete,
-                                path, recursive=True)
+                    # Double check that it hasn't been used since we
+                    # decided to delete it
+                    data, zstat = self._retry(locked_context,
+                                              self.context.client.get,
+                                              flag)
+                    if zstat.last_modified_transaction_id < ltime:
+                        self._retry(locked_context, self.context.client.delete,
+                                    path, recursive=True)
         except NoNodeError:
             raise KeyError(key)
 

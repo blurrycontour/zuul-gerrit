@@ -54,6 +54,7 @@ from tests.base import (
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.layout import LayoutState
 from zuul.zk.locks import management_queue_lock
+from zuul.zk import zkobject
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
 
@@ -3584,7 +3585,8 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with gate.manager.currentContext(self.createZKContext()):
+        with self.createZKContext() as ctx,\
+             gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3606,7 +3608,8 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with gate.manager.currentContext(self.createZKContext()):
+        with self.createZKContext() as ctx,\
+             gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3628,7 +3631,8 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with gate.manager.currentContext(self.createZKContext()):
+        with self.createZKContext() as ctx,\
+             gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3649,7 +3653,8 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with gate.manager.currentContext(self.createZKContext()):
+        with self.createZKContext() as ctx,\
+             gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3671,7 +3676,8 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with gate.manager.currentContext(self.createZKContext()):
+        with self.createZKContext() as ctx,\
+             gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -6432,6 +6438,33 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='check-job', result='SUCCESS', changes='1,1'),
             dict(name='hold-job', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+    def test_zkobject_parallel_refresh(self):
+        # Test that we don't deadlock when refreshing objects
+        zkobject.BaseZKContext._max_workers = 1
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
 
 
 class TestChangeQueues(ZuulTestCase):

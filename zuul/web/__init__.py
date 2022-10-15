@@ -972,21 +972,23 @@ class ZuulWebAPI(object):
 
     def _tenants(self):
         result = []
-        for tenant_name, tenant in sorted(self.zuulweb.abide.tenants.items()):
-            queue_size = 0
-            for pipeline in tenant.layout.pipelines.values():
-                status = pipeline.summary.refresh(self.zuulweb.zk_context)
-                for queue in status.get("change_queues", []):
-                    for head in queue["heads"]:
-                        for item in head:
-                            if item["live"]:
-                                queue_size += 1
+        with self.zuulweb.zk_context as ctx:
+            for tenant_name, tenant in sorted(
+                    self.zuulweb.abide.tenants.items()):
+                queue_size = 0
+                for pipeline in tenant.layout.pipelines.values():
+                    status = pipeline.summary.refresh(ctx)
+                    for queue in status.get("change_queues", []):
+                        for head in queue["heads"]:
+                            for item in head:
+                                if item["live"]:
+                                    queue_size += 1
 
-            result.append({
-                'name': tenant_name,
-                'projects': len(tenant.untrusted_projects),
-                'queue': queue_size,
-            })
+                result.append({
+                    'name': tenant_name,
+                    'projects': len(tenant.untrusted_projects),
+                    'queue': queue_size,
+                })
         return result
 
     @cherrypy.expose
@@ -1096,13 +1098,16 @@ class ZuulWebAPI(object):
         result_event_queues = self.zuulweb.pipeline_result_events[tenant.name]
         management_event_queues = self.zuulweb.pipeline_management_events[
             tenant.name]
-        for pipeline in tenant.layout.pipelines.values():
-            status = pipeline.summary.refresh(self.zuulweb.zk_context)
-            status['trigger_events'] = len(trigger_event_queues[pipeline.name])
-            status['result_events'] = len(result_event_queues[pipeline.name])
-            status['management_events'] = len(
-                management_event_queues[pipeline.name])
-            pipelines.append(status)
+        with self.zuulweb.zk_context as ctx:
+            for pipeline in tenant.layout.pipelines.values():
+                status = pipeline.summary.refresh(ctx)
+                status['trigger_events'] = len(
+                    trigger_event_queues[pipeline.name])
+                status['result_events'] = len(
+                    result_event_queues[pipeline.name])
+                status['management_events'] = len(
+                    management_event_queues[pipeline.name])
+                pipelines.append(status)
         return data, json.dumps(data).encode('utf-8')
 
     def _getTenantOrRaise(self, tenant_name):
@@ -1694,13 +1699,13 @@ class ZuulWebAPI(object):
 
         change = Branch(project)
         change.branch = branch_name or "master"
-        context = LocalZKContext(self.log)
-        queue = ChangeQueue.new(context, pipeline=pipeline)
-        item = QueueItem.new(context, queue=queue, change=change,
-                             pipeline=queue.pipeline)
-        item.freezeJobGraph(tenant.layout, context,
-                            skip_file_matcher=True,
-                            redact_secrets_and_keys=True)
+        with LocalZKContext(self.log) as context:
+            queue = ChangeQueue.new(context, pipeline=pipeline)
+            item = QueueItem.new(context, queue=queue, change=change,
+                                 pipeline=queue.pipeline)
+            item.freezeJobGraph(tenant.layout, context,
+                                skip_file_matcher=True,
+                                redact_secrets_and_keys=True)
 
         return item
 
