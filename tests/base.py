@@ -5596,6 +5596,8 @@ class ZuulTestCase(BaseTestCase):
                         ctx = self.createZKContext(lock)
                         with pipeline.manager.currentContext(ctx):
                             pipeline.state.refresh(ctx)
+        # return the context in case the caller wants to examine iops
+        return ctx
 
     def _logQueueStatus(self, logger, matcher, all_zk_queues_empty,
                         all_merge_jobs_waiting, all_builds_reported,

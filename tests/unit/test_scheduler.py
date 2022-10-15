@@ -6317,16 +6317,79 @@ For CI problems and help debugging, contact ci@example.org"""
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.model.FrozenJob.MAX_DATA_LEN',
             1))
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.model.Build.MAX_DATA_LEN',
+            1))
 
+        # Return some data and pause the job.  We use a paused job
+        # here because there are only two times we refresh JobData:
+        # 1) A job which has not yet started its build
+        #    because the waiting status may change, we refresh the FrozenJob
+        # 2) A job which is paused
+        #    because the result/data may change, we refresh the Build
+        # This allows us to test that we re-use JobData instances when
+        # we are able.
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.returnData(
+            'check-job', A,
+            {'somedata': 'foobar',
+             'zuul': {'pause': True}},
+        )
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        # Make sure we're really using JobData objects
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         item = tenant.layout.pipelines['check'].queues[0].queue[0]
-        job = item.getJobs()[0]
-        self.assertTrue(isinstance(job._variables, zuul.model.JobData))
+        hold_job = item.getJobs()[1]
+        hold_build = item.current_build_set.getBuild('hold-job')
+
+        # Refresh the pipeline so that we can verify the JobData
+        # objects are immutable.
+        old_hold_job_variables = hold_job.variables
+        ctx = self.refreshPipelines(self.scheds.first.sched)
+        new_hold_job_variables = hold_job.variables
+
+        self.executor_server.release('check-job')
+        self.waitUntilSettled()
+        # Waiting on hold-job now
+
+        # Check the assertions on the hold job here so that the test
+        # can fail normally if they fail (it times out otherwise due
+        # to the held job).
+        self.assertEqual('hold-job', hold_job.name)
+        # Make sure we're really using JobData objects
+        self.assertTrue(isinstance(hold_job._variables, zuul.model.JobData))
+        # Make sure the same object instance is used
+        self.assertIs(old_hold_job_variables, new_hold_job_variables)
+        # Hopefully these asserts won't change much over time.  If
+        # they don't they may be a good way for us to catch unintended
+        # extra read operations.  If they change too much, they may
+        # not be worth keeping and we can just remove them.
+        self.assertEqual(6, ctx.cumulative_read_objects)
+        self.assertEqual(6, ctx.cumulative_read_znodes)
+        self.assertEqual(0, ctx.cumulative_write_objects)
+        self.assertEqual(0, ctx.cumulative_write_znodes)
+
+        check_job = item.getJobs()[0]
+        self.assertEqual('check-job', check_job.name)
+        self.assertTrue(isinstance(check_job._variables, zuul.model.JobData))
+        check_build = item.current_build_set.getBuild('check-job')
+        self.assertTrue(isinstance(check_build._result_data, zuul.model.JobData))
+
+        # Refresh the pipeline so that we can verify the JobData
+        # objects are immutable.
+        old_check_build_results = check_build.result_data
+        ctx = self.refreshPipelines(self.scheds.first.sched)
+        new_check_build_results = check_build.result_data
+
+        # Verify that we did not reload results
+        self.assertIs(old_check_build_results, new_check_build_results)
+
+        # Again check the object read counts
+        self.assertEqual(6, ctx.cumulative_read_objects)
+        self.assertEqual(6, ctx.cumulative_read_znodes)
+        self.assertEqual(0, ctx.cumulative_write_objects)
+        self.assertEqual(0, ctx.cumulative_write_znodes)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -6334,6 +6397,7 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.assertHistory([
             dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='hold-job', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
 
