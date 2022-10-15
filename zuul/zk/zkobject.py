@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from concurrent.futures import ThreadPoolExecutor
 import contextlib
 import json
 import logging
@@ -26,11 +27,24 @@ from zuul.zk import sharding
 from zuul.zk import ZooKeeperClient
 
 
-class ZKContext:
+class BaseZKContext:
     profile_logger = logging.getLogger('zuul.profile')
     profile_default = False
 
+    def __init__(self):
+        self._executor = None
+
+    @property
+    def executor(self):
+        if not self._executor:
+            # Use default max_workers (scales with nprocs)
+            self._executor = ThreadPoolExecutor()
+        return self._executor
+
+
+class ZKContext(BaseZKContext):
     def __init__(self, zk_client, lock, stop_event, log):
+        super().__init__()
         if isinstance(zk_client, ZooKeeperClient):
             client = zk_client.client
         else:
@@ -80,10 +94,11 @@ class ZKContext:
             self.cumulative_read_bytes, self.cumulative_write_bytes)
 
 
-class LocalZKContext:
+class LocalZKContext(BaseZKContext):
     """A Local ZKContext that means don't actually write anything to ZK"""
 
     def __init__(self, log):
+        super().__init__()
         self.client = None
         self.lock = None
         self.stop_event = None
