@@ -966,8 +966,8 @@ class AnsibleJob(object):
     def __init__(self, executor_server, build_request, arguments):
         logger = logging.getLogger("zuul.AnsibleJob")
         self.arguments = arguments
-        self.job = FrozenJob.fromZK(executor_server.zk_context,
-                                    arguments["job_ref"])
+        with executor_server.zk_context as ctx:
+            self.job = FrozenJob.fromZK(ctx, arguments["job_ref"])
         self.arguments["zuul"].update(zuul_params_from_job(self.job))
 
         self.zuul_event_id = self.arguments["zuul_event_id"]
@@ -1240,11 +1240,12 @@ class AnsibleJob(object):
 
     def loadRepoState(self):
         merge_rs_path = self.arguments['merge_repo_state_ref']
-        merge_repo_state = merge_rs_path and MergeRepoState.fromZK(
-            self.executor_server.zk_context, merge_rs_path)
-        extra_rs_path = self.arguments['extra_repo_state_ref']
-        extra_repo_state = extra_rs_path and ExtraRepoState.fromZK(
-            self.executor_server.zk_context, extra_rs_path)
+        with self.executor_server.zk_context as ctx:
+            merge_repo_state = merge_rs_path and MergeRepoState.fromZK(
+                ctx, merge_rs_path)
+            extra_rs_path = self.arguments['extra_repo_state_ref']
+            extra_repo_state = extra_rs_path and ExtraRepoState.fromZK(
+                ctx, extra_rs_path)
         d = {}
         for rs in (merge_repo_state, extra_repo_state):
             if not rs:
@@ -2081,23 +2082,24 @@ class AnsibleJob(object):
 
         """
         ret = {}
-        blobstore = BlobStore(self.executor_server.zk_context)
-        for secret_name, secret_index in secrets.items():
-            if isinstance(secret_index, dict):
-                key = secret_index['blob']
-                data = blobstore.get(key)
-                frozen_secret = json.loads(data.decode('utf-8'))
-            else:
-                frozen_secret = self.job.secrets[secret_index]
-            secret = zuul.model.Secret(secret_name, None)
-            secret.secret_data = yaml.encrypted_load(
-                frozen_secret['encrypted_data'])
-            private_secrets_key, public_secrets_key = \
-                self.executor_server.keystore.getProjectSecretsKeys(
-                    frozen_secret['connection_name'],
-                    frozen_secret['project_name'])
-            secret = secret.decrypt(private_secrets_key)
-            ret[secret_name] = secret.secret_data
+        with self.executor_server.zk_context as ctx:
+            blobstore = BlobStore(ctx)
+            for secret_name, secret_index in secrets.items():
+                if isinstance(secret_index, dict):
+                    key = secret_index['blob']
+                    data = blobstore.get(key)
+                    frozen_secret = json.loads(data.decode('utf-8'))
+                else:
+                    frozen_secret = self.job.secrets[secret_index]
+                secret = zuul.model.Secret(secret_name, None)
+                secret.secret_data = yaml.encrypted_load(
+                    frozen_secret['encrypted_data'])
+                private_secrets_key, public_secrets_key = \
+                    self.executor_server.keystore.getProjectSecretsKeys(
+                        frozen_secret['connection_name'],
+                        frozen_secret['project_name'])
+                secret = secret.decrypt(private_secrets_key)
+                ret[secret_name] = secret.secret_data
         return ret
 
     def checkoutTrustedProject(self, project, branch, args):
