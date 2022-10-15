@@ -680,16 +680,16 @@ class Scheduler(threading.Thread):
                 with pipeline_lock(
                     self.zk_client, tenant.name, pipeline.name,
                 ) as lock:
-                    ctx = self.createZKContext(lock, self.log)
-                    with pipeline.manager.currentContext(ctx):
-                        pipeline.change_list.refresh(ctx)
-                        pipeline.state.refresh(ctx)
-                        # In case we're in the middle of a reconfig,
-                        # include the old queue items.
-                        for item in pipeline.getAllItems(include_old=True):
-                            nrs = item.current_build_set.node_requests
-                            for req_id in (nrs.values()):
-                                outstanding_requests.add(req_id)
+                    with self.createZKContext(lock, self.log) as ctx:
+                        with pipeline.manager.currentContext(ctx):
+                            pipeline.change_list.refresh(ctx)
+                            pipeline.state.refresh(ctx)
+                            # In case we're in the middle of a reconfig,
+                            # include the old queue items.
+                            for item in pipeline.getAllItems(include_old=True):
+                                nrs = item.current_build_set.node_requests
+                                for req_id in (nrs.values()):
+                                    outstanding_requests.add(req_id)
         leaked_requests = zk_requests - outstanding_requests
         for req_id in leaked_requests:
             try:
@@ -761,25 +761,25 @@ class Scheduler(threading.Thread):
                 # lock and refresh the pipeline
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
-                        with pipeline_lock(
-                                self.zk_client, tenant.name, pipeline.name,
-                        ) as lock:
-                            ctx = self.createZKContext(lock, self.log)
+                        with (pipeline_lock(
+                                self.zk_client, tenant.name,
+                                pipeline.name) as lock,
+                              self.createZKContext(lock, self.log) as ctx):
                             pipeline.state.refresh(ctx)
                             # add any blobstore references
                             for item in pipeline.getAllItems(include_old=True):
                                 live_blobs.update(item.getBlobKeys())
-            ctx = self.createZKContext(None, self.log)
-            blobstore = BlobStore(ctx)
-            # get the set of blob keys unused since the start time
-            # (ie, we have already filtered any newly added keys)
-            unused_blobs = blobstore.getKeysLastUsedBefore(start_ltime)
-            # remove the current refences
-            unused_blobs -= live_blobs
-            # delete what's left
-            for key in unused_blobs:
-                self.log.debug("Deleting unused blob: %s", key)
-                blobstore.delete(key, start_ltime)
+            with self.createZKContext(None, self.log) as ctx:
+                blobstore = BlobStore(ctx)
+                # get the set of blob keys unused since the start time
+                # (ie, we have already filtered any newly added keys)
+                unused_blobs = blobstore.getKeysLastUsedBefore(start_ltime)
+                # remove the current refences
+                unused_blobs -= live_blobs
+                # delete what's left
+                for key in unused_blobs:
+                    self.log.debug("Deleting unused blob: %s", key)
+                    blobstore.delete(key, start_ltime)
             self.log.debug("Finished blob store cleanup")
         except Exception:
             self.log.exception("Error in blob store cleanup:")
@@ -1004,8 +1004,9 @@ class Scheduler(threading.Thread):
 
                     if layout_state is None:
                         # Reconfigure only tenants w/o an existing layout state
-                        ctx = self.createZKContext(tlock, self.log)
-                        self._reconfigureTenant(ctx, min_ltimes, -1, tenant)
+                        with self.createZKContext(tlock, self.log) as ctx:
+                            self._reconfigureTenant(
+                                ctx, min_ltimes, -1, tenant)
                         self._reportInitialStats(tenant)
                     else:
                         self.local_layout_state[tenant_name] = layout_state
@@ -1454,17 +1455,17 @@ class Scheduler(threading.Thread):
                         self.unparsed_abide, min_ltimes=min_ltimes,
                         branch_cache_min_ltimes=branch_cache_min_ltimes)
                     reconfigured_tenants.append(tenant_name)
-                    ctx = self.createZKContext(lock, self.log)
-                    if tenant is not None:
-                        self._reconfigureTenant(ctx, min_ltimes,
-                                                -1,
-                                                tenant, old_tenant)
-                    else:
-                        self._reconfigureDeleteTenant(ctx, old_tenant)
-                        with suppress(KeyError):
-                            del self.tenant_layout_state[tenant_name]
-                        with suppress(KeyError):
-                            del self.local_layout_state[tenant_name]
+                    with self.createZKContext(lock, self.log) as ctx:
+                        if tenant is not None:
+                            self._reconfigureTenant(ctx, min_ltimes,
+                                                    -1,
+                                                    tenant, old_tenant)
+                        else:
+                            self._reconfigureDeleteTenant(ctx, old_tenant)
+                            with suppress(KeyError):
+                                del self.tenant_layout_state[tenant_name]
+                            with suppress(KeyError):
+                                del self.local_layout_state[tenant_name]
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Reconfiguration complete (smart: %s, tenants: %s, "
@@ -1520,10 +1521,10 @@ class Scheduler(threading.Thread):
                     self.unparsed_abide, min_ltimes=min_ltimes,
                     branch_cache_min_ltimes=branch_cache_min_ltimes)
                 tenant = self.abide.tenants[event.tenant_name]
-                ctx = self.createZKContext(lock, self.log)
-                self._reconfigureTenant(ctx, min_ltimes,
-                                        event.trigger_event_ltime,
-                                        tenant, old_tenant)
+                with self.createZKContext(lock, self.log) as ctx:
+                    self._reconfigureTenant(ctx, min_ltimes,
+                                            event.trigger_event_ltime,
+                                            tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
         self.log.info("Tenant reconfiguration complete for %s (duration: %s "
                       "seconds)", event.tenant_name, duration)
@@ -2102,10 +2103,10 @@ class Scheduler(threading.Thread):
                 return
             stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             try:
-                with pipeline_lock(
-                    self.zk_client, tenant.name, pipeline.name, blocking=False
-                ) as lock:
-                    ctx = self.createZKContext(lock, self.log)
+                with (pipeline_lock(
+                        self.zk_client, tenant.name, pipeline.name,
+                        blocking=False) as lock,
+                      self.createZKContext(lock, self.log) as ctx):
                     with pipeline.manager.currentContext(ctx):
                         with self.statsd_timer(f'{stats_key}.handling'):
                             refreshed = self._process_pipeline(
@@ -2212,8 +2213,8 @@ class Scheduler(threading.Thread):
 
     def _gatherConnectionCacheKeys(self):
         relevant = set()
-        with self.layout_lock:
-            ctx = self.createZKContext(None, self.log)
+        with (self.layout_lock,
+              self.createZKContext(None, self.log) as ctx):
             for tenant in self.abide.tenants.values():
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",

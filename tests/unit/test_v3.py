@@ -5802,27 +5802,27 @@ class TestSecrets(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        context = self.scheds.first.sched.createZKContext(None, self.log)
-        bs = BlobStore(context)
-        self.assertEqual(len(bs), 1)
+        with self.scheds.first.sched.createZKContext(None, self.log) as context:
+            bs = BlobStore(context)
+            self.assertEqual(len(bs), 1)
 
-        self.scheds.first.sched._runBlobStoreCleanup()
-        self.assertEqual(len(bs), 1)
+            self.scheds.first.sched._runBlobStoreCleanup()
+            self.assertEqual(len(bs), 1)
 
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
+            self.executor_server.hold_jobs_in_build = False
+            self.executor_server.release()
+            self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 1, "A should report success")
-        self.assertHistory([
-            dict(name='project1-secret', result='SUCCESS', changes='1,1'),
-        ])
-        self.assertEqual(
-            [{'secret_name': self.secret}],
-            self._getSecrets('project1-secret', 'playbooks'))
+            self.assertEqual(A.reported, 1, "A should report success")
+            self.assertHistory([
+                dict(name='project1-secret', result='SUCCESS', changes='1,1'),
+            ])
+            self.assertEqual(
+                [{'secret_name': self.secret}],
+                self._getSecrets('project1-secret', 'playbooks'))
 
-        self.scheds.first.sched._runBlobStoreCleanup()
-        self.assertEqual(len(bs), 0)
+            self.scheds.first.sched._runBlobStoreCleanup()
+            self.assertEqual(len(bs), 0)
 
 
 class TestSecretInheritance(ZuulTestCase):
