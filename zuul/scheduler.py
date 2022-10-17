@@ -2098,6 +2098,17 @@ class Scheduler(threading.Thread):
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
                                pipeline.name, tenant.name)
+                try:
+                    # In case this pipeline is locked for some reason
+                    # other than processing events, we need to return
+                    # to it to process them.
+                    if self._pipelineHasEvents(tenant, pipeline):
+                        self.wake_event.set()
+                except Exception:
+                    self.log.exception(
+                        "Exception checking events for pipeline "
+                        "%s in tenant %s",
+                        pipeline.name, tenant.name)
             except Exception:
                 self.log.exception(
                     "Exception processing pipeline %s in tenant %s",
@@ -2121,12 +2132,8 @@ class Scheduler(threading.Thread):
         self.statsd.gauge(f'{stats_key}.write_bytes',
                           ctx.cumulative_write_bytes)
 
-    def _process_pipeline(self, tenant, pipeline):
-        # Return whether or not we refreshed the pipeline.
-
-        # We only need to process the pipeline if there are
-        # outstanding events.
-        if not any((
+    def _pipelineHasEvents(self, tenant, pipeline):
+        return any((
             self.pipeline_trigger_events[
                 tenant.name][pipeline.name].hasEvents(),
             self.pipeline_result_events[
@@ -2134,7 +2141,14 @@ class Scheduler(threading.Thread):
             self.pipeline_management_events[
                 tenant.name][pipeline.name].hasEvents(),
             pipeline.state.isDirty(self.zk_client.client),
-        )):
+        ))
+
+    def _process_pipeline(self, tenant, pipeline):
+        # Return whether or not we refreshed the pipeline.
+
+        # We only need to process the pipeline if there are
+        # outstanding events.
+        if not self._pipelineHasEvents(tenant, pipeline):
             self.log.debug("No events to process for pipeline %s in tenant %s",
                            pipeline.name, tenant.name)
             return False
