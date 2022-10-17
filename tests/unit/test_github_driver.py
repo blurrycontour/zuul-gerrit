@@ -1356,11 +1356,59 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEquals(A.comments[1],
                           'Merge mode cherry-pick not supported by Github')
 
+    @simple_layout('layouts/gate-github-rebase.yaml', driver='github')
+    def test_merge_method_rebase(self):
+        """
+        Tests that the merge mode gets forwarded to the reporter and the
+        PR was rebased.
+        """
+        self.executor_server.keep_jobdir = True
+        self.executor_server.hold_jobs_in_build = True
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection(
+            'master', contexts=['tenant-one/check', 'tenant-one/gate'])
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        repo.create_status(A.head_sha, 'success', 'example.com', 'description',
+                           'tenant-one/check')
+
+        # Create a second commit on master to verify rebase behavior
+        self.create_commit('org/project', message="Test rebase commit")
+
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        build = self.builds[-1]
+        path = os.path.join(build.jobdir.src_root, 'github.com/org/project')
+        repo = git.Repo(path)
+        repo_messages = [c.message.strip() for c in repo.iter_commits()]
+        repo_messages.reverse()
+        expected = [
+            'initial commit',
+            'initial commit',  # simple_layout adds a second "initial commit"
+            'Test rebase commit',
+            'A-1',
+        ]
+        self.assertEqual(expected, repo_messages)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # the change should have entered the gate
+        self.assertEqual(2, len(self.history))
+
+        # now check if the merge was done via rebase
+        merges = [report for report in self.fake_github.github_data.reports
+                  if report[2] == 'merge']
+        assert (len(merges) == 1 and merges[0][3] == 'rebase')
+
     @simple_layout('layouts/gate-github-squash-merge.yaml', driver='github')
     def test_merge_method_squash_merge(self):
         """
         Tests that the merge mode gets forwarded to the reporter and the
-        merge fails because cherry-pick is not supported by github.
+        PR was squashed.
         """
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project('org/project')
@@ -1381,7 +1429,7 @@ class TestGithubDriver(ZuulTestCase):
         # the change should have entered the gate
         self.assertEqual(2, len(self.history))
 
-        # now check if the merge was done via rebase
+        # now check if the merge was done via squash
         merges = [report for report in self.fake_github.github_data.reports
                   if report[2] == 'merge']
         assert (len(merges) == 1 and merges[0][3] == 'squash')
