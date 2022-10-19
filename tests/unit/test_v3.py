@@ -2910,6 +2910,76 @@ class TestInRepoConfig(ZuulTestCase):
             dict(name='test-job', result='SUCCESS', changes='3,1'),
         ], ordered=True)
 
+    def test_final_parent(self):
+        # If all variants of the parent are final, it is an error.
+        # This doesn't catch all possibilities (that is handled during
+        # job freezing) but this may catch most errors earlier.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: parent
+                final: true
+            - job:
+                name: project-test1
+                parent: parent
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('is final and can not act as a parent', A.messages[0])
+
+    def test_intermediate_parent(self):
+        # If all variants of the parent are intermediate and this job
+        # is not abstract, it is an error.
+        # This doesn't catch all possibilities (that is handled during
+        # job freezing) but this may catch most errors earlier.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: parent
+                intermediate: true
+                abstract: true
+            - job:
+                name: project-test1
+                parent: parent
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('is not abstract', A.messages[0])
+
+    @simple_layout('layouts/protected-parent.yaml')
+    def test_protected_parent(self):
+        # If a parent is protected, it may only be used by a child in
+        # the same project.
+        # This doesn't catch all possibilities (that is handled during
+        # job freezing) but this may catch most errors earlier.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                parent: protected-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('protected job in a different project', A.messages[0])
+
 
 class TestInRepoConfigSOS(ZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'
