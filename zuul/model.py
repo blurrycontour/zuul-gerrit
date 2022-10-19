@@ -2848,7 +2848,36 @@ class Job(ConfigObject):
         # Verify that references to other objects in the layout are
         # valid.
         if not self.isBase() and self.parent:
-            layout.getJob(self.parent)
+            parents = layout.getJobs(self.parent)
+            if not parents:
+                raise Exception("Job %s not defined" % (self.parent,))
+            # For the following checks, we allow some leeway to
+            # account for the possibility that there may be
+            # nonconforming job variants that would not match and
+            # therefore not trigger an error during job graph
+            # freezing.  We only raise an error here if there is no
+            # possibility of success, which may help prevent errors in
+            # most cases.  If we don't raise an error here, the
+            # possibility of later failure still remains.
+            nonfinal_parents = [p for p in parents if not p.final]
+            if not nonfinal_parents:
+                raise Exception(
+                    f'The parent of job "{self.name}", "{self.parent}" '
+                    'is final and can not act as a parent')
+            nonintermediate_parents = [
+                p for p in parents if not p.intermediate]
+            if not nonintermediate_parents and not self.abstract:
+                raise Exception(
+                    f'The parent of job "{self.name}", "{self.parent}" '
+                    f'is intermediate but "{self.name}" is not abstract')
+            nonprotected_parents = [
+                p for p in parents if not p.protected]
+            if (not nonprotected_parents and
+                parents[0].source_context.project_canonical_name !=
+                self.source_context.project_canonical_name):
+                raise Exception(
+                    f'The parent of job "{self.name}", "{self.parent}" '
+                    f'is a protected job in a different project')
 
         for ns in self.flattenNodesetAlternatives(layout):
             if layout.tenant.max_nodes_per_job != -1 and \

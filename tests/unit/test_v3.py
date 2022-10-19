@@ -185,9 +185,8 @@ class TestProtected(ZuulTestCase):
 
         self.assertEqual(A.reported, 1)
         self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
-        self.assertIn(
-            "which is defined in review.example.com/org/project is protected "
-            "and cannot be inherited from other projects.", A.messages[0])
+        self.assertIn("is a protected job in a different project",
+                      A.messages[0])
 
 
 class TestAbstract(ZuulTestCase):
@@ -256,8 +255,7 @@ class TestIntermediate(ZuulTestCase):
 
         self.assertEqual(A.reported, 1)
         self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
-        self.assertIn('may only inherit to another abstract job',
-                      A.messages[0])
+        self.assertIn('is not abstract', A.messages[0])
 
     def test_intermediate_config_fail(self):
         # an intermediate job must also be abstract
@@ -343,41 +341,6 @@ class TestFinal(ZuulTestCase):
                           dont_override_this: bar
             """)
         file_dict = {'.zuul.yaml': in_repo_conf}
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
-                                           files=file_dict)
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        # The second patch tried to override some variables.
-        # Thus it should fail.
-        self.assertEqual(A.reported, 1)
-        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
-        self.assertIn('Unable to modify final job', A.messages[0])
-
-    def test_final_inheritance(self):
-        # test misuse of final parent job
-        in_repo_conf = textwrap.dedent(
-            """
-            - job:
-                name: project-test
-                parent: job-final
-                run: playbooks/project-test.yaml
-
-            - project:
-                name: org/project
-                check:
-                  jobs:
-                    - project-test
-            """)
-
-        in_repo_playbook = textwrap.dedent(
-            """
-            - hosts: all
-              tasks: []
-            """)
-
-        file_dict = {'.zuul.yaml': in_repo_conf,
-                     'playbooks/project-test.yaml': in_repo_playbook}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -2909,6 +2872,76 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertHistory([
             dict(name='test-job', result='SUCCESS', changes='3,1'),
         ], ordered=True)
+
+    def test_final_parent(self):
+        # If all variants of the parent are final, it is an error.
+        # This doesn't catch all possibilities (that is handled during
+        # job freezing) but this may catch most errors earlier.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: parent
+                final: true
+            - job:
+                name: project-test1
+                parent: parent
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('is final and can not act as a parent', A.messages[0])
+
+    def test_intermediate_parent(self):
+        # If all variants of the parent are intermediate and this job
+        # is not abstract, it is an error.
+        # This doesn't catch all possibilities (that is handled during
+        # job freezing) but this may catch most errors earlier.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: parent
+                intermediate: true
+                abstract: true
+            - job:
+                name: project-test1
+                parent: parent
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('is not abstract', A.messages[0])
+
+    @simple_layout('layouts/protected-parent.yaml')
+    def test_protected_parent(self):
+        # If a parent is protected, it may only be used by a child in
+        # the same project.
+        # This doesn't catch all possibilities (that is handled during
+        # job freezing) but this may catch most errors earlier.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+                parent: protected-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('protected job in a different project', A.messages[0])
 
 
 class TestInRepoConfigSOS(ZuulTestCase):
