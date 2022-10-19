@@ -103,13 +103,14 @@ class CallbackModule(default.CallbackModule):
         self._task = None
         self._daemon_running = False
         self._play = None
-        self._streamers = []
+        self._streamers = {}
         self._streamers_stop = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
         self._playbook_name = None
         self._zuul_console_version = 0
+        self._streamers_lock = threading.Lock()
 
     def configure_logger(self):
         # ansible appends timestamp, user and pid to the log lines emitted
@@ -151,7 +152,7 @@ class CallbackModule(default.CallbackModule):
             else:
                 self._display.display(msg)
 
-    def _read_log_connect(self, host, ip, port):
+    def _read_log_connect(self, host, ip, port, log_id):
         logger_retries = 0
         while True:
             try:
@@ -164,7 +165,7 @@ class CallbackModule(default.CallbackModule):
                 return s
             except socket.timeout:
                 self._log_streamline(
-                    "localhost",
+                    "localhost", log_id,
                     "Timeout exception waiting for the logger. "
                     "Please check connectivity to [%s:%s]"
                     % (ip, port))
@@ -177,7 +178,7 @@ class CallbackModule(default.CallbackModule):
                 continue
 
     def _read_log(self, host, ip, port, log_id, task_name, hosts):
-        s = self._read_log_connect(host, ip, port)
+        s = self._read_log_connect(host, ip, port, log_id)
         if s is None:
             # Can't connect; _read_log_connect() already logged an
             # error for us, just bail
@@ -218,10 +219,11 @@ class CallbackModule(default.CallbackModule):
                 # code points to escape sequences which exactly represent
                 # the correct data without throwing a decoding exception.
                 done = self._log_streamline(
-                    host, line.decode("utf-8", "backslashreplace"))
+                    host, log_id, line.decode("utf-8", "backslashreplace"))
                 if done:
                     if self._zuul_console_version > 0:
                         try:
+                            self._log("CUSTOM Cleanup log %s" % (log_id), job=False, executor=True)
                             # reestablish connection and tell console to
                             # clean up
                             s = self._read_log_connect(host, ip, port)
@@ -239,23 +241,29 @@ class CallbackModule(default.CallbackModule):
                     buff += more
         if buff:
             self._log_streamline(
-                host, buff.decode("utf-8", "backslashreplace"))
+                host, log_id, buff.decode("utf-8", "backslashreplace"))
+            self._log("CUSTOM logstreamline %s" % (log_id), job=False, executor=True)
 
-    def _log_streamline(self, host, line):
+    def _log_streamline(self, host, log_id, line):
         if "[Zuul] Task exit code" in line:
             return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
-            # When we got here it indicates that the task is already finished
-            # but the logfile didn't appear yet on the remote node. This can
-            # happen rarely on a contended remote node. In this case give
-            # the streamer some additional time to pick up the log. Otherwise
-            # we would discard the log.
-            if time.monotonic() < (self._streamers_stop_ts + 10):
-                # don't output this line
-                return False
-            return True
         elif "[Zuul] Log not found" in line:
-            # don't output this line
+            if self._streamers_stop:
+                # When we got here it indicates that the task is already finished
+                # but the logfile didn't appear yet on the remote node. This can
+                # happen rarely on a contended remote node. In this case give
+                # the streamer some additional time to pick up the log. Otherwise
+                # we would discard the log.
+                if time.monotonic() > (self._streamers_stop_ts + 10):
+                    # don't output this line
+                    return True
+
+            # if the task was skipped, there won't be any output
+            with self._streamers_lock:
+                if log_id in self._streamers and self._streamers[log_id][
+                        'skip']:
+                    return True
+
             return False
         elif " | " in line:
             ts, ln = line.split(' | ', 1)
@@ -347,16 +355,12 @@ class CallbackModule(default.CallbackModule):
                         continue
                     ip = '127.0.0.1'
 
-                # Get a unique key for ZUUL_LOG_ID_MAP.  Use it to add
-                # a counter to the log id so that if we run the same
-                # task more than once, we get a unique log file.  See
-                # comments in paths.py for details.
-                log_host = paths._sanitize_filename(inventory_hostname)
-                key = "%s-%s" % (self._task._uuid, log_host)
-                count = paths.ZUUL_LOG_ID_MAP.get(key, 0) + 1
-                paths.ZUUL_LOG_ID_MAP[key] = count
-                log_id = "%s-%s-%s" % (
-                    self._task._uuid, count, log_host)
+                log_id = self._get_log_id(inventory_hostname)
+
+                with self._streamers_lock:
+                    if log_id not in self._streamers:
+                        self._streamers[log_id] = {'skip': False,
+                                                   'streamers': []}
 
                 self._log("[%s] Starting to log %s for task %s"
                           % (host, log_id, task_name),
@@ -366,18 +370,25 @@ class CallbackModule(default.CallbackModule):
                         host, ip, port, log_id, task_name, hosts))
                 streamer.daemon = True
                 streamer.start()
-                self._streamers.append(streamer)
+                self._streamers_stop = False
+                with self._streamers_lock:
+                    self._streamers[log_id]['streamers'].append(streamer)
 
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
 
-    def _stop_streamers(self):
+    def _stop_streamers(self, log_id):
         self._streamers_stop_ts = time.monotonic()
         self._streamers_stop = True
+        with self._streamers_lock:
+            if log_id not in self._streamers:
+                return
         while True:
-            if not self._streamers:
-                break
-            streamer = self._streamers.pop()
+            with self._streamers_lock:
+                if not self._streamers[log_id]['streamers']:
+                    self._streamers[log_id]['skip'] = False
+                    break
+                streamer = self._streamers[log_id]['streamers'].pop()
             streamer.join(30)
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
@@ -389,6 +400,8 @@ class CallbackModule(default.CallbackModule):
         localhost_names = ('localhost', '127.0.0.1', '::1')
         is_localhost = False
         task_host = result._host.get_name()
+        log_id = self._get_log_id(task_host)
+
         delegated_vars = result_dict.get('_ansible_delegated_vars', None)
         if delegated_vars:
             delegated_host = delegated_vars['ansible_host']
@@ -409,7 +422,7 @@ class CallbackModule(default.CallbackModule):
                 is_localhost = True
 
         if not is_localhost and is_task:
-            self._stop_streamers()
+            self._stop_streamers(log_id)
         if result._task.action in ('command', 'shell',
                                    'win_command', 'win_shell'):
             stdout_lines = zuul_filter_result(result_dict)
@@ -456,6 +469,12 @@ class CallbackModule(default.CallbackModule):
             if reason:
                 # No reason means it's an item, which we'll log differently
                 self._log_message(result, status='skipping', msg=reason)
+
+            log_id = self._get_log_id(result._host.get_name())
+            with self._streamers_lock:
+                if log_id in self._streamers:
+                    self._streamers[log_id]['skip'] = True
+            self._process_result_for_localhost(result)
 
     def v2_runner_item_on_skipped(self, result):
         reason = result._result.get('skip_reason')
@@ -592,16 +611,24 @@ class CallbackModule(default.CallbackModule):
                 hostname = self._get_hostname(result)
                 self._log("%s | %s " % (hostname, line))
 
-            if isinstance(result_dict[loop_var], str):
-                self._log_message(
-                    result,
-                    "Item: {loop_var} Runtime: {delta}".format(
-                        loop_var=result_dict[loop_var],
-                        delta=result_dict['delta']))
+            # in case of an async loop, the ansible job is not finished
+            # and no delta key is present in the result
+            if 'delta' in result_dict:
+                if isinstance(result_dict[loop_var], str):
+                    self._log_message(
+                        result,
+                        "Item: {loop_var} Runtime: {delta}".format(
+                            loop_var=result_dict[loop_var],
+                            delta=result_dict['delta']))
+                else:
+                    self._log_message(
+                        result,
+                        "Item: Runtime: {delta}".format(
+                            **result_dict))
             else:
                 self._log_message(
                     result,
-                    "Item: Runtime: {delta}".format(
+                    "Item: ansible_job_id:{ansible_job_id}".format(
                         **result_dict))
 
         if self._deferred_result:
@@ -781,5 +808,19 @@ class CallbackModule(default.CallbackModule):
                 delegated_host=delegated_vars['ansible_host'])
         else:
             return result._host.get_name()
+
+    def _get_log_id(self, host):
+        # Get a unique key for ZUUL_LOG_ID_MAP.  Use it to add
+        # a counter to the log id so that if we run the same
+        # task more than once, we get a unique log file.  See
+        # comments in paths.py for details.
+        log_host = paths._sanitize_filename(host)
+        key = "%s-%s" % (self._task._uuid, log_host)
+        count = paths.ZUUL_LOG_ID_MAP.get(key, 0) + 1
+        paths.ZUUL_LOG_ID_MAP[key] = count
+        log_id = "%s-%s-%s" % (
+            self._task._uuid, count, log_host)
+
+        return log_id
 
     v2_runner_on_unreachable = v2_runner_on_failed
