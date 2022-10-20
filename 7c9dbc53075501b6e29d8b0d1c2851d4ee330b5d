@@ -16,6 +16,23 @@
       "message": "Do we need to load the data from zk if the hash is None as well? To avoid a None hashes allowing data to leak across?",
       "revId": "7c9dbc53075501b6e29d8b0d1c2851d4ee330b5d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07fc430c_d3b8e230",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2305,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-20T20:59:21Z",
+      "side": 1,
+      "message": "I don\u0027t believe there is a code path that allows for the serialized JobData object to have a None value for its hash.  However, existing_job_data may itself be None, which is why we have the getattr (so that we don\u0027t raise an AttributeError).  I suppose it may be marginally more safe to add \"and job_data[\u0027hash\u0027] is not None\" onto the end, but it should not be possible to hit, so I\u0027m not sure it\u0027s worth it.",
+      "revId": "7c9dbc53075501b6e29d8b0d1c2851d4ee330b5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
