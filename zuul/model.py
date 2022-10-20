@@ -3135,10 +3135,9 @@ class Job(ConfigObject):
             branch_change = change
         else:
             # If an override branch is supplied, create a very basic
-            # change (a Ref) and set its branch to the override
-            # branch.
-            branch_change = Ref(change.project)
-            branch_change.ref = override_branch
+            # change and set its branch to the override branch.
+            branch_change = Branch(change.project)
+            branch_change.branch = override_branch
 
         if self.branch_matcher and not self.branch_matcher.matches(
                 branch_change):

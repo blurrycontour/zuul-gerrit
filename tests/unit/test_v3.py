@@ -923,6 +923,159 @@ class TestBranchMismatch(ZuulTestCase):
         self.assertIn('nodeset "bar" was not found', A.messages[0],
                       "A should have a syntax error reported")
 
+    def _updateConfig(self, config, branch):
+        file_dict = {'zuul.yaml': config}
+        C = self.fake_gerrit.addFakeChange('org/project1', branch, 'C',
+                                           files=file_dict)
+        C.setMerged()
+        self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+    def test_implied_branch_matcher_similar(self):
+        # Test that we perform a full-text match with implied branch
+        # matchers.
+        self.create_branch('org/project1', 'testbranch')
+        self.create_branch('org/project1', 'testbranch2')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'testbranch'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'testbranch2'))
+
+        config = textwrap.dedent(
+            """
+            - job:
+                name: testjob
+                vars:
+                  this_branch: testbranch
+                  testbranch: true
+            - project:
+                check: {jobs: [testjob]}
+            """)
+        self._updateConfig(config, 'testbranch')
+        config = textwrap.dedent(
+            """
+            - job:
+                name: testjob
+                vars:
+                  this_branch: testbranch2
+                  testbranch2: true
+            - project:
+                check: {jobs: [testjob]}
+            """)
+        self._updateConfig(config, 'testbranch2')
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange(
+            'org/project1', 'testbranch', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(
+            {'testbranch': True, 'this_branch': 'testbranch'},
+            self.builds[0].job.combined_variables)
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange(
+            'org/project1', 'testbranch2', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # The two jobs should have distinct variables.  Notably,
+        # testbranch2 should not pick up vars from testbranch.
+        self.assertEqual(
+            {'testbranch2': True, 'this_branch': 'testbranch2'},
+            self.builds[0].job.combined_variables)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='testjob', result='SUCCESS', changes='3,1'),
+            dict(name='testjob', result='SUCCESS', changes='4,1'),
+        ], ordered=False)
+
+    def test_implied_branch_matcher_similar_override_checkout(self):
+        # Overriding a checkout has some branch matching implications.
+        # Make sure that we are performing a full-text match on
+        # branches when we override a checkout.
+        self.create_branch('org/project1', 'testbranch')
+        self.create_branch('org/project1', 'testbranch2')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'testbranch'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'testbranch2'))
+        config = textwrap.dedent(
+            """
+            - job:
+                name: testjob
+                vars:
+                  this_branch: testbranch
+                  testbranch: true
+            - project:
+                check: {jobs: [testjob]}
+            """)
+        self._updateConfig(config, 'testbranch')
+        config = textwrap.dedent(
+            """
+            - job:
+                name: testjob
+                vars:
+                  this_branch: testbranch2
+                  testbranch2: true
+            - project:
+                check: {jobs: [testjob]}
+            """)
+        self._updateConfig(config, 'testbranch2')
+
+        self.executor_server.hold_jobs_in_build = True
+        config = textwrap.dedent(
+            """
+            - job:
+                name: project-test1
+            - job:
+                name: testjob-testbranch
+                parent: testjob
+                override-checkout: testbranch
+            - job:
+                name: testjob-testbranch2
+                parent: testjob
+                override-checkout: testbranch2
+            - project:
+                check: {jobs: [testjob-testbranch, testjob-testbranch2]}
+            """)
+        file_dict = {'zuul.yaml': config}
+        A = self.fake_gerrit.addFakeChange(
+            'org/project1', 'master', 'A', files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(
+            {'testbranch': True, 'this_branch': 'testbranch'},
+            self.builds[0].job.combined_variables)
+
+        # The two jobs should have distinct variables (notably, the
+        # variant on testbranch2 should not pick up vars from
+        # testbranch.
+        self.assertEqual(
+            {'testbranch2': True, 'this_branch': 'testbranch2'},
+            self.builds[1].job.combined_variables)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='testjob-testbranch', result='SUCCESS', changes='3,1'),
+            dict(name='testjob-testbranch2', result='SUCCESS', changes='3,1'),
+        ], ordered=False)
+
 
 class TestBranchRef(ZuulTestCase):
     tenant_config_file = 'config/branch-ref/main.yaml'
