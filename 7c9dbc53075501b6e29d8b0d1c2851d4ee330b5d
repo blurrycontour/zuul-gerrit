@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "869a5e18_6a2bf138",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2305,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-20T20:50:36Z",
+      "side": 1,
+      "message": "Do we need to load the data from zk if the hash is None as well? To avoid a None hashes allowing data to leak across?",
+      "revId": "7c9dbc53075501b6e29d8b0d1c2851d4ee330b5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
