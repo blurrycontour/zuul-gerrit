@@ -71,8 +71,11 @@ class TestMergerRepo(ZuulTestCase):
 
         # Forge a repo having a submodule
         parent_repo = git.Repo(parent_path)
-        parent_repo.git.submodule('add', os.path.join(
-            self.upstream_root, 'org/project2'), 'subdir')
+        parent_repo.git(c='protocol.file.allow=always').submodule(
+            'add',
+            os.path.join(self.upstream_root, 'org/project2'),
+            'subdir')
+
         parent_repo.index.commit('Adding project2 as a submodule in subdir')
         # git 1.7.8 changed .git from being a directory to a file pointing
         # to the parent repository /.git/modules/*
