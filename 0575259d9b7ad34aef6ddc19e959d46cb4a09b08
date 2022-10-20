@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "feee072a_519a3933",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35236
+      },
+      "writtenOn": "2022-10-20T14:50:22Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3:\n\u003e \n\u003e Thanks for the explanation.  Here is how I would recommend you proceed:\n\u003e \n\u003e First, fix the rebase locally.  Then, if it\u0027s still substantially similar to the original, then just update the original change with the new patchset.  That will maintain the authorship and review history.  If a completely new approach is needed, then make a new change (or keep using this change) and mention the older patch in the commit message if it\u0027s relevant.\n\u003e \n\u003e WIP changes are fine (we all upload unfinished changes in order to share our work with others).  But they still only make sense for changes that we hope to eventually review and merge, and it wasn\u0027t originally clear what the intended path was for this change.\n\nYes of course I will update the original change. I just didn\u0027t want to send a new patchset unless I\u0027m sure the changes I will be doing in the original review are not breaking tests",
+      "revId": "0575259d9b7ad34aef6ddc19e959d46cb4a09b08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
