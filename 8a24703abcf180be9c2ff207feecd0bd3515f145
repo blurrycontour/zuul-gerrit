@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac9af27b_fb50d8bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35236
+      },
+      "writtenOn": "2022-10-20T14:34:42Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2:\n\u003e \n\u003e What does \"Test custom merge conflict resolution\" mean?\n\nI\u0027m trying to rebase the mentioned review that is opened since 2020 and ensuring tests are still passing.\nAs I didn\u0027t want to upload a new patchset on the review, I created one for myself.\nI didn\u0027t think a WIP review would ping anyone.\n\nFor more context :\nWe are currently upgrading Zuul from 6 to 7. As we are having this issue on our production Zuul deployment, we cherry-picked the commit in our fork and we are trying to resolve conflicts as the file changed quite a lot.\n",
+      "revId": "8a24703abcf180be9c2ff207feecd0bd3515f145",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
