@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dad69cf_ce370c19",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 6329,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-20T21:05:26Z",
+      "side": 1,
+      "message": "I find this comment to be a bit confusing. It appears we\u0027re actually explicitly refreshing the pipelines below to refresh the JobData. Is this saying that the pause is necessary for the pipeline refresh to trigger a job refresh when we manually trigger pipeline refreshes?\n\nAdditionally, do we expect both pipeline refreshes to attempt to refresh job data or just the second one (which affects the paused job)?",
+      "revId": "ec4c6264ca1694082e30cffcf54ff54ada1d8c2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
