@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f07c6407_84889e70",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-20T21:29:14Z",
+      "side": 1,
+      "message": "Not approving as there is a git thing affecting testing. Feel free to approve when that is resolved.",
+      "revId": "7c9dbc53075501b6e29d8b0d1c2851d4ee330b5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "869a5e18_6a2bf138",
