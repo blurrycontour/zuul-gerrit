@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fbef0dd_872cc173",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-20T21:29:36Z",
+      "side": 1,
+      "message": "Not approving until the git submodule thing is fixed. Feel free to approve when that is resolved.",
+      "revId": "ec4c6264ca1694082e30cffcf54ff54ada1d8c2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1dad69cf_ce370c19",
