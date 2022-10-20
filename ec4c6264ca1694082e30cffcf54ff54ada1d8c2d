@@ -16,6 +16,23 @@
       "message": "I find this comment to be a bit confusing. It appears we\u0027re actually explicitly refreshing the pipelines below to refresh the JobData. Is this saying that the pause is necessary for the pipeline refresh to trigger a job refresh when we manually trigger pipeline refreshes?\n\nAdditionally, do we expect both pipeline refreshes to attempt to refresh job data or just the second one (which affects the paused job)?",
       "revId": "ec4c6264ca1694082e30cffcf54ff54ada1d8c2d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a69a8904_4da4fd4d",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 6329,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-20T21:20:15Z",
+      "side": 1,
+      "message": "There\u0027s a lot of \"refreshing\" going on, so let me explain... no let me summarize:\n\n* Not only does JobData rarely change, but the objects that hold JobData (which are either FrozenJob or Build objects) also rarely change.\n* The comment above is explaining why we are using a paused job: that is one of the times when a Build is refreshed, and that is a necessary pre-requisite to refreshing a Build\u0027s JobData.  In other words, to even have a chance of calling the code that decides whether or not to refresh a Build\u0027s JobData from ZK, we first have to call the code that refreshes Build.\n* That means that \"refreshPipelines\" doesn\u0027t always refresh every object in all the pipelines.\n* So if we want to verify that we are re-using JobData objects, we need to refresh a pipeline when it is in a condition where it will decide that it needs to refresh the Build so that we can test our JobData reuse code.\n\nSo to answer your question: refreshPipelines *does* cause us to execute the JobData hash matching code because the content of the pipeline is a paused build.  If it were any other build, we wouldn\u0027t even get that far so the test would not be useful.",
+      "revId": "ec4c6264ca1694082e30cffcf54ff54ada1d8c2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
