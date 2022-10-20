@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66b04325_99ecc5c9",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-20T21:58:58Z",
+      "side": 1,
+      "message": "Note this should be safe as the git issue appears to require you add a malicious repo and zuul controls the repo here.",
+      "revId": "ce3d9044ab9d9511c1a53d1815f21fb6bcc93141",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
