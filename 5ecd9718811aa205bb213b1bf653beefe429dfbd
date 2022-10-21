@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09cb2147_50d3d0d7",
+        "filename": "web/src/actions/user.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-21T13:25:45Z",
+      "side": 1,
+      "message": "We definitely need to be careful about dealing with react components inside redux actions, but there\u0027s no problem updating global variables.  Since we need the API token (if set) now in *every* API call, there are a few ways of getting that.  Here\u0027s a blog post that summarizes them.  This approach is #3:\n\nhttps://daveceddia.com/access-redux-store-outside-react/#option-3-use-middleware-and-intercept-an-action\n\nI think we have way too many API calls and the call stack is too complex to try to pass the token around all the time.",
+      "parentUuid": "a2b8df41_0149f863",
+      "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5134df7_59b06ede",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0925a4d0_2c0f5457",
+        "filename": "web/src/reducers/notifications.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-21T13:25:45Z",
+      "side": 1,
+      "message": "Yeah, I *think* they may not be anymore (not because of this patch, something long ago I suspect), and I\u0027m not sure if that was intentional.",
+      "parentUuid": "a5134df7_59b06ede",
+      "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1c39606_936f1648",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-10-21T09:41:58Z",
       "side": 1,
       "message": "I personally don\u0027t like this undefined/null pattern in JavaScript but I think in this case it\u0027s OK and I don\u0027t have a better solution for that out of the box. I think I even used this pattern somewhere else as I didn\u0027t come up with something better :D.",
+      "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a3a2385_684a7e40",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-21T13:25:45Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s a tri-state situation.  We could add more variables if we don\u0027t like it, but I\u0027m hoping if we just document it carefully we\u0027ll be good.",
+      "parentUuid": "f1c39606_936f1648",
       "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
