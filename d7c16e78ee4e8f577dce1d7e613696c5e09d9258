@@ -16,6 +16,24 @@
       "message": "I think that this part is the \"main\" part of this change, right? Where we actually change the workflow.\n\nWhen I saw this the first time, I was wondering why we didn\u0027t handle this case via a route. Then I saw that you removed the route in https://review.opendev.org/c/zuul/zuul/+/859466/7/web/src/routes.js.\n\nNow I\u0027m a little confused: Couldn\u0027t we just do the \"lingering\" within the AuthCallbackPage itself? This part here feels a little hacky.",
       "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f666d332_ce32c063",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:05:57Z",
+      "side": 1,
+      "message": "Having a second look I think I understand a little more :D\nThere is a second part, where we store the redirect property in redux, which allows us to wait for it within the AuthCallbackPage.\n\nBut then I\u0027m confused why we even need this part here.",
+      "parentUuid": "04c2f6db_09ff88c7",
+      "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
