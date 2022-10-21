@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6505008_2185951c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:43:17Z",
+      "side": 1,
+      "message": "Just some small questions and suggestions, but overall LGTM.",
+      "revId": "1a9fec6358fd119a4b5b12734cf404026378a33f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "961bf9bd_49da4bda",
+        "filename": "doc/source/authentication.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:43:17Z",
+      "side": 1,
+      "message": "nit: entirely -\u003e entire?\n\nJust a guess, you are the native speaker ;-)",
+      "revId": "1a9fec6358fd119a4b5b12734cf404026378a33f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6ed5b61_e2282131",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:43:17Z",
+      "side": 1,
+      "message": "This sounds like one always has to configure at least one access-rule to allow (read?) access to the tenant at all. I think on the last page you mentioned that anonymous read access to any tenant is by default still possible.",
+      "revId": "1a9fec6358fd119a4b5b12734cf404026378a33f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cda2b825_c0af71c2",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 717,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:43:17Z",
+      "side": 1,
+      "message": "Same like above.",
+      "revId": "1a9fec6358fd119a4b5b12734cf404026378a33f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ec4ef86_b68bd22a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:43:17Z",
+      "side": 1,
+      "message": "Question regarding the auth parameter provided to the api methods via the decorator: The authorization is already done at this point (within the decorator). We just provide the parameter in case the api method wants to do something with the auth info, right?",
+      "revId": "1a9fec6358fd119a4b5b12734cf404026378a33f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75c9b5f1_637df0d8",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T08:43:17Z",
+      "side": 1,
+      "message": "The tenant_name parameter seems to be unused, but it\u0027s provided by cherrypy and needed for the `check_tenant_auth` decorator. We just don\u0027t use it directly within this method right? Should we maybe add a comment about that as this might cause some confusion? I think this applies to most of the api methods that are using the `check_tenant_auth` decorator.",
+      "revId": "1a9fec6358fd119a4b5b12734cf404026378a33f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
