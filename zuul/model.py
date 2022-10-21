@@ -2302,10 +2302,14 @@ class FrozenJob(zkobject.ZKObject):
                 elif job_data['storage'] == 'offload':
                     existing_job_data = getattr(self, f"_{job_data_key}", None)
                     if (getattr(existing_job_data, 'hash', None) ==
-                        job_data['hash']):
+                        job_data['hash']
+                        and job_data['hash'] is not None):
                         # Re-use the existing object since it's the same
                         data['_' + job_data_key] = existing_job_data
                     else:
+                        if job_data['hash'] is None:
+                            context.log.error("JobData hash is None on %s",
+                                              self)
                         # Load the object from ZK
                         data['_' + job_data_key] = JobData.fromZK(
                             context, job_data['path'])
@@ -3703,10 +3707,14 @@ class Build(zkobject.ZKObject):
                 elif job_data['storage'] == 'offload':
                     existing_job_data = getattr(self, f"_{job_data_key}", None)
                     if (getattr(existing_job_data, 'hash', None) ==
-                        job_data['hash']):
+                        job_data['hash']
+                        and job_data['hash'] is not None):
                         # Re-use the existing object since it's the same
                         data['_' + job_data_key] = existing_job_data
                     else:
+                        if job_data['hash'] is None:
+                            context.log.error("JobData hash is None on %s",
+                                              self)
                         # Load the object from ZK
                         data['_' + job_data_key] = JobData.fromZK(
                             context, job_data['path'])
