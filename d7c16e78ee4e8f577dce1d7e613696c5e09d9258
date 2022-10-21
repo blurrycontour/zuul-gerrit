@@ -34,6 +34,24 @@
       "parentUuid": "04c2f6db_09ff88c7",
       "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e194d22_7e89eb44",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-21T13:45:57Z",
+      "side": 1,
+      "message": "It\u0027s mostly about the issue in the first paragraph of the commit message.  If we try to handle this with the router, there\u0027s too much other stuff going on that\u0027s trying to update our data.  We need to leave the window.location alone until we\u0027ve finished the login process, but trying to prevent the rest of the application from doing that is too complicated (perhaps impossible).\n\nPlus, I think this actually matches the way the auth system works better.",
+      "parentUuid": "04c2f6db_09ff88c7",
+      "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
