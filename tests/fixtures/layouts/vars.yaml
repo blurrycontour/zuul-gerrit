@@ -18,7 +18,14 @@
 
 - job:
     name: check-job
-    run: playbooks/check.yaml
+    vars:
+      my_var: foo
+    extra-vars:
+      extra_var: bar
+
+- job:
+    name: hold-job
+    dependencies: check-job
     vars:
       my_var: foo
     extra-vars:
@@ -29,3 +36,4 @@
     check:
       jobs:
         - check-job
+        - hold-job
