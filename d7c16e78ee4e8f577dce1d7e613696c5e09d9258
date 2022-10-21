@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04c2f6db_09ff88c7",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T07:51:34Z",
+      "side": 1,
+      "message": "I think that this part is the \"main\" part of this change, right? Where we actually change the workflow.\n\nWhen I saw this the first time, I was wondering why we didn\u0027t handle this case via a route. Then I saw that you removed the route in https://review.opendev.org/c/zuul/zuul/+/859466/7/web/src/routes.js.\n\nNow I\u0027m a little confused: Couldn\u0027t we just do the \"lingering\" within the AuthCallbackPage itself? This part here feels a little hacky.",
+      "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
