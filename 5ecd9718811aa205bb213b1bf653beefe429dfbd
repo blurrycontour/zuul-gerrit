@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2b8df41_0149f863",
+        "filename": "web/src/actions/user.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T09:41:58Z",
+      "side": 1,
+      "message": "I have something in mind that you shouldn\u0027t alter \"global\" objects (or objects/variables outside of the action\u0027s scope) in redux actions, but I could be totally wrong here and mix it up with something else. I haven\u0027t worked with redux for a longer time now and aren\u0027t that deep into the topic anymore (which will hopefully change within the next weeks ;-) ).\n\nHowever, I don\u0027t see a problem with that and I see why we need this so I\u0027d say it\u0027s OK. But maybe we should have a look at that topic later on.\n\n@Jim: You might know redux better here and say it\u0027s OK. Then I\u0027m also fine with this ;-)",
+      "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5134df7_59b06ede",
+        "filename": "web/src/reducers/notifications.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T09:41:58Z",
+      "side": 1,
+      "message": "I think the last time I worked with that they were still used, but (as said in my last comment) that was quite some while ago. So we should definitely check this.",
+      "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1c39606_936f1648",
+        "filename": "web/src/reducers/user.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-21T09:41:58Z",
+      "side": 1,
+      "message": "I personally don\u0027t like this undefined/null pattern in JavaScript but I think in this case it\u0027s OK and I don\u0027t have a better solution for that out of the box. I think I even used this pattern somewhere else as I didn\u0027t come up with something better :D.",
+      "revId": "5ecd9718811aa205bb213b1bf653beefe429dfbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
