@@ -52,6 +52,24 @@
       "parentUuid": "04c2f6db_09ff88c7",
       "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bedeba21_d4e4d9b9",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-22T16:50:46Z",
+      "side": 1,
+      "message": "This change is also anticipating the upcoming change to possibly require authn for read-only access.  In that change, the flow becomes:\n\n* If the URL is auth_callback, just show that page and stop\n* If we require read-only access, redirect to idp\n* Otherwise, use the router to show normal content\n\nBeing able to put the redirect before normal content handling means we can ensure that we avoid rendering anything if auth is required, which I think is a straightforward and safe way of handling it.  And we must not allow control to reach the idp redirect if we\u0027re at auth_callback (otherwise we get an infinite redirect loop).\n\nSo while I can\u0027t say at this point exactly what timing issue led me to decide that this change was the one where we should move the auth_callback handling outside of the router, I think we should now consider it in the context of the upcoming change where there is a much better reason for doing so.",
+      "parentUuid": "04c2f6db_09ff88c7",
+      "revId": "d7c16e78ee4e8f577dce1d7e613696c5e09d9258",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
