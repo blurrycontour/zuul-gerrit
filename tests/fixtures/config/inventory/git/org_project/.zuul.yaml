@@ -7,5 +7,4 @@
         - executor-only-inventory
         - group-inventory
         - hostvars-inventory
-        - ansible-version5-inventory
         - ansible-version6-inventory

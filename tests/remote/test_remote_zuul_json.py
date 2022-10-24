@@ -144,14 +144,6 @@ class FunctionalZuulJSONMixIn:
             dateutil.parser.parse(play_end_time)
 
 
-class TestZuulJSON5(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
-    ansible_version = '5'
-
-    def setUp(self):
-        super().setUp()
-        self._setUp()
-
-
 class TestZuulJSON6(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
     ansible_version = '6'
 
