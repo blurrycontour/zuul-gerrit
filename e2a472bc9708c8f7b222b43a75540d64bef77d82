@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4af24ba0_8b7cf1cf",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1219,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-10-24T12:07:06Z",
+      "side": 1,
+      "message": "It took me some time to understand the purpose of this change, although it\u0027s quite straight forward if you know :D\n\nIf I understood it correctly it\u0027s purpose is to look up the string representation of the merge mode based on it\u0027s numeric value (1-4). Which makes sense because returning the (internal) numeric value via the API doesn\u0027t make much sense.\n\nI think it would make sense to add a short comment here with that information.",
+      "revId": "e2a472bc9708c8f7b222b43a75540d64bef77d82",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
