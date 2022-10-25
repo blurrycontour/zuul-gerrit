@@ -88,6 +88,14 @@
       tox_envlist: zuul_client
 
 - job:
+    name: zuul-tox-py311
+    parent: zuul-tox
+    timeout: 7200  # 120 minutes
+    vars:
+      tox_envlist: py311
+      python_version: "3.11"
+
+- job:
     name: zuul-tox-py310
     parent: zuul-tox
     timeout: 7200  # 120 minutes
@@ -289,6 +297,7 @@
         - zuul-tox-py38
         - zuul-tox-py310
         - zuul-tox-py310-multi-scheduler
+        - zuul-tox-py311
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -319,6 +328,7 @@
             nodeset: ubuntu-jammy
         - zuul-tox-py38
         - zuul-tox-py310
+        - zuul-tox-py311
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
