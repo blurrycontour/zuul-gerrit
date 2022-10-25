@@ -4927,7 +4927,7 @@ class QueueItem(zkobject.ZKObject):
             self.warning(str(e))
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
-                                  result='FAILURE')
+                                  error_detail=str(e), result='FAILURE')
             self.addBuild(fakebuild)
             self.pipeline.manager.sql.reportBuildEnd(
                 fakebuild,
@@ -5227,11 +5227,16 @@ class QueueItem(zkobject.ZKObject):
         buildset = self.current_build_set
         job_graph = self.current_build_set.job_graph
         skipped = []
+        # We may skip several jobs, but if we do, they will all be for
+        # the same reason.
+        skipped_reason = None
         # NOTE(pabelanger): Check successful/paused jobs to see if
         # zuul_return includes zuul.child_jobs.
         build_result = build.result_data.get('zuul', {})
         if ((build.result == 'SUCCESS' or build.paused)
                 and 'child_jobs' in build_result):
+            skipped_reason = ('Skipped due to child_jobs return value in job '
+                              + build.job.name)
             zuul_return = build_result.get('child_jobs', [])
             dependent_jobs = job_graph.getDirectDependentJobs(
                 build.job.name)
@@ -5254,6 +5259,7 @@ class QueueItem(zkobject.ZKObject):
                     skipped += to_skip
 
         elif build.result not in ('SUCCESS', 'SKIPPED') and not build.paused:
+            skipped_reason = 'Skipped due to failed job ' + build.job.name
             to_skip = job_graph.getDependentJobsRecursively(
                 build.job.name)
             skipped += to_skip
@@ -5264,6 +5270,7 @@ class QueueItem(zkobject.ZKObject):
                 fakebuild = Build.new(self.pipeline.manager.current_context,
                                       job=job,
                                       build_set=self.current_build_set,
+                                      error_detail=skipped_reason,
                                       result='SKIPPED')
                 self.addBuild(fakebuild)
                 self.pipeline.manager.sql.reportBuildEnd(
@@ -5271,13 +5278,14 @@ class QueueItem(zkobject.ZKObject):
                     tenant=self.pipeline.tenant.name,
                     final=True)
 
-    def setNodeRequestFailure(self, job):
+    def setNodeRequestFailure(self, job, error):
         fakebuild = Build.new(
             self.pipeline.manager.current_context,
             job=job,
             build_set=self.current_build_set,
             start_time=time.time(),
             end_time=time.time(),
+            error_detail=error,
             result='NODE_FAILURE',
         )
         self.addBuild(fakebuild)
@@ -5291,19 +5299,19 @@ class QueueItem(zkobject.ZKObject):
         self.updateAttributes(
             self.pipeline.manager.current_context,
             dequeued_needing_change=msg)
-        self._setAllJobsSkipped()
+        self._setAllJobsSkipped(msg)
 
     def setDequeuedMissingRequirements(self):
         self.updateAttributes(
             self.pipeline.manager.current_context,
             dequeued_missing_requirements=True)
-        self._setAllJobsSkipped()
+        self._setAllJobsSkipped('Missing pipeline requirements')
 
-    def setDequeuedBundleFailing(self):
+    def setDequeuedBundleFailing(self, msg):
         self.updateAttributes(
             self.pipeline.manager.current_context,
             dequeued_bundle_failing=True)
-        self._setMissingJobsSkipped()
+        self._setMissingJobsSkipped(msg)
 
     def setUnableToMerge(self, errors=None):
         with self.current_build_set.activeContext(
@@ -5313,7 +5321,7 @@ class QueueItem(zkobject.ZKObject):
                 for msg in errors:
                     self.current_build_set.warning_messages.append(msg)
                     self.log.info(msg)
-        self._setAllJobsSkipped()
+        self._setAllJobsSkipped('Unable to merge')
 
     def setConfigError(self, error):
         err = ConfigurationError(None, None, error)
@@ -5333,27 +5341,27 @@ class QueueItem(zkobject.ZKObject):
             with self.current_build_set.activeContext(
                     self.pipeline.manager.current_context):
                 self.current_build_set.setConfigErrors(errors)
-        self._setAllJobsSkipped()
+        self._setAllJobsSkipped('Buildset configuration error')
 
-    def _setAllJobsSkipped(self):
+    def _setAllJobsSkipped(self, msg):
         for job in self.getJobs():
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
-                                  result='SKIPPED')
+                                  error_detail=msg, result='SKIPPED')
             self.addBuild(fakebuild)
             self.pipeline.manager.sql.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
                 final=True)
 
-    def _setMissingJobsSkipped(self):
+    def _setMissingJobsSkipped(self, msg):
         for job in self.getJobs():
             if job.name in self.current_build_set.builds:
                 # We already have a build for this job
                 continue
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
-                                  result='SKIPPED')
+                                  error_detail=msg, result='SKIPPED')
             self.addBuild(fakebuild)
             self.pipeline.manager.sql.reportBuildEnd(
                 fakebuild,
