@@ -88,12 +88,12 @@
       tox_envlist: zuul_client
 
 - job:
-    name: zuul-tox-py310
+    name: zuul-tox-py311
     parent: zuul-tox
     timeout: 7200  # 120 minutes
     vars:
-      tox_envlist: py310
-      python_version: "3.10"
+      tox_envlist: py311
+      python_version: "3.11"
 
 - job:
     name: zuul-tox-py38
@@ -105,8 +105,8 @@
     nodeset: ubuntu-focal
 
 - job:
-    name: zuul-tox-py310-multi-scheduler
-    parent: zuul-tox-py310
+    name: zuul-tox-py311-multi-scheduler
+    parent: zuul-tox-py311
     voting: false
     vars:
       tox_environment:
@@ -200,8 +200,8 @@
     allowed-projects: zuul/zuul
     timeout: 2700  # 45 minutes
     requires:
-      - python-builder-3.10-bullseye-container-image
-      - python-base-3.10-bullseye-container-image
+      - python-builder-3.11-bullseye-container-image
+      - python-base-3.11-bullseye-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
       docker_images:
@@ -239,8 +239,8 @@
     description: Build Docker images and upload to Docker Hub.
     allowed-projects: zuul/zuul
     requires:
-      - python-builder-3.10-bullseye-container-image
-      - python-base-3.10-bullseye-container-image
+      - python-builder-3.11-bullseye-container-image
+      - python-base-3.11-bullseye-container-image
     provides: zuul-container-image
     secrets:
       name: docker_credentials
@@ -287,8 +287,8 @@
               tox_install_bindep: false
             nodeset: ubuntu-jammy
         - zuul-tox-py38
-        - zuul-tox-py310
-        - zuul-tox-py310-multi-scheduler
+        - zuul-tox-py311
+        - zuul-tox-py311-multi-scheduler
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -318,7 +318,7 @@
               tox_install_bindep: false
             nodeset: ubuntu-jammy
         - zuul-tox-py38
-        - zuul-tox-py310
+        - zuul-tox-py311
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
