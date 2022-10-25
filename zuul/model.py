@@ -4929,6 +4929,10 @@ class QueueItem(zkobject.ZKObject):
                                   job=job, build_set=self.current_build_set,
                                   result='FAILURE')
             self.addBuild(fakebuild)
+            self.pipeline.manager.sql.reportBuildEnd(
+                fakebuild,
+                tenant=self.pipeline.tenant.name,
+                final=True)
             self.setResult(fakebuild)
             ret = False
         return ret
@@ -5262,6 +5266,10 @@ class QueueItem(zkobject.ZKObject):
                                       build_set=self.current_build_set,
                                       result='SKIPPED')
                 self.addBuild(fakebuild)
+                self.pipeline.manager.sql.reportBuildEnd(
+                    fakebuild,
+                    tenant=self.pipeline.tenant.name,
+                    final=True)
 
     def setNodeRequestFailure(self, job):
         fakebuild = Build.new(
@@ -5273,8 +5281,11 @@ class QueueItem(zkobject.ZKObject):
             result='NODE_FAILURE',
         )
         self.addBuild(fakebuild)
+        self.pipeline.manager.sql.reportBuildEnd(
+            fakebuild,
+            tenant=self.pipeline.tenant.name,
+            final=True)
         self.setResult(fakebuild)
-        return fakebuild
 
     def setDequeuedNeedingChange(self, msg):
         self.updateAttributes(
@@ -5330,6 +5341,10 @@ class QueueItem(zkobject.ZKObject):
                                   job=job, build_set=self.current_build_set,
                                   result='SKIPPED')
             self.addBuild(fakebuild)
+            self.pipeline.manager.sql.reportBuildEnd(
+                fakebuild,
+                tenant=self.pipeline.tenant.name,
+                final=True)
 
     def _setMissingJobsSkipped(self):
         for job in self.getJobs():
@@ -5340,6 +5355,10 @@ class QueueItem(zkobject.ZKObject):
                                   job=job, build_set=self.current_build_set,
                                   result='SKIPPED')
             self.addBuild(fakebuild)
+            self.pipeline.manager.sql.reportBuildEnd(
+                fakebuild,
+                tenant=self.pipeline.tenant.name,
+                final=True)
 
     def getNodePriority(self):
         return self.pipeline.manager.getNodePriority(self)

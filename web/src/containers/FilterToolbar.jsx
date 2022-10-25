@@ -319,13 +319,20 @@ function writeFiltersToUrl(filters, location, history) {
 
 function buildQueryString(filters) {
   let queryString = '&complete=true'
+  let resultFilter = false
   if (filters) {
     Object.keys(filters).map((key) => {
       filters[key].forEach((value) => {
+        if (value === 'result') {
+          resultFilter = true
+        }
         queryString += '&' + key + '=' + value
       })
       return queryString
     })
+  }
+  if (!resultFilter) {
+      queryString += '&exclude_result=SKIPPED'
   }
   return queryString
 }

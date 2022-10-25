@@ -1967,13 +1967,7 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.jobNodeRequestComplete(request.job_name, nodeset)
         # Put a fake build through the cycle to clean it up.
         if not request.fulfilled:
-            fakebuild = build_set.item.setNodeRequestFailure(job)
-            try:
-                self.sql.reportBuildEnd(
-                    fakebuild, tenant=build_set.item.pipeline.tenant.name,
-                    final=True)
-            except Exception:
-                log.exception("Error reporting build completion to DB:")
+            build_set.item.setNodeRequestFailure(job)
             self._resumeBuilds(build_set)
             tenant = build_set.item.pipeline.tenant
             tenant.semaphore_handler.release(

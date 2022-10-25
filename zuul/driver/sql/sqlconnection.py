@@ -59,6 +59,14 @@ class DatabaseSession(object):
             return query.filter(column.in_(value))
         return query.filter(column == value)
 
+    def exListFilter(self, query, column, value):
+        # Exclude values in list
+        if value is None:
+            return query
+        if isinstance(value, list) or isinstance(value, tuple):
+            return query.filter(column.not_in(value))
+        return query.filter(column != value)
+
     def getBuilds(self, tenant=None, project=None, pipeline=None,
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, event_timestamp=None,
@@ -66,7 +74,8 @@ class DatabaseSession(object):
                   uuid=None, job_name=None, voting=None, nodeset=None,
                   result=None, provides=None, final=None, held=None,
                   complete=None, sort_by_buildset=False, limit=50,
-                  offset=0, idx_min=None, idx_max=None):
+                  offset=0, idx_min=None, idx_max=None,
+                  exclude_result=None):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -114,6 +123,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.voting, voting)
         q = self.listFilter(q, build_table.c.nodeset, nodeset)
         q = self.listFilter(q, build_table.c.result, result)
+        q = self.exListFilter(q, build_table.c.result, exclude_result)
         q = self.listFilter(q, build_table.c.final, final)
         if complete is True:
             q = q.filter(build_table.c.result != None)  # noqa
