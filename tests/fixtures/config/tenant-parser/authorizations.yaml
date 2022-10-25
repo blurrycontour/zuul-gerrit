@@ -1,9 +1,9 @@
-- admin-rule:
+- authorization-rule:
     name: auth-rule-one
     conditions:
       - sub: venkman
       - sub: zeddemore
-- admin-rule:
+- authorization-rule:
     name: auth-rule-two
     conditions:
       - sub: gozer
