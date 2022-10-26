@@ -189,8 +189,7 @@ class GithubReporter(BaseReporter):
         merge_mode = item.current_build_set.getMergeMode()
 
         if merge_mode not in self.merge_modes:
-            mode = [x[0] for x in model.MERGER_MAP.items()
-                    if x[1] == merge_mode][0]
+            mode = model.get_merge_mode_name(merge_mode)
             self.log.warning('Merge mode %s not supported by Github', mode)
             raise MergeFailure('Merge mode %s not supported by Github' % mode)
 
