@@ -30,7 +30,7 @@ from collections import defaultdict, OrderedDict
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from kazoo.exceptions import NotEmptyError
+from kazoo.exceptions import NotEmptyError, NoNodeError
 from opentelemetry import trace
 
 from zuul import configloader, exceptions
@@ -2153,12 +2153,10 @@ class Scheduler(threading.Thread):
                            pipeline.name, tenant.name)
             return False
 
-        stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         ctx = pipeline.manager.current_context
+        stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         with self.statsd_timer(f'{stats_key}.refresh'):
-            pipeline.change_list.refresh(ctx)
-            pipeline.summary.refresh(ctx)
-            pipeline.state.refresh(ctx)
+            pipeline.manager.refreshState()
 
         pipeline.state.setDirty(self.zk_client.client)
         if pipeline.state.old_queues:
@@ -2225,6 +2223,9 @@ class Scheduler(threading.Thread):
                 for pipeline in tenant.layout.pipelines.values():
                     try:
                         pipeline.change_list.refresh(ctx)
+                    except NoNodeError:
+                        self.log.warning(
+                            "Pipeline change list not initialized")
                     except Exception:
                         self.log.exception(
                             "Unable to refresh pipeline change list for %s",

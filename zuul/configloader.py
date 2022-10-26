@@ -1752,6 +1752,8 @@ class TenantParser(object):
             # Only call the postConfig hook if we have a scheduler as this will
             # change data in ZooKeeper. In case we are in a zuul-web context,
             # we don't want to do that.
+            # FIXME: Find a way to only run this on the initial reconfiguration
+            # and skip this step for local layout updates.
             for pipeline in tenant.layout.pipelines.values():
                 pipeline.manager._postConfig()
 

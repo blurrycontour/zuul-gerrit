@@ -64,6 +64,7 @@ class PipelineManager(metaclass=ABCMeta):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
+        self.initialized = False
         self.sched = sched
         self.pipeline = pipeline
         self.event_filters = []
@@ -79,6 +80,10 @@ class PipelineManager(metaclass=ABCMeta):
         # schedulers after processing a pipeline.
         self.pipeline.summary = model.PipelineSummary()
         self.pipeline.summary._set(pipeline=self.pipeline)
+        self.pipeline.state = PipelineState()
+        self.pipeline.state._set(pipeline=self.pipeline)
+        self.pipeline.change_list = PipelineChangeList()
+        self.pipeline.change_list._set(pipeline=self.pipeline)
 
         if sched:
             self.sql = sched.sql
@@ -94,28 +99,17 @@ class PipelineManager(metaclass=ABCMeta):
         finally:
             self.current_context = None
 
-    def _postConfig(self):
-        layout = self.pipeline.tenant.layout
-        # If our layout UUID already matches the UUID in ZK, we don't
-        # need to make any changes in ZK.  But we do still need to
-        # update our local object pointers.  Note that our local queue
-        # state may still be out of date after this because we skip
-        # the refresh.
-        self.buildChangeQueues(layout)
-        ctx = self.sched.createZKContext(None, self.log)
-        with self.currentContext(ctx):
-            if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
-                self.pipeline.state = PipelineState()
-                self.pipeline.state._set(pipeline=self.pipeline)
-                self.pipeline.change_list = PipelineChangeList()
-                self.pipeline.change_list._set(pipeline=self.pipeline)
-                return
-
-        with pipeline_lock(
-            self.sched.zk_client, self.pipeline.tenant.name, self.pipeline.name
-        ) as lock:
-            ctx = self.sched.createZKContext(lock, self.log)
-            with self.currentContext(ctx):
+    def refreshState(self):
+        needs_refresh = True
+        if not self.initialized:
+            layout = self.pipeline.tenant.layout
+            # If our layout UUID already matches the UUID in ZK, we don't
+            # need to make any changes in ZK.  But we do still need to
+            # update our local object pointers.  Note that our local queue
+            # state may still be out of date after this because we skip
+            # the refresh.
+            self.buildChangeQueues(layout)
+            if layout.uuid != PipelineState.peekLayoutUUID(self.pipeline):
                 # Since the layout UUID is new, this will move queues
                 # to "old_queues" and refresh the pipeline state as a
                 # side effect.
@@ -123,10 +117,25 @@ class PipelineManager(metaclass=ABCMeta):
                     self.pipeline, layout.uuid)
                 self.pipeline.change_list = PipelineChangeList.create(
                     self.pipeline)
-                event = PipelinePostConfigEvent()
-                self.sched.pipeline_management_events[
-                    self.pipeline.tenant.name][self.pipeline.name].put(
-                        event, needs_result=False)
+                needs_refresh = False
+            self.initialized = True
+
+        ctx = self.current_context
+        if needs_refresh:
+            self.pipeline.summary.refresh(ctx)
+            self.pipeline.change_list.refresh(ctx)
+            self.pipeline.state.refresh(ctx)
+
+    def _postConfig(self):
+        layout = self.pipeline.tenant.layout
+        ctx = self.sched.createZKContext(None, self.log)
+        with self.currentContext(ctx):
+            if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
+                return
+            event = PipelinePostConfigEvent()
+            self.sched.pipeline_management_events[
+                self.pipeline.tenant.name][self.pipeline.name].put(
+                    event, needs_result=False)
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")

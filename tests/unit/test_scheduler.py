@@ -363,7 +363,6 @@ class TestScheduler(ZuulTestCase):
 
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged"
-
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
@@ -479,7 +478,8 @@ class TestScheduler(ZuulTestCase):
                 'zuul.tenant.tenant-one.pipeline.gate.refresh',
         ]:
             val = self.assertReportedStat(key, kind='ms')
-            self.assertTrue(0.0 < float(val) < 60000.0)
+            self.assertTrue(0.0 < float(val) < 60000.0,
+                            f"Value {val} for stat {key} not in range")
 
         for key in [
                 'zuul.tenant.tenant-one.pipeline.gate.read_objects',
@@ -3543,6 +3543,7 @@ class TestScheduler(ZuulTestCase):
 
     def test_queue_names(self):
         "Test shared change queue names"
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
@@ -3564,6 +3565,7 @@ class TestScheduler(ZuulTestCase):
     @simple_layout("layouts/template-queue.yaml")
     def test_template_queue(self):
         "Test a shared queue can be constructed from a project-template"
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
@@ -3586,6 +3588,7 @@ class TestScheduler(ZuulTestCase):
     @simple_layout("layouts/template-project-queue.yaml")
     def test_template_project_queue(self):
         "Test a shared queue can be constructed from a project-template"
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
@@ -3608,6 +3611,7 @@ class TestScheduler(ZuulTestCase):
     @simple_layout("layouts/regex-template-queue.yaml")
     def test_regex_template_queue(self):
         "Test a shared queue can be constructed from a regex project-template"
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
@@ -3630,6 +3634,7 @@ class TestScheduler(ZuulTestCase):
     @skipIfMultiScheduler()
     def test_regex_queue(self):
         "Test a shared queue can be constructed from a regex project"
+        self.waitUntilSettled()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')

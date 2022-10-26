@@ -649,6 +649,10 @@ class PipelineState(zkobject.ZKObject):
                     "old_queues": state.old_queues + state.queues,
                 }
                 state.updateAttributes(ctx, **reset_state)
+                if hasattr(pipeline.manager, "change_queue_managers"):
+                    # Clear out references to old queues
+                    for cq_manager in pipeline.manager.change_queue_managers:
+                        cq_manager.created_for_branches.clear()
             return state
         except NoNodeError:
             return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
@@ -868,6 +872,7 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         super().__init__()
         self._set(
             changes=[],
+            _change_keys=[],
         )
 
     def refresh(self, context):
