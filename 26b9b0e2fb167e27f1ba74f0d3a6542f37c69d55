@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "019bd4b6_c95ed1dc",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-10-26T15:51:15Z",
+      "side": 1,
+      "message": "This is doing the same conversion of internal data type to human readable type for merge modes as the code with a comment on the parent change. Might be a good thing to stick in a function or have a second dict with things mapped in reverse?",
+      "revId": "26b9b0e2fb167e27f1ba74f0d3a6542f37c69d55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
