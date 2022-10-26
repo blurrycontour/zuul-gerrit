@@ -107,6 +107,13 @@ class ElasticsearchReporter(BaseReporter):
 
             docs.append(build_doc)
 
+        if "start_time" not in buildset_doc:
+            start_time = int(time.time())
+            buildset_doc["start_time"] = start_time
+            buildset_doc["end_time"] = start_time
+            self.log.warn("Unabled to deduce buildset %s's start_date. Set current date" %
+                buildset_doc["uuid"])
+
         docs.append(buildset_doc)
         self.connection.add_docs(docs, index)
 
