@@ -123,6 +123,13 @@ def add_debug_line(debug_messages, msg, indent=0):
     debug_messages.append(indent + msg)
 
 
+def get_merge_mode_name(merge_mode):
+    "Look up the merge mode name given the constant"
+    for k, v in MERGER_MAP.items():
+        if v == merge_mode:
+            return k
+
+
 class ZuulMark:
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to
