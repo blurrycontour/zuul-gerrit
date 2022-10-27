@@ -293,7 +293,7 @@ class ZKObject:
         context.cumulative_read_bytes += len(compressed_data)
         return compressed_data, zstat
 
-    def _load(self, context, path=None):
+    def _load(self, context, path=None, deserialize=True):
         if path is None:
             path = self.getPath()
         if context.sessionIsInvalid():
@@ -306,12 +306,15 @@ class ZKObject:
             context.log.error(
                 "Exception loading ZKObject %s at %s", self, path)
             raise
-        self._set(_zkobject_hash=None)
+        if deserialize:
+            self._set(_zkobject_hash=None)
         try:
             data = zlib.decompress(compressed_data)
         except zlib.error:
             # Fallback for old, uncompressed data
             data = compressed_data
+        if not deserialize:
+            return data
         self._set(**self.deserialize(data, context))
         self._set(_zstat=zstat,
                   _zkobject_hash=hash(data),
@@ -347,7 +350,7 @@ class ZKObject:
             if hasattr(self, '_zstat'):
                 version = self._zstat.version
             else:
-                version = None
+                version = -1
             zstat = self._retry(context, self._retryableSave,
                                 context, create, path, compressed_data,
                                 version)
