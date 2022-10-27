@@ -396,10 +396,24 @@ class TestFileComments(AnsibleZuulTestCase):
                          'SUCCESS')
         self.assertEqual(self.getJobFromHistory('file-comments-error').result,
                          'SUCCESS')
-        self.assertEqual(len(A.comments), 6)
+        self.assertEqual(len(A.comments), 7)
         comments = sorted(A.comments, key=lambda x: (x['file'], x['line']))
         self.assertEqual(
             comments[0],
+           {
+               'file': '/COMMIT_MSG',
+               'line': 1,
+               'message': 'commit message comment',
+               'reviewer': {
+                   'email': 'zuul@example.com',
+                   'name': 'Zuul',
+                   'username': 'jenkins'
+                },
+            },
+        )
+
+        self.assertEqual(
+            comments[1],
             {
                 'file': 'otherfile.txt',
                 'line': 21,
@@ -414,7 +428,7 @@ class TestFileComments(AnsibleZuulTestCase):
         )
 
         self.assertEqual(
-            comments[1],
+            comments[2],
             {
                 "file": "path/to/file.py",
                 "line": 2,
@@ -428,7 +442,7 @@ class TestFileComments(AnsibleZuulTestCase):
         )
 
         self.assertEqual(
-            comments[2],
+            comments[3],
             {
                 "file": "path/to/file.py",
                 "line": 21,
@@ -445,7 +459,7 @@ class TestFileComments(AnsibleZuulTestCase):
         )
 
         self.assertEqual(
-            comments[3],
+            comments[4],
             {
                 'file': 'path/to/file.py',
                 'line': 42,
@@ -459,7 +473,7 @@ class TestFileComments(AnsibleZuulTestCase):
         )
 
         self.assertEqual(
-            comments[4],
+            comments[5],
             {
                 "file": "path/to/file.py",
                 "line": 42,
@@ -475,7 +489,7 @@ class TestFileComments(AnsibleZuulTestCase):
             }
         )
 
-        self.assertEqual(comments[5],
+        self.assertEqual(comments[6],
                          {'file': 'path/to/file.py',
                           'line': 82,
                           'message': 'line too short',
