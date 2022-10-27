@@ -641,19 +641,37 @@ class PipelineState(zkobject.ZKObject):
     def resetOrCreate(cls, pipeline, layout_uuid):
         ctx = pipeline.manager.current_context
         try:
-            state = cls.fromZK(ctx, cls.pipelinePath(pipeline),
-                               pipeline=pipeline)
-            if state.layout_uuid != layout_uuid:
-                reset_state = {
-                    **cls.defaultState(),
-                    "layout_uuid": layout_uuid,
-                    "pipeline": pipeline,
-                    "old_queues": state.old_queues + state.queues,
-                }
-                state.updateAttributes(ctx, **reset_state)
+            state = cls()
+            state._set(pipeline=pipeline)
+            state._reset(ctx, layout_uuid)
             return state
         except NoNodeError:
             return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
+
+    def _reset(self, ctx, layout_uuid):
+        path = self.pipelinePath(self.pipeline)
+        compressed_data, zstat = ctx.client.get(path)
+        try:
+            raw = zlib.decompress(compressed_data)
+        except zlib.error:
+            # Fallback for old, uncompressed data
+            raw = compressed_data
+        state = json.loads(raw.decode("utf8"))
+
+        if state["layout_uuid"] == layout_uuid:
+            return
+
+        reset_state = dict(
+            state=Pipeline.STATE_NORMAL,
+            queues=[],
+            old_queues=state["old_queues"] + state["queues"],
+            consecutive_failures=0,
+            disabled=False,
+            layout_uuid=layout_uuid,
+        )
+        raw = json.dumps(reset_state, sort_keys=True).encode("utf8")
+        compressed_data = zlib.compress(raw)
+        ctx.client.set(path, compressed_data)
 
     def getPath(self):
         if hasattr(self, '_path'):

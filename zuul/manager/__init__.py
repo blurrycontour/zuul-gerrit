@@ -117,8 +117,7 @@ class PipelineManager(metaclass=ABCMeta):
             ctx = self.sched.createZKContext(lock, self.log)
             with self.currentContext(ctx):
                 # Since the layout UUID is new, this will move queues
-                # to "old_queues" and refresh the pipeline state as a
-                # side effect.
+                # to "old_queues".
                 self.pipeline.state = PipelineState.resetOrCreate(
                     self.pipeline, layout.uuid)
                 self.pipeline.change_list = PipelineChangeList.create(
