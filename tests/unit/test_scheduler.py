@@ -15,6 +15,7 @@
 
 import configparser
 import gc
+import json
 import os
 import re
 import shutil
@@ -507,6 +508,27 @@ class TestScheduler(ZuulTestCase):
 
         for build in self.history:
             self.assertTrue(build.parameters['zuul']['voting'])
+
+    def test_zk_profile(self):
+        command_socket = self.scheds.first.sched.config.get(
+            'scheduler', 'command_socket')
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        with self.assertNoLogs('zuul.profile', level='DEBUG'):
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled()
+        args = json.dumps(['tenant-one', 'check'])
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall(f'zkprofile {args}\n'.encode('utf8'))
+        with self.assertLogs('zuul.profile', level='DEBUG'):
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled()
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall(f'zkprofile {args}\n'.encode('utf8'))
+        with self.assertNoLogs('zuul.profile', level='DEBUG'):
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled()
 
     def test_initial_pipeline_gauges(self):
         "Test that each pipeline reported its length on start"
