@@ -1586,6 +1586,9 @@ class AnsibleJob(object):
 
         new_lines = {}
         for (filename, lineno) in lines:
+            if filename == "/COMMIT_MSG":
+                continue
+
             try:
                 new_lineno = repo.mapLine(commit, filename, lineno)
             except Exception as e:
