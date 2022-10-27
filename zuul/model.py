@@ -597,18 +597,15 @@ class PipelineState(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
-        self._set(**self.defaultState())
-
-    @classmethod
-    def defaultState(cls):
-        return dict(
+        self._set(
             state=Pipeline.STATE_NORMAL,
             queues=[],
             old_queues=[],
             consecutive_failures=0,
             disabled=False,
-            pipeline=None,
             layout_uuid=None,
+            # Local pipeline reference (not persisted in Zookeeper)
+            pipeline=None,
         )
 
     @classmethod
@@ -639,21 +636,43 @@ class PipelineState(zkobject.ZKObject):
 
     @classmethod
     def resetOrCreate(cls, pipeline, layout_uuid):
+        # If there is an object in ZK, all the queues will be moved to
+        # old_queues.  Then this method will will create a new python
+        # object with no attached queues regardless of the contents of
+        # ZK (so refresh() will need to be called before use).
         ctx = pipeline.manager.current_context
         try:
-            state = cls.fromZK(ctx, cls.pipelinePath(pipeline),
-                               pipeline=pipeline)
-            if state.layout_uuid != layout_uuid:
-                reset_state = {
-                    **cls.defaultState(),
-                    "layout_uuid": layout_uuid,
-                    "pipeline": pipeline,
-                    "old_queues": state.old_queues + state.queues,
-                }
-                state.updateAttributes(ctx, **reset_state)
+            state = cls()
+            state._set(pipeline=pipeline)
+            state._reset(ctx, layout_uuid)
             return state
         except NoNodeError:
             return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
+
+    def _reset(self, context, layout_uuid):
+        # Deserialize will recursively load/refresh children, but we
+        # want to avoid that here, so we just load the raw data and
+        # manipulate the top level attributes.
+        raw = self._load(context, deserialize=False)
+        state = json.loads(raw.decode("utf8"))
+
+        if state["layout_uuid"] == layout_uuid:
+            return
+
+        # Note this differs from normal serialization in that we are
+        # dealing with queues only as string path references rather
+        # than objects.
+        reset_state = dict(
+            state=Pipeline.STATE_NORMAL,
+            queues=[],
+            old_queues=state["old_queues"] + state["queues"],
+            consecutive_failures=0,
+            disabled=False,
+            layout_uuid=layout_uuid,
+        )
+
+        raw = json.dumps(reset_state, sort_keys=True).encode("utf8")
+        self._save(context, raw)
 
     def getPath(self):
         if hasattr(self, '_path'):
