@@ -14,6 +14,7 @@
 
 import contextlib
 import json
+import logging
 import time
 import types
 import zlib
@@ -26,6 +27,9 @@ from zuul.zk import ZooKeeperClient
 
 
 class ZKContext:
+    profile_logger = logging.getLogger('zuul.profile')
+    profile_default = False
+
     def __init__(self, zk_client, lock, stop_event, log):
         if isinstance(zk_client, ZooKeeperClient):
             client = zk_client.client
@@ -44,6 +48,7 @@ class ZKContext:
         self.cumulative_read_bytes = 0
         self.cumulative_write_bytes = 0
         self.build_references = False
+        self.profile = self.profile_default
 
     def sessionIsValid(self):
         return ((not self.lock or self.lock.is_still_valid()) and
@@ -61,6 +66,18 @@ class ZKContext:
         self.cumulative_write_znodes += other.cumulative_write_znodes
         self.cumulative_read_bytes += other.cumulative_read_bytes
         self.cumulative_write_bytes += other.cumulative_write_bytes
+
+    def profileEvent(self, etype, path):
+        if not self.profile:
+            return
+        self.profile_logger.debug(
+            'ZK 0x%x %s %s  '
+            'rt=%s wt=%s  ro=%s wo=%s  rn=%s wn=%s  rb=%s wb=%s',
+            id(self), etype, path,
+            self.cumulative_read_time, self.cumulative_write_time,
+            self.cumulative_read_objects, self.cumulative_write_objects,
+            self.cumulative_read_znodes, self.cumulative_write_znodes,
+            self.cumulative_read_bytes, self.cumulative_write_bytes)
 
 
 class LocalZKContext:
@@ -201,6 +218,7 @@ class ZKObject:
         try:
             self._retry(context, context.client.delete,
                         path, recursive=True)
+            context.profileEvent('delete', path)
             return
         except Exception:
             context.log.error(
@@ -283,6 +301,7 @@ class ZKObject:
         try:
             compressed_data, zstat = self._retry(context, self._retryableLoad,
                                                  context, path)
+            context.profileEvent('get', path)
         except Exception:
             context.log.error(
                 "Exception loading ZKObject %s at %s", self, path)
@@ -332,6 +351,7 @@ class ZKObject:
             zstat = self._retry(context, self._retryableSave,
                                 context, create, path, compressed_data,
                                 version)
+            context.profileEvent('set', path)
         except Exception:
             context.log.error(
                 "Exception saving ZKObject %s at %s", self, path)
@@ -385,6 +405,7 @@ class ShardedZKObject(ZKObject):
             self._set(_zkobject_hash=None)
             data, compressed_size = self._retry(context, self._retryableLoad,
                                                 context, path)
+            context.profileEvent('get', path)
             self._set(**self.deserialize(data, context))
             self._set(_zkobject_hash=hash(data),
                       _zkobject_compressed_size=compressed_size,
@@ -421,10 +442,12 @@ class ShardedZKObject(ZKObject):
         try:
             if create and not self.truncate_on_create:
                 exists = self._retry(context, context.client.exists, path)
+                context.profileEvent('exists', path)
                 if exists is not None:
                     raise NodeExistsError
             compressed_size = self._retry(context, self._retryableSave,
                                           context, path, data)
+            context.profileEvent('set', path)
             self._set(_zkobject_hash=hash(data),
                       _zkobject_compressed_size=compressed_size,
                       _zkobject_uncompressed_size=len(data),
