@@ -1777,8 +1777,13 @@ class TenantParser(object):
             # Only call the postConfig hook if we have a scheduler as this will
             # change data in ZooKeeper. In case we are in a zuul-web context,
             # we don't want to do that.
+            old_tenant = abide.tenants.get(tenant.name)
             for pipeline in tenant.layout.pipelines.values():
-                pipeline.manager._postConfig()
+                old_pipeline = None
+                if old_tenant:
+                    old_pipeline = old_tenant.layout.pipelines.get(
+                        pipeline.name)
+                pipeline.manager._postConfig(old_pipeline)
 
         return tenant
 

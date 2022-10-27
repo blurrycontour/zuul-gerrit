@@ -31,6 +31,7 @@ from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk.locks import pipeline_lock
 
+from kazoo.exceptions import NoNodeError
 from opentelemetry import trace
 
 
@@ -94,21 +95,32 @@ class PipelineManager(metaclass=ABCMeta):
         finally:
             self.current_context = None
 
-    def _postConfig(self):
+    def _postConfig(self, old_pipeline):
         layout = self.pipeline.tenant.layout
+        self.buildChangeQueues(layout)
+
+        if old_pipeline:
+            if old_pipeline.state:
+                self.pipeline.state = old_pipeline.state
+                self.pipeline.state._set(pipeline=self.pipeline)
+            if old_pipeline.change_list:
+                self.pipeline.change_list = old_pipeline.change_list
+                self.pipeline.change_list._set(pipeline=self.pipeline)
+
         # If our layout UUID already matches the UUID in ZK, we don't
         # need to make any changes in ZK.  But we do still need to
         # update our local object pointers.  Note that our local queue
         # state may still be out of date after this because we skip
         # the refresh.
-        self.buildChangeQueues(layout)
         ctx = self.sched.createZKContext(None, self.log)
         with self.currentContext(ctx):
             if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
-                self.pipeline.state = PipelineState()
-                self.pipeline.state._set(pipeline=self.pipeline)
-                self.pipeline.change_list = PipelineChangeList()
-                self.pipeline.change_list._set(pipeline=self.pipeline)
+                if not self.pipeline.state:
+                    self.pipeline.state = PipelineState()
+                    self.pipeline.state._set(pipeline=self.pipeline)
+                if not self.pipeline.change_list:
+                    self.pipeline.change_list = PipelineChangeList()
+                    self.pipeline.change_list._set(pipeline=self.pipeline)
                 return
 
         with pipeline_lock(
@@ -117,12 +129,21 @@ class PipelineManager(metaclass=ABCMeta):
             ctx = self.sched.createZKContext(lock, self.log)
             with self.currentContext(ctx):
                 # Since the layout UUID is new, this will move queues
-                # to "old_queues" and refresh the pipeline state as a
-                # side effect.
-                self.pipeline.state = PipelineState.resetOrCreate(
-                    self.pipeline, layout.uuid)
-                self.pipeline.change_list = PipelineChangeList.create(
-                    self.pipeline)
+                # to "old_queues".
+                if self.pipeline.state:
+                    try:
+                        self.pipeline.state.reset(layout.uuid)
+                        self.log.debug("Reusing previous pipeline state")
+                    except NoNodeError:
+                        self.pipeline.state = None
+                        self.log.warning(
+                            "Unable to reset existing pipeline state")
+                if not self.pipeline.state:
+                    self.pipeline.state = PipelineState.create(
+                        self.pipeline, layout.uuid)
+                if not self.pipeline.change_list:
+                    self.pipeline.change_list = PipelineChangeList.create(
+                        self.pipeline)
                 event = PipelinePostConfigEvent()
                 self.sched.pipeline_management_events[
                     self.pipeline.tenant.name][self.pipeline.name].put(
