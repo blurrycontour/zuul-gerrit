@@ -138,12 +138,19 @@ pipeline.
       .. value:: cherry-pick
 
          Cherry-picks each change onto the branch rather than
-         performing any merges. This is not supported by Github and GitLab.
+         performing any merges. This is not supported by GitHub and GitLab.
 
       .. value:: squash-merge
 
          Squash merges each change onto the branch. This maps to the
          merge mode ``squash`` in GitHub and GitLab.
+
+      .. value:: rebase
+
+         Rebases the changes onto the branch.  This is only supported
+         by GitHub and maps to the ``rebase`` merge mode (but
+         does not alter committer information in the way that GitHub
+         does in the repos that Zuul prepares for jobs).
 
    .. attr:: vars
       :default: None

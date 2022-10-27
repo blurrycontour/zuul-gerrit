@@ -582,7 +582,7 @@ class Repo(object):
         repo.git.merge(*args)
         return repo.head.commit
 
-    def squash_merge(self, item, zuul_event_id=None):
+    def squashMerge(self, item, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         args = ['--squash', 'FETCH_HEAD']
@@ -592,6 +592,17 @@ class Repo(object):
         repo.git.merge(*args)
         repo.index.commit(
             'Merge change %s,%s' % (item['number'], item['patchset']))
+        return repo.head.commit
+
+    def rebaseMerge(self, item, base, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        repo = self.createRepoObject(zuul_event_id)
+        args = [base]
+        ref = item['ref']
+        self.fetch(ref, zuul_event_id=zuul_event_id)
+        log.debug("Rebasing %s with args %s", ref, args)
+        repo.git.checkout('FETCH_HEAD')
+        repo.git.rebase(*args)
         return repo.head.commit
 
     def fetch(self, ref, zuul_event_id=None):
@@ -1029,14 +1040,14 @@ class Merger(object):
             for message in messages:
                 ref_log.debug(message)
 
-    def _mergeChange(self, item, ref, zuul_event_id):
+    def _mergeChange(self, item, base, zuul_event_id):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.getRepo(item['connection'], item['project'],
                             zuul_event_id=zuul_event_id)
         try:
-            repo.checkout(ref, zuul_event_id=zuul_event_id)
+            repo.checkout(base, zuul_event_id=zuul_event_id)
         except Exception:
-            log.exception("Unable to checkout %s", ref)
+            log.exception("Unable to checkout %s", base)
             return None, None
 
         try:
@@ -1050,8 +1061,11 @@ class Merger(object):
                 commit = repo.cherryPick(item['ref'],
                                          zuul_event_id=zuul_event_id)
             elif mode == zuul.model.MERGER_SQUASH_MERGE:
-                commit = repo.squash_merge(
+                commit = repo.squashMerge(
                     item, zuul_event_id=zuul_event_id)
+            elif mode == zuul.model.MERGER_REBASE:
+                commit = repo.rebaseMerge(
+                    item, base, zuul_event_id=zuul_event_id)
             else:
                 raise Exception("Unsupported merge mode: %s" % mode)
         except git.GitCommandError:
