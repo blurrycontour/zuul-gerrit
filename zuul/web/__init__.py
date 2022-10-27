@@ -46,6 +46,7 @@ from zuul.lib.jsonutil import ZuulJSONEncoder
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.re2util import filter_allowed_disallowed
+from zuul import model
 from zuul.model import (
     Abide,
     BuildSet,
@@ -1234,6 +1235,12 @@ class ZuulWebAPI(object):
 
         result = project.toDict()
         result['configs'] = []
+        md = tenant.layout.getProjectMetadata(project.canonical_name).toDict()
+        for k, v in model.MERGER_MAP.items():
+            if v == md['merge_mode']:
+                md['merge_mode'] = k
+                break
+        result['metadata'] = md
         configs = tenant.layout.getAllProjectConfigs(project.canonical_name)
         for config_obj in configs:
             config = config_obj.toDict()

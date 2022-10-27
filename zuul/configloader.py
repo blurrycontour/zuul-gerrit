@@ -1178,8 +1178,9 @@ class ProjectParser(object):
             if name not in project_config.templates:
                 project_config.templates.append(name)
 
-        mode = conf.get('merge-mode', 'merge-resolve')
-        project_config.merge_mode = model.MERGER_MAP[mode]
+        mode = conf.get('merge-mode')
+        if mode is not None:
+            project_config.merge_mode = model.MERGER_MAP[mode]
 
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
@@ -2502,9 +2503,9 @@ class TenantParser(object):
 
         # Now that all the project pipelines are loaded, fixup and
         # verify references to other config objects.
-        self._validateProjectPipelineConfigs(layout)
+        self._validateProjectPipelineConfigs(tenant, layout)
 
-    def _validateProjectPipelineConfigs(self, layout):
+    def _validateProjectPipelineConfigs(self, tenant, layout):
         # Validate references to other config objects
         def inner_validate_ppcs(ppc):
             for jobs in ppc.job_list.jobs.values():
@@ -2532,6 +2533,14 @@ class TenantParser(object):
                                     inner_validate_ppcs(ppc)
                     for ppc in project_config.pipelines.values():
                         inner_validate_ppcs(ppc)
+            # Set a merge mode if we don't have one for this project.
+            # This can happen if there are only regex project stanzas
+            # but no specific project stanzas.
+            project_metadata = layout.getProjectMetadata(project_name)
+            if project_metadata.merge_mode is None:
+                (trusted, project) = tenant.getProject(project_name)
+                mode = project.source.getProjectDefaultMergeMode(project)
+                project_metadata.merge_mode = model.MERGER_MAP[mode]
 
     def _parseLayout(self, tenant, data, loading_errors, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because

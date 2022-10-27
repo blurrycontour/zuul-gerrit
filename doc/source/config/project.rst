@@ -105,12 +105,16 @@ pipeline.
       not appear in a :ref:`project-template` definition.
 
    .. attr:: merge-mode
-      :default: merge-resolve
+      :default: (driver specific)
 
       The merge mode which is used by Git for this project.  Be sure
       this matches what the remote system which performs merges (i.e.,
-      Gerrit). The requested merge mode will be used by the Github driver
-      when performing merges.
+      Gerrit). The requested merge mode will also be used by the
+      GitHub and GitLab drivers when performing merges.
+
+      The default is :value:`project.merge-mode.merge` for all drivers
+      except Gerrit, where the default is
+      :value:`project.merge-mode.merge-resolve`.
 
       Each project may only have one ``merge-mode`` therefore Zuul
       will use the first value that it encounters for a given project
@@ -122,24 +126,24 @@ pipeline.
       .. value:: merge
 
          Uses the default git merge strategy (recursive). This maps to
-         the merge mode ``merge`` in Github and Gitlab.
+         the merge mode ``merge`` in GitHub and GitLab.
 
       .. value:: merge-resolve
 
          Uses the resolve git merge strategy.  This is a very
          conservative merge strategy which most closely matches the
          behavior of Gerrit. This maps to the merge mode ``merge`` in
-         Github and Gitlab.
+         GitHub and GitLab.
 
       .. value:: cherry-pick
 
          Cherry-picks each change onto the branch rather than
-         performing any merges. This is not supported by Github and Gitlab.
+         performing any merges. This is not supported by Github and GitLab.
 
       .. value:: squash-merge
 
          Squash merges each change onto the branch. This maps to the
-         merge mode ``squash`` in Github and Gitlab.
+         merge mode ``squash`` in GitHub and GitLab.
 
    .. attr:: vars
       :default: None
