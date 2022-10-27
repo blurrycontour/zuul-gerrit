@@ -1495,6 +1495,7 @@ class Scheduler(threading.Thread):
                     self.zk_client, event.tenant_name,
                     identifier=RECONFIG_LOCK_ID) as lock,\
                     self.statsd_timer(f'{stats_key}.reconfiguration_time'):
+                self.log.debug("Loading tenant %s", event.tenant_name)
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
