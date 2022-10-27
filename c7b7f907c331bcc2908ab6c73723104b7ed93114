@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ca6e2d4_e87e8aa0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35236
+      },
+      "writtenOn": "2022-10-27T16:08:12Z",
+      "side": 1,
+      "message": "I\u0027ve rebased and fixed some conflict errors without changing too much the meaning of the code.\n\nI didn\u0027t resolved Tobias\u0027 comments as I don\u0027t have enough knowledge on how it should be done.\n\nNote that we use this change in the fork we use for our production cluster as the underlying issue is a blocker for us, and this solves it.",
+      "revId": "c7b7f907c331bcc2908ab6c73723104b7ed93114",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
