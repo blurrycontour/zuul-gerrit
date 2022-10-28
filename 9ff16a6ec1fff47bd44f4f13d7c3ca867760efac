@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3127923e_085b8679",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-10-28T05:27:12Z",
+      "side": 1,
+      "message": "nit: I think due to the early return in line 660 this check is not strictly necessary.",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80aeabb3_bcfcf9be",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-10-28T05:27:12Z",
+      "side": 1,
+      "message": "I think we shouldn\u0027t modify the ZKObject when we skip deserialization, even if it\u0027s just the stats. This seems to be only used for the hash() check before saving the reset data, which is not doing anything for this particular case.",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "I have a few concerns with this, and I think the best thing to do is to detail them here and then propose a solution as a new patchset.\n\n1) Because we don\u0027t use the ZKObject load/save methods, we are missing out on a lot of important work that it does for us:\n\n  * read/write stats\n  * retry attempts if there is a network issue\n  * verification that the lock is still held\n\nI think the last two are critical.  There are some places where we read data without the help of ZKObject, but we don\u0027t write data without it.\n\n2) We leave this object in an invalid state: we leave self.old_queues as a list of strings where it should be a list of objects.  That\u0027s technically fine because we don\u0027t do anything with this object after this without performing a refresh() first which should take care of returning those to objects.  However, it seems potentially dangerous to leave it this way.\n\nI don\u0027t think we want to actually put objects there (because to do so correctly, we might need to deserialize them if there\u0027s a new one we don\u0027t already have).  Instead, I propose that we leave the lists empty, and then leave lots of comments/notes reminding ourselves that\u0027s what we\u0027re doing.  It actually means that the output of the _postConfig method in the manager is the same regardless: at the end of that method, we have a PipelineState object with zero ChangeQueue objects attached to it, no matter what happens in the method.\n\nI will push up a patchset that implements my suggestions (mostly because I had to write it anyway to fully explore the ideas).",
       "revId": "79771bd8c3495c6530ef29d3ca6c9032d86dd6de",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "951f7d4f_8b11fc4e",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-10-28T05:27:12Z",
+      "side": 1,
+      "message": "1) ack\n2) I don\u0027t think that was the case as we never touched the pipeline state object and only work with the raw data, but maybe I\u0027m missing something.",
+      "parentUuid": "dedab8a2_88b7f035",
+      "revId": "79771bd8c3495c6530ef29d3ca6c9032d86dd6de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
