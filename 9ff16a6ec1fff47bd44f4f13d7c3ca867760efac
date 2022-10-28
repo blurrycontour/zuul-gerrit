@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49f405bb_ef5ac179",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-10-28T13:49:06Z",
+      "side": 1,
+      "message": "Since we avoid touching the actual object here I added a comment explaining why deviate from the usual pattern.",
+      "parentUuid": "bc38bba7_67818ae1",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80aeabb3_bcfcf9be",
@@ -65,6 +83,24 @@
       "writtenOn": "2022-10-28T13:27:25Z",
       "side": 1,
       "message": "This seems to make the approach a little less generic.  However, if we\u0027re not setting the hash here, then we should not clear it on line 309.",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d8edb7e_15e269af",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-10-28T13:49:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "171fc9f4_de752963",
       "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
