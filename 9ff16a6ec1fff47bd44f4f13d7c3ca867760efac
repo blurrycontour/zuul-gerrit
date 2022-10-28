@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc38bba7_67818ae1",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-28T13:27:25Z",
+      "side": 1,
+      "message": "That is true, but I did rather like that we were emulating the updateAttributes method here so we could benefit from its guarantees.\n\nI\u0027d still personally like to keep it, but if we omit it, we should probably add a comment so that in the future if we\u0027re trying to figure out why something isn\u0027t working, we don\u0027t say \"aha we\u0027re missing the hash check!\".",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80aeabb3_bcfcf9be",
@@ -31,6 +48,23 @@
       "writtenOn": "2022-10-28T05:27:12Z",
       "side": 1,
       "message": "I think we shouldn\u0027t modify the ZKObject when we skip deserialization, even if it\u0027s just the stats. This seems to be only used for the hash() check before saving the reset data, which is not doing anything for this particular case.",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "171fc9f4_de752963",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-28T13:27:25Z",
+      "side": 1,
+      "message": "This seems to make the approach a little less generic.  However, if we\u0027re not setting the hash here, then we should not clear it on line 309.",
       "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
