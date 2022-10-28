@@ -34,6 +34,24 @@
       "parentUuid": "dedab8a2_88b7f035",
       "revId": "79771bd8c3495c6530ef29d3ca6c9032d86dd6de",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c61f6c14_edfddb6b",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-28T13:27:21Z",
+      "side": 1,
+      "message": "2) You are right.  This is a very confusing method.  :)",
+      "parentUuid": "dedab8a2_88b7f035",
+      "revId": "79771bd8c3495c6530ef29d3ca6c9032d86dd6de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
