@@ -82,6 +82,8 @@ from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
 from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
+from zuul.zk.semaphore import SemaphoreHandler
+
 
 BUFFER_LINES_FOR_SYNTAX = 200
 DEFAULT_FINGER_PORT = 7900
@@ -497,6 +499,7 @@ class JobDirPlaybook(object):
         self.secrets = os.path.join(self.secrets_root, 'all.yaml')
         self.secrets_content = None
         self.secrets_keys = set()
+        self.semaphores = []
 
     def addRole(self):
         count = len(self.roles)
@@ -963,6 +966,8 @@ class AnsibleJob(object):
         RESULT_DISK_FULL: 'RESULT_DISK_FULL',
     }
 
+    semaphore_sleep_time = 30
+
     def __init__(self, executor_server, build_request, arguments):
         logger = logging.getLogger("zuul.AnsibleJob")
         self.arguments = arguments
@@ -1042,6 +1047,7 @@ class AnsibleJob(object):
         self.frozen_hostvars = {}
         # The zuul.* vars
         self.zuul_vars = {}
+        self.waiting_for_semaphores = False
 
     def run(self):
         self.running = True
@@ -2034,6 +2040,7 @@ class AnsibleJob(object):
         jobdir_playbook.project_canonical_name = project.canonical_name
         jobdir_playbook.canonical_name_and_path = os.path.join(
             project.canonical_name, playbook['path'])
+        jobdir_playbook.semaphores = playbook['semaphores']
         path = None
 
         if not jobdir_playbook.trusted:
@@ -3086,10 +3093,25 @@ class AnsibleJob(object):
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 
+        semaphore_handle = self.arguments['semaphore_handle']
+        while not self.executor_server.semaphore_handler.acquireFromInfo(
+                self.log, playbook.semaphores, semaphore_handle):
+            self.log.debug("Unable to acquire playbook semaphores, waiting")
+            self.waiting_for_semaphores = True
+            time.sleep(self.semaphore_sleep_time)
+        self.waiting_for_semaphores = False
+
         result, code = self.runAnsible(cmd, timeout, playbook, ansible_version,
                                        cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
+
+        event_queue = self.executor_server.result_events[
+            self.build_request.tenant_name][
+            self.build_request.pipeline_name]
+        self.executor_server.semaphore_handler.releaseFromInfo(
+            self.log, event_queue, playbook.semaphores, semaphore_handle)
+
         if self.executor_server.statsd:
             base_key = "zuul.executor.{hostname}.phase.{phase}"
             self.executor_server.statsd.incr(
@@ -3307,6 +3329,9 @@ class ExecutorServer(BaseMergeServer):
 
         # Used to offload expensive operations to different processes
         self.process_worker = None
+
+        self.semaphore_handler = SemaphoreHandler(
+            self.zk_client, self.statsd, None, None, None)
 
     def _get_key_store_password(self):
         try:

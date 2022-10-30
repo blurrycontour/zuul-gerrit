@@ -40,6 +40,7 @@ RESULT_EVENT_TYPE_MAP = {
     "FilesChangesCompletedEvent": model.FilesChangesCompletedEvent,
     "MergeCompletedEvent": model.MergeCompletedEvent,
     "NodesProvisionedEvent": model.NodesProvisionedEvent,
+    "SemaphoreReleaseEvent": model.SemaphoreReleaseEvent,
 }
 
 MANAGEMENT_EVENT_TYPE_MAP = {
