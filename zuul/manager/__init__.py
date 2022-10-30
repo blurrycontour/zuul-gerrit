@@ -959,7 +959,10 @@ class PipelineManager(metaclass=ABCMeta):
                     # current item so a potentially aquired semaphore must be
                     # released as it won't be released on dequeue of the item.
                     tenant = item.pipeline.tenant
-                    tenant.semaphore_handler.release(self.sched, item, job)
+                    pipeline = build_set.item.pipeline
+                    event_queue = self.sched.pipeline_result_events[
+                        tenant.name][pipeline.name]
+                    tenant.semaphore_handler.release(event_queue, item, job)
                 except Exception:
                     log.exception("Exception while releasing semaphore")
 
@@ -1796,8 +1799,11 @@ class PipelineManager(metaclass=ABCMeta):
         item = build.build_set.item
 
         log.debug("Build %s of %s completed" % (build, item.change))
+
+        event_queue = self.sched.pipeline_result_events[
+            item.pipeline.tenant.name][item.pipeline.name]
         item.pipeline.tenant.semaphore_handler.release(
-            self.sched, item, build.job)
+            event_queue, item, build.job)
 
         if item.getJob(build.job.name) is None:
             log.info("Build %s no longer in job graph for item %s",
@@ -1970,9 +1976,12 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.item.setNodeRequestFailure(
                 job, f'Node request {request.id} failed')
             self._resumeBuilds(build_set)
-            tenant = build_set.item.pipeline.tenant
+            pipeline = build_set.item.pipeline
+            tenant = pipeline.tenant
+            event_queue = self.sched.pipeline_result_events[
+                tenant.name][pipeline.name]
             tenant.semaphore_handler.release(
-                self.sched, build_set.item, job)
+                event_queue, build_set.item, job)
 
         log.info("Completed node request %s for job %s of item %s "
                  "with nodes %s",
