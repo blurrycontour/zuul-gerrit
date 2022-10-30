@@ -3257,6 +3257,7 @@ class FakeBuild(object):
 
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     result = None
+    semaphore_sleep_time = 5
 
     def _execute(self):
         for _ in iterate_timeout(60, 'wait for merge'):
