@@ -219,6 +219,13 @@ pipeline.
          can be forced to a specific value by e.g. defining it in a config
          repo.
 
+      .. attr:: fail-fast-soft
+         :default: false
+
+         If this is set to `true`, running jobs will not be aborted by
+         the soft-fail command, but instead only jobs that have not
+         started will be skipped.
+
 .. _project-template:
 
 Project Template

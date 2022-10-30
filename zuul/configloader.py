@@ -1019,6 +1019,7 @@ class ProjectTemplateParser(object):
         pipeline_contents = {
             'debug': bool,
             'fail-fast': bool,
+            'fail-fast-soft': bool,
             'jobs': job_list
         }
 
@@ -1049,8 +1050,8 @@ class ProjectTemplateParser(object):
             project_pipeline = model.ProjectPipelineConfig()
             project_template.pipelines[pipeline_name] = project_pipeline
             project_pipeline.debug = conf_pipeline.get('debug')
-            project_pipeline.fail_fast = conf_pipeline.get(
-                'fail-fast')
+            project_pipeline.fail_fast = conf_pipeline.get('fail-fast')
+            project_pipeline.fail_fast_soft = conf_pipeline.get('fail-fast-soft')
             self.parseJobList(
                 conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
