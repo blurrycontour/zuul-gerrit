@@ -1791,6 +1791,13 @@ class PipelineManager(metaclass=ABCMeta):
             if not build or not build.result:
                 self.sched.cancelJob(build_set, job, final=True)
 
+    def _cancelNotStartedBuilds(self, build_set):
+        item = build_set.item
+        for job in item.getJobs():
+            build = build_set.getBuild(job.name)
+            if not build or not build.start_time:
+                self.sched.cancelJob(build_set, job, final=True)
+
     def onBuildCompleted(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         item = build.build_set.item
@@ -1842,11 +1849,18 @@ class PipelineManager(metaclass=ABCMeta):
 
             if (build_set.fail_fast and
                 build.failed and build.job.voting and not build.retry):
-                # If fail-fast is set and the build is not successful
-                # cancel all remaining jobs.
-                log.debug("Build %s failed and fail-fast enabled, canceling "
-                          "running builds", build)
-                self._cancelRunningBuilds(build_set)
+                if build_set.fail_fast_soft:
+                    # If fail-fast is set and the build is not successful
+                    # cancel all remaining jobs.
+                    log.debug("Build %s failed and fail-fast soft enabled, canceling "
+                            "not-yet-started builds", build)
+                    self._cancelNotStartedBuilds(build_set)
+                else:
+                    # If fail-fast is set and the build is not successful
+                    # cancel all remaining jobs.
+                    log.debug("Build %s failed and fail-fast enabled, canceling "
+                            "running builds", build)
+                    self._cancelRunningBuilds(build_set)
 
         return True
 
