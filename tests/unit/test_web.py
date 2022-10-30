@@ -441,6 +441,7 @@ class TestWeb(BaseTestWeb):
                 'type': 'zuul'
             }],
             'secrets': [],
+            'semaphores': [],
             'source_context': source_ctx,
         }]
 
@@ -611,6 +612,7 @@ class TestWeb(BaseTestWeb):
                     'type': 'zuul'
                 }],
                 'secrets': [],
+                'semaphores': [],
                 'source_context': {
                     'branch': 'master',
                     'path': 'zuul.yaml',
@@ -1188,6 +1190,7 @@ class TestWeb(BaseTestWeb):
                     'project': 'common-config',
                 }],
                 'secrets': {},
+                'semaphores': [],
                 'path': 'playbooks/project-test1.yaml',
             }],
             'pre_playbooks': [],

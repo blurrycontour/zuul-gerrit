@@ -1890,7 +1890,8 @@ class PlaybookContext(ConfigObject):
 
     """
 
-    def __init__(self, source_context, path, roles, secrets):
+    def __init__(self, source_context, path, roles, secrets,
+                 semaphores):
         super(PlaybookContext, self).__init__()
         self.source_context = source_context
         self.path = path
@@ -1901,6 +1902,10 @@ class PlaybookContext(ConfigObject):
         # FrozenSecret objects which contain only the info the
         # executor needs
         self.frozen_secrets = ()
+        # The original PlaybookSemaphoreUse objects
+        self.semaphores = semaphores
+        # the result of getSemaphoreInfo from semaphore handler
+        self.frozen_semaphores = ()
 
     def __repr__(self):
         return '<PlaybookContext %s %s>' % (self.source_context,
@@ -1915,13 +1920,15 @@ class PlaybookContext(ConfigObject):
         return (self.source_context == other.source_context and
                 self.path == other.path and
                 self.roles == other.roles and
-                self.secrets == other.secrets)
+                self.secrets == other.secrets and
+                self.semaphores == other.semaphores)
 
     def copy(self):
         r = PlaybookContext(self.source_context,
                             self.path,
                             self.roles,
-                            self.secrets)
+                            self.secrets,
+                            self.semaphores)
         return r
 
     def validateReferences(self, layout):
@@ -1944,6 +1951,16 @@ class PlaybookContext(ConfigObject):
                 self.source_context.project_canonical_name)[1]
             # Decrypt a copy of the secret to verify it can be done
             secret.decrypt(project.private_secrets_key)
+        # TODO: if we remove the implicit max=1 semaphore, validate
+        # references here.
+
+    def freezeSemaphores(self, layout, semaphore_handler):
+        semaphores = []
+        abide = semaphore_handler.abide
+        for job_semaphore in self.semaphores:
+            info = semaphore_handler.getSemaphoreInfo(job_semaphore)
+            semaphores.append(info)
+        self.frozen_semaphores = tuple(semaphores)
 
     def freezeSecrets(self, layout):
         secrets = []
@@ -1981,6 +1998,7 @@ class PlaybookContext(ConfigObject):
             trusted=self.source_context.trusted,
             roles=[r.toDict() for r in self.roles],
             secrets=secrets,
+            semaphores=self.frozen_semaphores,
             path=self.path)
 
     def toSchemaDict(self):
@@ -1990,6 +2008,7 @@ class PlaybookContext(ConfigObject):
             'roles': list(map(lambda x: x.toDict(), self.roles)),
             'secrets': [{'name': secret.name, 'alias': secret.alias}
                         for secret in self.secrets],
+            'semaphores': [{'name': sem.name} for sem in self.semaphores],
         }
         if self.source_context:
             d['source_context'] = self.source_context.toDict()
@@ -2847,16 +2866,16 @@ class Job(ConfigObject):
     def _get(self, name):
         return self.__dict__.get(name)
 
-    def setBase(self, layout):
+    def setBase(self, layout, semaphore_handler):
         self.inheritance_path = self.inheritance_path + (repr(self),)
         if self._get('run') is not None:
-            self.run = self.freezePlaybooks(self.run, layout)
+            self.run = self.freezePlaybooks(self.run, layout, semaphore_handler)
         if self._get('pre_run') is not None:
-            self.pre_run = self.freezePlaybooks(self.pre_run, layout)
+            self.pre_run = self.freezePlaybooks(self.pre_run, layout, semaphore_handler)
         if self._get('post_run') is not None:
-            self.post_run = self.freezePlaybooks(self.post_run, layout)
+            self.post_run = self.freezePlaybooks(self.post_run, layout, semaphore_handler)
         if self._get('cleanup_run') is not None:
-            self.cleanup_run = self.freezePlaybooks(self.cleanup_run, layout)
+            self.cleanup_run = self.freezePlaybooks(self.cleanup_run, layout, semaphore_handler)
 
     def getNodeset(self, layout):
         if isinstance(self.nodeset, str):
@@ -2993,7 +3012,7 @@ class Job(ConfigObject):
                 setattr(job, k, v)
         return job
 
-    def freezePlaybooks(self, pblist, layout):
+    def freezePlaybooks(self, pblist, layout, semaphore_handler):
         """Take a list of playbooks, and return a copy of it updated with this
         job's roles.
 
@@ -3004,10 +3023,11 @@ class Job(ConfigObject):
             pb = old_pb.copy()
             pb.roles = self.roles
             pb.freezeSecrets(layout)
+            pb.freezeSemaphores(layout, semaphore_handler)
             ret.append(pb)
         return tuple(ret)
 
-    def applyVariant(self, other, layout):
+    def applyVariant(self, other, layout, semaphore_handler):
         """Copy the attributes which have been set on the other job to this
         job."""
         if not isinstance(other, Job):
@@ -3113,16 +3133,16 @@ class Job(ConfigObject):
                     self.post_review = True
 
         if other._get('run') is not None:
-            other_run = self.freezePlaybooks(other.run, layout)
+            other_run = self.freezePlaybooks(other.run, layout, semaphore_handler)
             self.run = other_run
         if other._get('pre_run') is not None:
-            other_pre_run = self.freezePlaybooks(other.pre_run, layout)
+            other_pre_run = self.freezePlaybooks(other.pre_run, layout, semaphore_handler)
             self.pre_run = self.pre_run + other_pre_run
         if other._get('post_run') is not None:
-            other_post_run = self.freezePlaybooks(other.post_run, layout)
+            other_post_run = self.freezePlaybooks(other.post_run, layout, semaphore_handler)
             self.post_run = other_post_run + self.post_run
         if other._get('cleanup_run') is not None:
-            other_cleanup_run = self.freezePlaybooks(other.cleanup_run, layout)
+            other_cleanup_run = self.freezePlaybooks(other.cleanup_run, layout, semaphore_handler)
             self.cleanup_run = other_cleanup_run + self.cleanup_run
         self.updateVariables(other.variables, other.extra_variables,
                              other.host_variables, other.group_variables)
@@ -6380,6 +6400,33 @@ class ResultEvent(AbstractEvent):
         pass
 
 
+class SemaphoreReleaseEvent(ResultEvent):
+    """Enqueued after a semaphore has been released in order
+    to trigger a processing run.
+
+    This is emitted when a playbook semaphore is released to instruct
+    the scheduler to emit fan-out PipelineSemaphoreReleaseEvents for
+    every potentially affected tenant-pipeline.
+    """
+
+    def __init__(self, semaphore_name):
+        self.semaphore_name = semaphore_name
+
+    def toDict(self):
+        return {
+            "semaphore_name": self.semaphore_name,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data.get("semaphore_name"))
+
+    def __repr__(self):
+        return (
+            f"<{self.__class__.__name__} semaphore_name={self.semaphore_name}>"
+        )
+
+
 class BuildResultEvent(ResultEvent):
     """Base class for all build result events.
 
@@ -7400,7 +7447,7 @@ class Layout(object):
         noop.description = 'A job that will always succeed, no operation.'
         noop.parent = noop.BASE_JOB_MARKER
         noop.deduplicate = False
-        noop.run = (PlaybookContext(None, 'noop.yaml', [], []),)
+        noop.run = (PlaybookContext(None, 'noop.yaml', [], [], []),)
         self.jobs = {'noop': [noop]}
         self.nodesets = {}
         self.secrets = {}
@@ -7771,6 +7818,7 @@ class Layout(object):
                         skip_file_matcher, redact_secrets_and_keys,
                         debug_messages):
         log = item.annotateLogger(self.log)
+        semaphore_handler = item.pipeline.tenant.semaphore_handler
         job_list = ppc.job_list
         change = item.change
         pipeline = item.pipeline
@@ -7808,9 +7856,9 @@ class Layout(object):
             for variant in variants:
                 if frozen_job is None:
                     frozen_job = variant.copy()
-                    frozen_job.setBase(self)
+                    frozen_job.setBase(self, semaphore_handler)
                 else:
-                    frozen_job.applyVariant(variant, self)
+                    frozen_job.applyVariant(variant, self, semaphore_handler)
                     frozen_job.name = variant.name
             frozen_job.name = jobname
 
@@ -7830,7 +7878,7 @@ class Layout(object):
             matched = False
             for variant in job_list.jobs[jobname]:
                 if variant.changeMatchesBranch(change):
-                    frozen_job.applyVariant(variant, self)
+                    frozen_job.applyVariant(variant, self, semaphore_handler)
                     matched = True
                     log.debug("Pipeline variant %s matched %s",
                               repr(variant), change)

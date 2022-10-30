@@ -633,6 +633,11 @@ class JobParser(object):
     semaphore = {vs.Required('name'): str,
                  'resources-first': bool}
 
+    complex_playbook_def = {vs.Required('name'): str,
+                            'semaphores': to_list(str)}
+
+    playbook_def = to_list(vs.Any(str, complex_playbook_def))
+
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
                       'final': bool,
@@ -661,10 +666,10 @@ class JobParser(object):
                       'timeout': int,
                       'post-timeout': int,
                       'attempts': int,
-                      'pre-run': to_list(str),
-                      'post-run': to_list(str),
-                      'run': to_list(str),
-                      'cleanup-run': to_list(str),
+                      'pre-run': playbook_def,
+                      'post-run': playbook_def,
+                      'run': playbook_def,
+                      'cleanup-run': playbook_def,
                       'ansible-version': vs.Any(str, float, int),
                       '_source_context': model.SourceContext,
                       '_start_mark': model.ZuulMark,
@@ -827,29 +832,47 @@ class JobParser(object):
             roles.insert(0, r)
         job.addRoles(roles)
 
-        for pre_run_name in as_list(conf.get('pre-run')):
+        def get_playbook_attrs(playbook_defs):
+            # Helper method to extract information from a playbook
+            # defenition.
+            for pb_def in playbook_defs:
+                pb_semaphores = []
+                if isinstance(pb_def, dict):
+                    pb_name = pb_def['name']
+                    for pb_sem_name in as_list(pb_def.get('semaphores')):
+                        pb_semaphores.append(model.JobSemaphore(pb_sem_name))
+                else:
+                    # The playbook definition is a simple string path
+                    pb_name = pb_def
+                yield (pb_name, pb_semaphores)
+
+        for pre_run_name, pre_run_semaphores in get_playbook_attrs(
+                as_list(conf.get('pre-run'))):
             pre_run = model.PlaybookContext(job.source_context,
                                             pre_run_name, job.roles,
-                                            secrets)
+                                            secrets, pre_run_semaphores)
             job.pre_run = job.pre_run + (pre_run,)
         # NOTE(pabelanger): Reverse the order of our post-run list. We prepend
         # post-runs for inherits however, we want to execute post-runs in the
         # order they are listed within the job.
-        for post_run_name in reversed(as_list(conf.get('post-run'))):
+        for post_run_name, post_run_semaphores in get_playbook_attrs(
+                reversed(as_list(conf.get('post-run')))):
             post_run = model.PlaybookContext(job.source_context,
                                              post_run_name, job.roles,
-                                             secrets)
+                                             secrets, post_run_semaphores)
             job.post_run = (post_run,) + job.post_run
-        for cleanup_run_name in reversed(as_list(conf.get('cleanup-run'))):
+        for cleanup_run_name, cleanup_run_semaphores in get_playbook_attrs(
+                reversed(as_list(conf.get('cleanup-run')))):
             cleanup_run = model.PlaybookContext(job.source_context,
                                                 cleanup_run_name, job.roles,
-                                                secrets)
+                                                secrets, cleanup_run_semaphores)
             job.cleanup_run = (cleanup_run,) + job.cleanup_run
 
         if 'run' in conf:
-            for run_name in as_list(conf.get('run')):
+            for run_name, run_semaphores in get_playbook_attrs(
+                    as_list(conf.get('run'))):
                 run = model.PlaybookContext(job.source_context, run_name,
-                                            job.roles, secrets)
+                                            job.roles, secrets, run_semaphores)
                 job.run = job.run + (run,)
 
         if conf.get('intermediate', False) and not conf.get('abstract', False):

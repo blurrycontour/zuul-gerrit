@@ -20,7 +20,7 @@ from urllib.parse import quote_plus, unquote
 from kazoo.exceptions import BadVersionError, NoNodeError
 
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import PipelineSemaphoreReleaseEvent
+from zuul.model import SemaphoreReleaseEvent
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.components import COMPONENT_REGISTRY
 
@@ -74,29 +74,60 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         except Exception:
             self.log.exception("Unable to send semaphore stats:")
 
+    def getSemaphoreInfo(self, job_semaphore):
+        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
+        return {
+            'name': job_semaphore.name,
+            'path': self._makePath(semaphore),
+            'resources_first': job_semaphore.resources_first,
+            'max': 1 if semaphore is None else semaphore.max,
+        }
+
+    def getSemaphoreHandle(self, item, job):
+        return {
+            "buildset_path": item.current_build_set.getPath(),
+            "job_name": job.name,
+        }
+
     def acquire(self, item, job, request_resources):
+        # This is the typical method for acquiring semaphores.  It
+        # runs on the scheduler and acquires all semaphores for a job.
         if self.read_only:
             raise RuntimeError("Read-only semaphore handler")
         if not job.semaphores:
             return True
 
         log = get_annotated_logger(self.log, item.event)
+        handle = self.getSemaphoreHandle(item, job)
+        infos = [self.getSemaphoreInfo(job_semaphore)
+                 for job_semaphore in job.semaphores]
+
+        return self.acquireFromInfo(log, infos, handle, request_resources)
+
+    def acquireFromInfo(self, log, infos, handle, request_resources=False):
+        # This method is used by the executor to acquire a playbook
+        # semaphore; it is similar to the acquire method but the
+        # semaphore info is frozen (this operates without an abide).
+        if self.read_only:
+            raise RuntimeError("Read-only semaphore handler")
+        if not infos:
+            return True
+
         all_acquired = True
-        for semaphore in job.semaphores:
-            if not self._acquire_one(log, item, job, request_resources,
-                                     semaphore):
+        for info in infos:
+            if not self._acquire_one(log, info, handle, request_resources):
                 all_acquired = False
                 break
         if not all_acquired:
             # Since we know we have less than all the required
             # semaphores, set quiet=True so we don't log an inability
             # to release them.
-            self.release(None, item, job, quiet=True)
+            self.releaseFromInfo(log, None, infos, handle, quiet=True)
             return False
         return True
 
-    def _acquire_one(self, log, item, job, request_resources, job_semaphore):
-        if job_semaphore.resources_first and request_resources:
+    def _acquire_one(self, log, info, handle, request_resources):
+        if info['resources_first'] and request_resources:
             # We're currently in the resource request phase and want to get the
             # resources before locking. So we don't need to do anything here.
             return True
@@ -107,41 +138,85 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             # the resources phase.
             pass
 
-        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
-        semaphore_path = self._makePath(semaphore)
-        semaphore_handle = {
-            "buildset_path": item.current_build_set.getPath(),
-            "job_name": job.name,
-        }
+        self.kazoo_client.ensure_path(info['path'])
+        semaphore_holders, zstat = self.getHolders(info['path'])
 
-        self.kazoo_client.ensure_path(semaphore_path)
-        semaphore_holders, zstat = self.getHolders(semaphore_path)
-
-        if semaphore_handle in semaphore_holders:
+        if handle in semaphore_holders:
             return True
 
         # semaphore is there, check max
-        while len(semaphore_holders) < self._max_count(semaphore.name):
-            semaphore_holders.append(semaphore_handle)
+        while len(semaphore_holders) < info['max']:
+            semaphore_holders.append(handle)
 
             try:
-                self.kazoo_client.set(semaphore_path,
+                self.kazoo_client.set(info['path'],
                                       holdersToData(semaphore_holders),
                                       version=zstat.version)
             except BadVersionError:
                 log.debug(
                     "Retrying semaphore %s acquire due to concurrent update",
-                    semaphore.name)
-                semaphore_holders, zstat = self.getHolders(semaphore_path)
+                    info['name'])
+                semaphore_holders, zstat = self.getHolders(info['path'])
                 continue
 
-            log.info("Semaphore %s acquired: job %s, item %s",
-                     semaphore.name, job.name, item)
-
-            self._emitStats(semaphore_path, len(semaphore_holders))
+            log.info("Semaphore %s acquired: handle %s",
+                     info['name'], handle)
+            self._emitStats(info['path'], len(semaphore_holders))
             return True
 
         return False
+
+    def release(self, event_queue, item, job, quiet=False):
+        if self.read_only:
+            raise RuntimeError("Read-only semaphore handler")
+        if not job.semaphores:
+            return
+
+        log = get_annotated_logger(self.log, item.event)
+
+        handle = self.getSemaphoreHandle(item, job)
+        infos = [self.getSemaphoreInfo(job_semaphore)
+                 for job_semaphore in job.semaphores]
+
+        return self.releaseFromInfo(log, event_queue, infos, handle,
+                                    quiet=False)
+
+    def releaseFromInfo(self, log, event_queue, infos, handle, quiet=False):
+        for info in infos:
+            self._release_one(log, info, handle, quiet)
+            if event_queue:
+                # If a scheduler has been provided (which it is except
+                # in the case of a rollback from acquire in this
+                # class), broadcast an event to trigger pipeline runs.
+                event = SemaphoreReleaseEvent(info['name'])
+                event_queue.put(event)
+
+    def _release_one(self, log, info, handle, quiet=False):
+        while True:
+            try:
+                semaphore_holders, zstat = self.getHolders(info['path'])
+                semaphore_holders.remove(handle)
+            except (ValueError, NoNodeError):
+                if not quiet:
+                    log.error("Semaphore %s can not be released for %s "
+                              "because the semaphore is not held",
+                              info['path'], handle)
+                break
+
+            try:
+                self.kazoo_client.set(info['path'],
+                                      holdersToData(semaphore_holders),
+                                      zstat.version)
+            except BadVersionError:
+                log.debug(
+                    "Retrying semaphore %s release due to concurrent update",
+                    semaphore_info['path'])
+                continue
+
+            log.info("Semaphore %s released for %s",
+                     info['path'], handle)
+            self._emitStats(info['path'], len(semaphore_holders))
+            break
 
     def getHolders(self, semaphore_path):
         data, zstat = self.kazoo_client.get(semaphore_path)
@@ -156,72 +231,6 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                 pass
         return ret
 
-    def _release(self, log, semaphore_path, semaphore_handle, quiet)
-        while True:
-            try:
-                semaphore_holders, zstat = self.getHolders(semaphore_path)
-                semaphore_holders.remove(semaphore_handle)
-            except (ValueError, NoNodeError):
-                if not quiet:
-                    log.error("Semaphore %s can not be released for %s "
-                              "because the semaphore is not held",
-                              semaphore_path, semaphore_handle)
-                break
-
-            try:
-                self.kazoo_client.set(semaphore_path,
-                                      holdersToData(semaphore_holders),
-                                      zstat.version)
-            except BadVersionError:
-                log.debug(
-                    "Retrying semaphore %s release due to concurrent update",
-                    semaphore_path)
-                continue
-
-            log.info("Semaphore %s released for %s",
-                     semaphore_path, semaphore_handle)
-            self._emitStats(semaphore_path, len(semaphore_holders))
-            break
-
-    def release(self, sched, item, job, quiet=False):
-        if self.read_only:
-            raise RuntimeError("Read-only semaphore handler")
-        if not job.semaphores:
-            return
-
-        log = get_annotated_logger(self.log, item.event)
-
-        for job_semaphore in job.semaphores:
-            self._release_one(log, item, job, job_semaphore, quiet)
-
-        # If a scheduler has been provided (which it is except in the
-        # case of a rollback from acquire in this class), broadcast an
-        # event to trigger pipeline runs.
-        if sched is None:
-            return
-
-        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
-        if semaphore.global_scope:
-            tenants = [t for t in self.abide.tenants.values()
-                       if job_semaphore.name in t.global_semaphores]
-        else:
-            tenants = [self.abide.tenants[self.tenant_name]]
-        for tenant in tenants:
-            for pipeline_name in tenant.layout.pipelines.keys():
-                event = PipelineSemaphoreReleaseEvent()
-                sched.pipeline_management_events[
-                    tenant.name][pipeline_name].put(
-                        event, needs_result=False)
-
-    def _release_one(self, log, item, job, job_semaphore, quiet):
-        semaphore = self.layout.getSemaphore(self.abide, job_semaphore.name)
-        semaphore_path = self._makePath(semaphore)
-        semaphore_handle = {
-            "buildset_path": item.current_build_set.getPath(),
-            "job_name": job.name,
-        }
-        self._release(log, semaphore_path, semaphore_handle, quiet)
-
     def semaphoreHolders(self, semaphore_name):
         semaphore = self.layout.getSemaphore(self.abide, semaphore_name)
         semaphore_path = self._makePath(semaphore)
@@ -230,10 +239,6 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         except NoNodeError:
             holders = []
         return holders
-
-    def _max_count(self, semaphore_name):
-        semaphore = self.layout.getSemaphore(self.abide, semaphore_name)
-        return 1 if semaphore is None else semaphore.max
 
     def cleanupLeaks(self):
         if self.read_only:
@@ -247,7 +252,10 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
                 semaphore = self.layout.getSemaphore(
                     self.abide, semaphore_name)
-                semaphore_path = self._makePath(semaphore)
+                info = {
+                    'name': semaphore.name,
+                    'path': self._makePath(semaphore),
+                }
                 self.log.error("Releasing leaked semaphore %s held by %s",
-                               semaphore_path, holder)
-                self._release(self.log, semaphore_path, holder, quiet=False)
+                               info['path'], holder)
+                self._release_one(self.log, info, holder, quiet=False)
