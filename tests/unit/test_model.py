@@ -53,8 +53,10 @@ class TestJob(BaseTestCase):
         self.connection = Dummy(connection_name='dummy_connection')
         self.source = Dummy(canonical_hostname='git.example.com',
                             connection=self.connection)
+        self.abide = model.Abide()
         self.tenant = model.Tenant('tenant')
         self.tenant.default_ansible_version = AnsibleManager().default_version
+        self.tenant.semaphore_handler = Dummy(abide=self.abide)
         self.layout = model.Layout(self.tenant)
         self.tenant.layout = self.layout
         self.project = model.Project('project', self.source)
@@ -129,16 +131,18 @@ class TestJob(BaseTestCase):
         # This simulates freezing a job.
 
         secrets = ['foo']
-        py27_pre = model.PlaybookContext(self.context, 'py27-pre', [], secrets)
-        py27_run = model.PlaybookContext(self.context, 'py27-run', [], secrets)
-        py27_post = model.PlaybookContext(self.context, 'py27-post', [],
-                                          secrets)
+        py27_pre = model.PlaybookContext(
+            self.context, 'py27-pre', [], secrets, [])
+        py27_run = model.PlaybookContext(
+            self.context, 'py27-run', [], secrets, [])
+        py27_post = model.PlaybookContext(
+            self.context, 'py27-post', [], secrets, [])
 
         py27 = model.Job('py27')
         py27.timeout = 30
-        py27.pre_run = [py27_pre]
-        py27.run = [py27_run]
-        py27.post_run = [py27_post]
+        py27.pre_run = (py27_pre,)
+        py27.run = (py27_run,)
+        py27.post_run = (py27_post,)
 
         job = py27.copy()
         self.assertEqual(30, job.timeout)
@@ -146,7 +150,7 @@ class TestJob(BaseTestCase):
         # Apply the diablo variant
         diablo = model.Job('py27')
         diablo.timeout = 40
-        job.applyVariant(diablo, self.layout)
+        job.applyVariant(diablo, self.layout, None)
 
         self.assertEqual(40, job.timeout)
         self.assertEqual(['py27-pre'],
@@ -165,7 +169,7 @@ class TestJob(BaseTestCase):
 
         good_final = model.Job('py27')
         good_final.voting = False
-        job.applyVariant(good_final, self.layout)
+        job.applyVariant(good_final, self.layout, None)
         self.assertFalse(job.voting)
 
         bad_final = model.Job('py27')
@@ -173,7 +177,7 @@ class TestJob(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Unable to modify final job"):
-            job.applyVariant(bad_final, self.layout)
+            job.applyVariant(bad_final, self.layout, None)
 
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_job_inheritance_job_tree(self, save_mock):

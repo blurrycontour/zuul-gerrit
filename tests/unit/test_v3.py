@@ -4325,6 +4325,246 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
         self.assertFalse(os.path.exists(post_end))
 
 
+class TestPlaybookSemaphore(AnsibleZuulTestCase):
+    tenant_config_file = 'config/playbook-semaphore/main.yaml'
+
+    def test_playbook_semaphore(self):
+        self.executor_server.verbose = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds) == 1:
+                break
+        build1 = self.builds[0]
+
+        # Wait for the first job to be running the mutexed playbook
+        run1_start = os.path.join(self.jobdir_root, build1.uuid +
+                                  '.run_start.flag')
+        for _ in iterate_timeout(60, 'job1 running'):
+            if os.path.exists(run1_start):
+                break
+
+        # Start a second build which should wait for the playbook
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        # Wait until we are waiting for the playbook
+        for _ in iterate_timeout(60, 'job2 waiting for semaphore'):
+            found = False
+            if len(self.builds) == 2:
+                build2 = self.builds[1]
+                for job_worker in self.executor_server.job_workers.values():
+                    if job_worker.build_request.uuid == build2.uuid:
+                        if job_worker.waiting_for_semaphores:
+                            found = True
+            if found:
+                break
+
+        # Wait for build1 to finish
+        with open(os.path.join(self.jobdir_root, build1.uuid, 'test_wait'),
+                  "w") as of:
+            of.write("continue")
+
+        # Wait for the second job to be running the mutexed playbook
+        run2_start = os.path.join(self.jobdir_root, build2.uuid +
+                                  '.run_start.flag')
+        for _ in iterate_timeout(60, 'job2 running'):
+            if os.path.exists(run2_start):
+                break
+
+        # Release build2 and wait to finish
+        with open(os.path.join(self.jobdir_root, build2.uuid, 'test_wait'),
+                  "w") as of:
+            of.write("continue")
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+            dict(name='test-job', result='SUCCESS', changes='2,1'),
+        ])
+
+    def test_playbook_and_job_semaphore_runtime(self):
+        # Test that a playbook does not specify the same semaphore as
+        # the job.  Test via inheritance which is a runtime check.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job2
+                parent: test-job
+                semaphore: test-semaphore
+
+            - project:
+                check:
+                  jobs:
+                    - test-job2
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([])
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('both job and playbook', A.messages[0])
+
+    def test_playbook_and_job_semaphore_def(self):
+        # Test that a playbook does not specify the same semaphore as
+        # the job.  Static configuration test.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job2
+                parent: test-job
+                semaphore: test-semaphore
+                run:
+                  - name: playbooks/run.yaml
+                    semaphores: test-semaphore
+
+            - project:
+                check:
+                  jobs:
+                    - test-job2
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([])
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('both job and playbook', A.messages[0])
+
+    def test_playbook_semaphore_timeout(self):
+        self.wait_timeout = 300
+        self.executor_server.verbose = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds) == 1:
+                break
+        build1 = self.builds[0]
+
+        # Wait for the first job to be running the mutexed playbook
+        run1_start = os.path.join(self.jobdir_root, build1.uuid +
+                                  '.run_start.flag')
+        for _ in iterate_timeout(60, 'job1 running'):
+            if os.path.exists(run1_start):
+                break
+
+        # Start a second build which should wait for the playbook
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - test-job:
+                        timeout: 20
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        # Wait until we are waiting for the playbook
+        for _ in iterate_timeout(60, 'job2 waiting for semaphore'):
+            found = False
+            if len(self.builds) == 2:
+                build2 = self.builds[1]
+                for job_worker in self.executor_server.job_workers.values():
+                    if job_worker.build_request.uuid == build2.uuid:
+                        if job_worker.waiting_for_semaphores:
+                            found = True
+            if found:
+                break
+
+        # Wait for the second build to timeout waiting for the semaphore
+        for _ in iterate_timeout(60, 'build timed out'):
+            if len(self.builds) == 1:
+                break
+
+        # Wait for build1 to finish
+        with open(os.path.join(self.jobdir_root, build1.uuid, 'test_wait'),
+                  "w") as of:
+            of.write("continue")
+
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test-job', result='TIMED_OUT', changes='2,1'),
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+        ])
+
+    def test_playbook_semaphore_abort(self):
+        self.wait_timeout = 300
+        self.executor_server.verbose = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds) == 1:
+                break
+        build1 = self.builds[0]
+
+        # Wait for the first job to be running the mutexed playbook
+        run1_start = os.path.join(self.jobdir_root, build1.uuid +
+                                  '.run_start.flag')
+        for _ in iterate_timeout(60, 'job1 running'):
+            if os.path.exists(run1_start):
+                break
+
+        # Start a second build which should wait for the playbook
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        # Wait until we are waiting for the playbook
+        for _ in iterate_timeout(60, 'job2 waiting for semaphore'):
+            found = False
+            if len(self.builds) == 2:
+                build2 = self.builds[1]
+                for job_worker in self.executor_server.job_workers.values():
+                    if job_worker.build_request.uuid == build2.uuid:
+                        if job_worker.waiting_for_semaphores:
+                            found = True
+            if found:
+                break
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs: []
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        B.addPatchset(files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(2))
+
+        for _ in iterate_timeout(60, 'build aborted'):
+            if len(self.builds) == 1:
+                break
+
+        # Wait for build1 to finish
+        with open(os.path.join(self.jobdir_root, build1.uuid, 'test_wait'),
+                  "w") as of:
+            of.write("continue")
+
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test-job', result='ABORTED', changes='2,1'),
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+        ])
+
+
 class TestBrokenTrustedConfig(ZuulTestCase):
     # Test we can deal with a broken config only with trusted projects. This
     # is different then TestBrokenConfig, as it does not have a missing

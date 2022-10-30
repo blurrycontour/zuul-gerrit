@@ -67,6 +67,10 @@ class ExecutorClient(object):
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 
+        semaphore_handler = item.pipeline.tenant.semaphore_handler
+        params['semaphore_handle'] = semaphore_handler.getSemaphoreHandle(
+            item, job)
+
         parent_span = tracing.restoreSpan(item.current_build_set.span_info)
         execute_time = time.time()
         with trace.use_span(parent_span):
