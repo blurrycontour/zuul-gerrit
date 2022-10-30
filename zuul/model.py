@@ -3944,6 +3944,7 @@ class BuildSet(zkobject.ZKObject):
             start_time=None,  # When the buildset reported start
             repo_state_request_time=None,  # When the refstate job was called
             fail_fast=False,
+            fail_fast_soft=False,
             job_graph=None,
             jobs={},
             deduplicated_jobs=[],
@@ -4052,6 +4053,7 @@ class BuildSet(zkobject.ZKObject):
             "repo_state_state": self.repo_state_state,
             "configured": self.configured,
             "fail_fast": self.fail_fast,
+            "fail_fast_soft": self.fail_fast_soft,
             "job_graph": (self.job_graph.toDict()
                           if self.job_graph else None),
             "span_info": self.span_info,
@@ -4623,11 +4625,14 @@ class QueueItem(zkobject.ZKObject):
 
             if ppc:
                 fail_fast = ppc.fail_fast
+                fail_fast_soft = ppc.fail_fast_soft
             else:
                 fail_fast = self.current_build_set.fail_fast
+                fail_fast_soft = self.current_build_set.fail_fast_soft
             self.current_build_set.updateAttributes(
                 context, job_graph=job_graph,
                 fail_fast=fail_fast,
+                fail_fast_soft=fail_fast_soft,
                 debug_messages=debug_messages)
 
         except Exception:
@@ -6844,6 +6849,7 @@ class ProjectPipelineConfig(ConfigObject):
         self.debug = False
         self.debug_messages = []
         self.fail_fast = None
+        self.fail_fast_soft = None
         self.variables = {}
 
     def addDebug(self, msg):
@@ -6856,6 +6862,8 @@ class ProjectPipelineConfig(ConfigObject):
             self.debug = other.debug
         if self.fail_fast is None:
             self.fail_fast = other.fail_fast
+        if self.fail_fast_soft is None:
+            self.fail_fast_soft = other.fail_fast_soft
         self.job_list.inheritFrom(other.job_list)
 
     def updateVariables(self, other):
