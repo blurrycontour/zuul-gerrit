@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d5b7838_a850dc83",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1589,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-10-31T23:09:11Z",
+      "side": 1,
+      "message": "We can probably simplify this to filename[0]\u003d\u003d\u0027/\u0027.  Gerrit uses that for several other things, relying on the fact that it\u0027s an invalid path in git.\n\nIt would be good to add some /COMMIT_MSG comments in one of the existing tests to make sure this code is covered.",
+      "revId": "42018c1241783c0a6eb4a4bd0dd99f623f1ab68f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
