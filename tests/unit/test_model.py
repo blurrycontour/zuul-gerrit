@@ -13,6 +13,7 @@
 # under the License.
 
 
+import configparser
 import collections
 import os
 import random
@@ -30,6 +31,7 @@ import zuul.lib.connections
 
 from tests.base import BaseTestCase, FIXTURE_DIR
 from zuul.lib.ansible import AnsibleManager
+from zuul.lib import tracing
 from zuul.zk.zkobject import LocalZKContext
 from zuul import change_matcher
 
@@ -85,6 +87,8 @@ class TestJob(BaseTestCase):
             self.project.public_secrets_key = pub
         m = yaml.Mark('name', 0, 0, 0, '', 0)
         self.start_mark = model.ZuulMark(m, m, '')
+        config = configparser.ConfigParser()
+        self.tracing = tracing.Tracing(config)
 
     @property
     def job(self):
