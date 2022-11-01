@@ -317,13 +317,13 @@ function writeFiltersToUrl(filters, location, history) {
   })
 }
 
-function buildQueryString(filters) {
+function buildQueryString(filters, excludeResults) {
   let queryString = '&complete=true'
   let resultFilter = false
   if (filters) {
     Object.keys(filters).map((key) => {
       filters[key].forEach((value) => {
-        if (value === 'result') {
+        if (key === 'result') {
           resultFilter = true
         }
         queryString += '&' + key + '=' + value
@@ -331,7 +331,7 @@ function buildQueryString(filters) {
       return queryString
     })
   }
-  if (!resultFilter) {
+  if (excludeResults && !resultFilter) {
       queryString += '&exclude_result=SKIPPED'
   }
   return queryString
