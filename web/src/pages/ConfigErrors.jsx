@@ -69,5 +69,5 @@ class ConfigErrorsPage extends React.Component {
 
 export default connect(state => ({
   tenant: state.tenant,
-  configErrors: state.configErrors
+  configErrors: state.configErrors.errors
 }))(ConfigErrorsPage)
