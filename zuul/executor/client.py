@@ -114,6 +114,11 @@ class ExecutorClient(object):
         # Store the NodeRequest ID in the job arguments, so we can look it up
         # on the executor side to lock the nodes.
         req_id = build.build_set.getJobNodeRequestID(job.name)
+        if isinstance(req_id, dict):
+            # This should never happen
+            raise Exception(
+                "Attempt to start build with deduplicated node request ID "
+                f"{req_id}")
         if req_id:
             params["noderequest_id"] = req_id
 
