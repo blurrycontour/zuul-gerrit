@@ -16,6 +16,24 @@
       "message": "Just wondering if the default for `ignore_deduplicate` should rather be True as we don\u0027t need the deduplication info in most cases and also `getNodeRequests()` ignores them.",
       "revId": "f35426cd072a25cdbc613d9bd9d590abe5433970",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44c16b06_990d9f1d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4302,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-03T12:59:38Z",
+      "side": 1,
+      "message": "I went with this because most of the usages are actually in model.py and they do need the dedup data (they check the type explicitly).\n\nIf this still doesn\u0027t feel right, maybe we should just make the argument required so we have to think about it each time we use it.",
+      "parentUuid": "4863b819_152c3f05",
+      "revId": "f35426cd072a25cdbc613d9bd9d590abe5433970",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
