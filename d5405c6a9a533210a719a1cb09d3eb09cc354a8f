@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0595a796_70f88a7f",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-04T23:43:18Z",
+      "side": 1,
+      "message": "I think that\u0027s the expected behavior and we probably don\u0027t need to explicitly document it.  But if we did, we should probably put it under the playbook semaphore docs.",
+      "parentUuid": "e9b22504_68849e81",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "31b66f8e_4ad54d59",
         "filename": "tests/fixtures/config/playbook-semaphore/git/common-config/zuul.yaml",
         "patchSetId": 5
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-04T21:40:38Z",
       "side": 1,
       "message": "Do we also need test cases to cover the implicit semaphore?",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e85db18c_2410b30d",
+        "filename": "tests/fixtures/config/playbook-semaphore/git/common-config/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-04T23:43:18Z",
+      "side": 1,
+      "message": "I didn\u0027t think it necessary because it\u0027s covered elsewhere and I think the relevant code paths are the same.",
+      "parentUuid": "31b66f8e_4ad54d59",
       "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0d4e42c9_f51cbb71",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 4421,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-04T23:43:18Z",
+      "side": 1,
+      "message": "The assertions in this test ensure we don\u0027t hit the case the above test checks (specifically, we check that we run 0 jobs).",
+      "parentUuid": "f46250de_1120f6c2",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dbc74eee_84f3332a",
         "filename": "zuul/executor/server.py",
         "patchSetId": 5
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "da0d6bb3_057c99fc",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-04T23:43:18Z",
+      "side": 1,
+      "message": "We don\u0027t expect to have exceptions from runAnsible, but if something does go wrong, the scheduler will cleanup the leaked semaphore on its own.  I think we can rely on that.",
+      "parentUuid": "dbc74eee_84f3332a",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90869794_47967dc1",
         "filename": "zuul/zk/semaphore.py",
         "patchSetId": 5
@@ -82,6 +154,24 @@
       "writtenOn": "2022-11-04T21:40:06Z",
       "side": 1,
       "message": "Have we always allowed an implicit semaphore? I thought we had to define them for some reason. If this is new do we need a doc update?",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2de0355f_97f025ef",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-04T23:43:18Z",
+      "side": 1,
+      "message": "We have always allowed an implicit semaphore.  I think we should remove it, but not today.  Since this isn\u0027t new, I don\u0027t think we need a doc update.",
+      "parentUuid": "90869794_47967dc1",
       "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
