@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b71a646_5030778b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-04T19:49:57Z",
+      "side": 1,
+      "message": "Should we have a release note indicating that users upgrading from 5.x need to stop at 8.0.1 before continuing forward?",
+      "revId": "1d8117097f5a4655e4e672cdcd6aa3ae09647c08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
