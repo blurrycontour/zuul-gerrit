@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f09f4f89_9101d02e",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-04T19:46:12Z",
+      "side": 1,
+      "message": "Maybe we should put this empty config for tracing in BaseTestCase and then all tests will get enough of a config to work as expected? More involved tests can override that config to do actual tracing testing.",
+      "range": {
+        "startLine": 45,
+        "startChar": 14,
+        "endLine": 45,
+        "endChar": 26
+      },
+      "revId": "b16c98bffbed53ef13b0bdaea323d2e6509a0cab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
