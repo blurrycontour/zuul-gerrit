@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "31b66f8e_4ad54d59",
+        "filename": "tests/fixtures/config/playbook-semaphore/git/common-config/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-04T21:40:38Z",
+      "side": 1,
+      "message": "Do we also need test cases to cover the implicit semaphore?",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f46250de_1120f6c2",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 5
