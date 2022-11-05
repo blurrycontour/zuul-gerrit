@@ -2222,6 +2222,8 @@ class TenantParser(object):
                 branch_cache.put(source_context.path, incdata)
         branch_cache.setValidFor(tpc, ltime)
         if min_ltimes is not None:
+            min_ltimes.setdefault(source_context.project_canonical_name,
+                                  collections.defaultdict(lambda: -1))
             min_ltimes[source_context.project_canonical_name][
                 source_context.branch] = branch_cache.ltime
 
