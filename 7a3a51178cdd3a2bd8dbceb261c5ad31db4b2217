@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0819af00_93af8a7d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35201
+      },
+      "writtenOn": "2022-11-06T23:17:37Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3: Code-Review-1\n\u003e \n\u003e Can you elaborate on how to produce this error?  And this should probably have a test that illustrates it.\n\nI\u0027d be handy if you can give me some pointers on the latter bit.  In the case of how to reproduce it, it happened 100% consistently when I created a new Zuul instance.",
+      "revId": "7a3a51178cdd3a2bd8dbceb261c5ad31db4b2217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
