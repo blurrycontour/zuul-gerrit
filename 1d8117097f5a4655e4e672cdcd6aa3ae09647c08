@@ -33,6 +33,24 @@
       "message": "I don\u0027t think we should have an expectation that skipping major versions during a rolling migration is supported.\n\nIn the future, we could put a reminder in the major version upgrade release notes.  But I honestly don\u0027t think it needs to be said.  The correction for an error resulting from this is just a restart anyway.",
       "revId": "1d8117097f5a4655e4e672cdcd6aa3ae09647c08",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "684d04f7_5617fc57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-07T16:28:03Z",
+      "side": 1,
+      "message": "I thought about this over the weekend and I think we should have a small upgrading section in the docs that describes our expectations for upgrades. THen we don\u0027t need to call out common things in release notes like upgrade to each major release fully before going to the next one.",
+      "parentUuid": "4e0885e5_5c3513ad",
+      "revId": "1d8117097f5a4655e4e672cdcd6aa3ae09647c08",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
