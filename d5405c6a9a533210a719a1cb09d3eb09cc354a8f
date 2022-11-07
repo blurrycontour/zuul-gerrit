@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5d85a65_5cc076f7",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0595a796_70f88a7f",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31b66f8e_4ad54d59",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "I didn\u0027t think it necessary because it\u0027s covered elsewhere and I think the relevant code paths are the same.",
       "parentUuid": "31b66f8e_4ad54d59",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9388ae36_cbdaabd9",
+        "filename": "tests/fixtures/config/playbook-semaphore/git/common-config/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e85db18c_2410b30d",
       "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -159,6 +195,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cffb79e_e5a9767b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3133,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "da0d6bb3_057c99fc",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90869794_47967dc1",
@@ -190,6 +244,24 @@
       "side": 1,
       "message": "We have always allowed an implicit semaphore.  I think we should remove it, but not today.  Since this isn\u0027t new, I don\u0027t think we need a doc update.",
       "parentUuid": "90869794_47967dc1",
+      "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29224d4c_d2b2a1bd",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-07T16:49:55Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2de0355f_97f025ef",
       "revId": "d5405c6a9a533210a719a1cb09d3eb09cc354a8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
