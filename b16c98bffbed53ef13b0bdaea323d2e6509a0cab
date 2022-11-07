@@ -39,6 +39,24 @@
       "message": "Maybe, I guess I\u0027m trying to keep the base test case as basic as possible.",
       "revId": "b16c98bffbed53ef13b0bdaea323d2e6509a0cab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1072a128_91bcf431",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-07T17:02:25Z",
+      "side": 1,
+      "message": "WFM",
+      "parentUuid": "5d6ffbc6_8f6deef6",
+      "revId": "b16c98bffbed53ef13b0bdaea323d2e6509a0cab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
