@@ -22,7 +22,6 @@ from kazoo.exceptions import BadVersionError, NoNodeError
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import PipelineSemaphoreReleaseEvent
 from zuul.zk import ZooKeeperSimpleBase
-from zuul.zk.components import COMPONENT_REGISTRY
 
 
 def holdersFromData(data):
@@ -113,22 +112,16 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             "buildset_path": item.current_build_set.getPath(),
             "job_name": job.name,
         }
-        legacy_handle = f"{item.uuid}-{job.name}"
 
         self.kazoo_client.ensure_path(semaphore_path)
         semaphore_holders, zstat = self.getHolders(semaphore_path)
 
-        if (semaphore_handle in semaphore_holders
-                or legacy_handle in semaphore_holders):
+        if semaphore_handle in semaphore_holders:
             return True
 
         # semaphore is there, check max
         while len(semaphore_holders) < self._max_count(semaphore.name):
-            # MODEL_API: >1
-            if COMPONENT_REGISTRY.model_api > 1:
-                semaphore_holders.append(semaphore_handle)
-            else:
-                semaphore_holders.append(legacy_handle)
+            semaphore_holders.append(semaphore_handle)
 
             try:
                 self.kazoo_client.set(semaphore_path,
@@ -162,17 +155,11 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                 pass
         return ret
 
-    def _release(self, log, semaphore_path, semaphore_handle, quiet,
-                 legacy_handle=None):
+    def _release(self, log, semaphore_path, semaphore_handle, quiet):
         while True:
             try:
                 semaphore_holders, zstat = self.getHolders(semaphore_path)
-                try:
-                    semaphore_holders.remove(semaphore_handle)
-                except ValueError:
-                    if legacy_handle is None:
-                        raise
-                    semaphore_holders.remove(legacy_handle)
+                semaphore_holders.remove(semaphore_handle)
             except (ValueError, NoNodeError):
                 if not quiet:
                     log.error("Semaphore %s can not be released for %s "
@@ -232,9 +219,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             "buildset_path": item.current_build_set.getPath(),
             "job_name": job.name,
         }
-        legacy_handle = f"{item.uuid}-{job.name}"
-        self._release(log, semaphore_path, semaphore_handle, quiet,
-                      legacy_handle)
+        self._release(log, semaphore_path, semaphore_handle, quiet)
 
     def semaphoreHolders(self, semaphore_name):
         semaphore = self.layout.getSemaphore(self.abide, semaphore_name)
@@ -252,20 +237,9 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
     def cleanupLeaks(self):
         if self.read_only:
             raise RuntimeError("Read-only semaphore handler")
-        # MODEL_API: >1
-        if COMPONENT_REGISTRY.model_api < 2:
-            self.log.warning("Skipping semaphore cleanup since minimum model "
-                             "API is %s (needs >= 2)",
-                             COMPONENT_REGISTRY.model_api)
-            return
 
         for semaphore_name in self.getSemaphores():
             for holder in self.semaphoreHolders(semaphore_name):
-                if isinstance(holder, str):
-                    self.log.warning(
-                        "Ignoring legacy semaphore holder %s for semaphore %s",
-                        holder, semaphore_name)
-                    continue
                 if (self.kazoo_client.exists(holder["buildset_path"])
                         is not None):
                     continue
