@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dca09cd_abd543b7",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-08T23:59:14Z",
+      "side": 1,
+      "message": "Looking at the deserializse method for PipelineState it appears the old queue list is always a list of paths? I was initially concerned about what would happen if we deserialize this different serialized content, but it seems they are equivalent? I\u0027m a bit confused about this comment as a result.",
+      "revId": "4e742d5205d99c3776ce02e02ac9a75e31176891",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

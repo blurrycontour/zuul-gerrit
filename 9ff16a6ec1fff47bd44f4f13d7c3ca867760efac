@@ -103,6 +103,24 @@
       "parentUuid": "171fc9f4_de752963",
       "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60c471f5_e1a752c3",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-08T23:59:14Z",
+      "side": 1,
+      "message": "I think this was resolved via the early return on line 317?",
+      "parentUuid": "80aeabb3_bcfcf9be",
+      "revId": "9ff16a6ec1fff47bd44f4f13d7c3ca867760efac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
