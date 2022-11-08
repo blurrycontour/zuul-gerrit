@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e70388b7_0e29bd2b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4146,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-08T23:21:02Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "2e0654bb_2c470df8",
+      "revId": "05ba26024afed13a87046485d7f42feda753a6ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8dc8c8e_3c8c9b3b",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-10-20T21:26:15Z",
       "side": 1,
       "message": "Do you need to update retry_builds here? The old code would\u0027ve run retry_builds[job_name].append(retry_build) for the new BuildReference we just created.",
+      "revId": "05ba26024afed13a87046485d7f42feda753a6ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8f5c39b_7b0b6dff",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4176,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-08T23:21:02Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e8dc8c8e_3c8c9b3b",
       "revId": "05ba26024afed13a87046485d7f42feda753a6ff",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
