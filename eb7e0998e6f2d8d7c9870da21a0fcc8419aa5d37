@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a29ec355_dc8eea85",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-08T23:43:00Z",
+      "side": 1,
+      "message": "The use of the symmetric difference operator allows us to add pipelines to profiling and remove pipelines that are already profiled using the same command. Should the command help text indicate that sending the same command a second time will disable profiling for that pipeline?",
+      "revId": "eb7e0998e6f2d8d7c9870da21a0fcc8419aa5d37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
