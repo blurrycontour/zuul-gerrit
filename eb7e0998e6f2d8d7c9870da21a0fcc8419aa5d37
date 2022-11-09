@@ -16,6 +16,24 @@
       "message": "The use of the symmetric difference operator allows us to add pipelines to profiling and remove pipelines that are already profiled using the same command. Should the command help text indicate that sending the same command a second time will disable profiling for that pipeline?",
       "revId": "eb7e0998e6f2d8d7c9870da21a0fcc8419aa5d37",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0f06f31_29bd774c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-09T00:12:12Z",
+      "side": 1,
+      "message": "Yes, the help text could be better; should probably say \"toggle\".  I\u0027ll toss that in a followup.  I\u0027m not expecting this change to be permanent -- but maybe I\u0027ll be surprised.",
+      "parentUuid": "a29ec355_dc8eea85",
+      "revId": "eb7e0998e6f2d8d7c9870da21a0fcc8419aa5d37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
