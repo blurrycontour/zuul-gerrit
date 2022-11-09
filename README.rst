@@ -27,7 +27,7 @@ There are two Zuul-related mailing lists:
   General discussion about Zuul, including questions about how to use
   it, and future development.
 
-You will also find Zuul developers in the `#zuul` channel on Freenode
+You will also find Zuul developers in the `#zuul` channel on OFTC
 IRC.
 
 Contributing
@@ -51,7 +51,7 @@ Example::
     $ git review
     # Enter your username if prompted
 
-Join `#zuul` on Freenode to discuss development or usage.
+Join `#zuul` on OFTC to discuss development or usage.
 
 License
 -------
