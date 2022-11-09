@@ -3378,7 +3378,7 @@ class ExecutorServer(BaseMergeServer):
         self.accepting_work = False
 
     def stop(self):
-        self.log.debug("Stopping")
+        self.log.debug("Stopping executor")
         self.component_info.state = self.component_info.STOPPED
         self.connections.stop()
         self.disk_accountant.stop()
@@ -3435,9 +3435,10 @@ class ExecutorServer(BaseMergeServer):
         self.stopRepl()
         self.monitoring_server.stop()
         self.tracing.stop()
-        self.log.debug("Stopped")
+        self.log.debug("Stopped executor")
 
     def join(self):
+        self.log.debug("Joining executor")
         self.governor_thread.join()
         for update_thread in self.update_threads:
             update_thread.join()
@@ -3447,6 +3448,7 @@ class ExecutorServer(BaseMergeServer):
         self.build_worker.join()
         self.command_thread.join()
         self.monitoring_server.join()
+        self.log.debug("Joined executor")
 
     def pause(self):
         self.log.debug('Pausing')

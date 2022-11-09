@@ -178,15 +178,18 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.merger_thread.start()
 
     def stop(self):
-        self.log.debug('Stopping merger')
+        self.log.debug('Stopping base merge server')
         self._merger_running = False
         self.merger_loop_wake_event.set()
-        self.zk_client.disconnect()
         self.tracing.stop()
+        self.log.debug('Stopped base merge server')
 
     def join(self):
+        self.log.debug('Joining base merge server')
         self.merger_loop_wake_event.set()
         self.merger_thread.join()
+        self.zk_client.disconnect()
+        self.log.debug('Joined base merge server')
 
     def pause(self):
         self.log.debug('Pausing merger')
@@ -542,17 +545,19 @@ class MergeServer(BaseMergeServer):
         self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
-        self.log.debug("Stopping")
+        self.log.debug("Stopping merger")
         self.component_info.state = self.component_info.STOPPED
         super().stop()
         self._command_running = False
         self.command_socket.stop()
         self.monitoring_server.stop()
-        self.log.debug("Stopped")
+        self.log.debug("Stopped merger")
 
     def join(self):
+        self.log.debug("Joining merger")
         super().join()
         self.monitoring_server.join()
+        self.log.debug("Joined merger")
 
     def pause(self):
         self.log.debug('Pausing')
