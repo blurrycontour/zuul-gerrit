@@ -137,10 +137,22 @@ class TenantReconfigureCommand(commandsocket.Command):
     args = [TenantArgument]
 
 
+class PipelineArgument(commandsocket.Argument):
+    name = 'pipeline'
+    help = 'The name of the pipeline'
+
+
+class ZKProfileCommand(commandsocket.Command):
+    name = 'zkprofile'
+    help = 'Enable ZK profiling for a pipeline'
+    args = [TenantArgument, PipelineArgument]
+
+
 COMMANDS = [
     FullReconfigureCommand,
     SmartReconfigureCommand,
     TenantReconfigureCommand,
+    ZKProfileCommand,
     commandsocket.StopCommand,
     commandsocket.ReplCommand,
     commandsocket.NoReplCommand,
@@ -192,6 +204,7 @@ class Scheduler(threading.Thread):
                  testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
+        self._profile_pipelines = set()
         self.wait_for_init = wait_for_init
         self.hostname = socket.getfqdn()
         self.tracing = tracing.Tracing(config)
@@ -211,6 +224,7 @@ class Scheduler(threading.Thread):
             SmartReconfigureCommand.name: self.smartReconfigureCommandHandler,
             TenantReconfigureCommand.name:
                 self.tenantReconfigureCommandHandler,
+            ZKProfileCommand.name: self.zkProfileCommandHandler,
             commandsocket.StopCommand.name: self.stop,
             commandsocket.ReplCommand.name: self.startRepl,
             commandsocket.NoReplCommand.name: self.stopRepl,
@@ -896,6 +910,11 @@ class Scheduler(threading.Thread):
 
     def tenantReconfigureCommandHandler(self, tenant_name):
         self._zuul_app.tenantReconfigure([tenant_name])
+
+    def zkProfileCommandHandler(self, tenant_name, pipeline_name):
+        key = set([(tenant_name, pipeline_name)])
+        self._profile_pipelines = self._profile_pipelines ^ key
+        self.log.debug("Now profiling %s", self._profile_pipelines)
 
     def startRepl(self):
         if self.repl:
@@ -2155,10 +2174,14 @@ class Scheduler(threading.Thread):
 
         stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         ctx = pipeline.manager.current_context
+        if (tenant.name, pipeline.name) in self._profile_pipelines:
+            ctx.profile = True
         with self.statsd_timer(f'{stats_key}.refresh'):
             pipeline.change_list.refresh(ctx)
             pipeline.summary.refresh(ctx)
             pipeline.state.refresh(ctx)
+        if (tenant.name, pipeline.name) in self._profile_pipelines:
+            ctx.profile = False
 
         pipeline.state.setDirty(self.zk_client.client)
         if pipeline.state.old_queues:
