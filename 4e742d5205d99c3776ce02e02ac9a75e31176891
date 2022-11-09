@@ -16,6 +16,23 @@
       "message": "Looking at the deserializse method for PipelineState it appears the old queue list is always a list of paths? I was initially concerned about what would happen if we deserialize this different serialized content, but it seems they are equivalent? I\u0027m a bit confused about this comment as a result.",
       "revId": "4e742d5205d99c3776ce02e02ac9a75e31176891",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "658a7539_db19c527",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-09T00:09:34Z",
+      "side": 1,
+      "message": "The deserialize method takes the JSON data which is a list of string paths, loads the objects at those paths from ZK, and stores the result on the queues and old_queues variables.  In other words, deserialize always takes string paths as input and returns objects as output.\n\nThe serialize method likewise always expects objects as input and returns string paths as output.\n\nSo what this comment is attempting to do is to highlight the fact that lines 665 through 672 look *almost exactly* like the contents of the serialize method, except that we expect string inputs here.\n\nThe output of this or the serialize method is the same, and is perfectly compatible with the deserialize method.",
+      "revId": "4e742d5205d99c3776ce02e02ac9a75e31176891",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
