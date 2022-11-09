@@ -33,6 +33,23 @@
       "message": "recheck is this timeout issue consistent? It appears that we ran 1359 tests which is the same count as the py38 job. But for some reason stestr isn\u0027t recording that properly.",
       "revId": "9b2b8f82ff298f7f12bce68ce57ba09a2a66da12",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e58032_8c11b94e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-09T16:19:24Z",
+      "side": 1,
+      "message": "recheck another change landed fixing a shutdown race in the mergers that might make this more stable",
+      "revId": "9b2b8f82ff298f7f12bce68ce57ba09a2a66da12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
