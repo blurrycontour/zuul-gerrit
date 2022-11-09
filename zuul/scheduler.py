@@ -144,7 +144,7 @@ class PipelineArgument(commandsocket.Argument):
 
 class ZKProfileCommand(commandsocket.Command):
     name = 'zkprofile'
-    help = 'Enable ZK profiling for a pipeline'
+    help = 'Toggle ZK profiling for a pipeline'
     args = [TenantArgument, PipelineArgument]
 
 
