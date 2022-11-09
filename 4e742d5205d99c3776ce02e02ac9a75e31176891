@@ -33,6 +33,24 @@
       "message": "The deserialize method takes the JSON data which is a list of string paths, loads the objects at those paths from ZK, and stores the result on the queues and old_queues variables.  In other words, deserialize always takes string paths as input and returns objects as output.\n\nThe serialize method likewise always expects objects as input and returns string paths as output.\n\nSo what this comment is attempting to do is to highlight the fact that lines 665 through 672 look *almost exactly* like the contents of the serialize method, except that we expect string inputs here.\n\nThe output of this or the serialize method is the same, and is perfectly compatible with the deserialize method.",
       "revId": "4e742d5205d99c3776ce02e02ac9a75e31176891",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "959e5ada_5b40deed",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 664,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-09T00:16:59Z",
+      "side": 1,
+      "message": "Got it, it has to do with the inputs not outputs of serialization.",
+      "parentUuid": "658a7539_db19c527",
+      "revId": "4e742d5205d99c3776ce02e02ac9a75e31176891",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
