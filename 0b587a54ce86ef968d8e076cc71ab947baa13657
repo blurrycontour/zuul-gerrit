@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "65b5e302_a8e17f4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-09T00:34:25Z",
+      "side": 1,
+      "message": "This code looks correct to me. But as reviews have pointed out it does add complexity. I think this complexity isn\u0027t too bad as dispatching a bunch of work to threadpools then iterating over the subsequent results is pretty straight forward. If this improves performance for users that need that I think we can manage.",
+      "revId": "0b587a54ce86ef968d8e076cc71ab947baa13657",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
