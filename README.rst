@@ -27,8 +27,8 @@ There are two Zuul-related mailing lists:
   General discussion about Zuul, including questions about how to use
   it, and future development.
 
-You will also find Zuul developers in the `#zuul` channel on Freenode
-IRC.
+You will also find Zuul developers on
+`Matrix <https://matrix.to/#/#zuul:opendev.org>`.
 
 Contributing
 ------------
@@ -51,7 +51,8 @@ Example::
     $ git review
     # Enter your username if prompted
 
-Join `#zuul` on Freenode to discuss development or usage.
+`Join us on Matrix <https://matrix.to/#/#zuul:opendev.org>`_ to discuss
+development or usage.
 
 License
 -------
