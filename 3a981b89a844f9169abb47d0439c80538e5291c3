@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32287865_2d2e9f1d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-09T21:47:13Z",
+      "side": 1,
+      "message": "With the line shortening it might be good to try and be consistent with how much the extra lines indent. It looks like some cases have a full 4 space indent, others just one space, and others have no indent.",
+      "revId": "3a981b89a844f9169abb47d0439c80538e5291c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
