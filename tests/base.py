@@ -5612,10 +5612,9 @@ class ZuulTestCase(BaseTestCase):
         for tenant in sched.abide.tenants.values():
             with tenant_read_lock(self.zk_client, tenant.name):
                 for pipeline in tenant.layout.pipelines.values():
-                    with pipeline_lock(
-                        self.zk_client, tenant.name, pipeline.name
-                    ) as lock:
-                        ctx = self.createZKContext(lock)
+                    with pipeline_lock(self.zk_client, tenant.name,
+                                       pipeline.name) as lock,\
+                            self.createZKContext(lock) as ctx:
                         with pipeline.manager.currentContext(ctx):
                             pipeline.state.refresh(ctx)
         # return the context in case the caller wants to examine iops

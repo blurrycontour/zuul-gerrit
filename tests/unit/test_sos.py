@@ -163,8 +163,8 @@ class TestScaleOutScheduler(ZuulTestCase):
         pipeline = tenant.layout.pipelines['check']
         summary = zuul.model.PipelineSummary()
         summary._set(pipeline=pipeline)
-        context = self.createZKContext()
-        summary.refresh(context)
+        with self.createZKContext() as context:
+            summary.refresh(context)
         self.assertEqual(summary.status['change_queues'], [])
 
     def test_config_priming(self):
@@ -322,7 +322,8 @@ class TestScaleOutScheduler(ZuulTestCase):
         def new_summary():
             summary = zuul.model.PipelineSummary()
             summary._set(pipeline=pipeline)
-            summary.refresh(context)
+            with context:
+                summary.refresh(context)
             return summary
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -345,7 +346,8 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.assertTrue(context.client.exists(summary2.getPath()))
 
         # Our earlier summary object should use its cached data
-        summary1.refresh(context)
+        with context:
+            summary1.refresh(context)
         self.assertNotEqual(summary1.status, {})
 
         self.executor_server.hold_jobs_in_build = False
@@ -354,7 +356,8 @@ class TestScaleOutScheduler(ZuulTestCase):
 
         # The scheduler should have written a new summary that our
         # second object can read now.
-        summary2.refresh(context)
+        with context:
+            summary2.refresh(context)
         self.assertNotEqual(summary2.status, {})
 
     @simple_layout('layouts/semaphore.yaml')

@@ -102,25 +102,27 @@ class BranchCache:
         # to the context.
         self.zk_context = ZKContext(zk_client, self.wlock, None, self.log)
 
-        with locked(self.wlock):
+        with self.zk_context as ctx,\
+             locked(self.wlock):
             try:
                 self.cache = BranchCacheZKObject.fromZK(
-                    self.zk_context, data_path, _path=data_path)
+                    ctx, data_path, _path=data_path)
             except NoNodeError:
                 self.cache = BranchCacheZKObject.new(
-                    self.zk_context, _path=data_path)
+                    ctx, _path=data_path)
 
     def clear(self, projects=None):
         """Clear the cache"""
-        with locked(self.wlock):
-            with self.cache.activeContext(self.zk_context):
-                if projects is None:
-                    self.cache.protected.clear()
-                    self.cache.remainder.clear()
-                else:
-                    for p in projects:
-                        self.cache.protected.pop(p, None)
-                        self.cache.remainder.pop(p, None)
+        with locked(self.wlock),\
+             self.zk_context as ctx,\
+             self.cache.activeContext(ctx):
+            if projects is None:
+                self.cache.protected.clear()
+                self.cache.remainder.clear()
+            else:
+                for p in projects:
+                    self.cache.protected.pop(p, None)
+                    self.cache.remainder.pop(p, None)
 
     def getProjectBranches(self, project_name, exclude_unprotected,
                            min_ltime=-1, default=RAISE_EXCEPTION):
@@ -154,8 +156,9 @@ class BranchCache:
             an error when fetching the branches.
         """
         if self.ltime < min_ltime:
-            with locked(self.rlock):
-                self.cache.refresh(self.zk_context)
+            with locked(self.rlock),\
+                 self.zk_context as ctx:
+                self.cache.refresh(ctx)
 
         protected_branches = None
         try:
@@ -197,23 +200,24 @@ class BranchCache:
             The list of branches or None to indicate a fetch error.
         """
 
-        with locked(self.wlock):
-            with self.cache.activeContext(self.zk_context):
-                if exclude_unprotected:
-                    self.cache.protected[project_name] = branches
-                    remainder_branches = self.cache.remainder.get(project_name)
-                    if remainder_branches and branches:
-                        remainder = list(set(remainder_branches) -
-                                         set(branches))
-                        self.cache.remainder[project_name] = remainder
-                else:
-                    protected_branches = self.cache.protected.get(project_name)
-                    if protected_branches and branches:
-                        remainder = list(set(branches) -
-                                         set(protected_branches))
-                    else:
-                        remainder = branches
+        with locked(self.wlock),\
+             self.zk_context as ctx,\
+             self.cache.activeContext(ctx):
+            if exclude_unprotected:
+                self.cache.protected[project_name] = branches
+                remainder_branches = self.cache.remainder.get(project_name)
+                if remainder_branches and branches:
+                    remainder = list(set(remainder_branches) -
+                                     set(branches))
                     self.cache.remainder[project_name] = remainder
+            else:
+                protected_branches = self.cache.protected.get(project_name)
+                if protected_branches and branches:
+                    remainder = list(set(branches) -
+                                     set(protected_branches))
+                else:
+                    remainder = branches
+                self.cache.remainder[project_name] = remainder
 
     def setProtected(self, project_name, branch, protected):
         """Correct the protection state of a branch.
@@ -222,33 +226,34 @@ class BranchCache:
         receiving an explicit event.
         """
 
-        with locked(self.wlock):
-            with self.cache.activeContext(self.zk_context):
-                protected_branches = self.cache.protected.get(project_name)
-                remainder_branches = self.cache.remainder.get(project_name)
-                if protected:
-                    if protected_branches is None:
-                        # We've never run a protected query, so we
-                        # should ignore this branch.
-                        return
-                    else:
-                        # We have run a protected query; if we have
-                        # also run an unprotected query, we need to
-                        # move the branch from remainder to protected.
-                        if remainder_branches and branch in remainder_branches:
-                            remainder_branches.remove(branch)
-                        if branch not in protected_branches:
-                            protected_branches.append(branch)
+        with locked(self.wlock),\
+             self.zk_context as ctx,\
+             self.cache.activeContext(ctx):
+            protected_branches = self.cache.protected.get(project_name)
+            remainder_branches = self.cache.remainder.get(project_name)
+            if protected:
+                if protected_branches is None:
+                    # We've never run a protected query, so we
+                    # should ignore this branch.
+                    return
                 else:
-                    if protected_branches and branch in protected_branches:
-                        protected_branches.remove(branch)
-                    if remainder_branches is None:
-                        # We've never run an unprotected query, so we
-                        # should ignore this branch.
-                        return
-                    else:
-                        if branch not in remainder_branches:
-                            remainder_branches.append(branch)
+                    # We have run a protected query; if we have
+                    # also run an unprotected query, we need to
+                    # move the branch from remainder to protected.
+                    if remainder_branches and branch in remainder_branches:
+                        remainder_branches.remove(branch)
+                    if branch not in protected_branches:
+                        protected_branches.append(branch)
+            else:
+                if protected_branches and branch in protected_branches:
+                    protected_branches.remove(branch)
+                if remainder_branches is None:
+                    # We've never run an unprotected query, so we
+                    # should ignore this branch.
+                    return
+                else:
+                    if branch not in remainder_branches:
+                        remainder_branches.append(branch)
 
     @property
     def ltime(self):

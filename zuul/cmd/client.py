@@ -1035,9 +1035,9 @@ class Client(zuul.cmd.ZuulApp):
             zk_client.client.delete(
                 f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}',
                 recursive=True)
-            context = ZKContext(zk_client, lock, None, self.log)
-            ps = PipelineState.new(context, _path=path,
-                                   layout_uuid=layout_uuid)
+            with ZKContext(zk_client, lock, None, self.log) as context:
+                ps = PipelineState.new(context, _path=path,
+                                       layout_uuid=layout_uuid)
             # Force everyone to make a new layout for this tenant in
             # order to rebuild the shared change queues.
             layout_state = LayoutState(

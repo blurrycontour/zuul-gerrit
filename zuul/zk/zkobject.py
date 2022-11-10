@@ -1,4 +1,4 @@
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2022 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,12 +12,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from concurrent.futures import ThreadPoolExecutor
 import contextlib
 import json
 import logging
+import sys
 import time
 import types
 import zlib
+import collections
 
 from kazoo.exceptions import NodeExistsError, NoNodeError
 from kazoo.retry import KazooRetry
@@ -26,11 +29,45 @@ from zuul.zk import sharding
 from zuul.zk import ZooKeeperClient
 
 
-class ZKContext:
+class BaseZKContext:
     profile_logger = logging.getLogger('zuul.profile')
     profile_default = False
+    # Only changed by unit tests.
+    # The default scales with number of procs.
+    _max_workers = None
 
+    def __init__(self):
+        # We create the executor dict in enter to make sure that this
+        # is used as a context manager and cleaned up properly.
+        self.executor = None
+
+    def __enter__(self):
+        if self.executor:
+            raise RuntimeError("ZKContext entered multiple times")
+        # This is a dictionary keyed by class.  ZKObject subclasses
+        # can request a dedicated ThreadPoolExecutor for their class
+        # so that deserialize methods that use it can avoid deadlocks
+        # with child class deserialize methods.
+        self.executor = collections.defaultdict(
+            lambda: ThreadPoolExecutor(
+                max_workers=self._max_workers,
+                thread_name_prefix="ZKContext",
+            ))
+        return self
+
+    def __exit__(self, etype, value, tb):
+        if self.executor:
+            for executor in self.executor.values():
+                if sys.version_info >= (3, 9):
+                    executor.shutdown(wait=False, cancel_futures=True)
+                else:
+                    executor.shutdown(wait=False)
+        self.executor = None
+
+
+class ZKContext(BaseZKContext):
     def __init__(self, zk_client, lock, stop_event, log):
+        super().__init__()
         if isinstance(zk_client, ZooKeeperClient):
             client = zk_client.client
         else:
@@ -80,10 +117,11 @@ class ZKContext:
             self.cumulative_read_bytes, self.cumulative_write_bytes)
 
 
-class LocalZKContext:
+class LocalZKContext(BaseZKContext):
     """A Local ZKContext that means don't actually write anything to ZK"""
 
     def __init__(self, log):
+        super().__init__()
         self.client = None
         self.lock = None
         self.stop_event = None
