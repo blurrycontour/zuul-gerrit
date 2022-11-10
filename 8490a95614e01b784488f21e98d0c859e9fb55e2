@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc0cf891_46dd7406",
+        "filename": "doc/source/operation.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-10T23:19:47Z",
+      "side": 1,
+      "message": "Not from this change, but just happened to notice the \", ,\" here.",
+      "revId": "8490a95614e01b784488f21e98d0c859e9fb55e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
