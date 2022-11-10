@@ -15,6 +15,8 @@
 import abc
 import time
 
+from zuul import model
+
 
 class BaseSource(object, metaclass=abc.ABCMeta):
     """Base class for sources.
@@ -182,6 +184,20 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         deletion events.
 
         """
+
+    def getProjectMergeModes(self, project, tenant, min_ltime=-1):
+        """Get supported merge modes for a project
+
+        This method is called very frequently, and should generally
+        return quickly.  The connection is expected to cache merge
+        modes for all projects queried.
+
+        The default implementation indicates that all merge modes are
+        supported.
+
+        """
+
+        return model.ALL_MERGE_MODES
 
     @abc.abstractmethod
     def getProjectBranchCacheLtime(self):

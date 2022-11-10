@@ -238,6 +238,11 @@ class FakeRepository(object):
 
         # List of branch protection rules
         self._branch_protection_rules = defaultdict(FakeBranchProtectionRule)
+        self._repodata = {
+            'allow_merge_commit': True,
+            'allow_squash_merge': True,
+            'allow_rebase_merge': True,
+        }
 
         # fail the next commit requests with 404
         self.fail_not_found = 0
@@ -350,6 +355,8 @@ class FakeRepository(object):
             return self.get_url_collaborators(request)
         if entity == 'commits':
             return self.get_url_commits(request, params=params)
+        if entity == '':
+            return self.get_url_repo()
         else:
             return None
 
@@ -443,6 +450,9 @@ class FakeRepository(object):
             }
         }
         return FakeResponse(data)
+
+    def get_url_repo(self):
+        return FakeResponse(self._repodata)
 
     def pull_requests(self, state=None, sort=None, direction=None):
         # sort and direction are unused currently, but present to match
@@ -752,7 +762,12 @@ class FakeGithubSession(object):
             return FakeResponse(check_run.as_dict(), 200)
 
     def get_repo(self, request, params=None):
-        org, project, request = request.split('/', 2)
+        parts = request.split('/', 2)
+        if len(parts) == 2:
+            org, project = parts
+            request = ''
+        else:
+            org, project, request = parts
         project_name = '{}/{}'.format(org, project)
 
         repo = self.client.repo_from_project(project_name)

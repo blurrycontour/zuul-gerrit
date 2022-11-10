@@ -15,10 +15,8 @@
 import abc
 import logging
 
-from typing import List, Optional
-
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Project
+from zuul import model
 
 
 class ReadOnlyBranchCacheError(RuntimeError):
@@ -143,8 +141,8 @@ class ZKBranchCacheMixin:
     read_only = False
 
     @abc.abstractmethod
-    def isBranchProtected(self, project_name: str, branch_name: str,
-                          zuul_event_id) -> Optional[bool]:
+    def isBranchProtected(self, project_name, branch_name,
+                          zuul_event_id):
         """Return if the branch is protected or None if the branch is unknown.
 
         :param str project_name:
@@ -157,9 +155,35 @@ class ZKBranchCacheMixin:
         pass
 
     @abc.abstractmethod
-    def _fetchProjectBranches(self, project: Project,
-                              exclude_unprotected: bool) -> List[str]:
-        pass
+    def _fetchProjectBranches(self, project, exclude_unprotected):
+        """Perform a remote query to determine the project's branches.
+
+        Connection subclasses should implement this method.
+
+        :param model.Project project:
+            The project.
+        :param bool exclude_unprotected:
+            Whether the query should exclude unprotected branches from
+            the response.
+
+        :returns: A list of branch names.
+        """
+
+    def _fetchProjectMergeModes(self, project):
+        """Perform a remote query to determine the project's supported merge
+           modes.
+
+        Connection subclasses should implement this method if they are
+        able to determine which merge modes apply for a project.  The
+        default implemantion returns that all merge modes are valid.
+
+        :param model.Project project:
+            The project.
+
+        :returns: A list of merge modes as model IDs.
+
+        """
+        return model.ALL_MERGE_MODES
 
     def clearConnectionCacheOnBranchEvent(self, event):
         """Update event and clear connection cache if needed.
@@ -214,8 +238,7 @@ class ZKBranchCacheMixin:
 
         # Update them if we have them
         if protected_branches is not None:
-            protected_branches = self._fetchProjectBranches(
-                project, True)
+            protected_branches = self._fetchProjectBranches(project, True)
             self._branch_cache.setProjectBranches(
                 project.name, True, protected_branches)
 
@@ -223,6 +246,10 @@ class ZKBranchCacheMixin:
             all_branches = self._fetchProjectBranches(project, False)
             self._branch_cache.setProjectBranches(
                 project.name, False, all_branches)
+
+        merge_modes = self._fetchProjectMergeModes(project)
+        self._branch_cache.setProjectMergeModes(
+            project.name, merge_modes)
         self.log.info("Got branches for %s" % project.name)
 
     def getProjectBranches(self, project, tenant, min_ltime=-1):
@@ -281,6 +308,62 @@ class ZKBranchCacheMixin:
                 project.name, exclude_unprotected, branches)
 
         return sorted(branches)
+
+    def getProjectMergeModes(self, project, tenant, min_ltime=-1):
+        """Get the merge modes for the given project.
+
+        :param zuul.model.Project project:
+            The project for which the merge modes are returned.
+        :param zuul.model.Tenant tenant:
+            The related tenant.
+        :param int min_ltime:
+            The minimum ltime to determine if we need to refresh the cache.
+
+        :returns: The list of merge modes by model id.
+        """
+        merge_modes = None
+
+        if self._branch_cache:
+            try:
+                merge_modes = self._branch_cache.getProjectMergeModes(
+                    project.name, min_ltime)
+            except LookupError:
+                if self.read_only:
+                    # A scheduler hasn't attempted to fetch them yet
+                    raise ReadOnlyBranchCacheError(
+                        "Will not fetch merge modes as read-only is set")
+                else:
+                    merge_modes = None
+
+        if merge_modes is not None:
+            return merge_modes
+        elif self.read_only:
+            # A scheduler has previously attempted a fetch, but got
+            # the None due to an error; we can't retry since we're
+            # read-only.
+            raise RuntimeError(
+                "Will not fetch merge_modes as read-only is set")
+
+        # We need to perform a query
+        try:
+            merge_modes = self._fetchProjectMergeModes(project)
+        except Exception:
+            # We weren't able to get the merge modes.  We need to tell
+            # future schedulers to try again but tell zuul-web that we
+            # tried and failed.  Set the merge modes to None to indicate
+            # that we have performed a fetch and retrieved no data.  Any
+            # time we encounter None in the cache, we will try again.
+            if self._branch_cache:
+                self._branch_cache.setProjectMergeModes(
+                    project.name, None)
+            raise
+        self.log.info("Got merge modes for %s" % project.name)
+
+        if self._branch_cache:
+            self._branch_cache.setProjectMergeModes(
+                project.name, merge_modes)
+
+        return merge_modes
 
     def checkBranchCache(self, project_name: str, event,
                          protected: bool = None) -> None:

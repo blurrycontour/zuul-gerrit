@@ -100,3 +100,9 @@ Version 10
 :Prior Zuul version: 6.4.0
 :Description: Renames admin_rules to authz_rules in unparsed abide.
               Affects schedulers and web.
+
+Version 11
+----------
+
+:Prior Zuul version: 8.0.1
+:Description: Adds merge_modes to branch cache.  Affects schedulers and web.

@@ -17,6 +17,7 @@ import json
 from zuul.zk.components import ComponentRegistry
 
 from tests.base import ZuulTestCase, simple_layout, iterate_timeout
+from tests.base import ZuulWebFixture
 
 
 def model_version(version):
@@ -304,6 +305,85 @@ class TestGithubModelUpgrade(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS'),
         ], ordered=False)
         self.assertTrue(A.is_merged)
+
+    @model_version(10)
+    @simple_layout('layouts/github-merge-mode.yaml', driver='github')
+    def test_merge_method_syntax_check(self):
+        """
+        Tests that the merge mode gets forwarded to the reporter and the
+        PR was rebased.
+        """
+        webfixture = self.useFixture(
+            ZuulWebFixture(self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
+        sched = self.scheds.first.sched
+        web = webfixture.web
+
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._repodata['allow_rebase_merge'] = False
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # Verify that there are no errors with model version 9 (we
+        # should be using the defaultdict that indicates all merge
+        # modes are supported).
+        tenant = sched.abide.tenants.get('tenant-one')
+        self.assertEquals(len(tenant.layout.loading_errors), 0)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 11
+
+        # Perform a smart reconfiguration which should not clear the
+        # cache; we should continue to see no errors because we should
+        # still be using the defaultdict.
+        self.scheds.first.smartReconfigure()
+        tenant = sched.abide.tenants.get('tenant-one')
+        self.assertEquals(len(tenant.layout.loading_errors), 0)
+
+        # Wait for web to have the same config
+        for _ in iterate_timeout(10, "config is synced"):
+            if (web.tenant_layout_state.get('tenant-one') ==
+                web.local_layout_state.get('tenant-one')):
+                break
+
+        # Repeat the check
+        tenant = web.abide.tenants.get('tenant-one')
+        self.assertEquals(len(tenant.layout.loading_errors), 0)
+
+        # Perform a full reconfiguration which should cause us to
+        # actually query, update the branch cache, and report an
+        # error.
+        self.scheds.first.fullReconfigure()
+        self.waitUntilSettled()
+
+        tenant = sched.abide.tenants.get('tenant-one')
+        loading_errors = tenant.layout.loading_errors
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "An error should have been stored in sched")
+        self.assertIn(
+            "rebase not supported",
+            str(loading_errors[0].error))
+
+        # Wait for web to have the same config
+        for _ in iterate_timeout(10, "config is synced"):
+            if (web.tenant_layout_state.get('tenant-one') ==
+                web.local_layout_state.get('tenant-one')):
+                break
+
+        # Repoat the check for web
+        tenant = web.abide.tenants.get('tenant-one')
+        loading_errors = tenant.layout.loading_errors
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "An error should have been stored in web")
+        self.assertIn(
+            "rebase not supported",
+            str(loading_errors[0].error))
 
 
 class TestDeduplication(ZuulTestCase):

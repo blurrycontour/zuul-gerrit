@@ -13,11 +13,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+import collections
 import logging
 import json
 
 from zuul.zk.zkobject import ZKContext, ShardedZKObject
 from zuul.zk.locks import SessionAwareReadLock, SessionAwareWriteLock, locked
+from zuul.zk.components import COMPONENT_REGISTRY
+from zuul import model
 
 from kazoo.exceptions import NoNodeError
 
@@ -63,14 +67,27 @@ class BranchCacheZKObject(ShardedZKObject):
     def __init__(self):
         super().__init__()
         self._set(protected={},
-                  remainder={})
+                  remainder={},
+                  merge_modes={})
 
     def serialize(self, context):
         data = {
             "protected": self.protected,
             "remainder": self.remainder,
         }
+        # This is mostly here to enable unit tests of upgrades, it's
+        # safe to move into the dict above at any time.
+        if (COMPONENT_REGISTRY.model_api >= 11):
+            data["merge_modes"] = self.merge_modes
         return json.dumps(data, sort_keys=True).encode("utf8")
+
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
+        # MODEL_API < 11
+        if "merge_modes" not in data:
+            data["merge_modes"] = collections.defaultdict(
+                lambda: model.ALL_MERGE_MODES)
+        return data
 
     def _save(self, context, data, create=False):
         super()._save(context, data, create)
@@ -119,10 +136,12 @@ class BranchCache:
             if projects is None:
                 self.cache.protected.clear()
                 self.cache.remainder.clear()
+                self.cache.merge_modes.clear()
             else:
                 for p in projects:
                     self.cache.protected.pop(p, None)
                     self.cache.remainder.pop(p, None)
+                    self.cache.merge_modes.pop(p, None)
 
     def getProjectBranches(self, project_name, exclude_unprotected,
                            min_ltime=-1, default=RAISE_EXCEPTION):
@@ -254,6 +273,68 @@ class BranchCache:
                 else:
                     if branch not in remainder_branches:
                         remainder_branches.append(branch)
+
+    def getProjectMergeModes(self, project_name,
+                             min_ltime=-1, default=RAISE_EXCEPTION):
+        """Get the merge modes for the given project.
+
+        Checking the branch cache we need to distinguish three different
+        cases:
+
+            1. cache miss (not queried yet)
+            2. cache hit (including empty list of merge modes)
+            3. error when fetching merge modes
+
+        If the cache doesn't contain any merge modes for the project and no
+        default value is provided a LookupError is raised.
+
+        If there was an error fetching the merge modes, the return value
+        will be None.
+
+        Otherwise the list of merge modes will be returned.
+
+        :param str project_name:
+            The project for which the merge modes are returned.
+        :param int min_ltime:
+            The minimum cache ltime to consider the cache valid.
+        :param any default:
+            Optional default value to return if no cache entry exits.
+
+        :returns: The list of merge modes by model id, or None if there was
+            an error when fetching the merge modes.
+        """
+        if self.ltime < min_ltime:
+            with locked(self.rlock):
+                self.cache.refresh(self.zk_context)
+
+        merge_modes = None
+        try:
+            merge_modes = self.cache.merge_modes[project_name]
+        except KeyError:
+            if default is RAISE_EXCEPTION:
+                raise LookupError(
+                    f"No merge modes for project {project_name}")
+            else:
+                return default
+
+        return merge_modes
+
+    def setProjectMergeModes(self, project_name, merge_modes):
+        """Set the supported merge modes for the given project.
+
+        Use None as a sentinel value for the merge modes to indicate
+        that there was a fetch error.
+
+        :param str project_name:
+            The project for the merge modes.
+        :param list[int] merge_modes:
+            The list of merge modes (by model ID) or None.
+
+        """
+
+        with locked(self.wlock):
+            with self.cache.activeContext(self.zk_context):
+                self.cache.merge_modes[project_name] = merge_modes
 
     @property
     def ltime(self):
