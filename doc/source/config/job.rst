@@ -483,47 +483,163 @@ Here is an example of two job definitions:
    .. attr:: pre-run
 
       The name of a playbook or list of playbooks to run before the
-      main body of a job.  The full path to the playbook in the repo
-      where the job is defined is expected.
+      main body of a job.  Values are either a string describing the
+      full path to the playbook in the repo where the job is defined,
+      or a dictionary described below.
 
       When a job inherits from a parent, the child's pre-run playbooks
       are run after the parent's.  See :ref:`job` for more
       information.
 
+      If the value is a dictionary, the following attributes are
+      available:
+
+      .. attr:: name
+
+         The path to the playbook relative to the root of the repo.
+
+      .. attr:: semaphore
+
+         The name of a :ref:`semaphore` (or list of them) or
+         :ref:`global_semaphore` which should be acquired and released
+         when the playbook begins and ends.  If the semaphore is at
+         maximum capacity, then Zuul will wait until it can be
+         acquired before starting the playbook. The format is either a
+         string, or a list of strings.
+
+         If multiple semaphores are requested, the playbook will not
+         start until all have been acquired, and Zuul will wait until
+         all are available before acquiring any.  The time spent
+         waiting for pre-run playbook semaphores is counted against
+         the :attr:`job.timeout`.
+
+         None of the semaphores specified for a playbook may also be
+         specified in the same job.
+
    .. attr:: post-run
 
       The name of a playbook or list of playbooks to run after the
-      main body of a job.  The full path to the playbook in the repo
-      where the job is defined is expected.
+      main body of a job.  Values are either a string describing the
+      full path to the playbook in the repo where the job is defined,
+      or a dictionary described below.
 
-      When a job inherits from a parent, the child's post-run
-      playbooks are run before the parent's.  See :ref:`job` for more
+      When a job inherits from a parent, the child's post-run playbooks
+      are run before the parent's.  See :ref:`job` for more
       information.
+
+      If the value is a dictionary, the following attributes are
+      available:
+
+      .. attr:: name
+
+         The path to the playbook relative to the root of the repo.
+
+      .. attr:: semaphore
+
+         The name of a :ref:`semaphore` (or list of them) or
+         :ref:`global_semaphore` which should be acquired and released
+         when the playbook begins and ends.  If the semaphore is at
+         maximum capacity, then Zuul will wait until it can be
+         acquired before starting the playbook. The format is either a
+         string, or a list of strings.
+
+         If multiple semaphores are requested, the playbook will not
+         start until all have been acquired, and Zuul will wait until
+         all are available before acquiring any.  The time spent
+         waiting for post-run playbook semaphores is counted against
+         the :attr:`job.post-timeout`.
+
+         None of the semaphores specified for a playbook may also be
+         specified in the same job.
 
    .. attr:: cleanup-run
 
-      The name of a playbook or list of playbooks to run after a job
-      execution. The full path to the playbook in the repo
-      where the job is defined is expected.
+      The name of a playbook or list of playbooks to run after job
+      execution.  Values are either a string describing the full path
+      to the playbook in the repo where the job is defined, or a
+      dictionary described below.
 
-      The cleanup phase is performed unconditionally of the job's result,
-      even when the job is canceled. Cleanup results are not taken into
-      account.
+      The cleanup phase is performed regardless of the job's result,
+      even when the job is canceled.  Cleanup results are not taken
+      into account when reporting the job result.
 
-      When a job inherits from a parent, the child's cleanup-run
-      playbooks are run before the parent's.  See :ref:`job` for more
+      When a job inherits from a parent, the child's cleanup-run playbooks
+      are run before the parent's.  See :ref:`job` for more
       information.
+
+      There is a hard-coded five minute timeout for cleanup playbooks.
+
+      If the value is a dictionary, the following attributes are
+      available:
+
+      .. attr:: name
+
+         The path to the playbook relative to the root of the repo.
+
+      .. attr:: semaphore
+
+         The name of a :ref:`semaphore` (or list of them) or
+         :ref:`global_semaphore` which should be acquired and released
+         when the playbook begins and ends.  If the semaphore is at
+         maximum capacity, then Zuul will wait until it can be
+         acquired before starting the playbook. The format is either a
+         string, or a list of strings.
+
+         If multiple semaphores are requested, the playbook will not
+         start until all have been acquired, and Zuul will wait until
+         all are available before acquiring any.  The time spent
+         waiting for post-run playbook semaphores is counted against
+         the cleanup phase timeout.
+
+         None of the semaphores specified for a playbook may also be
+         specified in the same job.
 
    .. attr:: run
 
       The name of a playbook or list of playbooks for this job.  If it
-      is not supplied, the parent's playbook will be used (and likewise
-      up the inheritance chain).  The full path within the repo is
-      required.  Example:
+      is not supplied, the parent's playbook will be used (and
+      likewise up the inheritance chain).  Values are either a string
+      describing the full path to the playbook in the repo where the
+      job is defined, or a dictionary described below.
+
+      If the value is a dictionary, the following attributes are
+      available:
+
+      .. attr:: name
+
+         The path to the playbook relative to the root of the repo.
+
+      .. attr:: semaphore
+
+         The name of a :ref:`semaphore` (or list of them) or
+         :ref:`global_semaphore` which should be acquired and released
+         when the playbook begins and ends.  If the semaphore is at
+         maximum capacity, then Zuul will wait until it can be
+         acquired before starting the playbook. The format is either a
+         string, or a list of strings.
+
+         If multiple semaphores are requested, the playbook will not
+         start until all have been acquired, and Zuul will wait until
+         all are available before acquiring any.  The time spent
+         waiting for run playbook semaphores is counted against
+         the :attr:`job.timeout`.
+
+         None of the semaphores specified for a playbook may also be
+         specified in the same job.
+
+      Example:
 
       .. code-block:: yaml
 
          run: playbooks/job-playbook.yaml
+
+      Or:
+
+      .. code-block:: yaml
+
+         run:
+           - name: playbooks/job-playbook.yaml
+             semaphores: playbook-semaphore
 
    .. attr:: ansible-version
 
