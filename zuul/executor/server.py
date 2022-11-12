@@ -2041,7 +2041,9 @@ class AnsibleJob(object):
         jobdir_playbook.project_canonical_name = project.canonical_name
         jobdir_playbook.canonical_name_and_path = os.path.join(
             project.canonical_name, playbook['path'])
-        jobdir_playbook.semaphores = playbook['semaphores']
+        # The playbook may lack semaphores if mid-upgrade and a build is run on
+        # behalf of a scheduler too old to add them.
+        jobdir_playbook.semaphores = playbook.get('semaphores', [])
         path = None
 
         if not jobdir_playbook.trusted:
