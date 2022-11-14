@@ -16,9 +16,8 @@ import time
 import logging
 import voluptuous as v
 
+from zuul import model
 from zuul.reporter import BaseReporter
-from zuul.model import MERGER_MERGE_RESOLVE, MERGER_MERGE, MERGER_MAP, \
-    MERGER_SQUASH_MERGE
 from zuul.lib.logutil import get_annotated_logger
 from zuul.driver.gitlab.gitlabsource import GitlabSource
 from zuul.driver.util import scalar_or_list
@@ -33,9 +32,9 @@ class GitlabReporter(BaseReporter):
 
     # Merge modes supported by gitlab
     merge_modes = {
-        MERGER_MERGE: 'merge',
-        MERGER_MERGE_RESOLVE: 'merge',
-        MERGER_SQUASH_MERGE: 'squash'
+        model.MERGER_MERGE: 'merge',
+        model.MERGER_MERGE_RESOLVE: 'merge',
+        model.MERGER_SQUASH_MERGE: 'squash'
     }
 
     def __init__(self, driver, connection, pipeline, config=None):
@@ -110,7 +109,7 @@ class GitlabReporter(BaseReporter):
         merge_mode = item.current_build_set.getMergeMode()
 
         if merge_mode not in self.merge_modes:
-            mode = [x[0] for x in MERGER_MAP.items() if x[1] == merge_mode][0]
+            mode = model.get_merge_mode_name(merge_mode)
             self.log.warning('Merge mode %s not supported by Gitlab', mode)
             raise MergeFailure('Merge mode %s not supported by Gitlab' % mode)
 
