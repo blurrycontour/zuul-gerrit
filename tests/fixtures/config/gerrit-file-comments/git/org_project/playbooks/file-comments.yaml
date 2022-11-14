@@ -15,6 +15,9 @@
               missingfile.txt:
                 - line: 89
                   message: does not exist
+              /COMMIT_MSG:
+                - line: 1
+                  message: commit message comment
     - name: Another task using zuul_return
       zuul_return:
         data:

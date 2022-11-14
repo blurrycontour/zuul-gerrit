@@ -1593,6 +1593,11 @@ class AnsibleJob(object):
 
         new_lines = {}
         for (filename, lineno) in lines:
+            # Gerrit has several special file names (like /COMMIT_MSG) that
+            # start with "/" and should not have mapping done on them
+            if filename[0] == "/":
+                continue
+
             try:
                 new_lineno = repo.mapLine(commit, filename, lineno)
             except Exception as e:
