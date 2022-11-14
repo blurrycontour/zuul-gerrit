@@ -546,15 +546,28 @@ class Repo(object):
             log.debug("Repo is already at %s" % ref)
         else:
             log.debug("Checking out %s" % ref)
-            # Perform a hard reset to the correct ref before checking out so
-            # that we clean up anything that might be left over from a merge
-            # while still only preparing the working copy once.
-            repo.head.reference = ref
-            repo.head.reset(working_tree=True)
-            repo.git.clean('-x', '-f', '-d')
-            repo.git.checkout(ref)
-
+            try:
+                self._checkout(repo, ref)
+            except Exception as exc:
+                lock_path = f"{self.local_path}/.git/index.lock"
+                if os.path.isfile(lock_path):
+                    log.warning("Deleting stale index.lock file: %s",
+                                lock_path)
+                    os.unlink(lock_path)
+                    # Retry the checkout
+                    self._checkout(repo, ref)
+                else:
+                    raise
         return repo.head.commit
+
+    def _checkout(self, repo, ref):
+        # Perform a hard reset to the correct ref before checking out so
+        # that we clean up anything that might be left over from a merge
+        # while still only preparing the working copy once.
+        repo.head.reference = ref
+        repo.head.reset(working_tree=True)
+        repo.git.clean('-x', '-f', '-d')
+        repo.git.checkout(ref)
 
     def cherryPick(self, ref, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
