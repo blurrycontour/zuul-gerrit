@@ -187,7 +187,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -227,7 +227,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -263,7 +263,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -308,7 +308,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -359,7 +359,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(

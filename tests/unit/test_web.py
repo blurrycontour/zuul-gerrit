@@ -2063,7 +2063,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='OnlyZuulNoDana',
                            algorithm='HS256')
         resp = self.post_url(
@@ -2125,7 +2125,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() - 3600}
+                 'exp': int(time.time()) - 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         resp = self.post_url(
@@ -2160,7 +2160,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-six', 'tenant-ten', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         resp = self.post_url(
@@ -2194,7 +2194,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                       'aud': 'zuul.example.com',
                       'sub': 'testuser',
                       'zuul': {'admin': ['tenant-one', ]},
-                      'exp': time.time() + 3600}
+                      'exp': int(time.time()) + 3600}
         args = {"reason": "some reason",
                 "count": 1,
                 'job': 'project-test2',
@@ -2234,7 +2234,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(
@@ -2286,7 +2286,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         request_id, _ = self._init_autohold_delete(authz)
         # now try the autohold-delete API
         bad_authz = {'iss': 'zuul_operator',
@@ -2295,7 +2295,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                      'zuul': {
                          'admin': ['tenant-two', ]
                      },
-                     'exp': time.time() + 3600}
+                     'exp': int(time.time()) + 3600}
         bad_token = jwt.encode(bad_authz, key='NoDanaOnlyZuul',
                                algorithm='HS256')
         resp = self.delete_url(
@@ -2313,7 +2313,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         bad_token = jwt.encode(authz, key='NoDanaOnlyZuul',
                                algorithm='HS256')
         resp = self.delete_url(
@@ -2328,7 +2328,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         request_id, token = self._init_autohold_delete(authz)
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request_id,
@@ -2352,7 +2352,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
@@ -2404,7 +2404,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(path % enqueue_args,
@@ -2448,7 +2448,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/dequeue"
@@ -2565,8 +2565,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600,
-                 'iat': time.time()}
+                 'exp': int(time.time()) + 3600,
+                 'iat': int(time.time())}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(
@@ -2654,8 +2654,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600,
-                 'iat': time.time()}
+                 'exp': int(time.time()) + 3600,
+                 'iat': int(time.time())}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(
@@ -2746,8 +2746,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600,
-                 'iat': time.time()}
+                 'exp': int(time.time()) + 3600,
+                 'iat': int(time.time())}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(
@@ -2795,7 +2795,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one'],
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.get_url(
@@ -2838,7 +2838,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(
@@ -2877,21 +2877,21 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             authz = {'iss': 'zuul_operator',
                      'aud': 'zuul.example.com',
                      'sub': 'venkman',
-                     'exp': time.time() + 3600}
+                     'exp': int(time.time()) + 3600}
             _test_project_enqueue_with_authz(i, p, authz, 200)
             i += 1
             # Unauthorized sub
             authz = {'iss': 'zuul_operator',
                      'aud': 'zuul.example.com',
                      'sub': 'vigo',
-                     'exp': time.time() + 3600}
+                     'exp': int(time.time()) + 3600}
             _test_project_enqueue_with_authz(i, p, authz, 403)
             i += 1
             # unauthorized issuer
             authz = {'iss': 'columbia.edu',
                      'aud': 'zuul.example.com',
                      'sub': 'stantz',
-                     'exp': time.time() + 3600}
+                     'exp': int(time.time()) + 3600}
             _test_project_enqueue_with_authz(i, p, authz, 401)
         self.waitUntilSettled()
 
@@ -2905,7 +2905,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'aud': 'zuul.example.com',
                  'sub': 'melnitz',
                  'groups': ['ghostbusters', 'secretary'],
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
@@ -2931,7 +2931,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'sub': 'zeddemore',
                  'vehicle': {
                      'car': 'ecto-1'},
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
@@ -2953,7 +2953,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'aud': 'zuul.example.com',
                  'sub': 'testuser',
                  'zuul': {'admin': admin_tenants},
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.get_url('/api/tenant/tenant-one/authorizations',
@@ -2991,7 +2991,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
 
         for test_user in users:
             authz = test_user['authz']
-            authz['exp'] = time.time() + 3600
+            authz['exp'] = int(time.time()) + 3600
             token = jwt.encode(authz, key='NoDanaOnlyZuul',
                                algorithm='HS256')
             req = self.get_url('/api/tenant/tenant-one/authorizations',
@@ -3031,7 +3031,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         resp = self.post_url(
@@ -3066,8 +3066,8 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 7200,
-                 'iat': time.time() + 3600}
+                 'exp': int(time.time()) + 7200,
+                 'iat': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         resp = self.post_url(
@@ -3102,8 +3102,8 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600,
-                 'iat': time.time()}
+                 'exp': int(time.time()) + 3600,
+                 'iat': int(time.time())}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         time.sleep(10)
@@ -3146,8 +3146,8 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ],
                  },
-                 'exp': time.time() + 3600,
-                 'iat': time.time()}
+                 'exp': int(time.time()) + 3600,
+                 'iat': int(time.time())}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         req = self.post_url(
@@ -3249,7 +3249,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -3288,7 +3288,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -3317,7 +3317,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -3356,7 +3356,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
@@ -3407,7 +3407,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'zuul': {
                      'admin': ['tenant-one', ]
                  },
-                 'exp': time.time() + 3600}
+                 'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
         p = subprocess.Popen(
