@@ -1833,7 +1833,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     if hasattr(pr_file, "previous_filename"):
                         files.append(pr_file.previous_filename)
                 pr['files'] = files
-        except github3.exceptions.ServerError as exc:
+        except github3.exceptions.ResponseError as exc:
             # NOTE: For PRs with a lot of lines changed, Github will return
             # an error (HTTP 500) because it can't generate the diff.
             self.log.warning("Failed to get list of files from Github. "
