@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faff4be0_f3866d36",
+        "filename": "doc/source/operation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 35201
+      },
+      "writtenOn": "2022-11-16T18:17:03Z",
+      "side": 1,
+      "message": "I\u0027m not sure how much depth you want to go into here, but it might be worth clarifying that kubernetes nodes work somewhat distinctly here - the executor uses kubectl port-forward to forward a localhost port to the individual nodes instead of connecting to them directly.",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 50
+      },
+      "revId": "5d6a6fb1ad826c1b8c748dd3a5ec9b9140a84c07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
