@@ -22,7 +22,7 @@ import textwrap
 import gc
 import re
 from time import sleep
-from unittest import skip, skipIf
+from unittest import mock, skip, skipIf
 from zuul.lib import yamlutil
 
 import fixtures
@@ -4356,6 +4356,29 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
         self.assertTrue(os.path.exists(cleanup_flag))
         self.assertTrue(os.path.exists(post_start))
         self.assertFalse(os.path.exists(post_end))
+
+    @mock.patch("zuul.executor.server.CLEANUP_TIMEOUT", 5)
+    def test_cleanup_playbook_timeout(self):
+        # Test that when the cleanup runs into a timeout, the job
+        # still completes.
+        self.executor_server.verbose = True
+
+        # Change the zuul config to run the python27-cleanup-timeout job
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - python27-cleanup-timeout
+            """)
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A",
+                                           files={".zuul.yaml": in_repo_conf})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="python27-cleanup-timeout", result="SUCCESS",
+                 changes="1,1")])
 
 
 class TestPlaybookSemaphore(AnsibleZuulTestCase):
