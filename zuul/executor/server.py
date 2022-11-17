@@ -2672,23 +2672,23 @@ class AnsibleJob(object):
 
     def _ansibleTimeout(self, msg):
         self.log.warning(msg)
-        self.abortRunningProc()
+        self.abortRunningProc(timed_out=True)
 
-    def abortRunningProc(self):
+    def abortRunningProc(self, timed_out=False):
         with self.proc_lock:
-            if self.proc and not self.cleanup_started:
-                self.log.debug("Abort: sending kill signal to job "
-                               "process group")
-                try:
-                    pgid = os.getpgid(self.proc.pid)
-                    os.killpg(pgid, signal.SIGKILL)
-                except Exception:
-                    self.log.exception(
-                        "Exception while killing ansible process:")
-            elif self.proc and self.cleanup_started:
-                self.log.debug("Abort: cleanup is in progress")
-            else:
+            if not self.proc:
                 self.log.debug("Abort: no process is running")
+                return
+            elif self.cleanup_started and not timed_out:
+                self.log.debug("Abort: cleanup is in progress")
+                return
+
+            self.log.debug("Abort: sending kill signal to job process group")
+            try:
+                pgid = os.getpgid(self.proc.pid)
+                os.killpg(pgid, signal.SIGKILL)
+            except Exception:
+                self.log.exception("Exception while killing ansible process:")
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
                    wrapped=True, cleanup=False):
