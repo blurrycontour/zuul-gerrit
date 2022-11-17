@@ -98,6 +98,9 @@ BLACKLISTED_VARS = dict(
     ansible_ssh_extra_args='-o PermitLocalCommand=no',
 )
 
+# TODO: make this configurable
+CLEANUP_TIMEOUT = 300
+
 
 class VerboseCommand(commandsocket.Command):
     name = 'verbose'
@@ -1862,9 +1865,6 @@ class AnsibleJob(object):
             # This means we can't run any cleanup playbooks.
             return
 
-        # TODO: make this configurable
-        cleanup_timeout = 300
-
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Running Ansible cleanup...\n".format(
                 now=datetime.datetime.now()
@@ -1873,7 +1873,7 @@ class AnsibleJob(object):
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
             self.runAnsiblePlaybook(
-                playbook, cleanup_timeout, self.ansible_version,
+                playbook, CLEANUP_TIMEOUT, self.ansible_version,
                 success=success, phase='cleanup', index=index)
 
     def _logFinalPlaybookError(self):
@@ -2672,23 +2672,23 @@ class AnsibleJob(object):
 
     def _ansibleTimeout(self, msg):
         self.log.warning(msg)
-        self.abortRunningProc()
+        self.abortRunningProc(timed_out=True)
 
-    def abortRunningProc(self):
+    def abortRunningProc(self, timed_out=False):
         with self.proc_lock:
-            if self.proc and not self.cleanup_started:
-                self.log.debug("Abort: sending kill signal to job "
-                               "process group")
-                try:
-                    pgid = os.getpgid(self.proc.pid)
-                    os.killpg(pgid, signal.SIGKILL)
-                except Exception:
-                    self.log.exception(
-                        "Exception while killing ansible process:")
-            elif self.proc and self.cleanup_started:
-                self.log.debug("Abort: cleanup is in progress")
-            else:
+            if not self.proc:
                 self.log.debug("Abort: no process is running")
+                return
+            elif self.cleanup_started and not timed_out:
+                self.log.debug("Abort: cleanup is in progress")
+                return
+
+            self.log.debug("Abort: sending kill signal to job process group")
+            try:
+                pgid = os.getpgid(self.proc.pid)
+                os.killpg(pgid, signal.SIGKILL)
+            except Exception:
+                self.log.exception("Exception while killing ansible process:")
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
                    wrapped=True, cleanup=False):
