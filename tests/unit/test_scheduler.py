@@ -41,6 +41,7 @@ import zuul.merger.merger
 from zuul.lib import yamlutil as yaml
 
 from tests.base import (
+    AnsibleZuulTestCase,
     SSLZuulTestCase,
     ZuulTestCase,
     repack_repo,

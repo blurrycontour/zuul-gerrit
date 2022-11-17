@@ -30,6 +30,7 @@ import git
 import paramiko
 
 import zuul.configloader
+import zuul.executor.server
 from zuul.lib import yamlutil as yaml
 from zuul.model import MergeRequest
 from zuul.zk.blob_store import BlobStore
@@ -4356,6 +4357,33 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
         self.assertTrue(os.path.exists(cleanup_flag))
         self.assertTrue(os.path.exists(post_start))
         self.assertFalse(os.path.exists(post_end))
+
+    def test_cleanup_playbook_timeout(self):
+        # Test that when the cleanup runs into a timeout, the job
+        # still completes.
+        self.executor_server.verbose = True
+
+        # TODO (felix): I did't make this work with unittest.mock.patch,
+        # therefore the "manual" solution
+        original_timeout = zuul.executor.server.CLEANUP_TIMEOUT
+        # Patch the cleanup timeout to a lower value
+        zuul.executor.server.CLEANUP_TIMEOUT = 5
+
+        # Change the zuul config to run the python27-cleanup-timeout job
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - python27-cleanup-timeout
+            """)
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A",
+                                           files={".zuul.yaml": in_repo_conf})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Reset the cleanup timeout to its original value
+        zuul.executor.server.CLEANUP_TIMEOUT = original_timeout
 
 
 class TestPlaybookSemaphore(AnsibleZuulTestCase):
