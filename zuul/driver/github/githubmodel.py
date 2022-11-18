@@ -38,6 +38,7 @@ class PullRequest(Change):
         self.files = []
         self.labels = []
         self.draft = None
+        self.mergeable = True
         self.review_decision = None
         self.required_contexts = set()
         self.contexts = set()
@@ -74,6 +75,7 @@ class PullRequest(Change):
             "reviews": list(self.reviews),
             "labels": self.labels,
             "draft": self.draft,
+            "mergeable": self.mergeable,
             "review_decision": self.review_decision,
             "required_contexts": list(self.required_contexts),
             "contexts": list(self.contexts),
@@ -90,6 +92,7 @@ class PullRequest(Change):
         self.reviews = data.get("reviews", [])
         self.labels = data.get("labels", [])
         self.draft = data.get("draft")
+        self.mergeable = data.get("mergeable", True)
         self.review_decision = data.get("review_decision")
         self.required_contexts = set(data.get("required_contexts", []))
         self.contexts = set(tuple(c) for c in data.get("contexts", []))

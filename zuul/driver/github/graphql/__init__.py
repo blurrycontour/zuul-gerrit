@@ -116,6 +116,11 @@ class GraphQLClient:
         pull_request = nested_get(repository, 'pullRequest')
         result['isDraft'] = nested_get(pull_request, 'isDraft', default=False)
 
+        # Check if Github detected a merge conflict. Possible enum values
+        # are CONFLICTING, MERGEABLE and UNKNOWN.
+        result['mergeable'] = nested_get(pull_request, 'mergeable',
+                                         default='MERGEABLE')
+
         # Get review decision. This is supported since GHE 2.21. Default to
         # None to signal if the field is not present.
         result['reviewDecision'] = nested_get(
