@@ -547,7 +547,7 @@ class FakePull(object):
                 'login': 'octocat'
             },
             'draft': pr.draft,
-            'mergeable': True,
+            'mergeable': pr.mergeable,
             'state': pr.state,
             'head': {
                 'sha': pr.head_sha,

@@ -2340,7 +2340,7 @@ class FakeGithubPullRequest(object):
     def __init__(self, github, number, project, branch,
                  subject, upstream_root, files=None, number_of_commits=1,
                  writers=[], body=None, body_text=None, draft=False,
-                 base_sha=None):
+                 mergeable=True, base_sha=None):
         """Creates a new PR with several commits.
         Sends an event about opened PR.
 
@@ -2356,6 +2356,7 @@ class FakeGithubPullRequest(object):
         self.body = body
         self.body_text = body_text
         self.draft = draft
+        self.mergeable = mergeable
         self.number_of_commits = 0
         self.upstream_root = upstream_root
         # Dictionary of FakeFile -> content
@@ -2911,12 +2912,12 @@ class FakeGithubConnection(githubconnection.GithubConnection):
 
     def openFakePullRequest(self, project, branch, subject, files=[],
                             body=None, body_text=None, draft=False,
-                            base_sha=None):
+                            mergeable=True, base_sha=None):
         self.pr_number += 1
         pull_request = FakeGithubPullRequest(
             self, self.pr_number, project, branch, subject, self.upstream_root,
             files=files, body=body, body_text=body_text, draft=draft,
-            base_sha=base_sha)
+            mergeable=mergeable, base_sha=base_sha)
         self.pull_requests[self.pr_number] = pull_request
         return pull_request
 

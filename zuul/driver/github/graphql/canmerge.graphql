@@ -20,6 +20,7 @@ query canMergeData(
     }
     pullRequest(number: $pull) {
       isDraft
+      mergeable
       reviewDecision
     }
     object(expression: $head_sha) {

@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from graphene import Boolean, Field, Int, List, ObjectType, String
+from graphene import Boolean, Enum, Field, Int, List, ObjectType, String
 
 
 class FakePageInfo(ObjectType):
@@ -178,12 +178,22 @@ class FakeCommit(ObjectType):
         return parent._check_runs
 
 
+class MergeableState(Enum):
+    CONFLICTING = 1
+    MERGEABLE = 2
+    UNKNOWN = 3
+
+
 class FakePullRequest(ObjectType):
     isDraft = Boolean()
     reviewDecision = String()
+    mergeable = MergeableState()
 
     def resolve_isDraft(parent, info):
         return parent.draft
+
+    def resolve_mergeable(parent, info):
+        return parent.mergeable
 
     def resolve_reviewDecision(parent, info):
         if hasattr(info.context, 'version') and info.context.version:

@@ -1692,6 +1692,8 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         change.contexts = self._get_contexts(canmerge_data)
         change.draft = canmerge_data.get('isDraft', False)
+        change.mergeable = (canmerge_data.get('mergeable', 'MERGEABLE').lower()
+                            in ('mergeable', 'unknown'))
         change.review_decision = canmerge_data['reviewDecision']
         change.required_contexts = set(
             canmerge_data['requiredStatusCheckContexts']
