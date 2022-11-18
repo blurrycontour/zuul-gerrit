@@ -785,6 +785,18 @@ class TestGithubDriver(ZuulTestCase):
         self.assertFalse(A.is_merged)
         self.assertHistory([])
 
+    @simple_layout('layouts/dependent-github.yaml', driver='github')
+    def test_non_mergeable_pr(self):
+        # pipeline merges the pull request on success
+        A = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'PR title', mergeable=False)
+        self.fake_github.emitEvent(A.addLabel('merge'))
+        self.waitUntilSettled()
+
+        # A non-mergeable pull request must not enter gate
+        self.assertFalse(A.is_merged)
+        self.assertHistory([])
+
     @simple_layout('layouts/reporting-multiple-github.yaml', driver='github')
     def test_reporting_multiple_github(self):
         project = 'org/project1'

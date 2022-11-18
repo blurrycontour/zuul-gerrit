@@ -1692,6 +1692,8 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         change.contexts = self._get_contexts(canmerge_data)
         change.draft = canmerge_data.get('isDraft', False)
+        change.mergeable = (canmerge_data.get('mergeable', 'MERGEABLE').lower()
+                            in ('mergeable', 'unknown'))
         change.review_decision = canmerge_data['reviewDecision']
         change.required_contexts = set(
             canmerge_data['requiredStatusCheckContexts']
@@ -1858,6 +1860,11 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         # If the PR is a draft it cannot be merged.
         if change.draft:
             log.debug('Change %s can not merge because it is a draft', change)
+            return False
+
+        if not change.mergeable:
+            log.debug('Change %s can not merge because Github detected a '
+                      'merge conflict', change)
             return False
 
         missing_status_checks = self._getMissingStatusChecks(
