@@ -1,0 +1,18 @@
+- include_role:
+    name: init-repository
+  vars:
+    projectname: "{{ repoinfo.name }}"
+
+- name: "Init Repo: Copy {{ repoinfo.archive }} in {{ repoinfo.name }}"
+  copy:
+    src: ../../doc/source/tutorials/archive/{{ repoinfo.archive }}
+    dest: "{{ workspace }}/"
+
+- name: "Init Repo: Setup repository {{ repoinfo.name }}"
+  shell:
+    chdir: "{{ workspace }}/{{ repoinfo.name }}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      tar -xzf ../{{ repoinfo.archive }} -C .
+      git add -A
