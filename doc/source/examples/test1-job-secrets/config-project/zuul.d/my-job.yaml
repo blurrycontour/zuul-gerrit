@@ -1,0 +1,7 @@
+---
+- job:
+    name: my-publication-job
+    run: playbooks/my-publication.yaml
+    secrets:
+      - name: publication_secret
+        secret: my-publication-secret
