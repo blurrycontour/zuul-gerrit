@@ -22,6 +22,30 @@
       },
       "revId": "5d6a6fb1ad826c1b8c748dd3a5ec9b9140a84c07",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba1192a1_b790189e",
+        "filename": "doc/source/operation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2022-11-20T23:14:12Z",
+      "side": 1,
+      "message": "I think if this can be made a paragraph that would be a sensible addition ... as the current domain expert in this, do you think you could propose a follow-on change? 😊",
+      "parentUuid": "faff4be0_f3866d36",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 50
+      },
+      "revId": "5d6a6fb1ad826c1b8c748dd3a5ec9b9140a84c07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
