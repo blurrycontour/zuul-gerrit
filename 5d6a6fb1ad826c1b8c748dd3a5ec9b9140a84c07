@@ -46,6 +46,30 @@
       },
       "revId": "5d6a6fb1ad826c1b8c748dd3a5ec9b9140a84c07",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f04f0be8_f23be366",
+        "filename": "doc/source/operation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 35201
+      },
+      "writtenOn": "2022-11-21T17:52:32Z",
+      "side": 1,
+      "message": "Certainly.  I\u0027ll write it up. 😊",
+      "parentUuid": "ba1192a1_b790189e",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 176,
+        "endChar": 50
+      },
+      "revId": "5d6a6fb1ad826c1b8c748dd3a5ec9b9140a84c07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
