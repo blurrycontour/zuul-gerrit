@@ -4442,6 +4442,9 @@ class TestScheduler(ZuulTestCase):
         # with a configuration which does not include a
         # timer-triggered job so that we have an opportunity to set
         # the hold flag before the first job.
+        timer = self.scheds.first.sched.connections.drivers['timer']
+        start_jobs = timer.apsched.get_jobs()
+
         self.create_branch('org/project', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchCreatedEvent(
@@ -4450,6 +4453,7 @@ class TestScheduler(ZuulTestCase):
         self.commitConfigUpdate('common-config', config_file)
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
 
+        first_jobs = timer.apsched.get_jobs()
         # Collect the currently cached branches in order to later check,
         # that the timer driver refreshes the cache.
         cached_versions = {}
@@ -4487,6 +4491,7 @@ class TestScheduler(ZuulTestCase):
         # below don't race against more jobs being queued.
         self.commitConfigUpdate('common-config', 'layouts/no-timer.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        second_jobs = timer.apsched.get_jobs()
         self.waitUntilSettled()
         # If APScheduler is in mid-event when we remove the job, we
         # can end up with one more event firing, so give it an extra
@@ -4513,6 +4518,11 @@ class TestScheduler(ZuulTestCase):
                 self.assertGreater(change.cache_version,
                                    cached_versions[branch])
 
+        # We start with no jobs, and our first reconfigure should add jobs
+        self.assertTrue(len(first_jobs) > len(start_jobs))
+        # Our second reconfigure should return us to no jobs
+        self.assertEqual(start_jobs, second_jobs)
+
     def _create_dummy_event(self, project, branch):
         event = zuul.model.TriggerEvent()
         event.type = 'test'
@@ -4531,6 +4541,21 @@ class TestScheduler(ZuulTestCase):
     def test_timer_with_jitter(self):
         "Test that a periodic job with a jitter is triggered"
         self._test_timer('layouts/timer-jitter.yaml')
+
+    @simple_layout('layouts/timer-jitter.yaml')
+    def test_timer_preserve_jobs(self):
+        # This tests that we keep the same apsched jobs if possible
+        # when reconfiguring.  If a reconfiguration happens during the
+        # "jitter" period, we might end up not running jobs unless we
+        # preserve the exact job object across reconfiguration.
+        timer = self.scheds.first.sched.connections.drivers['timer']
+        old_jobs = timer.apsched.get_jobs()
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        new_jobs = timer.apsched.get_jobs()
+
+        self.assertEqual(old_jobs, new_jobs)
 
     def test_idle(self):
         "Test that frequent periodic jobs work"
