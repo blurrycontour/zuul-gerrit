@@ -91,6 +91,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
 
         needed_by_changes = self.resolveChangeReferences(
             change.needed_by_changes)
+        log.debug("  Previously known following changes: %s",
+                  needed_by_changes)
         seen = set(needed_by_changes)
         for source in sources:
             log.debug("  Checking source: %s", source)
@@ -101,7 +103,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                     seen.add(c)
                     needed_by_changes.append(c)
 
-        log.debug("  Following changes: %s", needed_by_changes)
+        log.debug("  Updated following changes: %s", needed_by_changes)
 
         to_enqueue = []
         change_dependencies = dependency_graph.get(change, [])
