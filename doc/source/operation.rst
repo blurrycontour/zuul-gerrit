@@ -186,6 +186,13 @@ inventory).  Live streaming of ``shell`` and ``command`` calls will of
 course be unavailable in this case, but no spool files will be
 created.
 
+For Kubernetes-based job nodes the connection from the executor to the
+``zuul_console`` daemon is established by using ``kubectl port-forward``
+to forward a local port to the appropriate port on the pod containing
+the job node.  If the Kubernetes user is not bound to a role that has
+authorization for port-forwarding, this will prevent connection to
+the ``zuul_console`` daemon.
+
 Web Server
 ----------
 
