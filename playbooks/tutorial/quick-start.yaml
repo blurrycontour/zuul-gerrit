@@ -50,7 +50,6 @@
   shell:
     chdir: "{{ workspace }}/zuul-config/"
     executable: /bin/bash
-    warn: false
     cmd: |
       {{ ssh_agent.stdout }}
       git add playbooks zuul.d/jobs.yaml
