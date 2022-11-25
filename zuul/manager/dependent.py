@@ -80,7 +80,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         history = history if history is not None else []
 
         log.debug("Checking for changes needing %s:" % change)
-        if not hasattr(change, 'needed_by_changes'):
+        if not isinstance(change, model.Change):
             log.debug("  %s does not support dependencies" % type(change))
             return
 
@@ -90,7 +90,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         sources = {p.source for p in projects}
 
         needed_by_changes = self.resolveChangeReferences(
-            change.needed_by_changes)
+            change.getNeededByChanges())
         seen = set(needed_by_changes)
         for source in sources:
             log.debug("  Checking source: %s", source)
@@ -182,10 +182,11 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
         log.debug("Checking for changes needed by %s:" % change)
-        if not hasattr(change, 'needs_changes'):
+        if not isinstance(change, model.Change):
             log.debug("  %s does not support dependencies", type(change))
             return False, []
-        if not change.needs_changes:
+        if not change.getNeedsChanges(
+                self.useDependenciesByTopic(change.project)):
             log.debug("  No changes needed")
             return False, []
         changes_needed = []
@@ -193,7 +194,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         # Ignore supplied change_queue
         with self.getChangeQueue(change, event) as change_queue:
             for needed_change in self.resolveChangeReferences(
-                    change.needs_changes):
+                    change.getNeedsChanges(
+                        self.useDependenciesByTopic(change.project))):
                 log.debug("  Change %s needs change %s:" % (
                     change, needed_change))
                 if needed_change.is_merged:
@@ -243,13 +245,15 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         return abort, changes_needed
 
     def getFailingDependentItems(self, item, nnfi):
-        if not hasattr(item.change, 'needs_changes'):
+        if not isinstance(item.change, model.Change):
             return None
-        if not item.change.needs_changes:
+        if not item.change.getNeedsChanges(
+                self.useDependenciesByTopic(item.change.project)):
             return None
         failing_items = set()
         for needed_change in self.resolveChangeReferences(
-                item.change.needs_changes):
+                item.change.getNeedsChanges(
+                    self.useDependenciesByTopic(item.change.project))):
             needed_item = self.getItemForChange(needed_change)
             if not needed_item:
                 continue

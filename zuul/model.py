@@ -6162,18 +6162,17 @@ class Change(Branch):
             return True
         return False
 
-    @property
-    def needs_changes(self):
+    def getNeedsChanges(self, include_topic_needs=False):
         commit_needs_changes = self.commit_needs_changes or []
-        topic_needs_changes = self.topic_needs_changes or []
+        topic_needs_changes = (
+            include_topic_needs and self.topic_needs_changes) or []
         r = OrderedDict()
         for x in (self.git_needs_changes + self.compat_needs_changes +
                   commit_needs_changes + topic_needs_changes):
             r[x] = None
         return tuple(r.keys())
 
-    @property
-    def needed_by_changes(self):
+    def getNeededByChanges(self):
         r = OrderedDict()
         for x in (self.git_needed_by_changes + self.compat_needed_by_changes):
             r[x] = None
@@ -6197,8 +6196,9 @@ class Change(Branch):
            so far.  Will be updated with additional changes by this method.
         """
         related.add(self.cache_stat.key)
-        for reference in itertools.chain(self.needs_changes,
-                                         self.needed_by_changes):
+        for reference in itertools.chain(
+                self.getNeedsChanges(include_topic_needs=True),
+                self.getNeededByChanges()):
             key = ChangeKey.fromReference(reference)
             if key not in related:
                 source = sched.connections.getSource(key.connection_name)

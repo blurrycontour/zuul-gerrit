@@ -23,6 +23,7 @@ from zuul.driver.zuul.zuulmodel import ZuulTriggerEvent
 from zuul.driver.zuul import zuulmodel
 from zuul.driver.zuul import zuultrigger
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import Change
 
 PARENT_CHANGE_ENQUEUED = 'parent-change-enqueued'
 PROJECT_CHANGE_MERGED = 'project-change-merged'
@@ -121,7 +122,7 @@ class ZuulDriver(Driver, TriggerInterface):
         log = get_annotated_logger(self.log, event)
 
         log.debug("Checking for changes needing %s:" % change)
-        if not hasattr(change, 'needed_by_changes'):
+        if not isinstance(change, Change):
             log.debug("  %s does not support dependencies" % type(change))
             return
 
@@ -129,7 +130,8 @@ class ZuulDriver(Driver, TriggerInterface):
         # numbers of github installations.  This can be improved later
         # with persistent storage of dependency information.
         needed_by_changes = set(
-            pipeline.manager.resolveChangeReferences(change.needed_by_changes))
+            pipeline.manager.resolveChangeReferences(
+                change.getNeededByChanges()))
         for source in self.sched.connections.getSources():
             log.debug("  Checking source: %s",
                       source.connection.connection_name)

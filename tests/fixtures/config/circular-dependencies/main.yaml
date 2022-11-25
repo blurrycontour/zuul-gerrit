@@ -10,6 +10,8 @@
           - org/project1
           - org/project2
           - org/project3
+          - org/project5
+          - org/project6
       github:
         untrusted-projects:
           - gh/project
@@ -21,5 +23,9 @@
     name: tenant-two
     source:
       gerrit:
+        config-projects:
+          - common-tenant-two
         untrusted-projects:
           - org/project4
+          - org/project5
+          - org/project6

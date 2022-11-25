@@ -437,6 +437,9 @@ class FakeGerritChange(object):
         self.data['submitRecords'] = self.getSubmitRecords()
         self.open = status == 'NEW'
 
+    def getNeededByChanges(self):
+        return tuple(self.needed_by_changes)
+
     def addFakeChangeToRepo(self, msg, files, large, parent):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
