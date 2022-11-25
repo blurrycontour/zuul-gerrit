@@ -261,7 +261,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportOtherBundleItems(self, item):
         related_changes = item.pipeline.manager.resolveChangeReferences(
-            item.change.needs_changes)
+            item.change.needs_changes(
+                item.pipeline.manager.useDependenciesByTopic(
+                    item.change.project)))
         return "Related changes:\n{}\n".format("\n".join(
             f'  - {c.url}' for c in related_changes if c is not item.change))
 
