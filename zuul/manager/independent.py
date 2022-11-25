@@ -85,13 +85,15 @@ class IndependentPipelineManager(PipelineManager):
         if not hasattr(change, 'needs_changes'):
             log.debug("  %s does not support dependencies" % type(change))
             return False, []
-        if not change.needs_changes:
+        if not change.needs_changes(
+                self.useDependenciesByTopic(change.project)):
             log.debug("  No changes needed")
             return False, []
         changes_needed = []
         abort = False
         for needed_change in self.resolveChangeReferences(
-                change.needs_changes):
+                change.needs_changes(
+                    self.useDependenciesByTopic(change.project))):
             log.debug("  Change %s needs change %s:" % (
                 change, needed_change))
             if needed_change.is_merged:

@@ -228,9 +228,16 @@ class PipelineManager(metaclass=ABCMeta):
                 change = source.getChange(key)
                 if change is None:
                     self.log.error("Unable to resolve change from key %s", key)
-                if (isinstance(change, model.Change)
-                        and change.commit_needs_changes is None):
-                    self.updateCommitDependencies(change, None, event=None)
+
+                if isinstance(change, model.Change):
+                    update_commit_dependencies = (
+                        change.commit_needs_changes is None)
+                    update_topic_dependencies = (
+                        change.topic_needs_changes is None
+                        and self.useDependenciesByTopic(change.project))
+                    if (update_commit_dependencies
+                            or update_topic_dependencies):
+                        self.updateCommitDependencies(change, None, event=None)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
@@ -246,7 +253,8 @@ class PipelineManager(metaclass=ABCMeta):
                 active_layout_uuids.add(item.layout_uuid)
 
             if isinstance(item.change, model.Change):
-                referenced_change_keys.update(item.change.needs_changes)
+                referenced_change_keys.update(item.change.needs_changes(
+                    self.useDependenciesByTopic(item.change.project)))
                 referenced_change_keys.update(item.change.needed_by_changes)
 
         # Clean up unused layouts in the cache
