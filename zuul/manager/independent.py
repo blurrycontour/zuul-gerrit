@@ -82,16 +82,18 @@ class IndependentPipelineManager(PipelineManager):
         log.debug("Checking for changes needed by %s:" % change)
         # Return true if okay to proceed enqueing this change,
         # false if the change should not be enqueued.
-        if not hasattr(change, 'needs_changes'):
+        if not isinstance(change, model.Change):
             log.debug("  %s does not support dependencies" % type(change))
             return False, []
-        if not change.needs_changes:
+        if not change.getNeedsChanges(
+                self.useDependenciesByTopic(change.project)):
             log.debug("  No changes needed")
             return False, []
         changes_needed = []
         abort = False
         for needed_change in self.resolveChangeReferences(
-                change.needs_changes):
+                change.getNeedsChanges(
+                    self.useDependenciesByTopic(change.project))):
             log.debug("  Change %s needs change %s:" % (
                 change, needed_change))
             if needed_change.is_merged:

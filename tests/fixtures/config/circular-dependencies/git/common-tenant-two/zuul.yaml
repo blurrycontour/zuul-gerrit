@@ -1,6 +1,7 @@
 - queue:
     name: integrated
     allow-circular-dependencies: true
+    dependencies-by-topic: true
 
 - pipeline:
     name: check
@@ -67,99 +68,29 @@
     name: base
     parent: null
     run: playbooks/run.yaml
-    deduplicate: false
-    required-projects:
-      - common-config
-      - org/project
-      - org/project1
-      - org/project2
 
 - job:
-    name: common-config-job
+    name: project5-job-t2
 
 - job:
-    name: project-job
-
-- job:
-    name: project1-job
-
-- job:
-    name: project2-job
-
-- job:
-    name: project3-job
-
-- job:
-    name: project5-job-t1
-
-- job:
-    name: project6-job-t1
-
-- project:
-    name: common-config
-    queue: integrated
-    check:
-      jobs:
-        - common-config-job
-    gate:
-      jobs:
-        - common-config-job
-
-- project:
-    name: ^.*/project
-    queue: integrated
-    check:
-      jobs:
-        - project-job
-    gate:
-      jobs:
-        - project-job
-
-- project:
-    name: ^.*/project1
-    queue: integrated
-    check:
-      jobs:
-        - project1-job
-        - project-vars-job
-    gate:
-      jobs:
-        - project1-job
-        - project-vars-job
-
-- project-template:
-    name: project2-template
-    queue: integrated
-    check:
-      jobs:
-        - project2-job
-    gate:
-      jobs:
-        - project2-job
-
-- project:
-    name: ^.*/project2
-    templates:
-      - project2-template
-
-- project:
-    name: ^.*/project3
-    check:
-      jobs:
-        - project3-job
-    gate:
-      jobs:
-        - project3-job
+    name: project6-job-t2
 
 - project:
     name: org/project5
     queue: integrated
     check:
       jobs:
-        - project5-job-t1
+        - project5-job-t2
+    gate:
+      jobs:
+        - project5-job-t2
 
 - project:
     name: org/project6
+    queue: integrated
     check:
       jobs:
-        - project6-job-t1
+        - project6-job-t2
+    gate:
+      jobs:
+        - project6-job-t2
