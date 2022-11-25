@@ -2283,6 +2283,55 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="test-job", result="SUCCESS", changes="2,1 1,2"),
         ], ordered=False)
 
+    def test_deps_by_topic_multi_tenant(self):
+        A = self.fake_gerrit.addFakeChange('org/project5', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project6', "master", "B",
+                                           topic='test-topic')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # We're about to add approvals to changes without adding the
+        # triggering events to Zuul, so that we can be sure that it is
+        # enqueuing the changes based on dependencies, not because of
+        # triggering events.  Since it will have the changes cached
+        # already (without approvals), we need to clear the cache
+        # first.
+        for connection in self.scheds.first.connections.connections.values():
+            connection.maintainCache([], max_age=0)
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 4)
+        self.assertEqual(B.reported, 4)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+
+        self.assertHistory([
+            # Check
+            dict(name="project5-job-t1", result="SUCCESS", changes="1,1"),
+            dict(name="project6-job-t1", result="SUCCESS", changes="2,1"),
+            dict(name="project5-job-t2", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project6-job-t2", result="SUCCESS", changes="1,1 2,1"),
+            # Gate
+            dict(name="project5-job-t2", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project6-job-t2", result="SUCCESS", changes="1,1 2,1"),
+        ], ordered=False)
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
