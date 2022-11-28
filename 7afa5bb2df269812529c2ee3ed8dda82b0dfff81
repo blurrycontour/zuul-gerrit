@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "7afa5bb2df269812529c2ee3ed8dda82b0dfff81",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34289e06_e8c5fa02",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-28T21:00:52Z",
+      "side": 1,
+      "message": "This should change to camelcase, and probably be getNeedsChanges.\n\nWe should probably change needed_by_changes to getNeededByChanges as well, so they match.",
+      "revId": "7afa5bb2df269812529c2ee3ed8dda82b0dfff81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
