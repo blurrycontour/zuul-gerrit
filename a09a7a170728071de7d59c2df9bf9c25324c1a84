@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d29d69cc_4abf0f07",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-11-28T17:32:50Z",
+      "side": 1,
+      "message": "Note this is apparently Gerrit\u0027s built in default which is why this works... Probably something for upstream to deal with.",
+      "revId": "a09a7a170728071de7d59c2df9bf9c25324c1a84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
