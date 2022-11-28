@@ -20,7 +20,7 @@ set -e
 # Finally, it will install pip things.
 if [[ ! $(command -v yarn) ]]
 then
-    pip install nodeenv
+    python -m pip install nodeenv
     # Initialize nodeenv and tell it to re-use the currently active virtualenv
     attempts=0
     set +e
@@ -71,10 +71,10 @@ then
         fi
     popd
 fi
-pip install $*
+python -m pip install $*
 
 # Fail-fast if pip detects conflicts
-pip check
+python -m pip check
 
 # Check if we're installing zuul. If so install the managed ansible as well.
 if echo "$*" | grep -vq requirements.txt; then
