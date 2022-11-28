@@ -162,7 +162,7 @@ class MatchAnyFiles(AbstractMatchFiles):
         if not (hasattr(change, 'files') and change.files):
             return True
         if len(change.files) == 1 and self.commit_regex.match(change.files[0]):
-            return True
+            return False
         for file_ in change.files:
             for regex in self.regexes:
                 if regex.match(file_):
