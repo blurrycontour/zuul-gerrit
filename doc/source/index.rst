@@ -31,10 +31,10 @@ System, the remainder of the sections will be useful.
    :maxdepth: 1
 
    about
-   tutorials/quick-start
    project-config
    job-content
    admin
+   tutorials/tutorials
    rest-api
    howtos/index
    developer/index
