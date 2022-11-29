@@ -33,6 +33,24 @@
       "message": "I can\u0027t figure out why this is necessary -- maybe it\u0027s left over from earlier dev efforts and can be removed now?",
       "revId": "f576f82b03775f275069396b47d08ea358a5731e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8240a9b3_4d2f2094",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-11-29T15:46:11Z",
+      "side": 1,
+      "message": "I think I went to far here. The FakeGerritChange doesn\u0027t inherit from Change so we don\u0027t need to add this method here.",
+      "parentUuid": "c412f530_25722796",
+      "revId": "f576f82b03775f275069396b47d08ea358a5731e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
