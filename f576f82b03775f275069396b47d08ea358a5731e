@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "f576f82b03775f275069396b47d08ea358a5731e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c412f530_25722796",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-11-29T15:12:37Z",
+      "side": 1,
+      "message": "I can\u0027t figure out why this is necessary -- maybe it\u0027s left over from earlier dev efforts and can be removed now?",
+      "revId": "f576f82b03775f275069396b47d08ea358a5731e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
