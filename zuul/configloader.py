@@ -2385,6 +2385,23 @@ class TenantParser(object):
         extra_config_files = abide.getExtraConfigFiles(project.name)
         extra_config_dirs = abide.getExtraConfigDirs(project.name)
         if not self.merger:
+            try:
+                self.log.error(
+                    "Invalid cache state for %s for given ltimes:\n"
+                    "project branch ltime = %s\n"
+                    "min_ltimes = %s\n"
+                    "unparsed config cache (ZK) ltime = %s\n"
+                    "unparsed branch cache (local) ltime = %s\n"
+                    "config cache valid = %s\n"
+                    "branch cache valid = %s\n",
+                    project.name,
+                    pb_ltime, min_ltimes, files_cache.ltime,
+                    branch_cache.getValidFor(tpc, ZUUL_CONF_ROOT, -1),
+                    files_cache.isValidFor(tpc, pb_ltime),
+                    branch_cache.getValidFor(tpc, ZUUL_CONF_ROOT, pb_ltime),
+                )
+            except Exception:
+                self.log.exception("Error logging debug info:")
             err = Exception(
                 "Configuration files missing from cache. "
                 "Check Zuul scheduler logs for more information.")
