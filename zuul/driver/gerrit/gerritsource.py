@@ -121,6 +121,7 @@ class GerritSource(BaseSource):
             queries.add('message:{Depends-On: %s}' % uri)
         query = '(' + ' OR '.join(queries) + ')'
         results = self.connection.simpleQuery(query)
+        self.log.debug('%s possible depending changes found', len(results))
         seen = set()
         for result in results:
             for match in find_dependency_headers(result.message):
