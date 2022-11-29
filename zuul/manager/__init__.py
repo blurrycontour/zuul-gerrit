@@ -25,11 +25,9 @@ from zuul.lib.tarjan import strongly_connected_components
 import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
-    PipelinePostConfigEvent,
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
-from zuul.zk.locks import pipeline_lock
 
 from opentelemetry import trace
 
@@ -96,41 +94,19 @@ class PipelineManager(metaclass=ABCMeta):
 
     def _postConfig(self):
         layout = self.pipeline.tenant.layout
-        # If our layout UUID already matches the UUID in ZK, we don't
-        # need to make any changes in ZK.  But we do still need to
-        # update our local object pointers.  Note that our local queue
-        # state may still be out of date after this because we skip
-        # the refresh.
         self.buildChangeQueues(layout)
         with self.sched.createZKContext(None, self.log) as ctx,\
              self.currentContext(ctx):
-            if layout.uuid == PipelineState.peekLayoutUUID(self.pipeline):
-                self.pipeline.state = PipelineState()
-                self.pipeline.state._set(pipeline=self.pipeline)
-                self.pipeline.change_list = PipelineChangeList()
-                self.pipeline.change_list._set(pipeline=self.pipeline)
-                return
-
-        with pipeline_lock(
-                self.sched.zk_client, self.pipeline.tenant.name,
-                self.pipeline.name) as lock,\
-                self.sched.createZKContext(lock, self.log) as ctx,\
-                self.currentContext(ctx):
-            # Since the layout UUID is new, this will move queues
-            # to "old_queues".  Note that it will *not* refresh
-            # the contents, in fact, we will get a new
-            # PipelineState python object with no queues, just as
-            # above.  Our state is guaranteed to be out of date
-            # now, but we don't need to do anything with it, we
-            # will let the next actor to use it refresh it then.
-            self.pipeline.state = PipelineState.resetOrCreate(
+            # Make sure we have state and change list objects, and
+            # ensure that they exist in ZK.  We don't hold the
+            # pipeline lock, but if they don't exist, that means they
+            # are new, so no one else will either.  These will not
+            # automatically refresh now, so they will be out of date
+            # until they are refreshed later.
+            self.pipeline.state = PipelineState.create(
                 self.pipeline, layout.uuid)
             self.pipeline.change_list = PipelineChangeList.create(
                 self.pipeline)
-            event = PipelinePostConfigEvent()
-            self.sched.pipeline_management_events[
-                self.pipeline.tenant.name][self.pipeline.name].put(
-                    event, needs_result=False)
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")

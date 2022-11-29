@@ -1700,6 +1700,11 @@ class Scheduler(threading.Thread):
                 trigger.postConfig(pipeline)
             for reporter in pipeline.actions:
                 reporter.postConfig()
+            # Emit an event to trigger a pipeline run after the
+            # reconfiguration.
+            event = PipelinePostConfigEvent()
+            self.pipeline_management_events[tenant.name][pipeline.name].put(
+                event, needs_result=False)
 
         # Assemble a new list of min. ltimes of the project branch caches.
         branch_cache_min_ltimes = {
