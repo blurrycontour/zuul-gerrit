@@ -237,6 +237,11 @@ class ZKObject:
         """Update data from ZK"""
         self._load(context)
 
+    def exists(self, context):
+        """Return whether the object exists in ZK"""
+        path = self.getPath()
+        return bool(context.client.exists(path))
+
     def _trySerialize(self, context):
         if isinstance(context, LocalZKContext):
             return b''
