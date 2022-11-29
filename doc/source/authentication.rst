@@ -129,8 +129,8 @@ For example, in Python, and for an authenticator using the ``HS256`` algorithm:
    >>> jwt.encode({'sub': 'user1',
                    'iss': <issuer_id>,
                    'aud': <client_id>,
-                   'iat': time.time(),
-                   'exp': time.time() + 300,
+                   'iat': int(time.time()),
+                   'exp': int(time.time()) + 300,
                    'zuul': {
                             'admin': ['tenant-one']
                            }

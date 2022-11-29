@@ -735,7 +735,7 @@ class Client(zuul.cmd.ZuulApp):
             print('"%s" authenticator configuration not found.'
                   % self.args.auth_config)
             sys.exit(1)
-        now = time.time()
+        now = int(time.time())
         token = {'iat': now,
                  'exp': now + self.args.expires_in,
                  'iss': get_default(self.config, auth_section, 'issuer_id'),

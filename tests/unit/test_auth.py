@@ -92,7 +92,7 @@ class TestOpenIDConnectAuthenticator(BaseTestCase):
         payload = {
             'iss': FAKE_WELL_KNOWN_CONFIG['issuer'],
             'aud': config['client_id'],
-            'exp': time.time() + 3600,
+            'exp': int(time.time()) + 3600,
             'sub': 'someone'
         }
         token = jwt.encode(
