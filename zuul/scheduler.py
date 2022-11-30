@@ -369,6 +369,9 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping scheduler")
         self._stopped = True
         self.wake_event.set()
+        # If config priming failed we need to make sure to unblock the main
+        # thread in order to join it.
+        self.primed_event.set()
         self.start_cleanup_thread.join()
         self.log.debug("Stopping apscheduler")
         self.apsched.shutdown()
