@@ -77,6 +77,6 @@ pip install $*
 pip check
 
 # Check if we're installing zuul. If so install the managed ansible as well.
-if echo "$*" | grep -vq requirements.txt; then
+if echo "$*" | grep -vq '\(requirements.txt\|bindep\|flake8\)' ; then
     zuul-manage-ansible -v
 fi
