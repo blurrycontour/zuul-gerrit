@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdbe2a8b_2dd02cf3",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-12-01T10:09:31Z",
+      "side": 1,
+      "message": "Note for reviewers: the pipeline state that we change here locally is updated in Zookeeper either as a side-effect of e.g. queues being added/removed but at the latest when the pipeline state is set at the end of a pipeline run: https://opendev.org/zuul/zuul/src/branch/master/zuul/scheduler.py#L2232-L2233\n\nThe reason why this works is because the `_zkobject_hash` used for deciding whether to save the object or not, is calculated based on the original raw data from ZK.",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
