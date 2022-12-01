@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11a3150c_9e7469a5",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-01T16:55:05Z",
+      "side": 1,
+      "message": "We\u0027re not 100% consistent about this, but I think we should try to be in the future: most of the docs are written to avoid the second person (except tutorials).  So this might be better as something like \"or empty commits created with ``git commit --allow-empty`` (which can be used in order to run all jobs)\".",
+      "revId": "5f74004b183211072fc9f491da1c6305634aa212",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
