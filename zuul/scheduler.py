@@ -369,6 +369,9 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping scheduler")
         self._stopped = True
         self.wake_event.set()
+        # Main thread, connections and layout update may be waiting
+        # on the primed event
+        self.primed_event.set()
         self.start_cleanup_thread.join()
         self.log.debug("Stopping apscheduler")
         self.apsched.shutdown()
@@ -382,8 +385,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping nodepool")
         self.nodepool.stop()
         self.log.debug("Stopping connections")
-        # Connections and layout update may be waiting on the primed event
-        self.primed_event.set()
         # Layout update can reconfigure connections, so make sure
         # layout update is stopped first.
         self.log.debug("Waiting for layout update thread")
