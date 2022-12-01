@@ -1046,6 +1046,14 @@ Here is an example of two job definitions:
       value is used to determine if the job should run. This is a
       :ref:`regular expression <regex>` or list of regular expressions.
 
+      .. warning::
+
+         File filters will be ignored for refs that don't have any
+         files. This will be the case for merge commits (e.g. in a post
+         pipeline) or empty commits created with
+         ``git commit --allow-empty`` (which can be used in order to
+         run all jobs).
+
    .. attr:: irrelevant-files
 
       This is a negative complement of **files**.  It indicates that
@@ -1054,6 +1062,14 @@ Here is an example of two job definitions:
       supplied, then this job will not run if the only files changed
       are in the docs directory.  A :ref:`regular expression <regex>`
       or list of regular expressions.
+
+      .. warning::
+
+         File filters will be ignored for refs that don't have any
+         files. This will be the case for merge commits (e.g. in a post
+         pipeline) or empty commits created with
+         ``git commit --allow-empty`` (which can be used in order to
+         run all jobs).
 
    .. attr:: match-on-config-updates
       :default: true
