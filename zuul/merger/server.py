@@ -15,7 +15,6 @@
 
 import json
 import logging
-import os
 import socket
 import sys
 import threading
@@ -156,24 +155,6 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def start(self):
         self.log.debug('Starting merger')
-        self.log.debug('Cleaning any stale git index.lock files')
-        for (dirpath, dirnames, filenames) in os.walk(self.merge_root):
-            if '.git' in dirnames:
-                # Only recurse into .git dirs
-                dirnames.clear()
-                dirnames.append('.git')
-            elif dirpath.endswith('/.git'):
-                # Recurse no further
-                dirnames.clear()
-                if 'index.lock' in filenames:
-                    fp = os.path.join(dirpath, 'index.lock')
-                    try:
-                        os.unlink(fp)
-                        self.log.debug('Removed stale git lock: %s' % fp)
-                    except Exception:
-                        self.log.exception(
-                            'Unable to remove stale git lock: '
-                            '%s this may result in failed merges' % fp)
         self._merger_running = True
         self.merger_thread.start()
 

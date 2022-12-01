@@ -960,19 +960,12 @@ class TestMerger(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(A.data['status'], 'MERGED')
 
-        # Stop the merger so we can modify the git repo
-        self.merge_server.stop()
-        self.merge_server.join()
-
         # Add an index.lock file
         fpath = os.path.join(self.merger_src_root, 'review.example.com',
                              'org', 'org%2Fproject1', '.git', 'index.lock')
         with open(fpath, 'w'):
             pass
         self.assertTrue(os.path.exists(fpath))
-
-        # Start a new merger and check that we can still merge things
-        self._startMerger()
 
         # This will fail if git can't modify the repo due to a stale lock file.
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
