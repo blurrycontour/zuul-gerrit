@@ -5,6 +5,7 @@ Service Administration
    :maxdepth: 2
 
    installation
+   upgrading
    components
    configuration
    drivers/index
