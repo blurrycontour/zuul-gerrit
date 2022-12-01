@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f82364f_a9aef8c0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-01T00:09:13Z",
+      "side": 1,
+      "message": "^ This is set here.",
+      "revId": "9e859a0904debb0614314025e3b89f5931ad454e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
