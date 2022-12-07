@@ -667,7 +667,7 @@ class TestConnectionsGitweb(ZuulTestCase):
         self.assertEqual(url, url_should_be)
 
 
-class TestMQTTConnection(ZuulTestCase):
+class TestMQTTConnection(AnsibleZuulTestCase):
     config_file = 'zuul-mqtt-driver.conf'
     tenant_config_file = 'config/mqtt-driver/main.yaml'
 
@@ -742,6 +742,30 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertIn('zuul_event_id', mqtt_payload)
         self.assertIn('uuid', mqtt_payload)
         self.assertEquals(dependent_test_job['dependencies'], ['test'])
+
+    def test_mqtt_paused_dependency(self):
+
+        A = self.fake_gerrit.addFakeChange("org/project1", "master", "A")
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        success_event = self.mqtt_messages.pop()
+
+        mqtt_payload = success_event["msg"]
+        self.assertEquals(mqtt_payload["project"], "org/project1")
+        builds = mqtt_payload["buildset"]["builds"]
+        paused_job = [b for b in builds if b["job_name"] == "paused-job"][0]
+        dependent_test_job = [
+            b for b in builds if b["job_name"] == "dependent-test"
+        ][0]
+        self.assertEquals(len(paused_job["events"]), 1)
+        paused_event = paused_job["events"][0]
+        self.assertEquals(paused_event["event_type"], "paused")
+        self.assertGreater(
+            paused_event["event_time"], paused_job["start_time"])
+        self.assertLess(paused_event["event_time"], paused_job["end_time"])
+
+        self.assertEquals(dependent_test_job['dependencies'], ['paused-job'])
 
     def test_mqtt_invalid_topic(self):
         in_repo_conf = textwrap.dedent(

@@ -34,6 +34,10 @@
     name: dependent-test
     run: playbooks/test.yaml
 
+- job:
+    name: paused-job
+    run: playbooks/pause.yaml
+
 - project:
     name: org/project
     check:
@@ -42,6 +46,16 @@
         - dependent-test:
             dependencies:
               - test
+
+- project:
+    name: org/project1
+    check:
+      jobs:
+        - test
+        - paused-job
+        - dependent-test:
+            dependencies:
+              - paused-job
 
 - project:
     name: common-config
