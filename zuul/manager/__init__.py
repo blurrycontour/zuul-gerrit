@@ -1772,9 +1772,12 @@ class PipelineManager(metaclass=ABCMeta):
 
             if all_completed:
                 self.sched.executor.resumeBuild(build)
-                build.updateAttributes(
-                    build_set.item.pipeline.manager.current_context,
-                    paused=False)
+                with build.activeContext(self.current_context):
+                    build.paused = False
+                    build.addEvent(
+                        model.BuildEvent(
+                            event_time=time.time(),
+                            event_type=model.BuildEvent.TYPE_RESUMED))
 
     def _resetDependentBuilds(self, build_set, build):
         job_graph = build_set.job_graph
