@@ -163,6 +163,14 @@ class SQLReporter(BaseReporter):
                             artifact['metadata'] = json.dumps(
                                 artifact['metadata'])
                         db_build.createArtifact(**artifact)
+
+                    for event in build.events:
+                        event_time = event["event_time"]
+                        # Reformat the event_time so it's compatible to SQL
+                        event["event_time"] = datetime.datetime.fromtimestamp(
+                            event_time, tz=datetime.timezone.utc)
+                        db_build.createEvent(**event)
+
                 return db_build
             except sqlalchemy.exc.DBAPIError:
                 if retry_count < self.retry_count - 1:
