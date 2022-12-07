@@ -163,6 +163,17 @@ class SQLReporter(BaseReporter):
                             artifact['metadata'] = json.dumps(
                                 artifact['metadata'])
                         db_build.createArtifact(**artifact)
+
+                    for event in build.events:
+                        # Reformat the event_time so it's compatible to SQL.
+                        # Don't update the event object in place, but only
+                        # the generated dict representation to not alter the
+                        # datastructure for other reporters.
+                        ev = event.toDict()
+                        ev["event_time"] = datetime.datetime.fromtimestamp(
+                            event.event_time, tz=datetime.timezone.utc)
+                        db_build.createEvent(**ev)
+
                 return db_build
             except sqlalchemy.exc.DBAPIError:
                 if retry_count < self.retry_count - 1:
