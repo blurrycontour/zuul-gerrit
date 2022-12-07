@@ -2694,6 +2694,8 @@ class Scheduler(threading.Thread):
         # with child job skipping.
         with build.activeContext(pipeline.manager.current_context):
             build.paused = True
+            # TODO (felix): Define a class for this
+            build.addEvent({"event_time": time.time(), "event_type": "paused"})
             build.setResultData(
                 event.data.get("data", {}),
                 event.data.get("secret_data", {}))

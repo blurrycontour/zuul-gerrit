@@ -79,7 +79,8 @@ class MQTTReporter(BaseReporter):
                     'result': result,
                     'dependencies': [j.name for j in job.dependencies],
                     'artifacts': get_artifacts_from_result_data(
-                        build.result_data, logger=log)
+                        build.result_data, logger=log),
+                    'events': build.events,
                 })
                 if include_returned_data:
                     rdata = build.result_data.copy()
