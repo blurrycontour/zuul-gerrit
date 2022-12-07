@@ -29,6 +29,7 @@ from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 
 BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
+BUILD_EVENTS_TABLE = 'zuul_build_event'
 ARTIFACT_TABLE = 'zuul_artifact'
 PROVIDES_TABLE = 'zuul_provides'
 
@@ -446,6 +447,15 @@ class SQLConnection(BaseConnection):
                 session.flush()
                 return p
 
+            def createBuildEvent(self, *args, **kw):
+                session = orm.session.Session.object_session(self)
+                e = BuildEventModel(*args, **kw)
+                e.build_id = self.id
+                self.build_events.append(e)
+                session.add(e)
+                session.flush()
+                return e
+
         class ArtifactModel(Base):
             __tablename__ = self.table_prefix + ARTIFACT_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
@@ -463,6 +473,19 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id"))
             name = sa.Column(sa.String(255))
             build = orm.relationship(BuildModel, backref="provides")
+
+        class BuildEventModel(Base):
+            __tablename__ = self.table_prefix + BUILD_EVENTS_TABLE
+            id = sa.Column(sa.Integer, primary_key=True)
+            build_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + BUILD_TABLE + ".id"))
+            event_time = sa.Column(sa.DateTime)
+            event_type = sa.Column(sa.String(255))
+            description = sa.Column(sa.TEXT())
+            build = orm.relationship(BuildModel, backref="build_events")
+
+        self.buildEventModel = BuildEventModel
+        self.zuul_build_event_table = self.buildEventModel.__table__
 
         self.providesModel = ProvidesModel
         self.zuul_provides_table = self.providesModel.__table__
