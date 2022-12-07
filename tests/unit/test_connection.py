@@ -130,11 +130,12 @@ class TestSQLConnectionMysql(ZuulTestCase):
                     sa.sql.select([reporter.connection.zuul_buildset_table]))
 
                 buildsets = result.fetchall()
-                self.assertEqual(4, len(buildsets))
+                self.assertEqual(5, len(buildsets))
                 buildset0 = buildsets[0]
                 buildset1 = buildsets[1]
                 buildset2 = buildsets[2]
                 buildset3 = buildsets[3]
+                buildset4 = buildsets[4]
 
                 self.assertEqual('check', buildset0['pipeline'])
                 self.assertEqual('org/project', buildset0['project'])
@@ -221,6 +222,40 @@ class TestSQLConnectionMysql(ZuulTestCase):
                     buildset3_builds[1]['end_time'],
                     buildset3_builds[1]['start_time'])
 
+                # Check the paused build result
+                buildset4_builds = conn.execute(
+                    sa.sql.select([
+                        reporter.connection.zuul_build_table
+                    ]).where(
+                        reporter.connection.zuul_build_table.c.buildset_id ==
+                        buildset4['id']
+                    ).order_by(reporter.connection.zuul_build_table.c.id)
+                ).fetchall()
+
+                paused_build_events = conn.execute(
+                    sa.sql.select([
+                        reporter.connection.zuul_build_event_table
+                    ]).where(
+                        reporter.connection.zuul_build_event_table.c.build_id
+                        == buildset4_builds[0]["id"]
+                    )
+                ).fetchall()
+
+                self.assertEqual(len(paused_build_events), 2)
+                pause_event = paused_build_events[0]
+                resume_event = paused_build_events[1]
+                self.assertEqual(
+                    pause_event["event_type"], "paused")
+                self.assertIsNotNone(pause_event["event_time"])
+                self.assertIsNone(pause_event["description"])
+                self.assertEqual(
+                    resume_event["event_type"], "resumed")
+                self.assertIsNotNone(resume_event["event_time"])
+                self.assertIsNone(resume_event["description"])
+
+                self.assertGreater(
+                    resume_event["event_time"], pause_event["event_time"])
+
         self.executor_server.hold_jobs_in_build = True
 
         # Add a success result
@@ -260,6 +295,24 @@ class TestSQLConnectionMysql(ZuulTestCase):
         req = self.fake_nodepool.getNodeRequests()[0]
         self.fake_nodepool.addFailRequest(req)
         self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        # TODO (felix): There seems to be a bug in the test suite when using
+        # hold_jobs_in_build together with a paused job that prevents the
+        # job from being resumed properly. WaitUntilSettled() will directly
+        # return as the job in question is either paused or waiting,
+        # resulting in an endless loop. Until that is fixed, deactivate the
+        # hold_jobs_in_build as it's not needed for this test case.
+        self.executor_server.hold_jobs_in_build = False
+
+        # Add a paused build result
+        self.log.debug("Adding paused build result")
+        D = self.fake_gerrit.addFakeChange("org/project", "master", "D")
+        self.executor_server.returnData(
+            "project-merge", D, {"zuul": {"pause": True}})
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.orderedRelease()
         self.waitUntilSettled()
@@ -742,6 +795,37 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertIn('zuul_event_id', mqtt_payload)
         self.assertIn('uuid', mqtt_payload)
         self.assertEquals(dependent_test_job['dependencies'], ['test'])
+
+    def test_mqtt_paused_job(self):
+
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        # Let the job being paused via the executor
+        self.executor_server.returnData("test", A, {"zuul": {"pause": True}})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        success_event = self.mqtt_messages.pop()
+
+        mqtt_payload = success_event["msg"]
+        self.assertEquals(mqtt_payload["project"], "org/project")
+        builds = mqtt_payload["buildset"]["builds"]
+        paused_job = [b for b in builds if b["job_name"] == "test"][0]
+        self.assertEquals(len(paused_job["events"]), 2)
+
+        pause_event = paused_job["events"][0]
+        self.assertEquals(pause_event["event_type"], "paused")
+        self.assertGreater(
+            pause_event["event_time"], paused_job["start_time"])
+        self.assertLess(pause_event["event_time"], paused_job["end_time"])
+
+        resume_event = paused_job["events"][1]
+        self.assertEquals(resume_event["event_type"], "resumed")
+        self.assertGreater(
+            resume_event["event_time"], paused_job["start_time"])
+        self.assertLess(resume_event["event_time"], paused_job["end_time"])
+
+        self.assertGreater(
+            resume_event["event_time"], pause_event["event_time"])
 
     def test_mqtt_invalid_topic(self):
         in_repo_conf = textwrap.dedent(
