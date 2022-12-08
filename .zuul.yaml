@@ -281,7 +281,7 @@
       ensure_tox_version: "<4"
     check:
       jobs:
-        - zuul-build-image
+        # - zuul-build-image
         - zuul-tox-docs
         - tox-linters:
             vars:
@@ -289,25 +289,25 @@
             nodeset: ubuntu-jammy
         - zuul-tox-py38
         - zuul-tox-py311
-        - zuul-tox-py311-multi-scheduler
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
+        # - zuul-tox-py311-multi-scheduler
+        # - zuul-build-dashboard-openstack-whitelabel
+        # - zuul-build-dashboard-software-factory
+        # - zuul-build-dashboard-opendev
+        # - nodejs-run-lint:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     nodeset: ubuntu-jammy
+        # - nodejs-run-test:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     files:
+        #       - web/.*
+        #     nodeset: ubuntu-jammy
         - zuul-stream-functional-6
         - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
+        # - zuul-quick-start:
+        #     requires: nodepool-container-image
+        #     dependencies: zuul-build-image
         - zuul-tox-zuul-client
         - zuul-build-python-release
     gate:
