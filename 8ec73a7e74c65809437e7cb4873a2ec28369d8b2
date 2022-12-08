@@ -16,6 +16,41 @@
       "message": "Note for reviewers: the pipeline state that we change here locally is updated in Zookeeper either as a side-effect of e.g. queues being added/removed but at the latest when the pipeline state is set at the end of a pipeline run: https://opendev.org/zuul/zuul/src/branch/master/zuul/scheduler.py#L2232-L2233\n\nThe reason why this works is because the `_zkobject_hash` used for deciding whether to save the object or not, is calculated based on the original raw data from ZK.",
       "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ab406f4_fd726a39",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-12-08T23:23:31Z",
+      "side": 1,
+      "message": "Data here is coming from Zookeeper right? Wouldn\u0027t the uuid in zookeeper be the canonical version and not what we\u0027ve got in memory? Otherwise you\u0027d have multiple schedulers potentially fighting over updating this with different uuids?",
+      "parentUuid": "fdbe2a8b_2dd02cf3",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b40408e6_bc19c337",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1521,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2022-12-08T23:23:31Z",
+      "side": 1,
+      "message": "This line eventually calls the _postConfig(). Previously we would emit the event roughly at this point. Now we\u0027ve moved the event queuing to line 1527. This seems roughly equivalent except for timing.",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
