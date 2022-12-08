@@ -111,7 +111,6 @@ SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'
 
-
 def add_debug_line(debug_messages, msg, indent=0):
     if debug_messages is None:
         return
