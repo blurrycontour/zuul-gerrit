@@ -40,34 +40,35 @@
       zuul_ansible_version: 6
 
 - job:
-    name: zuul-tox
+    name: zuul-nox
     description: |
       Zuul unit tests with ZooKeeper running
-    parent: tox
+    parent: nox
     nodeset: ubuntu-jammy
-    pre-run: playbooks/zuul-tox/pre.yaml
-    post-run: playbooks/zuul-tox/post-system-logs.yaml
+    pre-run: playbooks/zuul-nox/pre.yaml
+    post-run: playbooks/zuul-nox/post-system-logs.yaml
     vars:
-      tox_environment:
+      nox_environment:
         ZUUL_ZK_CA: /opt/zookeeper/ca/certs/cacert.pem
         ZUUL_ZK_CERT: /opt/zookeeper/ca/certs/client.pem
         ZUUL_ZK_KEY: /opt/zookeeper/ca/keys/clientkey.pem
         ZUUL_TEST_ROOT: /tmp/zuul-test
         YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+        CI: "1"
       test_setup_environment:
         ZUUL_TEST_ROOT: /tmp/zuul-test
         YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
 
 - job:
-    name: zuul-tox-remote
-    parent: tox
+    name: zuul-nox-remote
+    parent: nox
     nodeset: ubuntu-jammy
     timeout: 2700  # 45 minutes
-    pre-run: playbooks/zuul-tox/pre.yaml
-    post-run: playbooks/zuul-tox/post-system-logs.yaml
+    pre-run: playbooks/zuul-nox/pre.yaml
+    post-run: playbooks/zuul-nox/post-system-logs.yaml
     vars:
-      tox_envlist: remote
-      tox_environment:
+      nox_envlist: remote
+      nox_environment:
         ZUUL_ZK_CA: /opt/zookeeper/ca/certs/cacert.pem
         ZUUL_ZK_CERT: /opt/zookeeper/ca/certs/client.pem
         ZUUL_ZK_KEY: /opt/zookeeper/ca/keys/clientkey.pem
@@ -76,8 +77,8 @@
         ZUUL_REMOTE_KEEP: "true"
 
 - job:
-    name: zuul-tox-zuul-client
-    parent: zuul-tox
+    name: zuul-nox-zuul-client
+    parent: zuul-nox
     description: |
       Test that Zuul and zuul-client work together.
     required-projects:
@@ -85,31 +86,33 @@
       - zuul/zuul-client
     vars:
       zuul_work_dir: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}"
-      tox_envlist: zuul_client
+      nox_envlist: zuul_client
 
 - job:
-    name: zuul-tox-py311
-    parent: zuul-tox
+    name: zuul-nox-py311
+    parent: zuul-nox
     timeout: 7200  # 120 minutes
     vars:
-      tox_envlist: py311
+      nox_keyword: tests
+      nox_force_python: "3.11"
       python_version: "3.11"
 
 - job:
-    name: zuul-tox-py38
-    parent: zuul-tox
+    name: zuul-nox-py38
+    parent: zuul-nox
     timeout: 7200  # 120 minutes
     vars:
-      tox_envlist: py38
+      nox_keyword: tests
+      nox_force_python: "3.8"
       python_version: "3.8"
     nodeset: ubuntu-focal
 
 - job:
-    name: zuul-tox-py311-multi-scheduler
-    parent: zuul-tox-py311
+    name: zuul-nox-py311-multi-scheduler
+    parent: zuul-nox-py311
     voting: false
     vars:
-      tox_environment:
+      nox_environment:
         ZUUL_SCHEDULER_COUNT: 2
 
 - job:
@@ -281,45 +284,45 @@
       ensure_tox_version: "<4"
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
-        - tox-linters:
+        # - zuul-build-image
+        - nox-docs
+        - nox-linters:
             vars:
-              tox_install_bindep: false
+              nox_install_bindep: false
             nodeset: ubuntu-jammy
-        - zuul-tox-py38
-        - zuul-tox-py311
-        - zuul-tox-py311-multi-scheduler
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
+        - zuul-nox-py38
+        - zuul-nox-py311
+        # - zuul-nox-py311-multi-scheduler
+        # - zuul-build-dashboard-openstack-whitelabel
+        # - zuul-build-dashboard-software-factory
+        # - zuul-build-dashboard-opendev
+        # - nodejs-run-lint:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     nodeset: ubuntu-jammy
+        # - nodejs-run-test:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     files:
+        #       - web/.*
+        #     nodeset: ubuntu-jammy
         - zuul-stream-functional-6
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - zuul-tox-zuul-client
+        - zuul-nox-remote
+        # - zuul-quick-start:
+        #     requires: nodepool-container-image
+        #     dependencies: zuul-build-image
+        - zuul-nox-zuul-client
         - zuul-build-python-release
     gate:
       jobs:
         - zuul-upload-image
-        - zuul-tox-docs
-        - tox-linters:
+        - nox-docs
+        - nox-linters:
             vars:
-              tox_install_bindep: false
+              nox_install_bindep: false
             nodeset: ubuntu-jammy
-        - zuul-tox-py38
-        - zuul-tox-py311
+        - zuul-nox-py38
+        - zuul-nox-py311
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
@@ -332,11 +335,11 @@
               - web/.*
             nodeset: ubuntu-jammy
         - zuul-stream-functional-6
-        - zuul-tox-remote
+        - zuul-nox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
-        - zuul-tox-zuul-client
+        - zuul-nox-zuul-client
         - zuul-build-python-release
     promote:
       jobs:
