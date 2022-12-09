@@ -90,6 +90,42 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dfaa3b5_02925a50",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-09T21:11:59Z",
+      "side": 1,
+      "message": "Agreed.  I think I\u0027ve come up with a solution that avoids the problem but generally maintains the same behavior without introducing any new delays.  So rather than ensuring that the layout is up to date, we just indicate to the refresh method that we don\u0027t care whether it is or not and it just loads the data as-is.",
+      "parentUuid": "fdbe2a8b_2dd02cf3",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "874a4f23_a5ab5dd4",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-09T21:11:59Z",
+      "side": 1,
+      "message": "Agreed.  I think I\u0027ve come up with a solution that avoids the problem but generally maintains the same behavior without introducing any new delays.  So rather than ensuring that the layout is up to date, we just indicate to the refresh method that we don\u0027t care whether it is or not and it just loads the data as-is.",
+      "parentUuid": "fdbe2a8b_2dd02cf3",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b40408e6_bc19c337",
