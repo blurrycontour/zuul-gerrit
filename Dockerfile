@@ -66,8 +66,10 @@ CMD ["/usr/local/bin/zuul"]
 FROM zuul as zuul-executor
 ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
-COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
+# The oc and kubectl binaries are large and have the same hash.
+# Copy them only once and use a symlink to save space.
+RUN ln -s /usr/local/bin/oc /usr/local/bin/kubectl
 
 RUN apt-get update \
   && apt-get install -y skopeo \
