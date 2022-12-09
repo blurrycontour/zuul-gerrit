@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "523ab401_f854c6fa",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-12-09T07:59:32Z",
+      "side": 1,
+      "message": "I think currently it\u0027s not showing the behavior you described as we don\u0027t write the updated pipeline state to Zookeeper in any of the cleanup methods as far as I can see.\n\nBut since the cleanup methods acquire the pipeline lock they could potentially update the state in the future. So I think it makes sense to account for that.",
+      "parentUuid": "8b00d4ee_ebb02425",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b40408e6_bc19c337",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
