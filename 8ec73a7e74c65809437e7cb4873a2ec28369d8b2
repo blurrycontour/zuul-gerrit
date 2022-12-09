@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "25b9495c_38ba14fa",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-09T00:06:01Z",
+      "side": 1,
+      "message": "Other way around: when we process the pipelines, we make sure that our local tenant layout is up to date first, then we refresh the pipeline state, and so if the layout uuid in ZK doesn\u0027t match, then we know that the pipeline state in ZK is out of date and needs to be refreshed.  So we \"reset\" it on the fly here.\n\nNow, after having written that, it occurs to me that we refresh the pipeline state at two other times (both of them cleanup methods), and we do not ensure that our local layout state is the most current at the time, so there may be a race there where one scheduler performs a tenant reconfiguration and then also runs this method during a normal pipeline processing run and updates the pipeline state to the new layout, then another scheduler performs a node request cleanup (before it updates its layout), runs this method, and sees that the ZK pipeline state does not match the tenant layout and performs this reset.  I think that would essentially cause the pipeline state to flap and continually reset until all the schedulers got on the same page again.\n\nI don\u0027t think it would be catastrophic or lose data, but I don\u0027t think it\u0027s what we want.\n\nI think we need the cleanup methods to either abort or wait if the layout state doesn\u0027t match.",
+      "parentUuid": "fdbe2a8b_2dd02cf3",
+      "revId": "8ec73a7e74c65809437e7cb4873a2ec28369d8b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b40408e6_bc19c337",
         "filename": "zuul/scheduler.py",
         "patchSetId": 1
