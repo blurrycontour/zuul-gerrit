@@ -179,9 +179,8 @@ function Buildset({ buildset, timezone, tenant, user }) {
   function enqueueConfirm() {
     setShowEnqueueModal(false)
     if (buildset.change === null) {
-      const oldrev = '0000000000000000000000000000000000000000'
-      const newrev = buildset.newrev ? buildset.newrev : '0000000000000000000000000000000000000000'
-      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline, buildset.ref, oldrev, newrev)
+      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline,
+                  buildset.ref, buildset.oldrev, buildset.newrev)
         .then(() => {
           dispatch(addNotification(
             {
@@ -234,6 +233,32 @@ function Buildset({ buildset, timezone, tenant, user }) {
     )
   }
 
+  function renderRefInfo(buildset) {
+    const refinfo = buildset.branch ? (
+      <>
+        <strong>Branch </strong> {buildset.branch}
+      </>
+    ) : (
+      <>
+        <strong>Ref </strong> {buildset.ref}
+      </>
+    )
+    const oldrev = buildset.oldrev ? (
+      <><br/><strong>Old</strong> {buildset.oldrev}</>
+    ) : ( <></> )
+    const newrev = buildset.newrev ? (
+      <><br/><strong>New</strong> {buildset.newrev}</>
+    ) : ( <></> )
+
+    return (
+      <>
+        {refinfo}
+        {oldrev}
+        {newrev}
+      </>
+    )
+  }
+
   return (
     <>
       <Title headingLevel="h2">
@@ -275,18 +300,7 @@ function Buildset({ buildset, timezone, tenant, user }) {
               <IconProperty
                 WrapElement={ListItem}
                 icon={<CodeBranchIcon />}
-                value={
-                  buildset.branch ? (
-                    <>
-                      <strong>Branch </strong> {buildset.branch}
-                    </>
-                  ) : (
-                    <>
-                      <strong>Ref </strong> {buildset.ref}
-                    </>
-                  )
-                }
-              />
+                value={renderRefInfo(buildset)}/>
               <IconProperty
                 WrapElement={ListItem}
                 icon={<StreamIcon />}
