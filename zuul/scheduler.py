@@ -1614,7 +1614,6 @@ class Scheduler(threading.Thread):
                     reenqueued = False
                     if new_project:
                         item.change.project = new_project
-                        item.pipeline = None
                         item.queue = None
                         if not old_item_ahead or not last_head:
                             last_head = item
