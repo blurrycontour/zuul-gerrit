@@ -626,15 +626,18 @@ class PipelineState(zkobject.ZKObject):
         return obj
 
     @classmethod
-    def create(cls, pipeline, layout_uuid):
+    def create(cls, pipeline, layout_uuid, old_state=None):
         # If the object does not exist in ZK, create it with the
         # default attributes and the supplied layout UUID.  Otherwise,
-        # return an initialized object without loading any data so
-        # that data can be loaded on the next refresh.
+        # return an initialized object (or the old object for reuse)
+        # without loading any data so that data can be loaded on the
+        # next refresh.
         ctx = pipeline.manager.current_context
         state = cls()
         state._set(pipeline=pipeline)
         if state.exists(ctx):
+            if old_state:
+                return old_state
             return state
         return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
 
@@ -894,15 +897,17 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         return pipeline_path + '/change_list'
 
     @classmethod
-    def create(cls, pipeline):
+    def create(cls, pipeline, old_list=None):
         # If the object does not exist in ZK, create it with the
         # default attributes.  Otherwise, return an initialized object
-        # without loading any data so that data can be loaded on the
-        # next refresh.
+        # (or the old object for reuse) without loading any data so
+        # that data can be loaded on the next refresh.
         ctx = pipeline.manager.current_context
         change_list = cls()
         change_list._set(pipeline=pipeline)
         if change_list.exists(ctx):
+            if old_list:
+                return old_list
             return change_list
         return cls.new(ctx, pipeline=pipeline)
 
