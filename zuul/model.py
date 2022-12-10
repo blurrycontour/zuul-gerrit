@@ -637,9 +637,15 @@ class PipelineState(zkobject.ZKObject):
         state._set(pipeline=pipeline)
         if state.exists(ctx):
             if old_state:
+                old_state._resetObjectRefs()
                 return old_state
             return state
         return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
+
+    def _resetObjectRefs(self):
+        # Update the pipeline references on the queue objects.
+        for queue in self.queues + self.old_queues:
+            queue.pipeline = self.pipeline
 
     def getPath(self):
         if hasattr(self, '_path'):
@@ -1060,7 +1066,7 @@ class ChangeQueue(zkobject.ZKObject):
             else:
                 tpe_jobs.append(('item', tpe.submit(
                     QueueItem.fromZK, context, item_path,
-                    pipeline=self.pipeline, queue=self)))
+                    queue=self)))
 
         for (kind, future) in tpe_jobs:
             result = future.result()
@@ -1135,7 +1141,6 @@ class ChangeQueue(zkobject.ZKObject):
             enqueue_time = time.time()
         item = QueueItem.new(self.zk_context,
                              queue=self,
-                             pipeline=self.pipeline,
                              change=change,
                              event=event,
                              span_info=span_info,
@@ -1144,8 +1149,7 @@ class ChangeQueue(zkobject.ZKObject):
         return item
 
     def enqueueItem(self, item):
-        # FIXME: the pipeline should not change
-        item._set(pipeline=self.pipeline, queue=self)
+        item._set(queue=self)
         if self.queue:
             item.updateAttributes(self.zk_context, item_ahead=self.queue[-1])
             with item.item_ahead.activeContext(self.zk_context):
@@ -4511,7 +4515,6 @@ class QueueItem(zkobject.ZKObject):
         super().__init__()
         self._set(
             uuid=uuid4().hex,
-            pipeline=None,
             queue=None,
             change=None,  # a ref
             dequeued_needing_change=None,
@@ -4542,6 +4545,12 @@ class QueueItem(zkobject.ZKObject):
             bundle=None,
             dequeued_bundle_failing=False
         )
+
+    @property
+    def pipeline(self):
+        if self.queue:
+            return self.queue.pipeline
+        return None
 
     @classmethod
     def new(klass, context, **kw):
