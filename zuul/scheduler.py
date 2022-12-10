@@ -2214,9 +2214,22 @@ class Scheduler(threading.Thread):
             ctx.profile = False
 
         pipeline.state.setDirty(self.zk_client.client)
+        req = False
         if pipeline.state.old_queues:
             self._reenqueuePipeline(tenant, pipeline, ctx)
+            req = True
         pipeline.state.cleanup(ctx)
+        if req:
+            import objgraph, inspect
+            import zuul.model
+            chain = objgraph.find_ref_chain(pipeline.state, lambda x: (isinstance(x, zuul.model.Layout) and x is not tenant.layout))
+            print('JEB chain', len(chain))
+            for x in chain:
+                print('JEB chain', x)
+            chain = objgraph.find_ref_chain(pipeline.state, lambda x: (isinstance(x, zuul.model.Pipeline) and x not in list(tenant.layout.pipelines.values())))
+            print('JEB chain', len(chain))
+            for x in chain:
+                print('JEB chain', x)
 
         with self.statsd_timer(f'{stats_key}.event_process'):
             self.process_pipeline_management_queue(tenant, pipeline)

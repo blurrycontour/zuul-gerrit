@@ -100,11 +100,14 @@ class PipelineManager(metaclass=ABCMeta):
             # Make sure we have state and change list objects, and
             # ensure that they exist in ZK.  We don't hold the
             # pipeline lock, but if they don't exist, that means they
-            # are new, so no one else will either.  These will not
-            # automatically refresh now, so they will be out of date
-            # until they are refreshed later.
+            # are new, so no one else will either, so the write on
+            # create is okay.  If they do exist and we have an old
+            # object, we'll just reuse it.  If it does exist and we
+            # don't have an old object, we'll get a new empty one.
+            # Regardless, these will not automatically refresh now, so
+            # they will be out of date until they are refreshed later.
             self.pipeline.state = PipelineState.create(
-                self.pipeline, layout.uuid)
+                self.pipeline, layout.uuid, self.pipeline.state)
             self.pipeline.change_list = PipelineChangeList.create(
                 self.pipeline)
 
