@@ -840,37 +840,53 @@ class PipelineManager(metaclass=ABCMeta):
     def updateCommitDependencies(self, change, change_queue, event):
         log = get_annotated_logger(self.log, event)
 
-        # Search for Depends-On headers and find appropriate changes
-        log.debug("  Updating commit dependencies for %s", change)
-        dependencies = []
-        seen = set()
-        for match in find_dependency_headers(change.message):
-            log.debug("  Found Depends-On header: %s", match)
-            if match in seen:
-                continue
-            seen.add(match)
-            try:
-                url = urllib.parse.urlparse(match)
-            except ValueError:
-                continue
-            source = self.sched.connections.getSourceByHostname(
-                url.hostname)
-            if not source:
-                continue
-            log.debug("  Found source: %s", source)
-            dep = source.getChangeByURLWithRetry(match, event)
-            if dep and (not dep.is_merged) and dep not in dependencies:
-                log.debug("  Adding dependency: %s", dep)
-                dependencies.append(dep)
-        new_commit_needs_changes = [d.cache_key for d in dependencies]
+        must_update_commit_deps = (
+            not hasattr(event, "zuul_event_ltime")
+            or change.commit_needs_changes is None
+            or change.cache_stat.mzxid <= event.zuul_event_ltime
+        )
 
-        update_attrs = dict(commit_needs_changes=new_commit_needs_changes)
+        must_update_topic_deps = (
+            self.useDependenciesByTopic(change.project) and (
+                not hasattr(event, "zuul_event_ltime")
+                or change.topic_needs_changes is None
+                or change.cache_stat.mzxid <= event.zuul_event_ltime
+            )
+        )
+
+        update_attrs = {}
+        if must_update_commit_deps:
+            # Search for Depends-On headers and find appropriate changes
+            log.debug("  Updating commit dependencies for %s", change)
+            dependencies = []
+            seen = set()
+            for match in find_dependency_headers(change.message):
+                log.debug("  Found Depends-On header: %s", match)
+                if match in seen:
+                    continue
+                seen.add(match)
+                try:
+                    url = urllib.parse.urlparse(match)
+                except ValueError:
+                    continue
+                source = self.sched.connections.getSourceByHostname(
+                    url.hostname)
+                if not source:
+                    continue
+                log.debug("  Found source: %s", source)
+                dep = source.getChangeByURLWithRetry(match, event)
+                if dep and (not dep.is_merged) and dep not in dependencies:
+                    log.debug("  Adding dependency: %s", dep)
+                    dependencies.append(dep)
+            new_commit_needs_changes = [d.cache_key for d in dependencies]
+
+            update_attrs = dict(commit_needs_changes=new_commit_needs_changes)
 
         # Ask the source for any tenant-specific changes (this allows
         # drivers to implement their own way of collecting deps):
         source = self.sched.connections.getSource(
             change.project.connection_name)
-        if self.useDependenciesByTopic(change.project):
+        if must_update_topic_deps:
             log.debug("  Updating topic dependencies for %s", change)
             new_topic_needs_changes = []
             for dep in source.getChangesByTopic(change.topic):
@@ -879,7 +895,8 @@ class PipelineManager(metaclass=ABCMeta):
                     new_topic_needs_changes.append(dep.cache_key)
             update_attrs['topic_needs_changes'] = new_topic_needs_changes
 
-        source.setChangeAttributes(change, **update_attrs)
+        if update_attrs:
+            source.setChangeAttributes(change, **update_attrs)
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
