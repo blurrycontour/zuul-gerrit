@@ -16,6 +16,24 @@
       "message": "How about throwing an exception in the serialize() method when we have refreshed the pipeline as read-only?",
       "revId": "d81838416389988a28cee30ddbdffc872063c774",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "127a1e7f_f500d56c",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-12T21:26:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87ba0d31_13da35ad",
+      "revId": "d81838416389988a28cee30ddbdffc872063c774",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
