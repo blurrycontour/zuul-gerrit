@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "581ce68e_add13d84",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2022-12-12T11:00:36Z",
+      "side": 1,
+      "message": "Wouldn\u0027t this change w/o https://review.opendev.org/c/zuul/zuul/+/867176 introduce a memory leak on schedulers that just refresh the pipeline state and don\u0027t perform the re-enqueue?",
+      "revId": "63f1fdcaf4735c97498df8c294db2642878848aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
