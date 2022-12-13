@@ -685,7 +685,7 @@ class Scheduler(threading.Thread):
                     with self.createZKContext(lock, self.log) as ctx:
                         with pipeline.manager.currentContext(ctx):
                             pipeline.change_list.refresh(ctx)
-                            pipeline.state.refresh(ctx)
+                            pipeline.state.refresh(ctx, read_only=True)
                             # In case we're in the middle of a reconfig,
                             # include the old queue items.
                             for item in pipeline.getAllItems(include_old=True):
@@ -767,7 +767,7 @@ class Scheduler(threading.Thread):
                                 self.zk_client, tenant.name,
                                 pipeline.name) as lock,\
                             self.createZKContext(lock, self.log) as ctx:
-                            pipeline.state.refresh(ctx)
+                            pipeline.state.refresh(ctx, read_only=True)
                             # add any blobstore references
                             for item in pipeline.getAllItems(include_old=True):
                                 live_blobs.update(item.getBlobKeys())
@@ -1701,6 +1701,11 @@ class Scheduler(threading.Thread):
                 trigger.postConfig(pipeline)
             for reporter in pipeline.actions:
                 reporter.postConfig()
+            # Emit an event to trigger a pipeline run after the
+            # reconfiguration.
+            event = PipelinePostConfigEvent()
+            self.pipeline_management_events[tenant.name][pipeline.name].put(
+                event, needs_result=False)
 
         # Assemble a new list of min. ltimes of the project branch caches.
         branch_cache_min_ltimes = {
