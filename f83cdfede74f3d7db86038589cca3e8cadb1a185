@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cba91fc_4404286f",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-13T21:58:27Z",
+      "side": 1,
+      "message": "There isn\u0027t a bug, but the issue is that you were using orderedRelease, which releases builds one at a time after each has completed, but you have configured the -merge job to pause, which means it can\u0027t complete until all the children are done.\n\nThe solution, to disable hold_jobs_in_build is reasonable.\n\nAnother solution would be to release the jobs by name in order, but as you pointed out, we don\u0027t really need information from the other jobs, so we don\u0027t really care what order they run in.  We only require that the first build id be the merge job.\n\nI recommend you rephrase the comment to simply indicate that we don\u0027t care about the order the child jobs run in, only that project-merge is first, and using orderedRelease with paused jobs is complex, so we have disabled the hold.",
+      "revId": "f83cdfede74f3d7db86038589cca3e8cadb1a185",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c74f712e_41e8f735",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2022-12-13T21:58:27Z",
+      "side": 1,
+      "message": "With the above in mind, we don\u0027t actually need lines 317 and 318 here.",
+      "revId": "f83cdfede74f3d7db86038589cca3e8cadb1a185",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
