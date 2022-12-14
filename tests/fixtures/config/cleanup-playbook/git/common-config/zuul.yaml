@@ -33,3 +33,8 @@
     name: python27-failure
     cleanup-run: playbooks/cleanup.yaml
     run: playbooks/failure.yaml
+
+- job:
+    name: python27-cleanup-timeout
+    cleanup-run: playbooks/cleanup-timeout.yaml
+    run: playbooks/python27.yaml
