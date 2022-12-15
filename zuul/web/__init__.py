@@ -1698,8 +1698,7 @@ class ZuulWebAPI(object):
         change.branch = branch_name or "master"
         with LocalZKContext(self.log) as context:
             queue = ChangeQueue.new(context, pipeline=pipeline)
-            item = QueueItem.new(context, queue=queue, change=change,
-                                 pipeline=queue.pipeline)
+            item = QueueItem.new(context, queue=queue, change=change)
             item.freezeJobGraph(tenant.layout, context,
                                 skip_file_matcher=True,
                                 redact_secrets_and_keys=True)
