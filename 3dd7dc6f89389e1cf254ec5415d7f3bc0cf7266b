@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5e46408_ad5e5dc8",
+        "filename": "setup.cfg",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2022-12-15T20:33:25Z",
+      "side": 1,
+      "message": "This needs SetupTools\u003e\u003d61 (released 9 months ago), but since we don\u0027t seem to set a minimum version for it anywhere I guess we just always assume everyone\u0027s using new enough.",
+      "revId": "3dd7dc6f89389e1cf254ec5415d7f3bc0cf7266b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
