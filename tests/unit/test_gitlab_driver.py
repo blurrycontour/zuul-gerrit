@@ -126,6 +126,27 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertTrue(A.approved)
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_opened_imcomplete(self):
+
+        now = time.monotonic()
+        complete_at = now + 3
+        with self.fake_gitlab.enable_delayed_complete_mr(complete_at):
+            description = "This is the\nMR description."
+            A = self.fake_gitlab.openFakeMergeRequest(
+                'org/project', 'master', 'A', description=description)
+            self.fake_gitlab.emitEvent(
+                A.getMergeRequestOpenedEvent(), project='org/project')
+            self.waitUntilSettled()
+
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test1').result)
+
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test2').result)
+
+        self.assertTrue(self.fake_gitlab._test_web_server.stats["get_mr"] > 2)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')

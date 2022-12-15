@@ -342,11 +342,31 @@ class GitlabAPIClient():
 
     # https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr
     def get_mr(self, project_name, number, zuul_event_id=None):
-        path = "/projects/%s/merge_requests/%s" % (
-            quote_plus(project_name), number)
-        resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
-        self._manage_error(*resp, zuul_event_id=zuul_event_id)
-        return resp[0]
+        log = get_annotated_logger(self.log, zuul_event_id)
+        attempts = 0
+
+        def _get_mr():
+            path = "/projects/%s/merge_requests/%s" % (
+                quote_plus(project_name), number)
+            resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
+            self._manage_error(*resp, zuul_event_id=zuul_event_id)
+            return resp[0]
+
+        while True:
+            attempts += 1
+            factor = 1.6
+            mr = _get_mr()
+            if all(map(lambda k: mr.get(k, None), ['diff_refs'])):
+                return mr
+            wait_delay = attempts * factor
+            if wait_delay > 20:
+                raise Exception(
+                    "Unable to fetch %s#%s due to imcomplete data" % (
+                        project_name, number))
+            log.info(
+                "Will retry to fetch %s#%s due to imcomplete data "
+                "(in %s seconds) ..." % (project_name, number, wait_delay))
+            time.sleep(wait_delay)
 
     # https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
     def get_project_branches(self, project_name, exclude_unprotected,
