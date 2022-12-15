@@ -76,7 +76,7 @@ pip install $*
 # Fail-fast if pip detects conflicts
 pip check
 
-# Check if we're installing zuul. If so install the managed ansible as well.
-if echo "$*" | grep -vq requirements.txt; then
+# Check if Zuul has been installed and if so install ansible.
+if command -v zuul-manage-ansible; then
     zuul-manage-ansible -v
 fi
