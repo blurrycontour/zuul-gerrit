@@ -2394,6 +2394,12 @@ class FrozenJob(zkobject.ZKObject):
                 data['_' + job_data_key] = None
         return data
 
+    def _save(self, context, *args, **kw):
+        # Before saving, update the buildset with the new job version
+        # so that future readers know to refresh it.
+        self.buildset.updateJobVersion(context, self)
+        return super()._save(context, *args, **kw)
+
     def setWaitingStatus(self, status):
         if self.waiting_status == status:
             return
@@ -3876,6 +3882,12 @@ class Build(zkobject.ZKObject):
     def getPath(self):
         return f"{self.job.getPath()}/build/{self.uuid}"
 
+    def _save(self, context, *args, **kw):
+        # Before saving, update the buildset with the new job version
+        # so that future readers know to refresh it.
+        self.job.buildset.updateBuildVersion(context, self)
+        return super()._save(context, *args, **kw)
+
     def __repr__(self):
         return ('<Build %s of %s voting:%s>' %
                 (self.uuid, self.job.name, self.job.voting))
@@ -4086,6 +4098,8 @@ class BuildSet(zkobject.ZKObject):
             job_graph=None,
             jobs={},
             deduplicated_jobs=[],
+            job_versions={},
+            build_versions={},
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
@@ -4197,6 +4211,8 @@ class BuildSet(zkobject.ZKObject):
             "configured_time": self.configured_time,
             "start_time": self.start_time,
             "repo_state_request_time": self.repo_state_request_time,
+            "job_versions": self.job_versions,
+            "build_versions": self.build_versions,
             # jobs (serialize as separate objects)
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
@@ -4294,7 +4310,8 @@ class BuildSet(zkobject.ZKObject):
 
                 if job_name in self.jobs:
                     job = self.jobs[job_name]
-                    if not old_build_exists:
+                    if ((not old_build_exists) or
+                        self.shouldRefreshJob(job)):
                         tpe_jobs.append((None, job_name,
                                          tpe.submit(job.refresh, context)))
                 else:
@@ -4306,7 +4323,8 @@ class BuildSet(zkobject.ZKObject):
                     build = self.builds.get(job_name)
                     builds[job_name] = build
                     if build and build.getPath() == build_path:
-                        if not build.result:
+                        if ((not build.result) or
+                            self.shouldRefreshBuild(build)):
                             tpe_jobs.append((
                                 None, job_name, tpe.submit(
                                     build.refresh, context)))
@@ -4360,6 +4378,54 @@ class BuildSet(zkobject.ZKObject):
             "_old_jobs": {},
         })
         return data
+
+    def updateBuildVersion(self, context, build):
+        # It's tempting to update versions regardless of the model
+        # API, but if we start writing versions before all components
+        # are upgraded we could get out of sync.
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+
+        # It is common for a lot of builds/jobs to be added at once,
+        # so to avoid writing this buildset object repeatedly during
+        # that time, we only update the version after the initial
+        # creation.
+        version = build.getZKVersion()
+        # If zstat is None, we created the object
+        if version is not None:
+            versions = self.build_versions.copy()
+            versions[build.uuid] = version + 1
+            self.updateAttributes(context, build_versions=versions)
+
+    def updateJobVersion(self, context, job):
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+
+        version = job.getZKVersion()
+        if version is not None:
+            versions = self.job_versions.copy()
+            versions[job.name] = version + 1
+            self.updateAttributes(context, job_versions=versions)
+
+    def shouldRefreshBuild(self, build):
+        # Unless all schedulers are updating versions, we can't trust
+        # the data.
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+        current = build.getZKVersion()
+        if current is None:
+            current = -1
+        expected = self.build_versions.get(build.uuid, 0)
+        return expected > current
+
+    def shouldRefreshJob(self, job):
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+        current = job.getZKVersion()
+        if current is None:
+            current = -1
+        expected = self.job_versions.get(job.name, 0)
+        return expected > current
 
     @property
     def ref(self):

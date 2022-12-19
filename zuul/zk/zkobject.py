@@ -308,6 +308,17 @@ class ZKObject:
 
         return (compressed_size, uncompressed_size)
 
+    def getZKVersion(self):
+        """Return the ZK version of the object as of the last load/refresh.
+
+        Returns None if the object is newly created.
+        """
+        zstat = getattr(self, '_zstat', None)
+        # If zstat is None, we created the object
+        if zstat is None:
+            return None
+        return zstat.version
+
     # Private methods below
 
     def _retry(self, context, func, *args, max_tries=-1, **kw):
