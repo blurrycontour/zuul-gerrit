@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e3d8e32f_274b4253",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-12-19T09:30:54Z",
+      "side": 1,
+      "message": "Thanks for the explanation. This makes sense. I\u0027ve rephrased the comment.",
+      "parentUuid": "0cba91fc_4404286f",
+      "revId": "f83cdfede74f3d7db86038589cca3e8cadb1a185",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c74f712e_41e8f735",
         "filename": "tests/unit/test_connection.py",
         "patchSetId": 9
@@ -31,6 +49,24 @@
       "writtenOn": "2022-12-13T21:58:27Z",
       "side": 1,
       "message": "With the above in mind, we don\u0027t actually need lines 317 and 318 here.",
+      "revId": "f83cdfede74f3d7db86038589cca3e8cadb1a185",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54e2d3ad_fbc78e9d",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2022-12-19T09:30:54Z",
+      "side": 1,
+      "message": "Good point. I\u0027ve removed it.",
+      "parentUuid": "c74f712e_41e8f735",
       "revId": "f83cdfede74f3d7db86038589cca3e8cadb1a185",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
