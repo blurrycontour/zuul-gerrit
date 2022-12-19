@@ -135,6 +135,9 @@ class GithubSource(BaseSource):
     def getProjectBranches(self, project, tenant, min_ltime=-1):
         return self.connection.getProjectBranches(project, tenant, min_ltime)
 
+    def getProjectMergeModes(self, project, tenant, min_ltime=-1):
+        return self.connection.getProjectMergeModes(project, tenant, min_ltime)
+
     def getProjectBranchCacheLtime(self):
         return self.connection._branch_cache.ltime
 

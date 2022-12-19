@@ -64,6 +64,7 @@ MERGER_MAP = {
     'squash-merge': MERGER_SQUASH_MERGE,
     'rebase': MERGER_REBASE,
 }
+ALL_MERGE_MODES = list(MERGER_MAP.values())
 
 PRECEDENCE_NORMAL = 0
 PRECEDENCE_LOW = 1
@@ -6968,6 +6969,7 @@ class TenantProjectConfig(object):
         self.extra_config_dirs = ()
         # Load config from a different branch if this is a config project
         self.load_branch = None
+        self.merge_modes = None
 
     def isAlwaysDynamicBranch(self, branch):
         if self.always_dynamic_branches is None:

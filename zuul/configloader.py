@@ -1858,6 +1858,9 @@ class TenantParser(object):
         tpc.branches = static_branches
         tpc.dynamic_branches = always_dynamic_branches
 
+        tpc.merge_modes = tpc.project.source.getProjectMergeModes(
+            tpc.project, tenant, min_ltime)
+
     def _loadProjectKeys(self, connection_name, project):
         project.private_secrets_key, project.public_secrets_key = (
             self.keystorage.getProjectSecretsKeys(
@@ -2577,11 +2580,22 @@ class TenantParser(object):
             # Set a merge mode if we don't have one for this project.
             # This can happen if there are only regex project stanzas
             # but no specific project stanzas.
+            (trusted, project) = tenant.getProject(project_name)
             project_metadata = layout.getProjectMetadata(project_name)
             if project_metadata.merge_mode is None:
-                (trusted, project) = tenant.getProject(project_name)
                 mode = project.source.getProjectDefaultMergeMode(project)
                 project_metadata.merge_mode = model.MERGER_MAP[mode]
+            tpc = tenant.project_configs[project.canonical_name]
+            if tpc.merge_modes is not None:
+                source_context = model.ProjectContext(
+                    project.canonical_name, project.name)
+                with project_configuration_exceptions(source_context,
+                                                      layout.loading_errors):
+                    if project_metadata.merge_mode not in tpc.merge_modes:
+                        mode = model.get_merge_mode_name(
+                            project_metadata.merge_mode)
+                        raise Exception(f'Merge mode {mode} not supported '
+                                        f'by project {project_name}')
 
     def _parseLayout(self, tenant, data, loading_errors, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because

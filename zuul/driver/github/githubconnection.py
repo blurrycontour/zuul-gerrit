@@ -48,6 +48,7 @@ from zuul.driver.github.graphql import GraphQLClient
 from zuul.lib import tracing
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
+from zuul import model
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
@@ -64,6 +65,12 @@ GITHUB_BASE_URL = 'https://api.github.com'
 PREVIEW_JSON_ACCEPT = 'application/vnd.github.machine-man-preview+json'
 PREVIEW_DRAFT_ACCEPT = 'application/vnd.github.shadow-cat-preview+json'
 PREVIEW_CHECKS_ACCEPT = 'application/vnd.github.antiope-preview+json'
+ALL_MERGE_MODES = [
+    model.MERGER_MERGE,
+    model.MERGER_MERGE_RESOLVE,
+    model.MERGER_SQUASH_MERGE,
+    model.MERGER_REBASE,
+]
 
 # NOTE (felix): Using log levels for file comments / annotations is IMHO more
 # convenient than the values Github expects. Having in mind that those comments
@@ -956,8 +963,9 @@ class GithubClientManager:
                 if 'cache-control' in response.headers:
                     del response.headers['cache-control']
 
+        self._cache = DictCache()
         self.cache_adapter = cachecontrol.CacheControlAdapter(
-            DictCache(),
+            self._cache,
             cache_etags=True,
             heuristic=NoAgeHeuristic())
 
@@ -1775,6 +1783,42 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             branches.extend([x['name'] for x in resp.json()])
 
         return branches
+
+    def _fetchProjectMergeModes(self, project):
+        github = self.getGithubClient(project.name)
+        url = github.session.build_url('repos', project.name)
+        headers = {'Accept': 'application/vnd.github.loki-preview+json'}
+        merge_modes = []
+
+        # GitHub API bug: if the allow_* attributes below are changed,
+        # the ETag is not updated, meaning that once we cache the repo
+        # URL, we'll never update it.  To avoid this, clear this URL
+        # from the cache before performing the request.
+        self._github_client_manager._cache.data.pop(url, None)
+
+        resp = github.session.get(url, headers=headers)
+
+        if resp.status_code == 403:
+            self.log.error(str(resp))
+            rate_limit = github.rate_limit()
+            if rate_limit['resources']['core']['remaining'] == 0:
+                self.log.warning(
+                    "Rate limit exceeded, using full merge method list")
+            return ALL_MERGE_MODES
+        elif resp.status_code == 404:
+            raise Exception("Got status code 404 when fetching "
+                            "project %s" % project.name)
+
+        resp = resp.json()
+        if resp.get('allow_merge_commit'):
+            merge_modes.append(model.MERGER_MERGE)
+            merge_modes.append(model.MERGER_MERGE_RESOLVE)
+        if resp.get('allow_squash_merge'):
+            merge_modes.append(model.MERGER_SQUASH_MERGE)
+        if resp.get('allow_rebase_merge'):
+            merge_modes.append(model.MERGER_REBASE)
+
+        return merge_modes
 
     def isBranchProtected(self, project_name: str, branch_name: str,
                           zuul_event_id=None) -> Optional[bool]:

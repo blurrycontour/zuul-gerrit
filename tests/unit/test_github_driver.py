@@ -1463,6 +1463,27 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual('SUCCESS',
                          self.getJobFromHistory('project-test2').result)
 
+    @simple_layout('layouts/github-merge-mode.yaml', driver='github')
+    def test_merge_method_syntax_check(self):
+        """
+        Tests that the merge mode gets forwarded to the reporter and the
+        PR was rebased.
+        """
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._repodata['allow_rebase_merge'] = False
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        loading_errors = tenant.layout.loading_errors
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "An error should have been stored")
+        self.assertIn(
+            "rebase not supported",
+            str(loading_errors[0].error))
+
 
 class TestMultiGithubDriver(ZuulTestCase):
     config_file = 'zuul-multi-github.conf'

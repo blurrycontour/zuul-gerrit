@@ -1,0 +1,21 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      github:
+        - event: pull_request_review
+          action: submitted
+          state: approve
+    start:
+      github: {}
+    success:
+      github: {}
+    failure:
+      github: {}
+
+- project:
+    name: org/project
+    merge-mode: rebase
+    gate:
+      jobs:
+        - noop
