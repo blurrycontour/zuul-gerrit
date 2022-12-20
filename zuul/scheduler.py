@@ -689,8 +689,8 @@ class Scheduler(threading.Thread):
                             # In case we're in the middle of a reconfig,
                             # include the old queue items.
                             for item in pipeline.getAllItems(include_old=True):
-                                nrs = item.current_build_set.node_requests
-                                for req_id in (nrs.values()):
+                                nrs = item.current_build_set.getNodeRequests()
+                                for _, req_id in nrs:
                                     outstanding_requests.add(req_id)
         leaked_requests = zk_requests - outstanding_requests
         for req_id in leaked_requests:
@@ -1632,7 +1632,7 @@ class Scheduler(threading.Thread):
                             item.removeBuild(build)
                             builds_to_cancel.append(build)
                     for request_job, request in \
-                        item.current_build_set.node_requests.items():
+                        item.current_build_set.getNodeRequests():
                         new_job = item.getJob(request_job)
                         if not new_job:
                             requests_to_cancel.append(
@@ -1654,7 +1654,7 @@ class Scheduler(threading.Thread):
             for build in item.current_build_set.getBuilds():
                 builds_to_cancel.append(build)
             for request_job, request in \
-                item.current_build_set.node_requests.items():
+                item.current_build_set.getNodeRequests():
                 requests_to_cancel.append(
                     (
                         item.current_build_set,
@@ -1781,7 +1781,7 @@ class Scheduler(threading.Thread):
                 for build in item.current_build_set.getBuilds():
                     builds_to_cancel.append(build)
                 for request_job, request in \
-                    item.current_build_set.node_requests.items():
+                    item.current_build_set.getNodeRequests():
                     requests_to_cancel.append(
                         (
                             item.current_build_set,
@@ -2230,6 +2230,7 @@ class Scheduler(threading.Thread):
                     pass
         except Exception:
             self.log.exception("Exception in pipeline processing:")
+            pipeline._exception_count += 1
             pipeline.state.updateAttributes(
                 ctx, state=pipeline.STATE_ERROR)
             # Continue processing other pipelines+tenants
@@ -2825,7 +2826,8 @@ class Scheduler(threading.Thread):
             # In case the build didn't show up on any executor, the node
             # request does still exist, so we have to make sure it is
             # removed from ZK.
-            request_id = build.build_set.getJobNodeRequestID(build.job.name)
+            request_id = build.build_set.getJobNodeRequestID(
+                build.job.name, ignore_deduplicate=True)
             if request_id:
                 self.nodepool.deleteNodeRequest(
                     request_id, event_id=build.zuul_event_id)
@@ -2926,9 +2928,10 @@ class Scheduler(threading.Thread):
             # Cancel node request if needed
             req_id = buildset.getJobNodeRequestID(job_name)
             if req_id:
-                req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
-                if req:
-                    self.nodepool.cancelRequest(req)
+                if not isinstance(req_id, dict):
+                    req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
+                    if req:
+                        self.nodepool.cancelRequest(req)
                 buildset.removeJobNodeRequestID(job_name)
 
             # Cancel build if needed

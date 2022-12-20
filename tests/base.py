@@ -3610,10 +3610,11 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
             self.log.debug('No running builds to release')
             return
 
-        self.log.debug("Releasing build %s (%s)" % (regex, len(builds)))
+        self.log.debug("Releasing build %s %s (%s)" % (
+            regex, change, len(builds)))
         for build in builds:
-            if (not regex or re.match(regex, build.name) and
-                not change or build.change == change):
+            if ((not regex or re.match(regex, build.name)) and
+                (not change or build.change == change)):
                 self.log.debug("Releasing build %s" %
                                (build.parameters['zuul']['build']))
                 build.release()
@@ -5158,6 +5159,11 @@ class ZuulTestCase(BaseTestCase):
                 self.assertIsNotNone(build.start_time)
                 self.assertIsNotNone(build.end_time)
 
+    def assertNoPipelineExceptions(self):
+        for tenant in self.scheds.first.sched.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                self.assertEqual(0, pipeline._exception_count)
+
     def assertFinalState(self):
         self.log.debug("Assert final state")
         # Make sure no jobs are running
@@ -5184,6 +5190,7 @@ class ZuulTestCase(BaseTestCase):
             for pipeline in tenant.layout.pipelines.values():
                 if isinstance(pipeline.manager, ipm):
                     self.assertEqual(len(pipeline.queues), 0)
+        self.assertNoPipelineExceptions()
 
     def shutdown(self):
         self.log.debug("Shutting down after tests")

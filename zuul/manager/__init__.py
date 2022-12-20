@@ -1647,7 +1647,7 @@ class PipelineManager(metaclass=ABCMeta):
         if (item.live and not dequeued
                 and self.sched.globals.use_relative_priority):
             priority = item.getNodePriority()
-            for request_id in item.current_build_set.node_requests.values():
+            for _, request_id in item.current_build_set.getNodeRequests():
                 node_request = self.sched.nodepool.zk_nodepool.getNodeRequest(
                     request_id, cached=True)
                 if not node_request:

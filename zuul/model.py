@@ -473,6 +473,8 @@ class Pipeline(object):
         self.window_decrease_factor = None
         self.state = None
         self.change_list = None
+        # Only used by the unit tests for assertions
+        self._exception_count = 0
 
     @property
     def queues(self):
@@ -4429,8 +4431,18 @@ class BuildSet(zkobject.ZKObject):
         with self.activeContext(self.item.pipeline.manager.current_context):
             self.node_requests[job_name] = request_id
 
-    def getJobNodeRequestID(self, job_name):
-        return self.node_requests.get(job_name)
+    def getJobNodeRequestID(self, job_name, ignore_deduplicate=False):
+        r = self.node_requests.get(job_name)
+        if ignore_deduplicate and isinstance(r, dict):
+            return None
+        return r
+
+    def getNodeRequests(self):
+        # This ignores deduplicated node requests
+        for job_name, request in self.node_requests.items():
+            if isinstance(request, dict):
+                continue
+            yield job_name, request
 
     def removeJobNodeRequestID(self, job_name):
         if job_name in self.node_requests:
