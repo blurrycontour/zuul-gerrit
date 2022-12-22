@@ -299,7 +299,7 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-tox-docs
+        - zuul-nox-docs
         - nox-linters:
             vars:
               nox_install_bindep: false
@@ -330,7 +330,7 @@
     gate:
       jobs:
         - zuul-upload-image
-        - zuul-tox-docs
+        - zuul-nox-docs
         - nox-linters:
             vars:
               nox_install_bindep: false
@@ -358,7 +358,7 @@
     promote:
       jobs:
         - zuul-promote-image
-        - zuul-promote-docs
+        - zuul-promote-nox-docs
         - opendev-promote-python:
             vars:
               download_artifact_job: zuul-build-python-release
@@ -369,7 +369,7 @@
     release:
       jobs:
         - zuul-release-python
-        - zuul-publish-tox-docs
+        - zuul-publish-nox-docs
         - upload-docker-image:
             secrets:
               name: docker_credentials
