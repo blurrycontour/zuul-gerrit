@@ -278,6 +278,7 @@
     vars:
       node_version: 16
       release_python: python3
+      ensure_tox_version: "<4"
     check:
       jobs:
         - zuul-build-image
