@@ -111,7 +111,7 @@ def venv(session):
     session.install('-r', 'requirements.txt',
                     '-r', 'test-requirements.txt')
     session.install('-e', '.')
-    session.run()
+    session.run(*session.posargs)
 
 
 @nox.session(python='3')
