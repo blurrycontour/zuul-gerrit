@@ -47,7 +47,6 @@ def bindep(session):
     set_standard_env_vars(session)
     set_env(session, 'SQLALCHEMY_WARN_20', '1')
     session.install('bindep')
-    session.install('.')
     session.run('bindep', 'test')
 
 
