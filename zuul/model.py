@@ -3723,6 +3723,27 @@ class BuildReference:
         self._path = _path
 
 
+class BuildEvent:
+    TYPE_PAUSED = "paused"
+    TYPE_RESUMED = "resumed"
+
+    def __init__(self, event_time, event_type, description=None):
+        self.event_time = event_time
+        self.event_type = event_type
+        self.description = description
+
+    def toDict(self):
+        return {
+            "event_time": self.event_time,
+            "event_type": self.event_type,
+            "description": self.description,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data["event_time"], data["event_type"], data["description"])
+
+
 class Build(zkobject.ZKObject):
     """A Build is an instance of a single execution of a Job.
 
@@ -3763,6 +3784,8 @@ class Build(zkobject.ZKObject):
             zuul_event_id=None,
             build_request_ref=None,
             span_info=None,
+            # A list of build events like paused, resume, ...
+            events=[],
         )
 
     def serialize(self, context):
@@ -3782,6 +3805,7 @@ class Build(zkobject.ZKObject):
             "zuul_event_id": self.zuul_event_id,
             "build_request_ref": self.build_request_ref,
             "span_info": self.span_info,
+            "events": [e.toDict() for e in self.events],
         }
         if COMPONENT_REGISTRY.model_api < 5:
             data["_result_data"] = (self._result_data.getPath()
@@ -3803,6 +3827,11 @@ class Build(zkobject.ZKObject):
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+
+        # Deserialize build events
+        data["events"] = [
+            BuildEvent.fromDict(e) for e in data.get("events", [])
+        ]
 
         # Result data can change (between a pause and build
         # completion).
@@ -3877,6 +3906,12 @@ class Build(zkobject.ZKObject):
             self._active_context,
             data=secret_result_data,
             _path=self.getPath() + '/secret_result_data')
+
+    def addEvent(self, event):
+        if not self._active_context:
+            raise Exception(
+                "addEvent must be used with a context manager")
+        self.events.append(event)
 
     @property
     def failed(self):

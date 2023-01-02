@@ -53,6 +53,7 @@ from zuul.model import (
     Abide,
     Build,
     BuildCompletedEvent,
+    BuildEvent,
     BuildPausedEvent,
     BuildStartedEvent,
     BuildStatusEvent,
@@ -2699,6 +2700,10 @@ class Scheduler(threading.Thread):
         # with child job skipping.
         with build.activeContext(pipeline.manager.current_context):
             build.paused = True
+            build.addEvent(
+                BuildEvent(
+                    event_time=time.time(),
+                    event_type=BuildEvent.TYPE_PAUSED))
             build.setResultData(
                 event.data.get("data", {}),
                 event.data.get("secret_data", {}))
