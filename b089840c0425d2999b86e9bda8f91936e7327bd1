@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45fa5c82_ba8097b5",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3834,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-01-02T08:09:38Z",
+      "side": 1,
+      "message": "This should be `data.get(\"events\", [])` to be backward compatible with existing builds in Zookeeper.",
+      "revId": "b089840c0425d2999b86e9bda8f91936e7327bd1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
