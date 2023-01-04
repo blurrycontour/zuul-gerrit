@@ -46,10 +46,18 @@ class ZuulSpan(Span):
 trace_sdk._Span = ZuulSpan
 
 
+def format_trace_id(trace_id):
+    return f"{trace_id:032x}"
+
+
+def format_span_id(span_id):
+    return f"{span_id:016x}"
+
+
 def _formatContext(context):
     return {
-        'trace_id': context.trace_id,
-        'span_id': context.span_id,
+        'trace_id': format_trace_id(context.trace_id),
+        'span_id': format_span_id(context.span_id),
     }
 
 
@@ -75,8 +83,8 @@ def getSpanInfo(span, include_attributes=False):
         }
     ret = {
         'name': span.name,
-        'trace_id': context.trace_id,
-        'span_id': context.span_id,
+        'trace_id': format_trace_id(context.trace_id),
+        'span_id': format_span_id(context.span_id),
         'trace_flags': context.trace_flags,
         'start_time': span.start_time,
         'parent': parent_context,
@@ -112,16 +120,16 @@ def restoreSpan(span_info, is_remote=True):
     if not required_keys <= set(span_info.keys()):
         return trace.INVALID_SPAN
     span_context = trace.SpanContext(
-        span_info['trace_id'],
-        span_info['span_id'],
+        int(span_info['trace_id'], 16),
+        int(span_info['span_id'], 16),
         is_remote=is_remote,
         trace_flags=trace.TraceFlags(span_info['trace_flags']),
     )
     links = []
     for link_info in span_info.get('links', []):
         link_context = trace.SpanContext(
-            link_info['context']['trace_id'],
-            link_info['context']['span_id'],
+            int(link_info['context']['trace_id'], 16),
+            int(link_info['context']['span_id'], 16),
             is_remote=link_info['is_remote'])
         link = trace.Link(link_context, link_info['attributes'])
         links.append(link)
@@ -129,8 +137,8 @@ def restoreSpan(span_info, is_remote=True):
     parent_context = None
     if parent_info := span_info.get("parent"):
         parent_context = trace.SpanContext(
-            parent_info['trace_id'],
-            parent_info['span_id'],
+            int(parent_info['trace_id'], 16),
+            int(parent_info['span_id'], 16),
             is_remote=parent_info['is_remote'],
         )
 
@@ -195,8 +203,8 @@ def getSpanContext(span):
     """
     context = span.get_span_context()
     return {
-        'trace_id': context.trace_id,
-        'span_id': context.span_id,
+        'trace_id': format_trace_id(context.trace_id),
+        'span_id': format_span_id(context.span_id),
         'trace_flags': context.trace_flags,
     }
 
@@ -209,8 +217,8 @@ def restoreSpanContext(span_context):
     """
     if span_context:
         span_context = trace.SpanContext(
-            trace_id=span_context['trace_id'],
-            span_id=span_context['span_id'],
+            trace_id=int(span_context['trace_id'], 16),
+            span_id=int(span_context['span_id'], 16),
             is_remote=True,
             trace_flags=trace.TraceFlags(span_context['trace_flags'])
         )

@@ -22,6 +22,7 @@ from urllib.parse import quote_plus, unquote_plus
 from kazoo.exceptions import NoNodeError
 
 from zuul import model
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.zk import sharding, ZooKeeperSimpleBase
 from zuul.zk.vendor import lock
 
@@ -53,7 +54,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
             "extra_dirs_searched": list(extra_config_dirs),
             "ltime": ltime,
         }
-        payload = json.dumps(data, sort_keys=True).encode("utf8")
+        payload = json_dumpb(data, sort_keys=True)
         try:
             self.kazoo_client.set(self.root_path, payload)
         except NoNodeError:
@@ -73,7 +74,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
             return False
 
         try:
-            content = json.loads(data)
+            content = json_loadb(data)
             extra_files_searched = set(content["extra_files_searched"])
             extra_dirs_searched = set(content["extra_dirs_searched"])
             ltime = content["ltime"]
@@ -91,7 +92,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
     def ltime(self):
         try:
             data, _ = self.kazoo_client.get(self.root_path)
-            content = json.loads(data)
+            content = json_loadb(data)
             return content["ltime"]
         except Exception:
             return -1
@@ -217,7 +218,7 @@ class SystemConfigCache(ZooKeeperSimpleBase):
                 with sharding.BufferedShardReader(
                     self.kazoo_client, self.conf_path
                 ) as stream:
-                    data = json.loads(stream.read())
+                    data = json_loadb(stream.read())
             except Exception:
                 raise RuntimeError("No valid system config")
             zstat = self.kazoo_client.exists(self.conf_path)

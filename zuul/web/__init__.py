@@ -43,6 +43,7 @@ import zuul.lib.repl
 from zuul.lib import commandsocket, encryption, streamer_utils, tracing
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.jsonutil import ZuulJSONEncoder
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.re2util import filter_allowed_disallowed
@@ -112,7 +113,7 @@ class APIError(cherrypy.HTTPError):
         super().set_response()
         resp = cherrypy.response
         if self._json_doc:
-            ret = json.dumps(self._json_doc).encode('utf8')
+            ret = json_dumpb(self._json_doc)
             resp.body = ret
             resp.headers['Content-Type'] = 'application/json'
             resp.headers["Content-Length"] = len(ret)
@@ -321,7 +322,7 @@ class LogStreamHandler(WebSocket):
 
     def received_message(self, message):
         if message.is_text:
-            req = json.loads(message.data.decode('utf-8'))
+            req = json_loadb(message.data)
             self.log.debug("Websocket request: %s", req)
             if self.streamer:
                 self.log.debug("Ignoring request due to existing streamer")
@@ -1108,7 +1109,7 @@ class ZuulWebAPI(object):
                 status['management_events'] = len(
                     management_event_queues[pipeline.name])
                 pipelines.append(status)
-        return data, json.dumps(data).encode('utf-8')
+        return data, json_dumpb(data)
 
     def _getTenantOrRaise(self, tenant_name):
         tenant = self.zuulweb.abide.tenants.get(tenant_name)
@@ -1406,7 +1407,7 @@ class ZuulWebAPI(object):
                 'url': artifact.url,
             }
             if artifact.meta:
-                art['metadata'] = json.loads(artifact.meta)
+                art['metadata'] = json_loadb(artifact.meta)
             ret['artifacts'].append(art)
         for provides in build.provides:
             ret['provides'].append({
