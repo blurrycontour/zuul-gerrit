@@ -109,7 +109,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
                     time.sleep(1)
                 else:
                     raise
-        return dep
+            return dep
 
     @abc.abstractmethod
     def getChangesDependingOn(self, change, projects, tenant):
