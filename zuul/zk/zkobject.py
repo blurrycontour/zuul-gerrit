@@ -14,7 +14,6 @@
 
 from concurrent.futures import ThreadPoolExecutor
 import contextlib
-import json
 import logging
 import sys
 import time
@@ -25,6 +24,7 @@ import collections
 from kazoo.exceptions import NodeExistsError, NoNodeError
 from kazoo.retry import KazooRetry
 
+from zuul.lib.jsonutil import json_loadb
 from zuul.zk import sharding
 from zuul.zk import ZooKeeperClient
 
@@ -166,7 +166,7 @@ class ZKObject:
         :returns: A dictionary of attributes and values to be set on
         the object.
         """
-        return json.loads(data.decode('utf-8'))
+        return json_loadb(data)
 
     # These methods are public and shouldn't need to be overridden
     def updateAttributes(self, context, **kw):

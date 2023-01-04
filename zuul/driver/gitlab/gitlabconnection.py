@@ -15,7 +15,6 @@
 
 import logging
 import threading
-import json
 import cherrypy
 import voluptuous as v
 import time
@@ -37,6 +36,7 @@ from zuul.connection import (
 from zuul.web.handler import BaseWebController
 from zuul.lib import tracing
 from zuul.lib.http import ZuulHTTPAdapter
+from zuul.lib.jsonutil import json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.config import any_to_bool
 from zuul.exceptions import MergeFailure
@@ -810,7 +810,7 @@ class GitlabWebController(BaseWebController):
         self.log.info("Event header: %s" % headers)
         self.log.info("Event body: %s" % body)
         self._validate_token(headers)
-        json_payload = json.loads(body.decode('utf-8'))
+        json_payload = json_loadb(body)
 
         data = {
             'payload': json_payload,

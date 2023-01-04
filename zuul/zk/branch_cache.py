@@ -16,8 +16,8 @@
 
 import collections
 import logging
-import json
 
+from zuul.lib.jsonutil import json_dumpb
 from zuul.zk.zkobject import ZKContext, ShardedZKObject
 from zuul.zk.locks import SessionAwareReadLock, SessionAwareWriteLock, locked
 from zuul.zk.components import COMPONENT_REGISTRY
@@ -79,7 +79,7 @@ class BranchCacheZKObject(ShardedZKObject):
         # safe to move into the dict above at any time.
         if (COMPONENT_REGISTRY.model_api >= 11):
             data["merge_modes"] = self.merge_modes
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
