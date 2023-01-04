@@ -234,7 +234,9 @@ class TimerDriver(Driver, TriggerInterface):
                                          event=event)
             log = get_annotated_logger(self.log, event)
             log.debug("Adding event")
-            self.sched.addTriggerEvent(self.name, event)
+            self.sched.pipeline_trigger_events[tenant.name][
+                    pipeline_name
+            ].put(self.name, event)
         except Exception:
             self.log.exception("Error dispatching timer event for "
                                "tenant %s project %s branch %s",
