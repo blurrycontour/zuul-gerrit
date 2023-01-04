@@ -42,6 +42,7 @@ from zuul.lib.ansible import AnsibleManager
 from zuul.lib.result_data import get_warnings_from_result_data
 from zuul.lib import yamlutil as yaml
 from zuul.lib.config import get_default
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.statsd import get_statsd
@@ -595,8 +596,8 @@ class JobDir(object):
         os.makedirs(self.ansible_root)
         self.ansible_vars_blacklist = os.path.join(
             self.ansible_root, 'vars_blacklist.yaml')
-        with open(self.ansible_vars_blacklist, 'w') as blacklist:
-            blacklist.write(json.dumps(BLACKLISTED_VARS))
+        with open(self.ansible_vars_blacklist, 'wb') as blacklist:
+            blacklist.write(json_dumpb(BLACKLISTED_VARS))
         self.zuul_vars = os.path.join(self.ansible_root, 'zuul_vars.yaml')
         self.trusted_root = os.path.join(self.root, 'trusted')
         os.makedirs(self.trusted_root)
@@ -1338,7 +1339,7 @@ class AnsibleJob(object):
                         error_detail=f'Failed to update project '
                                      f'{task.project_name}')
                     self.job.sendWorkComplete(
-                        json.dumps(result, sort_keys=True))
+                        json_dumpb(result, sort_keys=True))
                     return
 
                 raise ExecutorError(
@@ -1531,7 +1532,7 @@ class AnsibleJob(object):
             with open(self.jobdir.result_data_file) as f:
                 file_data = f.read()
                 if file_data:
-                    file_data = json.loads(file_data)
+                    file_data = json_loadb(file_data)
                     data = file_data.get('data', {})
                     secret_data = file_data.get('secret_data', {})
             # Check the variable names for safety, but zuul is allowed.
@@ -2102,7 +2103,7 @@ class AnsibleJob(object):
                 if isinstance(secret_index, dict):
                     key = secret_index['blob']
                     data = blobstore.get(key)
-                    frozen_secret = json.loads(data.decode('utf-8'))
+                    frozen_secret = json_loadb(data)
                 else:
                     frozen_secret = self.job.secrets[secret_index]
                 secret = zuul.model.Secret(secret_name, None)
@@ -2526,15 +2527,15 @@ class AnsibleJob(object):
             facts = {}
             if os.path.exists(path):
                 with open(path) as f:
-                    facts = json.loads(f.read())
+                    facts = json_loadb(f.read())
             self.frozen_hostvars[host['name']] = facts.pop('_zuul_frozen', {})
             # Always include the nodepool vars, even if we didn't run
             # the playbook for this host.
             if 'host_vars' in host:
                 self.frozen_hostvars[host['name']]['nodepool'] =\
                     host['host_vars']['nodepool']
-            with open(path, 'w') as f:
-                f.write(json.dumps(facts))
+            with open(path, 'wb') as f:
+                f.write(json_dumpb(facts))
 
             # While we're here, update both hostvars dicts with
             # an !unsafe copy of the original input as well.

@@ -16,7 +16,6 @@
 import abc
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
 import copy
-import json
 import hashlib
 import logging
 import os
@@ -44,7 +43,7 @@ from zuul.lib.config import get_default
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
-from zuul.lib.jsonutil import json_dumps
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.lib import tracing
 from zuul.zk import zkobject
 from zuul.zk.blob_store import BlobStore
@@ -203,7 +202,7 @@ class ConfigurationErrorKey(object):
         elements.append(error_text)
 
         hasher = hashlib.sha256()
-        hasher.update(json.dumps(elements, sort_keys=True).encode('utf8'))
+        hasher.update(json_dumpb(elements, sort_keys=True))
         self._hash = hasher.hexdigest()
 
     def serialize(self):
@@ -288,7 +287,7 @@ class ConfigurationErrorList(zkobject.ShardedZKObject):
         data = {
             "errors": [e.serialize() for e in self.errors],
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -702,7 +701,7 @@ class PipelineState(zkobject.ZKObject):
             "old_queues": [q.getPath() for q in self.old_queues],
             "layout_uuid": self.layout_uuid,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def refresh(self, context, read_only=False):
         # Set read_only to True to indicate that we should avoid
@@ -926,7 +925,7 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         data = {
             "changes": self.changes,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, data, context):
         data = super().deserialize(data, context)
@@ -973,7 +972,7 @@ class PipelineSummary(zkobject.ShardedZKObject):
         data = {
             "status": self.status,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def refresh(self, context):
         # Ignore exceptions and just re-use the previous state. This
@@ -1043,7 +1042,7 @@ class ChangeQueue(zkobject.ZKObject):
             "window_decrease_factor": self.window_decrease_factor,
             "dynamic": self.dynamic,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -2151,8 +2150,8 @@ class JobData(zkobject.ShardedZKObject):
     @staticmethod
     def getHash(data):
         hasher = hashlib.sha256()
-        # Use json_dumps to strip any ZuulMark entries
-        hasher.update(json_dumps(data, sort_keys=True).encode('utf8'))
+        # Use json_dumpb to strip any ZuulMark entries
+        hasher.update(json_dumpb(data, sort_keys=True))
         return hasher.hexdigest()
 
     def serialize(self, context):
@@ -2161,7 +2160,7 @@ class JobData(zkobject.ShardedZKObject):
             "hash": self.hash,
             "_path": self._path,
         }
-        return json_dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
 
 class FrozenJob(zkobject.ZKObject):
@@ -2259,7 +2258,7 @@ class FrozenJob(zkobject.ZKObject):
             if v:
                 # If the value is long, we need to make this a JobData;
                 # otherwise we can use the dict as-is.
-                if (len(json_dumps(v, sort_keys=True).encode('utf8')) >
+                if (len(json_dumpb(v, sort_keys=True)) >
                     klass.MAX_DATA_LEN):
                     job_data_vars[k] = v
                     v = None
@@ -2322,8 +2321,8 @@ class FrozenJob(zkobject.ZKObject):
         if (COMPONENT_REGISTRY.model_api < 9):
             data['nodeset'] = data['nodeset_alternatives'][0]
 
-        # Use json_dumps to strip any ZuulMark entries
-        return json_dumps(data, sort_keys=True).encode("utf8")
+        # Use json_dumpb to strip any ZuulMark entries
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -2510,7 +2509,7 @@ class FrozenJob(zkobject.ZKObject):
 
     def _makeJobData(self, context, name, data):
         # If the data is large, store it in another object
-        if (len(json_dumps(data, sort_keys=True).encode('utf8')) >
+        if (len(json_dumpb(data, sort_keys=True)) >
             self.MAX_DATA_LEN):
             return JobData.new(
                 context, _path=self.getPath() + '/' + name,
@@ -2776,8 +2775,8 @@ class Job(ConfigObject):
 
         # Cast to list so we can modify in place
         for secret_key, secret_value in list(playbook['secrets'].items()):
-            secret_serialized = json_dumps(
-                secret_value, sort_keys=True).encode("utf8")
+            secret_serialized = json_dumpb(
+                secret_value, sort_keys=True)
             if (COMPONENT_REGISTRY.model_api >= 6 and
                 len(secret_serialized) > self.SECRET_BLOB_SIZE):
                 # If the secret is large, store it in the blob store
@@ -2859,8 +2858,8 @@ class Job(ConfigObject):
         for attr in ['files', 'irrelevant_files',
                      'source_context', 'description']:
             job_dict.pop(attr, None)
-        # Use json_dumps to strip any ZuulMark entries
-        hasher.update(json_dumps(job_dict, sort_keys=True).encode('utf8'))
+        # Use json_dumpb to strip any ZuulMark entries
+        hasher.update(json_dumpb(job_dict, sort_keys=True))
         return hasher.hexdigest()
 
     def __ne__(self, other):
@@ -3823,7 +3822,7 @@ class Build(zkobject.ZKObject):
                     v = {'storage': 'local', 'data': v}
                 data[k] = v
 
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -3973,7 +3972,7 @@ class RepoFiles(zkobject.ShardedZKObject):
             "connections": self.connections,
             "_buildset_path": self._buildset_path,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
 
 class BaseRepoState(zkobject.ShardedZKObject):
@@ -4009,7 +4008,7 @@ class BaseRepoState(zkobject.ShardedZKObject):
             "state": self.state,
             "_buildset_path": self._buildset_path,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
 
 class MergeRepoState(BaseRepoState):
@@ -4199,7 +4198,7 @@ class BuildSet(zkobject.ZKObject):
             "repo_state_request_time": self.repo_state_request_time,
             # jobs (serialize as separate objects)
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def _isMyBuild(self, build_path):
         parts = build_path.split('/')
@@ -4671,7 +4670,7 @@ class QueueItem(zkobject.ZKObject):
             "dequeued_bundle_failing": self.dequeued_bundle_failing,
             "first_job_start_time": self.first_job_start_time,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -5064,7 +5063,7 @@ class QueueItem(zkobject.ZKObject):
                                 'patchset': build.buildset.patchset,
                                 'job': build.job_name}
                     if a.meta:
-                        artifact['metadata'] = json.loads(a.meta)
+                        artifact['metadata'] = json_loadb(a.meta)
                     data.append(artifact)
         self.log.debug("Found artifacts in DB: %s", repr(data))
         return data
@@ -8658,7 +8657,7 @@ class HoldRequest(object):
 
         Used for storing the object data in ZooKeeper.
         '''
-        return json.dumps(self.toDict(), sort_keys=True).encode('utf8')
+        return json_dumpb(self.toDict(), sort_keys=True)
 
 
 # AuthZ models
