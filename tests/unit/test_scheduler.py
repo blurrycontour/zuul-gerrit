@@ -3713,6 +3713,22 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.history[4].pipeline, 'check')
         self.assertEqual(self.history[5].pipeline, 'check')
 
+    @simple_layout('layouts/two-check.yaml')
+    def test_query_dependency_count(self):
+        #Test that we efficiently query dependent changes
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url'])
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # 1. The query to find the change id
+        #      from the Depends-On string "change:1" (simpleQuery)
+        # 2. The query to populate the change once we know the id
+        #      (queryChange)
+        self.assertEqual(A.queried, 2)
+        self.assertEqual(B.queried, 1)
+
     def test_reconfigure_merge(self):
         """Test that two reconfigure events are merged"""
         # Wrap the recofiguration handler so we can count how many
