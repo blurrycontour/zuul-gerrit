@@ -13,7 +13,6 @@
 # under the License.
 
 import io
-import json
 import logging
 import time
 from contextlib import suppress
@@ -23,6 +22,7 @@ import kazoo
 import paramiko
 
 from zuul.lib import encryption, strings
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.zk import ZooKeeperBase
 
 RSA_KEY_SIZE = 2048
@@ -52,7 +52,7 @@ class KeyStorage(ZooKeeperBase):
         else:
             data, _ = self.kazoo_client.get(root)
             try:
-                ret.append((root, json.loads(data)))
+                ret.append((root, json_loadb(data)))
             except Exception:
                 self.log.error(f"Unable to load keys at {root}")
                 # Keep processing exports
@@ -70,7 +70,7 @@ class KeyStorage(ZooKeeperBase):
             if not path.startswith('/keystorage'):
                 self.log.error(f"Invalid path: {path}")
                 return
-            data = json.dumps(data, sort_keys=True).encode('utf8')
+            data = json_dumpb(data, sort_keys=True)
             try:
                 self.kazoo_client.create(path, value=data, makepath=True)
                 self.log.info(f"Created key at {path}")
@@ -117,14 +117,14 @@ class KeyStorage(ZooKeeperBase):
         key_path = self.getSSHKeysPath(connection_name, project_name)
         try:
             data, _ = self.kazoo_client.get(key_path)
-            return json.loads(data)
+            return json_loadb(data)
         except kazoo.exceptions.NoNodeError:
             return None
 
     def saveProjectSSHKeys(self, connection_name, project_name, keydata):
         """Store the complete internal data structure"""
         key_path = self.getSSHKeysPath(connection_name, project_name)
-        data = json.dumps(keydata, sort_keys=True).encode("utf-8")
+        data = json_dumpb(keydata, sort_keys=True)
         self.kazoo_client.create(key_path, value=data, makepath=True)
 
     def deleteProjectSSHKeys(self, connection_name, project_name):
@@ -199,7 +199,7 @@ class KeyStorage(ZooKeeperBase):
             connection_name, project_name)
         try:
             data, _ = self.kazoo_client.get(key_path)
-            return json.loads(data)
+            return json_loadb(data)
         except kazoo.exceptions.NoNodeError:
             return None
 
@@ -207,7 +207,7 @@ class KeyStorage(ZooKeeperBase):
         """Store the complete internal data structure"""
         key_path = self.getProjectSecretsKeysPath(
             connection_name, project_name)
-        data = json.dumps(keydata, sort_keys=True).encode("utf-8")
+        data = json_dumpb(keydata, sort_keys=True)
         self.kazoo_client.create(key_path, value=data, makepath=True)
 
     def deleteProjectsSecretsKeys(self, connection_name, project_name):
