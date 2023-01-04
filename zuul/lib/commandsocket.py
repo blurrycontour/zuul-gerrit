@@ -15,12 +15,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import os
 import socket
 import threading
 
+from zuul.lib.jsonutil import json_loadb
 from zuul.lib.queue import NamedQueue
 
 
@@ -123,7 +123,7 @@ class CommandSocket(object):
                 # injected externally.
                 args = parts[1:]
                 if args:
-                    args = json.loads(args[0])
+                    args = json_loadb(args[0])
                 if parts[0] != '_stop':
                     self.queue.put((parts[0], args))
             except Exception:
