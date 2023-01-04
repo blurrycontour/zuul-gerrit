@@ -11,25 +11,62 @@
 # under the License.
 
 import json
+import logging
 import types
+try:
+    import orjson
+except ImportError:
+    orjson = None
 
 import zuul.model
 
+LOGGER = logging.getLogger(__name__)
+
 
 class ZuulJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, types.MappingProxyType):
-            d = dict(o)
+    def default(self, obj):
+        try:
+            return self._default(obj)
+        except TypeError:
+            return json.JSONEncoder.default(self, obj)
+
+    @classmethod
+    def _default(cls, obj):
+        if isinstance(obj, types.MappingProxyType):
+            d = dict(obj)
             # Always remove SafeLoader left-over
             d.pop('_source_context', None)
             d.pop('_start_mark', None)
             return d
         elif (
-                isinstance(o, zuul.model.SourceContext) or
-                isinstance(o, zuul.model.ZuulMark)):
+                isinstance(obj, zuul.model.SourceContext) or
+                isinstance(obj, zuul.model.ZuulMark)):
             return {}
-        return json.JSONEncoder.default(self, o)
+        raise TypeError
 
 
 def json_dumps(obj, **kw):
     return json.dumps(obj, cls=ZuulJSONEncoder, **kw)
+
+
+def json_dumpb(obj, sort_keys=False):
+    if orjson:
+        option = None
+        if sort_keys:
+            option = orjson.OPT_SORT_KEYS
+        try:
+            return orjson.dumps(obj, default=ZuulJSONEncoder._default,
+                                option=option)
+        except TypeError as e:
+            LOGGER.debug(">64-bit integer: Falling back to json module")
+            raise
+            # if str(e) != 'Integer exceeds 64-bit range':
+                # raise e
+    return json_dumps(obj, sort_keys=sort_keys).encode("utf8")
+
+
+def json_loadb(data):
+    if orjson:
+        return orjson.loads(data)
+    else:
+        return json.loads(data)

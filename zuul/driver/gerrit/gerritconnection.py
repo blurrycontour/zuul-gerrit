@@ -16,7 +16,6 @@
 import copy
 import datetime
 import itertools
-import json
 import math
 import logging
 import paramiko
@@ -45,6 +44,7 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
 from zuul.zk.branch_cache import BranchCache
@@ -412,7 +412,7 @@ class GerritWatcher(threading.Thread):
     def _read(self, fd):
         while True:
             l = fd.readline()
-            data = json.loads(l)
+            data = json_loadb(l)
             self.log.debug("Received data from Gerrit event stream: \n%s" %
                            pprint.pformat(data))
             self.gerrit_connection.addEvent(data)
@@ -742,7 +742,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         ret = None
         if r.text and len(r.text) > 4:
             try:
-                ret = json.loads(r.text[4:])
+                ret = json_loadb(r.text[4:])
             except Exception:
                 self.log.exception(
                     "Unable to parse result %s from post to %s" %
@@ -755,7 +755,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.log.debug('POST: %s' % (url,))
         self.log.debug('data: %s' % (data,))
         r = self.session.post(
-            url, data=json.dumps(data).encode('utf8'),
+            url, data=json_dumpb(data),
             verify=self.verify_ssl,
             auth=self.auth, timeout=TIMEOUT,
             headers={'Content-Type': 'application/json;charset=UTF-8',
@@ -771,7 +771,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         ret = None
         if r.text and len(r.text) > 4:
             try:
-                ret = json.loads(r.text[4:])
+                ret = json_loadb(r.text[4:])
             except Exception:
                 self.log.exception(
                     "Unable to parse result %s from post to %s" %
@@ -1432,7 +1432,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         lines = out.split('\n')
         if not lines:
             return False
-        data = json.loads(lines[0])
+        data = json_loadb(lines[0])
         if not data:
             return False
         iolog = get_annotated_logger(self.iolog, event)
@@ -1487,7 +1487,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 return False
 
             # filter out blank lines
-            data = [json.loads(line) for line in lines
+            data = [json_loadb(line) for line in lines
                     if line.startswith('{')]
 
             # check last entry for more changes
