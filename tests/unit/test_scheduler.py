@@ -460,6 +460,7 @@ class TestScheduler(ZuulTestCase):
             'zuul.mergers.online', value='1', kind='g')
         self.assertReportedStat('zuul.scheduler.eventqueues.connection.gerrit',
                                 value='0', kind='g')
+        self.assertReportedStat('zuul.scheduler.run_handler', kind='ms')
 
         # Catch time / monotonic errors
         for key in [
