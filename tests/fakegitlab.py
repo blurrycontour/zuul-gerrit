@@ -162,11 +162,6 @@ class GitlabWebServer(object):
                     'labels': mr.labels,
                     'merged_at': mr.merged_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
                     if mr.merged_at else mr.merged_at,
-                    'diff_refs': {
-                        'base_sha': mr.base_sha,
-                        'head_sha': mr.sha,
-                        'start_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00'
-                    },
                     'merge_status': mr.merge_status,
                 }
                 self.send_data(data)

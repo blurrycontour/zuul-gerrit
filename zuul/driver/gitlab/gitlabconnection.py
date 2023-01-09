@@ -672,8 +672,8 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.is_current_patchset = (change.mr['sha'] == change.patchset)
-        change.base_sha = change.mr['diff_refs'].get('base_sha')
-        change.commit_id = change.mr['diff_refs'].get('head_sha')
+        # event.patch_number is the commit SHA
+        change.commit_id = event.patch_number
         change.owner = change.mr['author'].get('username')
         # Files changes are not part of the Merge Request data
         # See api/merge_requests.html#get-single-mr-changes
