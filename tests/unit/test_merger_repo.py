@@ -16,6 +16,8 @@
 import datetime
 import logging
 import os
+import shutil
+from unittest import mock
 
 import git
 import testtools
@@ -677,6 +679,59 @@ class TestMergerRepo(ZuulTestCase):
         work_repo.update()
         new_result = work_repo_underlying.commit('testtag')
         self.assertEqual(new_commit, new_result)
+
+    def test_set_remote_url_clone(self):
+        """Test that we always use the new Git URL for cloning.
+
+        This is a regression test to make sure we always use the new
+        Git URL when a clone of the repo is necessary before updating
+        the config.
+        """
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # Simulate an invalid/outdated remote URL with the repo no
+        # longer existing on the file system.
+        work_repo.remote_url = "file:///dev/null"
+        shutil.rmtree(work_repo.local_path)
+
+        # Setting a valid remote URL should update the attribute and
+        # clone the repository.
+        work_repo.setRemoteUrl(parent_path)
+        self.assertEqual(work_repo.remote_url, parent_path)
+        self.assertTrue(os.path.exists(work_repo.local_path))
+
+    def test_set_remote_url_invalid(self):
+        """Test that we don't store the Git URL when failing to set it.
+
+        This is a regression test to make sure we will always update
+        the Git URL after a previously failed attempt.
+        """
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # Set the Git remote URL to an invalid value.
+        invalid_url = "file:///dev/null"
+        repo = work_repo.createRepoObject(None)
+        work_repo._git_set_remote_url(repo, invalid_url)
+        work_repo.remote_url = invalid_url
+
+        # Simulate a failed attempt to update the remote URL
+        with mock.patch.object(work_repo, "_git_set_remote_url",
+                               side_effect=RuntimeError):
+            with testtools.ExpectedException(RuntimeError):
+                work_repo.setRemoteUrl(parent_path)
+
+        # Make sure we cleared out the remote URL.
+        self.assertIsNone(work_repo.remote_url)
+
+        # Setting a valid remote URL should update the attribute and
+        # clone the repository.
+        work_repo.setRemoteUrl(parent_path)
+        self.assertEqual(work_repo.remote_url, parent_path)
+        self.assertTrue(os.path.exists(work_repo.local_path))
 
 
 class TestMergerWithAuthUrl(ZuulTestCase):
