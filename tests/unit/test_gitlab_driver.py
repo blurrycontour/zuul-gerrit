@@ -429,6 +429,7 @@ class TestGitlabDriver(ZuulTestCase):
             {'.zuul.yaml': yaml.dump(zuul_yaml),
              'job.yaml': playbook}
         )
+        A.addCommit({"dummy.file": ""})
         self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
         self.waitUntilSettled()
 
