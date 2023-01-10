@@ -438,6 +438,8 @@ class Pipeline(object):
         # reconfigured).  A pipeline requires a tenant in order to
         # reach the currently active layout for that tenant.
         self.tenant = tenant
+        self.allow_other_connections = True
+        self.connections = []
         self.source_context = None
         self.start_mark = None
         self.description = None

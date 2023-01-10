@@ -508,6 +508,12 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("Change %s is already in pipeline, ignoring" % change)
             return True
 
+        if ((not self.pipeline.allow_other_connections) and
+            (change.project.connection_name not in self.pipeline.connections)):
+            log.debug("Change %s is not from a connection known to %s ",
+                      change, self.pipeline)
+            return False
+
         if not ignore_requirements:
             for f in self.ref_filters:
                 if f.connection_name != change.project.connection_name:
