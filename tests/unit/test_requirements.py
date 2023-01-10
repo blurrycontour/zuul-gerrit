@@ -453,3 +453,40 @@ class TestRequirementsReject(ZuulTestCase):
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 3)
+
+
+class TestRequirementsTrustedCheck(ZuulTestCase):
+    config_file = "zuul-gerrit-github.conf"
+    tenant_config_file = "config/requirements/trusted-check/main.yaml"
+
+    def test_non_live_requirements(self):
+        # Test that pipeline requirements are applied to non-live
+        # changes.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1 2,1')],
+            ordered=False)
+
+    def test_other_connections(self):
+        # Test allow-other-connections: False
+        A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.url,
+        )
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([])

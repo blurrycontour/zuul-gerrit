@@ -2807,6 +2807,7 @@ class TestScheduler(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
         B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
             B.subject, A.data['url'])
+        A.addApproval('Code-Review', 2)
         B.addApproval('Code-Review', 2)
 
         self.executor_server.hold_jobs_in_build = True
