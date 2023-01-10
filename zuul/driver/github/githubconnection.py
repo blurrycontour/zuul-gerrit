@@ -1957,7 +1957,13 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                       'PullRequest', str(item.issue.number),
                                       str(sha))
             pr_body = self._getChange(pr_change_key, event=event).pr
-            self._sha_pr_cache.update(project_name, pr_body)
+            try:
+                self._sha_pr_cache.update(project_name, pr_body)
+            except Exception:
+                self.log.exception(
+                    "Exception updating SHA cache for project %s with data %s",
+                    project_name, pr_body)
+                raise
             if pr_body['head']['sha'] == sha:
                 if found_pr_body:
                     raise Exception(
