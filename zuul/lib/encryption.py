@@ -28,7 +28,11 @@ if hasattr(backend, '_rsa_skip_check_key'):
     backend._rsa_skip_check_key = True
 else:
     import logging
-    logging.warning("Cryptography backend lacks _rsa_skip_check_key flag, "
+    # Use a specific logger here to avoid polluting the root logger
+    # with the default stderr stream handler. This is important in
+    # testing to ensure we don't over log and create noise.
+    logger = logging.getLogger("zuul.rsa_skip_check_warning")
+    logger.warning("Cryptography backend lacks _rsa_skip_check_key flag, "
                     "key loading may be slow")
 
 
