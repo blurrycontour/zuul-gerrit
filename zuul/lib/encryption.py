@@ -20,22 +20,6 @@ from cryptography.hazmat.primitives import hashes
 from functools import lru_cache
 
 
-# OpenSSL 3.0.0 performs key validation in a very slow manner.  Since
-# our keys are internally generated and securely stored, we can skip
-# validation.  See https://github.com/pyca/cryptography/issues/7236
-backend = default_backend()
-if hasattr(backend, '_rsa_skip_check_key'):
-    backend._rsa_skip_check_key = True
-else:
-    import logging
-    # Use a specific logger here to avoid polluting the root logger
-    # with the default stderr stream handler. This is important in
-    # testing to ensure we don't over log and create noise.
-    logger = logging.getLogger("zuul.rsa_skip_check_warning")
-    logger.warning("Cryptography backend lacks _rsa_skip_check_key flag, "
-                   "key loading may be slow")
-
-
 # https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/#generation
 def generate_rsa_keypair():
     """Generate an RSA keypair.
@@ -46,7 +30,7 @@ def generate_rsa_keypair():
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=4096,
-        backend=backend,
+        backend=default_backend(),
     )
     public_key = private_key.public_key()
     return (private_key, public_key)
@@ -114,7 +98,8 @@ def deserialize_rsa_keypair(data, password=None):
     private_key = serialization.load_pem_private_key(
         data,
         password=password,
-        backend=backend,
+        backend=default_backend(),
+        unsafe_skip_rsa_key_validation=True,
     )
     public_key = private_key.public_key()
     return (private_key, public_key)
