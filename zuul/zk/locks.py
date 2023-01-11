@@ -17,9 +17,9 @@ from contextlib import contextmanager
 from urllib.parse import quote_plus
 
 from kazoo.protocol.states import KazooState
+from kazoo.recipe.lock import Lock, ReadLock, WriteLock
 
 from zuul.zk.exceptions import LockException
-from zuul.zk.vendor.lock import Lock, ReadLock, WriteLock
 
 LOCK_ROOT = "/zuul/locks"
 TENANT_LOCK_ROOT = f"{LOCK_ROOT}/tenant"

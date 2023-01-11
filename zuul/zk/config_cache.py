@@ -20,10 +20,10 @@ from collections.abc import MutableMapping
 from urllib.parse import quote_plus, unquote_plus
 
 from kazoo.exceptions import NoNodeError
+from kazoo.recipe import lock
 
 from zuul import model
 from zuul.zk import sharding, ZooKeeperSimpleBase
-from zuul.zk.vendor import lock
 
 CONFIG_ROOT = "/zuul/config"
 
