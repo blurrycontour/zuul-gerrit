@@ -1022,11 +1022,7 @@ class PipelineManager(metaclass=ABCMeta):
     def executeJobs(self, item):
         # TODO(jeblair): This should return a value indicating a job
         # was executed.  Appears to be a longstanding bug.
-        if not item.current_build_set.job_graph:
-            return False
-
-        jobs = item.findJobsToRun(
-            item.pipeline.tenant.semaphore_handler)
+        jobs = item.findJobsToRun(item.pipeline.tenant.semaphore_handler)
         if jobs:
             self._executeJobs(item, jobs)
 
