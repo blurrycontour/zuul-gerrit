@@ -981,11 +981,12 @@ class PipelineManager(metaclass=ABCMeta):
                     log.exception("Exception while releasing semaphore")
 
     def executeJobs(self, item):
-        # TODO(jeblair): This should return a value indicating a job
-        # was executed.  Appears to be a longstanding bug.
         jobs = item.findJobsToRun(item.pipeline.tenant.semaphore_handler)
         if jobs:
             self._executeJobs(item, jobs)
+            return True
+
+        return False
 
     def cancelJobs(self, item, prime=True):
         log = get_annotated_logger(self.log, item.event)
