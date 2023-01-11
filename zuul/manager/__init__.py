@@ -870,7 +870,7 @@ class PipelineManager(metaclass=ABCMeta):
 
     def provisionNodes(self, item):
         log = item.annotateLogger(self.log)
-        jobs = item.findJobsToRequest(item.pipeline.tenant.semaphore_handler)
+        jobs = item.findJobsToRequest()
         if not jobs:
             return False
         build_set = item.current_build_set
@@ -958,7 +958,7 @@ class PipelineManager(metaclass=ABCMeta):
                     log.exception("Exception while releasing semaphore")
 
     def executeJobs(self, item):
-        jobs = item.findJobsToRun(item.pipeline.tenant.semaphore_handler)
+        jobs = item.findJobsToRun()
         if jobs:
             self._executeJobs(item, jobs)
             return True
