@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "806633ca_2d1781ae",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 634,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-01-11T12:53:49Z",
+      "side": 0,
+      "message": "should this check be kept?",
+      "range": {
+        "startLine": 632,
+        "startChar": 0,
+        "endLine": 634,
+        "endChar": 42
+      },
+      "revId": "01eb95be5245629c681ae932ebd2ffbea998e161",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
