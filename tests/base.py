@@ -4331,6 +4331,11 @@ class BaseTestCase(testtools.TestCase):
         handler.setFormatter(formatter)
 
         logger = logging.getLogger()
+        # It is possible that a stderr log handler is inserted before our
+        # addHandler below. If that happens we will emit all logs to stderr
+        # even when we don't want to. Error here to make it clear there is
+        # a problem as early as possible as it is easy to overlook.
+        self.assertEqual(logger.handlers, [])
         logger.setLevel(logging.DEBUG)
         logger.addHandler(handler)
 
