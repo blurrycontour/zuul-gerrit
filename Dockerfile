@@ -27,8 +27,8 @@ ARG REACT_APP_ZUUL_API
 # Optional flag to enable React Service Worker. (set to true to enable)
 ARG REACT_APP_ENABLE_SERVICE_WORKER
 # Kubectl/Openshift version/sha
-ARG OPENSHIFT_URL=https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-ARG OPENSHIFT_SHA=4b0f07428ba854174c58d2e38287e5402964c9a9355f6c359d1242efd0990da3
+ARG OPENSHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.11.20/openshift-client-linux-4.11.20.tar.gz
+ARG OPENSHIFT_SHA=74f252c812932425ca19636b2be168df8fe57b114af6b114283975e67d987d11
 
 COPY . /tmp/src
 COPY --from=js-builder /tmp/src/build /tmp/src/zuul/web/static
@@ -46,7 +46,7 @@ RUN /output/install-from-bindep \
   && curl -L $OPENSHIFT_URL -o /tmp/openshift-install/openshift-client.tgz \
   && cd /tmp/openshift-install/ \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
-  && tar xvfz openshift-client.tgz --strip-components=1 -C /tmp/openshift-install
+  && tar xvfz openshift-client.tgz -C /tmp/openshift-install
 
 FROM docker.io/opendevorg/python-base:3.11-bullseye as zuul
 ENV DEBIAN_FRONTEND=noninteractive
