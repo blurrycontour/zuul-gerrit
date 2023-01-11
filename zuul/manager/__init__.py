@@ -958,9 +958,6 @@ class PipelineManager(metaclass=ABCMeta):
                     log.exception("Exception while releasing semaphore")
 
     def executeJobs(self, item):
-        if not item.current_build_set.job_graph:
-            return False
-
         jobs = item.findJobsToRun(item.pipeline.tenant.semaphore_handler)
         if jobs:
             self._executeJobs(item, jobs)
