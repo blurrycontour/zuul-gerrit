@@ -5476,7 +5476,8 @@ class QueueItem(zkobject.ZKObject):
                 self.addBuild(other_build)
                 job._set(_ready_to_run=False)
 
-    def findJobsToRun(self, semaphore_handler):
+    def findJobsToRun(self):
+        semaphore_handler = self.pipeline.tenant.semaphore_handler
         torun = []
         if not self.live:
             return []
@@ -5502,7 +5503,8 @@ class QueueItem(zkobject.ZKObject):
                     torun.append(job)
         return torun
 
-    def findJobsToRequest(self, semaphore_handler):
+    def findJobsToRequest(self):
+        semaphore_handler = self.pipeline.tenant.semaphore_handler
         build_set = self.current_build_set
         toreq = []
         if not self.live:
