@@ -1303,8 +1303,9 @@ class PipelineManager(metaclass=ABCMeta):
         build_set = item.current_build_set
 
         # if base_sha is not available, fallback to branch
-        to_sha = getattr(item.change, "base_sha",
-                         getattr(item.change, "branch", None))
+        to_sha = getattr(item.change, "base_sha", None)
+        if to_sha is None:
+            to_sha = getattr(item.change, "branch", None)
 
         self.sched.merger.getFilesChanges(
             item.change.project.connection_name, item.change.project.name,
