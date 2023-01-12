@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ee72173_65a78b55",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1290,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-01-12T14:17:07Z",
+      "side": 0,
+      "message": "For more context: according to class definition in model.py every change object is initialized with a base_sha attribute set to None, therefore the first getattr will never fall back to the branch attribute.",
+      "range": {
+        "startLine": 1289,
+        "startChar": 8,
+        "endLine": 1290,
+        "endChar": 62
+      },
+      "revId": "9acb47a48e20b5ff3c8dedede7709e88ba2771d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

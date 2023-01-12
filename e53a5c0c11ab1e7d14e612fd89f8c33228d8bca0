@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e148746_650e931f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-01-12T14:17:07Z",
+      "side": 1,
+      "message": "NIT: this is redundant",
+      "range": {
+        "startLine": 1289,
+        "startChar": 48,
+        "endLine": 1289,
+        "endChar": 54
+      },
+      "revId": "e53a5c0c11ab1e7d14e612fd89f8c33228d8bca0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
