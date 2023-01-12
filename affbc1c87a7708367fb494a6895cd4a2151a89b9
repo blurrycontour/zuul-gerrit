@@ -56,6 +56,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c34ce7b0_78761120",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2023-01-12T17:55:12Z",
+      "side": 1,
+      "message": "\u003e I understand how it works, my point was that the fallback is only an approximation.  It will not return the correct set of files if the target branch has diverged from when the MR was originally written (and that happens all the time).  It is very frequently wrong enough that users notice and complain.  See 79b6252370568926e69610f752f2c2618a557341 for more information.\n\nOk, yes I understand what could the issue and why relying on the code review provider to give the base_sha is better.\n\n\u003e I\u0027m intrigued by your other change, that approach would seem to let us continue to use the more accurate base_sha.  Were there problems with that?\n\nYes exactly. No, it seems the change will work well: gitlab\u0027s devs confirmed that the update event is only triggered after diff_refs is updated (and accurate) and the issue (diff_refs at None) only happens at MR creation. So yes if you think we should go with this other change I\u0027m fine as well. So I\u0027ve restored it.",
+      "parentUuid": "b9715b75_608d3163",
+      "revId": "affbc1c87a7708367fb494a6895cd4a2151a89b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e96d07d_872de3b0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
