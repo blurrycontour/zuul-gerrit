@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "bb610176_90917a9e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-12T17:02:46Z",
+      "side": 1,
+      "message": "base_sha is actually fairly important.  Without it we are unable to correctly calculate the set of changed files.  The difference is and will be observable to users who will not understand why jobs they expect to run are not running, or the other way around.\n\nWhat are the options for waiting until gitlab\u0027s async work is completed?",
+      "revId": "affbc1c87a7708367fb494a6895cd4a2151a89b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e96d07d_872de3b0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
