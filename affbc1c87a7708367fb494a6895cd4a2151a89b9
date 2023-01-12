@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b9715b75_608d3163",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-12T17:36:00Z",
+      "side": 1,
+      "message": "I understand how it works, my point was that the fallback is only an approximation.  It will not return the correct set of files if the target branch has diverged from when the MR was originally written (and that happens all the time).  It is very frequently wrong enough that users notice and complain.  See 79b6252370568926e69610f752f2c2618a557341 for more information.\n\nI\u0027m intrigued by your other change, that approach would seem to let us continue to use the more accurate base_sha.  Were there problems with that?",
+      "parentUuid": "bb610176_90917a9e",
+      "revId": "affbc1c87a7708367fb494a6895cd4a2151a89b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e96d07d_872de3b0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
