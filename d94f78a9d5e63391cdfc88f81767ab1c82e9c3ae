@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26706665_5eca87e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35201
+      },
+      "writtenOn": "2023-01-12T19:26:15Z",
+      "side": 1,
+      "message": "\u003e Patch Set 3: Code-Review-1\n\u003e \n\u003e This has some serious implications about pipeline processing.  Have you traced through all of the possibilities?\n\nThe only place where I\u0027m finding executeJobs() being used is in _processOneItem() to determine whether to set changed\u003dT/F - subsequent to that it doesn\u0027t appear to alter the immediate control flow (changed is only further modified or returned)\n\n_processOneItem() appears to be only used in processQueue() and the return value alters \u0027queue_changed\u0027, which appears to have some impact on debug logging and and cause the return value of processQueue() to return T/F\n\nprocessQueue()\u0027s return value appears impact whether or not the while-loop in Scheduler#_process_pipeline() (scheduler.py) continues or exits \n\ntl;dr yes, I\u0027ve looked through.  Currently the only value returned by executeJobs() are falsy, but it appears that maybe that\u0027s bad?",
+      "revId": "d94f78a9d5e63391cdfc88f81767ab1c82e9c3ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
