@@ -22,6 +22,30 @@
       },
       "revId": "e53a5c0c11ab1e7d14e612fd89f8c33228d8bca0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4b719fc_061a7310",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-01-12T14:59:39Z",
+      "side": 1,
+      "message": "If the default is not provided `getattr` will raise an AttributeError.",
+      "parentUuid": "6e148746_650e931f",
+      "range": {
+        "startLine": 1289,
+        "startChar": 48,
+        "endLine": 1289,
+        "endChar": 54
+      },
+      "revId": "e53a5c0c11ab1e7d14e612fd89f8c33228d8bca0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
