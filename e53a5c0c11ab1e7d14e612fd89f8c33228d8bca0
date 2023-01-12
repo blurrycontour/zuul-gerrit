@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "725f5661_cbcab892",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-01-12T14:10:35Z",
+      "side": 0,
+      "message": "For the sake of being exact, shouldn\u0027t you keep the \"diff_refs\" field but set it to None? That\u0027s the behavior if I understand https://gitlab.com/gitlab-org/gitlab/-/issues/386562#what-is-the-current-bug-behavior properly",
+      "revId": "e53a5c0c11ab1e7d14e612fd89f8c33228d8bca0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
