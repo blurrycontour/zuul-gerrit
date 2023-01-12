@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4a68fea7_0212d603",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2023-01-12T17:22:59Z",
+      "side": 1,
+      "message": "Internally Zuul uses the merger\u0027s fileschanges task to compute the files diff between the PR Head and the target branch HEAD if base_sha is not provided (None). Thus the fix in the parent change. This is simulated in the tests (the additional addCommit) and validated on a test instance connected to gitlab.com.\n\nAn other option I\u0027ve proposed but then abandonned for this one was https://review.opendev.org/c/zuul/zuul/+/867804/",
+      "parentUuid": "bb610176_90917a9e",
+      "revId": "affbc1c87a7708367fb494a6895cd4a2151a89b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e96d07d_872de3b0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
