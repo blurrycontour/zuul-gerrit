@@ -74,6 +74,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "85be92ec_fbe4183c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-12T18:18:03Z",
+      "side": 1,
+      "message": "Thanks, I think I like the other change better even though it\u0027s more complex.  Let\u0027s focus there for now.",
+      "parentUuid": "b9715b75_608d3163",
+      "revId": "affbc1c87a7708367fb494a6895cd4a2151a89b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e96d07d_872de3b0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
