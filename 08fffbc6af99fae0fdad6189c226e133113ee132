@@ -33,6 +33,24 @@
       "message": "At this point, should we just log a warning and return the incomplete data?  (Then we should make sure we can handle the missing data and we correctly use the fallback.)",
       "revId": "08fffbc6af99fae0fdad6189c226e133113ee132",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89e45d6e_367b8578",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2023-01-16T10:48:39Z",
+      "side": 1,
+      "message": "Thanks for the suggestion, the PS3 returns the imcomplete MR after the delay and we ensure base_sha is None to let the fileschanges merger to fallback on the target_branch sha.",
+      "parentUuid": "23839469_994a3598",
+      "revId": "08fffbc6af99fae0fdad6189c226e133113ee132",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ],
   "submitRequirementResults": []
