@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ed2a390_1da861a8",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4396,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-01-17T14:35:04Z",
+      "side": 1,
+      "message": "I think this (update before save to ZK) is already the case when using the `activeContext()` ctx manager.\n\nHaving the copy adds a little more object churn, but I guess this is more of a nit.",
+      "parentUuid": "679f17d9_508f5921",
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d77abfb_6b78773c",
