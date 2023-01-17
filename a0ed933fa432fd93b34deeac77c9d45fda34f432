@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71e528f5_ec6d4b6d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4396,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-17T14:41:37Z",
+      "side": 1,
+      "message": "True, we really have two different behaviors.  I don\u0027t feel strongly about keeping it this way.",
+      "parentUuid": "679f17d9_508f5921",
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d77abfb_6b78773c",
