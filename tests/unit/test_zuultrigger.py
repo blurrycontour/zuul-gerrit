@@ -35,9 +35,10 @@ class TestZuulTriggerParentChangeEnqueued(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         B1.addApproval('Code-Review', 2)
         B2.addApproval('Code-Review', 2)
-        A.addApproval('Verified', 1)    # required by gate
-        B1.addApproval('Verified', -1)  # should go to check
-        B2.addApproval('Verified', 1)   # should go to gate
+        A.addApproval('Verified', 1, username="for-check")   # reqd by check
+        A.addApproval('Verified', 1, username="for-gate")    # reqd by gate
+        B1.addApproval('Verified', 1, username="for-check")  # go to check
+        B2.addApproval('Verified', 1, username="for-gate")   # go to gate
         B1.addApproval('Approved', 1)
         B2.addApproval('Approved', 1)
         B1.setDependsOn(A, 1)
@@ -75,9 +76,9 @@ class TestZuulTriggerParentChangeEnqueued(ZuulTestCase):
             self.scheds.first.sched, "addTriggerEvent", addTriggerEvent
         ):
             C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-            C.addApproval('Verified', -1)
+            C.addApproval('Verified', 1, username="for-check")
             D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
-            D.addApproval('Verified', -1)
+            D.addApproval('Verified', 1, username="for-check")
             D.setDependsOn(C, 1)
             self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
 
@@ -108,6 +109,7 @@ class TestZuulTriggerParentChangeEnqueuedGithub(ZuulGithubAppTestCase):
         B1.addReview('derp', 'APPROVED')
         B2.addReview('derp', 'APPROVED')
         A.addLabel('for-gate')    # required by gate
+        A.addLabel('for-check')   # required by check
         B1.addLabel('for-check')  # should go to check
         B2.addLabel('for-gate')   # should go to gate
 

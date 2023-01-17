@@ -61,13 +61,15 @@ class IndependentPipelineManager(PipelineManager):
         for needed_change in needed_changes:
             # This differs from the dependent pipeline by enqueuing
             # changes ahead as "not live", that is, not intended to
-            # have jobs run.  Also, pipeline requirements are always
-            # ignored (which is safe because the changes are not
-            # live).
+            # have jobs run.  Pipeline requirements are still in place
+            # in order to avoid unreviewed code being executed in
+            # pipelines that require review.
             if needed_change not in history:
                 r = self.addChange(needed_change, event, quiet=True,
-                                   ignore_requirements=True, live=False,
-                                   change_queue=change_queue, history=history,
+                                   ignore_requirements=ignore_requirements,
+                                   live=False,
+                                   change_queue=change_queue,
+                                   history=history,
                                    dependency_graph=dependency_graph)
                 if not r:
                     return False

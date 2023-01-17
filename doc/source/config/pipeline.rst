@@ -266,6 +266,17 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       type of the connection will dictate which options are available.
       See :ref:`drivers`.
 
+   .. attr:: allow-other-connections
+      :default: true
+
+      If this is set to `false` then any change enqueued into the
+      pipeline (whether it is enqueued to run jobs or merely as a
+      dependency) must be from one of the connections specified in the
+      pipeline configuration (this includes any trigger, reporter, or
+      source requirement).  When used in conjuctions with
+      :attr:`pipeline.require`, this can ensure that pipeline
+      requirements are exhaustive.
+
    .. attr:: supercedes
 
       The name of a pipeline, or a list of names, that this pipeline

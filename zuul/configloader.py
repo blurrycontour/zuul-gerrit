@@ -1292,6 +1292,7 @@ class PipelineParser(object):
 
         pipeline = {vs.Required('name'): str,
                     vs.Required('manager'): manager,
+                    'allow-other-connections': bool,
                     'precedence': precedence,
                     'supercedes': to_list(str),
                     'description': str,
@@ -1331,6 +1332,8 @@ class PipelineParser(object):
         pipeline = model.Pipeline(conf['name'], self.pcontext.tenant)
         pipeline.source_context = conf['_source_context']
         pipeline.start_mark = conf['_start_mark']
+        pipeline.allow_other_connections = conf.get(
+            'allow-other-connections', True)
         pipeline.description = conf.get('description')
         pipeline.supercedes = as_list(conf.get('supercedes', []))
 
@@ -1366,6 +1369,7 @@ class PipelineParser(object):
         # Make a copy to manipulate for backwards compat.
         conf_copy = conf.copy()
 
+        seen_connections = set()
         for conf_key, action in self.reporter_actions.items():
             reporter_set = []
             allowed_reporters = self.pcontext.tenant.allowed_reporters
@@ -1379,6 +1383,7 @@ class PipelineParser(object):
                         reporter_name, pipeline, params)
                     reporter.setAction(conf_key)
                     reporter_set.append(reporter)
+                    seen_connections.add(reporter_name)
             setattr(pipeline, action, reporter_set)
 
         # If merge-conflict actions aren't explicit, use the failure actions
@@ -1423,11 +1428,13 @@ class PipelineParser(object):
             source = self.pcontext.connections.getSource(source_name)
             manager.ref_filters.extend(
                 source.getRequireFilters(require_config))
+            seen_connections.add(source_name)
 
         for source_name, reject_config in conf.get('reject', {}).items():
             source = self.pcontext.connections.getSource(source_name)
             manager.ref_filters.extend(
                 source.getRejectFilters(reject_config))
+            seen_connections.add(source_name)
 
         for connection_name, trigger_config in conf.get('trigger').items():
             if self.pcontext.tenant.allowed_triggers is not None and \
@@ -1439,7 +1446,9 @@ class PipelineParser(object):
             manager.event_filters.extend(
                 trigger.getEventFilters(connection_name,
                                         conf['trigger'][connection_name]))
+            seen_connections.add(connection_name)
 
+        pipeline.connections = list(seen_connections)
         # Pipelines don't get frozen
         return pipeline
 
