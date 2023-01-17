@@ -2332,6 +2332,52 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project6-job-t2", result="SUCCESS", changes="1,1 2,1"),
         ], ordered=False)
 
+    def test_dependency_refresh(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates the typical workflow where a developer only
+        # knows the change id of changes one at a time.
+        # The first change:
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Now that it has been uploaded, upload the second change and
+        # point it at the first.
+        # B -> A
+        B = self.fake_gerrit.addFakeChange("org/project", "master", "B")
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Now that the second change is known, update the first change
+        # B <-> A
+        A.addPatchset()
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # A quirk: at the end of this process, the first change in
+        # Gerrit has a complete run because the process of updating it
+        # involves a new patchset that is enqueued.  Compare to the
+        # same test in GitHub.
+        self.assertHistory([
+            dict(name="project-job", result="ABORTED", changes="1,1"),
+            dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="project-job", result="SUCCESS", changes="2,1 1,2"),
+        ], ordered=False)
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
@@ -2524,3 +2570,50 @@ class TestGithubCircularDependencies(ZuulTestCase):
                       B.comments[-1]))
         self.assertFalse(re.search('Change .*? is needed',
                                    B.comments[-1]))
+
+    def test_dependency_refresh(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates the typical workflow where a developer only
+        # knows the PR id of changes one at a time.
+        # The first change:
+        A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # Now that it has been uploaded, upload the second change and
+        # point it at the first.
+        # B -> A
+        B = self.fake_github.openFakePullRequest("gh/project", "master", "B")
+        B.body = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.url
+        )
+        self.fake_github.emitEvent(B.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # Now that the second change is known, update the first change
+        # B <-> A
+        A.body = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.url
+        )
+
+        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.subject))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # A quirk: at the end of this process, the second PR in GitHub
+        # has a complete run because the process of updating the first
+        # change is not disruptive to the second.  Compare to the same
+        # test in Gerrit.
+        self.assertHistory([
+            dict(name="project-job", result="ABORTED",
+                 changes=f"{A.number},{A.head_sha}"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
+        ], ordered=False)
