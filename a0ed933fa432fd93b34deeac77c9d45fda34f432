@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "679f17d9_508f5921",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4396,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-17T14:27:22Z",
+      "side": 1,
+      "message": "This was so that if there is an exception, we won\u0027t have updated our internal object, so it will behave more like when we call updateAttributes with a scalar.  I don\u0027t know if it\u0027s necessary, but it seemed safer and more predictable.",
+      "parentUuid": "1f86a748_9f65e7c5",
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d77abfb_6b78773c",
