@@ -4393,9 +4393,8 @@ class BuildSet(zkobject.ZKObject):
         version = build.getZKVersion()
         # If zstat is None, we created the object
         if version is not None:
-            versions = self.build_versions.copy()
-            versions[build.uuid] = version + 1
-            self.updateAttributes(context, build_versions=versions)
+            self.build_versions[build.uuid] = version + 1
+            self.updateAttributes(context, build_versions=self.build_versions)
 
     def updateJobVersion(self, context, job):
         if (COMPONENT_REGISTRY.model_api < 12):
@@ -4403,9 +4402,8 @@ class BuildSet(zkobject.ZKObject):
 
         version = job.getZKVersion()
         if version is not None:
-            versions = self.job_versions.copy()
-            versions[job.name] = version + 1
-            self.updateAttributes(context, job_versions=versions)
+            self.job_versions[job.name] = version + 1
+            self.updateAttributes(context, job_versions=self.job_versions)
 
     def shouldRefreshBuild(self, build):
         # Unless all schedulers are updating versions, we can't trust
