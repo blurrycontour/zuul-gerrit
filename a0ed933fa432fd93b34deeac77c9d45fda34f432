@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f86a748_9f65e7c5",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4396,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-01-17T13:01:11Z",
+      "side": 1,
+      "message": "What\u0027s the reason we are copying the versions dict here? Shouldn\u0027t it be fine to update the build version directly and pass it to `updateAttributes()`?",
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d77abfb_6b78773c",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4406,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-01-17T13:01:11Z",
+      "side": 1,
+      "message": "same question as above",
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
