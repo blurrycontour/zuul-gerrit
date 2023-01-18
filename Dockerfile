@@ -60,6 +60,19 @@ RUN /output/install-from-bindep zuul_base \
 # where it becomes the default.
   && git config --system protocol.version 2
 
+# Begin temporary git package upgrade
+RUN ARCH=`dpkg --print-architecture` \
+    && cd /tmp \
+    && apt-get update \
+    && apt-get -y install wget \
+    && wget https://static.opendev.org/project/opendev.org/debs/git/git_2.30.2-1opendev1.0_$ARCH.deb \
+    && wget https://static.opendev.org/project/opendev.org/debs/git/git-man_2.30.2-1opendev1.0_all.deb \
+    && apt-get -y install /tmp/git_*.deb /tmp/git-man_*.deb \
+    && rm -f /tmp/*.deb \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+# End temporary git package upgrade
+
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
