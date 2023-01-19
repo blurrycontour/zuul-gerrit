@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes `tenant.untrusted-projects.<project>.include-branches` being lower
+    priority than `tenant.untrusted-projects.<project>.exclude-branches`. It is
+    now higher priority as the docs indicate.
