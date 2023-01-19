@@ -1736,7 +1736,12 @@ class Scheduler(threading.Thread):
                 new_pipeline = tenant.layout.pipelines.get(name)
                 if not new_pipeline:
                     with old_pipeline.manager.currentContext(context):
-                        self._reconfigureDeletePipeline(old_pipeline)
+                        try:
+                            self._reconfigureDeletePipeline(old_pipeline)
+                        except Exception:
+                            self.log.exception(
+                                "Failed to cleanup deleted pipeline %s:",
+                                old_pipeline)
 
         self.connections.reconfigureDrivers(tenant)
 
@@ -1799,7 +1804,11 @@ class Scheduler(threading.Thread):
                       (tenant,))
         for pipeline in tenant.layout.pipelines.values():
             with pipeline.manager.currentContext(context):
-                self._reconfigureDeletePipeline(pipeline)
+                try:
+                    self._reconfigureDeletePipeline(pipeline)
+                except Exception:
+                    self.log.exception(
+                        "Failed to cleanup deleted pipeline %s:", pipeline)
 
         # Delete the tenant root path for this tenant in ZooKeeper to remove
         # all tenant specific event queues
@@ -1815,45 +1824,80 @@ class Scheduler(threading.Thread):
     def _reconfigureDeletePipeline(self, pipeline):
         self.log.info("Removing pipeline %s during reconfiguration" %
                       (pipeline,))
-        for shared_queue in pipeline.queues:
-            builds_to_cancel = []
-            requests_to_cancel = []
-            for item in shared_queue.queue:
-                with item.activeContext(pipeline.manager.current_context):
-                    item.item_ahead = None
-                    item.items_behind = []
-                self.log.info(
-                    "Removing item %s during reconfiguration" % (item,))
-                for build in item.current_build_set.getBuilds():
-                    builds_to_cancel.append(build)
-                for request_job, request in \
-                    item.current_build_set.getNodeRequests():
-                    requests_to_cancel.append(
-                        (
-                            item.current_build_set,
-                            request,
-                            item.getJob(request_job),
-                        )
-                    )
-                try:
-                    self.sql.reportBuildsetEnd(
-                        item.current_build_set, 'dequeue',
-                        final=False, result='DEQUEUED')
-                except Exception:
-                    self.log.exception(
-                        "Error reporting buildset completion to DB:")
 
-            for build in builds_to_cancel:
-                self.log.info(
-                    "Canceling build %s during reconfiguration" % (build,))
+        ctx = pipeline.manager.current_context
+        pipeline.state.refresh(ctx)
+
+        builds_to_cancel = []
+        requests_to_cancel = []
+        for item in pipeline.getAllItems():
+            with item.activeContext(pipeline.manager.current_context):
+                item.item_ahead = None
+                item.items_behind = []
+            self.log.info(
+                "Removing item %s during reconfiguration" % (item,))
+            for build in item.current_build_set.getBuilds():
+                builds_to_cancel.append(build)
+            for request_job, request in \
+                item.current_build_set.getNodeRequests():
+                requests_to_cancel.append(
+                    (
+                        item.current_build_set,
+                        request,
+                        item.getJob(request_job),
+                    )
+                )
+            try:
+                self.sql.reportBuildsetEnd(
+                    item.current_build_set, 'dequeue',
+                    final=False, result='DEQUEUED')
+            except Exception:
+                self.log.exception(
+                    "Error reporting buildset completion to DB:")
+
+        for build in builds_to_cancel:
+            self.log.info(
+                "Canceling build %s during reconfiguration", build)
+            try:
                 self.cancelJob(build.build_set, build.job,
                                build=build, force=True)
-            for build_set, request, request_job in requests_to_cancel:
-                self.log.info(
-                    "Canceling node request %s during reconfiguration",
-                    request)
+            except Exception:
+                self.log.exception(
+                    "Error canceling build %s during reconfiguration", build)
+        for build_set, request, request_job in requests_to_cancel:
+            self.log.info(
+                "Canceling node request %s during reconfiguration", request)
+            try:
                 self.cancelJob(build_set, request_job, force=True)
-            shared_queue.delete(pipeline.manager.current_context)
+            except Exception:
+                self.log.exception(
+                    "Error canceling node request %s during reconfiguration",
+                    request)
+
+        # Delete the pipeline event root path in ZooKeeper to remove
+        # all pipeline specific event queues.
+        try:
+            self.zk_client.client.delete(
+                PIPELINE_NAME_ROOT.format(
+                    tenant=pipeline.tenant.name,
+                    pipeline=pipeline.name),
+                recursive=True)
+        except Exception:
+            # In case a pipeline event has been submitted during
+            # reconfiguration this cleanup will fail.
+            self.log.exception(
+                "Error removing event queues for deleted pipeline %s in "
+                "tenant %s", pipeline.name, pipeline.tenant.name)
+
+        # Delete the pipeline root path in ZooKeeper to remove all pipeline
+        # state.
+        try:
+            self.zk_client.client.delete(pipeline.state.getPath(),
+                                         recursive=True)
+        except Exception:
+            self.log.exception(
+                "Error removing state for deleted pipeline %s in tenant %s",
+                pipeline.name, pipeline.tenant.name)
 
     def _doPromoteEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
