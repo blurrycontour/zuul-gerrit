@@ -23,6 +23,7 @@ import sys
 import threading
 import time
 import traceback
+import urllib.parse
 import uuid
 from contextlib import suppress
 from zuul.vendor.contextlib import nullcontext
@@ -99,6 +100,8 @@ from zuul.zk.event_queues import (
     PipelineManagementEventQueue,
     PipelineResultEventQueue,
     PipelineTriggerEventQueue,
+    PIPELINE_ROOT,
+    PIPELINE_NAME_ROOT,
     TENANT_ROOT,
 )
 from zuul.zk.exceptions import LockException
@@ -711,6 +714,7 @@ class Scheduler(threading.Thread):
                 self._runMergerApiCleanup()
                 self._runLayoutDataCleanup()
                 self._runBlobStoreCleanup()
+                self._runLeakedPipelineCleanup()
                 self.maintainConnectionCache()
             except Exception:
                 self.log.exception("Error in general cleanup:")
@@ -752,6 +756,54 @@ class Scheduler(threading.Thread):
             self.tenant_layout_state.cleanup()
         except Exception:
             self.log.exception("Error in layout data cleanup:")
+
+    def _runLeakedPipelineCleanup(self):
+        for tenant in self.abide.tenants.values():
+            try:
+                with tenant_read_lock(self.zk_client, tenant.name,
+                                      blocking=False):
+                    if not self.isTenantLayoutUpToDate(tenant.name):
+                        self.log.debug(
+                            "Skipping leaked pipeline cleanup for tenant %s",
+                            tenant.name)
+                        continue
+                    valid_pipelines = tenant.layout.pipelines.values()
+                    valid_state_paths = set(
+                        p.state.getPath() for p in valid_pipelines)
+                    valid_event_root_paths = set(
+                        PIPELINE_NAME_ROOT.format(
+                            tenant=p.tenant.name, pipeline=p.name)
+                        for p in valid_pipelines)
+
+                    safe_tenant = urllib.parse.quote_plus(tenant.name)
+                    state_root = f"/zuul/tenant/{safe_tenant}/pipeline"
+                    event_root = PIPELINE_ROOT.format(tenant=tenant.name)
+
+                    all_state_paths = set(
+                        f"{state_root}/{p}" for p in
+                        self.zk_client.client.get_children(state_root))
+                    all_event_root_paths = set(
+                        f"{event_root}/{p}" for p in
+                        self.zk_client.client.get_children(event_root))
+
+                    leaked_state_paths = all_state_paths - valid_state_paths
+                    leaked_event_root_paths = (
+                        all_event_root_paths - valid_event_root_paths)
+
+                    for leaked_path in (
+                            leaked_state_paths | leaked_event_root_paths):
+                        self.log.info("Removing leaked pipeline path %s",
+                                      leaked_path)
+                        try:
+                            self.zk_client.client.delete(leaked_path,
+                                                         recursive=True)
+                        except Exception:
+                            self.log.exception(
+                                "Error removing leaked pipeline path %s in "
+                                "tenant %s", leaked_path, tenant.name)
+            except LockException:
+                # We'll cleanup this tenant on the next iteration
+                pass
 
     def _runBlobStoreCleanup(self):
         self.log.debug("Starting blob store cleanup")
@@ -1708,10 +1760,18 @@ class Scheduler(threading.Thread):
                     with old_pipeline.manager.currentContext(context):
                         self._reconfigureDeletePipeline(old_pipeline)
 
+        self.management_events[tenant.name].initialize()
+        self.trigger_events[tenant.name].initialize()
         self.connections.reconfigureDrivers(tenant)
 
         # TODOv3(jeblair): remove postconfig calls?
         for pipeline in tenant.layout.pipelines.values():
+            self.pipeline_management_events[tenant.name][
+                pipeline.name].initialize()
+            self.pipeline_trigger_events[tenant.name][
+                pipeline.name].initialize()
+            self.pipeline_result_events[tenant.name
+                ][pipeline.name].initialize()
             for trigger in pipeline.triggers:
                 trigger.postConfig(pipeline)
             for reporter in pipeline.actions:

@@ -637,6 +637,36 @@ class TestEventWatchers(EventQueueBaseTestCase):
         result_queues["other-tenant"]["post"].put(result_event)
         self._wait_for_event(event)
 
+    def test_pipeline_event_watcher_recreate(self):
+        event = threading.Event()
+        watcher = event_queues.EventWatcher(self.zk_client, event.set)
+
+        management_queues = (
+            event_queues.PipelineManagementEventQueue.createRegistry(
+                self.zk_client
+            )
+        )
+        self.assertFalse(event.is_set())
+
+        management_queues["tenant"]["check"].put(model.ReconfigureEvent())
+        self._wait_for_event(event)
+
+        # Wait for the watch to be fully established to avoid race
+        # conditions, since the event watcher will also ensure that the
+        # trigger and result event paths exist.
+        for _ in iterate_timeout(5, "all watches to be established"):
+            if watcher.watched_pipelines:
+                break
+
+        self.zk_client.client.delete(
+            event_queues.PIPELINE_NAME_ROOT.format(
+                tenant="tenant", pipeline="check"), recursive=True)
+        event.clear()
+
+        management_queues["tenant"]["check"].initialize()
+        management_queues["tenant"]["check"].put(model.ReconfigureEvent())
+        self._wait_for_event(event)
+
 
 class TestConnectionEventQueue(EventQueueBaseTestCase):
 
