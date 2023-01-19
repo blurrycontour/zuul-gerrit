@@ -1643,7 +1643,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def getInfoRefs(self, project: Project) -> Dict[str, str]:
         try:
-            data = self._uploadPack(project)
+            # Encode the UTF-8 data back to a byte array, as the size of
+            # each record in the pack is in bytes, and so the slicing must
+            # also be done on a byte-basis.
+            data = self._uploadPack(project).encode("utf-8")
         except Exception:
             self.log.error("Cannot get references from %s" % project)
             raise  # keeps error information
@@ -1662,7 +1665,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 plen -= 4
             if len(data) - i < plen:
                 raise Exception("Invalid data in info/refs")
-            line = data[i:i + plen]
+            # Once the pack data is sliced, we can safely decode it back
+            # into a (UTF-8) string.
+            line = data[i:i + plen].decode("utf-8")
             i += plen
             if not read_advertisement:
                 read_advertisement = True
