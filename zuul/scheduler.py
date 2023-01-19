@@ -2470,6 +2470,18 @@ class Scheduler(threading.Thread):
             with management_queue_lock(
                 self.zk_client, tenant.name, blocking=False
             ):
+                remote_state = self.tenant_layout_state.get(tenant.name)
+                if remote_state is None:
+                    # The tenant may still be in the
+                    # process of initial configuration
+                    self.wake_event.set()
+                    return
+                local_state = self.local_layout_state.get(tenant.name)
+                if local_state is None or remote_state > local_state:
+                    self.log.debug("Local layout of tenant %s not up to date",
+                                   tenant.name)
+                    self.layout_update_event.set()
+                    return
                 self._process_tenant_management_queue(tenant)
         except LockException:
             self.log.debug("Skipping locked management event queue"
