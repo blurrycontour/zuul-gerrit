@@ -52,6 +52,7 @@ from tests.base import (
     skipIfMultiScheduler,
 )
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.event_queues import PIPELINE_NAME_ROOT
 from zuul.zk.layout import LayoutState
 from zuul.zk.locks import management_queue_lock
 from zuul.zk import zkobject
@@ -6507,6 +6508,33 @@ For CI problems and help debugging, contact ci@example.org"""
         ], ordered=False)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
+
+    def test_leaked_pipeline_cleanup(self):
+        self.waitUntilSettled()
+        sched = self.scheds.first.sched
+
+        pipeline_state_path = "/zuul/tenant/tenant-one/pipeline/invalid"
+        self.zk_client.client.ensure_path(pipeline_state_path)
+
+        # Create the ZK path as a side-effect of getting the event queue.
+        sched.pipeline_management_events["tenant-one"]["invalid"]
+        pipeline_event_queue_path = PIPELINE_NAME_ROOT.format(
+            tenant="tenant-one", pipeline="invalid")
+
+        self.assertIsNotNone(self.zk_client.client.exists(pipeline_state_path))
+        # Wait for the event watcher to create the event queues
+        for _ in iterate_timeout(30, "create event queues"):
+            for event_queue in ("management", "trigger", "result"):
+                if self.zk_client.client.exists(
+                        f"{pipeline_event_queue_path}/{event_queue}") is None:
+                    break
+            else:
+                break
+
+        sched._runLeakedPipelineCleanup()
+        self.assertIsNone(
+            self.zk_client.client.exists(pipeline_event_queue_path))
+        self.assertIsNone(self.zk_client.client.exists(pipeline_state_path))
 
 
 class TestChangeQueues(ZuulTestCase):
