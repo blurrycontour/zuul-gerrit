@@ -17,11 +17,10 @@
 
 import json
 
-import pbr.version
+import importlib
 import pkg_resources
 
-version_info = pbr.version.VersionInfo('zuul')
-release_string = version_info.release_string()
+release_string = importlib.metadata.distribution('zuul').version
 
 is_release = None
 git_version = None
