@@ -610,6 +610,10 @@ class TestTenantExcludeBranches(TestTenantIncludeBranches):
 
     # Same test results as include-branches
 
+class TestTenantExcludeIncludeBranches(TestTenantIncludeBranches):
+    tenant_config_file = 'config/tenant-parser/exclude-include-branches.yaml'
+
+    # Same test results as include-branches
 
 class TestTenantExcludeAll(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/exclude-all.yaml'

@@ -7028,26 +7028,19 @@ class TenantProjectConfig(object):
                 return True
 
     def includesBranch(self, branch):
-        if self.include_branches is not None:
-            included = False
-            for r in self.include_branches:
-                if r.fullmatch(branch):
-                    included = True
-                    break
-        else:
-            included = True
-        if not included:
-            return False
-
         excluded = False
         if self.exclude_branches is not None:
             for r in self.exclude_branches:
                 if r.fullmatch(branch):
                     excluded = True
                     break
-        if excluded:
-            return False
-        return True
+
+        if self.include_branches is not None:
+            for r in self.include_branches:
+                if r.fullmatch(branch):
+                    return True
+
+        return not excluded
 
 
 class ProjectPipelineConfig(ConfigObject):
