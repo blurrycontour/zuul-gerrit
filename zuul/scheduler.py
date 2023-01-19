@@ -1292,6 +1292,19 @@ class Scheduler(threading.Thread):
         self.log.info("Local layout update complete for %s (duration: %s "
                       "seconds)", tenant_name, duration)
 
+    def isTenantLayoutUpToDate(self, tenant_name):
+        remote_state = self.tenant_layout_state.get(tenant_name)
+        if remote_state is None:
+            # The tenant may still be in the
+            # process of initial configuration
+            return False
+        local_state = self.local_layout_state.get(tenant_name)
+        if local_state is None or remote_state > local_state:
+            self.log.debug("Local layout of tenant %s not up to date",
+                           tenant_name)
+            return False
+        return True
+
     def _checkTenantSourceConf(self, config):
         tenant_config = None
         script = False
@@ -2470,6 +2483,11 @@ class Scheduler(threading.Thread):
             with management_queue_lock(
                 self.zk_client, tenant.name, blocking=False
             ):
+                if not self.isTenantLayoutUpToDate(tenant.name):
+                    self.log.debug(
+                        "Skipping management event queue for tenant %s",
+                        tenant.name)
+                    return
                 self._process_tenant_management_queue(tenant)
         except LockException:
             self.log.debug("Skipping locked management event queue"
