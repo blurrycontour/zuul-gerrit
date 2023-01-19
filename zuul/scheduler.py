@@ -23,6 +23,7 @@ import sys
 import threading
 import time
 import traceback
+import urllib.parse
 import uuid
 from contextlib import suppress
 from zuul.vendor.contextlib import nullcontext
@@ -99,7 +100,10 @@ from zuul.zk.event_queues import (
     PipelineManagementEventQueue,
     PipelineResultEventQueue,
     PipelineTriggerEventQueue,
+    PIPELINE_ROOT,
+    PIPELINE_NAME_ROOT,
     TENANT_ROOT,
+
 )
 from zuul.zk.exceptions import LockException
 from zuul.zk.layout import LayoutState, LayoutStateStore
@@ -711,6 +715,7 @@ class Scheduler(threading.Thread):
                 self._runMergerApiCleanup()
                 self._runLayoutDataCleanup()
                 self._runBlobStoreCleanup()
+                self._runLeakedPipelineCleanup()
                 self.maintainConnectionCache()
             except Exception:
                 self.log.exception("Error in general cleanup:")
@@ -752,6 +757,46 @@ class Scheduler(threading.Thread):
             self.tenant_layout_state.cleanup()
         except Exception:
             self.log.exception("Error in layout data cleanup:")
+
+    def _runLeakedPipelineCleanup(self):
+        for tenant in self.abide.tenants.values():
+            try:
+                with tenant_read_lock(self.zk_client, tenant.name,
+                                      blocking=False):
+                    valid_pipelines = tenant.layout.pipelines.values()
+                    valid_state_paths = set(
+                        p.state.getPath() for p in valid_pipelines)
+                    valid_event_root_paths = set(
+                        PIPELINE_NAME_ROOT.format(
+                            tenant=p.tenant.name, pipeline=p.name)
+                        for p in valid_pipelines)
+
+                    safe_tenant = urllib.parse.quote_plus(tenant.name)
+                    all_state_paths = set(
+                        self.zk_client.client.get_children(
+                            f"/zuul/tenant/{safe_tenant}/pipeline"))
+                    all_event_root_paths = set(
+                        self.zk_client.client.get_children(
+                            PIPELINE_ROOT.format(tenant=tenant.name)))
+
+                    leaked_state_paths = all_state_paths - valid_state_paths
+                    leaked_event_root_paths = (
+                        all_event_root_paths - valid_event_root_paths)
+
+                    for leaked_path in (
+                            leaked_state_paths + leaked_event_root_paths):
+                        self.log.info("Removing leaked pipeline path %s",
+                                      leaked_path)
+                        try:
+                            self.zk_client.client.delete(leaked_path,
+                                                         recursive=True)
+                        except Exception:
+                            self.log.exception(
+                                "Error removing leaked pipeline path %s in "
+                                "tenant %s", leaked_path, tenant.name)
+            except LockException:
+                # We'll cleanup this tenant on the next iteration
+                pass
 
     def _runBlobStoreCleanup(self):
         self.log.debug("Starting blob store cleanup")
