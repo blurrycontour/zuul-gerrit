@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc4595c1_ea1f18db",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5625,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-01-20T14:47:05Z",
+      "side": 1,
+      "message": "Required, since there might be no pipelines.",
+      "revId": "e17490eea42fc4954549d1b491e4ce588e862c0c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
