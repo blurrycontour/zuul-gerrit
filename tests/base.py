@@ -5622,6 +5622,7 @@ class ZuulTestCase(BaseTestCase):
             time.sleep(0.1)
 
     def refreshPipelines(self, sched):
+        ctx = None
         for tenant in sched.abide.tenants.values():
             with tenant_read_lock(self.zk_client, tenant.name):
                 for pipeline in tenant.layout.pipelines.values():
