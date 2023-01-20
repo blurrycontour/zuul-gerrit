@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff6f0fd0_4d33b46d",
+        "filename": "releasenotes/notes/fix-exclude-include-priority-ea4a21ab1e53cb4a.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-20T17:16:44Z",
+      "side": 1,
+      "message": "Perhaps we should make it a configuration error.",
+      "revId": "a557e140b15656d631b930f1d7707bce2b4175db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
