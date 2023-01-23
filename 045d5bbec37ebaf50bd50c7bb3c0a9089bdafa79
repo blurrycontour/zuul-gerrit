@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "664ca8a6_980366d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-23T18:03:10Z",
+      "side": 1,
+      "message": "Why not do this synchronously in _reconfigureDeletePipeline?  That seems like it might simplify the issue below regarding cached data, etc.\n\nOne possible answer I can think of is that the cleanup approach may be more resilient in the case of a full restart onto new configuration, but I would expect that to be generally unreliable anyway and would think that should be done with a `zuul-admin delete-state` call.",
+      "revId": "045d5bbec37ebaf50bd50c7bb3c0a9089bdafa79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ff956274_90943e57",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
