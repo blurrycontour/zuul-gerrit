@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f1b2bc5_5ec7be9a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1915,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-23T18:10:54Z",
+      "side": 1,
+      "message": "I think this is the answer to my question in the earlier change about why don\u0027t we just do this here instead of the periodic cleanup.",
+      "revId": "b6a1eb4607ec38d67a95c47a2fa4af04651d7626",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
