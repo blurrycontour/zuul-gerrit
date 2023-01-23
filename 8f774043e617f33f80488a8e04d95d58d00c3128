@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a189ae2_6a73f772",
+        "filename": "zuul/version.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-01-23T23:55:15Z",
+      "side": 1,
+      "message": "https://docs.python.org/3/library/importlib.metadata.html#distributions for anyone else looking for docs on how this works.",
+      "revId": "8f774043e617f33f80488a8e04d95d58d00c3128",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
