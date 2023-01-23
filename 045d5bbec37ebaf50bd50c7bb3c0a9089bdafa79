@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "8167fb17_9fa08230",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-23T18:12:23Z",
+      "side": 1,
+      "message": "Okay, I think the answer to this is in the followup change (because new events arriving for the pipeline could cause the zk delete to fail and it will need to be re-attempted later after all schedulers recognize the pipeline has been deleted).",
+      "parentUuid": "664ca8a6_980366d8",
+      "revId": "045d5bbec37ebaf50bd50c7bb3c0a9089bdafa79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ff956274_90943e57",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
