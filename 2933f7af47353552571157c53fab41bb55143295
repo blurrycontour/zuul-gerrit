@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "2933f7af47353552571157c53fab41bb55143295",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44716ec6_3978ec27",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1306,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-23T17:55:52Z",
+      "side": 1,
+      "message": "The trigger version of this is almost the same, except that it sets some events to make sure the run loop and the layout update loops run (in case something was missed -- worst case, we run an extra loop).  It seems like that should be safe to do here, and then we could replace the identical block of code in the trigger section with this method call.  That seems worthwhile considering how complex this all is.",
+      "revId": "2933f7af47353552571157c53fab41bb55143295",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
