@@ -48,6 +48,15 @@ RUN /output/install-from-bindep \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz -C /tmp/openshift-install
 
+
+FROM docker.io/library/golang:1.19-bullseye AS skopeo-builder
+RUN apt-get update \
+  && apt-get install -y git build-essential libgpgme-dev libassuan-dev libbtrfs-dev libdevmapper-dev pkg-config \
+  && git clone https://github.com/containers/skopeo.git \
+  && cd skopeo && git checkout v1.9.3 \
+  && make bin/skopeo \
+  && cp bin/skopeo /tmp/skopeo
+
 FROM docker.io/opendevorg/python-base:3.11-bullseye as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -84,8 +93,11 @@ COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 # Copy them only once and use a symlink to save space.
 RUN ln -s /usr/local/bin/oc /usr/local/bin/kubectl
 
+# See note above about this workaround.  These are the runtime
+# dependencies, this should just install skopeo when we upgrade.
+COPY --from=skopeo-builder /tmp/skopeo /usr/local/bin/skopeo
 RUN apt-get update \
-  && apt-get install -y skopeo \
+  && apt-get install -y libdevmapper1.02.1 libgpgme11 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
