@@ -290,6 +290,11 @@
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
+- job:
+    name: zuul-build-container-skopeo
+    nodeset: debian-bullseye
+    run: playbooks/build-container-skopeo.yaml
+
 - project:
     queue: zuul
     vars:
@@ -327,6 +332,7 @@
             dependencies: zuul-build-image
         - zuul-nox-zuul-client
         - zuul-build-python-release
+        - zuul-build-container-skopeo
     gate:
       jobs:
         - zuul-upload-image

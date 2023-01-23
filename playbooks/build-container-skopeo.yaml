@@ -1,0 +1,32 @@
+- hosts: all
+  tasks:
+    - name: Install build requirements
+      package:
+        name:
+          - build-essential
+          - git
+          - libgpgme-devel
+          - device-mapper-devel
+          - libbtrfs-devel
+          - glib2-devel
+        state: latest
+
+    - name: Get Go source
+      get_url:
+        url: https://go.dev/dl/go1.19.5.linux-amd64.tar.gz
+        dest: go1.19.5.linux-amd64-tar.gz
+
+    - name: Install go
+      command: |
+          tar -C /usr/local -xzf go1.19.5.linux-amd64-tar.gz
+
+    - name: Clone skopeo
+      git:
+        repo: 'https://github.com/containers/skopeo'
+        version: '1.9.3'
+
+    - name: Build it
+      command: |
+        PATH=$PATH:/usr/local/go/bin
+        cd skopeo
+        make bin/skopeo
