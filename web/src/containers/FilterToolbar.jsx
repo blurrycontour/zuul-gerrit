@@ -58,15 +58,15 @@ function FilterToolbar(props) {
   }
 
   function handleInputSend(event, category) {
-    const { onFilterChange, filters } = props
+    const { onFilterChange, filters, filterInputValidation } = props
 
     // In case the event comes from a key press, only accept "Enter"
     if (event.key && event.key !== 'Enter') {
       return
     }
 
-    // Ignore empty values
-    if (!inputValue) {
+    // If input validation fales, do nothing
+    if (!filterInputValidation(category.key, inputValue)) {
       return
     }
 
