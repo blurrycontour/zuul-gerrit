@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c03a62b_a8c83b50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35719
+      },
+      "writtenOn": "2023-01-24T17:11:02Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1:\n\u003e \n\u003e This looks good, but can you add a test for it?\n\nThanks. Patchset 2 now adds a test for this, which indeed fails for the old code and passes with this change.",
+      "revId": "ffc03cfcc16965cdc81c3f7b88f650788a8fe5de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
