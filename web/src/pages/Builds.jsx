@@ -195,6 +195,28 @@ class BuildsPage extends React.Component {
       this.updateData(filters)
     }
   }
+  
+  filterInputValidation = (filterKey, filterValue) => {
+    // Input value should not be empty for all cases
+    if (!filterValue) {
+      return {
+        success: false,
+        message: 'Input should not be empty'
+      }
+    }
+
+    // For change filter, it must be an integer
+    if (filterKey === 'change' && isNaN(filterValue)) {
+      return {
+        success: false,
+        message: 'Change must be an integer (do not include revision)'
+      }
+    }
+
+    return {
+      success: true
+    }
+  }
 
   handleFilterChange = (newFilters) => {
     const { location, history } = this.props
@@ -261,6 +283,7 @@ class BuildsPage extends React.Component {
           filterCategories={this.filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
+          filterInputValidation={this.filterInputValidation}
         />
         <Pagination
           toggleTemplate={({ firstIndex, lastIndex, itemCount }) => (
