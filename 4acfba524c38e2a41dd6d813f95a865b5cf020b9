@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7df128c_34cff528",
+        "filename": "Dockerfile",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-01-24T01:07:30Z",
+      "side": 1,
+      "message": "Nit, maybe consider using one of the golang debian images (this is what we do for the OpenDev gitea image for example). Then you only need to bump the 19 to 20 and so on rather than managing every minor release of go when updates happen.",
+      "revId": "4acfba524c38e2a41dd6d813f95a865b5cf020b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c06a2fc_de8bfe69",
+        "filename": "Dockerfile",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-01-24T01:07:30Z",
+      "side": 1,
+      "message": "I would remove the apt-get install for skopeo entirely and replace it with a comment indicating why we\u0027re installing these two packages (because skopeo is linking against them).",
+      "revId": "4acfba524c38e2a41dd6d813f95a865b5cf020b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
