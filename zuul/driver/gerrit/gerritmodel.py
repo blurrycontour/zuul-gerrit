@@ -148,9 +148,13 @@ class GerritChange(Change):
             '%s/c/%s/+/%s' % (baseurl, self.project.name, self.number),
         ]
 
+        # TODO note this is incomplete we need to handle related changes and
+        # patchset files too.
+        for revision, rev_info in data['revisions'].items():
+            if str(rev_info['_number']) == self.patchset:
+                self.ref = rev_info['ref']
+                self.commit = revision
         if str(current_revision['_number']) == self.patchset:
-            self.ref = current_revision['ref']
-            self.commit = data['current_revision']
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False

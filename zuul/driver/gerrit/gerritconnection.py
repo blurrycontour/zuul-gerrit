@@ -1441,9 +1441,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         return data
 
     def queryChangeHTTP(self, number, event=None):
-        data = self.get('changes/%s?o=DETAILED_ACCOUNTS&o=CURRENT_REVISION&'
-                        'o=CURRENT_COMMIT&o=CURRENT_FILES&o=LABELS&'
+        data = self.get('changes/%s?o=DETAILED_ACCOUNTS&o=ALL_REVISIONS&'
+                        'o=ALL_COMMITS&o=ALL_FILES&o=LABELS&'
                         'o=DETAILED_LABELS' % (number,))
+        # TODO figure this out from current patchset as with ssh
         related = self.get('changes/%s/revisions/%s/related' % (
             number, data['current_revision']))
         files = self.get('changes/%s/revisions/%s/files?parent=1' % (
