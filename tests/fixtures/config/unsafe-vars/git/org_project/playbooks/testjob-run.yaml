@@ -9,3 +9,5 @@
     - debug:
         msg: "TESTJOB SECRET: {{ project_secret.secretsub }}"
       when: project_secret is defined
+    - debug:
+        msg: "TESTJOB MESSAGE: {{ zuul.change_message }}"

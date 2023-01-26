@@ -8576,6 +8576,8 @@ class TestUnsafeVars(AnsibleZuulTestCase):
         self.executor_server.keep_jobdir = True
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.data['commitMessage'] = 'start {{ ansible_host }} end'
+
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -8591,6 +8593,8 @@ class TestUnsafeVars(AnsibleZuulTestCase):
         # check the !unsafe tagged version
         self.assertIn("BASE LATESUB UNSAFE: "
                       "{{ latefact | default('undefined') }}", job_output)
+        # check that change_message is !unsafe
+        self.assertIn("BASE MESSAGE: start {{ ansible_host }} end", job_output)
 
         # Both of these are dynamically evaluated
         self.assertIn("TESTJOB SUB: text", job_output)
@@ -8602,6 +8606,13 @@ class TestUnsafeVars(AnsibleZuulTestCase):
 
         # The project secret is not defined
         self.assertNotIn("TESTJOB SECRET:", job_output)
+        # check that change_message is !unsafe
+        self.assertIn("TESTJOB MESSAGE: start {{ ansible_host }} end",
+                      job_output)
+
+        inventory = self._get_file(testjob, 'ansible/inventory.yaml')
+        self.assertIn("change_message: start {{ ansible_host }} end",
+                      inventory)
 
         testjob = self.getJobFromHistory('testjob-secret')
         job_output = self._get_file(testjob, 'work/logs/job-output.txt')
