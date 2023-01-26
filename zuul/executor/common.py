@@ -65,6 +65,7 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         zuul_params['patchset'] = str(item.change.patchset)
     if hasattr(item.change, 'message'):
         zuul_params['message'] = strings.b64encode(item.change.message)
+        zuul_params['change_message'] = item.change.message
     if (hasattr(item.change, 'oldrev') and item.change.oldrev
         and item.change.oldrev != '0' * 40):
         zuul_params['oldrev'] = item.change.oldrev
