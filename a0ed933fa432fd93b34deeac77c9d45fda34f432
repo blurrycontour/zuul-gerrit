@@ -130,6 +130,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cd00197_3f13a7f5",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4419,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-01-26T23:24:11Z",
+      "side": 1,
+      "message": "We do read in exactly the right order since this is in the (de)serialize methods, which are called on the top-most ZK object and work their way down (or up) in the order you specified.  So I don\u0027t think it\u0027s fragile, and reading in any other order is very much invalid (we might consider panicking if expected \u003c current).\n\nBut in general, an ordered comparison on a \"version\" number seems natural to me.",
+      "parentUuid": "b75ba48a_6dddd9f7",
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40c6f560_ff3a9681",
