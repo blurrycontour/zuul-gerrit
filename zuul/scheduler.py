@@ -2208,7 +2208,10 @@ class Scheduler(threading.Thread):
         if (tenant.name, pipeline.name) in self._profile_pipelines:
             ctx.profile = True
         with self.statsd_timer(f'{stats_key}.refresh'):
-            pipeline.change_list.refresh(ctx)
+            try:
+                pipeline.change_list.refresh(ctx)
+            except Exception:
+                self.log.exception("Failed to update pipeline change list")
             pipeline.summary.refresh(ctx)
             pipeline.state.refresh(ctx)
         if (tenant.name, pipeline.name) in self._profile_pipelines:
