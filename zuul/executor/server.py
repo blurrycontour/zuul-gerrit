@@ -14,6 +14,7 @@
 # under the License.
 
 import collections
+import copy
 import datetime
 import json
 import logging
@@ -1049,7 +1050,7 @@ class AnsibleJob(object):
         # The same, but frozen
         self.frozen_hostvars = {}
         # The zuul.* vars
-        self.zuul_vars = {}
+        self.debug_zuul_vars = {}
         self.waiting_for_semaphores = False
 
     def run(self):
@@ -2495,10 +2496,18 @@ class AnsibleJob(object):
                        if ri.role_path is not None],
             ))
 
+        # The zuul vars in the debug inventory.yaml file should not
+        # have any !unsafe tags, so save those before we update the
+        # execution version of those.
+        self.debug_zuul_vars = copy.deepcopy(zuul_vars)
+        if 'change_message' in zuul_vars:
+            zuul_vars['change_message'] = yaml.mark_strings_unsafe(
+                zuul_vars['change_message'])
+
         with open(self.jobdir.zuul_vars, 'w') as zuul_vars_yaml:
             zuul_vars_yaml.write(
-                yaml.safe_dump({'zuul': zuul_vars}, default_flow_style=False))
-        self.zuul_vars = zuul_vars
+                yaml.ansible_unsafe_dump({'zuul': zuul_vars},
+                                         default_flow_style=False))
 
         # Squash all and extra vars into localhost (it's not
         # explicitly listed).
@@ -2552,7 +2561,7 @@ class AnsibleJob(object):
         inventory = make_inventory_dict(
             self.host_list, self.nodeset, self.original_hostvars)
 
-        inventory['all']['vars']['zuul'] = self.zuul_vars
+        inventory['all']['vars']['zuul'] = self.debug_zuul_vars
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
                 yaml.ansible_unsafe_dump(

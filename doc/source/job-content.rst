@@ -612,7 +612,6 @@ of item.
          The patchset identifier for the change.  If a change is
          revised, this will have a different value.
 
-
       .. var:: resources
          :type: dict
 
@@ -706,14 +705,18 @@ are available:
       The commit or pull request message of the change base64 encoded. Use the
       `b64decode` filter in ansible when working with it.
 
-      .. code-block:: yaml
+      .. warning:: This variable is deprecated and will be removed in
+                   a future version.  Use :var:`zuul.change_message`
+                   instead.
 
-         - hosts: all
-           tasks:
-             - name: Dump commit message
-               copy:
-                 content: "{{ zuul.message | b64decode }}"
-                 dest: "{{ zuul.executor.log_root }}/commit-message.txt"
+   .. var:: change_message
+
+      The commit or pull request message of the change.  When Zuul
+      runs Ansible, this variable is tagged with the ``!unsafe`` YAML
+      tag so that Ansible will not interpolate values into it.  Note,
+      however, that the `inventory.yaml` file placed in the build's
+      workspace for debugging and inspection purposes does not inclued
+      the ``!unsafe`` tag.
 
 
 Branch Items
