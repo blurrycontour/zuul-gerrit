@@ -105,6 +105,52 @@
       "message": "same question as above",
       "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b75ba48a_6dddd9f7",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4419,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-01-26T23:01:14Z",
+      "side": 1,
+      "message": "If we did a !\u003d comparison would that give us the flexibility to write buildsets, jobs, and builds in any order? I\u0027ve tried to trace through some of the state transitions here and I think this is correct, but it seems to rely on very careful order of operations and resource access. For example you must always read the buildset first before accessing builds or jobs otherwise another executor may have updated the builds/jobs but youwould think you are up to date.\n\nSemi related, we default to expected \u003d 0 and current \u003d -1 if we haven\u0027t done the initial write to Zookeeper yet? This seems too be necessary to carefully ensure the behavior we need. Is that worth at least a comment that the two default values need to keep this ordered relationship? Or maybe drop the default 0 value and always refresh if expected is None?",
+      "range": {
+        "startLine": 4419,
+        "startChar": 24,
+        "endLine": 4419,
+        "endChar": 25
+      },
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40c6f560_ff3a9681",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4428,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-01-26T23:01:14Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 4428,
+        "startChar": 24,
+        "endLine": 4428,
+        "endChar": 25
+      },
+      "revId": "a0ed933fa432fd93b34deeac77c9d45fda34f432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
