@@ -34,13 +34,16 @@ def upgrade(table_prefix=''):
 
     connection = op.get_bind()
     connection.execute(
-        """
-        UPDATE {buildset_table}
-          SET updated=greatest(
-            coalesce(first_build_start_time, '1970-01-01 00:00:00'),
-            coalesce(last_build_end_time, '1970-01-01 00:00:00'),
-            coalesce(event_timestamp, '1970-01-01 00:00:00'))
-        """.format(buildset_table=table_prefix + "zuul_buildset"))
+        sa.text(
+            """
+            UPDATE {buildset_table}
+              SET updated=greatest(
+                coalesce(first_build_start_time, '1970-01-01 00:00:00'),
+                coalesce(last_build_end_time, '1970-01-01 00:00:00'),
+                coalesce(event_timestamp, '1970-01-01 00:00:00'))
+            """.format(buildset_table=table_prefix + "zuul_buildset")
+        )
+    )
 
 
 def downgrade():
