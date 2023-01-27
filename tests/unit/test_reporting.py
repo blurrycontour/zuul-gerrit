@@ -151,7 +151,7 @@ class TestReporting(ZuulTestCase):
              engine.connect() as conn:
 
             result = conn.execute(
-                sa.sql.select([reporter.connection.zuul_buildset_table]))
+                sa.sql.select(reporter.connection.zuul_buildset_table))
 
             buildsets = result.fetchall()
             for x in buildsets:
@@ -180,7 +180,7 @@ class TestReporting(ZuulTestCase):
              engine.connect() as conn:
 
             result = conn.execute(
-                sa.sql.select([reporter.connection.zuul_buildset_table]))
+                sa.sql.select(reporter.connection.zuul_buildset_table))
 
             buildsets = result.fetchall()
             for x in buildsets:

@@ -65,7 +65,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
     def _sql_tables_created(self, connection_name):
         connection = self.scheds.first.connections.connections[connection_name]
-        insp = sa.engine.reflection.Inspector(connection.engine)
+        insp = sa.inspect(connection.engine)
 
         table_prefix = connection.table_prefix
         self.assertEqual(self.expected_table_prefix, table_prefix)
@@ -82,7 +82,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
     def _sql_indexes_created(self, connection_name):
         connection = self.scheds.first.connections.connections[connection_name]
-        insp = sa.engine.reflection.Inspector(connection.engine)
+        insp = sa.inspect(connection.engine)
 
         table_prefix = connection.table_prefix
         self.assertEqual(self.expected_table_prefix, table_prefix)
@@ -127,7 +127,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
                     engine.connect() as conn:
 
                 result = conn.execute(
-                    sa.sql.select([reporter.connection.zuul_buildset_table]))
+                    sa.sql.select(reporter.connection.zuul_buildset_table))
 
                 buildsets = result.fetchall()
                 self.assertEqual(5, len(buildsets))
@@ -137,107 +137,107 @@ class TestSQLConnectionMysql(ZuulTestCase):
                 buildset3 = buildsets[3]
                 buildset4 = buildsets[4]
 
-                self.assertEqual('check', buildset0['pipeline'])
-                self.assertEqual('org/project', buildset0['project'])
-                self.assertEqual(1, buildset0['change'])
-                self.assertEqual('1', buildset0['patchset'])
-                self.assertEqual('SUCCESS', buildset0['result'])
-                self.assertEqual('Build succeeded.', buildset0['message'])
-                self.assertEqual('tenant-one', buildset0['tenant'])
+                self.assertEqual('check', buildset0.pipeline)
+                self.assertEqual('org/project', buildset0.project)
+                self.assertEqual(1, buildset0.change)
+                self.assertEqual('1', buildset0.patchset)
+                self.assertEqual('SUCCESS', buildset0.result)
+                self.assertEqual('Build succeeded.', buildset0.message)
+                self.assertEqual('tenant-one', buildset0.tenant)
                 self.assertEqual(
-                    'https://review.example.com/%d' % buildset0['change'],
-                    buildset0['ref_url'])
-                self.assertNotEqual(None, buildset0['event_id'])
-                self.assertNotEqual(None, buildset0['event_timestamp'])
+                    'https://review.example.com/%d' % buildset0.change,
+                    buildset0.ref_url)
+                self.assertNotEqual(None, buildset0.event_id)
+                self.assertNotEqual(None, buildset0.event_timestamp)
 
                 buildset0_builds = conn.execute(
-                    sa.sql.select([
+                    sa.sql.select(
                         reporter.connection.zuul_build_table
-                    ]).where(
+                    ).where(
                         reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset0['id']
+                        buildset0.id
                     )
                 ).fetchall()
 
                 # Check the first result, which should be the project-merge job
                 self.assertEqual(
-                    'project-merge', buildset0_builds[0]['job_name'])
-                self.assertEqual("SUCCESS", buildset0_builds[0]['result'])
-                self.assertEqual(None, buildset0_builds[0]['log_url'])
-                self.assertEqual('check', buildset1['pipeline'])
-                self.assertEqual('master', buildset1['branch'])
-                self.assertEqual('org/project', buildset1['project'])
-                self.assertEqual(2, buildset1['change'])
-                self.assertEqual('1', buildset1['patchset'])
-                self.assertEqual('FAILURE', buildset1['result'])
-                self.assertEqual('Build failed.', buildset1['message'])
+                    'project-merge', buildset0_builds[0].job_name)
+                self.assertEqual("SUCCESS", buildset0_builds[0].result)
+                self.assertEqual(None, buildset0_builds[0].log_url)
+                self.assertEqual('check', buildset1.pipeline)
+                self.assertEqual('master', buildset1.branch)
+                self.assertEqual('org/project', buildset1.project)
+                self.assertEqual(2, buildset1.change)
+                self.assertEqual('1', buildset1.patchset)
+                self.assertEqual('FAILURE', buildset1.result)
+                self.assertEqual('Build failed.', buildset1.message)
 
                 buildset1_builds = conn.execute(
-                    sa.sql.select([
+                    sa.sql.select(
                         reporter.connection.zuul_build_table
-                    ]).where(
+                    ).where(
                         reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset1['id']
+                        buildset1.id
                     )
                 ).fetchall()
 
                 # Check the second result, which should be the project-test1
                 # job which failed
                 self.assertEqual(
-                    'project-test1', buildset1_builds[1]['job_name'])
-                self.assertEqual("FAILURE", buildset1_builds[1]['result'])
-                self.assertEqual(None, buildset1_builds[1]['log_url'])
+                    'project-test1', buildset1_builds[1].job_name)
+                self.assertEqual("FAILURE", buildset1_builds[1].result)
+                self.assertEqual(None, buildset1_builds[1].log_url)
 
                 buildset2_builds = conn.execute(
-                    sa.sql.select([
+                    sa.sql.select(
                         reporter.connection.zuul_build_table
-                    ]).where(
+                    ).where(
                         reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset2['id']
+                        buildset2.id
                     )
                 ).fetchall()
 
                 # Check the first result, which should be the project-publish
                 # job
                 self.assertEqual('project-publish',
-                                 buildset2_builds[0]['job_name'])
-                self.assertEqual("SUCCESS", buildset2_builds[0]['result'])
+                                 buildset2_builds[0].job_name)
+                self.assertEqual("SUCCESS", buildset2_builds[0].result)
 
                 buildset3_builds = conn.execute(
-                    sa.sql.select([
+                    sa.sql.select(
                         reporter.connection.zuul_build_table
-                    ]).where(
+                    ).where(
                         reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset3['id']
+                        buildset3.id
                     )
                 ).fetchall()
 
                 self.assertEqual(
-                    'project-test1', buildset3_builds[1]['job_name'])
-                self.assertEqual('NODE_FAILURE', buildset3_builds[1]['result'])
-                self.assertEqual(None, buildset3_builds[1]['log_url'])
-                self.assertIsNotNone(buildset3_builds[1]['start_time'])
-                self.assertIsNotNone(buildset3_builds[1]['end_time'])
+                    'project-test1', buildset3_builds[1].job_name)
+                self.assertEqual('NODE_FAILURE', buildset3_builds[1].result)
+                self.assertEqual(None, buildset3_builds[1].log_url)
+                self.assertIsNotNone(buildset3_builds[1].start_time)
+                self.assertIsNotNone(buildset3_builds[1].end_time)
                 self.assertGreaterEqual(
-                    buildset3_builds[1]['end_time'],
-                    buildset3_builds[1]['start_time'])
+                    buildset3_builds[1].end_time,
+                    buildset3_builds[1].start_time)
 
                 # Check the paused build result
                 buildset4_builds = conn.execute(
-                    sa.sql.select([
+                    sa.sql.select(
                         reporter.connection.zuul_build_table
-                    ]).where(
+                    ).where(
                         reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset4['id']
+                        buildset4.id
                     ).order_by(reporter.connection.zuul_build_table.c.id)
                 ).fetchall()
 
                 paused_build_events = conn.execute(
-                    sa.sql.select([
+                    sa.sql.select(
                         reporter.connection.zuul_build_event_table
-                    ]).where(
+                    ).where(
                         reporter.connection.zuul_build_event_table.c.build_id
-                        == buildset4_builds[0]["id"]
+                        == buildset4_builds[0].id
                     )
                 ).fetchall()
 
@@ -245,16 +245,16 @@ class TestSQLConnectionMysql(ZuulTestCase):
                 pause_event = paused_build_events[0]
                 resume_event = paused_build_events[1]
                 self.assertEqual(
-                    pause_event["event_type"], "paused")
-                self.assertIsNotNone(pause_event["event_time"])
-                self.assertIsNone(pause_event["description"])
+                    pause_event.event_type, "paused")
+                self.assertIsNotNone(pause_event.event_time)
+                self.assertIsNone(pause_event.description)
                 self.assertEqual(
-                    resume_event["event_type"], "resumed")
-                self.assertIsNotNone(resume_event["event_time"])
-                self.assertIsNone(resume_event["description"])
+                    resume_event.event_type, "resumed")
+                self.assertIsNotNone(resume_event.event_time)
+                self.assertIsNone(resume_event.description)
 
                 self.assertGreater(
-                    resume_event["event_time"], pause_event["event_time"])
+                    resume_event.event_time, pause_event.event_time)
 
         self.executor_server.hold_jobs_in_build = True
 
@@ -333,51 +333,51 @@ class TestSQLConnectionMysql(ZuulTestCase):
                     engine.connect() as conn:
 
                 result = conn.execute(
-                    sa.sql.select([reporter.connection.zuul_buildset_table])
+                    sa.sql.select(reporter.connection.zuul_buildset_table)
                 )
 
                 buildsets = result.fetchall()
                 self.assertEqual(1, len(buildsets))
                 buildset0 = buildsets[0]
 
-                self.assertEqual('check', buildset0['pipeline'])
-                self.assertEqual('org/project', buildset0['project'])
-                self.assertEqual(1, buildset0['change'])
-                self.assertEqual('1', buildset0['patchset'])
-                self.assertEqual('SUCCESS', buildset0['result'])
-                self.assertEqual('Build succeeded.', buildset0['message'])
-                self.assertEqual('tenant-one', buildset0['tenant'])
+                self.assertEqual('check', buildset0.pipeline)
+                self.assertEqual('org/project', buildset0.project)
+                self.assertEqual(1, buildset0.change)
+                self.assertEqual('1', buildset0.patchset)
+                self.assertEqual('SUCCESS', buildset0.result)
+                self.assertEqual('Build succeeded.', buildset0.message)
+                self.assertEqual('tenant-one', buildset0.tenant)
                 self.assertEqual(
-                    'https://review.example.com/%d' % buildset0['change'],
-                    buildset0['ref_url'])
+                    'https://review.example.com/%d' % buildset0.change,
+                    buildset0.ref_url)
 
                 buildset0_builds = conn.execute(
                     sa.sql.select(
-                        [reporter.connection.zuul_build_table]
+                        reporter.connection.zuul_build_table
                     ).where(
                         reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset0['id']
+                        buildset0.id
                     )
                 ).fetchall()
 
             # Check the retry results
-            self.assertEqual('project-merge', buildset0_builds[0]['job_name'])
-            self.assertEqual('SUCCESS', buildset0_builds[0]['result'])
-            self.assertTrue(buildset0_builds[0]['final'])
+            self.assertEqual('project-merge', buildset0_builds[0].job_name)
+            self.assertEqual('SUCCESS', buildset0_builds[0].result)
+            self.assertTrue(buildset0_builds[0].final)
 
-            self.assertEqual('project-test1', buildset0_builds[1]['job_name'])
-            self.assertEqual('RETRY', buildset0_builds[1]['result'])
-            self.assertFalse(buildset0_builds[1]['final'])
-            self.assertEqual('project-test2', buildset0_builds[2]['job_name'])
-            self.assertEqual('RETRY', buildset0_builds[2]['result'])
-            self.assertFalse(buildset0_builds[2]['final'])
+            self.assertEqual('project-test1', buildset0_builds[1].job_name)
+            self.assertEqual('RETRY', buildset0_builds[1].result)
+            self.assertFalse(buildset0_builds[1].final)
+            self.assertEqual('project-test2', buildset0_builds[2].job_name)
+            self.assertEqual('RETRY', buildset0_builds[2].result)
+            self.assertFalse(buildset0_builds[2].final)
 
-            self.assertEqual('project-test1', buildset0_builds[3]['job_name'])
-            self.assertEqual('SUCCESS', buildset0_builds[3]['result'])
-            self.assertTrue(buildset0_builds[3]['final'])
-            self.assertEqual('project-test2', buildset0_builds[4]['job_name'])
-            self.assertEqual('SUCCESS', buildset0_builds[4]['result'])
-            self.assertTrue(buildset0_builds[4]['final'])
+            self.assertEqual('project-test1', buildset0_builds[3].job_name)
+            self.assertEqual('SUCCESS', buildset0_builds[3].result)
+            self.assertTrue(buildset0_builds[3].final)
+            self.assertEqual('project-test2', buildset0_builds[4].job_name)
+            self.assertEqual('SUCCESS', buildset0_builds[4].result)
+            self.assertTrue(buildset0_builds[4].final)
 
         self.executor_server.hold_jobs_in_build = True
 
@@ -430,7 +430,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
              engine.connect() as conn:
 
             result = conn.execute(
-                sa.sql.select([reporter.connection.zuul_buildset_table])
+                sa.sql.select(reporter.connection.zuul_buildset_table)
             )
 
             buildsets = result.fetchall()
@@ -439,10 +439,10 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
             buildset0_builds = conn.execute(
                 sa.sql.select(
-                    [reporter.connection.zuul_build_table]
+                    reporter.connection.zuul_build_table
                 ).where(
                     reporter.connection.zuul_build_table.c.buildset_id ==
-                    buildset0['id']
+                    buildset0.id
                 )
             ).fetchall()
 
@@ -488,7 +488,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
              engine.connect() as conn:
 
             result = conn.execute(
-                sa.sql.select([reporter.connection.zuul_buildset_table])
+                sa.sql.select(reporter.connection.zuul_buildset_table)
             )
 
             buildsets = result.fetchall()
@@ -497,10 +497,10 @@ class TestSQLConnectionMysql(ZuulTestCase):
 
             buildset0_builds = conn.execute(
                 sa.sql.select(
-                    [reporter.connection.zuul_build_table]
+                    reporter.connection.zuul_build_table
                 ).where(
                     reporter.connection.zuul_build_table.c.buildset_id ==
-                    buildset0['id']
+                    buildset0.id
                 )
             ).fetchall()
 
