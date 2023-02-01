@@ -1697,7 +1697,7 @@ class TenantParser(object):
                   'disallowed-labels': to_list(str),
                   'allow-circular-dependencies': bool,
                   'default-parent': str,
-                  'default-ansible-version': vs.Any(str, float),
+                  'default-ansible-version': vs.Any(str, float, int),
                   'access-rules': to_list(str),
                   'admin-rules': to_list(str),
                   'semaphores': to_list(str),
@@ -1780,8 +1780,8 @@ class TenantParser(object):
         # Set default ansible version
         default_ansible_version = conf.get('default-ansible-version')
         if default_ansible_version is not None:
-            # The ansible version can be interpreted as float by yaml so make
-            # sure it's a string.
+            # The ansible version can be interpreted as float or int
+            # by yaml so make sure it's a string.
             default_ansible_version = str(default_ansible_version)
             ansible_manager.requestVersion(default_ansible_version)
         else:
