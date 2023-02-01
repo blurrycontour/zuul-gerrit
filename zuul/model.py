@@ -895,6 +895,7 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         super().__init__()
         self._set(
             changes=[],
+            _change_keys=[],
         )
 
     def refresh(self, context):
