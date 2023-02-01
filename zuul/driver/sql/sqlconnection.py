@@ -311,24 +311,24 @@ class SQLConnection(BaseConnection):
         with self.engine.begin() as conn:
             context = alembic.migration.MigrationContext.configure(conn)
             current_rev = context.get_current_revision()
-            self.log.debug('Current migration revision: %s' % current_rev)
+        self.log.debug('Current migration revision: %s' % current_rev)
 
-            config = alembic.config.Config()
-            config.set_main_option("script_location",
-                                   "zuul:driver/sql/alembic")
-            config.set_main_option("sqlalchemy.url",
-                                   self.connection_config.get('dburi').
-                                   replace('%', '%%'))
+        config = alembic.config.Config()
+        config.set_main_option("script_location",
+                               "zuul:driver/sql/alembic")
+        config.set_main_option("sqlalchemy.url",
+                               self.connection_config.get('dburi').
+                               replace('%', '%%'))
 
-            # Alembic lets us add arbitrary data in the tag argument. We can
-            # leverage that to tell the upgrade scripts about the table prefix.
-            tag = {'table_prefix': self.table_prefix}
+        # Alembic lets us add arbitrary data in the tag argument. We can
+        # leverage that to tell the upgrade scripts about the table prefix.
+        tag = {'table_prefix': self.table_prefix}
 
-            if current_rev is None and not self.force_migrations:
-                self.metadata.create_all(self.engine)
-                alembic.command.stamp(config, revision, tag=tag)
-            else:
-                alembic.command.upgrade(config, revision, tag=tag)
+        if current_rev is None and not self.force_migrations:
+            self.metadata.create_all(self.engine)
+            alembic.command.stamp(config, revision, tag=tag)
+        else:
+            alembic.command.upgrade(config, revision, tag=tag)
 
     def onLoad(self, zk_client, component_registry=None):
         safe_connection = quote_plus(self.connection_name)
