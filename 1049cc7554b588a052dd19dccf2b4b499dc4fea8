@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b563dbf_a3ee49d3",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-02-01T14:08:40Z",
+      "side": 1,
+      "message": "I think for the presentation we should use something different than a plain alert. Maybe something like this: https://www.patternfly.org/v4/components/form/design-guidelines/#errors-and-validation.\n\nIf I\u0027m not mistaken we are using a TextInput for this field, so it might work to use the `validated` property for that (https://www.patternfly.org/v4/components/text-input#textinput). There are also a few examples on https://www.patternfly.org/v4/components/text-input#invalid and https://www.patternfly.org/v4/components/form#validated\n\nIn case of a Form/FormGroup, the error message seems to be displayed via the `helperTextInvalid\u003d{invalidText}` property. AFAIK we don\u0027t have a form here, but use a PF4 Toolbar (https://www.patternfly.org/v4/components/toolbar/). There doesn\u0027t seem to be something similar available for a toolbar, so we might want to use another component to show the error message. Maybe something like https://www.patternfly.org/v4/components/alert ? Sadly for the toolbar there aren\u0027t any \"design guidelines\" regarding validation and error handling.",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
