@@ -32,13 +32,6 @@ def set_standard_env_vars(session):
     set_env(session, 'OS_STDERR_CAPTURE', '1')
     set_env(session, 'OS_STDOUT_CAPTURE', '1')
     set_env(session, 'OS_TEST_TIMEOUT', '360')
-    session.env['PYTHONWARNINGS'] = ','.join([
-        'always::DeprecationWarning:zuul.driver.sql.sqlconnection',
-        'always::DeprecationWarning:tests.base',
-        'always::DeprecationWarning:tests.unit.test_database',
-        'always::DeprecationWarning:zuul.driver.sql.alembic.env',
-        'always::DeprecationWarning:zuul.driver.sql.alembic.script',
-    ])
 
 
 @nox.session(python='3')
