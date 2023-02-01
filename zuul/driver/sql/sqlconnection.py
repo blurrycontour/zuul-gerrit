@@ -308,27 +308,31 @@ class SQLConnection(BaseConnection):
 
     def _migrate(self, revision='head'):
         """Perform the alembic migrations for this connection"""
+        # Note that this method needs to be called with an external lock held.
+        # The reason for this is we retrieve the alembic version and run the
+        # alembic migrations in different database transactions which opens
+        # us to races without an external lock.
         with self.engine.begin() as conn:
             context = alembic.migration.MigrationContext.configure(conn)
             current_rev = context.get_current_revision()
-            self.log.debug('Current migration revision: %s' % current_rev)
+        self.log.debug('Current migration revision: %s' % current_rev)
 
-            config = alembic.config.Config()
-            config.set_main_option("script_location",
-                                   "zuul:driver/sql/alembic")
-            config.set_main_option("sqlalchemy.url",
-                                   self.connection_config.get('dburi').
-                                   replace('%', '%%'))
+        config = alembic.config.Config()
+        config.set_main_option("script_location",
+                               "zuul:driver/sql/alembic")
+        config.set_main_option("sqlalchemy.url",
+                               self.connection_config.get('dburi').
+                               replace('%', '%%'))
 
-            # Alembic lets us add arbitrary data in the tag argument. We can
-            # leverage that to tell the upgrade scripts about the table prefix.
-            tag = {'table_prefix': self.table_prefix}
+        # Alembic lets us add arbitrary data in the tag argument. We can
+        # leverage that to tell the upgrade scripts about the table prefix.
+        tag = {'table_prefix': self.table_prefix}
 
-            if current_rev is None and not self.force_migrations:
-                self.metadata.create_all(self.engine)
-                alembic.command.stamp(config, revision, tag=tag)
-            else:
-                alembic.command.upgrade(config, revision, tag=tag)
+        if current_rev is None and not self.force_migrations:
+            self.metadata.create_all(self.engine)
+            alembic.command.stamp(config, revision, tag=tag)
+        else:
+            alembic.command.upgrade(config, revision, tag=tag)
 
     def onLoad(self, zk_client, component_registry=None):
         safe_connection = quote_plus(self.connection_name)
