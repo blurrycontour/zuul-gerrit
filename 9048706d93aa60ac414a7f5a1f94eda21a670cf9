@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b044efc1_4156bb3d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1763,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T06:32:27Z",
+      "side": 1,
+      "message": "You are right in that we already handle most of the exceptions in `_reconfigureDeletePipeline()`. The main idea there was to cleanup as much as possible without stopping on the first exception. But there are still things that could fail. I\u0027m mainly thinking about the `pipeline.state.refresh(ctx)` here.\n\nI think in general we shouldn\u0027t abort a tenant reconfiguration by letting an exception bubble up when a step is not required to complete the reconfig. So this is more of a better-safe-than-sorry exception handling here.",
+      "parentUuid": "3a24f7d0_47addf65",
+      "revId": "9048706d93aa60ac414a7f5a1f94eda21a670cf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d3619a0_629e577f",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
