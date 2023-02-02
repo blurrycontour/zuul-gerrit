@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f6971b7_e1eb618b",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2004,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T10:13:07Z",
+      "side": 0,
+      "message": "Removed this line as it\u0027s not testing anything.",
+      "revId": "a5c1d3a3b8272329a3e436c979612f937933ee15",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
