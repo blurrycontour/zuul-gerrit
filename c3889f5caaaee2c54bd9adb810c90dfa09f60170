@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59dee5cf_91607738",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2055,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "I think we should assert here that the path in ZK exists. Something like:\n\n  self.assertIsNotNone(\n      self.zk_client.client.exists(self.pipeline.state.getPath()))",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83f668a0_fd160403",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "nit: this also tests the change list",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62f99489_c6b88a6b",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "Is this testing with a pre-existing object?\n\nI was expecting something like a create + initial refresh of the state (which would create the ZK path) and then another create + refresh. Otherwise this just seems to be a combination of test 1 and 3.",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02527e33_2c9eabc7",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2083,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "I think we should assert that the ZK path exists.",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "859afec9_cfddced2",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 743,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "This is only true when `read_only\u003dFalse`.",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bc8f3e8_12ea817a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "I think we must not create the pipeline state when refreshing the pipeline in read-only mode. Otherwise we are re-creating a similar race condition that we are trying to fix (I could imagine that this is also the reason for the test failures).",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41b42733_6e9c3749",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:21:14Z",
+      "side": 1,
+      "message": "This is not always the case. We also refresh the pipeline change list during tenant trigger event processing and when gathering connection cache keys during cleanup w/o holding the pipeline lock.\n\nIn those cases we don\u0027t want to create the initial change list. Maybe we also need a `read_only` flag here.",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
