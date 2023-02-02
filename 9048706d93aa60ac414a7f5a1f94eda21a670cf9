@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ea7eefd_c7260505",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T01:08:01Z",
+      "side": 1,
+      "message": "One concern related to my concern in the parent change and the other item is super minor. Again +2 and feel free to approve if we sure these concerns are not really a problem.",
+      "revId": "9048706d93aa60ac414a7f5a1f94eda21a670cf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a24f7d0_47addf65",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1763,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T01:08:01Z",
+      "side": 1,
+      "message": "It seems most actions that could raise in _reconfigureDeletePipeline are wrapped in try blocks already and we log and ignore the errors there. Do we need to try and except here as well?",
+      "revId": "9048706d93aa60ac414a7f5a1f94eda21a670cf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d3619a0_629e577f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1913,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T01:08:01Z",
+      "side": 1,
+      "message": "Questions about safe tenant and pipeline names in the parent change would apply here as well.",
+      "revId": "9048706d93aa60ac414a7f5a1f94eda21a670cf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
