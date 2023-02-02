@@ -50,6 +50,24 @@
       "message": "Questions about safe tenant and pipeline names in the parent change would apply here as well.",
       "revId": "9048706d93aa60ac414a7f5a1f94eda21a670cf9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9368164d_5e5f090d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1913,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T01:28:46Z",
+      "side": 1,
+      "message": "See parent change for more detail, but for the moment at least, this appears to be correct for event queues.",
+      "parentUuid": "1d3619a0_629e577f",
+      "revId": "9048706d93aa60ac414a7f5a1f94eda21a670cf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
