@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2b539bc_4441e950",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T13:32:46Z",
+      "side": 1,
+      "message": "Ok, I think I get it now. The refresh of the change list in line #2069 will create the empty pipeline state as a side-effect (`change list path \u003d\u003d $pipeline_state_path/change_list`). And then the refresh of the state will find an existing but empty node in ZK.\n\nMaybe it\u0027s worth to have a comment for that.",
+      "parentUuid": "62f99489_c6b88a6b",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "02527e33_2c9eabc7",
         "filename": "tests/unit/test_zk.py",
         "patchSetId": 1
