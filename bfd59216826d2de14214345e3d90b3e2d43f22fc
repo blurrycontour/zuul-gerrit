@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "9dad9420_c4f996bb",
         "filename": "tests/zuul_client/test_zuulclient.py",
@@ -14,8 +15,25 @@
       "side": 1,
       "message": "Perhaps move the zuul-client process creation after it settled?, here",
       "revId": "bfd59216826d2de14214345e3d90b3e2d43f22fc",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55ebe8ad_e1a3ad27",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-02-02T10:49:38Z",
+      "side": 1,
+      "message": "Unnecessary",
+      "parentUuid": "9dad9420_c4f996bb",
+      "revId": "bfd59216826d2de14214345e3d90b3e2d43f22fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
