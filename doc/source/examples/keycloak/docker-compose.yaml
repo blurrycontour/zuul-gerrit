@@ -7,7 +7,7 @@ version: '2.1'
 
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:18.0
+    image: quay.io/keycloak/keycloak:23.0
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=kcadmin
