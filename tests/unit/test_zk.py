@@ -1976,6 +1976,8 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
         source_context = model.SourceContext(
             'cname', 'project', 'connection', 'branch', 'test', True)
 
+        project_context = model.ProjectContext('cname', 'project')
+
         m1 = yaml.Mark('name', 0, 0, 0, '', 0)
         m2 = yaml.Mark('name', 1, 0, 0, '', 0)
         start_mark = model.ZuulMark(m1, m2, 'hello')
@@ -1989,19 +1991,22 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
                 source_context, start_mark, "Test error1")
             e2 = model.ConfigurationError(
                 source_context, start_mark, "Test error2")
+            e3 = model.ConfigurationError(
+                project_context, start_mark, "Test error3")
             with pipeline.activeContext(context):
                 path = '/zuul/pipeline/test/errors'
                 el1 = model.ConfigurationErrorList.new(
-                    context, errors=[e1, e2], _path=path)
+                    context, errors=[e1, e2, e3], _path=path)
 
             el2 = model.ConfigurationErrorList.fromZK(
                 context, path, _path=path)
             self.assertEqual(el1.errors, el2.errors)
             self.assertFalse(el1 is el2)
             self.assertEqual(el1.errors[0], el2.errors[0])
+            self.assertEqual(el1.errors[2], el2.errors[2])
             self.assertEqual(el1.errors[0], e1)
+            self.assertEqual(el2.errors[2], e3)
             self.assertNotEqual(e1, e2)
-            self.assertEqual([e1, e2], [e1, e2])
 
 
 class TestBlobStore(ZooKeeperBaseTestCase):

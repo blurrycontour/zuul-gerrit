@@ -779,3 +779,18 @@ class TestSourceContext(BaseTestCase):
 
     def test_serialize(self):
         self.context.deserialize(self.context.serialize())
+
+
+class TestProjectContext(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.connection = Dummy(connection_name='dummy_connection')
+        self.source = Dummy(canonical_hostname='git.example.com',
+                            connection=self.connection)
+        self.project = model.Project('project', self.source)
+        self.context = model.ProjectContext(
+            self.project.canonical_name, self.project.name)
+        self.context.branch = "master"
+
+    def test_serialize(self):
+        self.context.deserialize(self.context.serialize())

@@ -207,7 +207,15 @@ class ConfigurationErrorKey(object):
         self._hash = hasher.hexdigest()
 
     def serialize(self):
+        if isinstance(self.context, SourceContext):
+            context_type = "source"
+        elif isinstance(self.context, ProjectContext):
+            context_type = "project"
+        else:
+            context_type = None
+
         return {
+            "_context_type": context_type,
             "context": self.context and self.context.serialize(),
             "mark": self.mark and self.mark.serialize(),
             "error_text": self.error_text,
@@ -216,9 +224,21 @@ class ConfigurationErrorKey(object):
 
     @classmethod
     def deserialize(cls, data):
+        if data["context"]:
+            # To be backward compatible with existing error keys, we default
+            # to the SourceContext if the context type is unset.
+            context_type = data.pop("_context_type", "source")
+            if context_type == "source":
+                context = SourceContext.deserialize(data["context"])
+            elif context_type == "project":
+                context = ProjectContext.deserialize(data["context"])
+            else:
+                raise Exception(f"Unsupported context type {context_type}")
+        else:
+            context = None
+
         data.update({
-            "context": data["context"] and SourceContext.deserialize(
-                data["context"]),
+            "context": context,
             "mark": data["mark"] and ZuulMark.deserialize(data["mark"]),
         })
         o = cls.__new__(cls)
@@ -1823,10 +1843,35 @@ class ProjectContext(ConfigObject):
     def __str__(self):
         return self.project_name
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, ProjectContext):
+            return False
+        return (self.project_canonical_name == other.project_canonical_name and
+                self.project_name == other.project_name and
+                self.branch == other.branch and
+                self.path == other.path)
+
     def toDict(self):
         return dict(
             project=self.project_name,
         )
+
+    def serialize(self):
+        return {
+            "project_canonical_name": self.project_canonical_name,
+            "project_name": self.project_name,
+            "branch": self.branch,
+            "path": self.path,
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        o = cls.__new__(cls)
+        o.__dict__.update(data)
+        return o
 
 
 class SourceContext(ConfigObject):
