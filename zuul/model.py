@@ -4411,19 +4411,15 @@ class BuildSet(zkobject.ZKObject):
         if (COMPONENT_REGISTRY.model_api < 12):
             return True
         current = build.getZKVersion()
-        if current is None:
-            current = -1
         expected = self.build_versions.get(build.uuid, 0)
-        return expected > current
+        return expected != current
 
     def shouldRefreshJob(self, job):
         if (COMPONENT_REGISTRY.model_api < 12):
             return True
         current = job.getZKVersion()
-        if current is None:
-            current = -1
         expected = self.job_versions.get(job.name, 0)
-        return expected > current
+        return expected != current
 
     @property
     def ref(self):
