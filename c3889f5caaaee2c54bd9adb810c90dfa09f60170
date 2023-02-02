@@ -194,6 +194,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c746ec68_109ab080",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 743,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T16:06:58Z",
+      "side": 1,
+      "message": "Yep, you are right. Sorry missed that.",
+      "parentUuid": "c10cd11b_2529d09e",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bc8f3e8_12ea817a",
@@ -225,6 +243,24 @@
       "side": 1,
       "message": "Assuming the above question about whether we hold the pipeline lock is resolved such that we do, then this is safe.  The important thing is the lock, not \"read-only\".  It\u0027s confusing, so I put a comment in for that.",
       "parentUuid": "3bc8f3e8_12ea817a",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22076e77_a953ae44",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T16:06:58Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "95780611_7bccb169",
       "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
