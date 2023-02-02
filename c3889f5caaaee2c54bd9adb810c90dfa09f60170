@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10ee254b_28f21795",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2055,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "59dee5cf_91607738",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "83f668a0_fd160403",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-02-02T13:21:14Z",
       "side": 1,
       "message": "nit: this also tests the change list",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c34848cc_d67c77fd",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "Yes; it\u0027s needed in order to cause the other code path to run.  These tests are super fast, so I wanted to have explicit testing of each thing, even though there\u0027s some duplication.  I can leave a comment explaining.",
+      "parentUuid": "83f668a0_fd160403",
       "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -70,6 +106,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96702d90_1458685d",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "62f99489_c6b88a6b",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02527e33_2c9eabc7",
@@ -83,6 +137,24 @@
       "writtenOn": "2023-02-02T13:21:14Z",
       "side": 1,
       "message": "I think we should assert that the ZK path exists.",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab22a16b_144dd692",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2083,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "02527e33_2c9eabc7",
       "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -104,6 +176,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c10cd11b_2529d09e",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 743,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "There are three places we call pipeline.state.refresh; all in scheduler.py.  And in all three places we do hold the pipeline lock.  Did I miss something?",
+      "parentUuid": "859afec9_cfddced2",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bc8f3e8_12ea817a",
@@ -121,6 +211,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95780611_7bccb169",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 756,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "Assuming the above question about whether we hold the pipeline lock is resolved such that we do, then this is safe.  The important thing is the lock, not \"read-only\".  It\u0027s confusing, so I put a comment in for that.",
+      "parentUuid": "3bc8f3e8_12ea817a",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41b42733_6e9c3749",
@@ -134,6 +242,24 @@
       "writtenOn": "2023-02-02T13:21:14Z",
       "side": 1,
       "message": "This is not always the case. We also refresh the pipeline change list during tenant trigger event processing and when gathering connection cache keys during cleanup w/o holding the pipeline lock.\n\nIn those cases we don\u0027t want to create the initial change list. Maybe we also need a `read_only` flag here.",
+      "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a23a93ef_89dca027",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T15:40:34Z",
+      "side": 1,
+      "message": "That\u0027s true, I missed those two cases.  We do need to handle them, possibly with a flag (but probably not \"read_only\" since that\u0027s confusing) and in that case, we should raise an exception that we catch in the retry method.",
+      "parentUuid": "41b42733_6e9c3749",
       "revId": "c3889f5caaaee2c54bd9adb810c90dfa09f60170",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
