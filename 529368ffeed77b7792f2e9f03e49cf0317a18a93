@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "769e50f6_565fd446",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T22:05:22Z",
+      "side": 1,
+      "message": "recheck the py38 job just seems to have been slow. No errors from sqlalchemy that I can see.",
+      "revId": "529368ffeed77b7792f2e9f03e49cf0317a18a93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
