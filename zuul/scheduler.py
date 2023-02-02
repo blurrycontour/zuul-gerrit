@@ -112,7 +112,7 @@ from zuul.zk.locks import (
     trigger_queue_lock,
 )
 from zuul.zk.system import ZuulSystem
-from zuul.zk.zkobject import ZKContext
+from zuul.zk.zkobject import ZKContext, ZKObjectNotInitializedError
 from zuul.zk.election import SessionAwareElection
 
 RECONFIG_LOCK_ID = "RECONFIG"
@@ -2249,7 +2249,13 @@ class Scheduler(threading.Thread):
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",
                                    tenant.name, pipeline.name)
-                    pipeline.change_list.refresh(ctx)
+                    try:
+                        pipeline.change_list.refresh(ctx, allow_init=False)
+                    except ZKObjectNotInitializedError:
+                        # If the pipeline hasn't been initialized,
+                        # there probably aren't any changes in it, so
+                        # we can ignore it.
+                        continue
                     change_keys = pipeline.change_list.getChangeKeys()
                     relevant_changes = pipeline.manager.resolveChangeKeys(
                         change_keys)
@@ -2279,7 +2285,12 @@ class Scheduler(threading.Thread):
                 ctx = self.createZKContext(None, self.log)
                 for pipeline in tenant.layout.pipelines.values():
                     try:
-                        pipeline.change_list.refresh(ctx)
+                        pipeline.change_list.refresh(ctx, allow_init=False)
+                    except ZKObjectNotInitializedError:
+                        # If the pipeline hasn't been initialized,
+                        # there probably aren't any changes in it, so
+                        # we can ignore the error without logging it.
+                        continue
                     except Exception:
                         self.log.exception(
                             "Unable to refresh pipeline change list for %s",
