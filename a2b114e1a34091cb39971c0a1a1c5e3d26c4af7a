@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaab8eb2_607c0006",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-02T01:24:49Z",
+      "side": 1,
+      "message": "Re namespacing: exactly so.\n\nRe safe: this appears to be correct because we don\u0027t url quote the event queues, but we do url quote the pipeline state.  Since they have different roots (/zuul/event vs /zuul), they do have a different risk exposure there, but I suspect there may be a lurking potential problem with the event queues.  We should probably put something on our backlog to look into that.",
+      "parentUuid": "cf8b37ce_df1f43fc",
+      "revId": "a2b114e1a34091cb39971c0a1a1c5e3d26c4af7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4c6c256_f66c446c",
