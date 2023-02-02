@@ -1770,8 +1770,12 @@ class TenantParser(object):
 
         for branch_future in as_completed(branch_futures.keys()):
             tpc = branch_futures[branch_future]
-            source_context = model.ProjectContext(
-                tpc.project.canonical_name, tpc.project.name)
+            # We don't really care if the context here is for a trusted
+            # or untrusted project, so we set the trusted flag to False
+            # even though the project might indeed be trusted.
+            source_context = model.SourceContext(
+                tpc.project.canonical_name, tpc.project.name,
+                tpc.project.connection_name, None, None, False)
             with project_configuration_exceptions(source_context,
                                                   loading_errors):
                 self._getProjectBranches(tenant, tpc, branch_cache_min_ltimes)
@@ -2596,8 +2600,9 @@ class TenantParser(object):
                 project_metadata.merge_mode = model.MERGER_MAP[mode]
             tpc = tenant.project_configs[project.canonical_name]
             if tpc.merge_modes is not None:
-                source_context = model.ProjectContext(
-                    project.canonical_name, project.name)
+                source_context = model.SourceContext(
+                    project.canonical_name, project.name,
+                    project.connection_name, None, None, trusted)
                 with project_configuration_exceptions(source_context,
                                                       layout.loading_errors):
                     if project_metadata.merge_mode not in tpc.merge_modes:
