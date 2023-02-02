@@ -95,21 +95,20 @@ class PipelineManager(metaclass=ABCMeta):
     def _postConfig(self):
         layout = self.pipeline.tenant.layout
         self.buildChangeQueues(layout)
-        with self.sched.createZKContext(None, self.log) as ctx,\
-             self.currentContext(ctx):
-            # Make sure we have state and change list objects, and
-            # ensure that they exist in ZK.  We don't hold the
-            # pipeline lock, but if they don't exist, that means they
-            # are new, so no one else will either, so the write on
-            # create is okay.  If they do exist and we have an old
-            # object, we'll just reuse it.  If it does exist and we
-            # don't have an old object, we'll get a new empty one.
-            # Regardless, these will not automatically refresh now, so
-            # they will be out of date until they are refreshed later.
-            self.pipeline.state = PipelineState.create(
-                self.pipeline, layout.uuid, self.pipeline.state)
-            self.pipeline.change_list = PipelineChangeList.create(
-                self.pipeline)
+        # Make sure we have state and change list objects.  We
+        # don't actually ensure they exist in ZK here; these are
+        # just local objects until they are serialized the first
+        # time.  Since we don't hold the pipeline lock, we can't
+        # reliably perform any read or write operations; we just
+        # need to ensure we have in-memory objects to work with
+        # and they will be initialized or loaded on the next
+        # refresh.
+
+        # These will be out of date until they are refreshed later.
+        self.pipeline.state = PipelineState.create(
+            self.pipeline, layout.uuid, self.pipeline.state)
+        self.pipeline.change_list = PipelineChangeList.create(
+            self.pipeline)
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")

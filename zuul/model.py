@@ -620,6 +620,18 @@ class PipelineState(zkobject.ZKObject):
             _read_only=False,
         )
 
+    def _lateInitData(self):
+        # If we're initializing the object on our initial refresh,
+        # reset the data to this.
+        return dict(
+            state=Pipeline.STATE_NORMAL,
+            queues=[],
+            old_queues=[],
+            consecutive_failures=0,
+            disabled=False,
+            layout_uuid=self.pipeline.tenant.layout.uuid,
+        )
+
     @classmethod
     def fromZK(klass, context, path, pipeline, **kw):
         obj = klass()
@@ -632,20 +644,22 @@ class PipelineState(zkobject.ZKObject):
 
     @classmethod
     def create(cls, pipeline, layout_uuid, old_state=None):
-        # If the object does not exist in ZK, create it with the
-        # default attributes and the supplied layout UUID.  Otherwise,
-        # return an initialized object (or the old object for reuse)
-        # without loading any data so that data can be loaded on the
-        # next refresh.
-        ctx = pipeline.manager.current_context
+        # If we are resetting an existing pipeline, we will have an
+        # old_state, so just clean up the object references there and
+        # let the next refresh handle updating any data.
+        if old_state:
+            old_state._resetObjectRefs()
+            return old_state
+
+        # Otherwise, we are initializing a pipeline that we haven't
+        # seen before.  It still might exist in ZK, but since we
+        # haven't seen it, we don't have any object references to
+        # clean up.  We can just start with a clean object, set the
+        # pipeline reference, and let the next refresh deal with
+        # whether there might be any data in ZK.
         state = cls()
         state._set(pipeline=pipeline)
-        if state.exists(ctx):
-            if old_state:
-                old_state._resetObjectRefs()
-                return old_state
-            return state
-        return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
+        return state
 
     def _resetObjectRefs(self):
         # Update the pipeline references on the queue objects.
@@ -712,14 +726,54 @@ class PipelineState(zkobject.ZKObject):
         # This is so that we can refresh the object in circumstances
         # where we haven't verified that our local layout matches
         # what's in ZK.
+
+        # Notably, this need not prevent us from performing the
+        # initialization below if necessary.  The case of the object
+        # being brand new in ZK supercedes our worry that our old copy
+        # might be out of date since our old copy is, itself, brand
+        # new.
         self._set(_read_only=read_only)
-        return super().refresh(context)
+        try:
+            return super().refresh(context)
+        except NoNodeError:
+            # If the object doesn't exist we will receive a
+            # NoNodeError.  This happens because the postConfig call
+            # creates this object without holding the pipeline lock,
+            # so it can't determine whether or not it exists in ZK.
+            # We do hold the pipeline lock here, so if we get this
+            # error, we know we're initializing the object, and we
+            # should write it to ZK.
+
+            # Note that typically this code is not used since
+            # currently other objects end up creating the pipeline
+            # path in ZK first.  It is included in case that ever
+            # changes.  Currently the empty byte-string code path in
+            # deserialize() is used instead.
+            context.log.warning("Initializing pipeline state for %s; "
+                                "this is expected only for new pipelines",
+                                self.pipeline.name)
+            self._set(**self._lateInitData())
+            self.internalCreate(context)
 
     def deserialize(self, raw, context):
         # We may have old change objects in the pipeline cache, so
         # make sure they are the same objects we would get from the
         # source change cache.
         self.pipeline.manager.clearCache()
+
+        # If the object doesn't exist we will get back an empty byte
+        # string.  This happens because the postConfig call creates
+        # this object without holding the pipeline lock, so it can't
+        # determine whether or not it exists in ZK.  We do hold the
+        # pipeline lock here, so if we get the empty byte string, we
+        # know we're initializing the object.  In that case, we should
+        # initialize the layout id to the current layout.  Nothing
+        # else needs to be set.
+        if raw == b'':
+            context.log.warning("Initializing pipeline state for %s; "
+                                "this is expected only for new pipelines",
+                                self.pipeline.name)
+            return self._lateInitData()
 
         data = super().deserialize(raw, context)
 
@@ -898,9 +952,32 @@ class PipelineChangeList(zkobject.ShardedZKObject):
             _change_keys=[],
         )
 
-    def refresh(self, context):
-        self._retry(context, super().refresh,
-                    context, max_tries=5)
+    def refresh(self, context, allow_init=True):
+        # Set allow_init to false to indicate that we don't hold the
+        # lock and we should not try to initialize the object in ZK if
+        # it does not exist.
+        try:
+            self._retry(context, super().refresh,
+                        context, max_tries=5)
+        except NoNodeError:
+            # If the object doesn't exist we will receive a
+            # NoNodeError.  This happens because the postConfig call
+            # creates this object without holding the pipeline lock,
+            # so it can't determine whether or not it exists in ZK.
+            # We do hold the pipeline lock here, so if we get this
+            # error, we know we're initializing the object, and
+            # we should write it to ZK.
+            if allow_init:
+                context.log.warning(
+                    "Initializing pipeline change list for %s; "
+                    "this is expected only for new pipelines",
+                    self.pipeline.name)
+                self.internalCreate(context)
+            else:
+                # If we're called from a context where we can't
+                # initialize the change list, re-raise the exception
+                # so that it can be caught and retried.
+                raise zkobject.ZKObjectNotInitializedError()
 
     def getPath(self):
         return self.getChangeListPath(self.pipeline)
@@ -911,19 +988,14 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         return pipeline_path + '/change_list'
 
     @classmethod
-    def create(cls, pipeline, old_list=None):
-        # If the object does not exist in ZK, create it with the
-        # default attributes.  Otherwise, return an initialized object
-        # (or the old object for reuse) without loading any data so
-        # that data can be loaded on the next refresh.
-        ctx = pipeline.manager.current_context
+    def create(cls, pipeline):
+        # This object may or may not exist in ZK, but we using any of
+        # that data here.  We can just start with a clean object, set
+        # the pipeline reference, and let the next refresh deal with
+        # whether there might be any data in ZK.
         change_list = cls()
         change_list._set(pipeline=pipeline)
-        if change_list.exists(ctx):
-            if old_list:
-                return old_list
-            return change_list
-        return cls.new(ctx, pipeline=pipeline)
+        return change_list
 
     def serialize(self, context):
         data = {
@@ -931,8 +1003,8 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, data, context):
-        data = super().deserialize(data, context)
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
         change_keys = []
         # We must have a dictionary with a 'changes' key; otherwise we
         # may be reading immediately after truncating.  Allow the
