@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a3fd37b_9d8af801",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T00:53:36Z",
+      "side": 1,
+      "message": "Tentative +2 pending clarification of inline comments. Feel free to approve if we\u0027re not concerned those question represent real issues.",
+      "revId": "a2b114e1a34091cb39971c0a1a1c5e3d26c4af7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf8b37ce_df1f43fc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T00:53:36Z",
+      "side": 1,
+      "message": "Any zk \"namespacing\" using a top level dir path is handled by the client and we treat things as / so using these constants without accomodating that namespace is ok right?\n\nAnd do we not need to use a safe tenant name and safe pipeline name here as well?",
+      "revId": "a2b114e1a34091cb39971c0a1a1c5e3d26c4af7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4c6c256_f66c446c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-02T00:53:36Z",
+      "side": 1,
+      "message": "Similar question about safe tenant here. It isn\u0027t clear to me why its ok to use unsafe tenant names in zk paths sometimes and not in others.",
+      "revId": "a2b114e1a34091cb39971c0a1a1c5e3d26c4af7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
