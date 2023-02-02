@@ -2249,7 +2249,9 @@ class Scheduler(threading.Thread):
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",
                                    tenant.name, pipeline.name)
-                    pipeline.change_list.refresh(ctx)
+                    # This will raise an exception and abort the process if
+                    # unable to refresh the change list.
+                    pipeline.change_list.refresh(ctx, allow_init=False)
                     change_keys = pipeline.change_list.getChangeKeys()
                     relevant_changes = pipeline.manager.resolveChangeKeys(
                         change_keys)
@@ -2278,8 +2280,16 @@ class Scheduler(threading.Thread):
                 # Update the pipeline changes
                 ctx = self.createZKContext(None, self.log)
                 for pipeline in tenant.layout.pipelines.values():
+                    # This will raise an exception if it is unable to
+                    # refresh the change list.  We will proceed anyway
+                    # and use our data from the last time we did
+                    # refresh in order to avoid stalling trigger
+                    # processing.  In this case we may not forward
+                    # some events which are related to changes in the
+                    # pipeline but don't match the pipeline trigger
+                    # criteria.
                     try:
-                        pipeline.change_list.refresh(ctx)
+                        pipeline.change_list.refresh(ctx, allow_init=False)
                     except Exception:
                         self.log.exception(
                             "Unable to refresh pipeline change list for %s",

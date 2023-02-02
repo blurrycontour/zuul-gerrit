@@ -489,9 +489,10 @@ class TestScheduler(ZuulTestCase):
                 'zuul.tenant.tenant-one.pipeline.gate.write_objects',
                 'zuul.tenant.tenant-one.pipeline.gate.read_znodes',
                 'zuul.tenant.tenant-one.pipeline.gate.write_znodes',
-                'zuul.tenant.tenant-one.pipeline.gate.read_bytes',
                 'zuul.tenant.tenant-one.pipeline.gate.write_bytes',
         ]:
+            # 'zuul.tenant.tenant-one.pipeline.gate.read_bytes' is
+            # expected to be zero since it's initialized after reading
             val = self.assertReportedStat(key, kind='g')
             self.assertTrue(0.0 < float(val) < 60000.0)
 
