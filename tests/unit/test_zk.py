@@ -18,6 +18,7 @@ import json
 import queue
 import threading
 import uuid
+from unittest import mock
 
 import testtools
 
@@ -2037,3 +2038,46 @@ class TestBlobStore(ZooKeeperBaseTestCase):
 
             with testtools.ExpectedException(KeyError):
                 bs.get(path)
+
+
+class TestPipelineInit(ZooKeeperBaseTestCase):
+    # Test the initialize-on-refresh code paths of various pipeline objects
+
+    def test_pipeline_state_new_object(self):
+        # Test the initialize-on-refresh code path with no existing object
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.state = model.PipelineState.create(
+            pipeline, layout.uuid, pipeline.state)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        pipeline.state.refresh(context)
+
+    def test_pipeline_state_existing_object(self):
+        # Test the initialize-on-refresh code path with a pre-existing object
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.manager = mock.Mock()
+        pipeline.state = model.PipelineState.create(
+            pipeline, layout.uuid, pipeline.state)
+        pipeline.change_list = model.PipelineChangeList.create(
+            pipeline)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        pipeline.change_list.refresh(context)
+        pipeline.state.refresh(context)
+
+    def test_pipeline_change_list_new_object(self):
+        # Test the initialize-on-refresh code path with no existing object
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.state = model.PipelineState.create(
+            pipeline, layout.uuid, pipeline.state)
+        pipeline.change_list = model.PipelineChangeList.create(
+            pipeline)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        pipeline.change_list.refresh(context)
