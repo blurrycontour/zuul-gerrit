@@ -68,6 +68,24 @@
       "message": "Similar question about safe tenant here. It isn\u0027t clear to me why its ok to use unsafe tenant names in zk paths sometimes and not in others.",
       "revId": "a2b114e1a34091cb39971c0a1a1c5e3d26c4af7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6eb118b_919e9c64",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-02T06:35:44Z",
+      "side": 1,
+      "message": "Initially when we implemented the event queues we did not escape tenants and piplines like we did later on. We never went back and refactored that part, but I think we should look into that.",
+      "parentUuid": "f4c6c256_f66c446c",
+      "revId": "a2b114e1a34091cb39971c0a1a1c5e3d26c4af7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
