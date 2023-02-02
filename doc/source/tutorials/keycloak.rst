@@ -85,3 +85,21 @@ you can log into the Zuul realm with the user `admin` and password
 
 Once you return to Zuul, you should see the option to create an
 autohold -- an admin-only option.
+
+Use the Zuul-client CLI
+-----------------------
+
+Once authenticated on the GUI, click on your username on the top right.
+From there you can copy a sample configuration that can be used with the
+zuul-client CLI. For this example, create the file `.zuul-tutorial.conf` in your
+home directory and paste the configuration in it.
+
+You can then perform admin actions from the CLI, which you can install via PyPI or pull as a container.
+For example, to create an autohold request with the containerized CLI:
+
+.. code-block:: shell
+
+   docker run --rm --net zuul-tutorial_zuul -v $HOME/.zuul-tutorial.conf:/root/.zuul.conf:Z docker.io/zuul/zuul-client --use-config example-tenant autohold --project test1 --job tox-docs --reason testCLI
+
+Note that if you use the containerized CLI you need to replace the "url" field with **url=http://zuul-tutorial_web_1:9000/**
+in your configuration file, due to how containers networking work.
