@@ -144,6 +144,17 @@ class EventWatcher(ZooKeeperSimpleBase):
             self.watched_tenants.add(tenant_name)
 
     def _pipelineWatch(self, tenant_name, pipelines):
+        # Remove pipelines that no longer exists from the watch list so
+        # we re-register the children watch in case the pipeline is
+        # added again.
+        for watched_tenant, pipeline_name in list(self.watched_pipelines):
+            if watched_tenant != tenant_name:
+                continue
+            if pipeline_name in pipelines:
+                continue
+            with suppress(KeyError):
+                self.watched_pipelines.remove((tenant_name, pipeline_name))
+
         for pipeline_name in pipelines:
             key = (tenant_name, pipeline_name)
             if key in self.watched_pipelines:
@@ -205,6 +216,9 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         self.queue_root = queue_root
         self.event_root = f'{queue_root}/queue'
         self.data_root = f'{queue_root}/data'
+        self.initialize()
+
+    def initialize(self):
         self.kazoo_client.ensure_path(self.event_root)
         self.kazoo_client.ensure_path(self.data_root)
 
