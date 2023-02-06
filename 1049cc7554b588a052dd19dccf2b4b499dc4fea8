@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6636232e_aadbd76f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-06T14:17:52Z",
+      "side": 1,
+      "message": "I will make a separate change to dealing with 500 error in api. \nSo what you mean is if it would be a 400 error, would it be handled correctly by the zuul-web, correct?",
+      "parentUuid": "70172fbd_d6eda9d0",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b563dbf_a3ee49d3",
         "filename": "web/src/pages/Builds.jsx",
         "patchSetId": 4
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "The first link you mention is the right approach to me in terms of UX. If it is too much of a hassle we also have a notification system in place that could be used to display such errors.",
       "parentUuid": "7b563dbf_a3ee49d3",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "746070be_e649f7b0",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-06T14:17:52Z",
+      "side": 1,
+      "message": "Indeed the alert system in the first link from Felix only applies to Form, and we ToolbarItem, which can not apply it.\n@Mattheiu, what notification system do you mean? could you show me some example where it is used?",
+      "parentUuid": "ea87db02_0b02b186",
       "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
