@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f862812e_1daef8bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-02-06T15:48:25Z",
+      "side": 1,
+      "message": "Would there be any way to sync automatically this file with the CI? Why not use this file in the CI to set the environment for example?",
+      "revId": "04ba835bf253f736c830e0366ff6286754d84b95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
