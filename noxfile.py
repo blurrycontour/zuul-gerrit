@@ -40,6 +40,10 @@ def set_standard_env_vars(session):
         'always::DeprecationWarning:zuul.driver.sql.alembic.env',
         'always::DeprecationWarning:zuul.driver.sql.alembic.script',
     ])
+    # Set PYTHONTRACEMALLOC to a value greater than 0 in the calling env
+    # to get tracebacks of that depth for ResourceWarnings. Disabled by
+    # default as this consumes more resources and is slow.
+    set_env(session, 'PYTHONTRACEMALLOC', '0')
 
 
 @nox.session(python='3')

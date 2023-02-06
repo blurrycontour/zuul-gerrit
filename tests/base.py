@@ -1227,6 +1227,7 @@ class GerritWebServer(object):
     def stop(self):
         self.httpd.shutdown()
         self.thread.join()
+        self.httpd.server_close()
 
 
 class FakeGerritPoller(gerritconnection.GerritPoller):

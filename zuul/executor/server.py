@@ -3481,6 +3481,8 @@ class ExecutorServer(BaseMergeServer):
             self.statsd.gauge(base_key + '.load_average', 0)
             self.statsd.gauge(base_key + '.pct_used_ram', 0)
             self.statsd.gauge(base_key + '.running_builds', 0)
+            self.statsd.close()
+            self.statsd = None
 
         # Use the BaseMergeServer's stop method to disconnect from
         # ZooKeeper.  We do this as one of the last steps to ensure
