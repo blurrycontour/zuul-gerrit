@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fe303232_3accae4d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-02-06T14:29:05Z",
+      "side": 1,
+      "message": "I think returning a 400 error would be the right way to handle an input error. It is after all a client-side error, it shouldn\u0027t trigger a server side error (ie an error 500).",
+      "parentUuid": "6636232e_aadbd76f",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b563dbf_a3ee49d3",
         "filename": "web/src/pages/Builds.jsx",
         "patchSetId": 4
@@ -85,6 +103,24 @@
       "side": 1,
       "message": "Indeed the alert system in the first link from Felix only applies to Form, and we ToolbarItem, which can not apply it.\n@Mattheiu, what notification system do you mean? could you show me some example where it is used?",
       "parentUuid": "ea87db02_0b02b186",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db7e9adb_90bca9a8",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-02-06T14:29:05Z",
+      "side": 1,
+      "message": "Have a look at the AutoholdModal component, IIRC it triggers a notification when the autohold request succeeds. It also handles API failures so that could tie in with the API change we discussed before.",
+      "parentUuid": "746070be_e649f7b0",
       "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
