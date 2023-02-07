@@ -57,7 +57,8 @@ class TestInventoryBase(ZuulTestCase):
 
         build = self.getBuildByName(name)
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        inventory = yaml.safe_load(open(inv_path, 'r'))
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
         return inventory
 
     def _get_setup_inventory(self, name):
@@ -65,7 +66,9 @@ class TestInventoryBase(ZuulTestCase):
 
         build = self.getBuildByName(name)
         setup_inv_path = build.jobdir.setup_playbook.inventory
-        return yaml.ansible_unsafe_load(open(setup_inv_path, 'r'))
+        with open(setup_inv_path, 'r') as f:
+            inventory = yaml.ansible_unsafe_load(f)
+        return inventory
 
     def runJob(self, name):
         self.hold_jobs_in_queue = False
@@ -409,10 +412,12 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
 
         build = self.history[0]
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        inventory = yaml.safe_load(open(inv_path, 'r'))
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
 
         zv_path = os.path.join(build.jobdir.root, 'ansible', 'zuul_vars.yaml')
-        zv = yaml.safe_load(open(zv_path, 'r'))
+        with open(zv_path, 'r') as f:
+            zv = yaml.safe_load(f)
 
         # TODO(corvus): zuul vars aren't really stored here anymore;
         # rework these tests to examine them separately.
