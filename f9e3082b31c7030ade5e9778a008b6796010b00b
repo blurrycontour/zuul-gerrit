@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "f9e3082b31c7030ade5e9778a008b6796010b00b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f92ebcef_414241fa",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-07T12:53:30Z",
+      "side": 1,
+      "message": "I think the name of the exception is a bit misleading. When we get a `NoNodeError` we don\u0027t know if the pipeline was not initialized or if the change list is currently in the process of being updated (sharded zkobject).",
+      "revId": "f9e3082b31c7030ade5e9778a008b6796010b00b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f12e9447_fbcb392d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2257,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-07T12:53:30Z",
+      "side": 1,
+      "message": "I think it\u0027s not safe to assume that the pipeline is not yet initialized when we get a `ZKObjectNotInitializedError` aka. `NoNodeError` (see my comment in model.py).\n\nContinuing here in case of error might also lead to the cleanup of cached changes that are still relevant (if they are also older than `max_age\u003d2h`).",
+      "revId": "f9e3082b31c7030ade5e9778a008b6796010b00b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
