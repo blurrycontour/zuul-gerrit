@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b38199ea_960586ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-02-07T09:28:23Z",
+      "side": 1,
+      "message": "FWIW we\u0027ve been running our Zuul instances with MariaDB, so I\u0027m all for actual testing on it!",
+      "revId": "45fe276a823d4cf5d46cb1e1102548686e8dd774",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
