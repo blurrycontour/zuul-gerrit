@@ -50,6 +50,23 @@
       "message": "recheck",
       "revId": "6c8c82c26b475e61dc988efe683c05e001bceeed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d18b3e55_550860b7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1775,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-07T19:43:37Z",
+      "side": 1,
+      "message": "It\u0027s trivial to find out: `trusted, _ \u003d tenant.getProject(tpc.project.canonical_name))` if we did want to include the correct info.  I agree it\u0027s not important, and this note should be sufficient.  But if you did want to do that, I\u0027d +2 that as well.",
+      "revId": "6c8c82c26b475e61dc988efe683c05e001bceeed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
