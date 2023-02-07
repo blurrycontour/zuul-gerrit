@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7338eb96_f4f7f5f9",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-07T19:12:33Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "f92ebcef_414241fa",
+      "revId": "f9e3082b31c7030ade5e9778a008b6796010b00b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f12e9447_fbcb392d",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-02-07T12:53:30Z",
       "side": 1,
       "message": "I think it\u0027s not safe to assume that the pipeline is not yet initialized when we get a `ZKObjectNotInitializedError` aka. `NoNodeError` (see my comment in model.py).\n\nContinuing here in case of error might also lead to the cleanup of cached changes that are still relevant (if they are also older than `max_age\u003d2h`).",
+      "revId": "f9e3082b31c7030ade5e9778a008b6796010b00b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26bc5244_d7e0b6f9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-07T19:12:33Z",
+      "side": 1,
+      "message": "Agreed.  I was hoping to improve this case, as well as the other one below.  But I can\u0027t find a way to distinguish \"uninitialized\" from \"write in progress\" without significantly more complexity, so I think we\u0027ll have to live with the current guarantees (or lack thereof).",
+      "parentUuid": "f12e9447_fbcb392d",
       "revId": "f9e3082b31c7030ade5e9778a008b6796010b00b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
