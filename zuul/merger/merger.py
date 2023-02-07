@@ -333,6 +333,24 @@ class Repo(object):
                 os.rmdir(root)
 
     @staticmethod
+    def _cleanup_leaked_rebase_merge_dir(local_path, log, messages):
+        merge_dir = os.path.join(local_path, ".git/rebase-merge")
+        if os.path.exists(merge_dir):
+            if log:
+                log.debug("Cleaning leaked rebase-merge dir %s", merge_dir)
+            else:
+                messages.append(
+                    f"Cleaning leaked rebase-merge dir {merge_dir}")
+            try:
+                shutil.rmtree(merge_dir)
+            except Exception as exc:
+                msg = "Failed to remove leaked rebase-merge dir:"
+                if log:
+                    log.exception(msg)
+                else:
+                    messages.append(f"{msg}\n{exc}")
+
+    @staticmethod
     def refNameToZuulRef(ref_name: str) -> str:
         return "refs/zuul/{}".format(
             hashlib.sha1(ref_name.encode("utf-8")).hexdigest()
@@ -383,6 +401,8 @@ class Repo(object):
             else:
                 messages.append("Delete stale Zuul ref {}".format(ref))
             Repo._deleteRef(ref.path, repo)
+
+        Repo._cleanup_leaked_rebase_merge_dir(local_path, log, messages)
 
         # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
         # directory foo behind that will block creating the reference foo
