@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbdb9f0e_9e4f77ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-02-07T14:21:21Z",
+      "side": 1,
+      "message": "Let\u0027s port this to zuul/zuul-client",
+      "revId": "96d08b7eaaf234759af36deaa05c8400b7efefbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
