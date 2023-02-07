@@ -5283,7 +5283,8 @@ class TestRoleBranches(RoleTestCase):
     def getBuildInventory(self, name):
         build = self.getBuildByName(name)
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        inventory = yaml.safe_load(open(inv_path, 'r'))
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
         return inventory
 
     def getCheckout(self, build, path):
