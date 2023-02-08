@@ -1888,7 +1888,8 @@ class AnsibleJob(object):
                 logfile=json_output))
             return
         try:
-            output = json.load(open(json_output, 'r'))
+            with open(json_output, 'r') as f:
+                output = json.load(f)
             last_playbook = output[-1]
             # Transform json to yaml - because it's easier to read and given
             # the size of the data it'll be extra-hard to read this as an
@@ -2332,7 +2333,8 @@ class AnsibleJob(object):
     def prepareKubeConfig(self, jobdir, data):
         kube_cfg_path = jobdir.kubeconfig
         if os.path.exists(kube_cfg_path):
-            kube_cfg = yaml.safe_load(open(kube_cfg_path))
+            with open(kube_cfg_path) as f:
+                kube_cfg = yaml.safe_load(f)
         else:
             kube_cfg = {
                 'apiVersion': 'v1',
