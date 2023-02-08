@@ -570,6 +570,258 @@ class TestBranchTag(ZuulTestCase):
             ordered=False)
 
 
+class TestOverrideCheckoutTag(ZuulTestCase):
+    # Test override-checkout when pointed at a tag
+
+    @simple_layout('layouts/override-checkout-tag.yaml')
+    def test_override_checkout_tag_pipeline(self):
+        # Test what happens when we override-checkout a tag within a
+        # tag-based pipeline.  This test codifies the current behavior
+        # even though it's counter-intuitive.  We may want to change
+        # this later.
+
+        # Add a job to the master branch of project1
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+                vars:
+                    master: true
+
+            - project:
+                tag:
+                  jobs:
+                    - test-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Then create a branch from master.
+        self.create_branch('org/project1', 'stable/pike')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable/pike'))
+        self.waitUntilSettled()
+
+        # Update the pike variant
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+                vars:
+                    pike: true
+
+            - project:
+                tag:
+                  jobs:
+                    - test-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project1', 'stable/pike', 'B',
+                                           files=file_dict,
+                                           parent=A.patchsets[-1]['revision'])
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        event = self.fake_gerrit.addFakeTag(
+            'org/project1', 'stable/pike', 'foo')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+
+        # At this point, test-job is defined in org/project1 with two
+        # branch variants, one on master and one on stable/pike.  The
+        # repo also has a tag named "foo" which points to a commit
+        # that is only in the stable/pike branch.
+
+        # Create a new job in another repo that inherits from
+        # test-job.  It tells Zuul to override-checkout: foo.  This
+        # will correctly checkout the foo tag in the job.  If it were
+        # a branch, Zuul would use that branch variant of test-job,
+        # but this behavior doesn't apply to tags, so we'll get the
+        # branch variants that match the queue item.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: child-job
+                parent: test-job
+                required-projects:
+                  - name: org/project1
+                    override-checkout: foo
+
+            - project:
+                tag:
+                  jobs:
+                    - child-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C',
+                                           files=file_dict)
+        C.setMerged()
+        self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Now create a tag with a different name on the second repo: bar.
+        self.executor_server.hold_jobs_in_build = True
+        event = self.fake_gerrit.addFakeTag(
+            'org/project2', 'master', 'bar')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        # There is one running build: child-job
+        self.assertEqual(1, len(self.builds))
+        build = self.builds[0]
+        self.assertEqual('child-job', build.name)
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        ipath = build.parameters['zuul']['_inheritance_path']
+        for i in ipath:
+            self.log.debug("inheritance path %s", i)
+        self.log.debug("vars %s", build.job.combined_variables)
+        # Since override-checkout doesn't apply to tags, the only
+        # matching variant is test-job from the master branch.  That's
+        # because the bar tag applied to a commit on the master
+        # branch, so that is the value of containing_branches for the
+        # queue item.
+        self.assertEqual({'master': True},
+                         build.job.combined_variables)
+
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', ref='refs/tags/foo'),
+            dict(name='child-job', result='SUCCESS', ref='refs/tags/bar'),
+        ], ordered=False)
+
+    @simple_layout('layouts/override-checkout-tag.yaml')
+    def test_override_checkout_check_pipeline(self):
+        # Test what happens when we override-checkout a tag within a
+        # change-based pipeline.  This test codifies the current
+        # behavior even though it's counter-intuitive.  We may want to
+        # change this later.
+
+        # Add a job to the master branch of project1
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+                vars:
+                    master: true
+
+            - project:
+                check:
+                  jobs:
+                    - test-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Then create a branch from master.
+        self.create_branch('org/project1', 'stable/pike')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable/pike'))
+        self.waitUntilSettled()
+
+        # Update the pike variant
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+                vars:
+                    pike: true
+
+            - project:
+                check:
+                  jobs:
+                    - test-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project1', 'stable/pike', 'B',
+                                           files=file_dict,
+                                           parent=A.patchsets[-1]['revision'])
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        event = self.fake_gerrit.addFakeTag(
+            'org/project1', 'stable/pike', 'foo')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+
+        # At this point, test-job is defined in org/project1 with two
+        # branch variants, one on master and one on stable/pike.  The
+        # repo also has a tag named "foo" which points to a commit
+        # that is only in the stable/pike branch.
+
+        # Create a new job in another repo that inherits from
+        # test-job.  It tells Zuul to override-checkout: foo.  This
+        # will correctly checkout the foo tag in the job.  If it were
+        # a branch, Zuul would use that branch variant of test-job,
+        # but this behavior doesn't apply to tags, so we'll get the
+        # branch variants that match the queue item.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: child-job
+                parent: test-job
+                required-projects:
+                  - name: org/project1
+                    override-checkout: foo
+
+            - project:
+                check:
+                  jobs:
+                    - child-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C',
+                                           files=file_dict)
+        C.setMerged()
+        self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Now create a change on the second repo.
+        self.executor_server.hold_jobs_in_build = True
+        D = self.fake_gerrit.addFakeChange('org/project2', 'master', 'D')
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # There is one running build: child-job
+        self.assertEqual(1, len(self.builds))
+        build = self.builds[0]
+        self.assertEqual('child-job', build.name)
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        ipath = build.parameters['zuul']['_inheritance_path']
+        for i in ipath:
+            self.log.debug("inheritance path %s", i)
+        self.log.debug("vars %s", build.job.combined_variables)
+        # Since override-checkout doesn't apply to tags, the only
+        # matching variant is test-job from the master branch.  That's
+        # because this change is on the master branch.
+        self.assertEqual({'master': True},
+                         build.job.combined_variables)
+
+        self.assertHistory([
+            dict(name='child-job', result='SUCCESS', changes='4,1'),
+        ], ordered=False)
+
+
 class TestBranchNegative(ZuulTestCase):
     tenant_config_file = 'config/branch-negative/main.yaml'
 

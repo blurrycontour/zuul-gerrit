@@ -6041,19 +6041,20 @@ class Ref(object):
         pname = None
         if self.project and self.project.name:
             pname = self.project.name
+        contained = getattr(self, 'containing_branches', [])
         if self.newrev == '0000000000000000000000000000000000000000':
-            rep = '<%s 0x%x %s deletes %s from %s' % (
+            rep = '<%s 0x%x %s deletes %s from %s contained in branches %s' % (
                 type(self).__name__, id(self), pname,
-                self.ref, self.oldrev)
+                self.ref, self.oldrev, contained)
         elif self.oldrev == '0000000000000000000000000000000000000000':
-            rep = '<%s 0x%x %s creates %s on %s>' % (
+            rep = '<%s 0x%x %s creates %s on %s contained in branches %s>' % (
                 type(self).__name__, id(self), pname,
-                self.ref, self.newrev)
+                self.ref, self.newrev, contained)
         else:
             # Catch all
-            rep = '<%s 0x%x %s %s updated %s..%s>' % (
+            rep = '<%s 0x%x %s %s updated %s..%s contained in branches %s>' % (
                 type(self).__name__, id(self), pname,
-                self.ref, self.oldrev, self.newrev)
+                self.ref, self.oldrev, self.newrev, contained)
         return rep
 
     def equals(self, other):
