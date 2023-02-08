@@ -165,7 +165,7 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
         self.streaming_data[name] = ''
         with socket.create_connection(gateway_address) as s:
             if self.fingergw_use_ssl:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = False
                 context.load_cert_chain(

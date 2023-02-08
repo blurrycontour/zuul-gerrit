@@ -168,7 +168,7 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
 
         if all([self.server_ssl_key, self.server_ssl_cert,
                 self.server_ssl_ca]):
-            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
             context.load_cert_chain(self.server_ssl_cert, self.server_ssl_key)
             context.load_verify_locations(self.server_ssl_ca)
             context.verify_mode = ssl.CERT_REQUIRED
