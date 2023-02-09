@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbebe0d9_d9e7be41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-09T11:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe303232_3accae4d",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b563dbf_a3ee49d3",
@@ -121,6 +139,24 @@
       "side": 1,
       "message": "Have a look at the AutoholdModal component, IIRC it triggers a notification when the autohold request succeeds. It also handles API failures so that could tie in with the API change we discussed before.",
       "parentUuid": "746070be_e649f7b0",
+      "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7a75381_ae414462",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-09T11:09:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db7e9adb_90bca9a8",
       "revId": "1049cc7554b588a052dd19dccf2b4b499dc4fea8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
