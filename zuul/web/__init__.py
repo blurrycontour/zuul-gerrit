@@ -395,7 +395,7 @@ class LogStreamer(object):
         self.finger_socket = socket.create_connection(
             (server, port), timeout=10)
         if use_ssl:
-            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
             context.verify_mode = ssl.CERT_REQUIRED
             context.check_hostname = self.zuulweb.finger_tls_verify_hostnames
             context.load_cert_chain(

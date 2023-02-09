@@ -71,7 +71,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         '''
         with socket.create_connection((server, port), timeout=10) as s:
             if use_ssl:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = self.fingergw.tls_verify_hostnames
                 context.load_cert_chain(self.fingergw.tls_cert,
