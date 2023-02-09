@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba099129_d616646d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-09T17:05:42Z",
+      "side": 1,
+      "message": "One small testing thing inline",
+      "revId": "78a4cf08d06928d6021c00ab3b32bf4d488dcad5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80a760a6_9810379e",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-09T17:05:42Z",
+      "side": 1,
+      "message": "This should be change-message.txt not commit-message.txt.",
+      "range": {
+        "startLine": 438,
+        "startChar": 53,
+        "endLine": 438,
+        "endChar": 59
+      },
+      "revId": "78a4cf08d06928d6021c00ab3b32bf4d488dcad5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
