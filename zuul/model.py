@@ -1811,24 +1811,6 @@ class FrozenSecret(ConfigObject):
         )
 
 
-class ProjectContext(ConfigObject):
-
-    def __init__(self, project_canonical_name, project_name):
-        super().__init__()
-        self.project_canonical_name = project_canonical_name
-        self.project_name = project_name
-        self.branch = None
-        self.path = None
-
-    def __str__(self):
-        return self.project_name
-
-    def toDict(self):
-        return dict(
-            project=self.project_name,
-        )
-
-
 class SourceContext(ConfigObject):
     """A reference to the branch of a project in configuration.
 
