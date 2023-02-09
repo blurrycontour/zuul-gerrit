@@ -2267,8 +2267,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
 
         self.assertHistory([
-            dict(name="test-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="test-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
         ], ordered=False)
 
         A.addPatchset()
@@ -2277,10 +2277,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             # Original check run
-            dict(name="test-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="test-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
             # Second check run
-            dict(name="test-job", result="SUCCESS", changes="2,1 1,2"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,2"),
         ], ordered=False)
 
     def test_deps_by_topic_multi_tenant(self):
@@ -2376,6 +2376,81 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project-job", result="ABORTED", changes="1,1"),
             dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
             dict(name="project-job", result="SUCCESS", changes="2,1 1,2"),
+        ], ordered=False)
+
+    @simple_layout('layouts/deps-by-topic.yaml')
+    def test_dependency_refresh_by_topic_check(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates the typical workflow where a developer
+        # uploads changes one at a time.
+        # The first change:
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Now that it has been uploaded, upload the second change
+        # in the same topic.
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # A quirk: at the end of this process, the second change in
+        # Gerrit has a complete run because only at that point is the
+        # topic complete; the first is aborted once the second is
+        # uploaded.
+        self.assertHistory([
+            dict(name="check-job", result="ABORTED", changes="1,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/deps-by-topic.yaml')
+    def test_dependency_refresh_by_topic_gate(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates a workflow where a developer adds a change to
+        # a cycle already in gate.
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        # Add a new change to the cycle.
+        C = self.fake_gerrit.addFakeChange('org/project1', "master", "C",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # At the end of this process, the gate jobs should be aborted
+        # because the new dpendency showed up.
+        self.assertEqual(A.data["status"], "NEW")
+        self.assertEqual(B.data["status"], "NEW")
+        self.assertEqual(C.data["status"], "NEW")
+        self.assertHistory([
+            dict(name="gate-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="gate-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1"),
         ], ordered=False)
 
 
