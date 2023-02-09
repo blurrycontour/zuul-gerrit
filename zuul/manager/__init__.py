@@ -216,7 +216,7 @@ class PipelineManager(metaclass=ABCMeta):
                         and self.useDependenciesByTopic(change.project))
                     if (update_commit_dependencies
                             or update_topic_dependencies):
-                        self.updateCommitDependencies(change, None, event=None)
+                        self.updateCommitDependencies(change, event=None)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
@@ -258,10 +258,16 @@ class PipelineManager(metaclass=ABCMeta):
                 return True
         return False
 
-    def isAnyVersionOfChangeInPipeline(self, change):
-        # Checks any items in the pipeline
+    def isChangeRelevantToPipeline(self, change):
+        # Checks if any version of the change or its deps matches any
+        # item in the pipeline.
         for change_key in self.pipeline.change_list.getChangeKeys():
             if change.cache_stat.key.isSameChange(change_key):
+                return True
+        for dep_change_ref in change.getNeedsChanges(
+                self.useDependenciesByTopic(change.project)):
+            dep_change_key = ChangeKey.fromReference(dep_change_ref)
+            if change.cache_stat.key.isSameChange(dep_change_key):
                 return True
         return False
 
@@ -288,7 +294,7 @@ class PipelineManager(metaclass=ABCMeta):
                     to_refresh.add(item.change)
 
         for existing_change in to_refresh:
-            self.updateCommitDependencies(existing_change, None, event)
+            self.updateCommitDependencies(existing_change, event)
 
     def reportEnqueue(self, item):
         if not self.pipeline.state.disabled:
@@ -537,7 +543,7 @@ class PipelineManager(metaclass=ABCMeta):
         # to date and this is a noop; otherwise, we need to refresh
         # them anyway.
         if isinstance(change, model.Change):
-            self.updateCommitDependencies(change, None, event)
+            self.updateCommitDependencies(change, event)
 
         with self.getChangeQueue(change, event, change_queue) as change_queue:
             if not change_queue:
@@ -830,7 +836,7 @@ class PipelineManager(metaclass=ABCMeta):
                         self.pipeline.tenant.name][other_pipeline.name].put(
                             event, needs_result=False)
 
-    def updateCommitDependencies(self, change, change_queue, event):
+    def updateCommitDependencies(self, change, event):
         log = get_annotated_logger(self.log, event)
 
         must_update_commit_deps = (
