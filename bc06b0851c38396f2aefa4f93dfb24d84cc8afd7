@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7032e188_49810919",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-09T16:59:09Z",
+      "side": 0,
+      "message": "I guess the main behavior difference here is that if commit_needs_changes is empty we would not update commit dependencies for the change itself? That makes sense given the Github behavior where no new patchset is created. Its a single change without dependencies unless we explicitly check for this case.",
+      "revId": "bc06b0851c38396f2aefa4f93dfb24d84cc8afd7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
