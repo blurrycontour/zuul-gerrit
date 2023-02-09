@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c8f9a42_a7b1d4f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-09T21:08:27Z",
+      "side": 1,
+      "message": "recheck the post failures are/were due to a sad swift log storage endpoint which we\u0027ve temporarily removed.",
+      "revId": "ac3122503f632df2febe4e919eee0e2851c2afb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
