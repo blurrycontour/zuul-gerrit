@@ -2502,9 +2502,25 @@ class Scheduler(threading.Thread):
         event.span_context = tracing.getSpanContext(span)
 
         for pipeline in tenant.layout.pipelines.values():
+            # For most kinds of dependencies, it's sufficient to check
+            # if this change is already in the pipeline, because the
+            # only way to update a dependency cycle is to update one
+            # of the changes in it.  However, dependencies-by-topic
+            # can have changes added to the cycle without updating any
+            # of the existing changes in the cycle.  That means in
+            # order to detect whether a new change is added to an
+            # existing cycle in the pipeline, we need to know all of
+            # the dependencies of the new change, and check if *they*
+            # are in the pipeline.  Therefore, go ahead and update our
+            # dependencies here so they are available for comparison
+            # against the pipeline contents.  This front-loads some
+            # work that otherwise would happen in the pipeline
+            # manager, but the result of the work goes into the change
+            # cache, so it's not wasted; it's just less parallelized.
+            pipeline.manager.updateCommitDependencies(change, event)
             if (
                 pipeline.manager.eventMatches(event, change)
-                or pipeline.manager.isAnyVersionOfChangeInPipeline(change)
+                or pipeline.manager.isChangeRelevantToPipeline(change)
             ):
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
