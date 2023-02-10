@@ -108,7 +108,7 @@ class PipelineManager(metaclass=ABCMeta):
 
         # These will be out of date until they are refreshed later.
         self.pipeline.state = PipelineState.create(
-            self.pipeline, layout.uuid, self.pipeline.state)
+            self.pipeline, self.pipeline.state)
         self.pipeline.change_list = PipelineChangeList.create(
             self.pipeline)
 
