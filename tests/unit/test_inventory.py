@@ -417,23 +417,29 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
 
         zv_path = os.path.join(build.jobdir.root, 'ansible', 'zuul_vars.yaml')
         with open(zv_path, 'r') as f:
-            zv = yaml.safe_load(f)
+            zv = yaml.ansible_unsafe_load(f)
 
         # TODO(corvus): zuul vars aren't really stored here anymore;
         # rework these tests to examine them separately.
         inventory['all']['vars'] = {'zuul': zv['zuul']}
 
+        # The deprecated base64 version
         decoded_message = base64.b64decode(
             inventory['all']['vars']['zuul']['message']).decode('utf-8')
         self.assertEqual(decoded_message, expected_message)
-
         obtained_message = self._get_file(self.history[0],
                                           'work/logs/commit-message.txt')
+        self.assertEqual(obtained_message, expected_message)
 
+        # The new !unsafe version
+        decoded_message = inventory['all']['vars']['zuul']['change_message']
+        self.assertEqual(decoded_message, expected_message)
+        obtained_message = self._get_file(self.history[0],
+                                          'work/logs/change-message.txt')
         self.assertEqual(obtained_message, expected_message)
 
     def test_jinja2_message_brackets(self):
-        self._jinja2_message("This message has {{ jinja2 }} in it ")
+        self._jinja2_message("This message has {{ ansible_host }} in it ")
 
     def test_jinja2_message_raw(self):
         self._jinja2_message("This message has {% raw %} in {% endraw %} it ")
