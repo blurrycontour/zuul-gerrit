@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1674ae8_2c090779",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-10T17:14:33Z",
+      "side": 1,
+      "message": "I don\u0027t think the additional test complexity of reading data via a second route is worth it.  We have coverage of reading and writing zk objects and this uses the usual read/write methods.  We just need to exercise all the code paths to make sure we get the corner cases for initialization.  I think for this test, we either get a working object back (success) or it raises an exception.",
+      "parentUuid": "e79dc062_0d0c1db9",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cea88ecc_0926ec2b",
@@ -52,6 +70,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c39c914c_1bb5f5ea",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 776,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-10T17:14:33Z",
+      "side": 1,
+      "message": "I\u0027m not seeing a reference to layout_uuid in refresh, so I\u0027m having trouble parsing this.\n\nWe write to ZK at the end of every pipeline processing (or if we call internalCreate).",
+      "parentUuid": "c1e1b3ea_c12dd03f",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20678488_6d12463e",
@@ -71,6 +107,24 @@
         "endLine": 955,
         "endChar": 46
       },
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c54d0f19_2e8b99e7",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 955,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-10T17:14:33Z",
+      "side": 1,
+      "message": "The normal pattern is to hold the lock, so it\u0027s designed for that.  I get where you\u0027re coming from, but I don\u0027t want to flip the pattern so we have to do extra work when we have the lock.  We should *always* have the lock, and in the one or two places where we decided it\u0027s okay not to, we should be really careful and explicit about it.  I don\u0027t want us thinking that the default is working with it unlocked because it is very much not safe.",
+      "parentUuid": "20678488_6d12463e",
       "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
