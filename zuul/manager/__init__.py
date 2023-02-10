@@ -496,7 +496,8 @@ class PipelineManager(metaclass=ABCMeta):
 
     def addChange(self, change, event, quiet=False, enqueue_time=None,
                   ignore_requirements=False, live=True,
-                  change_queue=None, history=None, dependency_graph=None):
+                  change_queue=None, history=None, dependency_graph=None,
+                  skip_presence_check=False):
         log = get_annotated_logger(self.log, event)
         log.debug("Considering adding change %s" % change)
 
@@ -511,7 +512,9 @@ class PipelineManager(metaclass=ABCMeta):
         # If we are adding a live change, check if it's a live item
         # anywhere in the pipeline.  Otherwise, we will perform the
         # duplicate check below on the specific change_queue.
-        if live and self.isChangeAlreadyInPipeline(change):
+        if (live and
+            self.isChangeAlreadyInPipeline(change) and
+            not skip_presence_check):
             log.debug("Change %s is already in pipeline, ignoring" % change)
             return True
 
@@ -570,8 +573,10 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("History after enqueuing changes ahead: %s", history)
 
             if self.isChangeAlreadyInQueue(change, change_queue):
-                log.debug("Change %s is already in queue, ignoring" % change)
-                return True
+                if not skip_presence_check:
+                    log.debug("Change %s is already in queue, ignoring",
+                              change)
+                    return True
 
             cycle = []
             if isinstance(change, model.Change):
@@ -1534,6 +1539,7 @@ class PipelineManager(metaclass=ABCMeta):
             log.info("Dequeuing change %s because "
                      "it can no longer merge" % item.change)
             self.cancelJobs(item)
+            quiet_dequeue = False
             if item.isBundleFailing():
                 item.setDequeuedBundleFailing('Bundle is failing')
             elif not meets_reqs:
@@ -1545,7 +1551,28 @@ class PipelineManager(metaclass=ABCMeta):
                 else:
                     msg = f'Change {clist} is needed.'
                 item.setDequeuedNeedingChange(msg)
-            if item.live:
+                # If all the dependencies are already in the pipeline
+                # (but not ahead of this change), then we probably
+                # just added updated versions of them, possibly
+                # updating a cycle.  In that case, attempt to
+                # re-enqueue this change with the updated deps.
+                if (item.live and
+                    all([self.isChangeAlreadyInPipeline(c)
+                         for c in needs_changes])):
+                    # Try enqueue, if that succeeds, keep this dequeue quiet
+                    try:
+                        log.info("Attempting re-enqueue of change %s",
+                                 item.change)
+                        quiet_dequeue = self.addChange(
+                            item.change, item.event,
+                            enqueue_time=item.enqueue_time,
+                            quiet=True,
+                            skip_presence_check=True)
+                    except Exception:
+                        log.exception("Unable to re-enqueue change %s "
+                                      "which is missing dependencies",
+                                      item.change)
+            if item.live and not quiet_dequeue:
                 try:
                     self.reportItem(item)
                 except exceptions.MergeFailure:

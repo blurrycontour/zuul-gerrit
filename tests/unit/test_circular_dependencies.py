@@ -2368,13 +2368,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        # A quirk: at the end of this process, the first change in
-        # Gerrit has a complete run because the process of updating it
-        # involves a new patchset that is enqueued.  Compare to the
-        # same test in GitHub.
         self.assertHistory([
             dict(name="project-job", result="ABORTED", changes="1,1"),
             dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="project-job", result="SUCCESS", changes="1,2 2,1"),
             dict(name="project-job", result="SUCCESS", changes="2,1 1,2"),
         ], ordered=False)
 
@@ -2404,12 +2401,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        # A quirk: at the end of this process, the second change in
-        # Gerrit has a complete run because only at that point is the
-        # topic complete; the first is aborted once the second is
-        # uploaded.
         self.assertHistory([
             dict(name="check-job", result="ABORTED", changes="1,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
         ], ordered=False)
 
@@ -2682,13 +2676,11 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        # A quirk: at the end of this process, the second PR in GitHub
-        # has a complete run because the process of updating the first
-        # change is not disruptive to the second.  Compare to the same
-        # test in Gerrit.
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha}"),
             dict(name="project-job", result="SUCCESS",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
         ], ordered=False)
