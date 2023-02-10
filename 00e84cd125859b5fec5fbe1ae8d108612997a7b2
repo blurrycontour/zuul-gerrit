@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c904618_83e48275",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T19:39:05Z",
+      "side": 1,
+      "message": "recheck looks like maybe the failures are due to zookeeper problems? Its hard to make out in the large logfile.",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e79dc062_0d0c1db9",
