@@ -22,6 +22,30 @@
       },
       "revId": "e57548e3714454f54148eac69ef3daaafadab05c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f59c14b0_31346d0c",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T17:32:52Z",
+      "side": 0,
+      "message": "Note this was mostly written for my own understanding and for the hopes of helping anyone else reviewing the change. Doesn\u0027t call out something that needs updating.",
+      "parentUuid": "2716ce94_0578ff6a",
+      "range": {
+        "startLine": 648,
+        "startChar": 47,
+        "endLine": 648,
+        "endChar": 70
+      },
+      "revId": "e57548e3714454f54148eac69ef3daaafadab05c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

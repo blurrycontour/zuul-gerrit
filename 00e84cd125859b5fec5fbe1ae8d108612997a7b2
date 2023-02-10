@@ -88,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc97ca2e_08aa48c4",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 776,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T17:32:52Z",
+      "side": 1,
+      "message": "I was missing the refresh -\u003e load -\u003e deserialize call path in my head. We end up _set()ing the return value of this call up the stack. THat will set layout_uuid from the _lateInitData() call.",
+      "parentUuid": "c39c914c_1bb5f5ea",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20678488_6d12463e",
