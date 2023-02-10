@@ -643,7 +643,7 @@ class PipelineState(zkobject.ZKObject):
         return obj
 
     @classmethod
-    def create(cls, pipeline, layout_uuid, old_state=None):
+    def create(cls, pipeline, old_state=None):
         # If we are resetting an existing pipeline, we will have an
         # old_state, so just clean up the object references there and
         # let the next refresh handle updating any data.
