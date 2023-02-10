@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e79dc062_0d0c1db9",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2058,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T16:53:35Z",
+      "side": 1,
+      "message": "Related to some of my other questions should we check the data stored here too? That would give a better sense of what information is written back at this point.",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cea88ecc_0926ec2b",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2074,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T16:53:35Z",
+      "side": 1,
+      "message": "Similar to above maybe assert the null? state here. Then refresh the change list and check for empty list?",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1e1b3ea_c12dd03f",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 776,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T16:53:35Z",
+      "side": 1,
+      "message": "In refresh we note that this deserialize() path is used instaed. But unlike refresh() we don\u0027t call _set() to set the layout_uuid on this object. And we don\u0027t write out the contents to zookeeper. Should these two be equivalent considering one is taking precedence over the other?\n\nI\u0027m guessing we may not always have a write lock when deserializing which makes that unsafe. This leads me to wonder when we do actually write back to zookeeper for this object? Also, any concern with multiple schedulers passing through this block without a lock?",
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20678488_6d12463e",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 955,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T16:53:35Z",
+      "side": 1,
+      "message": "Nit, might be more defensive to default to false here and explicitly indicate the lock is held when it is rather than the opposite.",
+      "range": {
+        "startLine": 955,
+        "startChar": 31,
+        "endLine": 955,
+        "endChar": 46
+      },
+      "revId": "00e84cd125859b5fec5fbe1ae8d108612997a7b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2716ce94_0578ff6a",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-10T16:53:35Z",
+      "side": 0,
+      "message": "Looks like we stop setting the layout_uuid on the PipelineState here as we get it from the pipeline object in _lateInitData instead.\n\nAlso looks like create() is not a common pattern to all the zkobjects that we\u0027re changing semantics for. This method is only on the two classes modified in this change.",
+      "range": {
+        "startLine": 648,
+        "startChar": 47,
+        "endLine": 648,
+        "endChar": 70
+      },
+      "revId": "e57548e3714454f54148eac69ef3daaafadab05c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
