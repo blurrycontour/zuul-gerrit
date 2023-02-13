@@ -1557,6 +1557,50 @@ class TestInRepoConfig(ZuulTestCase):
                                     'start_line': 5},
                           })
 
+    def test_dynamic_config_job_anchors(self):
+        # Test the use of anchors in job configuration.  This is a
+        # regression test designed to catch a failure where we freeze
+        # the first job and in doing so, mutate the vars dict.  The
+        # intended behavior is that the two jobs end up with two
+        # separate python objects for their vars dicts.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: myvars
+                vars: &anchor
+                  plugins:
+                    foo: bar
+
+            - job:
+                name: project-test1
+                timeout: 999999999999
+                vars: *anchor
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - project-test1
+            """)
+
+        in_repo_playbook = textwrap.dedent(
+            """
+            - hosts: all
+              tasks: []
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf,
+                     'playbooks/project-test2.yaml': in_repo_playbook}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('max-job-timeout', A.messages[0])
+        self.assertHistory([])
+
     def test_dynamic_config_non_existing_job_in_template(self):
         """Test that requesting a non existent job fails"""
         in_repo_conf = textwrap.dedent(
