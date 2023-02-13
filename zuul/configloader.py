@@ -452,6 +452,7 @@ class PragmaParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
 
         bm = conf.get('implied-branch-matchers')
@@ -512,6 +513,7 @@ class NodeSetParser(object):
         return vs.Schema(nodeset)
 
     def fromYaml(self, conf, anonymous=False):
+        conf = copy.deepcopy(conf)
         if anonymous:
             self.anon_schema(conf)
             self.anonymous = True
@@ -599,6 +601,7 @@ class SecretParser(object):
         return vs.Schema(secret)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         s = model.Secret(conf['name'], conf['_source_context'])
         s.source_context = conf['_source_context']
@@ -723,6 +726,7 @@ class JobParser(object):
 
     def fromYaml(self, conf, project_pipeline=False, name=None,
                  validate=True):
+        conf = copy.deepcopy(conf)
         if validate:
             self.schema(conf)
 
@@ -1075,6 +1079,7 @@ class ProjectTemplateParser(object):
         return vs.Schema(project)
 
     def fromYaml(self, conf, validate=True, freeze=True):
+        conf = copy.deepcopy(conf)
         if validate:
             self.schema(conf)
         source_context = conf['_source_context']
@@ -1165,6 +1170,7 @@ class ProjectParser(object):
         return vs.Schema(project)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
 
         project_name = conf.get('name')
@@ -1328,6 +1334,7 @@ class PipelineParser(object):
         return vs.Schema(pipeline)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         pipeline = model.Pipeline(conf['name'], self.pcontext.tenant)
         pipeline.source_context = conf['_source_context']
@@ -1469,6 +1476,7 @@ class SemaphoreParser(object):
         return vs.Schema(semaphore)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1))
         semaphore.source_context = conf.get('_source_context')
@@ -1494,6 +1502,7 @@ class QueueParser:
         return vs.Schema(queue)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         queue = model.Queue(
             conf['name'],
@@ -1523,6 +1532,7 @@ class AuthorizationRuleParser(object):
         return vs.Schema(authRule)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         a = model.AuthZRuleTree(conf['name'])
 
@@ -1556,6 +1566,7 @@ class GlobalSemaphoreParser(object):
         return vs.Schema(semaphore)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1),
                                     global_scope=True)
@@ -1576,6 +1587,7 @@ class ApiRootParser(object):
         return vs.Schema(api_root)
 
     def fromYaml(self, conf):
+        conf = copy.deepcopy(conf)
         self.schema(conf)
         api_root = model.ApiRoot(conf.get('authentication-realm'))
         api_root.access_rules = conf.get('access-rules', [])
