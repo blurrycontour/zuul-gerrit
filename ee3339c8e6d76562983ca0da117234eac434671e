@@ -33,6 +33,23 @@
       "message": "recheck pipeline locking in tests was fixed",
       "revId": "ee3339c8e6d76562983ca0da117234eac434671e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e179f054_665835e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-13T23:26:53Z",
+      "side": 1,
+      "message": "recheck all of the tests were in the test_v3 file which this change does not modify. Looking closer it appears that we lost connectivity to mysql for some reason.",
+      "revId": "ee3339c8e6d76562983ca0da117234eac434671e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
