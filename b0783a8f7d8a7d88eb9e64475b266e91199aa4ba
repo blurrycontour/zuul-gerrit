@@ -16,6 +16,24 @@
       "message": "I know this isn\u0027t related to the change, but in reviewing the change I\u0027ve found this set of three attributes specialness to be a bit confusing. It isn\u0027t clear why we treat them specially other than it is apparently only useful in this one scenario?\n\nAliases were introduced with this change https://review.opendev.org/c/zuul/zuul/+/799127/3/zuul/executor/server.py and in the comments to that change its indicated the type of name being a string or a list of strings is confusing and the source of errors and should be changed.\n\nI\u0027m not sure I fully understand what the fix is though am happy to help if it can be articulated.",
       "revId": "b0783a8f7d8a7d88eb9e64475b266e91199aa4ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7039209_cc8372c4",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1391,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-14T23:13:13Z",
+      "side": 1,
+      "message": "It appears that https://opendev.org/zuul/zuul/src/branch/master/zuul/executor/server.py#L1908 is the clue. Basically we can give a single node a number of names. This is only true for some node connection types though.\n\nI guess the fix here would be to add aliases as an explicit attribute to Node in addition to name. Then create Node() when defined by the config with separate arguments and similarly have the executor loop over name and aliases when appropriate. The difficulty in doing this is that nodepool would also need to be updated to understand aliases and we would need a schema version (possibly with nodepool negotiating schema versions too?). This might be easier to accomplish once Zuul and nodepool share a codebase.",
+      "parentUuid": "32e580af_c8161fbe",
+      "revId": "b0783a8f7d8a7d88eb9e64475b266e91199aa4ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
