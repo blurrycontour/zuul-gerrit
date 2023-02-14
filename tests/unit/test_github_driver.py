@@ -18,8 +18,10 @@ import re
 from testtools.matchers import MatchesRegex, Not, StartsWith
 import urllib
 import socket
+import threading
 import time
 import textwrap
+from concurrent.futures import ThreadPoolExecutor
 from unittest import mock, skip
 
 import git
@@ -32,10 +34,11 @@ from zuul.zk.layout import LayoutState
 from zuul.lib import strings
 from zuul.merger.merger import Repo
 from zuul.model import MergeRequest, EnqueueEvent, DequeueEvent
+from zuul.zk.change_cache import ChangeKey
 
 from tests.base import (AnsibleZuulTestCase, BaseTestCase,
                         ZuulGithubAppTestCase, ZuulTestCase,
-                        simple_layout, random_sha1)
+                        simple_layout, random_sha1, iterate_timeout)
 from tests.base import ZuulWebFixture
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
@@ -1483,6 +1486,44 @@ class TestGithubDriver(ZuulTestCase):
         self.assertIn(
             "rebase not supported",
             str(loading_errors[0].error))
+
+    @simple_layout("layouts/basic-github.yaml", driver="github")
+    def test_concurrent_get_change(self):
+        """
+        Test that getting a change concurrently returns the same
+        object from the cache.
+        """
+        conn = self.scheds.first.sched.connections.connections["github"]
+
+        # Create a new change object and remove it from the cache so
+        # the concurrent call will try to create a new change object.
+        A = self.fake_github.openFakePullRequest("org/project", "master", "A")
+        change_key = ChangeKey(conn.connection_name, "org/project",
+                               "PullRequest", str(A.number), str(A.head_sha))
+        change = conn.getChange(change_key, refresh=True)
+        conn._change_cache.delete(change_key)
+
+        # Acquire the update lock so the concurrent get task needs to
+        # wait for the lock to be release.
+        lock = conn._change_update_lock.setdefault(change_key,
+                                                   threading.Lock())
+        lock.acquire()
+        try:
+            executor = ThreadPoolExecutor(max_workers=1)
+            task = executor.submit(conn.getChange, change_key, refresh=True)
+            for _ in iterate_timeout(5, "task to be running"):
+                if task.running():
+                    break
+            # Add the change back so the waiting task can get the
+            # change from the cache.
+            conn._change_cache.set(change_key, change)
+        finally:
+            lock.release()
+            executor.shutdown()
+
+        other_change = task.result()
+        self.assertIsNotNone(other_change.cache_stat)
+        self.assertIs(change, other_change)
 
 
 class TestMultiGithubDriver(ZuulTestCase):
