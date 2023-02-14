@@ -91,6 +91,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """
 
     def getChangeByURLWithRetry(self, url, event):
+        dep = None
         for x in range(3):
             # We retry this as we are unlikely to be able to report back
             # failures if our source is broken, but if we can get the
