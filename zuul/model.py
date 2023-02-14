@@ -6061,7 +6061,7 @@ class Ref(object):
 
     @property
     def cache_key(self):
-        return self.cache_stat.key.reference
+        return self.cache_stat and self.cache_stat.key.reference
 
     @property
     def cache_version(self):
