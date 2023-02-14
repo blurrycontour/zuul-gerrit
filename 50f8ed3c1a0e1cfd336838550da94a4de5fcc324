@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "071dc261_6e922789",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-14T21:11:31Z",
+      "side": 1,
+      "message": "Note, this appears to keep a commit but without changes. If you run `git show HEAD` after this operation you have a commit message with no diff. This is different than the git merge case which simply exits 0 and reports `Already up to date.`\n\nFor many users this might be fine. But if you use git repo state to calculate versioning for example this could be a problem.\n\nA better solution with fewer side effects may be to avoid merging anything in the case of change-merged/ref-updated events and simply checkout the state of the system at that point in time? I haven\u0027t dug in to see what would be involved in doing that, but would avoid problematic side effects in the git tree.",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "402862ae_1cb4e7f1",
