@@ -1461,6 +1461,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             log.debug("Change %s is currently being updated, "
                       "waiting for it to finish", change)
             with lock:
+                change = self._change_cache.get(change_key)
                 log.debug('Finished updating change %s', change)
         return change
 
