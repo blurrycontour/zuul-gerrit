@@ -46,6 +46,30 @@
       },
       "revId": "3bc86056d67d74d6ed0b7da04bc8eb9d36a407b3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ba1f8d8_f52b31ed",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-14T21:28:51Z",
+      "side": 1,
+      "message": "The callsite for executeJobs() does check the return value: https://opendev.org/zuul/zuul/src/branch/master/zuul/manager/__init__.py#L1622 However as has been pointed out there appears to be a long standing bug here. It seems previously we could\u0027ve returned False or None both of which would prevent setting changed \u003d True at the call site. With this change we should always return None which has the same effect.",
+      "parentUuid": "af7c77a6_1e1d4e4d",
+      "range": {
+        "startLine": 988,
+        "startChar": 0,
+        "endLine": 988,
+        "endChar": 9
+      },
+      "revId": "3bc86056d67d74d6ed0b7da04bc8eb9d36a407b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
