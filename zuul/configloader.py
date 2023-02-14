@@ -27,6 +27,7 @@ import subprocess
 import textwrap
 import threading
 import types
+import time
 
 import voluptuous as vs
 
@@ -2693,23 +2694,36 @@ class TenantParser(object):
                         skip_semaphores=False):
         # TODO(jeblair): make sure everything needing
         # reference_exceptions has it; add tests if needed.
+        start = time.perf_counter()
         if not skip_pipelines:
             for pipeline in parsed_config.pipelines:
                 with parse_context.errorContext(stanza='pipeline',
                                                 conf=pipeline):
                     with parse_context.accumulator.catchErrors():
                         layout.addPipeline(pipeline)
+            self.log.debug("Layout perf: added %s pipelines in %s",
+                           len(parsed_config.pipelines),
+                           time.perf_counter() - start)
 
+        start = time.perf_counter()
         for nodeset in parsed_config.nodesets:
             with parse_context.errorContext(stanza='nodeset', conf=nodeset):
                 with parse_context.accumulator.catchErrors():
                     layout.addNodeSet(nodeset)
+        self.log.debug("Layout perf: added %s nodesets in %s",
+                       len(parsed_config.nodesets),
+                       time.perf_counter() - start)
 
+        start = time.perf_counter()
         for secret in parsed_config.secrets:
             with parse_context.errorContext(stanza='secret', conf=secret):
                 with parse_context.accumulator.catchErrors():
                     layout.addSecret(secret)
+        self.log.debug("Layout perf: added %s secrets in %s",
+                       len(parsed_config.secrets),
+                       time.perf_counter() - start)
 
+        start = time.perf_counter()
         for job in parsed_config.jobs:
             with parse_context.errorContext(stanza='job', conf=job):
                 with parse_context.accumulator.catchErrors():
@@ -2718,22 +2732,37 @@ class TenantParser(object):
                         self.log.debug(
                             "Skipped adding job %s which shadows "
                             "an existing job", job)
+        self.log.debug("Layout perf: added %s jobs in %s",
+                       len(parsed_config.jobs),
+                       time.perf_counter() - start)
 
         # Now that all the jobs are loaded, verify references to other
         # config objects.
+        start = time.perf_counter()
         for nodeset in layout.nodesets.values():
             with parse_context.errorContext(stanza='nodeset', conf=nodeset):
                 with parse_context.accumulator.catchErrors():
                     nodeset.validateReferences(layout)
+        self.log.debug("Layout perf: validated %s nodesets in %s",
+                       len(layout.nodesets),
+                       time.perf_counter() - start)
+        start = time.perf_counter()
         for jobs in layout.jobs.values():
             for job in jobs:
                 with parse_context.errorContext(stanza='job', conf=job):
                     with parse_context.accumulator.catchErrors():
                         job.validateReferences(layout)
+        self.log.debug("Layout perf: validated %s jobs in %s",
+                       len(layout.jobs),
+                       time.perf_counter() - start)
+        start = time.perf_counter()
         for pipeline in layout.pipelines.values():
             with parse_context.errorContext(stanza='pipeline', conf=pipeline):
                 with parse_context.accumulator.catchErrors():
                     pipeline.validateReferences(layout)
+        self.log.debug("Layout perf: validated %s pipelines in %s",
+                       len(layout.pipelines),
+                       time.perf_counter() - start)
 
         if skip_semaphores:
             # We should not actually update the layout with new
@@ -2743,26 +2772,39 @@ class TenantParser(object):
             semaphore_layout = model.Layout(tenant)
         else:
             semaphore_layout = layout
+        start = time.perf_counter()
         for semaphore in parsed_config.semaphores:
             with parse_context.errorContext(stanza='semaphore',
                                             conf=semaphore):
                 with parse_context.accumulator.catchErrors():
                     semaphore_layout.addSemaphore(semaphore)
+        self.log.debug("Layout perf: added %s semaphores in %s",
+                       len(parsed_config.semaphores),
+                       time.perf_counter() - start)
 
+        start = time.perf_counter()
         for queue in parsed_config.queues:
             with parse_context.errorContext(stanza='queue', conf=queue):
                 with parse_context.accumulator.catchErrors():
                     layout.addQueue(queue)
+        self.log.debug("Layout perf: added %s queues in %s",
+                       len(parsed_config.queues),
+                       time.perf_counter() - start)
 
+        start = time.perf_counter()
         for template in parsed_config.project_templates:
             with parse_context.errorContext(stanza='project-template',
                                             conf=template):
                 with parse_context.accumulator.catchErrors():
                     layout.addProjectTemplate(template)
+        self.log.debug("Layout perf: added %s project-templates in %s",
+                       len(parsed_config.project_templates),
+                       time.perf_counter() - start)
 
         # The project stanzas containing a regex are separated from the normal
         # project stanzas and organized by regex. We need to loop over each
         # regex and copy each stanza below the regex for each matching project.
+        start = time.perf_counter()
         for regex, config_projects in parsed_config.projects_by_regex.items():
             projects_matching_regex = tenant.getProjectsByRegex(regex)
 
@@ -2775,9 +2817,16 @@ class TenantParser(object):
                     conf.name = name
                     conf.freeze()
                     parsed_config.projects.append(conf)
+        self.log.debug("Layout perf: froze %s regex projects in %s",
+                       len(parsed_config.projects_by_regex),
+                       time.perf_counter() - start)
 
+        start = time.perf_counter()
         for project in parsed_config.projects:
             layout.addProjectConfig(project)
+        self.log.debug("Layout perf: added %s projects in %s",
+                       len(parsed_config.projects),
+                       time.perf_counter() - start)
 
         # Now that all the project pipelines are loaded, fixup and
         # verify references to other config objects.
@@ -2794,6 +2843,7 @@ class TenantParser(object):
                     layout.getJob(job.name)
                     job.validateReferences(layout)
 
+        start = time.perf_counter()
         for project_name in layout.project_configs:
             for project_config in layout.project_configs[project_name]:
                 with parse_context.errorContext(stanza='project',
@@ -2842,6 +2892,9 @@ class TenantParser(object):
                                         f'by project {project_name}. '
                                         f'Supported modes: {allowed_modes}.')
                         parse_context.accumulator.addError(err)
+        self.log.debug("Layout perf: validated %s ppcs in %s",
+                       len(layout.project_configs),
+                       time.perf_counter() - start)
 
     def _parseLayout(self, tenant, data, parse_context, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because
