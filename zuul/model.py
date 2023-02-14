@@ -6028,8 +6028,7 @@ class Bundle:
     def deserialize(cls, context, queue, items_by_path, data):
         bundle = cls(data["uuid"])
         bundle.items = [
-            items_by_path.get(p) or QueueItem.fromZK(
-                context, p, pipeline=queue.pipeline, queue=queue)
+            items_by_path.get(p) or QueueItem.fromZK(context, p, queue=queue)
             for p in data["items"]
         ]
         bundle.started_reporting = data["started_reporting"]
