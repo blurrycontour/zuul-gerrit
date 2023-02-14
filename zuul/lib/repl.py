@@ -26,14 +26,14 @@ class ThreadLocalProxy(object):
         self.default = default
 
     def __getattr__(self, name):
-        obj = self.files.get(threading.currentThread(), self.default)
+        obj = self.files.get(threading.current_thread(), self.default)
         return getattr(obj, name)
 
     def register(self, obj):
-        self.files[threading.currentThread()] = obj
+        self.files[threading.current_thread()] = obj
 
     def unregister(self):
-        self.files.pop(threading.currentThread())
+        self.files.pop(threading.current_thread())
 
 
 class REPLHandler(socketserver.StreamRequestHandler):
