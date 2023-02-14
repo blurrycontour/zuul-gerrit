@@ -580,7 +580,7 @@ class Repo(object):
             repo.git.merge(*args)
         else:
             log.debug("Cherry-picking %s", ref)
-            repo.git.cherry_pick("FETCH_HEAD")
+            repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
         return repo.head.commit
 
     def merge(self, ref, strategy=None, zuul_event_id=None):
