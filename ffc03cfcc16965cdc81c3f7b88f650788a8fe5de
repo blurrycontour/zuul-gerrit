@@ -16,6 +16,23 @@
       "message": "\u003e Patch Set 1:\n\u003e \n\u003e This looks good, but can you add a test for it?\n\nThanks. Patchset 2 now adds a test for this, which indeed fails for the old code and passes with this change.",
       "revId": "ffc03cfcc16965cdc81c3f7b88f650788a8fe5de",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d6e266d_a73ef50c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1649,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-14T18:17:59Z",
+      "side": 1,
+      "message": "One initial concern I\u0027ve got reading this is that we get this information via ssh or http. It looks like the ssh connection has already assumed utf8 so no real regression there, but http did not. Instead python requests is/was decoding based on http headers. Except curling this URL I don\u0027t think Gerrit is giving us the text encoding type in the headers which would cause requests to fallback to charset_normalizer.\n\nIf that encoding is not utf8 we would break here. I think the chances of that happening are low hence my +2. But wanted to call that out as it may help future debugging should this ever come up.\n\nAlso worth noting if we got back utf16 instead we\u0027d be just as broken as with the utf8 case previously. Long winded way of saying I don\u0027t think this makes anything worse, but only solves it for utf8. As an option we might look into charset-normalizer here too?",
+      "revId": "ffc03cfcc16965cdc81c3f7b88f650788a8fe5de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
