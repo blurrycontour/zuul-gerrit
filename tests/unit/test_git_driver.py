@@ -62,7 +62,8 @@ class TestGitDriver(ZuulTestCase):
 
         # Update zuul.yaml to force a tenant reconfiguration
         path = os.path.join(self.upstream_root, 'common-config', 'zuul.yaml')
-        config = yaml.safe_load(open(path, 'r').read())
+        with open(path, 'r') as f:
+            config = yaml.safe_load(f)
         change = {
             'name': 'org/project',
             'check': {
