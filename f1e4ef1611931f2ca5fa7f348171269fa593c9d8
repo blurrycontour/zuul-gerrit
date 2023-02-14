@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c75ee8e0_d17c29ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-14T20:57:14Z",
+      "side": 1,
+      "message": "Not approving as it wasn\u0027t clear to me if corvus preferred the old code or not. I\u0027m ok with the old code despite my suggestion if we prefer it.",
+      "revId": "f1e4ef1611931f2ca5fa7f348171269fa593c9d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
