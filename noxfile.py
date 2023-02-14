@@ -32,7 +32,6 @@ def set_standard_env_vars(session):
     set_env(session, 'OS_STDERR_CAPTURE', '1')
     set_env(session, 'OS_STDOUT_CAPTURE', '1')
     set_env(session, 'OS_TEST_TIMEOUT', '360')
-    set_env(session, 'SQLALCHEMY_WARN_20', '1')
     session.env['PYTHONWARNINGS'] = ','.join([
         'always::DeprecationWarning:zuul.driver.sql.sqlconnection',
         'always::DeprecationWarning:tests.base',
@@ -49,7 +48,6 @@ def set_standard_env_vars(session):
 @nox.session(python='3')
 def bindep(session):
     set_standard_env_vars(session)
-    set_env(session, 'SQLALCHEMY_WARN_20', '1')
     session.install('bindep')
     session.run('bindep', 'test')
 
