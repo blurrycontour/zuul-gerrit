@@ -7435,6 +7435,47 @@ class TestSchedulerMerges(ZuulTestCase):
         result = self._test_project_merge_mode('cherry-pick')
         self.assertEqual(result, expected_messages)
 
+    def test_project_merge_mode_cherrypick_redundant(self):
+        self.executor_server.keep_jobdir = False
+        project = 'org/project-cherry-pick'
+        files = {
+            "foo.txt": "ABC",
+        }
+        A = self.fake_gerrit.addFakeChange(project, 'master', 'A', files=files)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+        B = self.fake_gerrit.addFakeChange(project, 'master', 'B', files=files)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        build = self.builds[-1]
+        path = os.path.join(build.jobdir.src_root, 'review.example.com',
+                            project)
+        repo = git.Repo(path)
+        repo_messages = [c.message.strip() for c in repo.iter_commits()]
+        repo_messages.reverse()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        expected_messages = [
+            'initial commit',
+            'add content from fixture',
+            'A-1',
+        ]
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+        ])
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(repo_messages, expected_messages)
+
     def test_project_merge_mode_cherrypick_branch_merge(self):
         "Test that branches can be merged together in cherry-pick mode"
         self.create_branch('org/project-merge-branches', 'mp')

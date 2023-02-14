@@ -580,7 +580,18 @@ class Repo(object):
             repo.git.merge(*args)
         else:
             log.debug("Cherry-picking %s", ref)
-            repo.git.cherry_pick("FETCH_HEAD")
+            repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
+
+            # Redundant (empty) commits are allowed when cherry-picking above,
+            # but one is added back it out. This makes the cherry-pick behavior
+            # match the merge behavior where commits that have already been
+            # applied are ignored
+            head = repo.commit("HEAD")
+            parent = head.parents[0]
+            if not any(head.diff(parent)):
+                log.debug("%s has no changed files. Removing it", ref)
+                self._checkout(repo, parent)
+
         return repo.head.commit
 
     def merge(self, ref, strategy=None, zuul_event_id=None):
