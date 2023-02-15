@@ -716,6 +716,12 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
          The size of the current connection event queue.
 
+   .. stat:: run_handler
+      :type: timer
+
+      A timer metric reporting the time taken for one scheduler run
+      handler iteration.
+
    .. stat:: time_query
       :type: timer
 
