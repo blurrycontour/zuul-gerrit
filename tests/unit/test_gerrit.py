@@ -957,3 +957,48 @@ class TestGerritConnection(ZuulTestCase):
         self.assertEqual(B.queried, 2)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
+
+
+class TestGerritUnicodeRefs(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    upload_pack_data = (b'014452944ee370db5c87691e62e0f9079b6281319b4e HEAD'
+                        b'\x00multi_ack thin-pack side-band side-band-64k '
+                        b'ofs-delta shallow deepen-since deepen-not '
+                        b'deepen-relative no-progress include-tag '
+                        b'multi_ack_detailed allow-tip-sha1-in-want '
+                        b'allow-reachable-sha1-in-want '
+                        b'symref=HEAD:refs/heads/faster filter '
+                        b'object-format=sha1 agent=git/2.37.1.gl1\n'
+                        b'003d5f42665d737b3fd4ec22ca0209e6191859f09fd6 '
+                        b'refs/for/faster\n'
+                        b'004952944ee370db5c87691e62e0f9079b6281319b4e '
+                        b'refs/heads/foo/\xf0\x9f\x94\xa5\xf0\x9f\x94\xa5'
+                        b'\xf0\x9f\x94\xa5\n'
+                        b'003f52944ee370db5c87691e62e0f9079b6281319b4e '
+                        b'refs/heads/faster\n0000').decode("utf-8")
+
+    def test_mb_unicode_refs(self):
+        gerrit_config = {
+            'user': 'gerrit',
+            'server': 'localhost',
+        }
+        driver = GerritDriver()
+        gerrit = GerritConnection(driver, 'review_gerrit', gerrit_config)
+
+        def _uploadPack(project):
+            return self.upload_pack_data
+
+        self.patch(gerrit, '_uploadPack', _uploadPack)
+
+        project = gerrit.source.getProject('org/project')
+        refs = gerrit.getInfoRefs(project)
+
+        self.assertEqual(refs,
+                         {'refs/for/faster':
+                          '5f42665d737b3fd4ec22ca0209e6191859f09fd6',
+                          'refs/heads/foo/🔥🔥🔥':
+                          '52944ee370db5c87691e62e0f9079b6281319b4e',
+                          'refs/heads/faster':
+                          '52944ee370db5c87691e62e0f9079b6281319b4e'})
