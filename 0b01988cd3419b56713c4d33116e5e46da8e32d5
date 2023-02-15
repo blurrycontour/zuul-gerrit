@@ -50,6 +50,24 @@
       "message": "I\u0027m not sure this is strictly true. For example Change Filter \"834009,1\": https://zuul.opendev.org/t/openstack/builds?change\u003d834009%2C1\u0026skip\u003d0 works with Gerrit in OpenDev.\n\nMaybe we want to ask for forgiveness and report an error if it fails rather than limiting what can be filtered by?",
       "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bff653a7_2a1de246",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-15T21:00:54Z",
+      "side": 1,
+      "message": "That URL also works if you put gibberish after the change: https://zuul.opendev.org/t/openstack/builds?change\u003d834009%2Cfoobar\u0026skip\u003d0\n\nWhich makes me curious what would cause the 500 error that Dong described in the commit message.  It\u0027s clear that in OpenDev, something is ignoring everything after the comma.\n\nEspecially since the API method takes both a change and patchset argument, I am inclined to agree with this change and filter the input method.  But I am curious about what actually caused an error for Dong.",
+      "parentUuid": "7a466dc1_402750c9",
+      "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
