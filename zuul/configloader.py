@@ -2259,6 +2259,12 @@ class TenantParser(object):
                 job.source_context.branch)
             with self.unparsed_config_cache.writeLock(
                     job.source_context.project_canonical_name):
+                # Prevent files cache ltime from going backward
+                if files_cache.ltime >= job.ltime:
+                    self.log.info(
+                        "Discarding job %s result since the files cache was "
+                        "updated in the meantime", job)
+                    continue
                 # Since the cat job returns all required config files
                 # for ALL tenants the project is a part of, we can
                 # clear the whole cache and then populate it with the
