@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68ff86ba_9cbef40a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-15T16:36:38Z",
+      "side": 1,
+      "message": "Looking at image builds logs this appears to have build zuul-8.1.1.dev39 which means the empty var isn\u0027t setting the version to a null value.",
+      "revId": "c3ea135eaa25bd1574478c7b4a8f59d1b7794db6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
