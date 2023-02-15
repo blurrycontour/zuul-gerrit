@@ -1548,7 +1548,6 @@ class Scheduler(threading.Thread):
         # This is called in the scheduler loop after another thread submits
         # a request
         if self.unparsed_abide.ltime < self.system_config_cache.ltime:
-            self.log.debug("Updating system config")
             self.updateSystemConfig()
 
         with self.layout_lock:
@@ -2211,6 +2210,7 @@ class Scheduler(threading.Thread):
 
     def updateSystemConfig(self):
         with self.layout_lock:
+            self.log.debug("Updating system config")
             self.unparsed_abide, self.globals = self.system_config_cache.get()
             self.ansible_manager = AnsibleManager(
                 default_version=self.globals.default_ansible_version)
@@ -2245,6 +2245,8 @@ class Scheduler(threading.Thread):
                         self.zk_client, tenant.name, pipeline.name,
                         blocking=False) as lock,\
                     self.createZKContext(lock, self.log) as ctx:
+                    self.log.debug("Processing pipeline %s in tenant %s",
+                                   pipeline.name, tenant.name)
                     with pipeline.manager.currentContext(ctx):
                         with self.statsd_timer(f'{stats_key}.handling'):
                             refreshed = self._process_pipeline(
@@ -2386,6 +2388,8 @@ class Scheduler(threading.Thread):
             with trigger_queue_lock(
                 self.zk_client, tenant.name, blocking=False
             ):
+                self.log.debug("Processing tenant trigger events in %s",
+                               tenant.name)
                 # Update the pipeline changes
                 ctx = self.createZKContext(None, self.log)
                 for pipeline in tenant.layout.pipelines.values():
@@ -2594,6 +2598,8 @@ class Scheduler(threading.Thread):
                         "Skipping management event queue for tenant %s",
                         tenant.name)
                     return
+                self.log.debug("Processing tenant management events in %s",
+                               tenant.name)
                 self._process_tenant_management_queue(tenant)
         except LockException:
             self.log.debug("Skipping locked management event queue"
