@@ -72,6 +72,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4dd755e_b9221c1f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2023-02-15T16:57:23Z",
+      "side": 1,
+      "message": "`git cherry-pick --allow-empty` is unfortunately insufficient because it only applies to commits that are _initially_ empty (that is, the commit you are cherry-picking from is empty). There is no option to tell git to skip cherry-picking a commit that does nothing; you can either apply the empty commit with `--keep-redundant-commit` or have `git cherry-pick` fail so you can inspect the results.\n\nThe other option would be to use `--keep-redundant-commit` and then manually inspect if the commit is empty after applying and hard reset back if so.\n\n\nOr filter based on the event, but I don\u0027t see any other events doing that sort of thing.",
+      "parentUuid": "3a615a66_7f03d97f",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "402862ae_1cb4e7f1",
