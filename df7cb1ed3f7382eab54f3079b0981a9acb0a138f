@@ -16,6 +16,24 @@
       "message": "Is there any implication for changing this id value? I\u0027m guessing if we used openapi to generate API servers and clients it would be a bigger issue?",
       "revId": "df7cb1ed3f7382eab54f3079b0981a9acb0a138f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cb70203_c912d3bd",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 28619
+      },
+      "writtenOn": "2023-02-15T16:13:58Z",
+      "side": 1,
+      "message": "oh, ok, I didn\u0027t knew that there\u0027re some possible implications for changing this. I can revert this change. I mainly aimed to be more definitive in ID naming.",
+      "parentUuid": "0541a2f0_70c639ce",
+      "revId": "df7cb1ed3f7382eab54f3079b0981a9acb0a138f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
