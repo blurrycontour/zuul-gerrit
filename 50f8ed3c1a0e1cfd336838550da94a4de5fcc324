@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "fa21475c_9b663cf4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-15T14:00:37Z",
+      "side": 1,
+      "message": "Here\u0027s an experiment I\u0027d like you to run to collect information to help us decide how to proceed:\n\nPropose a change to gerrit in a cherry-pick repo which is identical to a commit already in the branch.  Does that work?  If so, submit it.   Does that work?   What does the resulting tree look like?\n\nThat\u0027s the behavior we need to mimic, because the pre-merge behavior should match Gerrit exactly.  If we need to alter the behavior for a post-merge change-based pipeline, then we may need to add a pipeline option, or start paying attention to the \u0027merged\u0027 flag on the change.",
+      "parentUuid": "071dc261_6e922789",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "402862ae_1cb4e7f1",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
