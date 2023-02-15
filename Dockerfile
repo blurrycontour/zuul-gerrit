@@ -29,6 +29,7 @@ ARG REACT_APP_ENABLE_SERVICE_WORKER
 # Kubectl/Openshift version/sha
 ARG OPENSHIFT_URL=https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.11.20/openshift-client-linux-4.11.20.tar.gz
 ARG OPENSHIFT_SHA=74f252c812932425ca19636b2be168df8fe57b114af6b114283975e67d987d11
+ARG PBR_VERSION=
 
 COPY . /tmp/src
 COPY --from=js-builder /tmp/src/build /tmp/src/zuul/web/static
