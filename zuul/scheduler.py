@@ -2248,6 +2248,9 @@ class Scheduler(threading.Thread):
                     self.log.debug("Processing pipeline %s in tenant %s",
                                    pipeline.name, tenant.name)
                     with pipeline.manager.currentContext(ctx):
+                        if ((tenant.name, pipeline.name) in
+                            self._profile_pipelines):
+                            ctx.profile = True
                         with self.statsd_timer(f'{stats_key}.handling'):
                             refreshed = self._process_pipeline(
                                 tenant, pipeline)
@@ -2316,14 +2319,10 @@ class Scheduler(threading.Thread):
 
         stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         ctx = pipeline.manager.current_context
-        if (tenant.name, pipeline.name) in self._profile_pipelines:
-            ctx.profile = True
         with self.statsd_timer(f'{stats_key}.refresh'):
             pipeline.change_list.refresh(ctx)
             pipeline.summary.refresh(ctx)
             pipeline.state.refresh(ctx)
-        if (tenant.name, pipeline.name) in self._profile_pipelines:
-            ctx.profile = False
 
         pipeline.state.setDirty(self.zk_client.client)
         if pipeline.state.old_queues:
