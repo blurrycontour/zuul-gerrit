@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a615a66_7f03d97f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 35619
+      },
+      "writtenOn": "2023-02-15T15:00:58Z",
+      "side": 1,
+      "message": "Proposing a change identical to a commit in the branch works (provided it has a unique Change-Id footer in the commit message, so the commit hash _is_ different in my experiment).\n\nAs for submitting, it depends on the `submit.rejectEmptyCommit` project setting in Gerrit. If `submit.rejectEmptyCommit \u003d True`, you get an error when you submit:\n\n\u003e Could not perform action: Failed to submit 1 change due to the following problems:\n\u003e Change 4184: Change could not be merged because the commit is empty. Project policy requires all commits to contain modifications to at least one file.\n\nIf `submit.rejectEmptyCommit \u003d False`, the submit succeeds, and the change is marked as merged by Gerrit, but no extra commit appears in the git log. I believe this matches the `--allow-empty` option to git cherry-pick.\n\nTested on Gerrit 3.6.1.",
+      "parentUuid": "fa21475c_9b663cf4",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "402862ae_1cb4e7f1",
