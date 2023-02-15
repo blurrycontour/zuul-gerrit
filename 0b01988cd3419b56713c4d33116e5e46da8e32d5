@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a466dc1_402750c9",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-15T20:49:20Z",
+      "side": 1,
+      "message": "I\u0027m not sure this is strictly true. For example Change Filter \"834009,1\": https://zuul.opendev.org/t/openstack/builds?change\u003d834009%2C1\u0026skip\u003d0 works with Gerrit in OpenDev.\n\nMaybe we want to ask for forgiveness and report an error if it fails rather than limiting what can be filtered by?",
+      "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
