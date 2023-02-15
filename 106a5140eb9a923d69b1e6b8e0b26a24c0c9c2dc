@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d4935d8_7a2ae979",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-15T17:41:15Z",
+      "side": 1,
+      "message": "Based on the commit message\u0027s traceback I wonder if it would be better to abort the rebase here after it fails? Then if the specific files change (for example the git-rebase manpage indicates there may be .git/rebase-apply files too) we can let git clean them up.",
+      "revId": "106a5140eb9a923d69b1e6b8e0b26a24c0c9c2dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
