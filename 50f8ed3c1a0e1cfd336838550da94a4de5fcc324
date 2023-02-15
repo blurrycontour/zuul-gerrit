@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "93a89ffc_11012ec8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 35619
+      },
+      "writtenOn": "2023-02-15T07:48:54Z",
+      "side": 1,
+      "message": "OK, so `--keep-redundant-commit` keeps an extra commit that we\u0027re not actually interested in having. I think maybe `--allow-empty` would be the better option then:\n\n\u003e Commits which are made empty due to a previous commit are dropped. To force the inclusion of those commits use --keep-redundant-commits.",
+      "parentUuid": "071dc261_6e922789",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "402862ae_1cb4e7f1",
