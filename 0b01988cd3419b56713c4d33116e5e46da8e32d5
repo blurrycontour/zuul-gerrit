@@ -68,6 +68,24 @@
       "parentUuid": "7a466dc1_402750c9",
       "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7928914a_6c49e67c",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-16T10:02:48Z",
+      "side": 1,
+      "message": "If I looked at the source code correctly,the \"change\" parameter got from get request is passed through to the db request without being modified. I am also wondering why on opendev setup there is no issue.\n\nIn our setup, the error stack trace looks like:\n\n\n Traceback (most recent call last):\n  File \"/opt/zuul/lib/python3.10/site-packages/cherrypy/_cprequest.py\", line 638, in respond\n    self._do_respond(path_info)\n  File \"/opt/zuul/lib/python3.10/site-packages/cherrypy/_cprequest.py\", line 697, in _do_respond\n    response.body \u003d self.handler()\n  File \"/opt/zuul/lib/python3.10/site-packages/cherrypy/lib/encoding.py\", line 223, in __call__\n    self.body \u003d self.oldhandler(*args, **kwargs)\n  File \"/opt/zuul/lib/python3.10/site-packages/cherrypy/lib/jsontools.py\", line 59, in json_handler\n    value \u003d cherrypy.serving.request._json_inner_handler(*args, **kwargs)\n  File \"/opt/zuul/lib/python3.10/site-packages/cherrypy/_cpdispatch.py\", line 54, in __call__\n    return self.callable(*self.args, **self.kwargs)\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/web/__init__.py\", line 1451, in builds\n    builds \u003d connection.getBuilds(\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/driver/sql/sqlconnection.py\", line 511, in getBuilds\n    return db.getBuilds(*args, **kw)\n  File \"/opt/zuul/lib/python3.10/site-packages/zuul/driver/sql/sqlconnection.py\", line 150, in getBuilds\n    return q.all()\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/orm/query.py\", line 2773, in all\n    return self._iter().all()\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/orm/query.py\", line 2916, in _iter\n    result \u003d self.session.execute(\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/orm/session.py\", line 1714, in execute\n    result \u003d conn._execute_20(statement, params or {}, execution_options)\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/engine/base.py\", line 1705, in _execute_20\n    return meth(self, args_10style, kwargs_10style, execution_options)\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/sql/elements.py\", line 334, in _execute_on_connection\n    return connection._execute_clauseelement(\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/engine/base.py\", line 1572, in _execute_clauseelement\n    ret \u003d self._execute_context(\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/engine/base.py\", line 1943, in _execute_context\n    self._handle_dbapi_exception(\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/engine/base.py\", line 2124, in _handle_dbapi_exception\n    util.raise_(\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/util/compat.py\", line 211, in raise_\n    raise exception\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/engine/base.py\", line 1900, in _execute_context\n    self.dialect.do_execute(\n  File \"/opt/zuul/lib/python3.10/site-packages/sqlalchemy/engine/default.py\", line 736, in do_execute\n    cursor.execute(statement, parameters)\nsqlalchemy.exc.DataError: (psycopg2.errors.InvalidTextRepresentation) invalid input syntax for type integer: \"1234,5\"\nLINE 3: ...buildset.tenant \u003d \u0027xx\u0027 AND zuul_buildset.change \u003d \u00271234,5\u0027 A...",
+      "parentUuid": "bff653a7_2a1de246",
+      "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
