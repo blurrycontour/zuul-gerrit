@@ -70,6 +70,24 @@
       "parentUuid": "1bb2c15e_935ee2ae",
       "revId": "106a5140eb9a923d69b1e6b8e0b26a24c0c9c2dc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0697500c_561f4b7f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-16T14:21:50Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "70d39e78_1b9205ec",
+      "revId": "106a5140eb9a923d69b1e6b8e0b26a24c0c9c2dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
