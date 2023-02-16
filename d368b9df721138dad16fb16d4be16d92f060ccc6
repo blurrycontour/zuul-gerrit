@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8410313f_7785f831",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-16T13:32:47Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e I\u0027m concerned about this, but maybe there\u0027s an explanation I\u0027m not seeing.  Do you know how it\u0027s possible to get a Change object without a cache_stat?  I think that would mean that the driver returned a change from getChangeByURL without putting it into the ZK change cache, and I don\u0027t think we expect that to ever happen.\n\nLast time this happened I wasn\u0027t able to track down how we can end up in that situation, but I found another occurrence today. There I was able to see that there was a concurrent update of a dependency around the same time. I updated the change with what I think should fix this edge case.\n\nI think I still want to add some tests though.",
+      "revId": "d368b9df721138dad16fb16d4be16d92f060ccc6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
