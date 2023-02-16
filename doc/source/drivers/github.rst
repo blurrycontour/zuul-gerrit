@@ -55,9 +55,9 @@ To create a `GitHub application
 * Create a Webhook secret
 * Set permissions:
 
-  * Repository administration: Read
+  * Administration: Read
   * Checks: Read & Write
-  * Repository contents: Read & Write (write to let zuul merge change)
+  * Contents: Read & Write (write to let Zuul merge PRs)
   * Issues: Read & Write
   * Pull requests: Read & Write
   * Commit statuses: Read & Write
