@@ -110,6 +110,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "beb314e2_9cee6929",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2023-02-16T13:53:31Z",
+      "side": 1,
+      "message": "Patch set 3 will do that; regardless of submit.rejectEmptyCommit I think this is OK, because it models what Gerrit will do if it allows the commit to actually merge, plus fixes the deploy pipeline problem we were having",
+      "parentUuid": "723a69e6_b0ee7ba4",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "402862ae_1cb4e7f1",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
