@@ -92,6 +92,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "723a69e6_b0ee7ba4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 35619
+      },
+      "writtenOn": "2023-02-16T08:16:45Z",
+      "side": 1,
+      "message": "Looks like you\u0027re right about `git cherry-pick --allow-empty`. The man page confused me by talking about \"commits which are made empty due to a previous commit\". Maybe `--keep-redundant-commit` and conditionally checking out the parent is the closest we can get to the Gerrit behavior, at least when `submit.rejectEmptyCommit \u003d False`.",
+      "parentUuid": "b4dd755e_b9221c1f",
+      "revId": "50f8ed3c1a0e1cfd336838550da94a4de5fcc324",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "402862ae_1cb4e7f1",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
