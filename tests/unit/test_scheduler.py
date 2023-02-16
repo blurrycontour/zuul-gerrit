@@ -3960,6 +3960,10 @@ class TestScheduler(ZuulTestCase):
             else:
                 time.sleep(0)
 
+        self.assertGreater(new.last_reconfigured, old.last_reconfigured)
+        self.assertGreater(new.last_reconfigure_event_ltime,
+                           old.last_reconfigure_event_ltime)
+
     def test_tenant_reconfiguration_command_socket(self):
         "Test that single-tenant reconfiguration via command socket works"
 
