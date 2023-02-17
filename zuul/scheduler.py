@@ -1528,7 +1528,7 @@ class Scheduler(threading.Thread):
                     with self.createZKContext(lock, self.log) as ctx:
                         if tenant is not None:
                             self._reconfigureTenant(ctx, min_ltimes,
-                                                    -1,
+                                                    event.zuul_event_ltime,
                                                     tenant, old_tenant)
                         else:
                             self._reconfigureDeleteTenant(ctx, old_tenant)
