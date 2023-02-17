@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86a653d0_12bf2de6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-17T10:52:45Z",
+      "side": 1,
+      "message": "It looks like this needs to be protected with\n\n  if isinstance(item.change, model.Change):",
+      "revId": "1135ec9d26346109da36704c557ca9d59c133f52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
