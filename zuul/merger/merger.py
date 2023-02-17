@@ -333,6 +333,26 @@ class Repo(object):
                 os.rmdir(root)
 
     @staticmethod
+    def _cleanup_leaked_rebase_dirs(local_path, log, messages):
+        for rebase_dir in [".git/rebase-merge", ".git/rebase-apply"]:
+            leaked_dir = os.path.join(local_path, rebase_dir)
+            if not os.path.exists(leaked_dir):
+                continue
+            if log:
+                log.debug("Cleaning leaked %s dir", leaked_dir)
+            else:
+                messages.append(
+                    f"Cleaning leaked {leaked_dir} dir")
+            try:
+                shutil.rmtree(leaked_dir)
+            except Exception as exc:
+                msg = f"Failed to remove leaked {leaked_dir} dir:"
+                if log:
+                    log.exception(msg)
+                else:
+                    messages.append(f"{msg}\n{exc}")
+
+    @staticmethod
     def refNameToZuulRef(ref_name: str) -> str:
         return "refs/zuul/{}".format(
             hashlib.sha1(ref_name.encode("utf-8")).hexdigest()
@@ -383,6 +403,8 @@ class Repo(object):
             else:
                 messages.append("Delete stale Zuul ref {}".format(ref))
             Repo._deleteRef(ref.path, repo)
+
+        Repo._cleanup_leaked_rebase_dirs(local_path, log, messages)
 
         # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
         # directory foo behind that will block creating the reference foo
@@ -615,7 +637,11 @@ class Repo(object):
         self.fetch(ref, zuul_event_id=zuul_event_id)
         log.debug("Rebasing %s with args %s", ref, args)
         repo.git.checkout('FETCH_HEAD')
-        repo.git.rebase(*args)
+        try:
+            repo.git.rebase(*args)
+        except Exception:
+            repo.git.rebase(abort=True)
+            raise
         return repo.head.commit
 
     def fetch(self, ref, zuul_event_id=None):

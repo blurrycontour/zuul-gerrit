@@ -163,6 +163,64 @@ class TestMergerRepo(ZuulTestCase):
         work_repo.reset()
         work_repo.checkout("foobar")
 
+    def test_rebase_merge_conflict_abort(self):
+        """Test that a failed rebase is properly aborted and related
+        directories are cleaned up."""
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("feature")
+
+        files = {"test.txt": "master"}
+        self.create_commit("org/project1", files=files, head="master",
+                           message="Add master file")
+
+        files = {"test.txt": "feature"}
+        self.create_commit("org/project1", files=files, head="feature",
+                           message="Add feature file")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         "none@example.org", "User Name", "0", "0")
+
+        item = {"ref": "refs/heads/feature"}
+        # We expect the rebase to fail because of a conflict, but the
+        # rebase will be aborted.
+        with testtools.ExpectedException(git.exc.GitCommandError):
+            work_repo.rebaseMerge(item, "master")
+
+        # Assert that the failed rebase doesn't leave any temporary
+        # directories behind.
+        self.assertFalse(
+            os.path.exists(f"{work_repo.local_path}/.git/rebase-merge"))
+        self.assertFalse(
+            os.path.exists(f"{work_repo.local_path}/.git/rebase-apply"))
+
+    def test_rebase_merge_conflict_reset_cleanup(self):
+        """Test temporary directories of a failed rebase merge are
+        removed on repo reset."""
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("feature")
+
+        files = {"master.txt": "master"}
+        self.create_commit("org/project1", files=files, head="master",
+                           message="Add master file")
+
+        files = {"feature.txt": "feature"}
+        self.create_commit("org/project1", files=files, head="feature",
+                           message="Add feature file")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         "none@example.org", "User Name", "0", "0")
+
+        # Simulate leftovers from a failed rebase
+        os.mkdir(f"{work_repo.local_path}/.git/rebase-merge")
+        os.mkdir(f"{work_repo.local_path}/.git/rebase-apply")
+
+        # Resetting the repo should clean up any leaked directories
+        work_repo.reset()
+        item = {"ref": "refs/heads/feature"}
+        work_repo.rebaseMerge(item, "master")
+
     def test_set_refs(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         remote_sha = self.create_commit('org/project1')
