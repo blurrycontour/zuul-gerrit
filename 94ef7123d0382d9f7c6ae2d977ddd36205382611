@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a159d70_eb95f8a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-17T17:24:01Z",
+      "side": 1,
+      "message": "Changing my vote as I wasn\u0027t aware of an existing need for empty commits with Zuul. Given that I think the behavior here is not a corner case limitation that can be accepted.",
+      "revId": "94ef7123d0382d9f7c6ae2d977ddd36205382611",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ebedfbc_ef62b8fb",
