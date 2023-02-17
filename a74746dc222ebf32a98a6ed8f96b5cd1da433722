@@ -33,6 +33,24 @@
       "message": "You WIP\u0027d this, so maybe you saw it already, but this references merge_dir instead of leaked_dir.\n\nThis is kind of a nit, but if you\u0027re updating it anway, including the detection above in the loop may make this whole function simpler.  Basically:\n\nfor merge_dir in [rebasse-merge, rebase-apply]:\n   if exists:\n       delete",
       "revId": "a74746dc222ebf32a98a6ed8f96b5cd1da433722",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7df4ea4_7560c846",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-17T06:36:59Z",
+      "side": 1,
+      "message": "Thanks, copy\u0026pasta :)",
+      "parentUuid": "b3acc590_9df70aae",
+      "revId": "a74746dc222ebf32a98a6ed8f96b5cd1da433722",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
