@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ebedfbc_ef62b8fb",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-17T16:46:10Z",
+      "side": 1,
+      "message": "Nit looks like we may want to use checkout() to avoid some stale lock file problem? However, the risk of that seems low since we\u0027re switching to HEAD~1.\n\nThinking about this I suppose it is possible for users to intentionally cherry pick a commit that is empty for some reason (version manipulation?). For this reason I\u0027m still not sure this is the best approach. As I mentioned on a previous patchset I think we may need to use the information from the code review system to know if we are merging an intentional empty commit or something that should just be ignored.\n\nThat said I do think this is an improvement over the previous patchset because only those looking for intentional empty commits will be affected instead of every change. I don\u0027t use cherry-pick but this caveat may be worth living withfor now as it should get most use cases of this merge type moving forward in post review pipelines.",
+      "revId": "94ef7123d0382d9f7c6ae2d977ddd36205382611",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
