@@ -4666,6 +4666,33 @@ class BuildSet(zkobject.ZKObject):
         return Attributes(uuid=self.uuid)
 
 
+class EventInfo:
+
+    def __init__(self):
+        self.zuul_event_id = None
+        self.timestamp = time.time()
+
+    @classmethod
+    def fromEvent(cls, event):
+        tinfo = cls()
+        tinfo.zuul_event_id = event.zuul_event_id
+        tinfo.timestamp = event.timestamp
+        return tinfo
+
+    @classmethod
+    def fromDict(cls, d):
+        tinfo = cls()
+        tinfo.zuul_event_id = d["zuul_event_id"]
+        tinfo.timestamp = d["timestamp"]
+        return tinfo
+
+    def toDict(self):
+        return {
+            "zuul_event_id": self.zuul_event_id,
+            "timestamp": self.timestamp,
+        }
+
+
 class QueueItem(zkobject.ZKObject):
 
     """Represents the position of a Change in a ChangeQueue.
@@ -4700,7 +4727,7 @@ class QueueItem(zkobject.ZKObject):
             live=True,  # Whether an item is intended to be processed at all
             layout_uuid=None,
             _cached_sql_results={},
-            event=None,  # The trigger event that lead to this queue item
+            event=None,  # Info about the event that lead to this queue item
 
             # Additional container for connection specifig information to be
             # used by reporters throughout the lifecycle
@@ -4722,6 +4749,9 @@ class QueueItem(zkobject.ZKObject):
     def new(klass, context, **kw):
         obj = klass()
         obj._set(**kw)
+        if COMPONENT_REGISTRY.model_api >= 13:
+            obj._set(event=EventInfo.fromEvent(obj.event))
+
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
         files_state = (BuildSet.COMPLETE if obj.change.files is not None
@@ -4750,10 +4780,18 @@ class QueueItem(zkobject.ZKObject):
         return (tenant, pipeline, uuid)
 
     def serialize(self, context):
-        if isinstance(self.event, TriggerEvent):
-            event_type = "TriggerEvent"
+        if COMPONENT_REGISTRY.model_api < 13:
+            if isinstance(self.event, TriggerEvent):
+                event_type = "TriggerEvent"
+            else:
+                event_type = self.event.__class__.__name__
         else:
-            event_type = self.event.__class__.__name__
+            event_type = "EventInfo"
+            if not isinstance(self.event, EventInfo):
+                # Convert our local trigger event to a trigger info
+                # object. This will only happen on the transition to
+                # model API version 13.
+                self._set(event=EventInfo.fromEvent(self.event))
 
         data = {
             "uuid": self.uuid,
@@ -4795,14 +4833,18 @@ class QueueItem(zkobject.ZKObject):
         # child objects.
         self._set(uuid=data["uuid"])
 
-        event_type = data["event"]["type"]
-        if event_type == "TriggerEvent":
-            event_class = (
-                self.pipeline.manager.sched.connections.getTriggerEventClass(
-                    data["event"]["data"]["driver_name"])
-            )
+        if COMPONENT_REGISTRY.model_api < 13:
+            event_type = data["event"]["type"]
+            if event_type == "TriggerEvent":
+                event_class = (
+                    self.pipeline.manager.sched.connections
+                        .getTriggerEventClass(
+                            data["event"]["data"]["driver_name"])
+                )
+            else:
+                event_class = EventTypeIndex.event_type_mapping.get(event_type)
         else:
-            event_class = EventTypeIndex.event_type_mapping.get(event_type)
+            event_class = EventInfo
 
         if event_class is None:
             raise NotImplementedError(
