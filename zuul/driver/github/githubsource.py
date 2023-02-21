@@ -21,7 +21,7 @@ import voluptuous as v
 from zuul.source import BaseSource
 from zuul.model import Project
 from zuul.driver.github.githubmodel import GithubRefFilter
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list
 from zuul.zk.change_cache import ChangeKey
 
 
@@ -165,29 +165,15 @@ class GithubSource(BaseSource):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
     def getRequireFilters(self, config):
-        f = GithubRefFilter(
-            connection_name=self.connection.connection_name,
-            statuses=to_list(config.get('status')),
-            required_reviews=to_list(config.get('review')),
-            open=config.get('open'),
-            merged=config.get('merged'),
-            current_patchset=config.get('current-patchset'),
-            draft=config.get('draft'),
-            labels=to_list(config.get('label')),
-        )
+        f = GithubRefFilter.requiresFromConfig(
+            self.connection.connection_name,
+            config)
         return [f]
 
     def getRejectFilters(self, config):
-        f = GithubRefFilter(
-            connection_name=self.connection.connection_name,
-            reject_reviews=to_list(config.get('review')),
-            reject_labels=to_list(config.get('label')),
-            reject_statuses=to_list(config.get('status')),
-            reject_open=config.get('open'),
-            reject_merged=config.get('merged'),
-            reject_current_patchset=config.get('current-patchset'),
-            reject_draft=config.get('draft'),
-        )
+        f = GithubRefFilter.rejectFromConfig(
+            self.connection.connection_name,
+            config)
         return [f]
 
     def getRefForChange(self, change):
