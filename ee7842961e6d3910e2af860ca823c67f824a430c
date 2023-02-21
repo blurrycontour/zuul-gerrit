@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "074b1aeb_e107dda9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2023-02-21T11:36:28Z",
+      "side": 1,
+      "message": "It seems the gate failure is not related. Could it possible to re-gate ?",
+      "revId": "ee7842961e6d3910e2af860ca823c67f824a430c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a081877_0d131a77",
