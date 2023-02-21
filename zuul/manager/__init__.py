@@ -625,7 +625,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if enqueue_time:
                     item.enqueue_time = enqueue_time
                 item.live = live
-                self.reportStats(item, added=True)
+                self.reportStats(item, trigger_event=event)
                 item.quiet = quiet
 
             if item.live:
@@ -2197,7 +2197,7 @@ class PipelineManager(metaclass=ABCMeta):
                 log.error("Reporting item %s received: %s", item, ret)
         return action, (not ret)
 
-    def reportStats(self, item, added=False):
+    def reportStats(self, item, trigger_event=None):
         if not self.sched.statsd:
             return
         try:
@@ -2236,7 +2236,10 @@ class PipelineManager(metaclass=ABCMeta):
                 if dt:
                     self.sched.statsd.timing(key + '.resident_time', dt)
                     self.sched.statsd.incr(key + '.total_changes')
-            if added and hasattr(item.event, 'arrived_at_scheduler_timestamp'):
+            if (
+                trigger_event
+                and hasattr(trigger_event, 'arrived_at_scheduler_timestamp')
+            ):
                 now = time.time()
                 arrived = item.event.arrived_at_scheduler_timestamp
                 processing = (now - arrived) * 1000
