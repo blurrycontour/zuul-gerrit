@@ -107,7 +107,19 @@ class TestEventQueue(EventQueueBaseTestCase):
 
 
 class DummyTriggerEvent(model.TriggerEvent):
-    pass
+
+    def __init__(self):
+        super().__init__()
+        self.data = None
+
+    def toDict(self):
+        d = super().toDict()
+        d["data"] = self.data
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.data = d["data"]
 
 
 class DummyDriver(Driver, TriggerInterface):
