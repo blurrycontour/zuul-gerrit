@@ -4752,8 +4752,13 @@ class QueueItem(zkobject.ZKObject):
     def serialize(self, context):
         if isinstance(self.event, TriggerEvent):
             event_type = "TriggerEvent"
+            if COMPONENT_REGISTRY.model_api < 13:
+                event_data = self.event.toDict()
+            else:
+                event_data = TriggerEvent.toDict(self.event)
         else:
             event_type = self.event.__class__.__name__
+            event_data = self.event.toDict()
 
         data = {
             "uuid": self.uuid,
@@ -4780,7 +4785,7 @@ class QueueItem(zkobject.ZKObject):
             "layout_uuid": self.layout_uuid,
             "event": {
                 "type": event_type,
-                "data": self.event.toDict(),
+                "data": event_data,
             },
             "dynamic_state": self.dynamic_state,
             "bundle": self.bundle and self.bundle.serialize(),
@@ -4797,10 +4802,14 @@ class QueueItem(zkobject.ZKObject):
 
         event_type = data["event"]["type"]
         if event_type == "TriggerEvent":
-            event_class = (
-                self.pipeline.manager.sched.connections.getTriggerEventClass(
-                    data["event"]["data"]["driver_name"])
-            )
+            if COMPONENT_REGISTRY.model_api < 13:
+                event_class = (
+                    self.pipeline.manager.sched.connections
+                        .getTriggerEventClass(
+                            data["event"]["data"]["driver_name"])
+                )
+            else:
+                event_class = TriggerEvent
         else:
             event_class = EventTypeIndex.event_type_mapping.get(event_type)
 
@@ -6913,8 +6922,6 @@ class NodesProvisionedEvent(ResultEvent):
 class TriggerEvent(AbstractEvent):
     """Incoming event from an external system."""
     def __init__(self):
-        # TODO(jeblair): further reduce this list
-        self.data = None
         # common
         self.type = None
         self.branch_updated = False
@@ -6957,7 +6964,7 @@ class TriggerEvent(AbstractEvent):
 
     def toDict(self):
         return {
-            "data": self.data,
+            "data": None,
             "type": self.type,
             "branch_updated": self.branch_updated,
             "branch_created": self.branch_created,
@@ -6992,7 +6999,6 @@ class TriggerEvent(AbstractEvent):
         }
 
     def updateFromDict(self, d):
-        self.data = d["data"]
         self.type = d["type"]
         self.branch_updated = d["branch_updated"]
         self.branch_created = d["branch_created"]
