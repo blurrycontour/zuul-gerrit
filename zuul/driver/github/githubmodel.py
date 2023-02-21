@@ -172,13 +172,16 @@ class GithubTriggerEvent(TriggerEvent):
 
 class GithubCommonFilter(object):
     def __init__(self, required_reviews=[], required_statuses=[],
-                 reject_reviews=[], reject_statuses=[]):
+                 reject_reviews=[], reject_statuses=[],
+                 required_labels=[], reject_labels=[]):
         self._required_reviews = copy.deepcopy(required_reviews)
         self._reject_reviews = copy.deepcopy(reject_reviews)
         self.required_reviews = self._tidy_reviews(self._required_reviews)
         self.reject_reviews = self._tidy_reviews(self._reject_reviews)
         self.required_statuses = required_statuses
         self.reject_statuses = reject_statuses
+        self.required_labels = required_labels
+        self.reject_labels = reject_labels
 
     def _tidy_reviews(self, reviews):
         for r in reviews:
@@ -303,16 +306,54 @@ class GithubCommonFilter(object):
                         self.reject_statuses, change.status))
         return True
 
+    def matchesLabels(self, change):
+        if self.required_labels or self.reject_labels:
+            if not hasattr(change, 'number'):
+                # not a PR, no label
+                return FalseWithReason("Can't match labels without PR")
+            if self.required_labels and not change.labels:
+                # No labels means no matching of required bits
+                # having reject labels but no labels on the change is okay
+                return FalseWithReason(
+                    "Required labels %s does not match %s" % (
+                        self.required_labels, change.labels))
+        return (self.matchesRequiredLabels(change) and
+                self.matchesNoRejectLabels(change))
+
+    def matchesRequiredLabels(self, change):
+        for label in self.required_labels:
+            if label not in change.labels:
+                return FalseWithReason("Labels %s does not match %s" % (
+                    self.required_labels, change.labels))
+        return True
+
+    def matchesNoRejectLabels(self, change):
+        for label in self.reject_labels:
+            if label in change.labels:
+                return FalseWithReason("NoRejectLabels %s matches %s" % (
+                    self.reject_labels, change.labels))
+        return True
+
 
 class GithubEventFilter(EventFilter, GithubCommonFilter):
-    def __init__(self, connection_name, trigger, types=[], branches=[],
-                 refs=[], comments=[], actions=[], labels=[], unlabels=[],
-                 states=[], statuses=[], required_statuses=[],
-                 check_runs=[], ignore_deletes=True):
+    def __init__(self, connection_name, trigger, types=[],
+                 branches=[], refs=[], comments=[], actions=[],
+                 labels=[], unlabels=[], states=[], statuses=[],
+                 required_statuses=[], reject_statuses=[],
+                 required_reviews=[], reject_reviews=[],
+                 required_labels=[], reject_labels=[], check_runs=[],
+                 ignore_deletes=True):
 
         EventFilter.__init__(self, connection_name, trigger)
 
-        GithubCommonFilter.__init__(self, required_statuses=required_statuses)
+        GithubCommonFilter.__init__(self,
+                                    required_statuses=required_statuses,
+                                    reject_statuses=reject_statuses,
+                                    required_reviews=required_reviews,
+                                    reject_reviews=reject_reviews,
+                                    required_labels=required_labels,
+                                    reject_labels=reject_labels,
+                                    )
 
         self._types = types
         self._branches = branches
@@ -327,7 +368,6 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         self.unlabels = unlabels
         self.states = states
         self.statuses = statuses
-        self.required_statuses = required_statuses
         self.check_runs = check_runs
         self.ignore_deletes = ignore_deletes
 
@@ -357,7 +397,17 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         if self.statuses:
             ret += ' statuses: %s' % ', '.join(self.statuses)
         if self.required_statuses:
-            ret += ' required_statuses: %s' % ', '.join(self.required_statuses)
+            ret += ' require-statuses: %s' % str(self.required_statuses)
+        if self.reject_statuses:
+            ret += ' reject-statuses: %s' % str(self.reject_statuses)
+        if self.required_reviews:
+            ret += ' require-reviews: %s' % str(self.required_reviews)
+        if self.reject_reviews:
+            ret += ' reject-reviews: %s' % str(self.reject_reviews)
+        if self.required_labels:
+            ret += ' require-labels: %s' % str(self.required_labels)
+        if self.reject_labels:
+            ret += ' reject-labels: %s' % str(self.reject_labels)
         ret += '>'
 
         return ret
@@ -454,23 +504,36 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
                 return FalseWithReason("Statuses %s doesn't match %s" % (
                     self.statuses, event.status))
 
-        return self.matchesStatuses(change)
+        statuses_result = self.matchesStatuses(change)
+        if not statuses_result:
+            return statuses_result
+
+        reviews_result = self.matchesReviews(change)
+        if not reviews_result:
+            return reviews_result
+
+        labels_result = self.matchesLabels(change)
+        if not labels_result:
+            return labels_result
+
+        return True
 
 
 class GithubRefFilter(RefFilter, GithubCommonFilter):
     def __init__(self, connection_name, statuses=[],
-                 required_reviews=[], reject_reviews=[], open=None,
+                 reviews=[], reject_reviews=[], open=None,
                  merged=None, current_patchset=None, draft=None,
                  reject_open=None, reject_merged=None,
                  reject_current_patchset=None, reject_draft=None,
                  labels=[], reject_labels=[], reject_statuses=[]):
         RefFilter.__init__(self, connection_name)
 
-        GithubCommonFilter.__init__(self, required_reviews=required_reviews,
+        GithubCommonFilter.__init__(self, required_reviews=reviews,
                                     reject_reviews=reject_reviews,
                                     required_statuses=statuses,
-                                    reject_statuses=reject_statuses)
-        self.statuses = statuses
+                                    reject_statuses=reject_statuses,
+                                    required_labels=labels,
+                                    reject_labels=reject_labels)
         if reject_open is not None:
             self.open = not reject_open
         else:
@@ -487,23 +550,25 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
             self.draft = not reject_draft
         else:
             self.draft = draft
-        self.labels = labels
-        self.reject_labels = reject_labels
 
     def __repr__(self):
         ret = '<GithubRefFilter'
 
         ret += ' connection_name: %s' % self.connection_name
-        if self.statuses:
-            ret += ' statuses: %s' % ', '.join(self.statuses)
+        if self.required_statuses:
+            ret += ' status: %s' % str(self.required_statuses)
         if self.reject_statuses:
-            ret += ' reject-statuses: %s' % ', '.join(self.reject_statuses)
+            ret += ' reject-status: %s' % str(self.reject_statuses)
         if self.required_reviews:
-            ret += (' required-reviews: %s' %
+            ret += (' reviews: %s' %
                     str(self.required_reviews))
         if self.reject_reviews:
             ret += (' reject-reviews: %s' %
                     str(self.reject_reviews))
+        if self.required_labels:
+            ret += ' labels: %s' % str(self.required_labels)
+        if self.reject_labels:
+            ret += ' reject-labels: %s' % str(self.reject_labels)
         if self.open is not None:
             ret += ' open: %s' % self.open
         if self.merged is not None:
@@ -512,10 +577,6 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
             ret += ' current-patchset: %s' % self.current_patchset
         if self.draft is not None:
             ret += ' draft: %s' % self.draft
-        if self.labels:
-            ret += ' labels: %s' % self.labels
-        if self.reject_labels:
-            ret += ' reject-labels: %s' % self.reject_labels
 
         ret += '>'
 
@@ -525,6 +586,14 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
         statuses_result = self.matchesStatuses(change)
         if not statuses_result:
             return statuses_result
+
+        reviews_result = self.matchesReviews(change)
+        if not reviews_result:
+            return reviews_result
+
+        labels_result = self.matchesLabels(change)
+        if not labels_result:
+            return labels_result
 
         if self.open is not None:
             # if a "change" has no number, it's not a change, but a push
@@ -565,22 +634,5 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
                         "Change does not match draft requirement")
             else:
                 return FalseWithReason("Change is not a PR")
-
-        # required reviews are ANDed (reject reviews are ORed)
-        reviews_result = self.matchesReviews(change)
-        if not reviews_result:
-            return reviews_result
-
-        # required labels are ANDed
-        for label in self.labels:
-            if label not in change.labels:
-                return FalseWithReason("Labels %s does not match %s" % (
-                    self.labels, change.labels))
-
-        # rejected reviews are OR'd
-        for label in self.reject_labels:
-            if label in change.labels:
-                return FalseWithReason("RejectLabels %s matches %s" % (
-                    self.reject_labels, change.labels))
 
         return True

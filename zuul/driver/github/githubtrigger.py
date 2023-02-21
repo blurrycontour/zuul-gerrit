@@ -16,6 +16,7 @@ import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.github.githubmodel import GithubEventFilter
+from zuul.driver.github.githubsource import review as review_schema
 from zuul.driver.util import scalar_or_list, to_list
 
 
@@ -50,7 +51,12 @@ class GithubTrigger(BaseTrigger):
                 unlabels=to_list(trigger.get('unlabel')),
                 states=to_list(trigger.get('state')),
                 statuses=to_list(trigger.get('status')),
-                required_statuses=to_list(trigger.get('require-status'))
+                required_statuses=to_list(trigger.get('require-status')),
+                reject_statuses=to_list(trigger.get('reject-status')),
+                required_reviews=to_list(trigger.get('require-review')),
+                reject_reviews=to_list(trigger.get('reject-review')),
+                required_labels=to_list(trigger.get('require-label')),
+                reject_labels=to_list(trigger.get('reject-label')),
             )
             efilters.append(f)
 
@@ -75,6 +81,11 @@ def getSchema():
         'unlabel': scalar_or_list(str),
         'state': scalar_or_list(str),
         'require-status': scalar_or_list(str),
+        'reject-status': scalar_or_list(str),
+        'require-review': scalar_or_list(review_schema),
+        'reject-review': scalar_or_list(review_schema),
+        'require-label': scalar_or_list(str),
+        'reject-label': scalar_or_list(str),
         'status': scalar_or_list(str),
         'check': scalar_or_list(str),
     }

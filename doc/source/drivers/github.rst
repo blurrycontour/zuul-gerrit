@@ -339,7 +339,7 @@ the following options.
       format of ``user:context:status``.  For example,
       ``zuul_github_ci_bot:check_pipeline:success``.
 
-   .. attr: check
+   .. attr:: check
 
       This is only used for ``check_run`` events. It works similar to
       the ``status`` attribute and accepts a list of strings each of
@@ -362,6 +362,52 @@ the following options.
       a regular expression and multiple refs may be listed. GitHub
       always sends full ref name, eg. ``refs/tags/bar`` and this
       string is matched against the regular expression.
+
+   .. attr:: require-label
+
+      This may be used for any event.  It requires that a certain
+      label be present on the PR (the label could be added by the
+      event in question).  It follows the same syntax as
+      :attr:`pipeline.require.<github source>.label`. For each
+      specified criteria there must exist a matching label.
+
+   .. attr:: reject-label
+
+      This takes a list of labels in the same format as
+      :attr:`pipeline.trigger.<github source>.require-label` but the
+      item will fail to enter the pipeline if there is a matching
+      label.
+
+   .. attr:: require-review
+
+      This may be used for any event.  It requires that a certain kind
+      of review be present on the PR (the review could be added by the
+      event in question).  It follows the same syntax as
+      :attr:`pipeline.require.<github source>.review`. For each
+      specified criteria there must exist a matching review.
+
+   .. attr:: reject-review
+
+      This takes a list of reviews in the same format as
+      :attr:`pipeline.trigger.<github source>.require-review` but the
+      item will fail to enter the pipeline if there is a matching
+      review.
+
+   .. attr:: require-status
+
+      This may be used for any event.  It requires that a certain kind
+      of status be present for the PR (the status could be added by
+      the event in question).  It follows the same syntax as
+      :attr:`pipeline.require.<github source>.status`. For each
+      specified criteria there must exist a matching status.
+
+   .. attr:: reject-status
+
+      This takes a list of statuses in the same format as
+      :attr:`pipeline.trigger.<github source>.require-status` but the
+      item will fail to enter the pipeline if there is a matching
+      status.
+
 
 Reporter Configuration
 ----------------------

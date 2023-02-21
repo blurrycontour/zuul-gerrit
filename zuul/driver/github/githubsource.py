@@ -168,21 +168,21 @@ class GithubSource(BaseSource):
         f = GithubRefFilter(
             connection_name=self.connection.connection_name,
             statuses=to_list(config.get('status')),
-            required_reviews=to_list(config.get('review')),
+            reviews=to_list(config.get('review')),
+            labels=to_list(config.get('label')),
             open=config.get('open'),
             merged=config.get('merged'),
             current_patchset=config.get('current-patchset'),
             draft=config.get('draft'),
-            labels=to_list(config.get('label')),
         )
         return [f]
 
     def getRejectFilters(self, config):
         f = GithubRefFilter(
             connection_name=self.connection.connection_name,
+            reject_statuses=to_list(config.get('status')),
             reject_reviews=to_list(config.get('review')),
             reject_labels=to_list(config.get('label')),
-            reject_statuses=to_list(config.get('status')),
             reject_open=config.get('open'),
             reject_merged=config.get('merged'),
             reject_current_patchset=config.get('current-patchset'),
