@@ -21,7 +21,7 @@ import time
 
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 from zuul.model import FalseWithReason
-from zuul.driver.util import time_to_seconds
+from zuul.driver.util import time_to_seconds, to_list
 
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -170,15 +170,277 @@ class GithubTriggerEvent(TriggerEvent):
         return ' '.join(r)
 
 
-class GithubCommonFilter(object):
-    def __init__(self, required_reviews=[], required_statuses=[],
-                 reject_reviews=[], reject_statuses=[]):
-        self._required_reviews = copy.deepcopy(required_reviews)
+class GithubEventFilter(EventFilter):
+    def __init__(self, connection_name, trigger, types=[],
+                 branches=[], refs=[], comments=[], actions=[],
+                 labels=[], unlabels=[], states=[], statuses=[],
+                 required_statuses=[], check_runs=[],
+                 ignore_deletes=True,
+                 require=None, reject=None):
+
+        EventFilter.__init__(self, connection_name, trigger)
+
+        # TODO: Backwards compat, remove after 9.x:
+        if required_statuses and require is None:
+            require = {'status': required_statuses}
+
+        if require:
+            self.require_filter = GithubRefFilter.requiresFromConfig(
+                connection_name, require)
+        else:
+            self.require_filter = None
+
+        if reject:
+            self.reject_filter = GithubRefFilter.rejectFromConfig(
+                connection_name, reject)
+        else:
+            self.reject_filter = None
+
+        self._types = types
+        self._branches = branches
+        self._refs = refs
+        self._comments = comments
+        self.types = [re.compile(x) for x in types]
+        self.branches = [re.compile(x) for x in branches]
+        self.refs = [re.compile(x) for x in refs]
+        self.comments = [re.compile(x) for x in comments]
+        self.actions = actions
+        self.labels = labels
+        self.unlabels = unlabels
+        self.states = states
+        self.statuses = statuses
+        self.check_runs = check_runs
+        self.ignore_deletes = ignore_deletes
+
+    def __repr__(self):
+        ret = '<GithubEventFilter'
+        ret += ' connection: %s' % self.connection_name
+        if self._types:
+            ret += ' types: %s' % ', '.join(self._types)
+        if self._branches:
+            ret += ' branches: %s' % ', '.join(self._branches)
+        if self._refs:
+            ret += ' refs: %s' % ', '.join(self._refs)
+        if self.ignore_deletes:
+            ret += ' ignore_deletes: %s' % self.ignore_deletes
+        if self._comments:
+            ret += ' comments: %s' % ', '.join(self._comments)
+        if self.actions:
+            ret += ' actions: %s' % ', '.join(self.actions)
+        if self.check_runs:
+            ret += ' check_runs: %s' % ','.join(self.check_runs)
+        if self.labels:
+            ret += ' labels: %s' % ', '.join(self.labels)
+        if self.unlabels:
+            ret += ' unlabels: %s' % ', '.join(self.unlabels)
+        if self.states:
+            ret += ' states: %s' % ', '.join(self.states)
+        if self.statuses:
+            ret += ' statuses: %s' % ', '.join(self.statuses)
+        if self.require_filter:
+            ret += ' require: %s' % repr(self.require_filter)
+        if self.reject_filter:
+            ret += ' reject: %s' % repr(self.reject_filter)
+        ret += '>'
+
+        return ret
+
+    def matches(self, event, change):
+        if not super().matches(event, change):
+            return False
+
+        # event types are ORed
+        matches_type = False
+        for etype in self.types:
+            if etype.match(event.type):
+                matches_type = True
+        if self.types and not matches_type:
+            return FalseWithReason("Types %s doesn't match %s" % (
+                self.types, event.type))
+
+        # branches are ORed
+        matches_branch = False
+        for branch in self.branches:
+            if branch.match(event.branch):
+                matches_branch = True
+        if self.branches and not matches_branch:
+            return FalseWithReason("Branches %s doesn't match %s" % (
+                self.branches, event.branch))
+
+        # refs are ORed
+        matches_ref = False
+        if event.ref is not None:
+            for ref in self.refs:
+                if ref.match(event.ref):
+                    matches_ref = True
+        if self.refs and not matches_ref:
+            return FalseWithReason(
+                "Refs %s doesn't match %s" % (self.refs, event.ref))
+        if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
+            # If the updated ref has an empty git sha (all 0s),
+            # then the ref is being deleted
+            return FalseWithReason("Ref deletion are ignored")
+
+        # comments are ORed
+        matches_comment_re = False
+        for comment_re in self.comments:
+            if (event.comment is not None and
+                comment_re.search(event.comment)):
+                matches_comment_re = True
+        if self.comments and not matches_comment_re:
+            return FalseWithReason("Comments %s doesn't match %s" % (
+                self.comments, event.comment))
+
+        # actions are ORed
+        matches_action = False
+        for action in self.actions:
+            if (event.action == action):
+                matches_action = True
+        if self.actions and not matches_action:
+            return FalseWithReason("Actions %s doesn't match %s" % (
+                self.actions, event.action))
+
+        # check_runs are ORed
+        if self.check_runs:
+            check_run_found = False
+            for check_run in self.check_runs:
+                if re2.fullmatch(check_run, event.check_run):
+                    check_run_found = True
+                    break
+            if not check_run_found:
+                return FalseWithReason("Check_runs %s doesn't match %s" % (
+                    self.check_runs, event.check_run))
+
+        # labels are ORed
+        if self.labels and event.label not in self.labels:
+            return FalseWithReason("Labels %s doesn't match %s" % (
+                self.labels, event.label))
+
+        # unlabels are ORed
+        if self.unlabels and event.unlabel not in self.unlabels:
+            return FalseWithReason("Unlabels %s doesn't match %s" % (
+                self.unlabels, event.unlabel))
+
+        # states are ORed
+        if self.states and event.state not in self.states:
+            return FalseWithReason("States %s doesn't match %s" % (
+                self.states, event.state))
+
+        # statuses are ORed
+        if self.statuses:
+            status_found = False
+            for status in self.statuses:
+                if re2.fullmatch(status, event.status):
+                    status_found = True
+                    break
+            if not status_found:
+                return FalseWithReason("Statuses %s doesn't match %s" % (
+                    self.statuses, event.status))
+
+        if self.require_filter:
+            require_filter_result = self.require_filter.matches(change)
+            if not require_filter_result:
+                return require_filter_result
+
+        if self.reject_filter:
+            reject_filter_result = self.reject_filter.matches(change)
+            if not reject_filter_result:
+                return reject_filter_result
+
+        return True
+
+
+class GithubRefFilter(RefFilter):
+    def __init__(self, connection_name, statuses=[],
+                 reviews=[], reject_reviews=[], open=None,
+                 merged=None, current_patchset=None, draft=None,
+                 reject_open=None, reject_merged=None,
+                 reject_current_patchset=None, reject_draft=None,
+                 labels=[], reject_labels=[], reject_statuses=[]):
+        RefFilter.__init__(self, connection_name)
+
+        self._required_reviews = copy.deepcopy(reviews)
         self._reject_reviews = copy.deepcopy(reject_reviews)
         self.required_reviews = self._tidy_reviews(self._required_reviews)
         self.reject_reviews = self._tidy_reviews(self._reject_reviews)
-        self.required_statuses = required_statuses
+        self.required_statuses = statuses
         self.reject_statuses = reject_statuses
+        self.required_labels = labels
+        self.reject_labels = reject_labels
+
+        if reject_open is not None:
+            self.open = not reject_open
+        else:
+            self.open = open
+        if reject_merged is not None:
+            self.merged = not reject_merged
+        else:
+            self.merged = merged
+        if reject_current_patchset is not None:
+            self.current_patchset = not reject_current_patchset
+        else:
+            self.current_patchset = current_patchset
+        if reject_draft is not None:
+            self.draft = not reject_draft
+        else:
+            self.draft = draft
+
+    @classmethod
+    def requiresFromConfig(cls, connection_name, config):
+        return cls(
+            connection_name=connection_name,
+            statuses=to_list(config.get('status')),
+            reviews=to_list(config.get('review')),
+            labels=to_list(config.get('label')),
+            open=config.get('open'),
+            merged=config.get('merged'),
+            current_patchset=config.get('current-patchset'),
+            draft=config.get('draft'),
+        )
+
+    @classmethod
+    def rejectFromConfig(cls, connection_name, config):
+        return cls(
+            connection_name=connection_name,
+            reject_statuses=to_list(config.get('status')),
+            reject_reviews=to_list(config.get('review')),
+            reject_labels=to_list(config.get('label')),
+            reject_open=config.get('open'),
+            reject_merged=config.get('merged'),
+            reject_current_patchset=config.get('current-patchset'),
+            reject_draft=config.get('draft'),
+        )
+
+    def __repr__(self):
+        ret = '<GithubRefFilter'
+
+        ret += ' connection_name: %s' % self.connection_name
+        if self.required_statuses:
+            ret += ' status: %s' % str(self.required_statuses)
+        if self.reject_statuses:
+            ret += ' reject-status: %s' % str(self.reject_statuses)
+        if self.required_reviews:
+            ret += (' reviews: %s' %
+                    str(self.required_reviews))
+        if self.reject_reviews:
+            ret += (' reject-reviews: %s' %
+                    str(self.reject_reviews))
+        if self.required_labels:
+            ret += ' labels: %s' % str(self.required_labels)
+        if self.reject_labels:
+            ret += ' reject-labels: %s' % str(self.reject_labels)
+        if self.open is not None:
+            ret += ' open: %s' % self.open
+        if self.merged is not None:
+            ret += ' merged: %s' % self.merged
+        if self.current_patchset is not None:
+            ret += ' current-patchset: %s' % self.current_patchset
+        if self.draft is not None:
+            ret += ' draft: %s' % self.draft
+
+        ret += '>'
+
+        return ret
 
     def _tidy_reviews(self, reviews):
         for r in reviews:
@@ -303,228 +565,46 @@ class GithubCommonFilter(object):
                         self.reject_statuses, change.status))
         return True
 
+    def matchesLabels(self, change):
+        if self.required_labels or self.reject_labels:
+            if not hasattr(change, 'number'):
+                # not a PR, no label
+                return FalseWithReason("Can't match labels without PR")
+            if self.required_labels and not change.labels:
+                # No labels means no matching of required bits
+                # having reject labels but no labels on the change is okay
+                return FalseWithReason(
+                    "Required labels %s does not match %s" % (
+                        self.required_labels, change.labels))
+        return (self.matchesRequiredLabels(change) and
+                self.matchesNoRejectLabels(change))
 
-class GithubEventFilter(EventFilter, GithubCommonFilter):
-    def __init__(self, connection_name, trigger, types=[], branches=[],
-                 refs=[], comments=[], actions=[], labels=[], unlabels=[],
-                 states=[], statuses=[], required_statuses=[],
-                 check_runs=[], ignore_deletes=True):
+    def matchesRequiredLabels(self, change):
+        for label in self.required_labels:
+            if label not in change.labels:
+                return FalseWithReason("Labels %s does not match %s" % (
+                    self.required_labels, change.labels))
+        return True
 
-        EventFilter.__init__(self, connection_name, trigger)
-
-        GithubCommonFilter.__init__(self, required_statuses=required_statuses)
-
-        self._types = types
-        self._branches = branches
-        self._refs = refs
-        self._comments = comments
-        self.types = [re.compile(x) for x in types]
-        self.branches = [re.compile(x) for x in branches]
-        self.refs = [re.compile(x) for x in refs]
-        self.comments = [re.compile(x) for x in comments]
-        self.actions = actions
-        self.labels = labels
-        self.unlabels = unlabels
-        self.states = states
-        self.statuses = statuses
-        self.required_statuses = required_statuses
-        self.check_runs = check_runs
-        self.ignore_deletes = ignore_deletes
-
-    def __repr__(self):
-        ret = '<GithubEventFilter'
-        ret += ' connection: %s' % self.connection_name
-        if self._types:
-            ret += ' types: %s' % ', '.join(self._types)
-        if self._branches:
-            ret += ' branches: %s' % ', '.join(self._branches)
-        if self._refs:
-            ret += ' refs: %s' % ', '.join(self._refs)
-        if self.ignore_deletes:
-            ret += ' ignore_deletes: %s' % self.ignore_deletes
-        if self._comments:
-            ret += ' comments: %s' % ', '.join(self._comments)
-        if self.actions:
-            ret += ' actions: %s' % ', '.join(self.actions)
-        if self.check_runs:
-            ret += ' check_runs: %s' % ','.join(self.check_runs)
-        if self.labels:
-            ret += ' labels: %s' % ', '.join(self.labels)
-        if self.unlabels:
-            ret += ' unlabels: %s' % ', '.join(self.unlabels)
-        if self.states:
-            ret += ' states: %s' % ', '.join(self.states)
-        if self.statuses:
-            ret += ' statuses: %s' % ', '.join(self.statuses)
-        if self.required_statuses:
-            ret += ' required_statuses: %s' % ', '.join(self.required_statuses)
-        ret += '>'
-
-        return ret
-
-    def matches(self, event, change):
-        if not super().matches(event, change):
-            return False
-
-        # event types are ORed
-        matches_type = False
-        for etype in self.types:
-            if etype.match(event.type):
-                matches_type = True
-        if self.types and not matches_type:
-            return FalseWithReason("Types %s doesn't match %s" % (
-                self.types, event.type))
-
-        # branches are ORed
-        matches_branch = False
-        for branch in self.branches:
-            if branch.match(event.branch):
-                matches_branch = True
-        if self.branches and not matches_branch:
-            return FalseWithReason("Branches %s doesn't match %s" % (
-                self.branches, event.branch))
-
-        # refs are ORed
-        matches_ref = False
-        if event.ref is not None:
-            for ref in self.refs:
-                if ref.match(event.ref):
-                    matches_ref = True
-        if self.refs and not matches_ref:
-            return FalseWithReason(
-                "Refs %s doesn't match %s" % (self.refs, event.ref))
-        if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
-            # If the updated ref has an empty git sha (all 0s),
-            # then the ref is being deleted
-            return FalseWithReason("Ref deletion are ignored")
-
-        # comments are ORed
-        matches_comment_re = False
-        for comment_re in self.comments:
-            if (event.comment is not None and
-                comment_re.search(event.comment)):
-                matches_comment_re = True
-        if self.comments and not matches_comment_re:
-            return FalseWithReason("Comments %s doesn't match %s" % (
-                self.comments, event.comment))
-
-        # actions are ORed
-        matches_action = False
-        for action in self.actions:
-            if (event.action == action):
-                matches_action = True
-        if self.actions and not matches_action:
-            return FalseWithReason("Actions %s doesn't match %s" % (
-                self.actions, event.action))
-
-        # check_runs are ORed
-        if self.check_runs:
-            check_run_found = False
-            for check_run in self.check_runs:
-                if re2.fullmatch(check_run, event.check_run):
-                    check_run_found = True
-                    break
-            if not check_run_found:
-                return FalseWithReason("Check_runs %s doesn't match %s" % (
-                    self.check_runs, event.check_run))
-
-        # labels are ORed
-        if self.labels and event.label not in self.labels:
-            return FalseWithReason("Labels %s doesn't match %s" % (
-                self.labels, event.label))
-
-        # unlabels are ORed
-        if self.unlabels and event.unlabel not in self.unlabels:
-            return FalseWithReason("Unlabels %s doesn't match %s" % (
-                self.unlabels, event.unlabel))
-
-        # states are ORed
-        if self.states and event.state not in self.states:
-            return FalseWithReason("States %s doesn't match %s" % (
-                self.states, event.state))
-
-        # statuses are ORed
-        if self.statuses:
-            status_found = False
-            for status in self.statuses:
-                if re2.fullmatch(status, event.status):
-                    status_found = True
-                    break
-            if not status_found:
-                return FalseWithReason("Statuses %s doesn't match %s" % (
-                    self.statuses, event.status))
-
-        return self.matchesStatuses(change)
-
-
-class GithubRefFilter(RefFilter, GithubCommonFilter):
-    def __init__(self, connection_name, statuses=[],
-                 required_reviews=[], reject_reviews=[], open=None,
-                 merged=None, current_patchset=None, draft=None,
-                 reject_open=None, reject_merged=None,
-                 reject_current_patchset=None, reject_draft=None,
-                 labels=[], reject_labels=[], reject_statuses=[]):
-        RefFilter.__init__(self, connection_name)
-
-        GithubCommonFilter.__init__(self, required_reviews=required_reviews,
-                                    reject_reviews=reject_reviews,
-                                    required_statuses=statuses,
-                                    reject_statuses=reject_statuses)
-        self.statuses = statuses
-        if reject_open is not None:
-            self.open = not reject_open
-        else:
-            self.open = open
-        if reject_merged is not None:
-            self.merged = not reject_merged
-        else:
-            self.merged = merged
-        if reject_current_patchset is not None:
-            self.current_patchset = not reject_current_patchset
-        else:
-            self.current_patchset = current_patchset
-        if reject_draft is not None:
-            self.draft = not reject_draft
-        else:
-            self.draft = draft
-        self.labels = labels
-        self.reject_labels = reject_labels
-
-    def __repr__(self):
-        ret = '<GithubRefFilter'
-
-        ret += ' connection_name: %s' % self.connection_name
-        if self.statuses:
-            ret += ' statuses: %s' % ', '.join(self.statuses)
-        if self.reject_statuses:
-            ret += ' reject-statuses: %s' % ', '.join(self.reject_statuses)
-        if self.required_reviews:
-            ret += (' required-reviews: %s' %
-                    str(self.required_reviews))
-        if self.reject_reviews:
-            ret += (' reject-reviews: %s' %
-                    str(self.reject_reviews))
-        if self.open is not None:
-            ret += ' open: %s' % self.open
-        if self.merged is not None:
-            ret += ' merged: %s' % self.merged
-        if self.current_patchset is not None:
-            ret += ' current-patchset: %s' % self.current_patchset
-        if self.draft is not None:
-            ret += ' draft: %s' % self.draft
-        if self.labels:
-            ret += ' labels: %s' % self.labels
-        if self.reject_labels:
-            ret += ' reject-labels: %s' % self.reject_labels
-
-        ret += '>'
-
-        return ret
+    def matchesNoRejectLabels(self, change):
+        for label in self.reject_labels:
+            if label in change.labels:
+                return FalseWithReason("NoRejectLabels %s matches %s" % (
+                    self.reject_labels, change.labels))
+        return True
 
     def matches(self, change):
         statuses_result = self.matchesStatuses(change)
         if not statuses_result:
             return statuses_result
+
+        reviews_result = self.matchesReviews(change)
+        if not reviews_result:
+            return reviews_result
+
+        labels_result = self.matchesLabels(change)
+        if not labels_result:
+            return labels_result
 
         if self.open is not None:
             # if a "change" has no number, it's not a change, but a push
@@ -565,22 +645,5 @@ class GithubRefFilter(RefFilter, GithubCommonFilter):
                         "Change does not match draft requirement")
             else:
                 return FalseWithReason("Change is not a PR")
-
-        # required reviews are ANDed (reject reviews are ORed)
-        reviews_result = self.matchesReviews(change)
-        if not reviews_result:
-            return reviews_result
-
-        # required labels are ANDed
-        for label in self.labels:
-            if label not in change.labels:
-                return FalseWithReason("Labels %s does not match %s" % (
-                    self.labels, change.labels))
-
-        # rejected reviews are OR'd
-        for label in self.reject_labels:
-            if label in change.labels:
-                return FalseWithReason("RejectLabels %s matches %s" % (
-                    self.reject_labels, change.labels))
 
         return True
