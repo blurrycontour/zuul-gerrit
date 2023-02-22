@@ -16,6 +16,23 @@
       "message": "It seems the gate failure is not related. Could it possible to re-gate ?",
       "revId": "d7c97f81350336277e69a6b5c79aebdbc31ac265",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ea20b01_6ba3baf6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-22T11:36:00Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "d7c97f81350336277e69a6b5c79aebdbc31ac265",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
