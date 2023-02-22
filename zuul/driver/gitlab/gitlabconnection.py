@@ -607,17 +607,12 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return change
         project = self.source.getProject(change_key.project_name)
         if not change:
-            if not event:
-                self.log.error("Change %s not found in cache and no event",
-                               change_key)
-            if event:
-                url = event.change_url
             change = MergeRequest(project.name)
             change.project = project
             change.number = number
             # patch_number is the tips commit SHA of the MR
             change.patchset = change_key.revision
-            change.url = url or self.getMRUrl(project.name, number)
+            change.url = self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
 
         log.debug("Getting change mr#%s from project %s" % (
