@@ -1450,14 +1450,23 @@ class PipelineManager(metaclass=ABCMeta):
             ):
                 extra_config_files = set(tpc.extra_config_files)
                 extra_config_dirs = set(tpc.extra_config_dirs)
+
+                # Here we can not use build_set.merger_items because it does not
+                # contain the project canonical_name
+                merger_items = []
+                if item.bundle:
+                    merger_items.extend(item.bundle.items)
+                else:
+                    merger_items.extend(i for i in item.items_ahead)
+
                 # Merge extra_config_files and extra_config_dirs of the
                 # dependent change
-                for item_ahead in item.items_ahead:
-                    tpc_ahead = tenant.project_configs.get(
-                        item_ahead.change.project.canonical_name)
-                    if tpc_ahead:
-                        extra_config_files.update(tpc_ahead.extra_config_files)
-                        extra_config_dirs.update(tpc_ahead.extra_config_dirs)
+                for merger_item in merger_items:
+                    merger_item_tpc = tenant.project_configs.get(
+                        merger_item.change.project.canonical_name)
+                    if merger_item_tpc:
+                        extra_config_files.update(merger_item_tpc.extra_config_files)
+                        extra_config_dirs.update(merger_item_tpc.extra_config_dirs)
 
                 ready = self.scheduleMerge(
                     item,
