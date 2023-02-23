@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "db601106_a57bb9d7",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1455,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-23T12:07:37Z",
+      "side": 1,
+      "message": "It would save some work here if merger_items use the canonical project name, but I am not quite sure about that, and would leave it untouched in this change.",
+      "parentUuid": "31ba8703_c7c1796f",
+      "revId": "205a1289f6f7bfbbdf055a5b59de11b8480e38fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f49b975e_119d9a12",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e62fb3b8_d71cc56d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1456,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-23T12:07:37Z",
+      "side": 1,
+      "message": "Make sense since we do not need to guarantee the order.",
+      "parentUuid": "f49b975e_119d9a12",
+      "revId": "205a1289f6f7bfbbdf055a5b59de11b8480e38fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cf4dabf_458b28fb",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-02-23T11:27:09Z",
       "side": 1,
       "message": "It looks like we should not put this into an `else` branch as we also need to consider the items ahead when we are dealing with a bundle.\n\nHow about something like the following which addresses also the comment above and simplifies a few more things:\n\n```\n                # replace from line 1451-1460\n                merger_items \u003d set(item)\n                merger_items.update(item.items_ahead)\n                if item.bundle:\n                    merger_items.update(item.bundle.items)\n\n                # Merge extra_config_files and extra_config_dirs of the\n                # necessary changes.\n                extra_config_files \u003d set()\n                extra_config_dirs \u003d set()\n                for merger_item in merger_items:\n                    item_tpc \u003d tenant.project_configs.get(\n                        merger_item.change.project.canonical_name)\n                    if item_tpc:\n                        extra_config_files.update(item_tpc.extra_config_files)\n                        extra_config_dirs.update(item_tpc.extra_config_dirs)\n```",
+      "revId": "205a1289f6f7bfbbdf055a5b59de11b8480e38fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8be8f033_98c6f15c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1459,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-02-23T12:07:37Z",
+      "side": 1,
+      "message": "looks good, I update.",
+      "parentUuid": "6cf4dabf_458b28fb",
       "revId": "205a1289f6f7bfbbdf055a5b59de11b8480e38fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
