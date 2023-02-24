@@ -3632,6 +3632,10 @@ class ExecutorServer(BaseMergeServer):
             log.exception('Process pool got broken')
             self.resetProcessPool()
             task.transient_error = True
+        except IOError:
+            log.exception('Got I/O error while updating repo %s/%s',
+                          task.connection_name, task.project_name)
+            task.transient_error = True
         except Exception:
             log.exception('Got exception while updating repo %s/%s',
                           task.connection_name, task.project_name)
