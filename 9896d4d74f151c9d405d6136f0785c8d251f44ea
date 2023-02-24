@@ -16,6 +16,24 @@
       "message": "Sorry, my bad. This should be `merger_items \u003d {item}`",
       "revId": "9896d4d74f151c9d405d6136f0785c8d251f44ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aee34c3c_70180830",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1453,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-24T08:30:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dae6c021_50384e41",
+      "revId": "9896d4d74f151c9d405d6136f0785c8d251f44ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
