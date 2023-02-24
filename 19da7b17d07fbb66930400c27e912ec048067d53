@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "19da7b17d07fbb66930400c27e912ec048067d53",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "020d3e30_7645b166",
+        "filename": "doc/source/drivers/github.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-02-24T12:12:41Z",
+      "side": 1,
+      "message": "Should this also be pipeline.trigger.my-github.require? Or are those different things, just sharing the same condition parameters? If the latter, some explanation about the difference between the two might be helpful.",
+      "revId": "19da7b17d07fbb66930400c27e912ec048067d53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
