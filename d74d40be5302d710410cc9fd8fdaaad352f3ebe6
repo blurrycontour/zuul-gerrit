@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87d58f38_64be60c4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1452,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-24T13:44:14Z",
+      "side": 1,
+      "message": "I pushed a follow-up change that uses the buildset merger items: https://review.opendev.org/c/zuul/zuul/+/875037",
+      "revId": "d74d40be5302d710410cc9fd8fdaaad352f3ebe6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
