@@ -247,12 +247,25 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise Exception("Multiple buildset found with uuid %s", uuid)
 
-    def deleteBuildsets(self, cutoff):
+    def deleteBuildsets(self, cutoff, batch_size):
         """Delete buildsets before the cutoff"""
 
         # delete buildsets updated before the cutoff
-        for buildset in self.getBuildsets(updated_max=cutoff):
-            self.session().delete(buildset)
+        deleted = True
+        while deleted:
+            deleted = False
+            oldest = None
+            for buildset in self.getBuildsets(
+                    updated_max=cutoff, limit=batch_size):
+                deleted = True
+                if oldest is None:
+                    oldest = buildset.updated
+                else:
+                    oldest = min(oldest, buildset.updated)
+                self.session().delete(buildset)
+            self.session().commit()
+            if deleted:
+                self.log.info("Deleted from %s to %s", oldest, cutoff)
 
 
 class SQLConnection(BaseConnection):
@@ -409,7 +422,10 @@ class SQLConnection(BaseConnection):
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
             nodeset = sa.Column(sa.String(255))
-            buildset = orm.relationship(BuildSetModel, backref="builds")
+            buildset = orm.relationship(BuildSetModel,
+                                        backref=orm.backref(
+                                            "builds",
+                                            cascade="all, delete-orphan"))
 
             sa.Index(self.table_prefix + 'job_name_buildset_id_idx',
                      job_name, buildset_id)
@@ -468,7 +484,10 @@ class SQLConnection(BaseConnection):
             name = sa.Column(sa.String(255))
             url = sa.Column(sa.TEXT())
             meta = sa.Column('metadata', sa.TEXT())
-            build = orm.relationship(BuildModel, backref="artifacts")
+            build = orm.relationship(BuildModel,
+                                     backref=orm.backref(
+                                         "artifacts",
+                                         cascade="all, delete-orphan"))
 
         class ProvidesModel(Base):
             __tablename__ = self.table_prefix + PROVIDES_TABLE
@@ -476,7 +495,10 @@ class SQLConnection(BaseConnection):
             build_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + BUILD_TABLE + ".id"))
             name = sa.Column(sa.String(255))
-            build = orm.relationship(BuildModel, backref="provides")
+            build = orm.relationship(BuildModel,
+                                     backref=orm.backref(
+                                         "provides",
+                                         cascade="all, delete-orphan"))
 
         class BuildEventModel(Base):
             __tablename__ = self.table_prefix + BUILD_EVENTS_TABLE
@@ -486,7 +508,10 @@ class SQLConnection(BaseConnection):
             event_time = sa.Column(sa.DateTime)
             event_type = sa.Column(sa.String(255))
             description = sa.Column(sa.TEXT())
-            build = orm.relationship(BuildModel, backref="build_events")
+            build = orm.relationship(BuildModel,
+                                     backref=orm.backref(
+                                         "build_events",
+                                         cascade="all, delete-orphan"))
 
         self.buildEventModel = BuildEventModel
         self.zuul_build_event_table = self.buildEventModel.__table__
