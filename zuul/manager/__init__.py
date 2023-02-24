@@ -1448,25 +1448,17 @@ class PipelineManager(metaclass=ABCMeta):
                 item.bundle and
                 item.bundle.updatesConfig(tenant) and tpc is not None
             ):
-                # Here we can not use build_set.merger_items because it does
-                # not contain the project canonical_name
-                merger_items = {item}
-                merger_items.update(item.items_ahead)
-                if item.bundle:
-                    merger_items.update(item.bundle.items)
-
-                # Merge extra_config_files and extra_config_dirs of the
-                # dependent change
+                # Collect extra config files and dirs of required changes.
                 extra_config_files = set()
                 extra_config_dirs = set()
-                for merger_item in merger_items:
-                    merger_item_tpc = tenant.project_configs.get(
-                        merger_item.change.project.canonical_name)
-                    if merger_item_tpc:
-                        extra_config_files.update(
-                            merger_item_tpc.extra_config_files)
-                        extra_config_dirs.update(
-                            merger_item_tpc.extra_config_dirs)
+                for merger_item in item.current_build_set.merger_items:
+                    source = self.sched.connections.getSource(
+                        merger_item["connection"])
+                    project = source.getProject(merger_item["project"])
+                    tpc = tenant.project_configs.get(project.canonical_name)
+                    if tpc:
+                        extra_config_files.update(tpc.extra_config_files)
+                        extra_config_dirs.update(tpc.extra_config_dirs)
 
                 ready = self.scheduleMerge(
                     item,
