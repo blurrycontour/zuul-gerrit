@@ -11,8 +11,9 @@
 - name: Run quick-start tutorial
   include_tasks: quick-start.yaml
 
-- name: Run admin tutorial
-  include_tasks: admin.yaml
-
-- name: Run tracing tutorial
-  include_tasks: tracing.yaml
+- name: Run tutorials
+  include_tasks: "{{ tutorial_playbook_name }}"
+  when: run_playbooks is defined
+  loop: "{{ run_playbooks }}"
+  loop_control:
+    loop_var: tutorial_playbook_name
