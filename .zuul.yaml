@@ -183,15 +183,23 @@
 # the buildset registry.  It includes zuul as a required project
 # because that is where the docker-compose file is located.
 - job:
-    name: zuul-quick-start
+    name: zuul-tutorial
     parent: opendev-buildset-registry-consumer
-    description: Run the commands in the Zuul tutorial quick-start documentation.
     pre-run: playbooks/tutorial/pre.yaml
     run: playbooks/tutorial/run.yaml
     post-run: playbooks/tutorial/post.yaml
     required-projects:
       - zuul/zuul
     nodeset: ubuntu-jammy
+
+- job:
+    name: zuul-quick-start
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    vars:
+      run_playbooks:
+        - admin.yaml
+        - tracing.yaml
 
 # Image building jobs
 - secret:
