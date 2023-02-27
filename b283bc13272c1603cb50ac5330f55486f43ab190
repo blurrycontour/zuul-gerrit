@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47b3c362_7e4e7d1f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-27T16:52:32Z",
+      "side": 1,
+      "message": "Here and above on line ~517 we seem to skip things if the inverse of this flag is set. I find that reads confusingly. It seems to be saying \"if the skip flag is set then don\u0027t skip the check below\" and \"if the skip flag is not set then skip the check\".",
+      "revId": "b283bc13272c1603cb50ac5330f55486f43ab190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
