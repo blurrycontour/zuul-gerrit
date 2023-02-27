@@ -27,10 +27,11 @@ import jwt
 import testtools
 
 from zuul.zk import ZooKeeperClient
+from zuul.zk.locks import pipeline_lock
 from zuul.cmd.client import parse_cutoff
 
 from tests.base import BaseTestCase, ZuulTestCase
-from tests.base import FIXTURE_DIR
+from tests.base import FIXTURE_DIR, iterate_timeout
 
 from kazoo.exceptions import NoNodeError
 
@@ -362,81 +363,91 @@ class TestOnlineZKOperations(ZuulTestCase):
     def assertSQLState(self):
         pass
 
-    def test_delete_pipeline_check(self):
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+    def _test_delete_pipeline(self, pipeline):
+        sched = self.scheds.first.sched
+        # Force a reconfiguration due to a config change (so that the
+        # tenant trigger event queue gets a minimum timestamp set)
+        file_dict = {'zuul.yaml': ''}
+        M = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        M.setMerged()
+        self.fake_gerrit.addEvent(M.getChangeMergedEvent())
         self.waitUntilSettled()
 
-        config_file = os.path.join(self.test_root, 'zuul.conf')
-        with open(config_file, 'w') as f:
-            self.config.write(f)
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        if pipeline == 'check':
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        else:
+            A.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
 
-        # Make sure the pipeline exists
-        self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
-        p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul-admin'),
-             '-c', config_file,
-             'delete-pipeline-state',
-             'tenant-one', 'check',
-             ],
-            stdout=subprocess.PIPE)
-        out, _ = p.communicate()
-        self.log.debug(out.decode('utf8'))
-        # Make sure it's deleted
-        with testtools.ExpectedException(NoNodeError):
-            self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
+        # Lock the check pipeline so we don't process the event we're
+        # about to submit (it should go into the tenant trigger event
+        # queue and stay there while we delete the pipeline state).
+        # This way we verify that events arrived before the deletion
+        # still work.
+        with pipeline_lock(self.zk_client, 'tenant-one', pipeline):
+            self.log.debug('Got pipeline lock')
+            # Add a new event while our old last reconfigure time is
+            # in place.
+            B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+            if pipeline == 'check':
+                self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+            else:
+                B.addApproval('Code-Review', 2)
+                self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+            # Wait until it appears in the tenant trigger event queue
+            self.log.debug('Waiting for event')
+            for x in iterate_timeout(30, 'trigger event queue has events'):
+                if sched.trigger_events['tenant-one'].hasEvents():
+                    break
+            self.log.debug('Got event')
+            # It's not necessary to grab the run lock here, but if we
+            # don't the scheduler will busy-wait, so let's do it to
+            # keep things tidy.
+            with sched.run_handler_lock:
+                self.log.debug('Got run lock')
+                config_file = os.path.join(self.test_root, 'zuul.conf')
+                with open(config_file, 'w') as f:
+                    self.config.write(f)
+
+                # Make sure the pipeline exists
+                self.getZKTree(
+                    f'/zuul/tenant/tenant-one/pipeline/{pipeline}/item')
+                self.log.debug('Deleting pipeline state')
+                p = subprocess.Popen(
+                    [os.path.join(sys.prefix, 'bin/zuul-admin'),
+                     '-c', config_file,
+                     'delete-pipeline-state',
+                     'tenant-one', pipeline,
+                     ],
+                    stdout=subprocess.PIPE)
+                # Delete the pipeline state
+                out, _ = p.communicate()
+                self.log.debug(out.decode('utf8'))
+                # Make sure it's deleted
+                with testtools.ExpectedException(NoNodeError):
+                    self.getZKTree(
+                        f'/zuul/tenant/tenant-one/pipeline/{pipeline}/item')
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([
-            dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-merge', result='SUCCESS', changes='2,1'),
-            dict(name='project-test1', result='SUCCESS', changes='2,1'),
-            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project-merge', result='SUCCESS', changes='3,1'),
+            dict(name='project-test1', result='SUCCESS', changes='3,1'),
+            dict(name='project-test2', result='SUCCESS', changes='3,1'),
         ], ordered=False)
+
+    def test_delete_pipeline_check(self):
+        self._test_delete_pipeline('check')
 
     def test_delete_pipeline_gate(self):
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.waitUntilSettled()
-
-        config_file = os.path.join(self.test_root, 'zuul.conf')
-        with open(config_file, 'w') as f:
-            self.config.write(f)
-
-        # Make sure the pipeline exists
-        self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
-        p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul-admin'),
-             '-c', config_file,
-             'delete-pipeline-state',
-             'tenant-one', 'gate',
-             ],
-            stdout=subprocess.PIPE)
-        out, _ = p.communicate()
-        self.log.debug(out.decode('utf8'))
-        # Make sure it's deleted
-        with testtools.ExpectedException(NoNodeError):
-            self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='project-merge', result='SUCCESS', changes='1,1'),
-            dict(name='project-merge', result='SUCCESS', changes='2,1'),
-            dict(name='project-test1', result='SUCCESS', changes='2,1'),
-            dict(name='project-test2', result='SUCCESS', changes='2,1'),
-        ], ordered=False)
+        self._test_delete_pipeline('gate')
 
 
 class TestDBPruneParse(BaseTestCase):
