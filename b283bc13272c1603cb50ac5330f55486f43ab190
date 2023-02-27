@@ -34,6 +34,24 @@
       "parentUuid": "47b3c362_7e4e7d1f",
       "revId": "b283bc13272c1603cb50ac5330f55486f43ab190",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "807916e6_066c381a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-27T17:02:41Z",
+      "side": 1,
+      "message": "There are two \"skips\" happening here which is what I got confused over. The first is \"skip the check in this conditional (isChangeAlreadyInQueue() and isChangeAlreadyInPipeline()). The second is \"short circuit this entire function, return early, and skip subsequent checks\".\n\nThe new parameter refers to the first skip and I was looking at it from the perspective of the second during my first review comment. I think this is probably fine as is. The code isn\u0027t difficult to trace through if necessary.",
+      "parentUuid": "47b3c362_7e4e7d1f",
+      "revId": "b283bc13272c1603cb50ac5330f55486f43ab190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
