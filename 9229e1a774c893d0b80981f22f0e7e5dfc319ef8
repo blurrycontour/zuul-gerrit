@@ -33,6 +33,24 @@
       "message": "I want to make sure I understand this properly. Prior to calling isChangeRelevantToPipeline() we refresh all dependencies across the board. Then when we get here we loop over dependencies and if we should up as a dependency we know we are in a dep cycle. IF we are in a dep cycle then one of the possibilities is a new dep introduced via topic update. And we return true to get that processed properly.",
       "revId": "9229e1a774c893d0b80981f22f0e7e5dfc319ef8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dc3806e_41d4d99c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-27T20:08:11Z",
+      "side": 1,
+      "message": "Yes, the original refresh you refer to will have happened, at the latest, during a previous pipeline run which will ensure the change object (which has an existence independent of pipelines) will have up to date dependency info.  If that hasn\u0027t happened yet, that\u0027s okay, because that just means that the change in the pipeline that\u0027s missing dependency info will pick up any dependencies (such as the one we\u0027re trying to notice here) when it is updated.\n\nAnd yes to the rest of that.",
+      "parentUuid": "6144b52d_a0b0dd34",
+      "revId": "9229e1a774c893d0b80981f22f0e7e5dfc319ef8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
