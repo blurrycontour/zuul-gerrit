@@ -30,16 +30,14 @@ import time
 import textwrap
 import requests
 import urllib.parse
-from uuid import uuid4
 
 import zuul.cmd
 from zuul.lib.config import get_default
-from zuul.model import SystemAttributes, PipelineState
+from zuul.model import SystemAttributes, PipelineState, PipelineChangeList
 from zuul.zk import ZooKeeperClient
 from zuul.lib.keystorage import KeyStorage
 from zuul.zk.locks import tenant_write_lock
 from zuul.zk.zkobject import ZKContext
-from zuul.zk.layout import LayoutState, LayoutStateStore
 from zuul.zk.components import COMPONENT_REGISTRY
 
 
@@ -1031,25 +1029,11 @@ class Client(zuul.cmd.ZuulApp):
         COMPONENT_REGISTRY.create(zk_client)
         with tenant_write_lock(zk_client, args.tenant) as lock:
             path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
-            layout_uuid = None
             zk_client.client.delete(path, recursive=True)
             with ZKContext(zk_client, lock, None, self.log) as context:
-                ps = PipelineState.new(context, _path=path,
-                                       layout_uuid=layout_uuid)
-            ltime = ps._zstat.last_modified_transaction_id
-            # Force everyone to make a new layout for this tenant in
-            # order to rebuild the shared change queues.
-            layout_state = LayoutState(
-                tenant_name=args.tenant,
-                hostname='admin command',
-                last_reconfigured=int(time.time()),
-                last_reconfigure_event_ltime=ltime,
-                uuid=uuid4().hex,
-                branch_cache_min_ltimes={},
-                ltime=ltime,
-            )
-            tenant_layout_state = LayoutStateStore(zk_client, lambda: None)
-            tenant_layout_state[args.tenant] = layout_state
+                PipelineState.new(context, _path=path,
+                                  layout_uuid=None)
+                PipelineChangeList.new(context)
 
         sys.exit(0)
 
