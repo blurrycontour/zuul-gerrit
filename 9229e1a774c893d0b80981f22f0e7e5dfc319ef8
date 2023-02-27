@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "9229e1a774c893d0b80981f22f0e7e5dfc319ef8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6144b52d_a0b0dd34",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-02-27T20:00:57Z",
+      "side": 1,
+      "message": "I want to make sure I understand this properly. Prior to calling isChangeRelevantToPipeline() we refresh all dependencies across the board. Then when we get here we loop over dependencies and if we should up as a dependency we know we are in a dep cycle. IF we are in a dep cycle then one of the possibilities is a new dep introduced via topic update. And we return true to get that processed properly.",
+      "revId": "9229e1a774c893d0b80981f22f0e7e5dfc319ef8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
