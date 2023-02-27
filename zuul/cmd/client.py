@@ -1032,22 +1032,21 @@ class Client(zuul.cmd.ZuulApp):
         with tenant_write_lock(zk_client, args.tenant) as lock:
             path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
             layout_uuid = None
-            zk_client.client.delete(
-                f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}',
-                recursive=True)
+            zk_client.client.delete(path, recursive=True)
             with ZKContext(zk_client, lock, None, self.log) as context:
                 ps = PipelineState.new(context, _path=path,
                                        layout_uuid=layout_uuid)
+            ltime = ps._zstat.last_modified_transaction_id
             # Force everyone to make a new layout for this tenant in
             # order to rebuild the shared change queues.
             layout_state = LayoutState(
                 tenant_name=args.tenant,
                 hostname='admin command',
                 last_reconfigured=int(time.time()),
-                last_reconfigure_event_ltime=-1,
+                last_reconfigure_event_ltime=ltime,
                 uuid=uuid4().hex,
                 branch_cache_min_ltimes={},
-                ltime=ps._zstat.last_modified_transaction_id,
+                ltime=ltime,
             )
             tenant_layout_state = LayoutStateStore(zk_client, lambda: None)
             tenant_layout_state[args.tenant] = layout_state
