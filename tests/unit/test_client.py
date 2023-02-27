@@ -27,7 +27,7 @@ import jwt
 import testtools
 
 from zuul.zk import ZooKeeperClient
-from zuul.zk.locks import pipeline_lock
+from zuul.zk.locks import SessionAwareLock
 from zuul.cmd.client import parse_cutoff
 
 from tests.base import BaseTestCase, ZuulTestCase
@@ -365,6 +365,7 @@ class TestOnlineZKOperations(ZuulTestCase):
 
     def _test_delete_pipeline(self, pipeline):
         sched = self.scheds.first.sched
+        tenant = sched.abide.tenants['tenant-one']
         # Force a reconfiguration due to a config change (so that the
         # tenant trigger event queue gets a minimum timestamp set)
         file_dict = {'zuul.yaml': ''}
@@ -388,7 +389,11 @@ class TestOnlineZKOperations(ZuulTestCase):
         # queue and stay there while we delete the pipeline state).
         # This way we verify that events arrived before the deletion
         # still work.
-        with pipeline_lock(self.zk_client, 'tenant-one', pipeline):
+        plock = SessionAwareLock(
+            self.zk_client.client,
+            f"/zuul/locks/pipeline/{tenant.name}/{pipeline}")
+        plock.acquire(blocking=True, timeout=None)
+        try:
             self.log.debug('Got pipeline lock')
             # Add a new event while our old last reconfigure time is
             # in place.
@@ -403,36 +408,45 @@ class TestOnlineZKOperations(ZuulTestCase):
             self.log.debug('Waiting for event')
             for x in iterate_timeout(30, 'trigger event queue has events'):
                 if sched.pipeline_trigger_events[
-                        'tenant-one'][pipeline].hasEvents():
+                        tenant.name][pipeline].hasEvents():
                     break
             self.log.debug('Got event')
             # It's not necessary to grab the run lock here, but if we
             # don't the scheduler will busy-wait, so let's do it to
             # keep things tidy.
-            with sched.run_handler_lock:
-                self.log.debug('Got run lock')
-                config_file = os.path.join(self.test_root, 'zuul.conf')
-                with open(config_file, 'w') as f:
-                    self.config.write(f)
+        except Exception:
+            plock.release()
+        sched.run_handler_lock.acquire()
+        try:
+            plock.release()
+            self.log.debug('Got run lock')
+            config_file = os.path.join(self.test_root, 'zuul.conf')
+            with open(config_file, 'w') as f:
+                self.config.write(f)
 
-                # Make sure the pipeline exists
+            # Make sure the pipeline exists
+            self.getZKTree(
+                f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/item')
+            # Save the old layout uuid
+            tenant = sched.abide.tenants[tenant.name]
+            old_layout_uuid = tenant.layout.uuid
+            self.log.debug('Deleting pipeline state')
+            p = subprocess.Popen(
+                [os.path.join(sys.prefix, 'bin/zuul-admin'),
+                 '-c', config_file,
+                 'delete-pipeline-state',
+                 tenant.name, pipeline,
+                 ],
+                stdout=subprocess.PIPE)
+            # Delete the pipeline state
+            out, _ = p.communicate()
+            self.log.debug(out.decode('utf8'))
+            # Make sure it's deleted
+            with testtools.ExpectedException(NoNodeError):
                 self.getZKTree(
-                    f'/zuul/tenant/tenant-one/pipeline/{pipeline}/item')
-                self.log.debug('Deleting pipeline state')
-                p = subprocess.Popen(
-                    [os.path.join(sys.prefix, 'bin/zuul-admin'),
-                     '-c', config_file,
-                     'delete-pipeline-state',
-                     'tenant-one', pipeline,
-                     ],
-                    stdout=subprocess.PIPE)
-                # Delete the pipeline state
-                out, _ = p.communicate()
-                self.log.debug(out.decode('utf8'))
-                # Make sure it's deleted
-                with testtools.ExpectedException(NoNodeError):
-                    self.getZKTree(
-                        f'/zuul/tenant/tenant-one/pipeline/{pipeline}/item')
+                    f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/item')
+        finally:
+            sched.run_handler_lock.release()
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -443,6 +457,9 @@ class TestOnlineZKOperations(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='3,1'),
             dict(name='project-test2', result='SUCCESS', changes='3,1'),
         ], ordered=False)
+        tenant = sched.abide.tenants[tenant.name]
+        new_layout_uuid = tenant.layout.uuid
+        self.assertEqual(old_layout_uuid, new_layout_uuid)
 
     def test_delete_pipeline_check(self):
         self._test_delete_pipeline('check')
