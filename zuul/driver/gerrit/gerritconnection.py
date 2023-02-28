@@ -161,6 +161,8 @@ class GerritEventConnector(threading.Thread):
 
     IGNORED_EVENTS = (
         'cache-eviction',  # evict-cache plugin
+        'fetch-ref-replicated',
+        'fetch-ref-replication-scheduled',
         'ref-replicated',
         'ref-replication-scheduled',
         'ref-replication-done'
