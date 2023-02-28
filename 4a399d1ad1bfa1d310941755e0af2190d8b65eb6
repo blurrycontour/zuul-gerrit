@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40efa68d_615fb6eb",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1030,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-02-28T07:37:04Z",
+      "side": 1,
+      "message": "Since we no longer touch the layout state I think we can downgrade to a tenant read lock here. This way we don\u0027t pause all other pipeline processing.",
+      "revId": "4a399d1ad1bfa1d310941755e0af2190d8b65eb6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
