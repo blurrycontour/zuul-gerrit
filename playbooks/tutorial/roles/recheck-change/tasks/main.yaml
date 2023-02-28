@@ -1,4 +1,16 @@
-- name: "Set recheck"
+- name: "recheck change: create draft"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ change_id }}/revisions/current/drafts"
+    method: PUT
+    user: user
+    password: secret
+    status_code: 201
+    body_format: json
+    body:
+      message: "recheck"
+      path: "/PATCHSET_LEVEL"
+
+- name: "recheck change: publish draft"
   uri:
     url: "http://localhost:8080/a/changes/{{ change_id }}/revisions/current/review"
     method: POST
@@ -7,4 +19,5 @@
     status_code: 200
     body_format: json
     body:
-      message: "recheck"
+      drafts: "PUBLISH_ALL_REVISIONS"
+
