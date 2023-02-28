@@ -255,7 +255,7 @@ class GithubEventFilter(EventFilter):
             if etype.match(event.type):
                 matches_type = True
         if self.types and not matches_type:
-            return FalseWithReason("Types %s doesn't match %s" % (
+            return FalseWithReason("Types %s do not match %s" % (
                 self.types, event.type))
 
         # branches are ORed
@@ -264,7 +264,7 @@ class GithubEventFilter(EventFilter):
             if branch.match(event.branch):
                 matches_branch = True
         if self.branches and not matches_branch:
-            return FalseWithReason("Branches %s doesn't match %s" % (
+            return FalseWithReason("Branches %s do not match %s" % (
                 self.branches, event.branch))
 
         # refs are ORed
@@ -275,11 +275,11 @@ class GithubEventFilter(EventFilter):
                     matches_ref = True
         if self.refs and not matches_ref:
             return FalseWithReason(
-                "Refs %s doesn't match %s" % (self.refs, event.ref))
+                "Refs %s do not match %s" % (self.refs, event.ref))
         if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
             # If the updated ref has an empty git sha (all 0s),
             # then the ref is being deleted
-            return FalseWithReason("Ref deletion are ignored")
+            return FalseWithReason("Ref deletion events are ignored")
 
         # comments are ORed
         matches_comment_re = False
@@ -288,7 +288,7 @@ class GithubEventFilter(EventFilter):
                 comment_re.search(event.comment)):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
-            return FalseWithReason("Comments %s doesn't match %s" % (
+            return FalseWithReason("Comments %s do not match %s" % (
                 self.comments, event.comment))
 
         # actions are ORed
@@ -297,7 +297,7 @@ class GithubEventFilter(EventFilter):
             if (event.action == action):
                 matches_action = True
         if self.actions and not matches_action:
-            return FalseWithReason("Actions %s doesn't match %s" % (
+            return FalseWithReason("Actions %s do not match %s" % (
                 self.actions, event.action))
 
         # check_runs are ORed
@@ -308,22 +308,22 @@ class GithubEventFilter(EventFilter):
                     check_run_found = True
                     break
             if not check_run_found:
-                return FalseWithReason("Check_runs %s doesn't match %s" % (
+                return FalseWithReason("Check runs %s do not match %s" % (
                     self.check_runs, event.check_run))
 
         # labels are ORed
         if self.labels and event.label not in self.labels:
-            return FalseWithReason("Labels %s doesn't match %s" % (
+            return FalseWithReason("Labels %s do not match %s" % (
                 self.labels, event.label))
 
         # unlabels are ORed
         if self.unlabels and event.unlabel not in self.unlabels:
-            return FalseWithReason("Unlabels %s doesn't match %s" % (
+            return FalseWithReason("Unlabels %s do not match %s" % (
                 self.unlabels, event.unlabel))
 
         # states are ORed
         if self.states and event.state not in self.states:
-            return FalseWithReason("States %s doesn't match %s" % (
+            return FalseWithReason("States %s do not match %s" % (
                 self.states, event.state))
 
         # statuses are ORed
@@ -334,7 +334,7 @@ class GithubEventFilter(EventFilter):
                     status_found = True
                     break
             if not status_found:
-                return FalseWithReason("Statuses %s doesn't match %s" % (
+                return FalseWithReason("Statuses %s do not match %s" % (
                     self.statuses, event.status))
 
         if self.require_filter:
@@ -498,7 +498,7 @@ class GithubRefFilter(RefFilter):
             if self.required_reviews and not change.reviews:
                 # No reviews means no matching of required bits
                 # having reject reviews but no reviews on the change is okay
-                return FalseWithReason("Reviews %s does not match %s" % (
+                return FalseWithReason("Reviews %s do not match %s" % (
                     self.required_reviews, change.reviews))
 
         return (self.matchesRequiredReviews(change) and
@@ -514,7 +514,7 @@ class GithubRefFilter(RefFilter):
                     break
             if not matches_review:
                 return FalseWithReason(
-                    "Required reviews %s does not match %s" % (
+                    "Required reviews %s do not match %s" % (
                         self.required_reviews, change.reviews))
         return True
 
@@ -523,7 +523,7 @@ class GithubRefFilter(RefFilter):
             for review in change.reviews:
                 if self._match_review_required_review(rreview, review):
                     # A review matched, we can reject right away
-                    return FalseWithReason("Reject reviews %s matches %s" % (
+                    return FalseWithReason("Reject reviews %s match %s" % (
                         self.reject_reviews, change.reviews))
         return True
 
@@ -531,10 +531,10 @@ class GithubRefFilter(RefFilter):
         if self.required_statuses or self.reject_statuses:
             if not hasattr(change, 'number'):
                 # not a PR, no status
-                return FalseWithReason("Can't match statuses without PR")
+                return FalseWithReason("Can not match statuses without PR")
             if self.required_statuses and not change.status:
                 return FalseWithReason(
-                    "Required statuses %s does not match %s" % (
+                    "Required statuses %s do not match %s" % (
                         self.required_statuses, change.status))
         required_statuses_results = self.matchesRequiredStatuses(change)
         if not required_statuses_results:
@@ -551,7 +551,7 @@ class GithubRefFilter(RefFilter):
                 for status in change.status:
                     if re2.fullmatch(required_status, status):
                         return True
-            return FalseWithReason("RequiredStatuses %s does not match %s" % (
+            return FalseWithReason("Required statuses %s do not match %s" % (
                 self.required_statuses, change.status))
         return True
 
@@ -561,7 +561,7 @@ class GithubRefFilter(RefFilter):
         for rstatus in self.reject_statuses:
             for status in change.status:
                 if re2.fullmatch(rstatus, status):
-                    return FalseWithReason("NoRejectStatuses %s matches %s" % (
+                    return FalseWithReason("Reject statuses %s match %s" % (
                         self.reject_statuses, change.status))
         return True
 
@@ -569,7 +569,7 @@ class GithubRefFilter(RefFilter):
         if self.required_labels or self.reject_labels:
             if not hasattr(change, 'number'):
                 # not a PR, no label
-                return FalseWithReason("Can't match labels without PR")
+                return FalseWithReason("Can not match labels without PR")
             if self.required_labels and not change.labels:
                 # No labels means no matching of required bits
                 # having reject labels but no labels on the change is okay
@@ -582,14 +582,14 @@ class GithubRefFilter(RefFilter):
     def matchesRequiredLabels(self, change):
         for label in self.required_labels:
             if label not in change.labels:
-                return FalseWithReason("Labels %s does not match %s" % (
+                return FalseWithReason("Labels %s do not match %s" % (
                     self.required_labels, change.labels))
         return True
 
     def matchesNoRejectLabels(self, change):
         for label in self.reject_labels:
             if label in change.labels:
-                return FalseWithReason("NoRejectLabels %s matches %s" % (
+                return FalseWithReason("Reject labels %s match %s" % (
                     self.reject_labels, change.labels))
         return True
 

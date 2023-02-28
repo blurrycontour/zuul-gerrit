@@ -16,6 +16,7 @@ import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.gerrit.gerritmodel import GerritEventFilter
+from zuul.driver.gerrit import gerritsource
 from zuul.driver.util import scalar_or_list, to_list
 
 
@@ -59,7 +60,9 @@ class GerritTrigger(BaseTrigger):
                 ),
                 uuid=trigger.get('uuid'),
                 scheme=trigger.get('scheme'),
-                ignore_deletes=ignore_deletes
+                ignore_deletes=ignore_deletes,
+                require=trigger.get('require'),
+                reject=trigger.get('reject'),
             )
             efilters.append(f)
 
@@ -101,6 +104,8 @@ def getSchema():
         'approval': scalar_or_list(variable_dict),
         'require-approval': scalar_or_list(approval),
         'reject-approval': scalar_or_list(approval),
+        'require': gerritsource.getRequireSchema(),
+        'reject': gerritsource.getRejectSchema(),
     }
 
     return gerrit_trigger
