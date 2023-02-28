@@ -19,8 +19,8 @@ import urllib.parse
 import dateutil.parser
 
 from zuul.model import EventFilter, RefFilter
-from zuul.model import Change, TriggerEvent
-from zuul.driver.util import time_to_seconds
+from zuul.model import Change, TriggerEvent, FalseWithReason
+from zuul.driver.util import time_to_seconds, to_list
 from zuul import exceptions
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -243,13 +243,313 @@ class GerritTriggerEvent(TriggerEvent):
         return 'change-abandoned' == self.type
 
 
-class GerritApprovalFilter(object):
-    def __init__(self, required_approvals=[], reject_approvals=[]):
+class GerritEventFilter(EventFilter):
+    def __init__(self, connection_name, trigger, types=[], branches=[],
+                 refs=[], event_approvals={}, comments=[], emails=[],
+                 usernames=[], required_approvals=[], reject_approvals=[],
+                 uuid=None, scheme=None, ignore_deletes=True,
+                 require=None, reject=None):
+
+        EventFilter.__init__(self, connection_name, trigger)
+
+        # TODO: Backwards compat, remove after 9.x:
+        if required_approvals and require is None:
+            require = {'approval': required_approvals}
+        if reject_approvals and reject is None:
+            reject = {'approval': reject_approvals}
+
+        if require:
+            self.require_filter = GerritRefFilter.requiresFromConfig(
+                connection_name, require)
+        else:
+            self.require_filter = None
+
+        if reject:
+            self.reject_filter = GerritRefFilter.rejectFromConfig(
+                connection_name, reject)
+        else:
+            self.reject_filter = None
+
+        self._types = types
+        self._branches = branches
+        self._refs = refs
+        self._comments = comments
+        self._emails = emails
+        self._usernames = usernames
+        self.types = [re.compile(x) for x in types]
+        self.branches = [re.compile(x) for x in branches]
+        self.refs = [re.compile(x) for x in refs]
+        self.comments = [re.compile(x) for x in comments]
+        self.emails = [re.compile(x) for x in emails]
+        self.usernames = [re.compile(x) for x in usernames]
+        self.event_approvals = event_approvals
+        self.uuid = uuid
+        self.scheme = scheme
+        self.ignore_deletes = ignore_deletes
+
+    def __repr__(self):
+        ret = '<GerritEventFilter'
+        ret += ' connection: %s' % self.connection_name
+
+        if self._types:
+            ret += ' types: %s' % ', '.join(self._types)
+        if self.uuid:
+            ret += ' uuid: %s' % (self.uuid,)
+        if self.scheme:
+            ret += ' scheme: %s' % (self.scheme,)
+        if self._branches:
+            ret += ' branches: %s' % ', '.join(self._branches)
+        if self._refs:
+            ret += ' refs: %s' % ', '.join(self._refs)
+        if self.ignore_deletes:
+            ret += ' ignore_deletes: %s' % self.ignore_deletes
+        if self.event_approvals:
+            ret += ' event_approvals: %s' % ', '.join(
+                ['%s:%s' % a for a in self.event_approvals.items()])
+        if self._comments:
+            ret += ' comments: %s' % ', '.join(self._comments)
+        if self._emails:
+            ret += ' emails: %s' % ', '.join(self._emails)
+        if self._usernames:
+            ret += ' usernames: %s' % ', '.join(self._usernames)
+        if self.require_filter:
+            ret += ' require: %s' % repr(self.require_filter)
+        if self.reject_filter:
+            ret += ' reject: %s' % repr(self.reject_filter)
+        ret += '>'
+
+        return ret
+
+    def matches(self, event, change):
+        if not super().matches(event, change):
+            return False
+
+        # event types are ORed
+        matches_type = False
+        for etype in self.types:
+            if etype.match(event.type):
+                matches_type = True
+        if self.types and not matches_type:
+            return FalseWithReason("Types %s do not match %s" % (
+                self.types, event.type))
+
+        if event.type == 'pending-check':
+            if self.uuid and event.uuid != self.uuid:
+                return False
+            if self.scheme and event.uuid.split(':')[0] != self.scheme:
+                return False
+
+        # branches are ORed
+        matches_branch = False
+        for branch in self.branches:
+            if branch.match(event.branch):
+                matches_branch = True
+        if self.branches and not matches_branch:
+            return FalseWithReason("Branches %s do not match %s" % (
+                self.branches, event.branch))
+
+        # refs are ORed
+        matches_ref = False
+        if event.ref is not None:
+            for ref in self.refs:
+                if ref.match(event.ref):
+                    matches_ref = True
+        if self.refs and not matches_ref:
+            return FalseWithReason(
+                "Refs %s do not match %s" % (self.refs, event.ref))
+        if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
+            # If the updated ref has an empty git sha (all 0s),
+            # then the ref is being deleted
+            return FalseWithReason("Ref deletion events are ignored")
+
+        # comments are ORed
+        matches_comment_re = False
+        for comment_re in self.comments:
+            if (event.comment is not None and
+                comment_re.search(event.comment)):
+                matches_comment_re = True
+            if event.patchsetcomments is not None:
+                for comment in event.patchsetcomments:
+                    if (comment is not None and
+                        comment_re.search(comment)):
+                        matches_comment_re = True
+        if self.comments and not matches_comment_re:
+            return FalseWithReason("Comments %s do not match %s" % (
+                self.comments, event.patchsetcomments))
+
+        # We better have an account provided by Gerrit to do
+        # email filtering.
+        if event.account is not None:
+            account_email = event.account.get('email')
+            # emails are ORed
+            matches_email_re = False
+            for email_re in self.emails:
+                if (account_email is not None and
+                        email_re.search(account_email)):
+                    matches_email_re = True
+            if self.emails and not matches_email_re:
+                return FalseWithReason("Username %s does not match %s" % (
+                    self.emails, account_email))
+
+            # usernames are ORed
+            account_username = event.account.get('username')
+            matches_username_re = False
+            for username_re in self.usernames:
+                if (account_username is not None and
+                    username_re.search(account_username)):
+                    matches_username_re = True
+            if self.usernames and not matches_username_re:
+                return FalseWithReason("Username %s does not match %s" % (
+                    self.usernames, account_username))
+
+        # approvals are ANDed
+        for category, value in self.event_approvals.items():
+            matches_approval = False
+            for eapp in event.approvals:
+                if (eapp['description'] == category and
+                        int(eapp['value']) == int(value)):
+                    matches_approval = True
+            if not matches_approval:
+                return FalseWithReason("Approvals %s do not match %s" % (
+                    self.event_approvals, event.approvals))
+
+        if self.require_filter:
+            require_filter_result = self.require_filter.matches(change)
+            if not require_filter_result:
+                return require_filter_result
+
+        if self.reject_filter:
+            reject_filter_result = self.reject_filter.matches(change)
+            if not reject_filter_result:
+                return reject_filter_result
+
+        return True
+
+
+class GerritRefFilter(RefFilter):
+    def __init__(self, connection_name,
+                 open=None, reject_open=None,
+                 current_patchset=None, reject_current_patchset=None,
+                 wip=None, reject_wip=None,
+                 statuses=[], reject_statuses=[],
+                 required_approvals=[], reject_approvals=[]):
+        RefFilter.__init__(self, connection_name)
+
         self._required_approvals = copy.deepcopy(required_approvals)
         self.required_approvals = self._tidy_approvals(
             self._required_approvals)
         self._reject_approvals = copy.deepcopy(reject_approvals)
         self.reject_approvals = self._tidy_approvals(self._reject_approvals)
+        self.statuses = statuses
+        self.reject_statuses = reject_statuses
+
+        if reject_open is not None:
+            self.open = not reject_open
+        else:
+            self.open = open
+        if reject_wip is not None:
+            self.wip = not reject_wip
+        else:
+            self.wip = wip
+        if reject_current_patchset is not None:
+            self.current_patchset = not reject_current_patchset
+        else:
+            self.current_patchset = current_patchset
+
+    @classmethod
+    def requiresFromConfig(cls, connection_name, config):
+        return cls(
+            connection_name=connection_name,
+            open=config.get('open'),
+            current_patchset=config.get('current-patchset'),
+            wip=config.get('wip'),
+            statuses=to_list(config.get('status')),
+            required_approvals=to_list(config.get('approval')),
+        )
+
+    @classmethod
+    def rejectFromConfig(cls, connection_name, config):
+        return cls(
+            connection_name=connection_name,
+            reject_open=config.get('open'),
+            reject_current_patchset=config.get('current-patchset'),
+            reject_wip=config.get('wip'),
+            reject_statuses=to_list(config.get('status')),
+            reject_approvals=to_list(config.get('approval')),
+        )
+
+    def __repr__(self):
+        ret = '<GerritRefFilter'
+
+        ret += ' connection_name: %s' % self.connection_name
+        if self.open is not None:
+            ret += ' open: %s' % self.open
+        if self.wip is not None:
+            ret += ' wip: %s' % self.wip
+        if self.current_patchset is not None:
+            ret += ' current-patchset: %s' % self.current_patchset
+        if self.statuses:
+            ret += ' statuses: %s' % ', '.join(self.statuses)
+        if self.reject_statuses:
+            ret += ' reject-statuses: %s' % ', '.join(self.reject_statuses)
+        if self.required_approvals:
+            ret += (' required-approvals: %s' %
+                    str(self.required_approvals))
+        if self.reject_approvals:
+            ret += (' reject-approvals: %s' %
+                    str(self.reject_approvals))
+        ret += '>'
+
+        return ret
+
+    def matches(self, change):
+        if self.open is not None:
+            # if a "change" has no number, it's not a change, but a push
+            # and cannot possibly pass this test.
+            if hasattr(change, 'number'):
+                if self.open != change.open:
+                    return FalseWithReason(
+                        "Change does not match open requirement")
+            else:
+                return FalseWithReason("Ref is not a Change")
+
+        if self.current_patchset is not None:
+            # if a "change" has no number, it's not a change, but a push
+            # and cannot possibly pass this test.
+            if hasattr(change, 'number'):
+                if self.current_patchset != change.is_current_patchset:
+                    return FalseWithReason(
+                        "Change does not match current patchset requirement")
+            else:
+                return FalseWithReason("Ref is not a Change")
+
+        if self.wip is not None:
+            # if a "change" has no number, it's not a change, but a push
+            # and cannot possibly pass this test.
+            if hasattr(change, 'number'):
+                if self.wip != change.wip:
+                    return FalseWithReason(
+                        "Change does not match WIP requirement")
+            else:
+                return FalseWithReason("Ref is not a Change")
+
+        if self.statuses:
+            if change.status not in self.statuses:
+                return FalseWithReason(
+                    "Required statuses %s do not match %s" % (
+                        self.statuses, change.status))
+        if self.reject_statuses:
+            if change.status in self.reject_statuses:
+                return FalseWithReason(
+                    "Reject statuses %s match %s" % (
+                        self.reject_statuses, change.status))
+
+        # required approvals are ANDed (reject approvals are ORed)
+        matches_approvals_result = self.matchesApprovals(change)
+        if not matches_approvals_result:
+            return matches_approvals_result
+
+        return True
 
     def _tidy_approvals(self, approvals):
         for a in approvals:
@@ -297,10 +597,11 @@ class GerritApprovalFilter(object):
         if self.required_approvals or self.reject_approvals:
             if not hasattr(change, 'number'):
                 # Not a change, no reviews
-                return False
+                return FalseWithReason("Ref is not a Change")
         if self.required_approvals and not change.approvals:
             # A change with no approvals can not match
-            return False
+            return FalseWithReason("Approvals %s does not match %s" % (
+                self.required_approvals, change.approvals))
 
         # TODO(jhesketh): If we wanted to optimise this slightly we could
         # analyse both the REQUIRE and REJECT filters by looping over the
@@ -320,7 +621,9 @@ class GerritApprovalFilter(object):
                     matches_rapproval = True
                     break
             if not matches_rapproval:
-                return False
+                return FalseWithReason(
+                    "Required approvals %s do not match %s" % (
+                        self.required_approvals, change.approvals))
         return True
 
     def matchesNoRejectApprovals(self, change):
@@ -330,236 +633,8 @@ class GerritApprovalFilter(object):
                 if self._match_approval_required_approval(rapproval, approval):
                     # A reject approval has been matched, so we reject
                     # immediately
-                    return False
+                    return FalseWithReason("Reject approvals %s match %s" % (
+                        self.reject_approvals, change.approvals))
         # To get here no rejects can have been matched so we should be good to
         # queue
-        return True
-
-
-class GerritEventFilter(EventFilter, GerritApprovalFilter):
-    def __init__(self, connection_name, trigger, types=[], branches=[],
-                 refs=[], event_approvals={}, comments=[], emails=[],
-                 usernames=[], required_approvals=[], reject_approvals=[],
-                 uuid=None, scheme=None, ignore_deletes=True):
-
-        EventFilter.__init__(self, connection_name, trigger)
-
-        GerritApprovalFilter.__init__(self,
-                                      required_approvals=required_approvals,
-                                      reject_approvals=reject_approvals)
-
-        self._types = types
-        self._branches = branches
-        self._refs = refs
-        self._comments = comments
-        self._emails = emails
-        self._usernames = usernames
-        self.types = [re.compile(x) for x in types]
-        self.branches = [re.compile(x) for x in branches]
-        self.refs = [re.compile(x) for x in refs]
-        self.comments = [re.compile(x) for x in comments]
-        self.emails = [re.compile(x) for x in emails]
-        self.usernames = [re.compile(x) for x in usernames]
-        self.event_approvals = event_approvals
-        self.uuid = uuid
-        self.scheme = scheme
-        self.ignore_deletes = ignore_deletes
-
-    def __repr__(self):
-        ret = '<GerritEventFilter'
-        ret += ' connection: %s' % self.connection_name
-
-        if self._types:
-            ret += ' types: %s' % ', '.join(self._types)
-        if self.uuid:
-            ret += ' uuid: %s' % (self.uuid,)
-        if self.scheme:
-            ret += ' scheme: %s' % (self.scheme,)
-        if self._branches:
-            ret += ' branches: %s' % ', '.join(self._branches)
-        if self._refs:
-            ret += ' refs: %s' % ', '.join(self._refs)
-        if self.ignore_deletes:
-            ret += ' ignore_deletes: %s' % self.ignore_deletes
-        if self.event_approvals:
-            ret += ' event_approvals: %s' % ', '.join(
-                ['%s:%s' % a for a in self.event_approvals.items()])
-        if self.required_approvals:
-            ret += ' required_approvals: %s' % ', '.join(
-                ['%s' % a for a in self._required_approvals])
-        if self.reject_approvals:
-            ret += ' reject_approvals: %s' % ', '.join(
-                ['%s' % a for a in self._reject_approvals])
-        if self._comments:
-            ret += ' comments: %s' % ', '.join(self._comments)
-        if self._emails:
-            ret += ' emails: %s' % ', '.join(self._emails)
-        if self._usernames:
-            ret += ' usernames: %s' % ', '.join(self._usernames)
-        ret += '>'
-
-        return ret
-
-    def matches(self, event, change):
-        if not super().matches(event, change):
-            return False
-
-        # event types are ORed
-        matches_type = False
-        for etype in self.types:
-            if etype.match(event.type):
-                matches_type = True
-        if self.types and not matches_type:
-            return False
-
-        if event.type == 'pending-check':
-            if self.uuid and event.uuid != self.uuid:
-                return False
-            if self.scheme and event.uuid.split(':')[0] != self.scheme:
-                return False
-
-        # branches are ORed
-        matches_branch = False
-        for branch in self.branches:
-            if branch.match(event.branch):
-                matches_branch = True
-        if self.branches and not matches_branch:
-            return False
-
-        # refs are ORed
-        matches_ref = False
-        if event.ref is not None:
-            for ref in self.refs:
-                if ref.match(event.ref):
-                    matches_ref = True
-        if self.refs and not matches_ref:
-            return False
-        if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
-            # If the updated ref has an empty git sha (all 0s),
-            # then the ref is being deleted
-            return False
-
-        # comments are ORed
-        matches_comment_re = False
-        for comment_re in self.comments:
-            if (event.comment is not None and
-                comment_re.search(event.comment)):
-                matches_comment_re = True
-            if event.patchsetcomments is not None:
-                for comment in event.patchsetcomments:
-                    if (comment is not None and
-                        comment_re.search(comment)):
-                        matches_comment_re = True
-        if self.comments and not matches_comment_re:
-            return False
-
-        # We better have an account provided by Gerrit to do
-        # email filtering.
-        if event.account is not None:
-            account_email = event.account.get('email')
-            # emails are ORed
-            matches_email_re = False
-            for email_re in self.emails:
-                if (account_email is not None and
-                        email_re.search(account_email)):
-                    matches_email_re = True
-            if self.emails and not matches_email_re:
-                return False
-
-            # usernames are ORed
-            account_username = event.account.get('username')
-            matches_username_re = False
-            for username_re in self.usernames:
-                if (account_username is not None and
-                    username_re.search(account_username)):
-                    matches_username_re = True
-            if self.usernames and not matches_username_re:
-                return False
-
-        # approvals are ANDed
-        for category, value in self.event_approvals.items():
-            matches_approval = False
-            for eapp in event.approvals:
-                if (eapp['description'] == category and
-                        int(eapp['value']) == int(value)):
-                    matches_approval = True
-            if not matches_approval:
-                return False
-
-        # required approvals are ANDed (reject approvals are ORed)
-        if not self.matchesApprovals(change):
-            return False
-
-        return True
-
-
-class GerritRefFilter(RefFilter, GerritApprovalFilter):
-    def __init__(self, connection_name, open=None, current_patchset=None,
-                 wip=None, statuses=[], required_approvals=[],
-                 reject_approvals=[]):
-        RefFilter.__init__(self, connection_name)
-
-        GerritApprovalFilter.__init__(self,
-                                      required_approvals=required_approvals,
-                                      reject_approvals=reject_approvals)
-
-        self.open = open
-        self.wip = wip
-        self.current_patchset = current_patchset
-        self.statuses = statuses
-
-    def __repr__(self):
-        ret = '<GerritRefFilter'
-
-        ret += ' connection_name: %s' % self.connection_name
-        if self.open is not None:
-            ret += ' open: %s' % self.open
-        if self.current_patchset is not None:
-            ret += ' current-patchset: %s' % self.current_patchset
-        if self.statuses:
-            ret += ' statuses: %s' % ', '.join(self.statuses)
-        if self.required_approvals:
-            ret += (' required-approvals: %s' %
-                    str(self.required_approvals))
-        if self.reject_approvals:
-            ret += (' reject-approvals: %s' %
-                    str(self.reject_approvals))
-        ret += '>'
-
-        return ret
-
-    def matches(self, change):
-
-        filters = [
-            {
-                "required": self.open,
-                "value": change.open
-            },
-            {
-                "required": self.current_patchset,
-                "value": change.is_current_patchset
-            },
-            {
-                "required": self.wip,
-                "value": change.wip
-            },
-        ]
-        configured = filter(lambda x: x["required"] is not None, filters)
-
-        # if a "change" has no number, it's not a change, but a push
-        # and cannot possibly pass this test.
-        if hasattr(change, 'number'):
-            if any(map(lambda x: x["required"] != x["value"], configured)):
-                return False
-        elif configured:
-            return False
-
-        if self.statuses:
-            if change.status not in self.statuses:
-                return False
-
-        # required approvals are ANDed (reject approvals are ORed)
-        if not self.matchesApprovals(change):
-            return False
-
         return True
