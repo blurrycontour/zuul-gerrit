@@ -33,6 +33,24 @@
       "message": "I think this has potential for a race condition. Since we are not holding the run handler lock yet, the event might have been forwarded already.\n\nInstead we could just wait for the pipeline trigger event queue to receive the event (as mentioned above it won\u0027t stay in tenant trigger event queue).",
       "revId": "5eceaf89bfd255c4550a7d06fa7b29fe7fa9bb0a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56be15bc_b3aa69ee",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-02-28T15:11:36Z",
+      "side": 1,
+      "message": "Good point, done.",
+      "parentUuid": "bc8b8aa1_ef2f5e05",
+      "revId": "5eceaf89bfd255c4550a7d06fa7b29fe7fa9bb0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
