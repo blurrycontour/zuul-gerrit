@@ -940,6 +940,7 @@ class FakeGerritChange(object):
         if self.fail_merge:
             return
         self.data['status'] = 'MERGED'
+        self.data['open'] = False
         self.open = False
 
         path = os.path.join(self.upstream_root, self.project)
