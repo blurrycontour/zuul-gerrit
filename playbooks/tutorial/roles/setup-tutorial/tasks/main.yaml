@@ -46,9 +46,13 @@
   command: podman image ls --all --digests --no-trunc
 
 - name: Wait for Gerrit to start
-  wait_for:
-    host: localhost
-    port: 29418
+  uri:
+    url: http://localhost:8080/config/server/version
+    method: GET
+  register: result
+  retries: 180
+  delay: 1
+  until: result.status == 200
 
 - name: Wait for Zuul user to be created
   uri:
