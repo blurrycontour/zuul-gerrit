@@ -7,9 +7,13 @@
         /var/zuul-tools/zk-ca.sh /var/certs examples_zk_1.examples_default
         chmod -R a+rX /var/certs
     - name: Wait for Gerrit to start
-      wait_for:
-        host: gerrit
-        port: 29418
+      uri:
+        url: http://gerrit:8080/config/server/version
+        method: GET
+      register: result
+      retries: 180
+      delay: 1
+      until: result.status == 200
     - name: Generate admin SSH key for Gerrit
       command: ssh-keygen -f /var/ssh/admin -N ''
       args:
