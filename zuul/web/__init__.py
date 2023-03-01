@@ -121,6 +121,18 @@ class APIError(cherrypy.HTTPError):
             resp.headers["Content-Length"] = '0'
 
 
+class RequestTimeTool(cherrypy.Tool):
+    """
+    Time the request.
+    """
+    def __init__(self):
+        cherrypy.Tool.__init__(self, 'on_start_resource',
+                               self.setTime, priority=1)
+
+    def setTime(self):
+        cherrypy.request.zuul_start_time = time.perf_counter_ns()
+
+
 class SaveParamsTool(cherrypy.Tool):
     """
     Save the URL parameters to allow them to take precedence over query
@@ -2068,11 +2080,13 @@ class ZuulWeb(object):
             action='default')
 
         cherrypy.tools.stats = StatsTool(self.statsd, self.metrics)
+        cherrypy.tools.request_time = RequestTimeTool()
 
         conf = {
             '/': {
                 'request.dispatch': route_map,
                 'tools.stats.on': True,
+                'tools.request_time.on': True,
             }
         }
         cherrypy.config.update({

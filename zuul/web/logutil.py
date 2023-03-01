@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 import uuid
 
 from zuul.lib.logutil import get_annotated_logger
@@ -22,6 +23,15 @@ from cherrypy._cplogging import LogManager
 
 
 class ZuulCherrypyLogManager(LogManager):
+
+    @property
+    def access_log_format(self):
+        request = cherrypy.serving.request
+        now = time.perf_counter_ns()
+        elapsed = int((now - request.zuul_start_time) / 1000000)
+        return '[elapsed: %s] {h} {l} {u} {t} "{r}" {s} {b} "{f}" "{a}"' % (
+            elapsed)
+
     @property
     def access_log(self):
         request = cherrypy.serving.request
