@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d221d46d_992e13bb",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:33:38Z",
+      "side": 1,
+      "message": "Looks like this was corrected at some point. The comment now says pipeline trigger event queue is where the event will stay.",
+      "parentUuid": "484525db_b4e292f6",
+      "revId": "5eceaf89bfd255c4550a7d06fa7b29fe7fa9bb0a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc8b8aa1_ef2f5e05",
