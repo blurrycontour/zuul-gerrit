@@ -88,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "323990ab_c8a5f16d",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:58:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c255cf5c_3e023235",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb2f74ec_369b742e",
