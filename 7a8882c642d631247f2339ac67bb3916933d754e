@@ -34,6 +34,24 @@
       "parentUuid": "caa7ddbe_c422d63a",
       "revId": "7a8882c642d631247f2339ac67bb3916933d754e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2e6c098_371ecf2d",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:49:21Z",
+      "side": 1,
+      "message": "Got it. We aren\u0027t looking at a endpoint reporting just internals. The end user would never see a report to Gerrit in this situation for example.",
+      "parentUuid": "93cc13f7_0048ee0b",
+      "revId": "7a8882c642d631247f2339ac67bb3916933d754e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
