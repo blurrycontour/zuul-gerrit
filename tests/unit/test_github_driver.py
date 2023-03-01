@@ -1430,7 +1430,9 @@ class TestGithubDriver(ZuulTestCase):
         repo._set_branch_protection(
             'master', contexts=['tenant-one/check', 'tenant-one/gate'])
 
-        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        pr_description = "PR description"
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A',
+                                                 body=pr_description)
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
@@ -1448,6 +1450,9 @@ class TestGithubDriver(ZuulTestCase):
         merges = [report for report in self.fake_github.github_data.reports
                   if report[2] == 'merge']
         assert (len(merges) == 1 and merges[0][3] == 'squash')
+        # Assert that we won't duplicate the PR title in the merge
+        # message description.
+        self.assertEqual(A.merge_message, pr_description)
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
     def test_invalid_event(self):
