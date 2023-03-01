@@ -2118,6 +2118,21 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         yield
         self._test_web_server.options['community_edition'] = False
 
+    @contextmanager
+    def enable_delayed_complete_mr(self, complete_at):
+        self._test_web_server.options['delayed_complete_mr'] = complete_at
+        yield
+        self._test_web_server.options['delayed_complete_mr'] = 0
+
+    @contextmanager
+    def enable_uncomplete_mr(self):
+        self._test_web_server.options['uncomplete_mr'] = True
+        orig = self.gl_client.get_mr_wait_factor
+        self.gl_client.get_mr_wait_factor = 0.1
+        yield
+        self.gl_client.get_mr_wait_factor = orig
+        self._test_web_server.options['uncomplete_mr'] = False
+
 
 class GitlabChangeReference(git.Reference):
     _common_path_default = "refs/merge-requests"
