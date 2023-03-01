@@ -33,6 +33,23 @@
       "message": "The format of the commit message depends on the merge-mode. What you describe is only valid for merge-mode\u003dsquash-merge, with this patch applied the information will be missing for merge commits. Sadly it is also non-trivial for zuul to figure out which merge-mode is effectively being used, since it not only depends on the project configuration in zuul, but also on the configuration within github.",
       "revId": "ddc9ff5540765bbc810da39afa6d2a4d535f486e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d90b705e_b061700d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-03-01T13:08:58Z",
+      "side": 1,
+      "message": "I\u0027ve proposed https://review.opendev.org/c/zuul/zuul/+/875899 which considers the merge-mode when formatting the merge message.",
+      "revId": "ddc9ff5540765bbc810da39afa6d2a4d535f486e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
