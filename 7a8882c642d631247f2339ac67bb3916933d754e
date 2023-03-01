@@ -16,6 +16,24 @@
       "message": "Why does the A change only seem to run the project-merge job and not project-test1 or project-test2. Neither A or B run project-testfile due to file requirements that are not set, but it isn\u0027t clear to me why those other jobs for A are not being asserted here.",
       "revId": "7a8882c642d631247f2339ac67bb3916933d754e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93cc13f7_0048ee0b",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-01T21:46:01Z",
+      "side": 1,
+      "message": "test1 and test2 depend on merge, and we hold jobs in build.  At the point where we delete the pipeline state, the executor is running the merge job for change A, but it\u0027s holding (because of hold_jobs_in_build).  We delete the pipeline state, add change B and the rest of the test, then we unset the hold flag and release the executor.\n\nExecutors don\u0027t care about pipeline state so it has no idea what just happened.  All it knows is that it finished the merge job and it reported it back to the scheduler.  The scheduler discards the result since the queue item isn\u0027t present any more, then proceeds to work on change B in the normal manner.\n\nThe merge-job for change A shows up in the history here because assertHistory checks the build history for the executor.",
+      "parentUuid": "caa7ddbe_c422d63a",
+      "revId": "7a8882c642d631247f2339ac67bb3916933d754e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
