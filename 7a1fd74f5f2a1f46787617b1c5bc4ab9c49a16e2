@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90995ce5_37b6b125",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-01T21:54:41Z",
+      "side": 1,
+      "message": "Oh I actually meant to delete it because it is now necessary.  I\u0027ll do so, but I\u0027ll add a new one that clarifies what\u0027s going on here (esp wrt your reviewer comment below).",
+      "parentUuid": "b0dd178f_cb47bccb",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "260cb2b6_d58c22d8",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-01T21:47:25Z",
       "side": 1,
       "message": "You should probably reraise at this point to fail the test? Otherwise I Think the test will proceed and fail anyway but in a more confusing way (as it won\u0027t be close to the original failure).",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1605d126_279dbe92",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-01T21:54:41Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "260cb2b6_d58c22d8",
       "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2023-03-01T21:47:25Z",
       "side": 1,
       "message": "Based on the commit message do we actually need to check that the pipeline state refers to the old layout too?",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71174cc9_64dd0d36",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-01T21:54:41Z",
+      "side": 1,
+      "message": "Easy enough to add that.",
+      "parentUuid": "cb2f74ec_369b742e",
       "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
