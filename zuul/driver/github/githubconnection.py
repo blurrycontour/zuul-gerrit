@@ -439,7 +439,11 @@ class GithubEventProcessor(object):
                 # branch is now protected.
                 if hasattr(event, "branch") and event.branch:
                     protected = None
-                    if change:
+                    # Only use the `branch_protected` flag if the
+                    # target branch of change and event are the same.
+                    # The base branch could have changed in the
+                    # meantime.
+                    if change and change.branch == event.branch:
                         # PR based events already have the information if the
                         # target branch is protected so take the information
                         # from there.

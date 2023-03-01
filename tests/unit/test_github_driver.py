@@ -1741,6 +1741,41 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         # branch
         self.assertLess(old, new)
 
+    def test_base_branch_updated(self):
+        self.create_branch('org/project2', 'feature')
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project2')
+        repo._set_branch_protection('master', True)
+
+        # Make sure Zuul picked up and cached the configured branches
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        github_connection = self.scheds.first.connections.connections['github']
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        project = github_connection.source.getProject('org/project2')
+
+        # Verify that only the master branch is considered protected
+        branches = github_connection.getProjectBranches(project, tenant)
+        self.assertEqual(branches, ["master"])
+
+        A = self.fake_github.openFakePullRequest('org/project2', 'master',
+                                                 'A')
+        # Fake an event from a pull-request that changed the base
+        # branch from "feature" to "master". The PR is already
+        # using "master" as base, but the event still references
+        # the old "feature" branch.
+        event = A.getPullRequestOpenedEvent()
+        event[1]["pull_request"]["base"]["ref"] = "feature"
+
+        self.fake_github.emitEvent(event)
+        self.waitUntilSettled()
+
+        # Make sure we are still only considering "master" to be
+        # protected.
+        branches = github_connection.getProjectBranches(project, tenant)
+        self.assertEqual(branches, ["master"])
+
     # This test verifies that a PR is considered in case it was created for
     # a branch just has been set to protected before a tenant reconfiguration
     # took place.
