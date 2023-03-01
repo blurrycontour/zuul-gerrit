@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0dd178f_cb47bccb",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:47:25Z",
+      "side": 1,
+      "message": "This comment should be moved a couple of lines lower to match up with the sched.run_handler_lock.acquire() call.",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "260cb2b6_d58c22d8",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:47:25Z",
+      "side": 1,
+      "message": "You should probably reraise at this point to fail the test? Otherwise I Think the test will proceed and fail anyway but in a more confusing way (as it won\u0027t be close to the original failure).",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c255cf5c_3e023235",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:47:25Z",
+      "side": 1,
+      "message": "Note for other reviewers this release is necessary because the pipeline state delete command grabs this lock.",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb2f74ec_369b742e",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-01T21:47:25Z",
+      "side": 1,
+      "message": "Based on the commit message do we actually need to check that the pipeline state refers to the old layout too?",
+      "revId": "7a1fd74f5f2a1f46787617b1c5bc4ab9c49a16e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
