@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "962764d0_1a1a71c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-03-02T15:37:11Z",
+      "side": 1,
+      "message": "We discussed this on matrix and the motivation is that zuul-web actually access some of the files (like the manifests) using the `log_url` as the base path.\n\nClosing",
+      "revId": "acd43b8522c2e755468ba07d026f03f3feb6a4fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
