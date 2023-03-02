@@ -2151,21 +2151,25 @@ class TenantParser(object):
         for future in futures:
             future.result()
 
-        try:
-            self._processCatJobs(abide, tenant, loading_errors, jobs,
-                                 min_ltimes)
-        except Exception:
-            self.log.exception("Error processing cat jobs, canceling")
-            for job in jobs:
+        for i, job in enumerate(jobs, start=1):
+            try:
                 try:
-                    self.log.debug("Canceling cat job %s", job)
+                    self._processCatJob(abide, tenant, loading_errors, job,
+                                        min_ltimes)
+                except TimeoutError:
                     self.merger.cancel(job)
-                except Exception:
-                    self.log.exception("Unable to cancel job %s", job)
-                    if not ignore_cat_exception:
-                        raise
-            if not ignore_cat_exception:
-                raise
+                    raise
+            except Exception:
+                self.log.exception("Error processing cat jobs")
+                if not ignore_cat_exception:
+                    # Cancel remaining jobs
+                    for cancel_job in jobs[i:]:
+                        try:
+                            self.merger.cancel(cancel_job)
+                        except Exception:
+                            self.log.exception(
+                                "Unable to cancel job %s", cancel_job)
+                    raise
 
     def _cacheTenantYAMLBranch(self, abide, tenant, loading_errors, min_ltimes,
                                tpc, project, branch, jobs):
@@ -2234,49 +2238,48 @@ class TenantParser(object):
         job.source_context = source_context
         jobs.append(job)
 
-    def _processCatJobs(self, abide, tenant, loading_errors, jobs, min_ltimes):
+    def _processCatJob(self, abide, tenant, loading_errors, job, min_ltimes):
         # Called at the end of _cacheTenantYAML after all cat jobs
         # have been submitted
-        for job in jobs:
-            self.log.debug("Waiting for cat job %s" % (job,))
-            res = job.wait(self.merger.git_timeout)
-            if not res:
-                # We timed out
-                raise Exception("Cat job %s timed out; consider setting "
-                                "merger.git_timeout in zuul.conf" % (job,))
-            if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
-            self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
+        self.log.debug("Waiting for cat job %s" % (job,))
+        res = job.wait(self.merger.git_timeout)
+        if not res:
+            # We timed out
+            raise TimeoutError(f"Cat job {job} timed out; consider setting "
+                               "merger.git_timeout in zuul.conf")
+        if not job.updated:
+            raise Exception("Cat job %s failed" % (job,))
+        self.log.debug("Cat job %s got files %s" %
+                       (job, job.files.keys()))
 
-            self._updateUnparsedBranchCache(abide, tenant, job.source_context,
-                                            job.files, loading_errors,
-                                            job.ltime, min_ltimes)
+        self._updateUnparsedBranchCache(abide, tenant, job.source_context,
+                                        job.files, loading_errors,
+                                        job.ltime, min_ltimes)
 
-            # Save all config files in Zookeeper (not just for the current tpc)
-            files_cache = self.unparsed_config_cache.getFilesCache(
-                job.source_context.project_canonical_name,
-                job.source_context.branch)
-            with self.unparsed_config_cache.writeLock(
-                    job.source_context.project_canonical_name):
-                # Prevent files cache ltime from going backward
-                if files_cache.ltime >= job.ltime:
-                    self.log.info(
-                        "Discarding job %s result since the files cache was "
-                        "updated in the meantime", job)
-                    continue
-                # Since the cat job returns all required config files
-                # for ALL tenants the project is a part of, we can
-                # clear the whole cache and then populate it with the
-                # updated content.
-                files_cache.clear()
-                for fn, content in job.files.items():
-                    # Cache file in Zookeeper
-                    if content is not None:
-                        files_cache[fn] = content
-                files_cache.setValidFor(job.extra_config_files,
-                                        job.extra_config_dirs,
-                                        job.ltime)
+        # Save all config files in Zookeeper (not just for the current tpc)
+        files_cache = self.unparsed_config_cache.getFilesCache(
+            job.source_context.project_canonical_name,
+            job.source_context.branch)
+        with self.unparsed_config_cache.writeLock(
+                job.source_context.project_canonical_name):
+            # Prevent files cache ltime from going backward
+            if files_cache.ltime >= job.ltime:
+                self.log.info(
+                    "Discarding job %s result since the files cache was "
+                    "updated in the meantime", job)
+                return
+            # Since the cat job returns all required config files
+            # for ALL tenants the project is a part of, we can
+            # clear the whole cache and then populate it with the
+            # updated content.
+            files_cache.clear()
+            for fn, content in job.files.items():
+                # Cache file in Zookeeper
+                if content is not None:
+                    files_cache[fn] = content
+            files_cache.setValidFor(job.extra_config_files,
+                                    job.extra_config_dirs,
+                                    job.ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
                                    loading_errors, ltime, min_ltimes):
