@@ -3994,7 +3994,8 @@ class Build(zkobject.ZKObject):
     @property
     def log_url(self):
         log_url = self.result_data.get('zuul', {}).get('log_url')
-        if log_url and log_url[-1] != '/':
+        _, ext = os.path.splitext(log_url)
+        if log_url and log_url[-1] != '/' and ext == '':
             log_url = log_url + '/'
         return log_url
 
