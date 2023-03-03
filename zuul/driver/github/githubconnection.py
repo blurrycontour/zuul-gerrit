@@ -81,6 +81,10 @@ ANNOTATION_LEVELS = {
     "warning": "warning",
     "error": "failure",
 }
+# The maximum size for the 'message' field is 64 KB. Since it's unclear
+# from the Github docs if the unit is KiB or KB we'll use KB to be on
+# the safe side.
+ANNOTATION_MAX_MESSAGE_SIZE = 64 * 1000
 
 EventTuple = collections.namedtuple(
     "EventTuple", [
@@ -2428,7 +2432,9 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 raw_annotation = {
                     "path": fn,
                     "annotation_level": annotation_level,
-                    "message": comment["message"],
+                    "message": comment["message"].encode(
+                        "ut8")[:ANNOTATION_MAX_MESSAGE_SIZE].decode(
+                            "utf8", "ignore"),
                     "start_line": start_line,
                     "end_line": end_line,
                     "start_column": start_column,
