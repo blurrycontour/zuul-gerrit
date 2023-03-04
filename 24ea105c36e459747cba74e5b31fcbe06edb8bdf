@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "19b05121_f0541c3b",
         "filename": "zuul/ansible/base/callback/zuul_stream.py",
@@ -14,8 +15,25 @@
       "side": 1,
       "message": "The ip is not necessarily unique since we can have several hosts mapped to the same ip address. Therefore I think we should use the log_id instead (generated further down in this method).",
       "revId": "24ea105c36e459747cba74e5b31fcbe06edb8bdf",
-      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
-      "unresolved": true
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56edb52a_e6425e49",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2023-03-04T18:02:05Z",
+      "side": 1,
+      "message": "modified to task_uuid",
+      "parentUuid": "19b05121_f0541c3b",
+      "revId": "24ea105c36e459747cba74e5b31fcbe06edb8bdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

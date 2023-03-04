@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8eaa138_631ae851",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2023-03-04T18:02:05Z",
+      "side": 1,
+      "message": "not atomic",
+      "parentUuid": "c2066f19_44a2be8a",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd38ad94_7dad7918",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-03-22T22:07:13Z",
       "side": 1,
       "message": "I don\u0027t think we need streamers to be a list here since the log_id is already unique per task and inventory hostname so there will always be just one streamer in there.",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac4e4264_ca56d4c7",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2023-03-04T18:02:05Z",
+      "side": 1,
+      "message": "Changed to task_uuid. Even if log stream has been deactivated for async task and multiple items, depending on hosts, multiple threads might still occur for a single task.",
+      "parentUuid": "dd38ad94_7dad7918",
       "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "045eb6af_6896e9f2",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2023-03-04T18:02:05Z",
+      "side": 1,
+      "message": "modified to task_uuid: stop all streamers for this task.",
+      "parentUuid": "d51db9a3_c5343a4b",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26241bcc_35e99d8c",
@@ -65,6 +119,24 @@
       "writtenOn": "2022-03-22T22:07:13Z",
       "side": 1,
       "message": "Why do we need a lock here?",
+      "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2a2f8e7_c1e4db26",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2023-03-04T18:02:05Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "26241bcc_35e99d8c",
       "revId": "b7d0477d632fe3f5508dba931d424380a76bbe18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
