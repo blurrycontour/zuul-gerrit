@@ -100,20 +100,6 @@ class FunctionalZuulStreamMixIn:
         with open(path) as f:
             return f.read()
 
-    def _assertLogLine(self, line, log, full_match=True):
-        pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| %s%s'
-                   % (line, '$' if full_match else ''))
-        log_re = re.compile(pattern, re.MULTILINE)
-        m = log_re.search(log)
-        if m is None:
-            raise Exception("'%s' not found in log" % (line,))
-
-    def assertLogLineStartsWith(self, line, log):
-        self._assertLogLine(line, log, full_match=False)
-
-    def assertLogLine(self, line, log):
-        self._assertLogLine(line, log, full_match=True)
-
     def _getLogTime(self, line, log):
         pattern = (r'^(\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d)'
                    r' \| %s\n'
@@ -127,6 +113,20 @@ class FunctionalZuulStreamMixIn:
             date1 = datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S.%f")
             date2 = datetime.strptime(m.group(2), "%Y-%m-%d %H:%M:%S.%f")
             return (date1, date2)
+
+    def _assertLogLine(self, line, log, full_match=True):
+        pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| %s%s'
+                   % (line, '$' if full_match else ''))
+        log_re = re.compile(pattern, re.MULTILINE)
+        m = log_re.search(log)
+        if m is None:
+            raise Exception("'%s' not found in log" % (line,))
+
+    def assertLogLineStartsWith(self, line, log):
+        self._assertLogLine(line, log, full_match=False)
+
+    def assertLogLine(self, line, log):
+        self._assertLogLine(line, log, full_match=True)
 
     def test_command(self):
         job = self._run_job('command')
@@ -211,6 +211,13 @@ class FunctionalZuulStreamMixIn:
                                             text)
             self.assertLess((time2 - time1) / timedelta(milliseconds=1),
                             9000)
+            time1, _ = self._getLogTime(
+                r'TASK \[Skipped command\]', text)
+            time2, _ = self._getLogTime(
+                r'TASK \[Second task after skipped command\]', text)
+            self.log.info("ZUULDEBUG time1:{} time2:{}".format(time1, time2))
+            self.assertLess((time2 - time1) / timedelta(milliseconds=1),
+                            5000)
 
             # This is from the debug: msg='{{ ansible_version }}'
             # testing raw variable output.  To make it version

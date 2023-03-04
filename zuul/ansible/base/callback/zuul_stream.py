@@ -103,13 +103,14 @@ class CallbackModule(default.CallbackModule):
         self._task = None
         self._daemon_running = False
         self._play = None
-        self._streamers = []
+        self._streamers = {}
         self._streamers_stop = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
         self._playbook_name = None
         self._zuul_console_version = 0
+        self._streamers_lock = threading.Lock()
 
     def configure_logger(self):
         # ansible appends timestamp, user and pid to the log lines emitted
@@ -176,7 +177,7 @@ class CallbackModule(default.CallbackModule):
                 time.sleep(0.1)
                 continue
 
-    def _read_log(self, host, ip, port, log_id, task_name, hosts):
+    def _read_log(self, host, ip, port, log_id, task_uuid, task_name, hosts):
         s = self._read_log_connect(host, ip, port)
         if s is None:
             # Can't connect; _read_log_connect() already logged an
@@ -218,7 +219,7 @@ class CallbackModule(default.CallbackModule):
                 # code points to escape sequences which exactly represent
                 # the correct data without throwing a decoding exception.
                 done = self._log_streamline(
-                    host, line.decode("utf-8", "backslashreplace"))
+                    host, task_uuid, line.decode("utf-8", "backslashreplace"))
                 if done:
                     if self._zuul_console_version > 0:
                         try:
@@ -239,22 +240,27 @@ class CallbackModule(default.CallbackModule):
                     buff += more
         if buff:
             self._log_streamline(
-                host, buff.decode("utf-8", "backslashreplace"))
+                host, task_uuid, buff.decode("utf-8", "backslashreplace"))
 
-    def _log_streamline(self, host, line):
+    def _log_streamline(self, host, task_uuid, line):
         if "[Zuul] Task exit code" in line:
             return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
-            # When we got here it indicates that the task is already finished
-            # but the logfile didn't appear yet on the remote node. This can
-            # happen rarely on a contended remote node. In this case give
-            # the streamer some additional time to pick up the log. Otherwise
-            # we would discard the log.
-            if time.monotonic() < (self._streamers_stop_ts + 10):
-                # don't output this line
-                return False
-            return True
         elif "[Zuul] Log not found" in line:
+            if self._streamers_stop:
+                # When we got here it indicates that the task is already
+                # finished but the logfile didn't appear yet on the remote node
+                # This can happen rarely on a contended remote node. In this
+                # case give the streamer some additional time to pick up the
+                # log. Otherwise we would discard the log.
+                if time.monotonic() > (self._streamers_stop_ts + 10):
+                    return True
+
+            # if the task was skipped, there won't be any output
+            with self._streamers_lock:
+                if task_uuid in self._streamers and self._streamers[task_uuid][
+                        'skip']:
+                    return True
+
             # don't output this line
             return False
         elif " | " in line:
@@ -361,23 +367,33 @@ class CallbackModule(default.CallbackModule):
                 self._log("[%s] Starting to log %s for task %s"
                           % (host, log_id, task_name),
                           job=False, executor=True)
+                with self._streamers_lock:
+                    if self._task._uuid not in self._streamers:
+                        self._streamers[self._task._uuid] = {'skip': False,
+                                                             'streamers': []}
                 streamer = threading.Thread(
-                    target=self._read_log, args=(
-                        host, ip, port, log_id, task_name, hosts))
+                    target=self._read_log, args=(host, ip, port, log_id,
+                                                 self._task._uuid, task_name,
+                                                 hosts))
                 streamer.daemon = True
+                self._streamers_stop = False
+                self._streamers[self._task._uuid]['streamers'].append(streamer)
                 streamer.start()
-                self._streamers.append(streamer)
 
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
 
-    def _stop_streamers(self):
+    def _stop_streamers(self, task_uuid):
         self._streamers_stop_ts = time.monotonic()
         self._streamers_stop = True
+        if task_uuid not in self._streamers:
+            return
         while True:
-            if not self._streamers:
-                break
-            streamer = self._streamers.pop()
+            with self._streamers_lock:
+                if not self._streamers[task_uuid]['streamers']:
+                    del self._streamers[task_uuid]
+                    break
+                streamer = self._streamers[task_uuid]['streamers'].pop()
             streamer.join(30)
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
@@ -409,7 +425,7 @@ class CallbackModule(default.CallbackModule):
                 is_localhost = True
 
         if not is_localhost and is_task:
-            self._stop_streamers()
+            self._stop_streamers(result._task._uuid)
         if result._task.action in ('command', 'shell',
                                    'win_command', 'win_shell'):
             stdout_lines = zuul_filter_result(result_dict)
@@ -448,6 +464,11 @@ class CallbackModule(default.CallbackModule):
             self._log_message(result, "Ignoring Errors", status="ERROR")
 
     def v2_runner_on_skipped(self, result):
+        with self._streamers_lock:
+            if result._task._uuid in self._streamers:
+                self._streamers[result._task._uuid]['skip'] = True
+        self._stop_streamers(result._task._uuid)
+
         if result._task.loop:
             self._items_done = False
             self._deferred_result = dict(result._result)

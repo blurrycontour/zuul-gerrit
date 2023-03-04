@@ -128,3 +128,15 @@
       loop:
         - 1
         - 2
+
+- hosts: compute1,localhost
+  tasks:
+    - name: Skipped command
+      shell: echo "Skipped command"
+      when: false
+
+    - name: First task after skipped command
+      shell: echo "first after skipped"
+
+    - name: Second task after skipped command
+      shell: echo "second after skipped"
