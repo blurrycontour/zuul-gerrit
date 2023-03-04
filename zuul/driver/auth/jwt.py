@@ -220,6 +220,9 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
         if keys_url is None:
             well_known = self.get_well_known_config()
             keys_url = well_known.get('jwks_uri', None)
+            # Cache the url so we don't need to look up the well known
+            # config again
+            self.keys_url = keys_url
         if keys_url is None:
             msg = 'Invalid OpenID configuration: "jwks_uri" not found'
             logger.error(msg)
