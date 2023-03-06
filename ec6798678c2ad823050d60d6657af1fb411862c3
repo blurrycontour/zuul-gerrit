@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c313c617_a76feca3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-06T15:05:46Z",
+      "side": 1,
+      "message": "The key set cache refreshes in the case of a miss; that should not be a problem.",
+      "parentUuid": "e81d3d9d_5d0ba4ba",
+      "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32fe743a_7efb62e3",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-06T10:40:51Z",
       "side": 1,
       "message": "doesn\u0027t it need the cache_keys arg to explicitly cache the keys? Default seems to be False: https://github.com/jpadilla/pyjwt/blob/master/jwt/jwks_client.py#L17",
+      "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d04e1f3b_02b9d33e",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-06T15:05:46Z",
+      "side": 1,
+      "message": "That argument would cache the key indefinitely; we don\u0027t want that.  We want cache_jwk_set which understands expiration and defaults to true.",
+      "parentUuid": "32fe743a_7efb62e3",
       "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
