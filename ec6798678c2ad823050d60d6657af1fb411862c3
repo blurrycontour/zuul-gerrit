@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e81d3d9d_5d0ba4ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-03-06T10:40:51Z",
+      "side": 1,
+      "message": "The default lifespan for the cache is 5 minutes. Therefore in the worst case scenario, during a keys rotation, we can end up with valid tokens signed with a new key failing to be accepted by Zuul for at most 5 minutes.\n\nIt is recommended to rotate keys every 3-6 months, so while you\u0027d have to be extremely unlucky to hit the authenticated API during such a rotation using a signing key not present in the cache, this can happen and thus should be acknowledged, if only as a comment in the code.",
+      "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32fe743a_7efb62e3",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-03-06T10:40:51Z",
+      "side": 1,
+      "message": "doesn\u0027t it need the cache_keys arg to explicitly cache the keys? Default seems to be False: https://github.com/jpadilla/pyjwt/blob/master/jwt/jwks_client.py#L17",
+      "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
