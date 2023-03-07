@@ -24,6 +24,7 @@ from zuul.model import Project
 from zuul.driver.github.githubmodel import GithubRefFilter
 from zuul.driver.util import scalar_or_list
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.components import COMPONENT_REGISTRY
 
 
 class GithubSource(BaseSource):
@@ -157,6 +158,14 @@ class GithubSource(BaseSource):
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
         raise NotImplementedError()
+
+    def getProjectDefaultMergeMode(self, project):
+        if COMPONENT_REGISTRY.model_api < 18:
+            return 'merge'
+        github_version = self.connection._github_client_manager._github_version
+        if github_version and github_version < (3, 8):
+            return 'merge-recursive'
+        return 'merge-ort'
 
     def updateChange(self, change, history=None):
         """Update information for a change."""

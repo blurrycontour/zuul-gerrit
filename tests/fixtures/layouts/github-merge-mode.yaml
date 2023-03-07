@@ -19,3 +19,9 @@
     gate:
       jobs:
         - noop
+
+- project:
+    name: org/project1
+    gate:
+      jobs:
+        - noop

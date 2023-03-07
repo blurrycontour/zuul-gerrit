@@ -15,6 +15,7 @@
 import json
 
 from zuul import change_matcher
+from zuul import model
 from zuul.lib.re2util import ZuulRegex
 from zuul.zk.components import ComponentRegistry
 
@@ -479,6 +480,30 @@ class TestGithubModelUpgrade(ZuulTestCase):
         self.assertIn(
             "rebase not supported",
             str(loading_errors[0].error))
+
+    @model_version(17)
+    @simple_layout('layouts/github-merge-mode.yaml', driver='github')
+    def test_default_merge_mode(self):
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata('github.com/org/project1')
+        self.assertEqual(model.MERGER_MERGE, md.merge_mode)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 18
+
+        component_registry = ComponentRegistry(self.zk_client)
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 18:
+                break
+
+        # Perform a full reconfiguration which should cause us to
+        # re-fetch the merge modes.
+        self.scheds.first.fullReconfigure()
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata('github.com/org/project1')
+        self.assertEqual(model.MERGER_MERGE_ORT, md.merge_mode)
 
 
 class TestDefaultBranchUpgrade(ZuulTestCase):
