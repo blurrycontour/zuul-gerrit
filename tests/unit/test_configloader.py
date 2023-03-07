@@ -1260,7 +1260,7 @@ class TestMergeMode(ZuulTestCase):
 
     @simple_layout('layouts/merge-mode-default.yaml', driver='github')
     def test_default_merge_mode_github(self):
-        self._test_default_merge_mode(model.MERGER_MERGE,
+        self._test_default_merge_mode(model.MERGER_MERGE_ORT,
                                       'github.com')
 
 

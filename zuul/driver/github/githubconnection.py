@@ -70,6 +70,8 @@ PREVIEW_CHECKS_ACCEPT = 'application/vnd.github.antiope-preview+json'
 ALL_MERGE_MODES = [
     model.MERGER_MERGE,
     model.MERGER_MERGE_RESOLVE,
+    model.MERGER_MERGE_RECURSIVE,
+    model.MERGER_MERGE_ORT,
     model.MERGER_SQUASH_MERGE,
     model.MERGER_REBASE,
 ]
@@ -1879,6 +1881,8 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if resp.get('allow_merge_commit'):
             merge_modes.append(model.MERGER_MERGE)
             merge_modes.append(model.MERGER_MERGE_RESOLVE)
+            merge_modes.append(model.MERGER_MERGE_RECURSIVE)
+            merge_modes.append(model.MERGER_MERGE_ORT)
         if resp.get('allow_squash_merge'):
             merge_modes.append(model.MERGER_SQUASH_MERGE)
         if resp.get('allow_rebase_merge'):
