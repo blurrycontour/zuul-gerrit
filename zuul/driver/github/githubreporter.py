@@ -35,6 +35,8 @@ class GithubReporter(BaseReporter):
     merge_modes = {
         model.MERGER_MERGE: 'merge',
         model.MERGER_MERGE_RESOLVE: 'merge',
+        model.MERGER_MERGE_RECURSIVE: 'merge',
+        model.MERGER_MERGE_ORT: 'merge',
         model.MERGER_SQUASH_MERGE: 'squash',
         model.MERGER_REBASE: 'rebase',
     }
