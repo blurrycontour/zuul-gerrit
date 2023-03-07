@@ -145,6 +145,12 @@ class GithubSource(BaseSource):
         """Get the open changes for a project."""
         raise NotImplementedError()
 
+    def getProjectDefaultMergeMode(self, project):
+        github_version = self.connection._github_client_manager._github_version
+        if github_version and github_version < (3, 8):
+            return 'merge-recursive'
+        return 'merge-ort'
+
     def updateChange(self, change, history=None):
         """Update information for a change."""
         raise NotImplementedError()
