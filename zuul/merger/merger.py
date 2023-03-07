@@ -1127,6 +1127,12 @@ class Merger(object):
             elif mode == zuul.model.MERGER_MERGE_RESOLVE:
                 commit = repo.merge(item['ref'], 'resolve',
                                     zuul_event_id=zuul_event_id)
+            elif mode == zuul.model.MERGER_MERGE_RECURSIVE:
+                commit = repo.merge(item['ref'], 'recursive',
+                                    zuul_event_id=zuul_event_id)
+            elif mode == zuul.model.MERGER_MERGE_ORT:
+                commit = repo.merge(item['ref'], 'ort',
+                                    zuul_event_id=zuul_event_id)
             elif mode == zuul.model.MERGER_CHERRY_PICK:
                 commit = repo.cherryPick(item['ref'],
                                          zuul_event_id=zuul_event_id)
