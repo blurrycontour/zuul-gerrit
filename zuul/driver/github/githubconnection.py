@@ -68,6 +68,8 @@ PREVIEW_CHECKS_ACCEPT = 'application/vnd.github.antiope-preview+json'
 ALL_MERGE_MODES = [
     model.MERGER_MERGE,
     model.MERGER_MERGE_RESOLVE,
+    model.MERGER_MERGE_RECURSIVE,
+    model.MERGER_MERGE_ORT,
     model.MERGER_SQUASH_MERGE,
     model.MERGER_REBASE,
 ]
