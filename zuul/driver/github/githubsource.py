@@ -145,6 +145,15 @@ class GithubSource(BaseSource):
         """Get the open changes for a project."""
         raise NotImplementedError()
 
+    def getProjectDefaultMergeMode(self, project):
+        # The gerrit jgit merge operation is most closely approximated
+        # by "git merge -s resolve", so we return that as the default
+        # for the Gerrit driver.
+        github_version = self.connection._github_version
+        if github_version and github_version < (3, 8):
+            return 'merge-resolve'
+        return 'merge-ort'
+
     def updateChange(self, change, history=None):
         """Update information for a change."""
         raise NotImplementedError()
