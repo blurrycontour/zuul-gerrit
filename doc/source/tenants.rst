@@ -189,8 +189,7 @@ configuration. Some examples of tenant definitions are:
 
          .. attr:: shadow
 
-            A list of projects which this project is permitted to
-            shadow.  Normally, only one project in Zuul may contain
+            Normally, only one project in Zuul may contain
             definitions for a given job.  If a project earlier in the
             configuration defines a job which a later project
             redefines, the later definition is considered an error and
