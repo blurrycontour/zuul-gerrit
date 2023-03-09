@@ -6732,6 +6732,44 @@ class TestChangeQueues(ZuulTestCase):
         """
         self._test_dependent_queues_per_branch('org/project4')
 
+    def test_duplicate_definition_on_branches(self):
+        project = 'org/project3'
+        self.create_branch(project, 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(project, 'stable'))
+        self.waitUntilSettled()
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "No error should have been accumulated")
+        # This error is expected and unrelated to this test (the
+        # ignored configuration is used by other tests in this class):
+        self.assertIn('Queue integrated already defined',
+                      tenant.layout.loading_errors[0].error)
+
+        # At this point we've verified that we can have identical
+        # queue definitions on multiple branches without conflict.
+        # Next, let's try to change the queue def on one branch so it
+        # doesn't match (flip the per-branch boolean):
+        conf = textwrap.dedent(
+            """
+            - queue:
+                name: integrated-untrusted
+                per-branch: false
+            """)
+
+        file_dict = {'zuul.d/queue.yaml': conf}
+        A = self.fake_gerrit.addFakeChange(project, 'stable', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(len(A.messages), 1)
+        self.assertTrue(
+            'Queue integrated-untrusted does not match '
+            'existing definition in branch master' in A.messages[0])
+        self.assertEqual(A.data['status'], 'NEW')
+
 
 class TestJobUpdateBrokenConfig(ZuulTestCase):
     tenant_config_file = 'config/job-update-broken/main.yaml'
