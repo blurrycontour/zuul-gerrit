@@ -1,0 +1,71 @@
+From 408c06678618acff54d73eb5c32f99e1db21f892 Mon Sep 17 00:00:00 2001
+From: Simon Westphahl <simon.westphahl@bmw.de>
+Date: Fri, 24 Feb 2023 14:47:04 +0100
+Subject: [PATCH] Retry jobs on transient IO errors on repo update
+
+We are occassionally seeing different types of IO errors when updating
+repos on an executor. Currently those exceptions will abort the build
+and result in an error being reported.
+
+Since those errors are usually transient and point to some
+infrastructure problem we should retry those builds instead.
+
+We'll catch all IOErrors which includes request related exceptions from
+the "requests" Python package. See:
+https://github.com/psf/requests/blob/main/requests/exceptions.py
+
+Traceback (most recent call last):
+  File "/opt/zuul/lib/python3.10/site-packages/zuul/executor/server.py", line 3609, in _innerUpdateLoop
+    self.merger.updateRepo(
+  File "/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py", line 994, in updateRepo
+    repo = self.getRepo(connection_name, project_name,
+  File "/opt/zuul/lib/python3.10/site-packages/zuul/merger/merger.py", line 966, in getRepo
+    url = source.getGitUrl(project)
+  File "/opt/zuul/lib/python3.10/site-packages/zuul/driver/github/githubsource.py", line 154, in getGitUrl
+    return self.connection.getGitUrl(project)
+  File "/opt/zuul/lib/python3.10/site-packages/zuul/driver/github/githubconnection.py", line 1744, in getGitUrl
+    self._github_client_manager.get_installation_key(
+  File "/opt/zuul/lib/python3.10/site-packages/zuul/driver/github/githubconnection.py", line 1126, in get_installation_key
+    response = github.session.post(url, headers=headers, json=None)
+  File "/opt/zuul/lib/python3.10/site-packages/requests/sessions.py", line 635, in post
+    return self.request("POST", url, data=data, json=json, **kwargs)
+  File "/opt/zuul/lib/python3.10/site-packages/github3/session.py", line 171, in request
+    response = super().request(*args, **kwargs)
+  File "/opt/zuul/lib/python3.10/site-packages/requests/sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/opt/zuul/lib/python3.10/site-packages/requests/sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "/opt/zuul/lib/python3.10/site-packages/cachecontrol/adapter.py", line 53, in send
+    resp = super(CacheControlAdapter, self).send(request, **kw)
+  File "/opt/zuul/lib/python3.10/site-packages/requests/adapters.py", line 565, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError:
+HTTPSConnectionPool(host='github.com', port=443): Max retries exceeded
+with url: /api/v3/app/installations/123/access_tokens (Caused by
+NewConnectionError('<urllib3.connection.HTTPSConnection object at
+0x7f44f6136ef0>: Failed to establish a new connection: [Errno -3]
+Temporary failure in name resolution'))
+
+Change-Id: I4e07e945c88b9ba61f83131076fbf7b9768a61f9
+---
+ zuul/executor/server.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/zuul/executor/server.py b/zuul/executor/server.py
+index a49bbbbbf..b0e3d69f6 100644
+--- a/zuul/executor/server.py
++++ b/zuul/executor/server.py
+@@ -3632,6 +3632,10 @@ class ExecutorServer(BaseMergeServer):
+             log.exception('Process pool got broken')
+             self.resetProcessPool()
+             task.transient_error = True
++        except IOError:
++            log.exception('Got I/O error while updating repo %s/%s',
++                          task.connection_name, task.project_name)
++            task.transient_error = True
+         except Exception:
+             log.exception('Got exception while updating repo %s/%s',
+                           task.connection_name, task.project_name)
+-- 
+2.30.0
+
