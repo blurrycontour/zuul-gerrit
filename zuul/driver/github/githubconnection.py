@@ -403,7 +403,7 @@ class GithubEventProcessor(object):
             # Returns empty on unhandled events
             return
 
-        self.log.debug("Handling %s event", self.event_type)
+        self.log.debug("Handling %s event with installation_id %s", self.event_type, installation_id)
         events = []
         try:
             events = method()
