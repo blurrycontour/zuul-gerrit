@@ -16,6 +16,23 @@
       "message": "recheck\n\nooh, I have only updated the docs and it has run the unit tests and failed 😄",
       "revId": "b21cd5ce8fc8ab8926cb533089169aa6fa06d577",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29bfec44_abc76ab4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-03-10T07:55:06Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: Code-Review-1\n\u003e \n\u003e Indeed this does appear to be ambiguous.  I think your reading is correct, but so is the original!\n\u003e \n\u003e \u003e verb\n\u003e \u003e verb: shadow; 3rd person present: shadows; past tense: shadowed; past participle: shadowed; gerund or present participle: shadowing\n\u003e \u003e \n\u003e \u003e     1.\n\u003e \u003e     envelop in shadow; cast a shadow over.\n\u003e \u003e     \"the market is shadowed by St. Margaret\u0027s church\"\n\u003e \u003e \n\u003e \u003e     2.\n\u003e \u003e     follow and observe (someone) closely and secretly.\n\u003e \u003e     \"he had been up all night shadowing a team of poachers\"\n\u003e \n\u003e When I wrote this, I had #2 in mind, and I suspect you read this as #1.  Perhaps a better fix would avoid the ambiguity entirely; maybe something like \"A list of projects where duplicate definitions are permitted but considered secondary to this project.\"\n\nI argue that I have not heard anyone using this word in IT context with the 2nd definition in mind (until now of course!). I disagree with the alternative wording you propose because it introduces a concept of being \"secondary\" which is not explained elsewhere.\n\nShort-term maybe we could just remove the first sentence of the description as the rest reads well without it: it\u0027s narratory but this style is used with other attributes as well. If we want to keep the sentence, we can also replace \"shadow\" with \"override\" in my proposal (just let me know if this makes sense!).\n\nLong-term I think it would make sense to rethink even the name of this attribute as it\u0027s actually the only one I had to look up to understand zuul\u0027s config in opendev. :D ",
+      "revId": "b21cd5ce8fc8ab8926cb533089169aa6fa06d577",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
