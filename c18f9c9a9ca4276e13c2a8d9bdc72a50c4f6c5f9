@@ -1,0 +1,327 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5345c54f_63fc6766",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "\"many more tests code\" doesn\u0027t parse for me, not sure exactly what phrasing you were going for though.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb0a4051_b0fa4089",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "It also notifies the developer who proposed the change, which is fairly important to the process, since this may cause them to iterate on further improvements before wasting reviewers\u0027 time.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2d824d1_67a64be4",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "This URL will need correcting to something that works now.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8907ed3_0abe008f",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Nit: \"runs an Ansible\" seems a bit idiomatic, maybe \"runs Ansible play(book)s?\" Something like that anyway. Introducing readers to accurate terminology could be part of this document\u0027s purpose.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35aa2b9e_0f337f92",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Nit: This paragraph starts talking about playbooks and roles without really introducing the terms, just jumps straight to definitions. Maybe preface with something along the lines of, \"Ansible orchestrates tasks with the use of plays, playbooks and roles.\"",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "472cfa3e_9e98dc8f",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Nit: You don\u0027t really need \"an\" here as it\u0027s singular while \"scripts\" is plural. Alternatively, maybe you meant \"an ad-hoc script or existing scripts?\"",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45bc4125_19c4ed58",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Could point to https://zuul-ci.org/docs/zuul-jobs/roles.html instead as it\u0027s more approachable and maybe less overwhelming.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20ffe815_10c0bb24",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "s/need/needs/ (job is singular)",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92f6359c_3ff90882",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Nit: I like this paragraph, though it\u0027s a bit heavy on exclamation marks! Exclamation marks are great, but ending three sentences in a row with them feels over the top! Sometimes less is more! ;)",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eb6b596_5a164a55",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "s/their/there/",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "694b3c44_3a0724d3",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "\"Like every service in Zuul, executors can scale horizontally...\" (wasn\u0027t the case when you first wrote this, but great to underscore the recent progress)",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "722cad42_141870e3",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Nit: Verb tense disagreement you want either \"if the tests do not run before the code is merged\" or \"it was ultimately futile.\"",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a39ccd4_0e197560",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Nit: \"tools of your tools\" is mildly repetitive.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "384a3ef0_9a619820",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "This could be misconstrued as implying that Zuul merges to the public repository before final tests are run, in contrast to the sequence you explain in the previous paragraph.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25b01b47_606b9a87",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "s/an/and/",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7aebd89e_55d32ac5",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "I don\u0027t think this is true, nor how Zuul works. If B fails while A is running, Zuul doesn\u0027t assume anything about what that means until it sees whether A passes or fails. Maybe you wanted to say \"If change B fails and then A merges successfully?\"",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e656ea74_f86ddec3",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "Since this was originally written, it\u0027s now the case that Zuul might leave inline comments too, pointing out exactly where something went wrong. Not sure if you want to include that, just an idea that came to mind.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebadd9e8_41d15d4e",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "What\u0027s described immediately above is an independent pipeline. The prior section starts out with \"as described above\" too, but the mention of \"strict ordering\" here is already pretty clear so you could just drop this \"as described above\" altogether.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fb31390_11ca19ff",
+        "filename": "doc/source/zen.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-03-10T23:52:40Z",
+      "side": 1,
+      "message": "I would describe what Zuul does as commanding or instructing the code management system to merge the change, not merely signalling that it should be merged.",
+      "revId": "c18f9c9a9ca4276e13c2a8d9bdc72a50c4f6c5f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
