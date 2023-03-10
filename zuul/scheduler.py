@@ -2327,7 +2327,6 @@ class Scheduler(threading.Thread):
         pipeline.state.setDirty(self.zk_client.client)
         if pipeline.state.old_queues:
             self._reenqueuePipeline(tenant, pipeline, ctx)
-        pipeline.state.cleanup(ctx)
 
         with self.statsd_timer(f'{stats_key}.event_process'):
             self.process_pipeline_management_queue(tenant, pipeline)
@@ -2339,6 +2338,7 @@ class Scheduler(threading.Thread):
             with self.statsd_timer(f'{stats_key}.process'):
                 while not self._stopped and pipeline.manager.processQueue():
                     pass
+            pipeline.state.cleanup(ctx)
         except Exception:
             self.log.exception("Exception in pipeline processing:")
             pipeline._exception_count += 1

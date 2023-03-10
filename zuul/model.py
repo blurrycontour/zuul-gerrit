@@ -907,8 +907,19 @@ class PipelineState(zkobject.ZKObject):
         except NoNodeError:
             all_items = set()
 
-        known_items = {i.uuid for i in self._getKnownItems()}
-        stale_items = all_items - known_items
+        known_item_objs = self._getKnownItems()
+        known_items = {i.uuid for i in known_item_objs}
+        items_referenced_by_builds = set()
+        for i in known_item_objs:
+            build_set = i.current_build_set
+            job_graph = build_set.job_graph
+            if not job_graph:
+                continue
+            for job in job_graph.getJobs():
+                build = build_set.getBuild(job.name)
+                if build:
+                    items_referenced_by_builds.add(build.build_set.item.uuid)
+        stale_items = all_items - known_items - items_referenced_by_builds
         for item_uuid in stale_items:
             self.pipeline.manager.log.debug("Cleaning up stale item %s",
                                             item_uuid)
@@ -1249,16 +1260,14 @@ class ChangeQueue(zkobject.ZKObject):
                                          item_ahead=item.item_ahead)
 
         if item.bundle:
-            items_in_pipeline = self.pipeline.getAllItems(include_old=True)
-            if any([i in items_in_pipeline for i in item.bundle.items]):
-                item.updateAttributes(
-                    self.zk_context, item_ahead=None, items_behind=[],
-                    dequeue_time=time.time())
-            else:
-                # We no longer need the bundle items
-                for bundle_item in item.bundle.items:
-                    bundle_item.delete(self.zk_context)
-                item._set(dequeue_time=time.time())
+            # This item may have builds referenced by other items in
+            # the bundle, or even other bundles (in the case of
+            # independent pipelines).  Rather than trying to figure
+            # that out here, we will just let PipelineState.cleanup
+            # handle garbage collecting these items when done.
+            item.updateAttributes(
+                self.zk_context, item_ahead=None, items_behind=[],
+                dequeue_time=time.time())
         else:
             item.delete(self.zk_context)
             # We use the dequeue time for stats reporting, but the queue
@@ -5304,7 +5313,31 @@ class QueueItem(zkobject.ZKObject):
             ret = False
         return ret
 
-    def findDuplicateJob(self, job):
+    def findDuplicateBundles(self):
+        """
+        Find other bundles in the pipeline that are equivalent to ours.
+        """
+        if not self.bundle:
+            return None
+        ret = []
+        for item in self.queue.pipeline.getAllItems():
+            if not item.live:
+                continue
+            if item is self:
+                continue
+            other_bundle_changes = {i.change for i in item.bundle.items}
+            this_bundle_changes = {i.change for i in self.bundle.items}
+            if other_bundle_changes != this_bundle_changes:
+                continue
+            other_item_queue = {i.change for i in item.queue.queue}
+            this_item_queue = {i.change for i in self.queue.queue}
+            if other_item_queue != this_item_queue:
+                continue
+            if item.bundle not in ret:
+                ret.append(item.bundle)
+        return ret
+
+    def findDuplicateJob(self, job, other_bundles):
         """
         If another item in the bundle has a duplicate job,
         return the other item
@@ -5313,18 +5346,20 @@ class QueueItem(zkobject.ZKObject):
             return None
         if job.deduplicate is False:
             return None
-        for other_item in self.bundle.items:
-            if other_item is self:
-                continue
-            for other_job in other_item.getJobs():
-                if other_job.isEqual(job):
-                    if job.deduplicate == 'auto':
-                        # Deduplicate if there are required projects
-                        # or the item project is the same.
-                        if (not job.required_projects and
-                            self.change.project != other_item.change.project):
-                            continue
-                    return other_item
+        for other_bundle in other_bundles:
+            for other_item in other_bundle.items:
+                if other_item is self:
+                    continue
+                for other_job in other_item.getJobs():
+                    if other_job.isEqual(job):
+                        if job.deduplicate == 'auto':
+                            # Deduplicate if there are required projects
+                            # or the item project is the same.
+                            if (not job.required_projects and
+                                self.change.project !=
+                                other_item.change.project):
+                                continue
+                        return other_item
 
     def updateJobParentData(self):
         job_graph = self.current_build_set.job_graph
@@ -5420,6 +5455,13 @@ class QueueItem(zkobject.ZKObject):
 
         build_set = self.current_build_set
         job_graph = build_set.job_graph
+        if self.bundle and len([i for i in self.bundle.items if i.live]) > 1:
+            # We are in a queue that has multiple live items, so we
+            # will only check our own bundle.
+            other_bundles = [self.bundle]
+        else:
+            # Look for identical bundles elsewhere in the pipeline
+            other_bundles = self.findDuplicateBundles()
         for job in job_graph.getJobs():
             this_request = build_set.getJobNodeRequestID(job.name)
             this_nodeset = build_set.getJobNodeSetInfo(job.name)
@@ -5429,7 +5471,7 @@ class QueueItem(zkobject.ZKObject):
                 # Nothing more possible for this job
                 continue
 
-            other_item = self.findDuplicateJob(job)
+            other_item = self.findDuplicateJob(job, other_bundles)
             if not other_item:
                 continue
             other_build_set = other_item.current_build_set
