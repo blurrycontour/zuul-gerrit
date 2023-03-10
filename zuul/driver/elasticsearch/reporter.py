@@ -103,7 +103,9 @@ class ElasticsearchReporter(BaseReporter):
                 build_doc['job_vars'] = job.variables
 
             if self.index_returned_vars:
-                build_doc['job_returned_vars'] = build.result_data
+                rdata = build.result_data.copy()
+                rdata.pop('zuul', None)
+                build_doc['job_returned_vars'] = rdata
 
             docs.append(build_doc)
 
