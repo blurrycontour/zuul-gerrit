@@ -211,6 +211,12 @@ class FunctionalZuulStreamMixIn:
                                             text)
             self.assertLess((time2 - time1) / timedelta(milliseconds=1),
                             9000)
+            time1, _ = self._getLogTime(
+                r'TASK \[Skipped command\]', text)
+            time2, _ = self._getLogTime(
+                r'TASK \[Second task after skipped command\]', text)
+            self.assertLess((time2 - time1) / timedelta(milliseconds=1),
+                            5000)
 
             # This is from the debug: msg='{{ ansible_version }}'
             # testing raw variable output.  To make it version
