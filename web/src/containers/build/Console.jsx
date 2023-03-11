@@ -55,6 +55,7 @@ import {
 } from '../../actions/build'
 
 const INTERESTING_KEYS = ['msg', 'cmd', 'stdout', 'stderr']
+const ANSI_REGEX = new RegExp('\x33[[0-9;]+m')
 
 
 class TaskOutput extends React.Component {
@@ -119,8 +120,11 @@ class TaskOutput extends React.Component {
         </pre>
       )
     } else if (typeof(value) === 'string') {
+      // If there is an ANSI color escape string, set a white-on-black
+      // color scheme so the output looks more like what we would expect in a console.
+      const style = ANSI_REGEX.test(value) ? {backgroundColor: 'black', color: 'white'} : {}
       ret = (
-        <pre>
+        <pre style={style}>
           <ReAnsi log={value} />
         </pre>
       )
