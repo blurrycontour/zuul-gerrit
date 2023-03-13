@@ -691,6 +691,7 @@ class GithubEventProcessor(object):
 
         event.ref = f'refs/heads/{branch}'
         event.branch = branch
+        event.branch_cache_ltime = self._branch_cache.ltime
         return event
 
     def _check_run_action_to_event(self, check_run, project):
