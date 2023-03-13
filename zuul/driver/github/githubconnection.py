@@ -679,6 +679,11 @@ class GithubEventProcessor(object):
                            branch, project_name)
             events.append(
                 self._branch_protection_rule_to_event(project_name, branch))
+
+        for event in events:
+            # Make sure every event has a branch cache ltime
+            self.connection.clearConnectionCacheOnBranchEvent(event)
+
         return events
 
     def _branch_protection_rule_to_event(self, project_name, branch):
