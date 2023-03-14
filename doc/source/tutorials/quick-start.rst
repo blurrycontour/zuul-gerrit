@@ -1,7 +1,7 @@
 .. _quick-start:
 
-Quick-Start Installation and Tutorial
-=====================================
+Quick-Start Installation and Basic Tutorial
+===========================================
 
 Zuul is not like other CI or CD systems.  It is a project gating
 system designed to assist developers in taking a change from proposal
