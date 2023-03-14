@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30ef1e35_86400ee2",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-14T20:49:51Z",
+      "side": 1,
+      "message": "Agreed, this results in an empty message toast.",
+      "parentUuid": "c58fafa3_c5b535a2",
+      "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a466dc1_402750c9",
@@ -119,6 +137,23 @@
       "side": 1,
       "message": "Seems like mysql is being forgiving for us. Making behavior consistent across DB installs makes sense to me in that case.",
       "parentUuid": "7928914a_6c49e67c",
+      "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7d7dcf5_d9b90c5f",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-14T20:49:51Z",
+      "side": 1,
+      "message": "While you\u0027re updating the change, let\u0027s remove the reference to GitHub.  It\u0027s a little jarring for someone who\u0027s using a Gerrit system.  How about one of these?\n\n\"Change must be an integer\"\n\"Change must be an integer (do not include revision)\"\n\"Change must be an integer such as a change, pull request, or merge request number\"",
       "revId": "0b01988cd3419b56713c4d33116e5e46da8e32d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
