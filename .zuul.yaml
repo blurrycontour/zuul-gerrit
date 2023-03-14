@@ -200,6 +200,13 @@
       run_playbooks:
         - admin.yaml
         - tracing.yaml
+- job:
+    name: zuul-tutorial-gate-your-first-patch
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial gate your first patch documentation.
+    vars:
+      run_playbooks:
+        - gate-first-patch.yaml
 
 # Image building jobs
 - secret:
@@ -372,6 +379,9 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-gate-your-first-patch:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
         - zuul-nox-zuul-client
         - zuul-build-python-release
     gate:
@@ -398,6 +408,9 @@
         - zuul-stream-functional-6
         - zuul-nox-remote
         - zuul-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+        - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
         - zuul-nox-zuul-client

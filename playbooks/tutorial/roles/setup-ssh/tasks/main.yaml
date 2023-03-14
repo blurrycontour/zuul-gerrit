@@ -1,0 +1,26 @@
+- block:
+    - name: Generate example user ssh key
+      command: "ssh-keygen -f {{ workspace }}/id_rsa -N ''"
+      args:
+        creates: "{{ workspace }}/id_rsa.pub"
+    - name: Load example user SSH key
+      shell: "cat {{ workspace }}/id_rsa.pub"
+      register: ssh_key_cat
+    - name: Register example user SSH key (temp)
+      set_fact:
+        ssh_public_key_new: "{{ ssh_key_cat.stdout }}"
+        stop_ssh_agent: yes
+    - name: Start ssh-agent
+      command: ssh-agent
+      register: ssh_agent_new
+    - name: Add key to ssh agent
+      shell:
+        executable: /bin/bash
+        cmd: |
+          {{ ssh_agent_new.stdout }}
+          ssh-add {{ workspace }}/id_rsa
+    - name: "Set Fact: ssh_public_key/ssh_agent"
+      set_fact:
+        ssh_public_key: "{{ ssh_public_key_new }}"
+        ssh_agent: "{{ ssh_agent_new }}"
+  when: ssh_public_key is not defined or ssh_public_key == ''
