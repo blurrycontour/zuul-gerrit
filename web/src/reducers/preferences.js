@@ -21,7 +21,8 @@ const stored_prefs = localStorage.getItem('preferences')
 let default_prefs
 if (stored_prefs === null) {
   default_prefs = {
-    autoReload: true
+    autoReload: true,
+    darkMode: false
   }
 } else {
   default_prefs = JSON.parse(stored_prefs)
@@ -37,6 +38,13 @@ export default (state = {
       localStorage.setItem('preferences', JSON.stringify(newstate))
       return newstate
     default:
+      // We need to update DOM for dark mode upon loading
+      // because we cannot handle it by state
+      if (state.darkMode) {
+        document.documentElement.classList.add('pf-theme-dark');
+      } else {
+        document.documentElement.classList.remove('pf-theme-dark');
+      }
       return state
   }
 }
