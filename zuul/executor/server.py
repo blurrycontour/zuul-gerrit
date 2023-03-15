@@ -1931,6 +1931,7 @@ class AnsibleJob(object):
                         region=node.region,
                         host_id=node.host_id,
                         external_id=getattr(node, 'external_id', None),
+                        slot=node.slot,
                         interface_ip=node.interface_ip,
                         public_ipv4=node.public_ipv4,
                         private_ipv4=node.private_ipv4,
