@@ -39,6 +39,7 @@ class ConfigModal extends React.Component {
     this.state = {
       isModalOpen: false,
       autoReload: false,
+      darkMode: false,
     }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
@@ -47,9 +48,19 @@ class ConfigModal extends React.Component {
       this.resetState()
     }
 
+    this.handleDarkModeToggle = () => {
+      if (this.state.darkMode) {
+        document.documentElement.classList.add('pf-theme-dark')
+      } else {
+        document.documentElement.classList.remove('pf-theme-dark')
+      }
+    }
+
     this.handleSave = () => {
       this.handleModalToggle()
       this.props.dispatch(setPreference('autoReload', this.state.autoReload))
+      this.props.dispatch(setPreference('darkMode', this.state.darkMode))
+      this.handleDarkModeToggle()
     }
 
     this.handleAutoReload = () => {
@@ -57,16 +68,24 @@ class ConfigModal extends React.Component {
         autoReload: !autoReload
       }))
     }
+
+    this.handleDarkMode = () => {
+      this.setState(({ darkMode }) => ({
+        darkMode: !darkMode
+      }))
+    }
   }
 
   resetState() {
     this.setState({
       autoReload: this.props.preferences.autoReload,
+      darkMode: this.props.preferences.darkMode,
     })
+    this.handleDarkModeToggle()
   }
 
   render() {
-    const { isModalOpen, autoReload } = this.state
+    const { isModalOpen, autoReload, darkMode } = this.state
     return (
       <React.Fragment>
         <Button
@@ -91,12 +110,23 @@ class ConfigModal extends React.Component {
         >
           <div>
             <p key="info">Application settings are saved in browser local storage only. They are applied whether authenticated or not.</p>
+          </div>
+          <div>
             <Switch
               key="autoreload"
               id="autoreload"
               label="Auto reload status page"
               isChecked={autoReload}
               onChange={this.handleAutoReload}
+            />
+          </div>
+          <div>
+            <Switch
+              key="darkmode"
+              id="darkmode"
+              label="Dark mode"
+              isChecked={darkMode}
+              onChange={this.handleDarkMode}
             />
           </div>
         </Modal>
