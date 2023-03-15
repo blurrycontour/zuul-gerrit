@@ -384,7 +384,7 @@ class FakeGerritChange(object):
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
                  parent=None, merge_parents=None, merge_files=None,
-                 topic=None):
+                 topic=None, empty=False):
         self.gerrit = gerrit
         self.source = gerrit
         self.reported = 0
@@ -429,7 +429,7 @@ class FakeGerritChange(object):
             self.addMergePatchset(parents=merge_parents,
                                   merge_files=merge_files)
         else:
-            self.addPatchset(files=files, parent=parent)
+            self.addPatchset(files=files, parent=parent, empty=empty)
         if merge_parents:
             self.data['parents'] = merge_parents
         elif parent:
@@ -503,9 +503,11 @@ class FakeGerritChange(object):
         repo.heads['master'].checkout()
         return r
 
-    def addPatchset(self, files=None, large=False, parent=None):
+    def addPatchset(self, files=None, large=False, parent=None, empty=False):
         self.latest_patchset += 1
-        if not files:
+        if empty:
+            files = {}
+        elif not files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             data = ("test %s %s %s\n" %
                     (self.branch, self.number, self.latest_patchset))
@@ -1330,7 +1332,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
 
     def addFakeChange(self, project, branch, subject, status='NEW',
                       files=None, parent=None, merge_parents=None,
-                      merge_files=None, topic=None):
+                      merge_files=None, topic=None, empty=False):
         """Add a change to the fake Gerrit."""
         self.change_number += 1
         c = FakeGerritChange(self, self.change_number, project, branch,
@@ -1338,7 +1340,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                              status=status, files=files, parent=parent,
                              merge_parents=merge_parents,
                              merge_files=merge_files,
-                             topic=topic)
+                             topic=topic, empty=empty)
         self.changes[self.change_number] = c
         return c
 
