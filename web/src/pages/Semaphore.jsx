@@ -25,7 +25,7 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { fetchSemaphoresIfNeeded } from '../actions/semaphores'
 import Semaphore from '../containers/semaphore/Semaphore'
 
-function SemaphorePage({ match, semaphores, tenant, fetchSemaphoresIfNeeded, isFetching }) {
+function SemaphorePage({ match, semaphores, tenant, fetchSemaphoresIfNeeded, isFetching, preferences }) {
 
   const semaphoreName = match.params.semaphoreName
 
@@ -38,7 +38,7 @@ function SemaphorePage({ match, semaphores, tenant, fetchSemaphoresIfNeeded, isF
     e => e.name === semaphoreName) : undefined
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection variant={preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
       <Title headingLevel="h2">
         Details for Semaphore <span style={{color: 'var(--pf-global--primary-color--100)'}}>{semaphoreName}</span>
       </Title>
@@ -55,6 +55,7 @@ SemaphorePage.propTypes = {
   tenant: PropTypes.object.isRequired,
   isFetching: PropTypes.bool.isRequired,
   fetchSemaphoresIfNeeded: PropTypes.func.isRequired,
+  preferences: PropTypes.object,
 }
 const mapDispatchToProps = { fetchSemaphoresIfNeeded }
 
@@ -63,6 +64,7 @@ function mapStateToProps(state) {
     tenant: state.tenant,
     semaphores: state.semaphores.semaphores,
     isFetching: state.semaphores.isFetching,
+    preferences: state.preferences,
   }
 }
 
