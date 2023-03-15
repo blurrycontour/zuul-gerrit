@@ -65,6 +65,7 @@ class BuildPage extends React.Component {
     activeTab: PropTypes.string.isRequired,
     location: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
+    preferences: PropTypes.object,
   }
 
   state = {
@@ -250,10 +251,10 @@ class BuildPage extends React.Component {
 
     return (
       <>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
           <Build build={build} active={activeTab} hash={hash} />
         </PageSection>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
           <Tabs
             isFilled
             activeKey={activeTab}
@@ -314,7 +315,7 @@ class BuildPage extends React.Component {
           </Tabs>
         </PageSection>
         {!this.state.topOfPageVisible && (
-          <PageSection variant={PageSectionVariants.light}>
+          <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
             <Button onClick={scrollToTop} variant="primary" style={{position: 'fixed', bottom: 20, right: 20, zIndex: 1}}>
               Go to top of page <ArrowUpIcon/>
             </Button>
@@ -362,6 +363,7 @@ function mapStateToProps(state, ownProps) {
     isFetchingManifest: state.build.isFetchingManifest,
     isFetchingOutput: state.build.isFetchingOutput,
     isFetchingLogfile: state.logfile.isFetching,
+    preferences: state.preferences,
   }
 }
 

@@ -26,7 +26,8 @@ class JobsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    preferences: PropTypes.object,
   }
 
   updateData = (force) => {
@@ -51,8 +52,8 @@ class JobsPage extends React.Component {
 
     const jobs = remoteData.jobs[this.props.tenant.name]
     return (
-      <PageSection variant={PageSectionVariants.light}>
-        <PageSection style={{paddingRight: '5px'}}>
+      <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        <PageSection variant={PageSectionVariants.light} style={{paddingRight: '5px'}}>
           <Fetchable
             isFetching={remoteData.isFetching}
             fetchCallback={this.updateData}
@@ -70,4 +71,5 @@ class JobsPage extends React.Component {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.jobs,
+  preferences: state.preferences,
 }))(JobsPage)
