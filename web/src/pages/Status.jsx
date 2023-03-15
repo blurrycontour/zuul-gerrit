@@ -197,6 +197,7 @@ class StatusPage extends React.Component {
         <FormGroup controlId='status'>
           <FormControl
             type='text'
+            className="pf-c-form-control"
             placeholder='change or project name'
             defaultValue={filter}
             inputRef={i => this.filter = i}
@@ -222,7 +223,7 @@ class StatusPage extends React.Component {
       </Form>
     )
     return (
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <div style={{display: 'flex', float: 'right'}}>
           <Fetchable
             isFetching={remoteData.isFetching}

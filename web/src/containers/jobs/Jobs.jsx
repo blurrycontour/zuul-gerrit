@@ -163,6 +163,7 @@ class JobsList extends React.Component {
           <FormGroup controlId='jobs'>
             <FormControl
               type='text'
+              className="pf-c-form-control"
               placeholder='job name'
               defaultValue={filter}
               inputRef={i => this.filter = i}
