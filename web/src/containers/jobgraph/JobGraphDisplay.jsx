@@ -21,10 +21,15 @@ import { useHistory } from 'react-router-dom'
 import { makeJobGraphKey, fetchJobGraphIfNeeded } from '../../actions/jobgraph'
 import { graphviz } from 'd3-graphviz'
 
-function makeDot(tenant, pipeline, project, branch, jobGraph) {
+function makeDot(tenant, pipeline, project, branch, jobGraph, dark) {
   let ret = 'digraph job_graph {\n'
+  ret += '  bgcolor="transparent"\n'
   ret += '  rankdir=LR;\n'
-  ret += '  node [shape=box];\n'
+  if (dark) {
+    ret += '  node [shape=box color="white" fontcolor="white"];\n'
+  } else {
+    ret += '  node [shape=box];\n'
+  }
   jobGraph.forEach((job) => {
     const searchParams = new URLSearchParams('')
     searchParams.append('pipeline', pipeline)
@@ -43,8 +48,15 @@ function makeDot(tenant, pipeline, project, branch, jobGraph) {
     if (job.dependencies.length) {
       job.dependencies.forEach((dep) => {
         let soft = ' [dir=back]'
+        if (dark) {
+          soft = ' [dir=back color="white" fontcolor="white"]'
+        }
         if (dep.soft) {
-          soft = ' [style=dashed dir=back]'
+          if (dark) {
+            soft = ' [style=dashed dir=back color="white" fontcolor="white"]'
+          } else {
+            soft = ' [style=dashed dir=back]'
+          }
         }
         ret += '  "' + dep.name + '" -> "' + job.name + '"' + soft + ';\n'
       })
@@ -99,7 +111,7 @@ GraphViz.propTypes = {
 
 function JobGraphDisplay(props) {
   const [dot, setDot] = useState()
-  const {fetchJobGraphIfNeeded, tenant, project, pipeline, branch} = props
+  const {fetchJobGraphIfNeeded, tenant, project, pipeline, branch, preferences } = props
 
   useEffect(() => {
     fetchJobGraphIfNeeded(tenant, project.name, pipeline, branch)
@@ -112,9 +124,9 @@ function JobGraphDisplay(props) {
   const jobGraph = tenantJobGraph ? tenantJobGraph[jobGraphKey] : undefined
   useEffect(() => {
     if (jobGraph) {
-      setDot(makeDot(tenant, pipeline, project, branch, jobGraph))
+      setDot(makeDot(tenant, pipeline, project, branch, jobGraph, preferences.darkMode))
     }
-  }, [tenant, pipeline, project, branch, jobGraph])
+  }, [tenant, pipeline, project, branch, jobGraph, preferences])
   return (
     <>
       {dot && <GraphViz dot={dot}/>}
@@ -131,11 +143,13 @@ JobGraphDisplay.propTypes = {
   jobgraph: PropTypes.object,
   dispatch: PropTypes.func,
   state: PropTypes.object,
+  preferences: PropTypes.object,
 }
 function mapStateToProps(state) {
   return {
     tenant: state.tenant,
     jobgraph: state.jobgraph,
+    preferences: state.preferences,
     state: state,
   }
 }

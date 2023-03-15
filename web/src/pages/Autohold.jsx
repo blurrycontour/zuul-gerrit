@@ -59,6 +59,7 @@ class AutoholdPage extends React.Component {
     autohold: PropTypes.object,
     isFetching: PropTypes.bool.isRequired,
     fetchAutohold: PropTypes.func.isRequired,
+    preferences: PropTypes.object,
   }
 
   updateData = () => {
@@ -147,7 +148,7 @@ class AutoholdPage extends React.Component {
 
     return (
       <>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
           <Title headingLevel="h2">Autohold Request {autohold.id}</Title>
 
           <Flex className="zuul-autohold-attributes">
@@ -211,7 +212,9 @@ class AutoholdPage extends React.Component {
                     value={
                       <>
                         <strong>Reason:</strong>
-                        <pre>{autohold.reason}</pre>
+                        <div className={this.props.preferences.darkMode ? 'zuul-console-dark' : ''}>
+                          <pre>{autohold.reason}</pre>
+                        </div>
                       </>
                     }
                   />
@@ -221,7 +224,7 @@ class AutoholdPage extends React.Component {
             </Flex>
           </Flex>
         </PageSection>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
           <Title headingLevel="h3">
             <BuildIcon
               style={{
@@ -243,6 +246,7 @@ function mapStateToProps(state) {
     autohold: state.autoholds.autohold,
     tenant: state.tenant,
     isFetching: state.autoholds.isFetching,
+    preferences: state.preferences,
   }
 }
 

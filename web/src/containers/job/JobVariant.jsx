@@ -58,7 +58,8 @@ class JobVariant extends React.Component {
   static propTypes = {
     parent: PropTypes.object,
     tenant: PropTypes.object,
-    variant: PropTypes.object.isRequired
+    variant: PropTypes.object.isRequired,
+    preferences: PropTypes.object,
   }
 
   renderStatus (variant) {
@@ -161,7 +162,8 @@ class JobVariant extends React.Component {
                 collapsed={true}
                 sortKeys={true}
                 enableClipboard={false}
-                displayDataTypes={false}/>
+                displayDataTypes={false}
+                theme={this.props.preferences.darkMode ? 'tomorrow' : 'rjv-default'}/>
             </span>
           )
         }
@@ -287,4 +289,7 @@ class JobVariant extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(JobVariant)
+export default connect(state => ({
+  tenant: state.tenant,
+  preferences: state.preferences,
+}))(JobVariant)
