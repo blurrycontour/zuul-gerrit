@@ -46,7 +46,7 @@ function ProjectPage(props) {
 
   return (
     <>
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <TextContent>
           <Text component="h2">Project {projectName}</Text>
         <Fetchable
@@ -70,12 +70,14 @@ ProjectPage.propTypes = {
   tenant: PropTypes.object,
   remoteData: PropTypes.object,
   fetchProjectIfNeeded: PropTypes.func,
+  preferences: PropTypes.object,
 }
 
 function mapStateToProps(state) {
   return {
     tenant: state.tenant,
     remoteData: state.project,
+    preferences: state.preferences,
   }
 }
 
