@@ -14,6 +14,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import configureStore from '../../store'
 import BuildOutput from './BuildOutput'
 
 const fakeOutput = (width, height) => ({
@@ -31,7 +33,11 @@ it('BuildOutput renders big task', () => {
   const div = document.createElement('div')
   const output = fakeOutput(512, 1024)
   const begin = performance.now()
-  ReactDOM.render(<BuildOutput output={output} />, div, () => {
+  const store = configureStore()
+  ReactDOM.render(
+    <Provider store={store}>
+    <BuildOutput output={output} />
+    </Provider>, div, () => {
     const end = performance.now()
     console.log('Render took ' + (end - begin) + ' milliseconds.')
   })
