@@ -26,7 +26,8 @@ class JobPage extends React.Component {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    preferences: PropTypes.object,
   }
 
   updateData = (force) => {
@@ -53,7 +54,7 @@ class JobPage extends React.Component {
     const tenantJobs = remoteData.jobs[this.props.tenant.name]
     const jobName = this.props.match.params.jobName
     return (
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={this.props.preferences.darkMode? PageSectionVariants.dark : PageSectionVariants.light}>
         {tenantJobs && tenantJobs[jobName] && <Job job={tenantJobs[jobName]} />}
       </PageSection>
     )
@@ -63,4 +64,5 @@ class JobPage extends React.Component {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.job,
+  preferences: state.preferences,
 }))(JobPage)

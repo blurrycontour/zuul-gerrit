@@ -47,7 +47,7 @@ import { addNotification, addApiError } from '../../actions/notifications'
 import { ChartModal } from '../charts/ChartModal'
 import BuildsetGanttChart from '../charts/GanttChart'
 
-function Buildset({ buildset, timezone, tenant, user }) {
+function Buildset({ buildset, timezone, tenant, user, preferences }) {
   const buildset_link = buildExternalLink(buildset)
   const [isGanttChartModalOpen, setIsGanttChartModalOpen] = useState(false)
 
@@ -319,7 +319,9 @@ function Buildset({ buildset, timezone, tenant, user }) {
                 value={
                   <>
                     <strong>Message:</strong>
-                    <pre>{buildset.message}</pre>
+                    <div className={preferences.darkMode ? 'zuul-console-dark' : ''}>
+                      <pre>{buildset.message}</pre>
+                    </div>
                   </>
                 }
               />
@@ -349,10 +351,12 @@ Buildset.propTypes = {
   tenant: PropTypes.object,
   timezone: PropTypes.string,
   user: PropTypes.object,
+  preferences: PropTypes.object,
 }
 
 export default connect((state) => ({
   tenant: state.tenant,
   timezone: state.timezone,
   user: state.user,
+  preferences: state.preferences,
 }))(Buildset)

@@ -97,7 +97,8 @@ function FreezeJobPage(props) {
           collapsed={false}
           sortKeys={true}
           enableClipboard={false}
-          displayDataTypes={false}/>
+          displayDataTypes={false}
+          theme={props.preferences.darkMode ? 'tomorrow' : 'rjv-default'}/>
       </span>
     )
   }
@@ -133,12 +134,14 @@ FreezeJobPage.propTypes = {
   fetchFreezeJobIfNeeded: PropTypes.func,
   tenant: PropTypes.object,
   freezejob: PropTypes.object,
+  preferences: PropTypes.object,
 }
 
 function mapStateToProps(state) {
   return {
     tenant: state.tenant,
     freezejob: state.freezejob,
+    preferences: state.preferences,
   }
 }
 

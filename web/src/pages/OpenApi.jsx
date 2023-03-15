@@ -26,7 +26,8 @@ class OpenApiPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    preferences: PropTypes.object,
   }
 
   updateData = (force) => {
@@ -51,7 +52,7 @@ class OpenApiPage extends React.Component {
 
   render() {
     return (
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <div id="swaggerContainer" />
       </PageSection>
     )
@@ -61,4 +62,5 @@ class OpenApiPage extends React.Component {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.openapi,
+  preferences: state.preferences,
 }))(OpenApiPage)

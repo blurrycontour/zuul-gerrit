@@ -111,6 +111,7 @@ class SelectTz extends React.Component {
         <OutlinedClockIcon/>
         <Select
           className="zuul-select-tz"
+          classNamePrefix="zuul-select-tz"
           styles={customStyles}
           components={{ DropdownIndicator }}
           value={this.state.currentValue}

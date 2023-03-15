@@ -31,7 +31,8 @@ class StreamPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    preferences: PropTypes.object,
   }
 
   state = {
@@ -167,10 +168,11 @@ class StreamPage extends React.Component {
 
   render () {
     return (
-      <PageSection variant={PageSectionVariants.light} >
+      <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <Form inline>
           <FormGroup controlId='stream'>
             <FormControl
+              className="pf-c-form-control"
               type='text'
               placeholder='search'
               onKeyPress={this.handleKeyPress}
@@ -201,4 +203,7 @@ class StreamPage extends React.Component {
 }
 
 
-export default connect(state => ({tenant: state.tenant}))(StreamPage)
+export default connect(state => ({
+  tenant: state.tenant,
+  preferences: state.preferences,
+}))(StreamPage)

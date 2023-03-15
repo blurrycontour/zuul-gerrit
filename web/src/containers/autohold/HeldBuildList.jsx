@@ -62,7 +62,6 @@ class HeldBuildList extends React.Component {
               to={`${tenant.linkPrefix}/build/${node.build}`}
               style={{
                 textDecoration: 'none',
-                color: 'var(--pf-global--disabled-color--100)',
               }}
             >
               <DataListItemRow>
