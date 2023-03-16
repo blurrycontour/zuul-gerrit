@@ -40,8 +40,9 @@ a.refresh {
 }
 
 .zuul-select-tz {
-    /* That's the color PF4 uses for the dropdown items in the navbar */
-    color: var(--pf-global--Color--dark-100);
+    /* Always use black because when using dark mode the theme will default
+       to another dark color which is hard to see on a white background */
+    color: #000;
 }
 
 /* Config error modal */
