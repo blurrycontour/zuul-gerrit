@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85780cd2_38079268",
+        "filename": "web/src/index.css",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-03-16T09:45:42Z",
+      "side": 1,
+      "message": "quick note about this: all (?) browser after something like 2018 should support linear-gradient so we can use that to generate the line instead of having the image so we can get rid of that resource",
+      "range": {
+        "startLine": 321,
+        "startChar": 0,
+        "endLine": 329,
+        "endChar": 1
+      },
+      "revId": "e02ed9eed20bb5df4f6da7410dfc24953af9e561",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
