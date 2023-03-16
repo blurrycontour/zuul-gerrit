@@ -495,10 +495,18 @@ details.foldable[open] summary::before {
 }
 
 @media (prefers-color-scheme: dark) {
-   .pf-theme-dark .pf-c-nav__link {
-     color: #fff !important;
-   }
-   .pf-theme-dark .pf-c-modal-box__title-text, .pf-theme-dark .pf-c-modal-box__body {
-     color: #fff !important;
-   }
- }
+  .pf-theme-dark .pf-c-nav__link {
+    color: #fff !important;
+  }
+  .pf-theme-dark .pf-c-modal-box__title-text, .pf-theme-dark .pf-c-modal-box__body {
+    color: #fff !important;
+  }
+
+  .pf-theme-dark .swagger-ui {
+    filter: invert(88%) hue-rotate(180deg);
+  }
+
+  .pf-theme-dark .swagger-ui .highlight-code {
+    filter: invert(100%) hue-rotate(180deg);
+  }
+}
