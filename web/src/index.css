@@ -510,3 +510,7 @@ details.foldable[open] summary::before {
     filter: invert(100%) hue-rotate(180deg);
   }
 }
+
+.zuul-table-dark .list-group-item {
+  background-color: #333 !important;
+}

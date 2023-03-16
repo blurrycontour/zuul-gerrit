@@ -59,7 +59,7 @@ function ProjectVariant(props) {
 
   return (
     <div>
-      <table className='table table-striped table-bordered'>
+      <table className={props.preferences.darkMode? 'table zuul-table-dark' : 'table table-striped table-bordered'}>
         <tbody>
           {rows.map(item => (
             <tr key={item.label}>
@@ -75,12 +75,14 @@ function ProjectVariant(props) {
 
 ProjectVariant.propTypes = {
   tenant: PropTypes.object,
-  variant: PropTypes.object.isRequired
+  variant: PropTypes.object.isRequired,
+  preferences: PropTypes.object,
 }
 
 function mapStateToProps(state) {
   return {
     tenant: state.tenant,
+    preferences: state.preferences,
   }
 }
 
