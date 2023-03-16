@@ -495,7 +495,10 @@ details.foldable[open] summary::before {
 }
 
 @media (prefers-color-scheme: dark) {
-   .pf-c-nav__link {
+   .pf-theme-dark .pf-c-nav__link {
+     color: #fff !important;
+   }
+   .pf-theme-dark .pf-c-modal-box__title-text, .pf-theme-dark .pf-c-modal-box__body {
      color: #fff !important;
    }
  }
