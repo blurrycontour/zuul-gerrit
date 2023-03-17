@@ -18,6 +18,7 @@ import * as React from 'react'
 import ReAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
+import { connect } from 'react-redux'
 
 import {
   Button,
@@ -404,8 +405,8 @@ class PlayBook extends React.Component {
     dataListCells.push(
       <DataListCell key='name' width={1}>
         <strong>
-          {playbook.phase[0].toUpperCase() + playbook.phase.slice(1)} playbook<
-          /strong>
+          {playbook.phase[0].toUpperCase() + playbook.phase.slice(1)} playbook
+        </strong>
       </DataListCell>)
         dataListCells.push(
         <DataListCell key='path' width={5}>
@@ -484,6 +485,7 @@ class Console extends React.Component {
     errorIds: PropTypes.object,
     output: PropTypes.array,
     displayPath: PropTypes.array,
+    preferences: PropTypes.object,
   }
 
   render () {
@@ -492,7 +494,7 @@ class Console extends React.Component {
     return (
       <React.Fragment>
         <br />
-        <span className="zuul-console">
+        <span className={this.props.preferences.darkMode ? 'zuul-console zuul-console-dark' : 'zuul-console zuul-console-light'}>
           <DataList isCompact={true}
                     style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
             {
@@ -509,5 +511,11 @@ class Console extends React.Component {
   }
 }
 
+function mapStateToProps(state) {
+  return {
+    preferences: state.preferences,
+  }
+}
 
-export default Console
+
+export default connect(mapStateToProps)(Console)
