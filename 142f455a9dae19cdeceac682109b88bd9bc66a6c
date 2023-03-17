@@ -16,6 +16,23 @@
       "message": "recheck failed to acquire zk lock",
       "revId": "142f455a9dae19cdeceac682109b88bd9bc66a6c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e86bba7_5e7ea57a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-03-17T08:47:46Z",
+      "side": 1,
+      "message": "recheck kazoo timeout on py38",
+      "revId": "142f455a9dae19cdeceac682109b88bd9bc66a6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
