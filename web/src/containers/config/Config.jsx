@@ -81,7 +81,6 @@ class ConfigModal extends React.Component {
       autoReload: this.props.preferences.autoReload,
       darkMode: this.props.preferences.darkMode,
     })
-    this.handleDarkModeToggle()
   }
 
   render() {
