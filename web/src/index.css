@@ -381,9 +381,19 @@ pre.version {
     border-radius: 5px;
 }
 
-.zuul-console .pf-c-data-list__item:hover
+.zuul-console-light .pf-c-data-list__item:hover
 {
     background: var(--pf-global--palette--blue-50);
+}
+
+.zuul-console-dark .pf-c-data-list__item:hover
+{
+    background: var(--pf-global--BackgroundColor--200);
+}
+
+.zuul-console-dark pre {
+    background: #000;
+    color: #fff;
 }
 
 .zuul-console .pf-c-data-list__item:hover::before
