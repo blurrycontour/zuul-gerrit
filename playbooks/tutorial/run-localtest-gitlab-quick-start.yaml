@@ -1,0 +1,11 @@
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-zuul
+    local: true
+  tasks:
+    - name: Setup Gitlab Tutorial Execution
+      include_role:
+        name: gitlab-setup-tutorial
+
+    - name: Run Gitlab quick-start tutorial
+      include_tasks: gitlab-quick-start.yaml
