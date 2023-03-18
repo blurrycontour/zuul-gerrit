@@ -193,6 +193,17 @@
       - zuul/zuul
     nodeset: ubuntu-jammy
 
+- job:
+    name: zuul-gitlab-quick-start
+    parent: opendev-buildset-registry-consumer
+    description: quick-start using GitLab instead of Gerrit.
+    pre-run: playbooks/tutorial/pre.yaml
+    run: playbooks/tutorial/run-gitlab.yaml
+    post-run: playbooks/tutorial/post-gitlab.yaml
+    required-projects:
+      - zuul/zuul
+    nodeset: ubuntu-jammy
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -323,6 +334,9 @@
         - zuul-stream-functional-6
         - zuul-nox-remote
         - zuul-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+        - zuul-gitlab-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - zuul-nox-zuul-client
