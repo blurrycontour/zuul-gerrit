@@ -1036,7 +1036,9 @@ Here is an example of two job definitions:
       only affect it.
 
       See :attr:`pragma.implied-branch-matchers` for how to override
-      this behavior on a per-file basis.
+      this behavior on a per-file basis.  The behavior may also be
+      configured by a Zuul administrator using
+      :attr:`tenant.untrusted-projects.<project>.implied-branch-matchers`.
 
    .. attr:: files
 
