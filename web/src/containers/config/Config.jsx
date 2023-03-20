@@ -18,10 +18,14 @@ import {
   ButtonVariant,
   Modal,
   ModalVariant,
-  Switch
+  Switch,
+  Select,
+  SelectOption,
+  SelectVariant
 } from '@patternfly/react-core'
 import { CogIcon } from '@patternfly/react-icons'
 import { setPreference } from '../../actions/preferences'
+import { resolveDarkMode, setDarkMode } from '../../Misc'
 
 class ConfigModal extends React.Component {
 
@@ -39,7 +43,8 @@ class ConfigModal extends React.Component {
     this.state = {
       isModalOpen: false,
       autoReload: false,
-      darkMode: false,
+      theme: 'Auto',
+      isThemeOpen: false,
     }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
@@ -48,19 +53,39 @@ class ConfigModal extends React.Component {
       this.resetState()
     }
 
-    this.handleDarkModeToggle = () => {
-      if (this.state.darkMode) {
-        document.documentElement.classList.add('pf-theme-dark')
+    this.handleEscape = () => {
+      if (this.state.isThemeOpen) {
+        this.setState(({ isThemeOpen }) => ({
+          isThemeOpen: !isThemeOpen,
+        }))
       } else {
-        document.documentElement.classList.remove('pf-theme-dark')
+        this.handleModalToggle()
       }
+    }
+
+    this.handleThemeToggle = () => {
+      this.setState(({ isThemeOpen }) => ({
+        isThemeOpen: !isThemeOpen,
+      }))
+    }
+
+    this.handleThemeSelect = (event, selection) => {
+      this.setState({
+        theme: selection,
+        isThemeOpen: false
+      })
+    }
+
+    this.handleTheme = () => {
+      let darkMode = resolveDarkMode(this.state.theme)
+      setDarkMode(darkMode)
     }
 
     this.handleSave = () => {
       this.handleModalToggle()
       this.props.dispatch(setPreference('autoReload', this.state.autoReload))
-      this.props.dispatch(setPreference('darkMode', this.state.darkMode))
-      this.handleDarkModeToggle()
+      this.props.dispatch(setPreference('theme', this.state.theme))
+      this.handleTheme()
     }
 
     this.handleAutoReload = () => {
@@ -68,23 +93,17 @@ class ConfigModal extends React.Component {
         autoReload: !autoReload
       }))
     }
-
-    this.handleDarkMode = () => {
-      this.setState(({ darkMode }) => ({
-        darkMode: !darkMode
-      }))
-    }
   }
 
   resetState() {
     this.setState({
       autoReload: this.props.preferences.autoReload,
-      darkMode: this.props.preferences.darkMode,
+      theme: this.props.preferences.theme,
     })
   }
 
   render() {
-    const { isModalOpen, autoReload, darkMode } = this.state
+    const { isModalOpen, autoReload, theme, isThemeOpen } = this.state
     return (
       <React.Fragment>
         <Button
@@ -98,6 +117,7 @@ class ConfigModal extends React.Component {
           title="Preferences"
           isOpen={isModalOpen}
           onClose={this.handleModalToggle}
+          onEscapePress={this.handleEscape}
           actions={[
             <Button key="confirm" variant="primary" onClick={this.handleSave}>
               Confirm
@@ -119,14 +139,23 @@ class ConfigModal extends React.Component {
               onChange={this.handleAutoReload}
             />
           </div>
+          <div style={{'paddingTop': '25px'}}>
+            <p key="theme-info">Select your preferred theme, auto will base it on your system preference.</p>
+          </div>
           <div>
-            <Switch
-              key="darkmode"
-              id="darkmode"
-              label="Dark mode"
-              isChecked={darkMode}
-              onChange={this.handleDarkMode}
-            />
+            <Select
+              variant={SelectVariant.single}
+              label="Select Input"
+              onToggle={this.handleThemeToggle}
+              onSelect={this.handleThemeSelect}
+              selections={theme}
+              isOpen={isThemeOpen}
+              menuAppendTo="parent"
+            >
+              <SelectOption key="auto" value="Auto"/>
+              <SelectOption key="light" value="Light"/>
+              <SelectOption key="dark" value="Dark"/>
+            </Select>
           </div>
         </Modal>
       </React.Fragment>
