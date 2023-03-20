@@ -115,6 +115,30 @@
       },
       "revId": "3c327f57fc72f9a87af57b82a74863295239ba0b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "437e38b0_ea20243a",
+        "filename": "web/src/reducers/preferences.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-03-20T15:46:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a719ee41_4597d9ce",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 7
+      },
+      "revId": "3c327f57fc72f9a87af57b82a74863295239ba0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
