@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "725ca1f1_ca1b987f",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-20T23:11:43Z",
+      "side": 1,
+      "message": "-1: Turns out it is not treated as a regular expression (any more)?  So we should probably fix that while we\u0027re here.\n\n+1: The original idea was to just pass them through, but somewhere we ended up doing syntax checking, and we now have an allow list in the code, so it makes sense to document that here.",
+      "revId": "ae073e712b09f5037a6f69364cdfef448f340da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e0b53cb_685a7050",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-20T23:11:43Z",
+      "side": 1,
+      "message": "You could actually make these \".. value::\" entries, then the changes below could be direct links.  But I can also see the argument that a more informal concise list is better since we\u0027re not actually documenting the values (and I don\u0027t think we should!  I like deferring to Gerrit.)  So I\u0027m ambivalent about that.",
+      "revId": "ae073e712b09f5037a6f69364cdfef448f340da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
