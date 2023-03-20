@@ -177,9 +177,22 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
    .. attr:: event
       :required:
 
-      The event name from gerrit.  Examples: ``patchset-created``,
-      ``comment-added``, ``ref-updated``.  This field is treated as a
-      regular expression.
+      The `stream-event
+      <https://gerrit-review.googlesource.com/Documentation/cmd-stream-events.html>`__
+      name from Gerrit.
+
+      The currently supported events are:
+
+      * ``change-abandoned``
+      * ``change-merged``
+      * ``change-restored``
+      * ``comment-added``
+      * ``draft-published``
+      * ``patchset-created``
+      * ``ref-updated``
+      * ``vote-deleted``
+      * ``wip-state-changed``
+      * ``pending-check`` (note: provided by checks plugin)
 
    .. attr:: branch
 
@@ -189,8 +202,8 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
 
    .. attr:: ref
 
-      On ref-updated events, the branch parameter is not used, instead
-      the ref is provided.  Currently Gerrit has the somewhat
+      On ``ref-updated`` events, the branch parameter is not used,
+      instead the ref is provided.  Currently Gerrit has the somewhat
       idiosyncratic behavior of specifying bare refs for branch names
       (e.g., ``master``), but full ref names for other kinds of refs
       (e.g., ``refs/tags/foo``).  Zuul matches this value exactly
@@ -200,10 +213,10 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
    .. attr:: ignore-deletes
       :default: true
 
-      When a branch is deleted, a ref-updated event is emitted with a
-      newrev of all zeros specified. The ``ignore-deletes`` field is a
-      boolean value that describes whether or not these newrevs
-      trigger ref-updated events.
+      When a branch is deleted, a ``ref-updated`` event is emitted
+      with a newrev of all zeros specified. The ``ignore-deletes``
+      field is a boolean value that describes whether or not these
+      newrevs trigger ``ref-updated`` events.
 
    .. attr:: approval
 
