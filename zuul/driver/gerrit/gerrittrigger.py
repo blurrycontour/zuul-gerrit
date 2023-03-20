@@ -83,6 +83,7 @@ def getSchema():
                                  'change-restored',
                                  'change-merged',
                                  'comment-added',
+                                 'project-head-updated',
                                  'ref-updated',
                                  'pending-check',
                                  'vote-deleted',
