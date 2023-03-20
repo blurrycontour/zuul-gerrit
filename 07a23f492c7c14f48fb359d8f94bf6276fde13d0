@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "403bed09_96e3525b",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-03-20T08:15:47Z",
+      "side": 1,
+      "message": "nit: Is the `not ... \u003d\u003d ` here on purpose? Otherwise I find that\n\n  if merge_mode !\u003d model.MERGER_SQUASH_MERGE\n\nmight be a little easier to read.",
+      "revId": "07a23f492c7c14f48fb359d8f94bf6276fde13d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
