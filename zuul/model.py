@@ -1890,7 +1890,8 @@ class SourceContext(ConfigObject):
     originate."""
 
     def __init__(self, project_canonical_name, project_name,
-                 project_connection_name, branch, path, trusted):
+                 project_connection_name, branch, path, trusted,
+                 implied_branch_matchers=None):
         super(SourceContext, self).__init__()
         self.project_canonical_name = project_canonical_name
         self.project_name = project_name
@@ -1898,7 +1899,7 @@ class SourceContext(ConfigObject):
         self.branch = branch
         self.path = path
         self.trusted = trusted
-        self.implied_branch_matchers = None
+        self.implied_branch_matchers = implied_branch_matchers
         self.implied_branches = None
 
     def __str__(self):
@@ -1915,7 +1916,8 @@ class SourceContext(ConfigObject):
     def copy(self):
         return self.__class__(
             self.project_canonical_name, self.project_name,
-            self.project_connection_name, self.branch, self.path, self.trusted)
+            self.project_connection_name, self.branch, self.path, self.trusted,
+            self.implied_branch_matchers)
 
     def isSameProject(self, other):
         if not isinstance(other, SourceContext):
@@ -7179,6 +7181,7 @@ class TenantProjectConfig(object):
         # Load config from a different branch if this is a config project
         self.load_branch = None
         self.merge_modes = None
+        self.implied_branch_matchers = None
 
     def isAlwaysDynamicBranch(self, branch):
         if self.always_dynamic_branches is None:
