@@ -167,7 +167,14 @@ class GerritEventConnector(threading.Thread):
         'fetch-ref-replication-scheduled',
         'ref-replicated',
         'ref-replication-scheduled',
-        'ref-replication-done'
+        'ref-replication-done',
+        # currently unimplemented built-ins
+        'hashtags-changed',
+        'merge-failed',
+        'project-head-updated',
+        'project-updated',
+        'reviewer-added',
+        'topic-changed',
     )
 
     log = logging.getLogger("zuul.GerritEventConnector")
@@ -312,14 +319,17 @@ class GerritEventConnector(threading.Thread):
             'change-restored': 'restorer',
             'comment-added': 'author',
             'draft-published': 'uploader',  # Gerrit 2.5/2.6
-            'merge-failed': 'submitter',  # Gerrit 2.5/2.6; removed 2.13
             'patchset-created': 'uploader',
             'pending-check': None,  # Gerrit 3.0+
-            'project-created': None,  # Gerrit 2.14
             'ref-updated': 'submitter',
+            'vote-deleted': 'deleter',
+            # Unimplemented and currently ignored
+            'hashtags-changed': 'editor',
+            'merge-failed': 'submitter',  # Gerrit 2.5/2.6; removed 2.13
+            'project-created': None,  # Gerrit 2.14
+            'project-head-updated': None,  # Gerrit 3.7+
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
             'topic-changed': 'changer',
-            'vote-deleted': 'deleter',
         }
         event.account = None
         if event.type in accountfield_from_type:
