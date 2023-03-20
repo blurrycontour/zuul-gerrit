@@ -18,6 +18,40 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12e914ba_1908ae9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-03-20T13:29:51Z",
+      "side": 1,
+      "message": "Looks good to me and I like that change. I just left a comment about the conditional setting of the classname attribute based on the darkmode. \n\nOverall I would have expected much more customizations to be necessary to get a usable dark mode, but I haven\u0027t checked out the follow-up changes yet.",
+      "revId": "3c327f57fc72f9a87af57b82a74863295239ba0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8564b86a_deb5ff45",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-03-20T13:29:51Z",
+      "side": 1,
+      "message": "I think for those className attribute we should only add/change the necessary classes based on the darkmode, but keep all the remaining once instead of duplicating them.\n\nSo something like:\n\n  className\u003d{`progress zuul-change-total-result${this.props.preferences.darkMode ? \u0027 progress-dark\u0027 : \u0027\u0027}`}\n  \nor\n  className\u003d{`progress zuul-change-total-result ${this.props.preferences.darkMode ? \u0027progress-dark\u0027 : \u0027\u0027}`}\n  \nThe latter one adds an unnecessary whitespace to the className string, but might be easier to read. \n  \nThere should already be a few examples for those string interpolations within our JavaScript source code, e.g. https://opendev.org/zuul/zuul/src/branch/master/web/src/App.jsx#L448.",
+      "revId": "3c327f57fc72f9a87af57b82a74863295239ba0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "caaaa673_2147e5ef",
