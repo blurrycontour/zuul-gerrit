@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8f131674_0e3073b7",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-03-20T15:27:41Z",
+      "side": 1,
+      "message": "Ugh, I never liked the JS syntax imposed for this, I would maybe argue explicit is cleaner, but yeah I agree that there must be a better way to make that cleaner.\n\nSince it requires changes in a lot of places I\u0027ll postpone until I get more reviews on the entire series, and I\u0027ll fix that in the end if that\u0027s a requirement for it to be merged.",
+      "parentUuid": "8564b86a_deb5ff45",
+      "revId": "3c327f57fc72f9a87af57b82a74863295239ba0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "caaaa673_2147e5ef",
         "filename": "web/src/reducers/preferences.js",
         "patchSetId": 2
