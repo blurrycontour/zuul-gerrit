@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b1e975dc_8f5604a0",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-03-20T23:24:55Z",
+      "side": 1,
+      "message": "done, link fixed too",
+      "parentUuid": "725ca1f1_ca1b987f",
+      "revId": "ae073e712b09f5037a6f69364cdfef448f340da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6e0b53cb_685a7050",
         "filename": "doc/source/drivers/gerrit.rst",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-20T23:11:43Z",
       "side": 1,
       "message": "You could actually make these \".. value::\" entries, then the changes below could be direct links.  But I can also see the argument that a more informal concise list is better since we\u0027re not actually documenting the values (and I don\u0027t think we should!  I like deferring to Gerrit.)  So I\u0027m ambivalent about that.",
+      "revId": "ae073e712b09f5037a6f69364cdfef448f340da1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "407101d9_e30c9226",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-03-20T23:24:55Z",
+      "side": 1,
+      "message": "I tried that, and upon looking at it I think it makes it look a bit too much like these are \"zuul\" options rather than, as you say, upstream strings.",
+      "parentUuid": "6e0b53cb_685a7050",
       "revId": "ae073e712b09f5037a6f69364cdfef448f340da1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
