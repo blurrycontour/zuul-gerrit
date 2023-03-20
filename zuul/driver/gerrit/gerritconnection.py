@@ -160,7 +160,9 @@ class GerritEventConnector(threading.Thread):
     """Move events from Gerrit to the scheduler."""
 
     IGNORED_EVENTS = (
-        'cache-eviction',  # evict-cache plugin
+        # evict-cache plugin
+        'cache-eviction',
+        # replication plugin
         'fetch-ref-replicated',
         'fetch-ref-replication-scheduled',
         'ref-replicated',
@@ -305,19 +307,19 @@ class GerritEventConnector(threading.Thread):
         # account attribute. See Gerrit stream-event documentation
         # in cmd-stream-events.html
         accountfield_from_type = {
-            'patchset-created': 'uploader',
-            'draft-published': 'uploader',  # Gerrit 2.5/2.6
             'change-abandoned': 'abandoner',
-            'change-restored': 'restorer',
             'change-merged': 'submitter',
-            'merge-failed': 'submitter',  # Gerrit 2.5/2.6
+            'change-restored': 'restorer',
             'comment-added': 'author',
+            'draft-published': 'uploader',  # Gerrit 2.5/2.6
+            'merge-failed': 'submitter',  # Gerrit 2.5/2.6; removed 2.13
+            'patchset-created': 'uploader',
+            'pending-check': None,  # Gerrit 3.0+
+            'project-created': None,  # Gerrit 2.14
             'ref-updated': 'submitter',
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
             'topic-changed': 'changer',
             'vote-deleted': 'deleter',
-            'project-created': None,  # Gerrit 2.14
-            'pending-check': None,  # Gerrit 3.0+
         }
         event.account = None
         if event.type in accountfield_from_type:

@@ -76,17 +76,21 @@ def getSchema():
                          }, extra=v.ALLOW_EXTRA)
 
     gerrit_trigger = {
+        # If you modify this list, make sure to update the docs as we
+        # explicitly list the available events.
         v.Required('event'):
-            scalar_or_list(v.Any('patchset-created',
-                                 'draft-published',
-                                 'change-abandoned',
-                                 'change-restored',
-                                 'change-merged',
-                                 'comment-added',
-                                 'ref-updated',
-                                 'pending-check',
-                                 'vote-deleted',
-                                 'wip-state-changed')),
+            scalar_or_list(v.Any(
+                'change-abandoned',
+                'change-merged',
+                'change-restored',
+                'comment-added',
+                'draft-published',
+                'patchset-created',
+                'pending-check',
+                'ref-updated',
+                'vote-deleted',
+                'wip-state-changed'
+            )),
         'uuid': str,
         'scheme': str,
         'comment_filter': scalar_or_list(str),
