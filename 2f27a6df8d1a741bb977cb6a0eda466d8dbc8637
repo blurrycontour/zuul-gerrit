@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "102a8981_50000d47",
+        "filename": "zuul/driver/gerrit/gerrittrigger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-20T23:12:49Z",
+      "side": 1,
+      "message": "This is probably a good place to add a comment reminding folks to update docs.",
+      "revId": "2f27a6df8d1a741bb977cb6a0eda466d8dbc8637",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
