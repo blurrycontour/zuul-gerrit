@@ -160,12 +160,21 @@ class GerritEventConnector(threading.Thread):
     """Move events from Gerrit to the scheduler."""
 
     IGNORED_EVENTS = (
-        'cache-eviction',  # evict-cache plugin
+        # evict-cache plugin
+        'cache-eviction',
+        # replication plugin
         'fetch-ref-replicated',
         'fetch-ref-replication-scheduled',
         'ref-replicated',
         'ref-replication-scheduled',
-        'ref-replication-done'
+        'ref-replication-done',
+        # unimplemented built-ins
+        'hashtags-changed',
+        'merge-failed',
+        'project-head-updated',
+        'project-updated',
+        'reviewer-added',
+        'topic-changed',
     )
 
     log = logging.getLogger("zuul.GerritEventConnector")
@@ -305,19 +314,22 @@ class GerritEventConnector(threading.Thread):
         # account attribute. See Gerrit stream-event documentation
         # in cmd-stream-events.html
         accountfield_from_type = {
-            'patchset-created': 'uploader',
-            'draft-published': 'uploader',  # Gerrit 2.5/2.6
             'change-abandoned': 'abandoner',
-            'change-restored': 'restorer',
             'change-merged': 'submitter',
-            'merge-failed': 'submitter',  # Gerrit 2.5/2.6
+            'change-restored': 'restorer',
             'comment-added': 'author',
+            'draft-published': 'uploader',  # Gerrit 2.5/2.6
+            'patchset-created': 'uploader',
+            'pending-check': None,  # Gerrit 3.0+ (checks plugin)
             'ref-updated': 'submitter',
+            'vote-deleted': 'deleter',
+            # unimplemented
+            'hashtags-changed': 'editor'
+            'merge-failed': 'submitter',  # Gerrit 2.5/2.6; removed 2.13
+            'project-created': None,  # Gerrit 2.14
+            'project-head-updated': None,  # Gerrit 3.7+
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
             'topic-changed': 'changer',
-            'vote-deleted': 'deleter',
-            'project-created': None,  # Gerrit 2.14
-            'pending-check': None,  # Gerrit 3.0+
         }
         event.account = None
         if event.type in accountfield_from_type:
@@ -1236,7 +1248,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         #               do not contain full project information, we skip them
         #               here to keep logs clean.
         if data.get('type') in GerritEventConnector.IGNORED_EVENTS:
-            return
+            change = (" for change " +
+                      data['change']['id'] if 'change' in data else '')
+            self.log.debug('Ignored event %s%s', data.get('type'), change)
 
         event_uuid = uuid4().hex
         attributes = {
