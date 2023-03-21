@@ -34,6 +34,24 @@
       "parentUuid": "102a8981_50000d47",
       "revId": "2f27a6df8d1a741bb977cb6a0eda466d8dbc8637",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c2ec81f_82e7ad24",
+        "filename": "zuul/driver/gerrit/gerrittrigger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-03-21T20:59:01Z",
+      "side": 1,
+      "message": "sorry that comment got included in the prior change when i split things up \n\nhttps://review.opendev.org/c/zuul/zuul/+/878041/1/zuul/driver/gerrit/gerrittrigger.py",
+      "parentUuid": "e9f3cb4e_eb1d14b0",
+      "revId": "2f27a6df8d1a741bb977cb6a0eda466d8dbc8637",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
