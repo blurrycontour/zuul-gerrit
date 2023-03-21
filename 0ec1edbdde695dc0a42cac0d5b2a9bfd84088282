@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c9e7662_b20f767c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-03-21T04:18:48Z",
+      "side": 1,
+      "message": "I think this looks great!\n\nTwo things I noticed\n\nFirst is on the build page, expanded boxes have a grey that just doesn\u0027t look right : https://imgur.com/a/sXLNsPV\n\nAnd minor, but on the status page, the search box is a very bright white now, i wonder if that could be greyed down a bit? : https://imgur.com/a/svng7Y2\n(it is similar on the job search page too)\n\n",
+      "revId": "0ec1edbdde695dc0a42cac0d5b2a9bfd84088282",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
