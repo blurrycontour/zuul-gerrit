@@ -16,6 +16,24 @@
       "message": "This is probably a good place to add a comment reminding folks to update docs.",
       "revId": "2f27a6df8d1a741bb977cb6a0eda466d8dbc8637",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9f3cb4e_eb1d14b0",
+        "filename": "zuul/driver/gerrit/gerrittrigger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-21T20:57:31Z",
+      "side": 1,
+      "message": "Was this still something we wanted to do? Seems like the current iteration of this change doesn\u0027t touch this file anymore but it isn\u0027t clear to me if a comment is still useful.",
+      "parentUuid": "102a8981_50000d47",
+      "revId": "2f27a6df8d1a741bb977cb6a0eda466d8dbc8637",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
