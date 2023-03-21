@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "14439a6ef5c63af8bdefa470ac0289b8c47a6bfd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "464a4586_429b78a9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1253,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-21T03:25:03Z",
+      "side": 1,
+      "message": "I don\u0027t think we should add the debug message.  I think the rest of this change and its parent firms up the idea that we only support the events we support.  I don\u0027t think we need to tell people that we\u0027re ignoring events that they couldn\u0027t do anything with anyway.",
+      "revId": "14439a6ef5c63af8bdefa470ac0289b8c47a6bfd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
