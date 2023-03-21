@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f875d90c_814439b4",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-03-21T07:26:03Z",
+      "side": 1,
+      "message": "Other attributes use true/false to describe their default values, better be consistent with upper/lower case?",
+      "range": {
+        "startLine": 277,
+        "startChar": 15,
+        "endLine": 277,
+        "endChar": 19
+      },
+      "revId": "3bdd7775c8cacadb708f657e5b7703bdaf550420",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a3a9145_62206863",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-03-21T07:26:03Z",
+      "side": 1,
+      "message": "Also add a back-reference in the job.branches doc? Currently it only mentions the pragma, which may be confusing. Adding a reference in the pragma doc also might be helpful.",
+      "revId": "3bdd7775c8cacadb708f657e5b7703bdaf550420",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61802642_f14e8fec",
+        "filename": "doc/source/tenants.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-03-21T07:26:03Z",
+      "side": 1,
+      "message": "branches",
+      "range": {
+        "startLine": 286,
+        "startChar": 32,
+        "endLine": 286,
+        "endChar": 39
+      },
+      "revId": "3bdd7775c8cacadb708f657e5b7703bdaf550420",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63dc9141_db84fe72",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1642,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-03-21T07:26:03Z",
+      "side": 1,
+      "message": "?",
+      "range": {
+        "startLine": 1642,
+        "startChar": 17,
+        "endLine": 1642,
+        "endChar": 20
+      },
+      "revId": "3bdd7775c8cacadb708f657e5b7703bdaf550420",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
