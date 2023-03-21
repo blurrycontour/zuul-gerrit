@@ -88,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b78ab398_7532f125",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-03-21T10:14:54Z",
+      "side": 1,
+      "message": "\u003e Ugh, I never liked the JS syntax imposed for this, I would maybe argue explicit is cleaner, but yeah I agree that there must be a better way to make that cleaner.\n\nI can totally understand this, but you will get used to it ;-)\n\nI just wanted to continue reviewing this stack but now it looks like all changes are squashed into this one. Was that on purpose? Honestly I find it much easier to review a change like this if it is split up into multiple consecutive changes. There were also a few changes (e.g. https://review.opendev.org/c/zuul/zuul/+/877588/4 and https://review.opendev.org/c/zuul/zuul/+/877589/4). Those changes weren\u0027t depending on any darkmode settings, but mainly updating the respective pages to use PF4 elements (which is very good and also enables those for the darkmode), but we could keep those changes separated from the \"dark-mode stack\" if we want.",
+      "parentUuid": "48051739_35aa9e7e",
+      "revId": "3c327f57fc72f9a87af57b82a74863295239ba0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "caaaa673_2147e5ef",
