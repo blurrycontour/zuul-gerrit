@@ -67,6 +67,23 @@
       "message": "recheck",
       "revId": "408c06678618acff54d73eb5c32f99e1db21f892",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d2bdb5b_e15ebcd3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3638,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-22T19:45:11Z",
+      "side": 1,
+      "message": "This should still be subject to the job retry limit, so if it\u0027s not actually transient it should eventually bubble up.",
+      "revId": "408c06678618acff54d73eb5c32f99e1db21f892",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
