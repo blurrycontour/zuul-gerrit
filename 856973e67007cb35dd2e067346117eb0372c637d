@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "086b494d_3e772f90",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-22T20:07:10Z",
+      "side": 1,
+      "message": "Instead of this change as written, we might want to call clearConnectionCacheOnBranchEvent here and below, since that\u0027s what that method is for.  It will do the same thing, setting the ltime on the event, with some extra work that isn\u0027t important, and will also set the branch_updated attribute on the event.  That part might be technically wrong, and an argument to keep this change as written.  Though I don\u0027t believe setting branch_updated would cause a significant behavior change.",
+      "revId": "856973e67007cb35dd2e067346117eb0372c637d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54cf2106_0477fd35",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 681,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-22T20:07:10Z",
+      "side": 1,
+      "message": "Would also add it here.",
+      "revId": "856973e67007cb35dd2e067346117eb0372c637d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
