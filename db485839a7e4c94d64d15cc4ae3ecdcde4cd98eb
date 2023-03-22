@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f069ec2_7aee3717",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-22T20:13:33Z",
+      "side": 1,
+      "message": "Nit: this should probably be \"installation id\" in the log message since we\u0027re not specifically trying to convey the value of the variable, but actually just state what the installation id is.",
+      "revId": "db485839a7e4c94d64d15cc4ae3ecdcde4cd98eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
