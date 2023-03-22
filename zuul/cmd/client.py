@@ -116,6 +116,16 @@ class ZuulRESTClient(object):
         self._check_status(req)
         return req.json()
 
+    def autohold_delete(self, tenant, id):
+        if not self.auth_token:
+            raise Exception('Auth Token required')
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/autohold/%s' % (tenant, id))
+        req = self.session.delete(url)
+        self._check_status(req)
+        return True
+
     def enqueue(self, tenant, pipeline, project, trigger, change):
         if not self.auth_token:
             raise Exception('Auth Token required')
@@ -241,6 +251,8 @@ class Client(zuul.cmd.ZuulApp):
             'autohold-delete', help='[DEPRECATED - use zuul-client] '
                                     'delete autohold request')
         cmd_autohold_delete.set_defaults(func=self.autohold_delete)
+        cmd_autohold_delete.add_argument('--tenant', metavar='TENANT',
+                                         help='the tenant')
         cmd_autohold_delete.add_argument('id', metavar='REQUEST_ID',
                                          help='the hold request ID')
 
