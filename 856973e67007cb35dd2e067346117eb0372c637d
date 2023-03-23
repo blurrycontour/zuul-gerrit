@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25320930_c4a3a998",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-03-23T08:16:27Z",
+      "side": 1,
+      "message": "Ok, yes I think that makes sense. The `branch_updated\u003dTrue` flag shouldn\u0027t be a problem.",
+      "parentUuid": "086b494d_3e772f90",
+      "revId": "856973e67007cb35dd2e067346117eb0372c637d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54cf2106_0477fd35",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-22T20:07:10Z",
       "side": 1,
       "message": "Would also add it here.",
+      "revId": "856973e67007cb35dd2e067346117eb0372c637d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f43e78e6_c67bc228",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 681,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-03-23T08:16:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54cf2106_0477fd35",
       "revId": "856973e67007cb35dd2e067346117eb0372c637d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
