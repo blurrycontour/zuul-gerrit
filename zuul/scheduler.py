@@ -939,22 +939,20 @@ class Scheduler(threading.Thread):
             self.log.exception("Exception reporting runtime stats")
 
     def reconfigureTenant(self, tenant, project, trigger_event):
-        if trigger_event:
-            trigger_event_ltime = trigger_event.zuul_event_ltime
-        else:
-            trigger_event_ltime = None
-        self.log.debug("Submitting tenant reconfiguration event for "
-                       "%s due to event %s in project %s, ltime %s",
-                       tenant.name, trigger_event, project,
-                       trigger_event_ltime)
+        log = get_annotated_logger(self.log, trigger_event)
+        log.debug("Submitting tenant reconfiguration event for "
+                  "%s due to event %s in project %s, ltime %s",
+                  tenant.name, trigger_event, project,
+                  trigger_event.zuul_event_ltime)
         branch = trigger_event and trigger_event.branch
         event = TenantReconfigureEvent(
             tenant.name, project.canonical_name, branch,
         )
+        event.zuul_event_id = trigger_event.zuul_event_id
         if trigger_event:
             event.branch_cache_ltimes[trigger_event.connection_name] = (
                 trigger_event.branch_cache_ltime)
-            event.trigger_event_ltime = trigger_event_ltime
+            event.trigger_event_ltime = trigger_event.zuul_event_ltime
         self.management_events[tenant.name].put(event, needs_result=False)
 
     def fullReconfigureCommandHandler(self):
@@ -1092,17 +1090,20 @@ class Scheduler(threading.Thread):
         self.component_info.state = self.component_info.RUNNING
 
     def reconfigure(self, config, smart=False, tenants=None):
-        self.log.debug("Submitting reconfiguration event")
+        zuul_event_id = uuid.uuid4().hex
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("Submitting reconfiguration event")
 
         event = ReconfigureEvent(smart=smart, tenants=tenants)
+        event.zuul_event_id = zuul_event_id
         event.zuul_event_ltime = self.zk_client.getCurrentLtime()
         event.ack_ref = threading.Event()
         self.reconfigure_event_queue.put(event)
         self.wake_event.set()
 
-        self.log.debug("Waiting for reconfiguration")
+        log.debug("Waiting for reconfiguration")
         event.ack_ref.wait()
-        self.log.debug("Reconfiguration complete")
+        log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
@@ -1192,10 +1193,12 @@ class Scheduler(threading.Thread):
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
+        event.zuul_event_id = uuid.uuid4().hex
         result = self.management_events[tenant_name].put(event)
-        self.log.debug("Waiting for promotion")
+        log = get_annotated_logger(self.log, event.zuul_event_id)
+        log.debug("Waiting for promotion")
         result.wait()
-        self.log.debug("Promotion complete")
+        log.debug("Promotion complete")
 
     def dequeue(self, tenant_name, pipeline_name, project_name, change, ref):
         # We need to do some pre-processing here to get the correct
@@ -1211,10 +1214,12 @@ class Scheduler(threading.Thread):
         event = DequeueEvent(tenant_name, pipeline_name,
                              project.canonical_hostname, project.name,
                              change, ref)
+        event.zuul_event_id = uuid.uuid4().hex
+        log = get_annotated_logger(self.log, event.zuul_event_id)
         result = self.management_events[tenant_name].put(event)
-        self.log.debug("Waiting for dequeue")
+        log.debug("Waiting for dequeue")
         result.wait()
-        self.log.debug("Dequeue complete")
+        log.debug("Dequeue complete")
 
     def enqueue(self, tenant_name, pipeline_name, project_name,
                 change, ref, oldrev, newrev):
@@ -1231,10 +1236,12 @@ class Scheduler(threading.Thread):
         event = EnqueueEvent(tenant_name, pipeline_name,
                              project.canonical_hostname, project.name,
                              change, ref, oldrev, newrev)
+        event.zuul_event_id = uuid.uuid4().hex
+        log = get_annotated_logger(self.log, event.zuul_event_id)
         result = self.management_events[tenant_name].put(event)
-        self.log.debug("Waiting for enqueue")
+        log.debug("Waiting for enqueue")
         result.wait()
-        self.log.debug("Enqueue complete")
+        log.debug("Enqueue complete")
 
     def _get_key_store_password(self):
         try:
@@ -1545,15 +1552,15 @@ class Scheduler(threading.Thread):
             self.log.info("Reconfigured tenants: %s", reconfigured_tenants)
 
     def _doTenantReconfigureEvent(self, event):
+        log = get_annotated_logger(self.log, event.zuul_event_id)
         # This is called in the scheduler loop after another thread submits
         # a request
         if self.unparsed_abide.ltime < self.system_config_cache.ltime:
             self.updateSystemConfig()
 
         with self.layout_lock:
-            self.log.info("Tenant reconfiguration beginning for %s due to "
-                          "projects %s",
-                          event.tenant_name, event.project_branches)
+            log.info("Tenant reconfiguration beginning for %s due to "
+                     "projects %s", event.tenant_name, event.project_branches)
             start = time.monotonic()
             # Consider all caches valid (min. ltime -1) except for the
             # changed project-branches.
@@ -1585,7 +1592,7 @@ class Scheduler(threading.Thread):
                     self.zk_client, event.tenant_name,
                     identifier=RECONFIG_LOCK_ID) as lock,\
                     self.statsd_timer(f'{stats_key}.reconfiguration_time'):
-                self.log.debug("Loading tenant %s", event.tenant_name)
+                log.debug("Loading tenant %s", event.tenant_name)
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1596,8 +1603,8 @@ class Scheduler(threading.Thread):
                                             event.trigger_event_ltime,
                                             tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
-        self.log.info("Tenant reconfiguration complete for %s (duration: %s "
-                      "seconds)", event.tenant_name, duration)
+        log.info("Tenant reconfiguration complete for %s (duration: %s "
+                 "seconds)", event.tenant_name, duration)
 
     def _reenqueueGetProject(self, tenant, item):
         project = item.change.project
