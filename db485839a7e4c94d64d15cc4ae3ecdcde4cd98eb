@@ -16,6 +16,24 @@
       "message": "Nit: this should probably be \"installation id\" in the log message since we\u0027re not specifically trying to convey the value of the variable, but actually just state what the installation id is.",
       "revId": "db485839a7e4c94d64d15cc4ae3ecdcde4cd98eb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "728c7809_bf64fdd6",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-03-23T07:41:13Z",
+      "side": 1,
+      "message": "Updated",
+      "parentUuid": "8f069ec2_7aee3717",
+      "revId": "db485839a7e4c94d64d15cc4ae3ecdcde4cd98eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
