@@ -94,13 +94,18 @@ COMMANDS = [
 ]
 
 
-def get_request_logger(logger=None):
-    if logger is None:
-        logger = logging.getLogger("zuul.web")
+def get_zuul_request_id():
     request = cherrypy.serving.request
     if not hasattr(request, 'zuul_request_id'):
         request.zuul_request_id = uuid.uuid4().hex
-    return get_annotated_logger(logger, None, request=request.zuul_request_id)
+    return request.zuul_request_id
+
+
+def get_request_logger(logger=None):
+    if logger is None:
+        logger = logging.getLogger("zuul.web")
+    zuul_request_id = get_zuul_request_id()
+    return get_annotated_logger(logger, None, request=zuul_request_id)
 
 
 class APIError(cherrypy.HTTPError):
@@ -538,6 +543,7 @@ class ZuulWebAPI(object):
             event = DequeueEvent(
                 tenant_name, pipeline_name, project.canonical_hostname,
                 project.name, body.get('change', None), body.get('ref', None))
+            event.zuul_event_id = get_zuul_request_id()
             self.zuulweb.pipeline_management_events[tenant_name][
                 pipeline_name].put(event)
         else:
@@ -581,6 +587,7 @@ class ZuulWebAPI(object):
         event = EnqueueEvent(tenant.name, pipeline.name,
                              project.canonical_hostname, project.name,
                              change, ref=None, oldrev=None, newrev=None)
+        event.zuul_event_id = get_zuul_request_id()
         self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
 
@@ -591,6 +598,7 @@ class ZuulWebAPI(object):
                              project.canonical_hostname, project.name,
                              change=None, ref=ref, oldrev=oldrev,
                              newrev=newrev)
+        event.zuul_event_id = get_zuul_request_id()
         self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
 
@@ -620,6 +628,7 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400, 'Unknown pipeline')
 
         event = PromoteEvent(tenant_name, pipeline_name, changes)
+        event.zuul_event_id = get_zuul_request_id()
         self.zuulweb.pipeline_management_events[tenant_name][
             pipeline_name].put(event)
 
