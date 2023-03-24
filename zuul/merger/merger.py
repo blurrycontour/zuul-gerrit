@@ -722,9 +722,11 @@ class Repo(object):
         ret = {}
         repo = self.createRepoObject(zuul_event_id)
         if branch:
-            tree = repo.heads[branch].commit.tree
+            head = repo.heads[branch].commit
         else:
-            tree = repo.commit(commit).tree
+            head = repo.commit(commit)
+        log.debug("Getting files for %s at %s", self.local_path, head.hexsha)
+        tree = head.tree
         for fn in files:
             if fn in tree:
                 if tree[fn].type != 'blob':
