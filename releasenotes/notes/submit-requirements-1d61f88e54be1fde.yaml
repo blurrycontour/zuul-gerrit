@@ -1,0 +1,11 @@
+---
+fixes:
+  - |
+    Zuul will now attempt to honor Gerrit "submit requirements" when
+    determining whether to enqueue a change into a dependent (i.e.,
+    "gate") pipeline.  Zuul previously honored only Gerrit's older
+    "submit records" feature.  The new checks will avoid enqueing
+    changes in "gate" pipelines in the cases where Zuul can
+    unambiguously determine that there is no possibility of merging,
+    but some non-mergable changes may still be enqueued if Zuul can
+    not be certain whether a rule should apply or be disregarded.

@@ -34,6 +34,7 @@ class GerritChange(Change):
         self.wip = None
         self.approvals = []
         self.missing_labels = set()
+        self.submit_requirements = []
         self.commit = None
         self.zuul_query_ltime = None
 
@@ -189,6 +190,7 @@ class GerritChange(Change):
             if 'approved' in label_data:
                 continue
             self.missing_labels.add(label_name)
+        self.submit_requirements = data.get('submit_requirements', [])
         self.open = data['status'] == 'NEW'
         self.status = data['status']
         self.wip = data.get('work_in_progress', False)

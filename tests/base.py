@@ -403,6 +403,7 @@ class FakeGerritChange(object):
         self.comments = []
         self.checks = {}
         self.checks_history = []
+        self.submit_requirements = []
         self.data = {
             'branch': branch,
             'comments': self.comments,
@@ -788,6 +789,12 @@ class FakeGerritChange(object):
         return [{'status': 'NOT_READY',
                  'labels': labels}]
 
+    def getSubmitRequirements(self):
+        return self.submit_requirements
+
+    def setSubmitRequirements(self, reqs):
+        self.submit_requirements = reqs
+
     def setDependsOn(self, other, patchset):
         self.depends_on_change = other
         self.depends_on_patchset = patchset
@@ -894,6 +901,7 @@ class FakeGerritChange(object):
             data['parents'] = self.data['parents']
         if 'topic' in self.data:
             data['topic'] = self.data['topic']
+        data['submit_requirements'] = self.getSubmitRequirements()
         return json.loads(json.dumps(data))
 
     def queryRevisionHTTP(self, revision):
