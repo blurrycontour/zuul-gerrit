@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ead7b4a0_ccb78899",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-03-28T08:18:06Z",
+      "side": 1,
+      "message": "I haven\u0027t checked out the source code changes yet, but was focusing on the UI preview. So far this looks very impressive :)\n\nA few things that caught my eye:\n- Task summary background for failed builds: I think we should drop the red background from the Task Summary tab on the Build result page (only visible for failed builds). With a light theme this looks good, but in the dark theme it\u0027s a hard transition from the dark background to the red one. Maybe it\u0027s just enough to drop the red background for the dark theme. The red X in front of the task name should be enough to show that this is a failure.\n- Tenant selector in top navigation bar: I would drop the gray background here and keep it black (like the timezone selector). It’s already black in the light theme, so I don’t see a need to change this to gray for the dark theme.\n- Builds/Buildsets pages: When hovering over items in the filter dropdown (e.g. clicking on Project and selecting a different filter), the text is dark blue which doesn’t really stick out of the dark background. The same applies to other links as well, but in most cases I think that is OK (e.g. hovering over a change URL in the builds list).\n- Buildset result page: The message text box on the top right of the buildset result page has a white background.\n- Config errors: The text boxes for the config errors still use a white background. Those can be seen when clicking on the bell icon in the top right navigation bar in a tenant with config errors.\n- The text on the status page is more gray-ish than on other pages. It looks like PF4 is using (224, 224, 224) as font color on most pages.  The status page on the other hand uses (204, 204, 204) as font color. Not sure if this is hardcoded somewhere or the result of a combination of different styles.\n- Background color of various input and search fields: Those fields currently have a gray background that is lighter than the page background. I think it looks better if we give those fields a background that is darker than the page background, e.g. “black”. I tried that out with the filter toolbar on the builds/buildsets pages and the search fields on the job and status pages. Using a darker background for those input fields also increases the contrast between the background and the text and I find that this improves the readability.\n\nI have the feeling that we might want to tweak the colors we use for states, results and links in various places a little for the dark theme, but that could be done in a later step. E.g. make the green a little lighter to better stand out of the dark background. The blue buttons often feel “a little out of place” because of the color. I’m not sure how to describe that properly, it just feels like those buttons don’t really blend in the dark theme).",
+      "revId": "d03e2211229498e74fcab2f5fa1bcd4672990f14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
