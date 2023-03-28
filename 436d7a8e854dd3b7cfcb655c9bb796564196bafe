@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f00184e4_ae7e2e40",
+        "filename": "releasenotes/notes/submit-requirements-1d61f88e54be1fde.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-28T23:16:33Z",
+      "side": 1,
+      "message": "All good and correct points.",
+      "parentUuid": "e2e08194_e8fd048d",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "013dd1b2_32173f50",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-03-28T22:23:25Z",
       "side": 1,
       "message": "I suspect this came out of a gerrit api request, but wouldn\u0027t -label:Code-Review\u003dMIN be a passing atom since we only have a +2?",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0626481_081ed807",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-28T23:16:33Z",
+      "side": 1,
+      "message": "It did come out of an API request.  Note that the atom lacks the negation (\"-\"), so the atom itself is failing but that part of the expression is passing.  That\u0027s part of why we just check the expression (and we don\u0027t try to do something more accurate like check only the failing atoms.  This doesn\u0027t seem that useful really...",
+      "parentUuid": "013dd1b2_32173f50",
       "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -82,6 +118,24 @@
       "writtenOn": "2023-03-28T22:23:25Z",
       "side": 1,
       "message": "All versions of Gerrit that support Submit Requirements also do case sensitive label names so we don\u0027t need to normalize case here? I think that is the case.",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1244f19b_6cb73ae6",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-28T23:16:33Z",
+      "side": 1,
+      "message": "Yeah, submit reqs are very recent, 3.5.0.  Case sensitive labels are a 2.x thing I think?",
+      "parentUuid": "0efaa0ed_f5272786",
       "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
