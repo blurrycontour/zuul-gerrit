@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2e08194_e8fd048d",
+        "filename": "releasenotes/notes/submit-requirements-1d61f88e54be1fde.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-28T22:23:25Z",
+      "side": 1,
+      "message": "Should we add a note indicating that even if enqueued the change cannot merge if Gerrit\u0027s requirements are not met?\n\nAlso it looks like the SSH change query API may not supply this info? Should we make note of that here?",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "013dd1b2_32173f50",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-28T22:23:25Z",
+      "side": 1,
+      "message": "I suspect this came out of a gerrit api request, but wouldn\u0027t -label:Code-Review\u003dMIN be a passing atom since we only have a +2?",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "379fffea_87fc19d0",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1185,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-28T22:23:25Z",
+      "side": 1,
+      "message": "To clarify for other reviewers allow_needs would include things like Verified which are expected to be unsatisfied at this point because zuul will satisfy them if testing goes well. We allow the missing labels to includ ethings like Verified as a result.",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0efaa0ed_f5272786",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1205,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-28T22:23:25Z",
+      "side": 1,
+      "message": "All versions of Gerrit that support Submit Requirements also do case sensitive label names so we don\u0027t need to normalize case here? I think that is the case.",
+      "revId": "436d7a8e854dd3b7cfcb655c9bb796564196bafe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
