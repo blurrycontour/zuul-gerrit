@@ -34,6 +34,24 @@
       "parentUuid": "ead7b4a0_ccb78899",
       "revId": "d03e2211229498e74fcab2f5fa1bcd4672990f14",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f76c7dd_8604488f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-03-29T12:46:20Z",
+      "side": 1,
+      "message": "Some feedback on above points:\n\n* I agree, the dark red is more distracting than helping with the dark theme. I will revert that to the default background color instead.\n\n* This looks like a hard one, I haven\u0027t looked at it but kept the dropdown for timezone the default color because it was kind of messy to change. Perhaps we can look at that in a follow-up? Also the timezone is white background for the dropdown and not greyish so not sure (haven\u0027t tested) what the tenant dropdown color is.\n\n* This seems more like something that would require changes to the entire dark theme, perhaps we can do that in a follow-up for the default link color?\n\n* Nice catch, that is fixed now so it\u0027s a black background like other pages, in next PS.\n\n* Config errors is fixed in next PS!\n\n* Looks like a remnant from my first changes, I changed the page section variant to dark and removed the CSS fix for the status page, in next PS.\n\n* This seems more like a patternfly dark theme related thing, perhaps in a follow-up or if that would need to be handled with the patternfly team?\n\nHopefully this next PS will be more satisfactory to your feedback.\n\nIf something is really off we could always make the default theme Light instead of Auto so that people needs to explicitly select Auto/Dark to get the dark theme, even though I guess having auto by default would be more cool 😊",
+      "parentUuid": "b19d0c32_d1b9d2e2",
+      "revId": "d03e2211229498e74fcab2f5fa1bcd4672990f14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
