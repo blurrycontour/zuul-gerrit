@@ -9241,3 +9241,44 @@ class TestDynamicBranchesProject(IncludeBranchesTestCase):
             dict(name='project-test', result='SUCCESS', changes='2,1'),
         ]
         self._test_include_branches(history1, history2, history3, history4)
+
+    def test_new_dynamic_branch(self):
+        # Create an included branch so that we ensure we're using the
+        # "more than one branch" code path (ie, not "master" only).
+        # We otherwise don't use this.
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+
+        # Create a new dynamic-only branch.  Since it's dynamic only,
+        # it won't trigger a reconfiguration.
+        self.create_branch('org/project', 'feature/foo')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'feature/foo'))
+        self.waitUntilSettled()
+
+        # Test that we load configuration from the dynamic branch even
+        # though the tenant layout doesn't know about it yet (since
+        # there hasn't been a reconfiguration since it was created).
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: project-dynamic
+
+            - project:
+                check:
+                  jobs:
+                    - project-dynamic
+            """)
+        file_dict = {'zuul.yaml': conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'feature/foo', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='central-test', result='SUCCESS', changes='1,1'),
+            dict(name='project-dynamic', result='SUCCESS', changes='1,1'),
+        ], ordered=False)

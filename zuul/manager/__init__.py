@@ -1114,6 +1114,7 @@ class PipelineManager(metaclass=ABCMeta):
         trusted_errors = False
         untrusted_layout = None
         untrusted_errors = False
+        additional_project_branches = self._getProjectBranches(item)
         try:
             # First parse the config as it will land with the
             # full set of config and project repos.  This lets us
@@ -1124,6 +1125,7 @@ class PipelineManager(metaclass=ABCMeta):
                 trusted_layout = loader.createDynamicLayout(
                     item,
                     build_set.files,
+                    additional_project_branches,
                     self.sched.ansible_manager,
                     include_config_projects=True,
                     zuul_event_id=None)
@@ -1138,6 +1140,7 @@ class PipelineManager(metaclass=ABCMeta):
                 untrusted_layout = loader.createDynamicLayout(
                     item,
                     build_set.files,
+                    additional_project_branches,
                     self.sched.ansible_manager,
                     include_config_projects=False,
                     zuul_event_id=None)
@@ -1226,6 +1229,17 @@ class PipelineManager(metaclass=ABCMeta):
             log.exception("Error in dynamic layout")
             item.setConfigError("Unknown configuration error")
             return None
+
+    def _getProjectBranches(self, item):
+        # Get the branches of the item and all items ahead
+        project_branches = {}
+        while item:
+            if hasattr(item.change, 'branch'):
+                this_project_branches = project_branches.setdefault(
+                    item.change.project.canonical_name, set())
+                this_project_branches.add(item.change.branch)
+            item = item.item_ahead
+        return project_branches
 
     def getFallbackLayout(self, item):
         parent_item = item.item_ahead
