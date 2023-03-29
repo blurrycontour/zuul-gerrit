@@ -923,7 +923,7 @@ key that will be used by Zuul when running jobs.  Because of the
 potential for an unrelated job to add an arbitrary host to the Ansible
 inventory which might accept this key (e.g., a node for another job,
 or a static host), the use of the `add-build-sshkey
-<https://zuul-ci.org/docs/zuul-jobs/roles.html#role-add-build-sshkey>`
+<https://zuul-ci.org/docs/zuul-jobs/general-roles.html#role-add-build-sshkey>`_
 role is recommended.
 
 Project Key
