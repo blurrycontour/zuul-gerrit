@@ -2762,6 +2762,21 @@ class AnsibleJob(object):
 
         context = wrapper.getExecutionContext(ro_paths, rw_paths, secrets)
 
+        # Sanitize calling env path to remove entries that won't
+        # be mounted into the execution context. This prevents
+        # Ansible from finding python executables that are not available.
+        new_path = []
+        provisional_path = env_copy['PATH'].split(':')
+        mounted_paths = context.getMountPaths(
+            work_dir=self.jobdir.work_root,
+            ssh_auth_sock=env_copy.get('SSH_AUTH_SOCK'))
+        for path in provisional_path:
+            for path_prefix in mounted_paths:
+                if path.startswith(path_prefix):
+                    new_path.append(path)
+                    break
+        env_copy['PATH'] = ':'.join(new_path)
+
         popen = context.getPopen(
             work_dir=self.jobdir.work_root,
             ssh_auth_sock=env_copy.get('SSH_AUTH_SOCK'))

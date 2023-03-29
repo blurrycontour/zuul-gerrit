@@ -23,7 +23,6 @@ import psutil
 import pwd
 import shlex
 import threading
-import re
 import struct
 
 from typing import Dict, List  # noqa
@@ -62,10 +61,33 @@ class WrappedPopen(object):
 class BubblewrapExecutionContext(BaseExecutionContext):
     log = logging.getLogger("zuul.BubblewrapExecutionContext")
 
-    def __init__(self, bwrap_command, ro_paths, rw_paths, secrets):
-        self.bwrap_command = bwrap_command
-        self.mounts_map = {'ro': ro_paths, 'rw': rw_paths}
+    def __init__(self, ro_paths, rw_paths, secrets):
+        super().__init__()
+        self.mounts_map['ro'].extend(ro_paths)
+        self.mounts_map['rw'].extend(rw_paths)
         self.secrets = secrets
+        self.bwrap_command = [
+            'setpriv',
+            '--ambient-caps',
+            '-all',
+            'bwrap',
+            '--dir', '/tmp',
+            '--tmpfs', '/tmp',
+            '--dir', '/var',
+            '--dir', '/var/tmp',
+            '--dir', '/run/user/{uid}',
+            '--tmpfs', '{work_dir}/tmp',
+            '--proc', '/proc',
+            '--dev', '/dev',
+            '--chdir', '{work_dir}',
+            '--unshare-all',
+            '--share-net',
+            '--die-with-parent',
+            '--uid', '{uid}',
+            '--gid', '{gid}',
+            '--file', '{uid_fd}', '/etc/passwd',
+            '--file', '{gid_fd}', '/etc/group',
+        ]
 
     def startPipeWriter(self, pipe, data):
         # In case we have a large amount of data to write through a
@@ -88,7 +110,7 @@ class BubblewrapExecutionContext(BaseExecutionContext):
 
     def getPopen(self, **kwargs):
         self.setpag()
-        bwrap_command = list(self.bwrap_command)
+        bwrap_command = self.bwrap_command
         for mount_type in ('ro', 'rw'):
             bind_arg = '--ro-bind' if mount_type == 'ro' else '--bind'
             for bind in self.mounts_map[mount_type]:
@@ -152,66 +174,11 @@ class BubblewrapDriver(Driver, WrapperInterface):
     log = logging.getLogger("zuul.BubblewrapDriver")
     name = 'bubblewrap'
 
-    release_file_re = re.compile(r'^\W+-release$')
-
-    def __init__(self):
-        self.bwrap_command = self._bwrap_command()
-
     def reconfigure(self, tenant):
         pass
 
     def stop(self):
         pass
-
-    def _bwrap_command(self):
-        bwrap_command = [
-            'setpriv',
-            '--ambient-caps',
-            '-all',
-            'bwrap',
-            '--dir', '/tmp',
-            '--tmpfs', '/tmp',
-            '--dir', '/var',
-            '--dir', '/var/tmp',
-            '--dir', '/run/user/{uid}',
-            '--ro-bind', '/usr', '/usr',
-            '--ro-bind', '/lib', '/lib',
-            '--ro-bind', '/bin', '/bin',
-            '--ro-bind', '/sbin', '/sbin',
-            '--ro-bind', '/etc/ld.so.cache', '/etc/ld.so.cache',
-            '--ro-bind', '/etc/resolv.conf', '/etc/resolv.conf',
-            '--ro-bind', '/etc/hosts', '/etc/hosts',
-            '--ro-bind', '/etc/localtime', '/etc/localtime',
-            '--ro-bind', '{ssh_auth_sock}', '{ssh_auth_sock}',
-            '--bind', '{work_dir}', '{work_dir}',
-            '--tmpfs', '{work_dir}/tmp',
-            '--proc', '/proc',
-            '--dev', '/dev',
-            '--chdir', '{work_dir}',
-            '--unshare-all',
-            '--share-net',
-            '--die-with-parent',
-            '--uid', '{uid}',
-            '--gid', '{gid}',
-            '--file', '{uid_fd}', '/etc/passwd',
-            '--file', '{gid_fd}', '/etc/group',
-        ]
-
-        for path in ['/lib64',
-                     '/etc/nsswitch.conf',
-                     '/etc/lsb-release.d',
-                     '/etc/alternatives',
-                     '/etc/ssl/certs',
-                     '/etc/subuid',
-                     ]:
-            if os.path.exists(path):
-                bwrap_command.extend(['--ro-bind', path, path])
-        for fn in os.listdir('/etc'):
-            if self.release_file_re.match(fn):
-                path = os.path.join('/etc', fn)
-                bwrap_command.extend(['--ro-bind', path, path])
-
-        return bwrap_command
 
     def getExecutionContext(self, ro_paths=None, rw_paths=None, secrets=None):
         if not ro_paths:
@@ -221,7 +188,6 @@ class BubblewrapDriver(Driver, WrapperInterface):
         if not secrets:
             secrets = {}
         return BubblewrapExecutionContext(
-            self.bwrap_command,
             ro_paths, rw_paths,
             secrets)
 

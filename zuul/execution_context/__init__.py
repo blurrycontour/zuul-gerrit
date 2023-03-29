@@ -13,6 +13,9 @@
 # under the License.
 
 import abc
+import os
+import os.path
+import re
 
 
 class BaseExecutionContext(object, metaclass=abc.ABCMeta):
@@ -24,6 +27,38 @@ class BaseExecutionContext(object, metaclass=abc.ABCMeta):
     single command.
 
     """
+    release_file_re = re.compile(r'^\W+-release$')
+
+    def __init__(self):
+        self.mounts_map = {
+            'ro': [
+                '/usr',
+                '/lib',
+                '/bin',
+                '/sbin',
+                '/etc/ld.so.cache',
+                '/etc/resolv.conf',
+                '/etc/hosts',
+                '/etc/localtime',
+                '{ssh_auth_sock}',
+            ],
+            'rw': [
+                '{work_dir}',
+            ],
+        }
+        for path in ['/lib64',
+                     '/etc/nsswitch.conf',
+                     '/etc/lsb-release.d',
+                     '/etc/alternatives',
+                     '/etc/ssl/certs',
+                     '/etc/subuid',
+                     ]:
+            if os.path.exists(path):
+                self.mounts_map['ro'].append(path)
+        for fn in os.listdir('/etc'):
+            if self.release_file_re.match(fn):
+                path = os.path.join('/etc', fn)
+                self.mounts_map['ro'].append(path)
 
     @abc.abstractmethod
     def getPopen(self, **kwargs):
@@ -38,3 +73,8 @@ class BaseExecutionContext(object, metaclass=abc.ABCMeta):
         :rtype: Callable
         """
         pass
+
+    def getMountPaths(self, **kwargs):
+        paths = [x.format(**kwargs)
+                 for x in self.mounts_map['ro'] + self.mounts_map['rw']]
+        return paths
