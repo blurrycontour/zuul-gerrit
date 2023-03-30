@@ -33,6 +33,23 @@
       "message": "nit: expected",
       "revId": "c5ce607675aa036a444c38f645bce66e5bde24fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e2c3581_0debb6ea",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-03-30T00:07:44Z",
+      "side": 1,
+      "message": "These cascade settings will result in table updates right? Do we need a migration to update the tables in existing installations?",
+      "revId": "c5ce607675aa036a444c38f645bce66e5bde24fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
