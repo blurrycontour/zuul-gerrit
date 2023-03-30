@@ -1318,6 +1318,18 @@ class TestCentralJobs(ZuulTestCase):
         self._test_central_template_on_branch('stable', 'master')
 
 
+class TestEmptyConfigFile(ZuulTestCase):
+    tenant_config_file = 'config/empty-config-file/main.yaml'
+
+    def test_empty_config_file(self):
+        # Tests that a config file with only comments does not cause
+        # an error.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 0,
+            "No error should have been accumulated")
+
+
 class TestInRepoConfig(ZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
