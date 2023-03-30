@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5584cff_427ef133",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2023-03-30T08:19:22Z",
+      "side": 1,
+      "message": "First time contributor here, so please be patient. Unfortunately I do not have the ability to test my changes properly.",
+      "revId": "ad3ee0f45722b67fc01fb70662e775c8d4511437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

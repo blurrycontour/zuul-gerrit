@@ -51,6 +51,24 @@
       "parentUuid": "30b2ea9f_0703c03f",
       "revId": "ab2fe2e2783b5ea4e7faa69b1d02c9d1787cb2ba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48bf27cf_6af31a35",
+        "filename": "releasenotes/notes/github-add-workflow-dispatch-trigger-aa219fff4550e328.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 33271
+      },
+      "writtenOn": "2023-03-30T08:19:22Z",
+      "side": 1,
+      "message": "Hi BlaiseP, done, thanks!",
+      "parentUuid": "d8b27733_5efcf45c",
+      "revId": "ab2fe2e2783b5ea4e7faa69b1d02c9d1787cb2ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
