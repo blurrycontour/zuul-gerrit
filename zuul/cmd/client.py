@@ -540,6 +540,10 @@ class Client(zuul.cmd.ZuulApp):
         cmd_prune_database.add_argument(
             '--older-than',
             help='relative time (e.g., "24h" or "180d")')
+        cmd_prune_database.add_argument(
+            '--batch-size',
+            default=10000,
+            help='transaction batch size')
         cmd_prune_database.set_defaults(func=self.prune_database)
 
         return parser
@@ -1049,7 +1053,7 @@ class Client(zuul.cmd.ZuulApp):
         cutoff = parse_cutoff(now, args.before, args.older_than)
         self.configure_connections(source_only=False, require_sql=True)
         connection = self.connections.getSqlConnection()
-        connection.deleteBuildsets(cutoff)
+        connection.deleteBuildsets(cutoff, args.batch_size)
         sys.exit(0)
 
 
