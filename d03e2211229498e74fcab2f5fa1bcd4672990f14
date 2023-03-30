@@ -52,6 +52,24 @@
       "parentUuid": "b19d0c32_d1b9d2e2",
       "revId": "d03e2211229498e74fcab2f5fa1bcd4672990f14",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a23412b6_1041a1d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-03-30T20:13:26Z",
+      "side": 1,
+      "message": "Tenant and timezone fixed in latest PS.",
+      "parentUuid": "4f76c7dd_8604488f",
+      "revId": "d03e2211229498e74fcab2f5fa1bcd4672990f14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
