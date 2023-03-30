@@ -50,6 +50,24 @@
       "message": "These cascade settings will result in table updates right? Do we need a migration to update the tables in existing installations?",
       "revId": "c5ce607675aa036a444c38f645bce66e5bde24fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e3b4ea2_e155c566",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-03-30T00:09:35Z",
+      "side": 1,
+      "message": "Nope, it\u0027s just internal to the ORM.  basically saying \"when this python object is deleted and you delete it from the database, also delete these other related objects\".",
+      "parentUuid": "6e2c3581_0debb6ea",
+      "revId": "c5ce607675aa036a444c38f645bce66e5bde24fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
