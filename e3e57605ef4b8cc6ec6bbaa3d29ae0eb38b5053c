@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6aaf2a2_42adb142",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-03-30T12:51:41Z",
+      "side": 1,
+      "message": "recheck\nFailure seems caused by flakiness, a genuine one would occur on tox-py311 too",
+      "revId": "e3e57605ef4b8cc6ec6bbaa3d29ae0eb38b5053c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
