@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "da690fde_2e25946d",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-03-31T15:28:55Z",
+      "side": 1,
+      "message": "I have limited the amount of colors to 4 and used icons to distinguish subtypes of failures, this should be less confusing.\nThe need for more colors was for the time chart, where it might have been interesting to have a better visual distinction; I can actually add a specific color chart for this.",
+      "parentUuid": "5fc1f2e0_130ca201",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e8cec93a_41d52452",
         "filename": "web/src/Misc.jsx",
         "patchSetId": 1
@@ -142,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fc4990bb_691a58fb",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-03-31T15:28:55Z",
+      "side": 1,
+      "message": "FAILURE means the playbook ran to completion but ended in failure.\nPOST_FAILURE signals a failure in the POST playbook. This can have many reasons (typo in the POST playbook, log server unreachable, etc). You can land a POST_FAILURE despite the rest of the playbook succeeding prior to the POST part. I think they should be set apart.",
+      "parentUuid": "7730add0_d49fb30c",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "625da04c_7be46fd6",
         "filename": "web/src/Misc.jsx",
         "patchSetId": 1
@@ -153,6 +189,24 @@
       "writtenOn": "2021-10-20T13:49:41Z",
       "side": 1,
       "message": "How often do we see those results in the UI? I don\u0027t think it\u0027s worth to highlight those. As those are all \"failed\" results I would also use infra/other failure color for them.",
+      "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b62310a3_c36c86a4",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-03-31T15:28:55Z",
+      "side": 1,
+      "message": "Some of these were actually obsolete and removed.",
+      "parentUuid": "625da04c_7be46fd6",
       "revId": "f94ece09e69eb909be807bae4f2b5088b643f515",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
