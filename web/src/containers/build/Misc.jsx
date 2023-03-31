@@ -19,80 +19,24 @@ import {
     Label,
 } from '@patternfly/react-core'
 import {
-  CheckIcon,
   ExclamationIcon,
   QuestionIcon,
-  TimesIcon,
 } from '@patternfly/react-icons'
-import { ConditionalWrapper } from '../../Misc'
+import { ConditionalWrapper, BUILD_CONSTS, INFO_COLOR, WARNING_COLOR } from '../../Misc'
 
 const RESULT_ICON_CONFIGS = {
   // In progress
   null: {
     icon: QuestionIcon,
-    color: 'var(--pf-global--info-color--100)',
+    color: INFO_COLOR,
     badgeColor: 'blue',
   },
-  SUCCESS: {
-    icon: CheckIcon,
-    color: 'var(--pf-global--success-color--100)',
-    badgeColor: 'green',
-  },
-  FAILURE: {
-    icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
-    badgeColor: 'red',
-  },
-  RETRY_LIMIT: {
-    icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
-    badgeColor: 'red',
-  },
-  SKIPPED: {
-    icon: QuestionIcon,
-    color: 'var(--pf-global--info-color--100)',
-    badgeColor: 'blue',
-  },
-  ABORTED: {
-    icon: QuestionIcon,
-    color: 'var(--pf-global--info-color--100)',
-    badgeColor: 'yellow',
-  },
-  MERGE_CONFLICT: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  MERGE_FAILURE: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  NODE_FAILURE: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  TIMED_OUT: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  POST_FAILURE: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
-  CONFIG_ERROR: {
-    icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
-    badgeColor: 'orange',
-  },
+  ...BUILD_CONSTS,
 }
 
 const DEFAULT_RESULT_ICON_CONFIG = {
   icon: ExclamationIcon,
-  color: 'var(--pf-global--warning-color--100)',
+  color: WARNING_COLOR,
   badgeColor: 'orange',
 }
 

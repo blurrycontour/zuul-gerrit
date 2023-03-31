@@ -39,6 +39,8 @@ import {
   TimesCircleIcon,
 } from '@patternfly/react-icons'
 
+import { ERROR_COLOR } from '../../Misc'
+
 class BuildOutputLabel extends React.Component {
   static propTypes = {
     ok: PropTypes.number,
@@ -112,7 +114,7 @@ class BuildOutput extends React.Component {
     return (
       <Card key={host + task.zuul_log_id} className="zuul-task-summary-failed">
         <CardHeader>
-          <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
+          <TimesIcon style={{ color: ERROR_COLOR }}/>
             &nbsp;Task&nbsp;<strong>{task.name}</strong>&nbsp;
             failed running on host&nbsp;<strong>{host}</strong>
         </CardHeader>

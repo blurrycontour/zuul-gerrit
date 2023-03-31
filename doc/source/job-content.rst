@@ -1204,7 +1204,38 @@ A job build may have the following status:
 **SKIPPED**
   One of the build dependencies failed and this job was not executed.
 
+**CANCELED**
+  The build was canceled, for example because of a manual dequeue.
+
+**ABORTED**
+  The build was aborted, for example because the build is obsoleted by a patchset update.
+  Aborted builds are generally restarted with an updated context.
+
 **NODE_FAILURE**
   The test instance provider was unable to fullfill the nodeset request.
   This can happen if Nodepool is unable to provide the requested node(s)
   for the request.
+
+**CONFIG_ERROR**
+  Zuul has encountered a tenant or job configuration error that prevents
+  executing the job.
+
+**DISK_FULL**
+  The job has reached or exceeded the maximum allowed disk space as per the
+  :attr:`executor.disk_limit_per_job` set in Zuul's configuration.
+
+**TIMED_OUT**
+  The job failed to complete within the allowed time as defined by :attr:`job.timeout`.
+
+**MERGE_FAILURE**
+  The change was unable to be merged in the upstream repository.
+
+**MERGE_CONFLICT**
+  The patchset cannot be merged into the current state of the build's target branch.
+
+**NO_JOBS**
+  The build was dequeued from a pipeline without running any jobs - most likely, the
+  pipeline was not relevant to the associated change.
+
+**ERROR**
+  The job encountered a miscellaneous error, see the logs for more details.

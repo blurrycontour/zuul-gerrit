@@ -107,12 +107,13 @@ class GithubReporter(BaseReporter):
         # We select different emojis to represents build results:
         # heavy_check_mark: SUCCESS
         # warning: SKIPPED/ABORTED
-        # x: all types of FAILUREs
+        # x: FAILURE (job executed correctly)
+        # heavy_exclamation_mark: failures derived from an execution error 
         # In addition, failure results are in bold text
 
         job_result = job_fields[2]
         # Also need to handle user defined success_message.
-        # The job_fields[6]: the user defined seccess_message (if available)
+        # The job_fields[6]: the user defined success_message (if available)
         success_message = job_fields[6]
 
         emoji = 'x'
@@ -121,9 +122,19 @@ class GithubReporter(BaseReporter):
         if job_result in ('SUCCESS', success_message):
             emoji = 'heavy_check_mark'
             bold_result = False
-        elif job_result in ('SKIPPED', 'ABORTED', 'CANCELED'):
+        elif job_result in ('SKIPPED', 'ABORTED', 'CANCELED', 'RETRY'):
             emoji = 'warning'
             bold_result = False
+        elif job_result in ('NODE_FAILURE',
+                            'CONFIG_ERROR',
+                            'DISK_FULL',
+                            'TIMED_OUT',
+                            'MERGE_CONFLICT',
+                            'MERGE_FAILURE',
+                            'RETRY_LIMIT',
+                            'POST_FAILURE',
+                            'ERROR'):
+            emoji = 'heavy_exclamation_mark'
 
         if bold_result:
             return ':%s: [%s](%s) **%s**%s%s%s\n' % (

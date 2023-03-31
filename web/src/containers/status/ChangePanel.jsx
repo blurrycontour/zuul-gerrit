@@ -224,16 +224,26 @@ class ChangePanel extends React.Component {
         className = 'label-success'
         break
       case 'failure':
+      case 'post_failure':
+      case 'node_failure':
+      case 'config_error':
+      case 'disk_full':
+      case 'timed_out':
+      case 'merge_conflict':
+      case 'merge_failure':
+      case 'retry_limit':
+      case 'error':
         className = 'label-danger'
         break
       case 'unstable':
-      case 'retry_limit':
-      case 'post_failure':
-      case 'node_failure':
+      case 'retry':
+      case 'no_jobs':
         className = 'label-warning'
         break
       case 'paused':
       case 'skipped':
+      case 'aborted':
+      case 'canceled':
         className = 'label-info'
         break
       case 'waiting':
@@ -248,7 +258,7 @@ class ChangePanel extends React.Component {
           title = 'Waiting on ' + job.waiting_status
         }
         break
-      // 'in progress' 'lost' 'aborted' ...
+      // 'in progress'
       default:
         className = 'label-default'
     }
