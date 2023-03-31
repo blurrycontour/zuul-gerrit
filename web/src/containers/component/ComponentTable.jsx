@@ -33,30 +33,30 @@ import {
   HistoryIcon,
 } from '@patternfly/react-icons'
 
-import { IconProperty } from '../../Misc'
+import { IconProperty, SUCCESS_COLOR, ERROR_COLOR, INFO_COLOR, WARNING_COLOR } from '../../Misc'
 
 const STATE_ICON_CONFIGS = {
   RUNNING: {
     icon: RunningIcon,
-    color: 'var(--pf-global--success-color--100)',
+    color: SUCCESS_COLOR,
   },
   INITIALIZING: {
     icon: HistoryIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: INFO_COLOR,
   },
   PAUSED: {
     icon: PauseCircleIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: INFO_COLOR,
   },
   STOPPED: {
     icon: StopCircleIcon,
-    color: 'var(--pf-global--danger-color--100)',
+    color: ERROR_COLOR,
   },
 }
 
 const DEFAULT_STATE_ICON_CONFIG = {
   icon: QuestionIcon,
-  color: 'var(--pf-global--info-color--100)',
+  color: WARNING_COLOR,
 }
 
 function ComponentStateIcon({ state }) {

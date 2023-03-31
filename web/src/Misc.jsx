@@ -14,7 +14,12 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import { ExternalLinkAltIcon } from '@patternfly/react-icons'
+import { 
+  ExternalLinkAltIcon,
+  CheckIcon,
+  ExclamationTriangleIcon,
+  ExclamationCircleIcon,
+  TimesCircleIcon, } from '@patternfly/react-icons'
 
 function removeHash() {
   // Remove location hash from url
@@ -120,4 +125,119 @@ IconProperty.propTypes = {
 const ConditionalWrapper = ({ condition, wrapper, children }) =>
   condition ? wrapper(children) : children
 
-export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper }
+// Tentative grouping of known build results. TODO this could be provided by Zuul REST API
+
+// Color consts
+const SUCCESS_COLOR = 'var(--pf-global--success-color--100)' // green
+const ERROR_COLOR = 'var(--pf-global--danger-color--100)' // red
+const INFO_COLOR = 'var(--pf-global--info-color--100)' // blue
+const WARNING_COLOR = 'var(--pf-global--warning-color--100)' // gold
+// const MISC_COLOR = 'var(--pf-global--disabled-color--100)' // gray
+
+const BUILD_SUCCESS_CONSTS = {
+  SUCCESS: {
+    icon: CheckIcon,
+    color: SUCCESS_COLOR,
+    badgeColor: 'green'
+  },
+}
+
+// build discontinuations that may be the result of normal events (PS updated, etc) -> info
+const BUILD_DISCONTINUED_CONSTS = {
+  SKIPPED: {
+    icon: ExclamationTriangleIcon,
+    color: INFO_COLOR,
+    badgeColor: 'cyan'
+  },
+  ABORTED: {
+    icon: ExclamationTriangleIcon,
+    color: INFO_COLOR,
+    badgeColor:'cyan'
+  },
+  CANCELED: {
+    icon: ExclamationTriangleIcon,
+    color: INFO_COLOR,
+    badgeColor:'cyan'
+  },
+  RETRY: {
+    icon: ExclamationTriangleIcon,
+    color: WARNING_COLOR,
+    badgeColor:'orange'
+  },
+  NO_JOBS: {
+    icon: ExclamationTriangleIcon,
+    color: WARNING_COLOR,
+    badgeColor: 'orange'
+  },
+}
+
+// We attempt a distinction between pure job-related failures (unit tests failing, for example)
+// and the rest, typically errors triggered by infrastructure failures or configuration mistakes.
+// This isn't as clear-cut in real life however, so the color codes are really just a preliminary
+// suggestion at what might have gone wrong.
+
+// Correct execution to completion, failure is change-related
+const BUILD_JOB_FAILURE_CONSTS = {
+  FAILURE: {
+    icon: TimesCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+}
+
+const BUILD_MISC_FAILURE_CONSTS = {
+  NODE_FAILURE: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  CONFIG_ERROR: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  DISK_FULL: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  TIMED_OUT: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  MERGE_CONFLICT: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  MERGE_FAILURE: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  RETRY_LIMIT: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  POST_FAILURE: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+  ERROR: {
+    icon: ExclamationCircleIcon,
+    color: ERROR_COLOR,
+    badgeColor: 'red'
+  },
+}
+
+const BUILD_CONSTS = {
+  ...BUILD_SUCCESS_CONSTS,
+  ...BUILD_DISCONTINUED_CONSTS,
+  ...BUILD_JOB_FAILURE_CONSTS,
+  ...BUILD_MISC_FAILURE_CONSTS,
+}
+
+export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper, BUILD_CONSTS, SUCCESS_COLOR, INFO_COLOR, WARNING_COLOR, ERROR_COLOR }
