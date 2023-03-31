@@ -18,7 +18,7 @@ const buildResultLegendData = Object.keys(BUILD_CONSTS).map(result => (
     {
         name: result,
         symbol: {
-            fill: BUILD_CONSTS[result].color
+            fill: BUILD_CONSTS[result].chartColor
         }
     })
 )

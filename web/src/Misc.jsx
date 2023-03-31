@@ -138,7 +138,8 @@ const BUILD_SUCCESS_CONSTS = {
   SUCCESS: {
     icon: CheckIcon,
     color: SUCCESS_COLOR,
-    badgeColor: 'green'
+    badgeColor: 'green',
+    chartColor: '#4CB140'
   },
 }
 
@@ -147,27 +148,32 @@ const BUILD_DISCONTINUED_CONSTS = {
   SKIPPED: {
     icon: ExclamationTriangleIcon,
     color: INFO_COLOR,
-    badgeColor: 'cyan'
+    badgeColor: 'cyan',
+    chartColor: '#009596'
   },
   ABORTED: {
     icon: ExclamationTriangleIcon,
     color: INFO_COLOR,
-    badgeColor:'cyan'
+    badgeColor:'cyan',
+    chartColor: '#009596'
   },
   CANCELED: {
     icon: ExclamationTriangleIcon,
     color: INFO_COLOR,
-    badgeColor:'cyan'
+    badgeColor:'cyan',
+    chartColor: '#009596'
   },
   RETRY: {
     icon: ExclamationTriangleIcon,
     color: WARNING_COLOR,
-    badgeColor:'orange'
+    badgeColor:'orange',
+    chartColor: '#EC7A08'
   },
   NO_JOBS: {
     icon: ExclamationTriangleIcon,
     color: WARNING_COLOR,
-    badgeColor: 'orange'
+    badgeColor: 'orange',
+    chartColor: '#EC7A08'
   },
 }
 
@@ -181,7 +187,8 @@ const BUILD_JOB_FAILURE_CONSTS = {
   FAILURE: {
     icon: TimesCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#C9190B'
   },
 }
 
@@ -189,47 +196,56 @@ const BUILD_MISC_FAILURE_CONSTS = {
   NODE_FAILURE: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   CONFIG_ERROR: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   DISK_FULL: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   TIMED_OUT: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   MERGE_CONFLICT: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   MERGE_FAILURE: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   RETRY_LIMIT: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   POST_FAILURE: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
   ERROR: {
     icon: ExclamationCircleIcon,
     color: ERROR_COLOR,
-    badgeColor: 'red'
+    badgeColor: 'red',
+    chartColor: '#7D1007'
   },
 }
 
