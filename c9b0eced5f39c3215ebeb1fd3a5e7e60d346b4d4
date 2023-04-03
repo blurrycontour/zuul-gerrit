@@ -16,6 +16,24 @@
       "message": "\u003e Patch Set 14:\n\u003e \n\u003e A couple more things (numbered for easy reference):\n\u003e \n\u003e 1) On the buildset result page, the build list seems to have the wrong style now; it\u0027s a vertically compressed table.\n\u003e 2) The builds timeline on that page has grey text (note the legend and axis texts).\n\u003e \n\u003e I agree the tenant dropdown button looks weird sticking out in grey as it is; seems like both it and the timezone selector should just always be black.\n\u003e \n\u003e I think \"auto\" should be the default.  I think we should just continue working on this until it\u0027s ready to merge.\n\n1) I\u0027m not sure what you mean, can you give me another hint? 😊\n\n2) Fixed.\n\nNew PS includes:\n\n* Fixed gant chart colors\n* Fixed timezone color\n* Fixed background color on tenant dropdown\n* Fixed text color for \"fetching/loading\" messages",
       "revId": "c9b0eced5f39c3215ebeb1fd3a5e7e60d346b4d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a087e353_70d241b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-03T22:30:03Z",
+      "side": 1,
+      "message": "1) Looks like you fixed it in PS17 -- probably by adding the PageSection variant to the Buildsets page... TBH I don\u0027t understand why it was dark with the table not being correct before you did that.  Maybe something about how if the app previously specified a variant it only changes some css?\n\nFTR https://imgur.com/Slq1obE.png is what I was referring to.",
+      "parentUuid": "9a155537_38328931",
+      "revId": "c9b0eced5f39c3215ebeb1fd3a5e7e60d346b4d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
