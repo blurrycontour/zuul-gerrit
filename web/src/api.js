@@ -176,6 +176,14 @@ function fetchBuilds(apiPrefix, queryString) {
   return makeRequest(apiPrefix + path)
 }
 
+function fetchBuildTimes(apiPrefix, queryString) {
+  let path = 'build-times'
+  if (queryString) {
+    path += '?' + queryString.slice(1)
+  }
+  return makeRequest(apiPrefix + path)
+}
+
 function fetchBuildset(apiPrefix, buildsetId) {
   return makeRequest(apiPrefix + 'buildset/' + buildsetId)
 }
@@ -330,6 +338,7 @@ export {
   fetchStatus,
   fetchBuild,
   fetchBuilds,
+  fetchBuildTimes,
   fetchBuildset,
   fetchBuildsets,
   fetchFreezeJob,
