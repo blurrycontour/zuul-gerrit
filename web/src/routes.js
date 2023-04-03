@@ -22,6 +22,7 @@ import JobPage from './pages/Job'
 import JobsPage from './pages/Jobs'
 import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
+import RuntimePage from './pages/Runtime'
 import SemaphorePage from './pages/Semaphore'
 import SemaphoresPage from './pages/Semaphores'
 import AutoholdsPage from './pages/Autoholds'
@@ -88,6 +89,10 @@ const routes = () => [
   {
     to: '/freeze-job',
     component: FreezeJobPage
+  },
+  {
+    to: '/runtime',
+    component: RuntimePage
   },
   {
     to: '/status/change/:changeId',
