@@ -33,6 +33,24 @@
       "message": "Latest changes look good, thanks!\n\nFound 2 more issues:\n\n3) The JSON tree widget is hard to read (it has a lot of dark colors).  It\u0027s used in the Job view and also the Freeze Job page.  The \"zuul-build-image\" has variables so you can see it.\n4) Also, the graphviz diagram for the Job Graph is black on white.  I\u0027m sure we can parameterize the graphviz colors based on the preference.\n\nYou can navigate to #4 by going to the projects list, selecting a project, then scrolling to the bottom and entering a branch name.  From there, you can click on a job in the diagram to navigate to #3.\n",
       "revId": "4f3ad5e89b935eddc041ca79cae044f1899208fe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "405ad68d_fa258ccc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16137
+      },
+      "writtenOn": "2023-04-04T08:58:02Z",
+      "side": 1,
+      "message": "I took a stab at these two in the latest PS, for 3) I added theme to all ReactJson components which I had already done in one place and 4) Graphviz fixed so that background is transparent and color/fontcolor white when dark mode is enabled.",
+      "parentUuid": "d2bebe37_9050245f",
+      "revId": "4f3ad5e89b935eddc041ca79cae044f1899208fe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
