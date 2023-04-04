@@ -7306,13 +7306,24 @@ class ProjectMetadata:
 
     def __init__(self):
         self.merge_mode = None
-        self.default_branch = None
+        self._default_branch = None
         self.queue_name = None
+
+    def isDefaultBranchSet(self):
+        return self._default_branch is not None
+
+    @property
+    def default_branch(self):
+        return self._default_branch or "master"
+
+    @default_branch.setter
+    def default_branch(self, default_branch):
+        self._default_branch = default_branch
 
     def toDict(self):
         return {
             'merge_mode': self.merge_mode,
-            'default_branch': self.default_branch,
+            'default_branch': self._default_branch,
             'queue_name': self.queue_name,
         }
 
@@ -7320,7 +7331,7 @@ class ProjectMetadata:
     def fromDict(cls, data):
         o = cls()
         o.merge_mode = data['merge_mode']
-        o.default_branch = data['default_branch']
+        o._default_branch = data['default_branch']
         o.queue_name = data['queue_name']
         return o
 
@@ -7946,7 +7957,7 @@ class Layout(object):
         md = self.project_metadata[project_config.name]
         if md.merge_mode is None and project_config.merge_mode is not None:
             md.merge_mode = project_config.merge_mode
-        if (md.default_branch is None and
+        if (not md.isDefaultBranchSet() and
             project_config.default_branch is not None):
             md.default_branch = project_config.default_branch
         if (
