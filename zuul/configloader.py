@@ -1253,7 +1253,7 @@ class ProjectParser(object):
         if mode is not None:
             project_config.merge_mode = model.MERGER_MAP[mode]
 
-        default_branch = conf.get('default-branch', 'master')
+        default_branch = conf.get('default-branch')
         project_config.default_branch = default_branch
 
         project_config.queue_name = conf.get('queue', None)
