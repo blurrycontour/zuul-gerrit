@@ -1,0 +1,40 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- project:
+    name: '^org/regex-default.*'
+
+- project:
+    name: '^org/regex-override.*'
+    default-branch: regex-default
+
+- project:
+    name: org/project-default
+
+- project:
+    # This should be the driver default
+    name: org/regex-default-project-empty
+
+- project:
+    # This should be squash because the regex doesn't specify
+    name: org/regex-default-project-develop
+    default-branch: develop
+
+- project:
+    # This should be cherry-pick because of the regex
+    name: org/regex-override-project-empty
+
+- project:
+    # This should be squash because it is more specific than the regex
+    name: org/regex-override-project-develop
+    default-branch: develop
