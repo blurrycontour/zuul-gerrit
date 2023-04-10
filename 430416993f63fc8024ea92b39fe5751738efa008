@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b762c2e8_ea613315",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-10T17:24:42Z",
+      "side": 1,
+      "message": "Minor things inline.",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64651b2e_da76aae1",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-10T17:24:42Z",
+      "side": 1,
+      "message": "Is this condition necessary? Seems like we can run it unconditionally to see if we connect. I Guess it might be confusing with the current command echo content if that string shows up in the normal test infrastructure streamer though.",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f53d8ea8_79a71336",
+        "filename": "playbooks/zuul-stream/validate.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-10T17:24:42Z",
+      "side": 1,
+      "message": "Should we also check that the unwanted string, \"This command should not stream\", doesn\u0027t show up in the file?",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb53e000_7c0ca9e7",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-10T17:24:42Z",
+      "side": 1,
+      "message": "Do we need to coerce this value to a boolean type? For example zuul_console_disabled: False would be the string \u0027False\u0027 which evaluates to true.",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
