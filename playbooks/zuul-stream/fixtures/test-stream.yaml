@@ -1,3 +1,11 @@
+- name: Run command to show skipping works
+  vars:
+    zuul_console_disabled: true
+  hosts: node
+  tasks:
+    - name: Run quiet command
+      command: echo 'This command should not stream'
+
 - name: Start zuul stream daemon
   hosts: node
   tasks:
