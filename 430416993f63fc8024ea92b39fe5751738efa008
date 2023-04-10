@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef68e8fd_e1ca0ad9",
+        "filename": "playbooks/zuul-stream/fixtures/test-stream.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-10T17:53:12Z",
+      "side": 1,
+      "message": "I elected to do this rather than add a comment saying \"This test is useless but harmless on the non-new_console code path\".  If folks prefer that instead, I can switch it.",
+      "parentUuid": "64651b2e_da76aae1",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f53d8ea8_79a71336",
@@ -52,6 +70,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f5aa1bc_f5430b70",
+        "filename": "playbooks/zuul-stream/validate.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-10T17:53:12Z",
+      "side": 1,
+      "message": "I believe the original functonality (not logging anything) is validated elsewhere.  I only wanted to add checks for the new functionality.",
+      "parentUuid": "f53d8ea8_79a71336",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb53e000_7c0ca9e7",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-04-10T17:24:42Z",
       "side": 1,
       "message": "Do we need to coerce this value to a boolean type? For example zuul_console_disabled: False would be the string \u0027False\u0027 which evaluates to true.",
+      "revId": "430416993f63fc8024ea92b39fe5751738efa008",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ca72617_7e51df19",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-10T17:53:12Z",
+      "side": 1,
+      "message": "Can do.",
+      "parentUuid": "fb53e000_7c0ca9e7",
       "revId": "430416993f63fc8024ea92b39fe5751738efa008",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
