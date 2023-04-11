@@ -2467,6 +2467,8 @@ class AnsibleJob(object):
         zuul_vars = args['zuul'].copy()
         # Overlay the zuul.resources we set in prepareNodes
         zuul_vars.update({'resources': zuul_resources})
+        # Make the max. attemps available to the job
+        zuul_vars['max_attempts'] = args['max_attempts']
 
         # Add in executor info
         zuul_vars['executor'] = dict(
