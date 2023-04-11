@@ -332,6 +332,12 @@ of item.
       connectivity issues then previous attempts may have been cancelled,
       and this value will be greater than 1.
 
+   .. var:: max_attempts
+
+      The number of attempts that will be be made for this job when
+      encountering an error in a pre-playbook before it is reported as failed.
+      This value is taken from :attr:`job.attempts`.
+
    .. var:: ansible_version
 
       The version of the Ansible community package release used for executing

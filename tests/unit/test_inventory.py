@@ -104,6 +104,8 @@ class TestInventoryGithub(TestInventoryBase):
         self.assertIn('zuul', inventory['all']['vars'])
         self.assertIn('attempts', inventory['all']['vars']['zuul'])
         self.assertEqual(1, inventory['all']['vars']['zuul']['attempts'])
+        self.assertIn('max_attempts', inventory['all']['vars']['zuul'])
+        self.assertEqual(3, inventory['all']['vars']['zuul']['max_attempts'])
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
@@ -228,6 +230,8 @@ class TestInventory(TestInventoryBase):
         self.assertIn('zuul', inventory['all']['vars'])
         self.assertIn('attempts', inventory['all']['vars']['zuul'])
         self.assertEqual(1, inventory['all']['vars']['zuul']['attempts'])
+        self.assertIn('max_attempts', inventory['all']['vars']['zuul'])
+        self.assertEqual(3, inventory['all']['vars']['zuul']['max_attempts'])
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])

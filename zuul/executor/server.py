@@ -4075,7 +4075,12 @@ class ExecutorServer(BaseMergeServer):
             # result.
             if result.get("result") is None:
                 attempts = params["zuul"]["attempts"]
-                max_attempts = params["max_attempts"]
+                try:
+                    max_attempts = params["zuul"]["max_attempts"]
+                except KeyError:
+                    # TODO (swestphahl):
+                    # Remove backward compatibility handling
+                    max_attempts = params["max_attempts"]
                 if attempts >= max_attempts:
                     result["result"] = "RETRY_LIMIT"
 
