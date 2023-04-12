@@ -58,6 +58,7 @@ import fixtures
 import kazoo.client
 import kazoo.exceptions
 import pymysql
+import pymysql.err
 import psycopg2
 import psycopg2.extensions
 import testtools
@@ -4170,11 +4171,18 @@ class MySQLSchemaFixture(fixtures.Fixture):
         #self.passwd = uuid.uuid4().hex
         self.host = os.environ.get('ZUUL_MYSQL_HOST', '127.0.0.1')
         self.port = int(os.environ.get('ZUUL_MYSQL_PORT', 3306))
-        db = pymysql.connect(host=self.host,
-                             port=self.port,
-                             user="openstack_citest",
-                             passwd="openstack_citest",
-                             db="openstack_citest")
+        try:
+            db = pymysql.connect(host=self.host,
+                                 port=self.port,
+                                 user="openstack_citest",
+                                 passwd="openstack_citest",
+                                 db="openstack_citest")
+        except pymysql.err.OperationalError:
+            db = pymysql.connect(host=self.host,
+                                 port=self.port,
+                                 user="openstack_citest",
+                                 passwd="openstack_citest",
+                                 db="openstack_citest")
         try:
             with db.cursor() as cur:
                 cur.execute("create database %s" % self.name)
@@ -4200,11 +4208,12 @@ class MySQLSchemaFixture(fixtures.Fixture):
                                  passwd="openstack_citest",
                                  db="openstack_citest",
                                  read_timeout=90)
-        except Exception:
-            # Debug if we try to connect to localhost explicitly for some
-            # reason or maybe fallback to PyMSQL default host of localhost
-            print("Connection host: %s" % self.host)
-            raise
+        except pymysql.err.OperationalError:
+            db = pymysql.connect(host=self.host,
+                                 port=self.port,
+                                 user="openstack_citest",
+                                 passwd="openstack_citest",
+                                 db="openstack_citest")
         try:
             with db.cursor() as cur:
                 cur.execute("drop database %s" % self.name)
