@@ -4167,7 +4167,7 @@ class MySQLSchemaFixture(fixtures.Fixture):
                                             string.ascii_uppercase)
                               for x in range(8))
         self.name = '%s_%s' % (random_bits, os.getpid())
-        self.passwd = uuid.uuid4().hex
+        #self.passwd = uuid.uuid4().hex
         self.host = os.environ.get('ZUUL_MYSQL_HOST', '127.0.0.1')
         self.port = int(os.environ.get('ZUUL_MYSQL_PORT', 3306))
         db = pymysql.connect(host=self.host,
@@ -4178,21 +4178,16 @@ class MySQLSchemaFixture(fixtures.Fixture):
         try:
             with db.cursor() as cur:
                 cur.execute("create database %s" % self.name)
-                cur.execute(
-                    "create user '{user}'@'' identified by '{passwd}'".format(
-                        user=self.name, passwd=self.passwd))
-                cur.execute("grant all on {name}.* to '{name}'@''".format(
-                    name=self.name))
-                cur.execute("flush privileges")
         finally:
             db.close()
 
-        self.dburi = 'mysql+pymysql://{name}:{passwd}@{host}:{port}/{name}'\
+        self.dburi = 'mysql+pymysql://{uname}:{passwd}@{host}:{port}/{dbname}'\
             .format(
-                name=self.name,
-                passwd=self.passwd,
+                uname="openstack_citest",
+                passwd="openstack_citest",
                 host=self.host,
-                port=self.port
+                port=self.port,
+                dbname=self.name,
             )
         self.addDetail('dburi', testtools.content.text_content(self.dburi))
         self.addCleanup(self.cleanup)
@@ -4213,8 +4208,6 @@ class MySQLSchemaFixture(fixtures.Fixture):
         try:
             with db.cursor() as cur:
                 cur.execute("drop database %s" % self.name)
-                cur.execute("drop user '%s'@''" % self.name)
-                cur.execute("flush privileges")
         finally:
             db.close()
 
