@@ -159,6 +159,11 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             warnings=warnings)
         if abort:
             return False
+
+        # Treat cycle dependencies as needed for the current change
+        needed_changes.extend(
+            self.getCycleDependencies(change, dependency_graph, event))
+
         if not needed_changes:
             return True
         log.debug("  Changes %s must be merged ahead of %s",
