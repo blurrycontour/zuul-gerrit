@@ -33,6 +33,10 @@ sudo -H mysqladmin -u root password $DB_ROOT_PW
 # other connections from that host will not work.
 
 sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
+    SET GLOBAL max_connections=300;"
+sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
+    SET GLOBAL log_warnings=4;"
+sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
     SELECT * FROM mysql.user;"
 sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
     DELETE FROM mysql.user WHERE User='';
