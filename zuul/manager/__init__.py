@@ -11,6 +11,7 @@
 # under the License.
 import collections
 import contextlib
+import itertools
 import logging
 import textwrap
 import time
@@ -700,6 +701,13 @@ class PipelineManager(metaclass=ABCMeta):
                 # Change can not be part of multiple cycles, so we can return
                 return scc
         return []
+
+    def getCycleDependencies(self, change, dependency_graph, event):
+        cycle = self.cycleForChange(change, dependency_graph, event)
+        return set(
+            itertools.chain.from_iterable(
+                dependency_graph[c] for c in cycle if c != change)
+        ) - set(cycle)
 
     def getQueueConfig(self, project):
         layout = self.pipeline.tenant.layout

@@ -142,6 +142,78 @@ class TestGerritCircularDependencies(ZuulTestCase):
             "org/project", "org/project1", "org/project2"
         )
 
+    def test_enqueue_order(self):
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
+        C = self.fake_gerrit.addFakeChange("org/project2", "master", "C")
+
+        # A <-> B and A -> C (via commit-depends)
+        A.data[
+            "commitMessage"
+        ] = "{}\n\nDepends-On: {}\nDepends-On: {}\n".format(
+            A.subject, B.data["url"], C.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # We're about to add approvals to changes without adding the
+        # triggering events to Zuul, so that we can be sure that it is
+        # enqueuing the changes based on dependencies, not because of
+        # triggering events.  Since it will have the changes cached
+        # already (without approvals), we need to clear the cache
+        # first.
+        for connection in self.scheds.first.connections.connections.values():
+            connection.maintainCache([], max_age=0)
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        C.addApproval("Code-Review", 2)
+        B.addApproval("Approved", 1)
+        C.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 3)
+        self.assertEqual(B.reported, 3)
+        self.assertEqual(C.reported, 3)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+        self.assertEqual(C.data["status"], "MERGED")
+
+        self.assertHistory([
+            # Change A (check + gate)
+            dict(name="project1-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="3,1 1,1 2,1"),
+            dict(name="project1-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="3,1 1,1 2,1"),
+            # Change B (check + gate)
+            dict(name="project-job", result="SUCCESS", changes="3,1 2,1 1,1"),
+            dict(name="project-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            # Change C (check + gate)
+            dict(name="project2-job", result="SUCCESS", changes="3,1"),
+            dict(name="project2-job", result="SUCCESS", changes="3,1"),
+        ], ordered=False)
+
     def test_forbidden_cycle(self):
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project3", "master", "B")
