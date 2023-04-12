@@ -4,3 +4,22 @@
     - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
+  tasks:
+    - name: Add zuul user to systemd-journal group for journal access
+      user:
+        name: zuul
+        append: true
+        groups: systemd-journal
+      become: yes
+    - name: Make mysql error log readable
+      file:
+        path: /var/log/mysql
+        state: directory
+        mode: 'o+rx'
+      become: yes
+    - name: Make mysql error log readable
+      file:
+        path: /var/log/mysql/error.log
+        state: file
+        mode: 'o+r'
+      become: yes
