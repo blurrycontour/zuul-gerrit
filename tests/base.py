@@ -4198,12 +4198,18 @@ class MySQLSchemaFixture(fixtures.Fixture):
         self.addCleanup(self.cleanup)
 
     def cleanup(self):
-        db = pymysql.connect(host=self.host,
-                             port=self.port,
-                             user="openstack_citest",
-                             passwd="openstack_citest",
-                             db="openstack_citest",
-                             read_timeout=90)
+        try:
+            db = pymysql.connect(host=self.host,
+                                 port=self.port,
+                                 user="openstack_citest",
+                                 passwd="openstack_citest",
+                                 db="openstack_citest",
+                                 read_timeout=90)
+        except Exception as e:
+            # Debug if we try to connect to localhost explicitly for some
+            # reason or maybe fallback to PyMSQL default host of localhost
+            print("Connection host: %s" % self.host)
+            raise
         try:
             with db.cursor() as cur:
                 cur.execute("drop database %s" % self.name)

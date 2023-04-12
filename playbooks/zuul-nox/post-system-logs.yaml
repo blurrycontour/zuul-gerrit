@@ -4,3 +4,5 @@
   tasks:
     - name: Collect zookeeper logs
       shell: "cp /opt/zookeeper/logs/* {{ zuul_output_dir }}/logs/"
+    - name: Collect mysql/mariadb logs
+      shell: "journalctl -u mysql > {{ zuul_output_dir }}/logs/mysql.journal.log"

@@ -4,3 +4,10 @@
     - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
+  tasks:
+    - name: Add zuul user to systemd-journal group for journal access
+      user:
+        name: zuul
+        append: true
+        groups: systemd-journal
+      become: yes
