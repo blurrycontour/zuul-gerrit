@@ -31,11 +31,16 @@ sudo -H mysqladmin -u root password $DB_ROOT_PW
 # It's best practice to remove anonymous users from the database.  If
 # a anonymous user exists, then it matches first for connections and
 # other connections from that host will not work.
+
+sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
+    SELECT * FROM mysql.user;"
 sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
     DELETE FROM mysql.user WHERE User='';
     FLUSH PRIVILEGES;
     CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PW';
     GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%' WITH GRANT OPTION;"
+sudo -H mysql -u root -p$DB_ROOT_PW -h localhost -e "
+    SELECT * FROM mysql.user;"
 
 # Now create our database.
 mysql -u $DB_USER -p$DB_PW -h 127.0.0.1 -e "
