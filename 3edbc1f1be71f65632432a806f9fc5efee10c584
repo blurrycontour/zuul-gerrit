@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e70e03_5d6e9442",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-13T21:49:50Z",
+      "side": 1,
+      "message": "This seems like a reasonable change, but can you elaborate on the assumption you describe?\n\nI\u0027ve had my head in the pipeline processor for a while now, and I was not operating under that assumption, so I\u0027d like to correct my understanding.  Also, I\u0027d like to know more about how it broke -- do you have any details about why it looped indefinitely?",
+      "revId": "3edbc1f1be71f65632432a806f9fc5efee10c584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
