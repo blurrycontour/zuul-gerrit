@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1316d944_6fd51a20",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 947,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-13T21:30:12Z",
+      "side": 1,
+      "message": "I think the only reason this is necessary is due to a single test in test_scheduler passing None as an option.  I think we should look at reworking that test.",
+      "revId": "0b5e6fa501935c3862031417b7255ff5f2bd35ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
