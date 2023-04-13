@@ -38,7 +38,7 @@ else
 fi
 
 
-MYSQL="${DOCKER} exec zuul-test-mysql mysql  -u root -pinsecure_worker"
+MYSQL="${DOCKER} exec zuul-test-mariadb mysql -u root -pinsecure_worker"
 
 if [ "${COMPOSE}" == "docker-compose" ]; then
   ${ROOTCMD} docker-compose rm -sf
