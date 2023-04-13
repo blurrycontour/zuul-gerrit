@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  mariadb:
-    container_name: zuul-test-mariadb
-    image: mariadb:10.6
+  mysql:
+    container_name: zuul-test-mysql
+    image: mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=insecure_worker
     ports:
