@@ -361,9 +361,13 @@ class GithubEventProcessor(object):
         # We typically return a list of one event, but we can return
         # multiple Zuul events from a single Github event.
         self.events = []
+        self._dispatch_ts = time.monotonic()
 
     def run(self):
-        self.log.debug("Starting event processing")
+        start = time.monotonic()
+        time_to_start = round(start - self._dispatch_ts, 3)
+        self.log.debug("Starting event processing (time-to-start: %s seconds)",
+                       time_to_start)
         try:
             attributes = {"rel": "GithubEvent"}
             link = trace.Link(self.event_span.get_span_context(),
@@ -374,7 +378,9 @@ class GithubEventProcessor(object):
         except Exception:
             self.log.exception("Exception when processing event:")
         finally:
-            self.log.debug("Finished event processing")
+            duration = round(time.monotonic() - start, 3)
+            self.log.debug("Finished event processing (duration: %s seconds)",
+                           duration)
         return self.events, self.connection_event
 
     def _process_event(self):
