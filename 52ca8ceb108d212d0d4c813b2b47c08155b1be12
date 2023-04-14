@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4c6a66c0_8c0a2d45",
+        "filename": "tests/fixtures/layouts/default-branch.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-14T05:46:55Z",
+      "side": 1,
+      "message": "All copy-pasta, sorry.",
+      "parentUuid": "b32db860_12a08949",
+      "revId": "52ca8ceb108d212d0d4c813b2b47c08155b1be12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c0dc3b61_3940f0e0",
         "filename": "tests/fixtures/layouts/default-branch.yaml",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-13T21:37:37Z",
       "side": 1,
       "message": "I think this comment is copy-pasta.  /squash/develop/",
+      "revId": "52ca8ceb108d212d0d4c813b2b47c08155b1be12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13211163_b6ac5cc8",
+        "filename": "tests/fixtures/layouts/default-branch.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-14T05:46:55Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "c0dc3b61_3940f0e0",
       "revId": "52ca8ceb108d212d0d4c813b2b47c08155b1be12",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3f58e0fd_aa63ea01",
+        "filename": "tests/fixtures/layouts/default-branch.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-14T05:46:55Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "00bd016e_443b70e8",
+      "revId": "52ca8ceb108d212d0d4c813b2b47c08155b1be12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7bd2662e_ff4b9648",
         "filename": "tests/fixtures/layouts/default-branch.yaml",
         "patchSetId": 4
@@ -65,6 +119,24 @@
       "writtenOn": "2023-04-13T21:37:37Z",
       "side": 1,
       "message": "Ditto (but develop).",
+      "revId": "52ca8ceb108d212d0d4c813b2b47c08155b1be12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "150237f0_31ea9f73",
+        "filename": "tests/fixtures/layouts/default-branch.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-14T05:46:55Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "7bd2662e_ff4b9648",
       "revId": "52ca8ceb108d212d0d4c813b2b47c08155b1be12",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
