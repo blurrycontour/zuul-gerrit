@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ff8ea78_6e6b09c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-14T06:15:18Z",
+      "side": 1,
+      "message": "Done. I did not bump the model API as we\u0027d need a fallback on the executor server side in any case, since there could still be build requests w/o `zuul.max_attempts` in the system.",
+      "revId": "646468b5ea06b5fbc530eb119505aa8f56cd0a20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
