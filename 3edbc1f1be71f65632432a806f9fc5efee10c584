@@ -16,6 +16,24 @@
       "message": "This seems like a reasonable change, but can you elaborate on the assumption you describe?\n\nI\u0027ve had my head in the pipeline processor for a while now, and I was not operating under that assumption, so I\u0027d like to correct my understanding.  Also, I\u0027d like to know more about how it broke -- do you have any details about why it looped indefinitely?",
       "revId": "3edbc1f1be71f65632432a806f9fc5efee10c584",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3abaab4c_ec800746",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-14T08:27:05Z",
+      "side": 1,
+      "message": "I think this assumption is implicit in some places - e.g. [0] - but it\u0027s also mentioned in [1].\n\nAllowing non-cycle item in-between items of the same bundle would also lead to a different set of changes being used for the items in the bundle depending on the position in the queue. \n\nFor example given a circular dependency `A\u003c-\u003eB` and a non-cycle dependency `A-\u003eC` we could end up with a queue state of `[A, C, B(head)]`.\n\nWith that, builds for `B` would include change `A+B`, but builds for `A` would have `A,B,C`.\n\nThis could also have consequences in combination with job de-duplication. I think we are not checking if the same set of changes is used when deciding whether to dedup or not.\n\nThe problem we\u0027ve seen was related to the condition in [0] where all items in the bundle were finished and one of the bundle items was at the head of the queue. Another item that was not part of the bundle was enqueued in-between cycle items and wasn\u0027t ready to report yet, leading to the pipeline processor always reporting an item as changed and with that leading to the infinite loop.\n\n[0] https://opendev.org/zuul/zuul/src/branch/master/zuul/manager/__init__.py#L1651-L1656\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/manager/__init__.py#L646-L649",
+      "parentUuid": "95e70e03_5d6e9442",
+      "revId": "3edbc1f1be71f65632432a806f9fc5efee10c584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
