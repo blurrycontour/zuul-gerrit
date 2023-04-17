@@ -1476,8 +1476,14 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         data = self.get(query)
         related = self.get('changes/%s/revisions/%s/related' % (
             number, data['current_revision']))
-        files = self.get('changes/%s/revisions/%s/files?parent=1' % (
-            number, data['current_revision']))
+
+        files_query = 'changes/%s/revisions/%s/files' % (
+                number, data['current_revision'])
+
+        if data['revisions'][data['current_revision']]['commit']['parents']:
+            files_query += '?parent=1'
+
+        files = self.get(files_query)
         return data, related, files
 
     def queryChange(self, number, event=None):
