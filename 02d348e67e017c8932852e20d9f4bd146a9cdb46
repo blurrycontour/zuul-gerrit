@@ -22,6 +22,30 @@
       },
       "revId": "02d348e67e017c8932852e20d9f4bd146a9cdb46",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "195116ce_5c976f81",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-17T09:31:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fad3fc0_551ee7fb",
+      "range": {
+        "startLine": 228,
+        "startChar": 57,
+        "endLine": 228,
+        "endChar": 59
+      },
+      "revId": "02d348e67e017c8932852e20d9f4bd146a9cdb46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
