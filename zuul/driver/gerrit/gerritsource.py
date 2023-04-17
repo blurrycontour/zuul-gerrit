@@ -164,7 +164,9 @@ class GerritSource(BaseSource):
             change = self.connection._getChange(change_key)
             changes[change_key] = change
 
-        for change in changes.values():
+        # Convert to list here because the recursive call can mutate
+        # the set.
+        for change in list(changes.values()):
             for git_change_ref in change.git_needs_changes:
                 change_key = ChangeKey.fromReference(git_change_ref)
                 if change_key in changes:
