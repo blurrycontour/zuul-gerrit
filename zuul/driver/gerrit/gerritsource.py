@@ -165,10 +165,11 @@ class GerritSource(BaseSource):
             changes[change_key] = change
 
         for change in changes.values():
-            for git_key in change.git_needs_changes:
-                if git_key in changes:
+            for git_change_ref in change.git_needs_changes:
+                change_key = ChangeKey.fromReference(git_change_ref)
+                if change_key in changes:
                     continue
-                git_change = self.getChange(git_key)
+                git_change = self.getChange(change_key)
                 if not git_change.topic or git_change.topic == topic:
                     continue
                 self.getChangesByTopic(git_change.topic, changes)
