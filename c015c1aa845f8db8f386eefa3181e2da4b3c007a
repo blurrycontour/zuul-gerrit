@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d24fa7b_ae22c5f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2023-04-17T17:12:06Z",
+      "side": 1,
+      "message": "For posterity, this error was seen on Gerrit 3.4.5",
+      "revId": "c015c1aa845f8db8f386eefa3181e2da4b3c007a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
