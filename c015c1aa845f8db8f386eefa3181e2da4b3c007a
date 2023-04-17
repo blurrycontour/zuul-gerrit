@@ -16,6 +16,23 @@
       "message": "For posterity, this error was seen on Gerrit 3.4.5",
       "revId": "c015c1aa845f8db8f386eefa3181e2da4b3c007a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95b9d7e3_719910a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2023-04-17T19:05:01Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "c015c1aa845f8db8f386eefa3181e2da4b3c007a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
