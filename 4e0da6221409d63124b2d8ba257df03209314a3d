@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94ddc81b_7f88f174",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-18T11:44:46Z",
+      "side": 1,
+      "message": "nit: `changes` is a dict",
+      "range": {
+        "startLine": 168,
+        "startChar": 14,
+        "endLine": 168,
+        "endChar": 17
+      },
+      "revId": "4e0da6221409d63124b2d8ba257df03209314a3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
