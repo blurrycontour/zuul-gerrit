@@ -195,25 +195,37 @@
 
 # Image building jobs
 - secret:
-    name: zuul-dockerhub
+    name: zuul-registry-credentials
     data:
-      username: zuulzuul
-      password: !encrypted/pkcs1-oaep
-        - DFlbrDM5eUMptMGIVMXV1g455xOJLi92UYF08Z2/JlIGu3t6v052o9FKlVyj1ZmpXs5+2
-          JTa5jHkLTvTsYs9fCaNcQc2nmViCyWNlbOMzjB17uiZOaYFNs1sMqZcUZbGEz7Y8ds6Qq
-          NBXI10jWFPTah4QxUuBvUbT3vmjnUToCzexl5ZGhKgijcnROWfUsnlCdugpgoNIcPsUki
-          zty5FotDihnrC8n8vIomVK6EClY38ty97pLrADzFDd+Cos/OUlvi2xooUhzx8Bn020rJA
-          lqEU5v8LGXp5QkHx0MSDx6JY6KppJ/4p/yM+4By6l+A20zdcimxmgiNc9rMWPwDj7xsao
-          m7NAZWmWqOO0Xkhgt6WOfugwgt9X46sgs2+yDEfbnI5ok8uRbAB/4FWj/KdpyXwhcf+O2
-          wEfhxLwDbAoGONQPjb4YcZmCXtmR7Qe5t+n2jyczWXvrbaBDUQP5a+YtVNN/xhmQ7D740
-          POlxv7bLxJAixzqaQ3d8Rz9ZEv6zzRuhWph32UQtZ1JxSNww+EvmXm2eEi2Q2z6pT1Cx/
-          j2OrFyA2GL/UJOVb15VHKF6bgHPHWJtpjPFhqdcvBhVute4BWB+KPcWH+y+apHN1enK3H
-          tNJO9iqm34nKwSuj5ExmFw50LtwR5/9FyRuRPq/vBL+8y82v8FDmeYsBeobn5M=
+      quay.io:
+        username: zuul-ci+opendevzuul
+        password: !encrypted/pkcs1-oaep
+          - B5RM116kdo4uTDHChDVWLbRUvXZHXkndzi9sZVmZ/8EjQRKhtsNfVWWPinr7cbXiN6NjA
+            ja85RrAMwYic8Y2f8cTRSowitPDmvAs8Av/zZ6PnFap6pGb1vQFuPYYOqEkkeqrQoY9vO
+            h2PV3Z2A+O48mzDt0CVhI6E8AQdqrMO7R0pO1plb5q9PFTHUlwgUdIbUMkVpndVMER8Ez
+            IdWs2bcVUC5hChUKFcSX2Jr8peOwQvLnzX5nGRAYATrp5tV/xsC8R/WkOVvKP0ORLJlf8
+            T/yZRXm7yw9LdizCsf+3jkzw726YZT+GqavPnygJvKeu+WVMtBs69TPhTdpq4B5WCnQko
+            Xq+g2WZkqdfeQRBp2BqMsk1wZ+fMnTqKb8iJRO0tjYmFJBq0xRRQHHjwLDd4clM1KBMqT
+            17ss4QvTY61ZbbSM33M3FgibBPe96G7vCuTLiUnrmcR8i5M1H+XHPYMSSbCn3DgY5IBl2
+            Lr9ism4velFlzXQ9r71VM5v+JCSbcjrMAn5GKFZ5f9MeqWnATqYUO+xwEa/wb+sgPzd/v
+            VNlB74K3tg7wP1abGM7LtQkVKkWuy44sXayt2PcikE4pDO6EiODOxSv5a5Uxc6ef/cmfl
+            ADZ08hlob4CFNjL1m5lZSZNYDcsgwYuYXoP2a5kgykerEV+v3q0epjExCCUrEI=
+        api_token: !encrypted/pkcs1-oaep
+          - HTgQ6onrqJCCwjwT+TGjgiXT6qgwJMbWYUXlt5mz570RKNN4Ptsa6oqu4zpk+paAIwain
+            Olw3n4InshNAWIvTSro6zwYurmiiKCbxcocaxLzIKM+zbgIR7haKm+Crqei4tanWNpXHq
+            ULdu4muJojxu6OdYNhftPY3NLdFFuDA5IF2zv2f4gZSthvmQ9NzvEqPKFDV2yzNa6G4V+
+            jicYR3X7f0TjW9QF9p9CuSMvZrOCxp98zRelT8EJBKsb+38JVapvJgbAqAgJhAaGgJYkP
+            1W7iqL+eNLMcRCnkoBEnOwZe66WO5gZagqWH25oRhjFnFM/qqMeYEG/AhAUae7vTHd9VK
+            yHSndEdrdCNpdzBsJQFGS7lxJMUl8ELL61qoojZSW91bGRIziedYEbDuPEzZUkoosaf6r
+            50jvdRYOsmYnmr3Q5/T0QxW00qLL6FkPCRHg8wI2EXDPA/X5+vTlEYMhJxEJZ1+unHk9t
+            PPebXHCZ2B0VA+x3Khnt5BOJt/ewxfbfVu0CVgjSgrAUaSHWY3DLdvbuA9lwjafybkfxC
+            vIEhQz8AxAgWsdWpFOr9uPCB+5C+ma4jF15k/RUWoODHhvYZEoSNDOz4BRGrK+kHczr3F
+            P9x7xzzPhVCdbspsf+sV90xpUI0U4vCeVpi+3Ha1zZZR0JAC1SIWXUnJxB2EkM=
 
 - job:
     name: zuul-build-image
-    parent: opendev-build-docker-image
-    description: Build Docker images.
+    parent: opendev-build-container-image
+    description: Build container images.
     allowed-projects: zuul/zuul
     timeout: 2700  # 45 minutes
     requires:
@@ -221,58 +233,67 @@
       - python-base-3.11-bullseye-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
-      docker_images:
+      promote_container_image_method: intermediate-registry
+      promote_container_image_job: zuul-client-upload-image
+      container_command: docker
+      container_images:
         - context: .
-          repository: zuul/zuul
+          registry: quay.io
+          repository: quay.io/zuul-ci/zuul
           target: zuul
           tags:
             # If zuul.tag is defined: [ '3', '3.19', '3.19.0' ].  Only works for 3-component tags.
             # Otherwise: ['latest']
             &imagetag "{{ zuul.tag is defined | ternary([zuul.get('tag', '').split('.')[0], '.'.join(zuul.get('tag', '').split('.')[:2]), zuul.get('tag', '')], ['latest']) }}"
         - context: .
-          repository: zuul/zuul-executor
+          registry: quay.io
+          repository: quay.io/zuul-ci/zuul-executor
           target: zuul-executor
           tags: *imagetag
         - context: .
-          repository: zuul/zuul-fingergw
+          registry: quay.io
+          repository: quay.io/zuul-ci/zuul-fingergw
           target: zuul-fingergw
           tags: *imagetag
         - context: .
-          repository: zuul/zuul-merger
+          registry: quay.io
+          repository: quay.io/zuul-ci/zuul-merger
           target: zuul-merger
           tags: *imagetag
         - context: .
-          repository: zuul/zuul-scheduler
+          registry: quay.io
+          repository: quay.io/zuul-ci/zuul-scheduler
           target: zuul-scheduler
           tags: *imagetag
         - context: .
-          repository: zuul/zuul-web
+          registry: quay.io
+          repository: quay.io/zuul-ci/zuul-web
           target: zuul-web
           tags: *imagetag
 
 - job:
     name: zuul-upload-image
-    parent: opendev-upload-docker-image
-    description: Build Docker images and upload to Docker Hub.
+    parent: opendev-upload-container-image
+    description: Build container images and upload.
     allowed-projects: zuul/zuul
     requires:
       - python-builder-3.11-bullseye-container-image
       - python-base-3.11-bullseye-container-image
     provides: zuul-container-image
     secrets:
-      name: docker_credentials
-      secret: zuul-dockerhub
+      name: container_registry_credentials
+      secret: zuul-registry-credentials
       pass-to-parent: true
     vars: *zuul_image_vars
 
 - job:
     name: zuul-promote-image
-    parent: opendev-promote-docker-image
-    description: Promote previously uploaded Docker images.
+    parent: opendev-promote-container-image
+    description: Promote previously uploaded container images.
     allowed-projects: zuul/zuul
     secrets:
-      name: docker_credentials
-      secret: zuul-dockerhub
+      name: container_registry_credentials
+      secret: zuul-registry-credentials
       pass-to-parent: true
     nodeset:
       nodes: []
@@ -370,11 +391,11 @@
       jobs:
         - zuul-release-python
         - zuul-publish-nox-docs
-        - upload-docker-image:
+        - upload-container-image:
             secrets:
-              name: docker_credentials
-              secret: zuul-dockerhub
+              name: container_registry_credentials
+              secret: zuul-registry-credentials
               pass-to-parent: true
             vars:
               <<: *zuul_image_vars
-              upload_docker_image_promote: false
+              upload_container_image_promote: false

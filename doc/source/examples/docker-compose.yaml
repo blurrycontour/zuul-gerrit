@@ -11,7 +11,7 @@ services:
     networks:
       - zuul
   gerritconfig:
-    image: docker.io/zuul/zuul-executor
+    image: quay.io/zuul-ci/zuul-executor
     environment:
       - http_proxy
       - https_proxy
@@ -66,7 +66,7 @@ services:
              zuul-scheduler -f'
     # FIXME: The scheduler has no ansible anymore so use the executor image.
     #        This needs to be changes such that ansible is not required for startup.
-    image: docker.io/zuul/zuul-scheduler
+    image: quay.io/zuul-ci/zuul-scheduler
     volumes:
       - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -83,7 +83,7 @@ services:
       - mysql
     ports:
       - "9000:9000"
-    image: docker.io/zuul/zuul-web
+    image: quay.io/zuul-ci/zuul-web
     environment:
       ZUUL_MYSQL_PASSWORD: secret
     volumes:
@@ -101,7 +101,7 @@ services:
       - ZUUL_MYSQL_PASSWORD=secret
     depends_on:
       - scheduler
-    image: docker.io/zuul/zuul-executor
+    image: quay.io/zuul-ci/zuul-executor
     volumes:
       - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -126,7 +126,7 @@ services:
   launcher:
     depends_on:
       - zk
-    image: docker.io/zuul/nodepool-launcher
+    image: quay.io/zuul-ci/nodepool-launcher
     volumes:
       - "./playbooks/:/var/playbooks/:z"
       - "./etc_nodepool/:/etc/nodepool/:z"
