@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eafb306_472cfd96",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-24T21:29:20Z",
+      "side": 1,
+      "message": "I tried to make it a simple O(1) regex that\u0027s easy to fail without lookahead/behinds.  timeit says it adds about 80 nanoseconds per query on my workstation.\n\nI don\u0027t love it either, but I explored other options to move this info around in sqlalchemy and didn\u0027t find anything better.",
+      "parentUuid": "522c6a45_d24e3050",
+      "revId": "84c0420792a1ac6c3205b9b7282e800c1d8623d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11b98ff8_db083d05",
