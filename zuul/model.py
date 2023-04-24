@@ -1459,7 +1459,7 @@ class Node(ConfigObject):
         if internal_attributes:
             # These attributes are only useful for the rpc serialization
             d['name'] = self.name[0]
-            d['aliases'] = self.name[1:]
+            d['aliases'] = list(self.name[1:])
             d['label'] = self.label
         return d
 
@@ -2149,7 +2149,8 @@ class ZuulRole(Role):
         return '<ZuulRole %s %s>' % (self.project_canonical_name,
                                      self.target_name)
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
 
     def __eq__(self, other):
         if not isinstance(other, ZuulRole):
@@ -2219,6 +2220,14 @@ class JobData(zkobject.ShardedZKObject):
             "_path": self._path,
         }
         return json_dumps(data, sort_keys=True).encode("utf8")
+
+    def __hash__(self):
+        return hash(self.hash)
+
+    def __eq__(self, other):
+        if not isinstance(other, JobData):
+            return False
+        return self.hash == other.hash
 
 
 class FrozenJob(zkobject.ZKObject):
@@ -2345,6 +2354,9 @@ class FrozenJob(zkobject.ZKObject):
         return self.jobPath(self.name, self.buildset.getPath())
 
     def serialize(self, context):
+        # Ensure that any special handling in this method is matched
+        # in Job.freezeJob so that FrozenJobs are identical regardless
+        # of whether they have been desiraliazed.
         data = {}
         for k in self.attributes:
             # TODO: Backwards compat handling, remove after 5.0
@@ -2383,6 +2395,9 @@ class FrozenJob(zkobject.ZKObject):
         return json_dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
+        # Ensure that any special handling in this method is matched
+        # in Job.freezeJob so that FrozenJobs are identical regardless
+        # of whether they have been desiraliazed.
         data = super().deserialize(raw, context)
 
         # MODEL_API < 8
@@ -2903,11 +2918,18 @@ class Job(ConfigObject):
                     for pb in v:
                         self._deduplicateSecrets(context, secrets, pb)
             kw[k] = v
-        kw['nodeset_alternatives'] = self.flattenNodesetAlternatives(layout)
         kw['nodeset_index'] = 0
         kw['secrets'] = secrets
         kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
+        # Ensure that the these attributes are exactly equal to what
+        # would be deserialized on another scheduler.
+        kw['nodeset_alternatives'] = [
+            NodeSet.fromDict(alt.toDict()) for alt in
+            self.flattenNodesetAlternatives(layout)
+        ]
+        kw['dependencies'] = frozenset(kw['dependencies'])
+        kw['semaphores'] = list(kw['semaphores'])
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
         return FrozenJob.new(context, **kw)
@@ -3371,6 +3393,14 @@ class JobProject(ConfigObject):
                    data['override_branch'],
                    data['override_checkout'])
 
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __eq__(self, other):
+        if not isinstance(other, JobProject):
+            return False
+        return self.toDict() == other.toDict()
+
 
 class JobSemaphore(ConfigObject):
     """ A reference to a semaphore from a job. """
@@ -3389,6 +3419,14 @@ class JobSemaphore(ConfigObject):
     @classmethod
     def fromDict(cls, data):
         return cls(data['name'], data['resources_first'])
+
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __eq__(self, other):
+        if not isinstance(other, JobSemaphore):
+            return False
+        return self.toDict() == other.toDict()
 
 
 class JobList(ConfigObject):
@@ -3427,7 +3465,8 @@ class JobDependency(ConfigObject):
             return False
         return self.toDict() == other.toDict()
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
 
     def toDict(self):
         return {'name': self.name,

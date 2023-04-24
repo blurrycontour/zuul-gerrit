@@ -1554,6 +1554,17 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(C.data['status'], 'MERGED')
 
     def _test_job_deduplication(self):
+        # We make a second scheduler here so that the first scheduler
+        # can freeze the jobs for the first item, and the second
+        # scheduler freeze jobs for the second.  This forces the
+        # scheduler to compare a desiralized FrozenJob with a newly
+        # created one and therefore show difference-in-serialization
+        # issues.
+        self.hold_merge_jobs_in_queue = True
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -1568,10 +1579,18 @@ class TestGerritCircularDependencies(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         B.addApproval('Code-Review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        with app.sched.run_handler_lock:
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.waitUntilSettled(matcher=[self.scheds.first])
+            self.merger_api.release(self.merger_api.queued()[0])
+            self.waitUntilSettled(matcher=[self.scheds.first])
 
-        self.waitUntilSettled()
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            self.merger_api.release()
+            self.waitUntilSettled(matcher=[app])
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
