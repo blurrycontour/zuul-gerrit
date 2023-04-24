@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "522c6a45_d24e3050",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-24T21:17:07Z",
+      "side": 1,
+      "message": "Any concern checking a regex against sql queries on every lookup even those we don\u0027t need a timeout for? Mostly concerned that the timeout implementation here checks everything and if it performs poorly everything may suffer.",
+      "revId": "84c0420792a1ac6c3205b9b7282e800c1d8623d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11b98ff8_db083d05",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-24T21:17:07Z",
+      "side": 1,
+      "message": "PostgreSQL docs say SET LOCAL takes effect only until the end of the current transaction. That should prevent this from leaking into other requests to the DB.",
+      "range": {
+        "startLine": 52,
+        "startChar": 24,
+        "endLine": 52,
+        "endChar": 33
+      },
+      "revId": "84c0420792a1ac6c3205b9b7282e800c1d8623d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
