@@ -38,9 +38,6 @@
 
 - job:
     name: common-job
-    required-projects:
-      - org/project1
-      - org/project2
 
 - job:
     name: project1-job
@@ -53,7 +50,18 @@
     queue: integrated
     gate:
       jobs:
-        - common-job
+        - common-job:
+            # We set these here instead of the job def in order to
+            # exercise the updateProjects code path.
+            required-projects:
+              - org/project1
+              - org/project2
+            semaphores:
+              - test-semaphore
+            nodeset:
+              nodes:
+                - label: ubuntu
+                  name: controller
         - project1-job
 
 - project:
@@ -61,5 +69,15 @@
     queue: integrated
     gate:
       jobs:
-        - common-job
+        - common-job:
+            required-projects:
+              - org/project1
+              - org/project2
+            semaphores:
+              - test-semaphore
+            nodeset:
+              alternatives:
+                - nodes:
+                    - label: ubuntu
+                      name: controller
         - project2-job

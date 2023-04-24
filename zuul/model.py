@@ -2220,6 +2220,11 @@ class JobData(zkobject.ShardedZKObject):
         }
         return json_dumps(data, sort_keys=True).encode("utf8")
 
+    def __eq__(self, other):
+        if not isinstance(other, JobData):
+            return False
+        return self.hash == other.hash
+
 
 class FrozenJob(zkobject.ZKObject):
     """A rendered job definition that will actually be run.
@@ -3371,6 +3376,11 @@ class JobProject(ConfigObject):
                    data['override_branch'],
                    data['override_checkout'])
 
+    def __eq__(self, other):
+        if not isinstance(other, JobProject):
+            return False
+        return self.toDict() == other.toDict()
+
 
 class JobSemaphore(ConfigObject):
     """ A reference to a semaphore from a job. """
@@ -3389,6 +3399,11 @@ class JobSemaphore(ConfigObject):
     @classmethod
     def fromDict(cls, data):
         return cls(data['name'], data['resources_first'])
+
+    def __eq__(self, other):
+        if not isinstance(other, JobSemaphore):
+            return False
+        return self.toDict() == other.toDict()
 
 
 class JobList(ConfigObject):
