@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a297940_1ac8c70d",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1507,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-25T22:53:01Z",
+      "side": 1,
+      "message": "Yes, but more like status:open.  I do think that we should upgrade this to be a real parser since we\u0027re doing more, but I feel this is acceptable for now because the old code fell back on all changes, and never actuall checked the status, so this is equivalent-but-slightly-better.",
+      "parentUuid": "4384840d_8bfb3ad4",
+      "revId": "4e0da6221409d63124b2d8ba257df03209314a3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94ddc81b_7f88f174",
