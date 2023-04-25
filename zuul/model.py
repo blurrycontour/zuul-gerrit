@@ -1441,6 +1441,14 @@ class Node(ConfigObject):
     def __eq__(self, other):
         if not isinstance(other, Node):
             return False
+        equal = (self.name == other.name and
+                self.label == other.label and
+                self.id == other.id)
+        log = logging.getLogger("SWE")
+        log.debug(f"SWE> {self.name=} - {other.name=}")
+        log.debug(f"SWE> {self.label=} - {other.label=}")
+        log.debug(f"SWE> {self.id=} - {other.id=}")
+        log.debug(f"SWE> {equal=}")
         return (self.name == other.name and
                 self.label == other.label and
                 self.id == other.id)
@@ -1540,6 +1548,13 @@ class NodeSet(ConfigObject):
     def __eq__(self, other):
         if not isinstance(other, NodeSet):
             return False
+
+        log = logging.getLogger("SWE")
+        log.debug(f"SWE> {self.name=} - {other.name=}")
+        log.debug(f"SWE> {self.nodes=} - {other.nodes=}")
+        log.debug(f"SWE> {self.groups=} - {other.groups=}")
+        log.debug(f"SWE> {self.alternatives=} - {other.alternatives=}")
+
         return (self.name == other.name and
                 self.nodes == other.nodes and
                 self.groups == other.groups and
@@ -1638,6 +1653,7 @@ class NodeSet(ConfigObject):
         self.flattenAlternatives(layout)
 
     def __repr__(self):
+        return f'<NodeSet {self.toDict()}>'
         if self.name:
             name = self.name + ' '
         else:
@@ -2300,10 +2316,27 @@ class FrozenJob(zkobject.ZKObject):
             return False
         if self.name != other.name:
             return False
+        log = logging.getLogger("SWE")
         for k in self.attributes:
             if k in ['inheritance_path', 'waiting_status', 'queued']:
                 continue
             if getattr(self, k) != getattr(other, k):
+                log.debug(f"SWE> job: {self.name}")
+                log.debug(f"SWE> attribute '{k}' differs")
+                log.debug(f"SWE> equal: {getattr(self, k) == getattr(other, k)}")
+                log.debug(f"SWE> self: {getattr(self, k)}")
+                log.debug(f"SWE> other: {getattr(other, k)}")
+                if k == "dependencies":
+                    s = getattr(self, k)
+                    o = getattr(other, k)
+                    sd = [d.toDict() for d in s]
+                    od = [d.toDict() for d in o]
+                    log.debug(f"SWE> self: {sd}")
+                    log.debug(f"SWE> other: {od}")
+                    sd = [type(d) for d in s]
+                    od = [type(d) for d in o]
+                    log.debug(f"SWE> self: {sd}")
+                    log.debug(f"SWE> other: {od}")
                 return False
         for k in self.job_data_attributes:
             if getattr(self, k) != getattr(other, k):
@@ -3441,6 +3474,9 @@ class JobDependency(ConfigObject):
         if not isinstance(other, JobDependency):
             return False
         return self.toDict() == other.toDict()
+
+    def __repr__(self):
+        return str(self.toDict())
 
     __hash__ = object.__hash__
 
