@@ -1578,6 +1578,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_auto_shared(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         self._test_job_deduplication()
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
@@ -1590,6 +1594,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-auto-unshared.yaml')
     def test_job_deduplication_auto_unshared(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         self._test_job_deduplication()
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
@@ -1614,6 +1622,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-false.yaml')
     def test_job_deduplication_false(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         self._test_job_deduplication()
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
@@ -1626,6 +1638,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-empty-nodeset.yaml')
     def test_job_deduplication_empty_nodeset(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         # Make sure that jobs with empty nodesets can still be
         # deduplicated
         self._test_job_deduplication()
@@ -1640,6 +1656,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_failed_node_request(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         # Pause nodepool so we can fail the node request later
         self.fake_nodepool.pause()
 
@@ -1677,6 +1697,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_failed_job(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
@@ -1721,6 +1745,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-false.yaml')
     def test_job_deduplication_false_failed_job(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         # Test that if we are *not* deduplicating jobs, we don't
         # duplicate the result on two different builds.
         # The way we check that is to retry the common-job between two
@@ -1866,6 +1894,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-retry.yaml')
     def test_job_deduplication_retry(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -1901,6 +1933,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-retry-child.yaml')
     def test_job_deduplication_retry_child(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         # This tests retrying a paused build (simulating an executor restart)
         # See test_data_return_child_from_retried_paused_job
         self.executor_server.hold_jobs_in_build = True
@@ -1965,6 +2001,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-parent-data.yaml')
     def test_job_deduplication_parent_data(self):
+        self.executor_server.hold_jobs_in_build = True
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -1989,12 +2030,19 @@ class TestGerritCircularDependencies(ZuulTestCase):
              ]}}
         )
 
-        A.addApproval('Code-Review', 2)
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        with app.sched.run_handler_lock:
+            A.addApproval('Code-Review', 2)
+            B.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.waitUntilSettled(matcher=[self.scheds.first])
 
-        self.waitUntilSettled()
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            self.executor_server.hold_jobs_in_build = False
+            self.executor_server.release()
+            self.waitUntilSettled(matcher=[app])
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
@@ -2012,6 +2060,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(len(self.fake_nodepool.history), 6)
 
     def _test_job_deduplication_semaphore(self):
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
         "Test semaphores with max=1 (mutex) and get resources first"
         self.executor_server.hold_jobs_in_build = True
 
