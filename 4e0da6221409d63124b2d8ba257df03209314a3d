@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4384840d_8bfb3ad4",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1507,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-25T22:46:18Z",
+      "side": 1,
+      "message": "I guess the queries we run are always something like status:merged but we don\u0027t actually care about that state in the processing of the response below? Is this also possibly a latent bug and we should filter our change list by those that meet the status criteria?",
+      "revId": "4e0da6221409d63124b2d8ba257df03209314a3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94ddc81b_7f88f174",
         "filename": "zuul/driver/gerrit/gerritsource.py",
         "patchSetId": 1
