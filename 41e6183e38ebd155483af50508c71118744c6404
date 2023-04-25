@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eb652df_268c2b86",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2223,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-25T11:29:07Z",
+      "side": 1,
+      "message": "Defining `__eq__` makes the type unhashable. I think we also want to define a `__hash__` method like\n\n```python\ndef __hash__(self):\n    return hash(self.hash)\n```\n\nas this seems to cause issue with the stats reporting\n\n```\n2023-04-24 22:40:55,123 zuul.Scheduler-0                 ERROR    Error in periodic stats:\nTraceback (most recent call last):\n  File \"/home/zuul/src/opendev.org/zuul/zuul/zuul/scheduler.py\", line 446, in runStats\n    self._runStats()\n\n[ ... snip ...]\n\n  File \"/home/zuul/src/opendev.org/zuul/zuul/zuul/zk/zkobject.py\", line 305, in walk\n    c, u \u003d walk(sub)\n           ^^^^^^^^^\n  File \"/home/zuul/src/opendev.org/zuul/zuul/zuul/zk/zkobject.py\", line 298, in walk\n    if obj in seen:\n       ^^^^^^^^^^^\nTypeError: unhashable type: \u0027JobData\u0027\n```",
+      "revId": "41e6183e38ebd155483af50508c71118744c6404",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d452579a_e77e58b7",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3379,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-25T11:29:07Z",
+      "side": 1,
+      "message": "I think we might want to also define a `__hash__` method here. Though, I haven\u0027t seen any exceptions related to that.",
+      "revId": "41e6183e38ebd155483af50508c71118744c6404",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcd15161_0ad2423f",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3403,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-25T11:29:07Z",
+      "side": 1,
+      "message": "dto.",
+      "revId": "41e6183e38ebd155483af50508c71118744c6404",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
