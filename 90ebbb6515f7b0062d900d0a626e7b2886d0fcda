@@ -16,6 +16,24 @@
       "message": "To which part(s) of the change is this parapgraph referring?",
       "revId": "90ebbb6515f7b0062d900d0a626e7b2886d0fcda",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c0ee34c_8f0d579a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-26T15:48:00Z",
+      "side": 1,
+      "message": "Oh, you\u0027re saying that we\u0027re explicitly specifying the strategy in all cases instead of relying on the default for the \"git\" command line.",
+      "parentUuid": "8bced4cf_57cdf5ce",
+      "revId": "90ebbb6515f7b0062d900d0a626e7b2886d0fcda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
