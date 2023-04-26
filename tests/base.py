@@ -1504,8 +1504,9 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 msg = msg[1:-1]
             l = [queryMethod(change) for change in self.changes.values()
                  if msg in change.data['commitMessage']]
-        elif query.startswith("status:"):
+        else:
             cut_off_time = 0
+            l = list(self.changes.values())
             parts = query.split(" ")
             for part in parts:
                 if part.startswith("-age"):
@@ -1513,17 +1514,18 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                     cut_off_time = (
                         datetime.datetime.now().timestamp() - float(age[:-1])
                     )
-            l = [
-                queryMethod(change) for change in self.changes.values()
-                if change.data["lastUpdated"] >= cut_off_time
-            ]
-        elif query.startswith('topic:'):
-            topic = query[len('topic:'):].strip()
-            l = [queryMethod(change) for change in self.changes.values()
-                 if topic in change.data.get('topic', '')]
-        else:
-            # Query all open changes
-            l = [queryMethod(change) for change in self.changes.values()]
+                    l = [
+                        change for change in l
+                        if change.data["lastUpdated"] >= cut_off_time
+                    ]
+                if part.startswith('topic:'):
+                    topic = part[len('topic:'):].strip()
+                    l = [
+                        change for change in l
+                        if 'topic' in change.data
+                        and topic in change.data['topic']
+                    ]
+            l = [queryMethod(change) for change in l]
         return l
 
     def simpleQuerySSH(self, query, event=None):

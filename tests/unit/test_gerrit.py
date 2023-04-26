@@ -827,6 +827,14 @@ class TestGerritFake(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
     tenant_config_file = "config/circular-dependencies/main.yaml"
 
+    def _make_tuple(self, data):
+        ret = []
+        for c in data:
+            dep_change = c['number']
+            dep_ps = c['currentPatchSet']['number']
+            ret.append((int(dep_change), int(dep_ps)))
+        return sorted(ret)
+
     def _get_tuple(self, change_number):
         ret = []
         data = self.fake_gerrit.get(
@@ -902,6 +910,11 @@ class TestGerritFake(ZuulTestCase):
         # The Gerrit connection method filters out the queried change
         ret = self.fake_gerrit._getSubmittedTogether(C1, None)
         self.assertEqual(ret, [(4, 1)])
+
+        # Test also the query used by the GerritConnection:
+        ret = self.fake_gerrit._simpleQuery('status:open topic:test-topic')
+        ret = self._make_tuple(ret)
+        self.assertEqual(ret, [(3, 1), (4, 1)])
 
 
 class TestGerritConnection(ZuulTestCase):
