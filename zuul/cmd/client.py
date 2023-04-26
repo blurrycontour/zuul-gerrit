@@ -33,7 +33,9 @@ import urllib.parse
 
 import zuul.cmd
 from zuul.lib.config import get_default
-from zuul.model import SystemAttributes, PipelineState, PipelineChangeList
+from zuul.model import (
+    SystemAttributes, Pipeline, PipelineState, PipelineChangeList
+)
 from zuul.zk import ZooKeeperClient
 from zuul.lib.keystorage import KeyStorage
 from zuul.zk.locks import tenant_read_lock, pipeline_lock
@@ -1035,14 +1037,16 @@ class Client(zuul.cmd.ZuulApp):
         with tenant_read_lock(zk_client, args.tenant):
             path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
             self.log.info('get pipe')
+            pipeline = Pipeline(args.tenant, args.pipeline)
             with pipeline_lock(
                     zk_client, args.tenant, args.pipeline
             ) as plock:
                 self.log.info('got locks')
                 zk_client.client.delete(path, recursive=True)
                 with ZKContext(zk_client, plock, None, self.log) as context:
-                    PipelineState.new(context, _path=path, layout_uuid=None)
-                    PipelineChangeList.new(context)
+                    pipeline.state = PipelineState.new(
+                        context, _path=path, layout_uuid=None)
+                    PipelineChangeList.new(context, pipeline=pipeline)
 
         sys.exit(0)
 

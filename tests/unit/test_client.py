@@ -448,6 +448,9 @@ class TestOnlineZKOperations(ZuulTestCase):
             with testtools.ExpectedException(NoNodeError):
                 self.getZKTree(
                     f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/item')
+            # Make sure the change list is re-created
+            self.getZKTree(
+                f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/change_list')
         finally:
             sched.run_handler_lock.release()
 
