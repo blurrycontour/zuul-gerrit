@@ -16,6 +16,24 @@
       "message": "Did we miss this because we\u0027re not checking the exit code here?",
       "revId": "3dd1ec71617dea75561a186b516f0e396a3ffd92",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5803202a_8cf1a498",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-04-26T13:58:56Z",
+      "side": 1,
+      "message": "Good point. I added the check in PS2",
+      "parentUuid": "2ea38b11_b6e8ce7f",
+      "revId": "3dd1ec71617dea75561a186b516f0e396a3ffd92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
