@@ -444,10 +444,14 @@ class TestOnlineZKOperations(ZuulTestCase):
             # Delete the pipeline state
             out, _ = p.communicate()
             self.log.debug(out.decode('utf8'))
+            self.assertEqual(p.returncode, 0, 'The command must exit 0')
             # Make sure it's deleted
             with testtools.ExpectedException(NoNodeError):
                 self.getZKTree(
                     f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/item')
+            # Make sure the change list is re-created
+            self.getZKTree(
+                f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/change_list')
         finally:
             sched.run_handler_lock.release()
 
