@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bced4cf_57cdf5ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-26T13:55:43Z",
+      "side": 1,
+      "message": "To which part(s) of the change is this parapgraph referring?",
+      "revId": "90ebbb6515f7b0062d900d0a626e7b2886d0fcda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
