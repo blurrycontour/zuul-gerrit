@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9271e090_e3000896",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 7703,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-27T18:10:15Z",
+      "side": 1,
+      "message": "It means the other job \"wins\".  We load jobs from repos in the order listed in the tenant config.  So we\u0027ll use the first job of a given name we come across, and then any other instances we will either raise an exception, or if the shadowing configuration permits, we will ignore them.",
+      "parentUuid": "6cbc4b12_90f1ad00",
+      "revId": "451da2a505fed3384cac5391c3caab3edae2cb61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61c95ad4_c5d7362c",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-27T17:38:08Z",
       "side": 1,
       "message": "Nit I think this can be further simplified to drop the skip_add var and return False here since we aren\u0027t iterating through a list.\n\nThen the check for skip_add below on 7777 can go away.",
+      "revId": "451da2a505fed3384cac5391c3caab3edae2cb61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1509ce82_7f0c6262",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 7768,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-04-27T18:10:15Z",
+      "side": 1,
+      "message": "True.  Oh well.",
+      "parentUuid": "61c95ad4_c5d7362c",
       "revId": "451da2a505fed3384cac5391c3caab3edae2cb61",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
