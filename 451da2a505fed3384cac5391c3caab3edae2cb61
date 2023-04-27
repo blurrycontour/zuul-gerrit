@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cbc4b12_90f1ad00",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 7703,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-27T17:38:08Z",
+      "side": 1,
+      "message": "This holds all of the pipeline configs for a single tenant right? What does that mean when we don\u0027t add a job to the jobs list because that job shadows a job in another repository?",
+      "revId": "451da2a505fed3384cac5391c3caab3edae2cb61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61c95ad4_c5d7362c",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 7768,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-27T17:38:08Z",
+      "side": 1,
+      "message": "Nit I think this can be further simplified to drop the skip_add var and return False here since we aren\u0027t iterating through a list.\n\nThen the check for skip_add below on 7777 can go away.",
+      "revId": "451da2a505fed3384cac5391c3caab3edae2cb61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
