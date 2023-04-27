@@ -3007,20 +3007,30 @@ class Job(ConfigObject):
             # possibility of success, which may help prevent errors in
             # most cases.  If we don't raise an error here, the
             # possibility of later failure still remains.
-            nonfinal_parents = [p for p in parents if not p.final]
-            if not nonfinal_parents:
+            nonfinal_parent_found = False
+            nonintermediate_parent_found = False
+            nonprotected_parent_found = False
+            for p in parents:
+                if not p.final:
+                    nonfinal_parent_found = True
+                if not p.intermediate:
+                    nonintermediate_parent_found = True
+                if not p.protected:
+                    nonprotected_parent_found = True
+                if (nonfinal_parent_found and
+                    nonintermediate_parent_found and
+                    nonprotected_parent_found):
+                    break
+
+            if not nonfinal_parent_found:
                 raise Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
                     'is final and can not act as a parent')
-            nonintermediate_parents = [
-                p for p in parents if not p.intermediate]
-            if not nonintermediate_parents and not self.abstract:
+            if not nonintermediate_parent_found and not self.abstract:
                 raise Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
                     f'is intermediate but "{self.name}" is not abstract')
-            nonprotected_parents = [
-                p for p in parents if not p.protected]
-            if (not nonprotected_parents and
+            if (not nonprotected_parent_found and
                 parents[0].source_context.project_canonical_name !=
                 self.source_context.project_canonical_name):
                 raise Exception(
@@ -7787,31 +7797,33 @@ class Layout(object):
     def addJob(self, job):
         # We can have multiple variants of a job all with the same
         # name, but these variants must all be defined in the same repo.
-        prior_jobs = [j for j in self.getJobs(job.name) if
-                      j.source_context.project_canonical_name !=
-                      job.source_context.project_canonical_name]
         # Unless the repo is permitted to shadow another.  If so, and
         # the job we are adding is from a repo that is permitted to
         # shadow the one with the older jobs, skip adding this job.
         job_project = job.source_context.project_canonical_name
         job_tpc = self.tenant.project_configs[job_project]
         skip_add = False
-        for prior_job in prior_jobs[:]:
-            prior_project = prior_job.source_context.project_canonical_name
-            if prior_project in job_tpc.shadow_projects:
-                prior_jobs.remove(prior_job)
-                skip_add = True
-
+        prior_jobs = self.jobs.get(job.name, [])
         if prior_jobs:
-            raise Exception("Job %s in %s is not permitted to shadow "
-                            "job %s in %s" % (
-                                job,
-                                job.source_context.project_name,
-                                prior_jobs[0],
-                                prior_jobs[0].source_context.project_name))
+            # All jobs we've added so far should be from the same
+            # project, so pick the first one.
+            prior_job = prior_jobs[0]
+            if (prior_job.source_context.project_canonical_name !=
+                job.source_context.project_canonical_name):
+                prior_project = prior_job.source_context.project_canonical_name
+                if prior_project in job_tpc.shadow_projects:
+                    skip_add = True
+                else:
+                    raise Exception("Job %s in %s is not permitted to shadow "
+                                    "job %s in %s" % (
+                                        job,
+                                        job.source_context.project_name,
+                                        prior_job,
+                                        prior_job.source_context.project_name))
+
         if skip_add:
             return False
-        if job.name in self.jobs:
+        if prior_jobs:
             self.jobs[job.name].append(job)
         else:
             self.jobs[job.name] = [job]
