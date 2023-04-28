@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4110597c_b10efa27",
+        "filename": "doc/source/drivers/github.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T18:27:15Z",
+      "side": 1,
+      "message": "Should this be \"conditions that must not be bet by the PR in order...\"",
+      "range": {
+        "startLine": 390,
+        "startChar": 19,
+        "endLine": 390,
+        "endChar": 36
+      },
+      "revId": "9b81d95c455423ec4a30d7676afe4a716c4bbad4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05754f2f_17a3dc92",
+        "filename": "releasenotes/notes/github-trigger-status-948e81b9f45418f1.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T18:27:15Z",
+      "side": 1,
+      "message": "Should this distinction be added to the documentation too? (or maybe just in the documentation?)",
+      "revId": "9b81d95c455423ec4a30d7676afe4a716c4bbad4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08a22a4d_eac3619c",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T18:27:15Z",
+      "side": 1,
+      "message": "Should we document that require_statuses is overridden by require?",
+      "revId": "9b81d95c455423ec4a30d7676afe4a716c4bbad4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0586444d_4a05588f",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T18:27:15Z",
+      "side": 1,
+      "message": "Nit its a bit confusing we have a separate ref filter but then filter refs here too. They are distinct and it isn\u0027t really exposed to users and it isn\u0027t new. Just calling it out.",
+      "revId": "9b81d95c455423ec4a30d7676afe4a716c4bbad4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46f85199_955e487d",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T18:27:15Z",
+      "side": 1,
+      "message": "Nit open() is a built in that we are shadowing here. Unlikely to be a problem since we don\u0027t need to open() any files.",
+      "revId": "9b81d95c455423ec4a30d7676afe4a716c4bbad4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
