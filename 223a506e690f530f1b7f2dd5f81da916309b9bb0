@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f82e425c_b038d4ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "Super minor thing. I only post it because of the recent performance improvement change elsewhere that I reviewed.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66c155da_f58fc303",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "Nit (and I\u0027m sorry I didn\u0027t catch this on the github change) but we could break here and process things a little quicker.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af46a41f_e97bfe67",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31705022_530473c2",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a27782e_597f7b10",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0b36795_13c0f420",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "See above but trickier here due to nested loops.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc1da79a_e32e41d3",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa82e5bf_a6a3f1e2",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-04-28T19:34:34Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "223a506e690f530f1b7f2dd5f81da916309b9bb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
