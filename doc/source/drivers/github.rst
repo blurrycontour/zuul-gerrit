@@ -339,7 +339,7 @@ the following options.
       format of ``user:context:status``.  For example,
       ``zuul_github_ci_bot:check_pipeline:success``.
 
-   .. attr: check
+   .. attr:: check
 
       This is only used for ``check_run`` events. It works similar to
       the ``status`` attribute and accepts a list of strings each of
@@ -362,6 +362,38 @@ the following options.
       a regular expression and multiple refs may be listed. GitHub
       always sends full ref name, eg. ``refs/tags/bar`` and this
       string is matched against the regular expression.
+
+   .. attr:: require-status
+
+      .. warning:: This is deprecated and will be removed in a future
+                   version.  Use :attr:`pipeline.trigger.<github
+                   source>.require` instead.
+
+      This may be used for any event.  It requires that a certain kind
+      of status be present for the PR (the status could be added by
+      the event in question).  It follows the same syntax as
+      :attr:`pipeline.require.<github source>.status`. For each
+      specified criteria there must exist a matching status.
+
+      This is ignored if the :attr:`pipeline.trigger.<github
+      source>.require` attribute is present.
+
+   .. attr:: require
+
+      This may be used for any event.  It describes conditions that
+      must be met by the PR in order for the trigger event to match.
+      Those conditions may be satisfied by the event in question.  It
+      follows the same syntax as :ref:`github_requirements`.
+
+   .. attr:: reject
+
+      This may be used for any event and is the mirror of
+      :attr:`pipeline.trigger.<github source>.require`.  It describes
+      conditions that when met by the PR cause the trigger event not
+      to match.  Those conditions may be satisfied by the event in
+      question.  It follows the same syntax as
+      :ref:`github_requirements`.
+
 
 Reporter Configuration
 ----------------------
@@ -461,6 +493,8 @@ itself. Status name, description, and context is taken from the pipeline.
       for Pull Request based items.
 
 .. _Github App: https://developer.github.com/apps/
+
+.. _github_requirements:
 
 Requirements Configuration
 --------------------------

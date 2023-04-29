@@ -250,7 +250,8 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
 
       This takes a list of approvals in the same format as
       :attr:`pipeline.trigger.<gerrit source>.require-approval` but
-      will fail to enter the pipeline if there is a matching approval.
+      the item will fail to enter the pipeline if there is a matching
+      approval.
 
 Reporter Configuration
 ----------------------
