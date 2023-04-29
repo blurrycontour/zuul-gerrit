@@ -239,6 +239,10 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
 
    .. attr:: require-approval
 
+      .. warning:: This is deprecated and will be removed in a future
+                   version.  Use :attr:`pipeline.trigger.<gerrit
+                   source>.require` instead.
+
       This may be used for any event.  It requires that a certain kind
       of approval be present for the current patchset of the change
       (the approval could be added by the event in question).  It
@@ -246,12 +250,39 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
       source>.approval`. For each specified criteria there must exist
       a matching approval.
 
+      This is ignored if the :attr:`pipeline.trigger.<gerrit
+      source>.require` attribute is present.
+
    .. attr:: reject-approval
+
+      .. warning:: This is deprecated and will be removed in a future
+                   version.  Use :attr:`pipeline.trigger.<gerrit
+                   source>.reject` instead.
 
       This takes a list of approvals in the same format as
       :attr:`pipeline.trigger.<gerrit source>.require-approval` but
       the item will fail to enter the pipeline if there is a matching
       approval.
+
+      This is ignored if the :attr:`pipeline.trigger.<gerrit
+      source>.reject` attribute is present.
+
+   .. attr:: require
+
+      This may be used for any event.  It describes conditions that
+      must be met by the change in order for the trigger event to
+      match.  Those conditions may be satisfied by the event in
+      question.  It follows the same syntax as
+      :ref:`gerrit_requirements`.
+
+   .. attr:: reject
+
+      This may be used for any event and is the mirror of
+      :attr:`pipeline.trigger.<gerrit source>.require`.  It describes
+      conditions that when met by the change cause the trigger event
+      not to match.  Those conditions may be satisfied by the event in
+      question.  It follows the same syntax as
+      :ref:`gerrit_requirements`.
 
 Reporter Configuration
 ----------------------
@@ -283,6 +314,8 @@ with an HTTP password, in which case the HTTP API is used.
 
 A :ref:`connection<connections>` that uses the gerrit driver must be
 supplied to the trigger.
+
+.. _gerrit_requirements:
 
 Requirements Configuration
 --------------------------
@@ -366,7 +399,7 @@ order to be enqueued into the pipeline.
    .. attr:: status
 
       A string value that corresponds with the status of the change
-      reported by the trigger.
+      reported by Gerrit.
 
 .. attr:: pipeline.reject.<gerrit source>
 
@@ -376,10 +409,12 @@ order to be enqueued into the pipeline.
 
    .. attr:: approval
 
-      This takes an approval or a list of approvals. If an approval 
-      matches the provided criteria the change can not be entered 
-      into the pipeline. It follows the same syntax as
-      :attr:`pipeline.require.<gerrit source>.approval`.
+      This requires that a certain kind of approval not be present for the
+      current patchset of the change (the approval could be added by
+      the event in question). Approval is a dictionary or a list of
+      dictionaries with attributes listed below, all of which are
+      optional and are combined together so that there must be no approvals
+      matching all specified requirements.
 
       Example to reject a change with any negative vote:
 
@@ -389,6 +424,55 @@ order to be enqueued into the pipeline.
            my-gerrit:
              approval:
                - Code-Review: [-1, -2]
+
+      .. attr:: username
+
+         If present, an approval from this username is required.  It is
+         treated as a regular expression.
+
+      .. attr:: email
+
+         If present, an approval with this email address is required.  It is
+         treated as a regular expression.
+
+      .. attr:: older-than
+
+         If present, the approval must be older than this amount of time
+         to match.  Provide a time interval as a number with a suffix of
+         "w" (weeks), "d" (days), "h" (hours), "m" (minutes), "s"
+         (seconds).  Example ``48h`` or ``2d``.
+
+      .. attr:: newer-than
+
+         If present, the approval must be newer than this amount
+         of time to match.  Same format as "older-than".
+
+      Any other field is interpreted as a review category and value
+      pair.  For example ``Verified: 1`` would require that the
+      approval be for a +1 vote in the "Verified" column.  The value
+      may either be a single value or a list: ``Verified: [1, 2]``
+      would match either a +1 or +2 vote.
+
+   .. attr:: open
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the change must be open or closed in order to be rejected.
+
+   .. attr:: current-patchset
+
+      A boolean value (``true`` or ``false``) that indicates whether the
+      change must be the current patchset in order to be rejected.
+
+   .. attr:: wip
+
+      A boolean value (``true`` or ``false``) that indicates whether the
+      change must be wip or not wip in order to be rejected.
+
+   .. attr:: status
+
+      A string value that corresponds with the status of the change
+      reported by Gerrit.
+
 
 Reference Pipelines Configuration
 ---------------------------------
