@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d16a8a82_3bc842ef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-02T22:18:11Z",
+      "side": 1,
+      "message": "Not just old but appears to be removed.",
+      "range": {
+        "startLine": 10,
+        "startChar": 41,
+        "endLine": 10,
+        "endChar": 44
+      },
+      "revId": "515e6ab8f7b9d07b81c2310ac1caa30bb4c3312d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
