@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f6a1d40_c882998e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-02T22:16:15Z",
+      "side": 1,
+      "message": "Is this the correct comparison? Lets say right now is the start of time in 1970 and its value is `0`. Five minutes from now is `300`. If we have a token that expires in 24 hours its value will be `86400`. With that we have:\n\n```\nnow \u003d 0\ncutoff_time \u003d 300\nexpiry \u003d 86400\n\nexpiry \u003e cutoff_time \u003d\u003d 86400 \u003e 300 \u003d\u003d True\n```\n\nand we\u0027ll needlessly refresh the token. I think this should be a `\u003c`?\n\n```\nexpiry \u003c cutoff_time \u003d\u003d 86400 \u003c 300 \u003d\u003d False\n```\n\nAnd we won\u0027t refresh the token until:\n\n```\nnow \u003d 86395\ncutoff_time \u003d 86400\nexpiry \u003d 86400\n\nexpiry \u003c cutoff_time \u003d\u003d 84600 \u003c 8400 \u003d\u003d False\n```\n\nNow we refresh the token five minutes before it will expire.",
+      "range": {
+        "startLine": 1128,
+        "startChar": 51,
+        "endLine": 1128,
+        "endChar": 52
+      },
+      "revId": "6852bee3ff286fb87babf5ff1dcc83dace05aed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
