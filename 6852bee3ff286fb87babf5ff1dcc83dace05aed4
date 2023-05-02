@@ -22,6 +22,30 @@
       },
       "revId": "6852bee3ff286fb87babf5ff1dcc83dace05aed4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a7548e8_c2830faa",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-02T22:21:04Z",
+      "side": 1,
+      "message": "Oops I have a couple of typos in that last example. It should be:\n\n```\nnow \u003d 86396\ncutoff_time \u003d 86401\nexpiry \u003d 86400\n\nexpiry \u003c cutoff_time \u003d\u003d 86400 \u003c 86401 \u003d\u003d True\n```",
+      "parentUuid": "8f6a1d40_c882998e",
+      "range": {
+        "startLine": 1128,
+        "startChar": 51,
+        "endLine": 1128,
+        "endChar": 52
+      },
+      "revId": "6852bee3ff286fb87babf5ff1dcc83dace05aed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
