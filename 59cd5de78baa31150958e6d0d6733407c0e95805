@@ -16,6 +16,23 @@
       "message": "Ah, there was two ReactJson on the JobVariant page and I only updated one of them, that is fixed now, thanks!",
       "revId": "59cd5de78baa31150958e6d0d6733407c0e95805",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1e6c7c7_c044777b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-05-02T23:12:53Z",
+      "side": 1,
+      "message": "That looks great, well done!",
+      "revId": "59cd5de78baa31150958e6d0d6733407c0e95805",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
