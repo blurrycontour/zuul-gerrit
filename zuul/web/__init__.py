@@ -463,6 +463,8 @@ class ZuulWebAPI(object):
 
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
+        # SQL build query timeout, in milliseconds:
+        self.query_timeout = 30000
 
     @property
     def log(self):
@@ -1454,7 +1456,8 @@ class ZuulWebAPI(object):
             newrev=newrev, uuid=uuid, job_name=job_name, voting=voting,
             nodeset=nodeset, result=result, final=final, held=held,
             complete=complete, limit=limit, offset=skip, idx_min=_idx_min,
-            idx_max=_idx_max, exclude_result=exclude_result)
+            idx_max=_idx_max, exclude_result=exclude_result,
+            query_timeout=self.query_timeout)
 
         return [self.buildToDict(b, b.buildset) for b in builds]
 
@@ -1510,7 +1513,8 @@ class ZuulWebAPI(object):
 
         buildsets = connection.getBuildsets(
             tenant=tenant_name, project=project, pipeline=pipeline,
-            branch=branch, complete=True, limit=1)
+            branch=branch, complete=True, limit=1,
+            query_timeout=self.query_timeout)
         if not buildsets:
             raise cherrypy.HTTPError(404, 'No buildset found')
 
@@ -1551,7 +1555,8 @@ class ZuulWebAPI(object):
             tenant=tenant_name, project=project, pipeline=pipeline,
             change=change, branch=branch, patchset=patchset, ref=ref,
             newrev=newrev, uuid=uuid, result=result, complete=complete,
-            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
+            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max,
+            query_timeout=self.query_timeout)
 
         return [self.buildsetToDict(b) for b in buildsets]
 
