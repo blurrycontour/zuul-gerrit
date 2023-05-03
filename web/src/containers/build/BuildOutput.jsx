@@ -13,6 +13,7 @@
 // under the License.
 
 import * as React from 'react'
+import { connect } from 'react-redux'
 import { Fragment } from 'react'
 import ReAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
@@ -73,6 +74,7 @@ class BuildOutputLabel extends React.Component {
 class BuildOutput extends React.Component {
   static propTypes = {
     output: PropTypes.object,
+    preferences: PropTypes.object,
   }
 
   renderHosts (hosts) {
@@ -109,8 +111,12 @@ class BuildOutput extends React.Component {
 
   renderFailedTask (host, task) {
     const max_lines = 42
+    let zuulOutputClass = 'zuul-build-output'
+    if (this.props.preferences.darkMode) {
+        zuulOutputClass = 'zuul-build-output-dark'
+    }
     return (
-      <Card key={host + task.zuul_log_id} className="zuul-task-summary-failed">
+      <Card key={host + task.zuul_log_id} className="zuul-task-summary-failed" style={this.props.preferences.darkMode ? {background: 'var(--pf-global--BackgroundColor--300)'} : {}}>
         <CardHeader>
           <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
             &nbsp;Task&nbsp;<strong>{task.name}</strong>&nbsp;
@@ -119,25 +125,25 @@ class BuildOutput extends React.Component {
         <CardBody>
           {task.invocation && task.invocation.module_args &&
            task.invocation.module_args._raw_params && (
-            <pre key="cmd" title="cmd" className={`${'cmd'}`}>
+            <pre key="cmd" title="cmd" className={'cmd ' + zuulOutputClass}>
               {task.invocation.module_args._raw_params}
             </pre>
           )}
           {task.msg && (
-            <pre key="msg" title="msg">{task.msg}</pre>
+            <pre key="msg" title="msg" className={zuulOutputClass}>{task.msg}</pre>
           )}
           {task.exception && (
-            <pre key="exc" style={{ color: 'red' }} title="exc">{task.exception}</pre>
+            <pre key="exc" style={{ color: 'red' }} title="exc" className={zuulOutputClass}>{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
             <Fragment>
               {task.stdout_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
-                  <pre key="stdout" title="stdout">
+                  <pre key="stdout" title="stdout" className={zuulOutputClass}>
                     <ReAnsi log={task.stdout_lines.slice(0, -max_lines).join('\n')} />
                   </pre>
                 </details>)}
-              <pre key="stdout" title="stdout">
+              <pre key="stdout" title="stdout" className={zuulOutputClass}>
                 <ReAnsi log={task.stdout_lines.slice(-max_lines).join('\n')} />
               </pre>
             </Fragment>
@@ -146,12 +152,12 @@ class BuildOutput extends React.Component {
             <Fragment>
               {task.stderr_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
-                  <pre key="stderr" title="stderr">
+                  <pre key="stderr" title="stderr" className={zuulOutputClass}>
                     <ReAnsi log={task.stderr_lines.slice(0, -max_lines).join('\n')} />
                   </pre>
                 </details>
               )}
-              <pre key="stderr" title="stderr">
+              <pre key="stderr" title="stderr" className={zuulOutputClass}>
                 <ReAnsi log={task.stderr_lines.slice(-max_lines).join('\n')} />
               </pre>
             </Fragment>
@@ -177,4 +183,10 @@ class BuildOutput extends React.Component {
 }
 
 
-export default BuildOutput
+function mapStateToProps(state) {
+  return {
+    preferences: state.preferences,
+  }
+}
+
+export default connect(mapStateToProps)(BuildOutput)

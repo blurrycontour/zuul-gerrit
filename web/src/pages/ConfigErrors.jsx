@@ -18,7 +18,12 @@ import { connect } from 'react-redux'
 import {
   Icon
 } from 'patternfly-react'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import {
+  PageSection,
+  PageSectionVariants,
+  List,
+  ListItem,
+} from '@patternfly/react-core'
 
 import { fetchConfigErrorsAction } from '../actions/configErrors'
 
@@ -26,7 +31,8 @@ class ConfigErrorsPage extends React.Component {
   static propTypes = {
     configErrors: PropTypes.object,
     tenant: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    preferences: PropTypes.object,
   }
 
   updateData = () => {
@@ -36,7 +42,7 @@ class ConfigErrorsPage extends React.Component {
   render () {
     const { configErrors } = this.props
     return (
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <div className="pull-right">
           {/* Lint warning jsx-a11y/anchor-is-valid */}
           {/* eslint-disable-next-line */}
@@ -45,22 +51,22 @@ class ConfigErrorsPage extends React.Component {
           </a>
         </div>
         <div className="pull-left">
-          <ul className="list-group">
+          <List isPlain isBordered>
             {configErrors.map((item, idx) => {
               let ctxPath = item.source_context.path
               if (item.source_context.branch !== 'master') {
                 ctxPath += ' (' + item.source_context.branch + ')'
               }
               return (
-                <li className="list-group-item" key={idx}>
+                <ListItem key={idx}>
                   <h3>{item.source_context.project} - {ctxPath}</h3>
                   <p style={{whiteSpace: 'pre-wrap'}}>
                     {item.error}
                   </p>
-                </li>
+                </ListItem>
               )
             })}
-          </ul>
+          </List>
         </div>
       </PageSection>
     )
@@ -69,5 +75,6 @@ class ConfigErrorsPage extends React.Component {
 
 export default connect(state => ({
   tenant: state.tenant,
-  configErrors: state.configErrors.errors
+  configErrors: state.configErrors.errors,
+  preferences: state.preferences,
 }))(ConfigErrorsPage)

@@ -26,7 +26,7 @@ import { buildResultLegendData, buildsBarStyle } from './Misc'
 
 
 function BuildsetGanttChart(props) {
-    const { builds, timezone } = props
+    const { builds, timezone, preferences } = props
     const sortedByStartTime = builds.sort((a, b) => {
         if (a.start_time > b.start_time) {
             return -1
@@ -64,6 +64,10 @@ function BuildsetGanttChart(props) {
 
     const chartLegend = buildResultLegendData.filter((legend) => { return uniqueResults.indexOf(legend.name) > -1 })
 
+    let horizontalLegendTextColor = '#000'
+    if (preferences.darkMode) {
+      horizontalLegendTextColor = '#ccc'
+    }
 
     return (
         <div style={{ height: Math.max(400, 20 * builds.length) + 'px', width: '900px' }}>
@@ -81,10 +85,9 @@ function BuildsetGanttChart(props) {
                 legendOrientation='horizontal'
                 legendPosition='top'
                 legendData={legendData}
-                legendComponent={<ChartLegend data={chartLegend} itemsPerRow={4} />}
-
+                legendComponent={<ChartLegend data={chartLegend} itemsPerRow={4} style={{labels: {fill: horizontalLegendTextColor}}} />}
             >
-                <ChartAxis />
+                <ChartAxis style={{tickLabels: {fill:horizontalLegendTextColor}}} />
                 <ChartAxis
                     dependentAxis
                     showGrid
@@ -103,15 +106,16 @@ function BuildsetGanttChart(props) {
                         return moment.duration(t, 'seconds').format(format)
                     }}
                     fixLabelOverlap={true}
-                    style={{ tickLabels: { angle: -25, padding: 1, verticalAnchor: 'middle', textAnchor: 'end' } }} />
+                    style={{ tickLabels: { angle: -25, padding: 1, verticalAnchor: 'middle', textAnchor: 'end', fill: horizontalLegendTextColor } }}
+                />
                 <ChartBar
                     data={data}
-                    style={buildsBarStyle}
+                    style={ buildsBarStyle }
                     labelComponent={
-                        <ChartTooltip constrainToVisibleArea />}
+                        <ChartTooltip constrainToVisibleArea/>}
                     labels={({ datum }) => `${datum.result}\nStarted ${datum.started}\nEnded ${datum.ended}`}
                 />
-            </ Chart>
+            </Chart>
         </div>
     )
 
@@ -120,8 +124,10 @@ function BuildsetGanttChart(props) {
 BuildsetGanttChart.propTypes = {
     builds: PropTypes.array.isRequired,
     timezone: PropTypes.string,
+    preferences: PropTypes.object,
 }
 
 export default connect((state) => ({
     timezone: state.timezone,
+    preferences: state.preferences,
 }))(BuildsetGanttChart)

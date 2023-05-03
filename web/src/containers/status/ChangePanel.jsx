@@ -25,7 +25,8 @@ class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    preferences: PropTypes.object
   }
 
   constructor () {
@@ -126,7 +127,7 @@ class ChangePanel extends React.Component {
     const interesting_jobs = change.jobs.filter(j => this.jobStrResult(j) !== 'skipped')
     let jobPercent = (100 / interesting_jobs.length).toFixed(2)
     return (
-      <div className='progress zuul-change-total-result'>
+      <div className={`progress zuul-change-total-result${this.props.preferences.darkMode ? ' progress-dark' : ''}`}>
         {change.jobs.map((job, idx) => {
           let result = this.jobStrResult(job)
           if (['queued', 'waiting', 'skipped'].includes(result)) {
@@ -204,7 +205,7 @@ class ChangePanel extends React.Component {
     }
 
     return (
-      <div className='progress zuul-job-result'
+      <div className={`progress zuul-job-result${this.props.preferences.darkMode ? ' progress-dark' : ''}`}
         title={title}>
         <div className={'progress-bar ' + className}
           role='progressbar'
@@ -321,9 +322,9 @@ class ChangePanel extends React.Component {
 
     return (
       <>
-        <ul className='list-group zuul-patchset-body'>
+        <ul className={`list-group ${this.props.preferences.darkMode ? 'zuul-patchset-body-dark' : 'zuul-patchset-body'}`}>
           {interestingJobs.map((job, idx) => (
-            <li key={idx} className='list-group-item zuul-change-job'>
+            <li key={idx} className={`list-group-item ${this.props.preferences.darkMode ? 'zuul-change-job-dark' : 'zuul-change-job'}`}>
               {this.renderJob(job, times.jobs[job.name])}
             </li>
           ))}
@@ -389,8 +390,8 @@ class ChangePanel extends React.Component {
     }
     const times = this.calculateTimes(change)
     const header = (
-      <div className='panel panel-default zuul-change'>
-        <div className='panel-heading zuul-patchset-header'
+      <div className={`panel panel-default ${this.props.preferences.darkMode ? 'zuul-change-dark' : 'zuul-change'}`}>
+        <div className={`panel-heading ${this.props.preferences.darkMode ? 'zuul-patchset-header-dark' : 'zuul-patchset-header'}`}
           onClick={this.onClick}>
           <div className='row'>
             <div className='col-xs-8'>
@@ -422,4 +423,7 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+  tenant: state.tenant,
+  preferences: state.preferences,
+}))(ChangePanel)
