@@ -46,6 +46,30 @@
       },
       "revId": "6852bee3ff286fb87babf5ff1dcc83dace05aed4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "765c5543_80dc660d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1128,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-05-03T05:27:39Z",
+      "side": 1,
+      "message": "Yep, you are completely right. Thanks!",
+      "parentUuid": "2a7548e8_c2830faa",
+      "range": {
+        "startLine": 1128,
+        "startChar": 51,
+        "endLine": 1128,
+        "endChar": 52
+      },
+      "revId": "6852bee3ff286fb87babf5ff1dcc83dace05aed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
