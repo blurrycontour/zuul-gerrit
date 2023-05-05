@@ -19,7 +19,7 @@ COPY web /tmp/src
 # Explicitly run the Javascript build
 RUN cd /tmp/src && yarn install -d && yarn build
 
-FROM docker.io/opendevorg/python-builder:3.11-bullseye as builder
+FROM quay.io/opendevorg/python-builder:3.11-bullseye as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Optional location of Zuul API endpoint.
@@ -58,7 +58,7 @@ RUN apt-get update \
   && make bin/skopeo \
   && cp bin/skopeo /tmp/skopeo
 
-FROM docker.io/opendevorg/python-base:3.11-bullseye as zuul
+FROM quay.io/opendevorg/python-base:3.11-bullseye as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
