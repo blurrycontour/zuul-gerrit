@@ -70,6 +70,9 @@ def mock_get(url, params=None, **kwargs):
 
 
 def mock_urlopen(url, *args, **kwargs):
+    if hasattr(url, 'full_url'):
+        # Like a urllib.Request object
+        url = url.full_url
     if url == ("https://my.oidc.provider/auth/realms/realm-one/"
                "protocol/openid-connect/certs"):
         io = StringIO()
