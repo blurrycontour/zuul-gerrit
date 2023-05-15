@@ -63,6 +63,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
 RUN /output/install-from-bindep zuul_base \
+# Install newer bwrap from backports for --disable-userns support (>=0.8.0)
+  && apt-get update \
+  && apt-get install -y bubblewrap/bullseye-backports \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
   && rm -rf /output \
   && useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul \
 # This enables git protocol v2 which is more efficient at negotiating
