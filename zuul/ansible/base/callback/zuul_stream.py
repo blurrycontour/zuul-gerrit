@@ -125,6 +125,8 @@ class CallbackModule(default.CallbackModule):
         logging_config.apply()
 
         self._logger = logging.getLogger('zuul.executor.ansible')
+        self._result_logger = logging.getLogger(
+            'zuul.executor.ansible.result')
 
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
         # With the default "linear" strategy (and likely others),
@@ -426,7 +428,7 @@ class CallbackModule(default.CallbackModule):
                     hostname = self._get_hostname(result)
                     self._log("%s | %s " % (hostname, line))
 
-    def v2_runner_on_failed(self, result, ignore_errors=False):
+    def _v2_runner_on_failed(self, result, ignore_errors=False):
         result_dict = dict(result._result)
 
         self._handle_exception(result_dict)
@@ -451,6 +453,17 @@ class CallbackModule(default.CallbackModule):
                 result=result, status='ERROR', result_dict=result_dict)
         if ignore_errors:
             self._log_message(result, "Ignoring Errors", status="ERROR")
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        ret = self._v2_runner_on_failed(result, ignore_errors)
+        if not ignore_errors:
+            self._result_logger.info("failure")
+        return ret
+
+    def v2_runner_on_unreachable(self, result):
+        ret = self._v2_runner_on_failed(result)
+        self._result_logger.info("unreachable")
+        return ret
 
     def v2_runner_on_skipped(self, result):
         if result._task.loop:
@@ -786,5 +799,3 @@ class CallbackModule(default.CallbackModule):
                 delegated_host=delegated_vars['ansible_host'])
         else:
             return result._host.get_name()
-
-    v2_runner_on_unreachable = v2_runner_on_failed
