@@ -125,6 +125,8 @@ class CallbackModule(default.CallbackModule):
         logging_config.apply()
 
         self._logger = logging.getLogger('zuul.executor.ansible')
+        self._result_logger = logging.getLogger(
+            'zuul.executor.ansible.result')
 
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
         # With the default "linear" strategy (and likely others),
@@ -451,6 +453,8 @@ class CallbackModule(default.CallbackModule):
                 result=result, status='ERROR', result_dict=result_dict)
         if ignore_errors:
             self._log_message(result, "Ignoring Errors", status="ERROR")
+        else:
+            self._result_logger.info("failure")
 
     def v2_runner_on_skipped(self, result):
         if result._task.loop:

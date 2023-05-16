@@ -2703,7 +2703,7 @@ class AnsibleJob(object):
                 self.log.exception("Exception while killing ansible process:")
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True, cleanup=False):
+                   allow_pre_fail, wrapped=True, cleanup=False):
         config_file = playbook.ansible_config
         env_copy = {key: value
                     for key, value in os.environ.copy().items()
@@ -2809,9 +2809,13 @@ class AnsibleJob(object):
             # don't count towards BUFFER_LINES_FOR_SYNTAX
             idx = 0
             for line in iter(self.proc.stdout.readline, b''):
+                result_line = None
                 if line.startswith(b'RESULT'):
-                    # TODO(mordred) Process result commands if sent
-                    continue
+                    result_line = line[len('RESULT'):].strip()
+                    if allow_pre_fail and result_line == b'failure':
+                        self.log.info("Early failure in job")
+                        self.executor_server.updateBuildStatus(
+                            self.build_request, {'pre_fail': True})
                 else:
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
@@ -2822,7 +2826,10 @@ class AnsibleJob(object):
                 else:
                     line = line[:1024].rstrip()
 
-                ansible_log.debug("Ansible output: %s" % (line,))
+                if result_line:
+                    ansible_log.debug("Ansible result output: %s" % (line,))
+                else:
+                    ansible_log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
             try:
                 cpu_times = self.proc.cpu_times()
@@ -2952,7 +2959,8 @@ class AnsibleJob(object):
 
         result, code = self.runAnsible(
             cmd=cmd, timeout=self.executor_server.setup_timeout,
-            playbook=playbook, ansible_version=ansible_version, wrapped=False)
+            playbook=playbook, ansible_version=ansible_version,
+            allow_pre_fail=False, wrapped=False)
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
         if self.executor_server.statsd:
@@ -3013,7 +3021,8 @@ class AnsibleJob(object):
 
         result, code = self.runAnsible(
             cmd=cmd, timeout=self.executor_server.setup_timeout,
-            playbook=playbook, ansible_version=ansible_version)
+            playbook=playbook, ansible_version=ansible_version,
+            allow_pre_fail=False)
         self.log.debug("Ansible freeze complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
 
@@ -3142,6 +3151,7 @@ class AnsibleJob(object):
         if acquired_semaphores:
             result, code = self.runAnsible(
                 cmd, timeout, playbook, ansible_version,
+                allow_pre_fail=phase in ('run', 'post'),
                 cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
