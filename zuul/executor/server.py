@@ -2809,9 +2809,13 @@ class AnsibleJob(object):
             # don't count towards BUFFER_LINES_FOR_SYNTAX
             idx = 0
             for line in iter(self.proc.stdout.readline, b''):
+                result_line = None
                 if line.startswith(b'RESULT'):
-                    # TODO(mordred) Process result commands if sent
-                    continue
+                    result_line = line[len('RESULT'):].strip()
+                    if result_line == b'failure':
+                        self.log.info("Early failure in job")
+                        self.executor_server.updateBuildStatus(
+                            self.build_request, {'pre_fail': True})
                 else:
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
@@ -2822,7 +2826,10 @@ class AnsibleJob(object):
                 else:
                     line = line[:1024].rstrip()
 
-                ansible_log.debug("Ansible output: %s" % (line,))
+                if result_line:
+                    ansible_log.debug("Ansible result output: %s" % (line,))
+                else:
+                    ansible_log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
             try:
                 cpu_times = self.proc.cpu_times()
