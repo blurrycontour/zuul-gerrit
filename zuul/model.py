@@ -3859,6 +3859,7 @@ class Build(zkobject.ZKObject):
             span_info=None,
             # A list of build events like paused, resume, ...
             events=[],
+            pre_fail=False,
         )
 
     def serialize(self, context):
@@ -3873,6 +3874,7 @@ class Build(zkobject.ZKObject):
             "estimated_time": self.estimated_time,
             "canceled": self.canceled,
             "paused": self.paused,
+            "pre_fail": self.pre_fail,
             "retry": self.retry,
             "held": self.held,
             "zuul_event_id": self.zuul_event_id,
@@ -3944,6 +3946,11 @@ class Build(zkobject.ZKObject):
                         # Load the object from ZK
                         data['_' + job_data_key] = JobData.fromZK(
                             context, job_data['path'])
+
+        # MODEL_API < 14
+        if 'pre_fail' not in data:
+            data['pre_fail'] = False
+
         return data
 
     def getPath(self):
@@ -3994,7 +4001,9 @@ class Build(zkobject.ZKObject):
 
     @property
     def failed(self):
-        if self.result and self.result not in ['SUCCESS', 'SKIPPED']:
+        if self.pre_fail:
+            return True
+        if self.result and self.result not in ['SUCCESS', 'SKIPPED', 'RETRY']:
             return True
         return False
 
@@ -5086,8 +5095,7 @@ class QueueItem(zkobject.ZKObject):
             if not job.voting:
                 continue
             build = self.current_build_set.getBuild(job.name)
-            if (build and build.result and
-                    build.result not in ['SUCCESS', 'SKIPPED', 'RETRY']):
+            if (build and build.failed):
                 return True
         return False
 
@@ -5912,6 +5920,7 @@ class QueueItem(zkobject.ZKObject):
                 'pipeline': build.pipeline.name if build else None,
                 'canceled': build.canceled if build else None,
                 'paused': build.paused if build else None,
+                'pre_fail': build.pre_fail if build else None,
                 'retry': build.retry if build else None,
                 'tries': self.current_build_set.getTries(job.name),
                 'queued': job.queued,
