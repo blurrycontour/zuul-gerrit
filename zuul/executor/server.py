@@ -2703,7 +2703,7 @@ class AnsibleJob(object):
                 self.log.exception("Exception while killing ansible process:")
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True, cleanup=False):
+                   allow_pre_fail, wrapped=True, cleanup=False):
         config_file = playbook.ansible_config
         env_copy = {key: value
                     for key, value in os.environ.copy().items()
@@ -2823,10 +2823,20 @@ class AnsibleJob(object):
                     except Exception:
                         self.log.exception("Unable to list namespace pids")
                     first = False
-
+                if b'FATAL ERROR DURING FILE TRANSFER' in line:
+                    # This can end up being an unreachable host (see
+                    # below), so don't pre-fail in this case.
+                    allow_pre_fail = False
+                result_line = None
                 if line.startswith(b'RESULT'):
-                    # TODO(mordred) Process result commands if sent
-                    continue
+                    result_line = line[len('RESULT'):].strip()
+                    if result_line == b'unreachable':
+                        self.log.info("Early unreachable host")
+                        allow_pre_fail = False
+                    if allow_pre_fail and result_line == b'failure':
+                        self.log.info("Early failure in job")
+                        self.executor_server.updateBuildStatus(
+                            self.build_request, {'pre_fail': True})
                 else:
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
@@ -2837,7 +2847,10 @@ class AnsibleJob(object):
                 else:
                     line = line[:1024].rstrip()
 
-                ansible_log.debug("Ansible output: %s" % (line,))
+                if result_line:
+                    ansible_log.debug("Ansible result output: %s" % (line,))
+                else:
+                    ansible_log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
             try:
                 cpu_times = self.proc.cpu_times()
@@ -2874,6 +2887,9 @@ class AnsibleJob(object):
         # creates the file job-output.unreachable in case there were
         # unreachable nodes. This can be removed once ansible returns a
         # distinct value for unreachable.
+        # TODO: Investigate whether the unreachable callback can be
+        # removed in favor of the ansible result log stream (see above
+        # in pre-fail)
         if ret == 3 or os.path.exists(self.jobdir.job_unreachable_file):
             # AnsibleHostUnreachable: We had a network issue connecting to
             # our zuul-worker.
@@ -2967,7 +2983,8 @@ class AnsibleJob(object):
 
         result, code = self.runAnsible(
             cmd=cmd, timeout=self.executor_server.setup_timeout,
-            playbook=playbook, ansible_version=ansible_version, wrapped=False)
+            playbook=playbook, ansible_version=ansible_version,
+            allow_pre_fail=False, wrapped=False)
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
         if self.executor_server.statsd:
@@ -3028,7 +3045,8 @@ class AnsibleJob(object):
 
         result, code = self.runAnsible(
             cmd=cmd, timeout=self.executor_server.setup_timeout,
-            playbook=playbook, ansible_version=ansible_version)
+            playbook=playbook, ansible_version=ansible_version,
+            allow_pre_fail=False)
         self.log.debug("Ansible freeze complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
 
@@ -3157,6 +3175,7 @@ class AnsibleJob(object):
         if acquired_semaphores:
             result, code = self.runAnsible(
                 cmd, timeout, playbook, ansible_version,
+                allow_pre_fail=phase in ('run', 'post'),
                 cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
