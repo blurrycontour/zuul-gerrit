@@ -19,9 +19,11 @@ import fcntl
 import grp
 import logging
 import os
+import os.path
 import psutil
 import pwd
 import shlex
+import subprocess
 import threading
 import re
 import struct
@@ -153,9 +155,71 @@ class BubblewrapDriver(Driver, WrapperInterface):
     name = 'bubblewrap'
 
     release_file_re = re.compile(r'^\W+-release$')
+    bwrap_version_re = re.compile(r'^(\d+\.\d+\.\d+).*')
 
     def __init__(self):
+        self.userns_enabled = self._is_userns_enabled()
+        self.bwrap_version = self._parse_bwrap_version()
         self.bwrap_command = self._bwrap_command()
+        # Validate basic bwrap functionality before we attempt to run
+        # workloads under bwrap.
+        context = self.getExecutionContext()
+        popen = context.getPopen(work_dir='/tmp',
+                                 ssh_auth_sock='/dev/null')
+        p = popen(['id'],
+                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p.communicate()
+        if p.returncode != 0:
+            self.log.error("Non zero return code executing: %s",
+                           " ".join(shlex.quote(c)
+                                    for c in popen.command + ['id']))
+            raise Exception('bwrap execution validation failed. You can use '
+                            '`zuul-bwrap /tmp id` to investigate manually.')
+
+    def _is_userns_enabled(self):
+        # This is based on the bwrap checks found here:
+        # https://github.com/containers/bubblewrap/blob/
+        # ad76c2d6ba8091a7afa95568e46af2261b362439/bubblewrap.c#L2735
+        return_val = False
+        if os.path.exists('/proc/self/ns/user'):
+            # Rhel 7 specific case
+            if os.path.exists('/sys/module/user_namespace/parameters/enable'):
+                with open('/sys/module/user_namespace/parameters/enable') as f:
+                    s = f.read()
+                    if not s or s[0] != 'Y':
+                        return return_val
+            if os.path.exists('/proc/sys/user/max_user_namespaces'):
+                with open('/proc/sys/user/max_user_namespaces') as f:
+                    s = f.read()
+                    try:
+                        i = int(s.strip())
+                        if i < 1:
+                            return return_val
+                    except ValueError:
+                        # If we can't determine the max namespace count but
+                        # namespaces are generally enabled then we should
+                        # treat them as enabled.
+                        return_val = True
+            return_val = True
+        return return_val
+
+    def _parse_bwrap_version(self):
+        p = subprocess.run(['bwrap', '--version'], text=True,
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # We don't know for sure what version schema bwrap may end up using.
+        # Match what they have done historically and be a bit forgiving of
+        # alpha, beta, rc, etc annotations.
+        r = self.bwrap_version_re.match(p.stdout.split()[-1])
+        if p.returncode == 0 and r:
+            return tuple(map(int, r.group(1).split('.')))
+        else:
+            if p.returncode == 0:
+                self.log.warning('Unable to determine bwrap version, from '
+                                 '"%s". Using 0.0.0' % p.stdout.strip())
+            else:
+                self.log.warning('Unable to determine bwrap version, got '
+                                 'returncode "%s". Using 0.0.0' % p.returncode)
+            return (0, 0, 0)
 
     def reconfigure(self, tenant):
         pass
@@ -164,6 +228,10 @@ class BubblewrapDriver(Driver, WrapperInterface):
         pass
 
     def _bwrap_command(self):
+        if self.bwrap_version >= (0, 8, 0) and self.userns_enabled:
+            userns_flags = ['--unshare-user', '--disable-userns']
+        else:
+            userns_flags = []
         bwrap_command = [
             'setpriv',
             '--ambient-caps',
@@ -195,7 +263,7 @@ class BubblewrapDriver(Driver, WrapperInterface):
             '--gid', '{gid}',
             '--file', '{uid_fd}', '/etc/passwd',
             '--file', '{gid_fd}', '/etc/group',
-        ]
+        ] + userns_flags
 
         for path in ['/lib64',
                      '/etc/nsswitch.conf',
