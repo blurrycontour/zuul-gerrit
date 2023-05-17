@@ -389,9 +389,9 @@
             nodeset: ubuntu-jammy
         - zuul-stream-functional-6
         - zuul-nox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-upload-image
+        # - zuul-quick-start:
+        #     requires: nodepool-container-image
+        #     dependencies: zuul-upload-image
         - zuul-nox-zuul-client
         - zuul-build-python-release
     promote:
