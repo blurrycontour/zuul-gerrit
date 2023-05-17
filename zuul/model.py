@@ -4390,8 +4390,7 @@ class BuildSet(zkobject.ZKObject):
                     build = self.builds.get(job_name)
                     builds[job_name] = build
                     if build and build.getPath() == build_path:
-                        if ((not build.result) or
-                            self.shouldRefreshBuild(build)):
+                        if self.shouldRefreshBuild(build):
                             tpe_jobs.append((
                                 None, job_name, tpe.submit(
                                     build.refresh, context)))
