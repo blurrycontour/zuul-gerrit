@@ -208,6 +208,7 @@ class Scheduler(threading.Thread):
     def __init__(self, config, connections, app, wait_for_init,
                  testonly=False):
         threading.Thread.__init__(self)
+        sys.exit(1)
         self.daemon = True
         self._profile_pipelines = set()
         self.wait_for_init = wait_for_init
