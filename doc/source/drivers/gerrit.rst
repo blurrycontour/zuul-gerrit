@@ -274,6 +274,17 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
       match.  Those conditions may be satisfied by the event in
       question.  It follows the same syntax as
       :ref:`gerrit_requirements`.
+      For example:
+
+      .. code-block:: yaml
+
+         trigger:
+           gerrit:
+             - event: comment-added
+               require:
+                 approval:
+                   - Policy-Compliant: 1
+                     username: zuul
 
    .. attr:: reject
 
@@ -283,6 +294,17 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
       not to match.  Those conditions may be satisfied by the event in
       question.  It follows the same syntax as
       :ref:`gerrit_requirements`.
+      For example:
+
+      .. code-block:: yaml
+
+         trigger:
+           gerrit:
+             - event: comment-added
+               reject:
+                 approval:
+                   - Policy-Compliant: -1
+                     username: zuul
 
 Reporter Configuration
 ----------------------
