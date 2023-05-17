@@ -197,8 +197,10 @@ class ZuulApp(object):
                 logging_config.setDebug()
         logging_config.apply()
 
-    def configure_connections(self, source_only=False, require_sql=False):
-        self.connections = zuul.lib.connections.ConnectionRegistry()
+    def configure_connections(self, source_only=False,
+                              require_sql=False, check_bwrap=False):
+        self.connections = zuul.lib.connections.ConnectionRegistry(
+            check_bwrap=check_bwrap)
         self.connections.configure(self.config, source_only, require_sql)
 
 

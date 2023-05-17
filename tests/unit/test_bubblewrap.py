@@ -33,7 +33,7 @@ class TestBubblewrap(testtools.TestCase):
         self.useFixture(fixtures.NestedTempfile())
 
     def test_bubblewrap_wraps(self):
-        bwrap = bubblewrap.BubblewrapDriver()
+        bwrap = bubblewrap.BubblewrapDriver(check_bwrap=True)
         context = bwrap.getExecutionContext()
         work_dir = tempfile.mkdtemp()
         ssh_agent = SshAgent()
@@ -57,7 +57,7 @@ class TestBubblewrap(testtools.TestCase):
 
     @skipIf(sys.platform == 'darwin', 'Not supported on MacOS')
     def test_bubblewrap_leak(self):
-        bwrap = bubblewrap.BubblewrapDriver()
+        bwrap = bubblewrap.BubblewrapDriver(check_bwrap=True)
         context = bwrap.getExecutionContext()
         work_dir = tempfile.mkdtemp()
         ansible_dir = tempfile.mkdtemp()
