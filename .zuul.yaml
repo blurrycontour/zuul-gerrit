@@ -248,6 +248,8 @@
             # If zuul.tag is defined: [ '3', '3.19', '3.19.0' ].  Only works for 3-component tags.
             # Otherwise: ['latest']
             &imagetag "{{ zuul.tag is defined | ternary([zuul.get('tag', '').split('.')[0], '.'.join(zuul.get('tag', '').split('.')[:2]), zuul.get('tag', '')], ['latest']) }}"
+          arch:
+            - linux/amd64
         - context: .
           registry: quay.io
           repository: quay.io/zuul-ci/zuul-executor
@@ -256,6 +258,8 @@
           repo_description: Zuul executor image
           target: zuul-executor
           tags: *imagetag
+          arch:
+            - linux/amd64
         - context: .
           registry: quay.io
           repository: quay.io/zuul-ci/zuul-fingergw
@@ -264,6 +268,8 @@
           repo_description: Zuul fingergw image
           target: zuul-fingergw
           tags: *imagetag
+          arch:
+            - linux/amd64
         - context: .
           registry: quay.io
           repository: quay.io/zuul-ci/zuul-merger
@@ -272,6 +278,8 @@
           repo_description: Zuul merger image
           target: zuul-merger
           tags: *imagetag
+          arch:
+            - linux/amd64
         - context: .
           registry: quay.io
           repository: quay.io/zuul-ci/zuul-scheduler
@@ -280,6 +288,8 @@
           repo_description: Zuul scheduler image
           target: zuul-scheduler
           tags: *imagetag
+          arch:
+            - linux/amd64
         - context: .
           registry: quay.io
           repository: quay.io/zuul-ci/zuul-web
@@ -288,6 +298,8 @@
           repo_description: Zuul web image
           target: zuul-web
           tags: *imagetag
+          arch:
+            - linux/amd64
 
 - job:
     name: zuul-upload-image
