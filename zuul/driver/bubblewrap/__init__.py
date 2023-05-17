@@ -157,24 +157,26 @@ class BubblewrapDriver(Driver, WrapperInterface):
     release_file_re = re.compile(r'^\W+-release$')
     bwrap_version_re = re.compile(r'^(\d+\.\d+\.\d+).*')
 
-    def __init__(self):
+    def __init__(self, check_bwrap):
         self.userns_enabled = self._is_userns_enabled()
         self.bwrap_version = self._parse_bwrap_version()
         self.bwrap_command = self._bwrap_command()
-        # Validate basic bwrap functionality before we attempt to run
-        # workloads under bwrap.
-        context = self.getExecutionContext()
-        popen = context.getPopen(work_dir='/tmp',
-                                 ssh_auth_sock='/dev/null')
-        p = popen(['id'],
-                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.communicate()
-        if p.returncode != 0:
-            self.log.error("Non zero return code executing: %s",
-                           " ".join(shlex.quote(c)
-                                    for c in popen.command + ['id']))
-            raise Exception('bwrap execution validation failed. You can use '
-                            '`zuul-bwrap /tmp id` to investigate manually.')
+        if check_bwrap:
+            # Validate basic bwrap functionality before we attempt to run
+            # workloads under bwrap.
+            context = self.getExecutionContext()
+            popen = context.getPopen(work_dir='/tmp',
+                                     ssh_auth_sock='/dev/null')
+            p = popen(['id'],
+                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p.communicate()
+            if p.returncode != 0:
+                self.log.error("Non zero return code executing: %s",
+                               " ".join(shlex.quote(c)
+                                        for c in popen.command + ['id']))
+                raise Exception('bwrap execution validation failed. You can '
+                                'use `zuul-bwrap /tmp id` to investigate '
+                                'manually.')
 
     def _is_userns_enabled(self):
         # This is based on the bwrap checks found here:
@@ -297,7 +299,7 @@ class BubblewrapDriver(Driver, WrapperInterface):
 def main(args=None):
     logging.basicConfig(level=logging.DEBUG)
 
-    driver = BubblewrapDriver()
+    driver = BubblewrapDriver(check_bwrap=True)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--ro-paths', nargs='+')

@@ -352,7 +352,7 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(SMTPDriver())
         self.registerDriver(TimerDriver())
         self.registerDriver(SQLDriver())
-        self.registerDriver(BubblewrapDriver())
+        self.registerDriver(BubblewrapDriver(check_bwrap=True))
         self.registerDriver(NullwrapDriver())
         self.registerDriver(MQTTDriver())
         self.registerDriver(PagureDriverMock(
