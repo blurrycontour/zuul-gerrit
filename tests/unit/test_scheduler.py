@@ -6467,8 +6467,8 @@ For CI problems and help debugging, contact ci@example.org"""
         # they don't they may be a good way for us to catch unintended
         # extra read operations.  If they change too much, they may
         # not be worth keeping and we can just remove them.
-        self.assertEqual(6, ctx.cumulative_read_objects)
-        self.assertEqual(6, ctx.cumulative_read_znodes)
+        self.assertEqual(5, ctx.cumulative_read_objects)
+        self.assertEqual(5, ctx.cumulative_read_znodes)
         self.assertEqual(0, ctx.cumulative_write_objects)
         self.assertEqual(0, ctx.cumulative_write_znodes)
 
@@ -6490,8 +6490,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIs(old_check_build_results, new_check_build_results)
 
         # Again check the object read counts
-        self.assertEqual(6, ctx.cumulative_read_objects)
-        self.assertEqual(6, ctx.cumulative_read_znodes)
+        self.assertEqual(4, ctx.cumulative_read_objects)
+        self.assertEqual(4, ctx.cumulative_read_znodes)
         self.assertEqual(0, ctx.cumulative_write_objects)
         self.assertEqual(0, ctx.cumulative_write_znodes)
 

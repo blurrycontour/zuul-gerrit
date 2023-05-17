@@ -4364,6 +4364,8 @@ class BuildSet(zkobject.ZKObject):
         # order.
         tpe_jobs = []
         tpe = context.executor[BuildSet]
+        job_versions = data.get('job_versions', {})
+        build_versions = data.get('build_versions', {})
         # jobs (deserialize as separate objects)
         if data['job_graph']:
             for job_name in data['job_graph'].jobs:
@@ -4378,7 +4380,7 @@ class BuildSet(zkobject.ZKObject):
                 if job_name in self.jobs:
                     job = self.jobs[job_name]
                     if ((not old_build_exists) or
-                        self.shouldRefreshJob(job)):
+                        self.shouldRefreshJob(job, job_versions)):
                         tpe_jobs.append((None, job_name,
                                          tpe.submit(job.refresh, context)))
                 else:
@@ -4390,8 +4392,7 @@ class BuildSet(zkobject.ZKObject):
                     build = self.builds.get(job_name)
                     builds[job_name] = build
                     if build and build.getPath() == build_path:
-                        if ((not build.result) or
-                            self.shouldRefreshBuild(build)):
+                        if self.shouldRefreshBuild(build, build_versions):
                             tpe_jobs.append((
                                 None, job_name, tpe.submit(
                                     build.refresh, context)))
@@ -4472,20 +4473,20 @@ class BuildSet(zkobject.ZKObject):
             self.job_versions[job.name] = version + 1
             self.updateAttributes(context, job_versions=self.job_versions)
 
-    def shouldRefreshBuild(self, build):
+    def shouldRefreshBuild(self, build, build_versions):
         # Unless all schedulers are updating versions, we can't trust
         # the data.
         if (COMPONENT_REGISTRY.model_api < 12):
             return True
         current = build.getZKVersion()
-        expected = self.build_versions.get(build.uuid, 0)
+        expected = build_versions.get(build.uuid, 0)
         return expected != current
 
-    def shouldRefreshJob(self, job):
+    def shouldRefreshJob(self, job, job_versions):
         if (COMPONENT_REGISTRY.model_api < 12):
             return True
         current = job.getZKVersion()
-        expected = self.job_versions.get(job.name, 0)
+        expected = job_versions.get(job.name, 0)
         return expected != current
 
     @property
