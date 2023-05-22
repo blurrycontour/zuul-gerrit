@@ -1249,3 +1249,26 @@ class TestMergeMode(ZuulTestCase):
     def test_default_merge_mode_github(self):
         self._test_default_merge_mode(model.MERGER_MERGE,
                                       'github.com')
+
+
+class TestDefaultBranch(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+
+    @simple_layout('layouts/default-branch.yaml')
+    def test_default_branch(self):
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata(
+            'review.example.com/org/project-default')
+        self.assertEqual('master', md.default_branch)
+        md = layout.getProjectMetadata(
+            'review.example.com/org/regex-default-project-empty')
+        self.assertEqual('master', md.default_branch)
+        md = layout.getProjectMetadata(
+            'review.example.com/org/regex-default-project-develop')
+        self.assertEqual('develop', md.default_branch)
+        md = layout.getProjectMetadata(
+            'review.example.com/org/regex-override-project-empty')
+        self.assertEqual('regex', md.default_branch)
+        md = layout.getProjectMetadata(
+            'review.example.com/org/regex-override-project-develop')
+        self.assertEqual('develop', md.default_branch)
