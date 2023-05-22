@@ -1,0 +1,6 @@
+---
+features:
+  - The ES reporter timestamp is now automatically generated using
+    `datetime.utcnow()` rather than using the job's start_time. This helps
+    keeping a linear timeline for events, which is essential for obeservability
+    and metrics
