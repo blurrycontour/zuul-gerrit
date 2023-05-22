@@ -7694,6 +7694,10 @@ class UnparsedConfig(object):
         return r
 
     def extend(self, conf):
+        # conf might be None in the case of a file with only comments.
+        if conf is None:
+            return
+
         if isinstance(conf, UnparsedConfig):
             self.pragmas.extend(conf.pragmas)
             self.pipelines.extend(conf.pipelines)
