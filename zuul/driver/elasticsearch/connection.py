@@ -110,8 +110,9 @@ class ElasticsearchConnection(BaseConnection):
     def gen(self, it, index):
         for source in it:
             d = {}
-            source['@timestamp'] = datetime.utcfromtimestamp(
-                int(source['start_time'])).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+            event_time = datetime.utcnow()
+            source['@timestamp'] = event_time.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             d['_index'] = index
             d['_op_type'] = 'index'
             d['_source'] = source
