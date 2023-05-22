@@ -34,6 +34,23 @@
       "parentUuid": "95e70e03_5d6e9442",
       "revId": "3edbc1f1be71f65632432a806f9fc5efee10c584",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a8d62c1_4790ec82",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-22T23:17:44Z",
+      "side": 1,
+      "message": "Do we need to remove any items from this set that are part of the cycle? Something like:\n\n```\n        return set(\n            itertools.chain.from_iterable(\n                dependency_graph[c] for c in cycle if c !\u003d change)\n        ) - set(cycle)\n```\n\nIn particular I\u0027m worried that elements of the cycle can be needed by other elements of the cycle and if we try to insert them ahead in the queue we may end up in a recursive loop that never ends?\n\nThe test almost covers this case I think so maybe this is a non issue due to some smart code elsewhere? However we only approve A and let everything else process from there. Which means we\u0027ll only call this function on A I think and then we skip A which has the depends on C outside the cycle due to `if c !\u003d change`.\n\nIf this isn\u0027t necessary for some reason maybe we need to make note of that here? Would probably also be a good idea to make a slightly more complicated test that ensures that ever cycle member has an external dependency too. So A \u003c-\u003e B and A -\u003e C and B -\u003e D? I think that would cover it.",
+      "revId": "3edbc1f1be71f65632432a806f9fc5efee10c584",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
