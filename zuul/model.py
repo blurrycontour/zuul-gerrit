@@ -7912,10 +7912,24 @@ class Layout(object):
         return semaphore
 
     def addQueue(self, queue):
-        # Change queues must be unique and cannot be overridden.
-        if queue.name in self.queues:
-            raise Exception('Queue %s is already defined' % queue.name)
-
+        # It's ok to have a duplicate queue definition, but only if
+        # they are in different branches of the same repo, and have
+        # the same values.
+        other = self.queues.get(queue.name)
+        if other is not None:
+            if not queue.source_context.isSameProject(other.source_context):
+                raise Exception(
+                    "Queue %s already defined in project %s" %
+                    (queue.name, other.source_context.project_name))
+            if queue.source_context.branch == other.source_context.branch:
+                raise Exception("Queue %s already defined" % (queue.name,))
+            if queue != other:
+                raise Exception("Queue %s does not match existing definition"
+                                " in branch %s" %
+                                (queue.name, other.source_context.branch))
+            # Identical data in a different branch of the same project;
+            # ignore the duplicate definition
+            return
         self.queues[queue.name] = queue
 
     def addPipeline(self, pipeline):
