@@ -1338,8 +1338,8 @@ class AnsibleJob(object):
                         result=None,
                         error_detail=f'Failed to update project '
                                      f'{task.project_name}')
-                    self.job.sendWorkComplete(
-                        json.dumps(result, sort_keys=True))
+                    self.executor_server.completeBuild(
+                        self.build_request, result)
                     return
 
                 raise ExecutorError(
