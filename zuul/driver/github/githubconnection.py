@@ -1119,11 +1119,13 @@ class GithubClientManager:
                            project_name)
             return ''
 
-        now = datetime.datetime.now(utc)
+        # Consider tokens outdated 5min before the actual expiry time
+        cutoff_time = datetime.datetime.now(utc) + datetime.timedelta(
+            minutes=5)
         token, expiry = self.installation_token_cache.get(installation_id,
                                                           (None, None))
 
-        if ((not expiry) or (not token) or (now >= expiry)):
+        if ((not expiry) or (not token) or (expiry < cutoff_time)):
             headers = self._get_app_auth_headers()
 
             url = "%s/app/installations/%s/access_tokens" % (
@@ -1136,7 +1138,6 @@ class GithubClientManager:
             data = response.json()
 
             expiry = iso8601.parse_date(data['expires_at'])
-            expiry -= datetime.timedelta(minutes=5)
             token = data['token']
 
             self.installation_token_cache[installation_id] = (token, expiry)
