@@ -53,7 +53,11 @@ class WSClient(WebSocketBaseClient):
 
     def run(self):
         self.connect()
-        req = {'uuid': self.build_uuid, 'logfile': None}
+        req = {
+            'uuid': self.build_uuid,
+            'logfile': None,
+            'tenant_name': 'tenant-one'
+        }
         self.send(json.dumps(req))
         self.event.set()
         super(WSClient, self).run()
