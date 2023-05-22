@@ -77,6 +77,10 @@ function getStreamUrl(apiPrefix) {
   return streamUrl
 }
 
+function getAuthToken() {
+  return authToken
+}
+
 function makeRequest(url, method, data) {
   if (method === undefined) {
     method = 'get'
@@ -325,6 +329,7 @@ export {
   apiUrl,
   getHomepageUrl,
   getStreamUrl,
+  getAuthToken,
   fetchChangeStatus,
   fetchConfigErrors,
   fetchStatus,

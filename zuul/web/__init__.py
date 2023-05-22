@@ -199,6 +199,11 @@ def _check_auth(require_admin=False, require_auth=False, tenant=None):
             require_auth = True
     # Always set the auth variable
     request.params['auth'] = None
+    con = cherrypy.request.headers.get('Connection', None)
+    upg = cherrypy.request.headers.get('Upgrade', None)
+    if con == 'Upgrade' and upg == 'websocket':
+        # WebSocket token will be checked in LogStreamHandler
+        return
 
     basic_error = zuulweb._basic_auth_header_check(required=require_auth)
     if basic_error is not None:
@@ -332,6 +337,7 @@ class LogStreamHandler(WebSocket):
                 self.log.debug("Ignoring request due to existing streamer")
                 return
             try:
+                self._checkToken(req)
                 self._streamLog(req)
             except Exception:
                 self.log.exception("Error processing websocket message:")
@@ -352,6 +358,41 @@ class LogStreamHandler(WebSocket):
             self.close(code, msg)
         except Exception:
             self.log.exception("Error closing websocket:")
+
+    def _checkToken(self, request):
+        if 'tenant_name' not in request:
+            return self.logClose(
+                4000,
+                "tenant_name missing from request payload")
+        # Always set the tenant variable
+        tenant = self.zuulweb.api._getTenantOrRaise(request['tenant_name'])
+        require_auth = False
+        if tenant:
+            if tenant.access_rules:
+                # This tenant requires auth for read-only access
+                require_auth = True
+        else:
+            if not require_auth and self.zuulweb.abide.api_root.access_rules:
+                # The API root requires auth for read-only access
+                require_auth = True
+        if require_auth:
+            if 'token' not in request:
+                return self.logClose(
+                    4000,
+                    "token missing from request payload")
+            rawToken = request['token']
+            try:
+                claims = self.zuulweb.authenticators.authenticate(rawToken)
+            except exceptions.AuthTokenException:
+                return self.logClose(
+                    4000,
+                    "token is invalid in request payload")
+
+            access, _ = self.zuulweb.api._isAuthorized(tenant, claims)
+            if not access:
+                return self.logClose(
+                    4000,
+                    "token in request payload don't have an access")
 
     def _streamLog(self, request):
         """
