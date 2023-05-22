@@ -110,8 +110,15 @@ class ElasticsearchConnection(BaseConnection):
     def gen(self, it, index):
         for source in it:
             d = {}
-            source['@timestamp'] = datetime.utcfromtimestamp(
-                int(source['start_time'])).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+            # Check in case the source event doesn't have a `start_time`
+            # in this case, set the timestamp to the current `utcnow` instead.
+            if "start_time" in source:
+                event_time = datetime.utcfromtimestamp(int(source['start_time']))
+            else:
+                event_time = datetime.datetime.utcnow()
+
+            source['@timestamp'] = event_time.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             d['_index'] = index
             d['_op_type'] = 'index'
             d['_source'] = source
