@@ -6265,9 +6265,10 @@ For CI problems and help debugging, contact ci@example.org"""
         self.hold_merge_jobs_in_queue = False
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
+        event = zuul.model.TriggerEvent()
         self.scheds.first.sched.reconfigureTenant(
             self.scheds.first.sched.abide.tenants['tenant-one'],
-            project1, None)
+            project1, event)
         self.waitUntilSettled()
 
         # Verify the merge job is still running and that the item is
