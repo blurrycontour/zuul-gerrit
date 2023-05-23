@@ -112,6 +112,10 @@ SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'
 
+# Error severity
+SEVERITY_ERROR = 'error'
+SEVERITY_WARNING = 'warning'
+
 
 def add_debug_line(debug_messages, msg, indent=0):
     if debug_messages is None:
@@ -242,16 +246,21 @@ class ConfigurationErrorKey(object):
 class ConfigurationError(object):
 
     """A configuration error"""
-    def __init__(self, context, mark, error, short_error=None):
-        self.error = str(error)
+    def __init__(self, context, mark, error, short_error=None,
+                 severity=None, name=None):
+        self.error = error
         self.short_error = short_error
+        self.severity = severity or SEVERITY_ERROR
+        self.name = name or 'Unknown'
         self.key = ConfigurationErrorKey(context, mark, self.error)
 
     def serialize(self):
         return {
             "error": self.error,
             "short_error": self.short_error,
-            "key": self.key.serialize()
+            "key": self.key.serialize(),
+            "severity": self.severity,
+            "name": self.name,
         }
 
     @classmethod
@@ -306,8 +315,12 @@ class LoadingErrors(object):
         self.errors = []
         self.error_keys = set()
 
-    def addError(self, context, mark, error, short_error=None):
-        e = ConfigurationError(context, mark, error, short_error)
+    def addError(self, context, mark, error, short_error=None,
+                 severity=None, name=None):
+        e = ConfigurationError(context, mark, error,
+                               short_error=short_error,
+                               severity=severity,
+                               name=name)
         self.errors.append(e)
         self.error_keys.add(e.key)
 

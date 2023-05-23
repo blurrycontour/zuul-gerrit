@@ -1201,8 +1201,13 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def config_errors(self, tenant_name, tenant, auth):
         ret = [
-            {'source_context': e.key.context.toDict(),
-             'error': e.error}
+            {
+                'source_context': e.key.context.toDict(),
+                'error': e.error,
+                'short_error': e.short_error,
+                'severity': e.severity,
+                'name': e.name,
+            }
             for e in tenant.layout.loading_errors.errors
         ]
         return ret
