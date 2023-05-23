@@ -112,6 +112,10 @@ SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'
 
+# Error severity
+SEVERITY_ERROR = 'error'
+SEVERITY_WARNING = 'warning'
+
 
 def add_debug_line(debug_messages, msg, indent=0):
     if debug_messages is None:
@@ -180,6 +184,9 @@ class ConfigurationErrorKey(object):
     sufficient to determine whether we should show an error to a user.
     """
 
+    # Note: this class is serialized to ZK via ConfigurationErrorList,
+    # ensure that it serializes and deserializes appropriately.
+
     def __init__(self, context, mark, error_text):
         self.context = context
         self.mark = mark
@@ -240,23 +247,34 @@ class ConfigurationErrorKey(object):
 
 
 class ConfigurationError(object):
-
     """A configuration error"""
-    def __init__(self, context, mark, error, short_error=None):
-        self.error = str(error)
+
+    # Note: this class is serialized to ZK via ConfigurationErrorList,
+    # ensure that it serializes and deserializes appropriately.
+
+    def __init__(self, context, mark, error, short_error=None,
+                 severity=None, name=None):
+        self.error = error
         self.short_error = short_error
+        self.severity = severity or SEVERITY_ERROR
+        self.name = name or 'Unknown'
         self.key = ConfigurationErrorKey(context, mark, self.error)
 
     def serialize(self):
         return {
             "error": self.error,
             "short_error": self.short_error,
-            "key": self.key.serialize()
+            "key": self.key.serialize(),
+            "severity": self.severity,
+            "name": self.name,
         }
 
     @classmethod
     def deserialize(cls, data):
         data["key"] = ConfigurationErrorKey.deserialize(data["key"])
+        # These attributes were added in MODEL_API 14
+        data['severity'] = data.get('severity', SEVERITY_ERROR)
+        data['name'] = data.get('name', 'Unknown')
         o = cls.__new__(cls)
         o.__dict__.update(data)
         return o
@@ -269,7 +287,9 @@ class ConfigurationError(object):
             return False
         return (self.error == other.error and
                 self.short_error == other.short_error and
-                self.key == other.key)
+                self.key == other.key and
+                self.severity == other.severity and
+                self.name == other.name)
 
 
 class ConfigurationErrorList(zkobject.ShardedZKObject):
@@ -306,8 +326,12 @@ class LoadingErrors(object):
         self.errors = []
         self.error_keys = set()
 
-    def addError(self, context, mark, error, short_error=None):
-        e = ConfigurationError(context, mark, error, short_error)
+    def addError(self, context, mark, error, short_error=None,
+                 severity=None, name=None):
+        e = ConfigurationError(context, mark, error,
+                               short_error=short_error,
+                               severity=severity,
+                               name=name)
         self.errors.append(e)
         self.error_keys.add(e.key)
 
