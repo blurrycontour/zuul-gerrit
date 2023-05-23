@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d1e3d7e_ec2005ba",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-23T18:28:18Z",
+      "side": 1,
+      "message": "I got myself turned around comparing the new code to the old code. I should just be looking at the new code in isolation. In that case it is a lot clearer that this is equivalent to the old code. Basically if we have any lines at all then check if we have short content (only present if we have long content) and create a summary if so. Otherwise present the content.",
+      "parentUuid": "b5537c31_20b40855",
+      "revId": "68d705bad8003d92eeca60b65684c13252c15cd8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72bf9eb1_7f934624",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-23T17:56:17Z",
       "side": 1,
       "message": "See above.",
+      "revId": "68d705bad8003d92eeca60b65684c13252c15cd8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3ced3a0_d6f5ee44",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-23T18:28:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72bf9eb1_7f934624",
       "revId": "68d705bad8003d92eeca60b65684c13252c15cd8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
