@@ -5944,8 +5944,8 @@ class ZuulTestCase(BaseTestCase):
                             unseen.remove(unseen_item)
                             break
                     if not found:
-                        raise Exception("No match found for element %i "
-                                        "in history" % (i,))
+                        raise Exception("No match found for element %i %s "
+                                        "in history" % (i, d))
                 if unseen:
                     raise Exception("Unexpected items in history")
         except Exception:
