@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5537c31_20b40855",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-23T17:56:17Z",
+      "side": 1,
+      "message": "I think this should be `stdout_late_lines.length \u003e 0` and on line 162 should be `stdout_early_lines.length \u003e 0`. The reason for this is the old code checked if there were any line present on line 162 which would be checking early_lines and then it checked if the content was longer than max_lines which would be checking late_lines.\n\nI think this would result in no summary if the content was super short. With this change we will always get a summary. I suspect the end result is relatively transparent to users, but want to make sure the change of behavior is intentional.",
+      "revId": "68d705bad8003d92eeca60b65684c13252c15cd8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72bf9eb1_7f934624",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-23T17:56:17Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "68d705bad8003d92eeca60b65684c13252c15cd8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
