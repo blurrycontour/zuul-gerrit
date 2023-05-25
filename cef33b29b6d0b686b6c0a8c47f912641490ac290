@@ -16,6 +16,24 @@
       "message": "I don\u0027t see an update to the model_api file in this change to bump it to 14. Did you decide that wasn\u0027t necessary? Or maybe forgot a git add?",
       "revId": "cef33b29b6d0b686b6c0a8c47f912641490ac290",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "141699a1_a36bc3f4",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-25T22:43:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b831184_4c001c53",
+      "revId": "cef33b29b6d0b686b6c0a8c47f912641490ac290",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
