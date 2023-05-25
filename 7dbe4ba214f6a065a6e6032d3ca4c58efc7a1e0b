@@ -16,6 +16,24 @@
       "message": "This class is not a ZkObject and yet we have a deserialize method. Do we need to do any model versioning to handle this? My suspicion is that this object is not directly serialized and deserialized to Zk but that other Zk objects include them which calls these methods.\n\nBecause we use class.__new__(cls) and __dict__.update(data) I think it is possible that we will initialize new ConfigurationError objects from old data with no severity or name set. We don\u0027t call __init__ which would default those values. We can probably avoid a model version if we simply initialize those values here?",
       "revId": "7dbe4ba214f6a065a6e6032d3ca4c58efc7a1e0b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6415892_197b1f82",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-25T22:40:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "387b3c8f_1aa5b0c0",
+      "revId": "7dbe4ba214f6a065a6e6032d3ca4c58efc7a1e0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
