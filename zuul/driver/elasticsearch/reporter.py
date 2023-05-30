@@ -52,6 +52,7 @@ class ElasticsearchReporter(BaseReporter):
             "zuul_ref": item.current_build_set.ref,
             "ref_url": item.change.url,
             "result": item.current_build_set.result,
+            "start_time": item.current_build_set.start_time,
             "message": self._formatItemReport(item, with_jobs=False)
         }
 
@@ -71,7 +72,7 @@ class ElasticsearchReporter(BaseReporter):
             # Manage to set time attributes in buildset
             start_time = int(build.start_time)
             end_time = int(build.end_time)
-            if ('start_time' not in buildset_doc or
+            if (buildset_doc.get('start_time') is None or
                     buildset_doc['start_time'] > start_time):
                 buildset_doc['start_time'] = start_time
             if ('end_time' not in buildset_doc or
