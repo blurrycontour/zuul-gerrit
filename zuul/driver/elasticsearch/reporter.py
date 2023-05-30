@@ -52,6 +52,7 @@ class ElasticsearchReporter(BaseReporter):
             "zuul_ref": item.current_build_set.ref,
             "ref_url": item.change.url,
             "result": item.current_build_set.result,
+            "start_time": item.current_build_set.start_time,
             "message": self._formatItemReport(item, with_jobs=False)
         }
 
