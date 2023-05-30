@@ -272,6 +272,7 @@ class BubblewrapDriver(Driver, WrapperInterface):
                      '/etc/lsb-release.d',
                      '/etc/alternatives',
                      '/etc/ssl/certs',
+                     '/etc/pki',
                      '/etc/subuid',
                      ]:
             if os.path.exists(path):
