@@ -65,6 +65,30 @@ changes to the configuration stored in ZooKeeper and automatically
 update their configuration in the background without interrupting
 processing.
 
+.. _backup:
+
+Backup and Restoration
+~~~~~~~~~~~~~~~~~~~~~~
+
+While all of Zuul's component services are designed to be run in a
+resilient active-active clustered deployment, a good disaster recovery
+plan should include backing up critical data. At a minimum, the
+randomly-generated project keys used for encryption of job secrets and
+SSH access should be backed up, as they **cannot be recreated** if
+lost. Zuul stores these keys in a keystore in ZooKeeper which is
+inconvenient to back up directly, but provides an administrative tool
+to :ref:`export <export-keys>` these keys to and :ref:`import
+<import-keys>` them from a local directory.
+
+It's highly recommended to set up periodic automation for dumping such
+an export to a secure location (for example, on the filesystem of each
+Zuul Scheduler) for use in a disaster where all ZooKeeper content is
+lost. You may also consider configuring a safe remote backup of these
+files with the tool of your choice, but be aware that they are
+potentially sensitive since anyone who gains access to them could
+decrypt job secrets or access protected systems which have been
+instructed to trust those keys.
+
 Merger
 ------
 
