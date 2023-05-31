@@ -21,11 +21,15 @@ import {
 import {
   PageSection,
   PageSectionVariants,
-  List,
-  ListItem,
 } from '@patternfly/react-core'
 
+import {
+  FilterToolbar,
+  getFiltersFromUrl,
+  writeFiltersToUrl,
+} from '../containers/FilterToolbar'
 import { fetchConfigErrorsAction } from '../actions/configErrors'
+import ConfigErrorTable from '../containers/configerrors/ConfigErrorTable'
 
 class ConfigErrorsPage extends React.Component {
   static propTypes = {
@@ -33,14 +37,120 @@ class ConfigErrorsPage extends React.Component {
     tenant: PropTypes.object,
     dispatch: PropTypes.func,
     preferences: PropTypes.object,
+    history: PropTypes.object,
+  }
+
+  constructor(props) {
+    super()
+    this.filterCategories = [
+      {
+        key: 'project',
+        title: 'Project',
+        placeholder: 'Filter by project...',
+        type: 'search',
+      },
+      {
+        key: 'branch',
+        title: 'Branch',
+        placeholder: 'Filter by branch...',
+        type: 'search',
+      },
+      {
+        key: 'severity',
+        title: 'Severity',
+        placeholder: 'Filter by severity...',
+        type: 'search',
+      },
+      {
+        key: 'name',
+        title: 'Name',
+        placeholder: 'Filter by name...',
+        type: 'search',
+      },
+    ]
+
+    const _filters = getFiltersFromUrl(props.location, this.filterCategories)
+    this.state = {
+      //fetching: false,
+      filters: _filters,
+      //itemCount: null,
+    }
+  }
+
+  componentDidMount () {
+    document.title = 'Zuul Configuration Errors'
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   updateData = () => {
     this.props.dispatch(fetchConfigErrorsAction(this.props.tenant))
   }
 
+  filterInputValidation = (filterKey, filterValue) => {
+    // Input value should not be empty for all cases
+    if (!filterValue) {
+      return {
+        success: false,
+        message: 'Input should not be empty'
+      }
+    }
+
+    return {
+      success: true
+    }
+  }
+
+  handleFilterChange = (newFilters) => {
+    const { location, history } = this.props
+
+    // We must update the URL parameters before the state. Otherwise, the URL
+    // will always be one filter selection behind the state. But as the URL
+    // reflects our state this should be ok.
+    writeFiltersToUrl(newFilters, location, history)
+    this.setState({filters: newFilters})
+  }
+
+  handleClearFilters = () => {
+    // Delete the values for each filter category
+    const filters = this.filterCategories.reduce((filterDict, category) => {
+      filterDict[category.key] = []
+      return filterDict
+    }, {})
+    this.handleFilterChange(filters)
+  }
+
+  filterErrors = (errors, filters) => {
+    return errors.filter((error) => {
+      if (filters.project.length &&
+          !filters.project.includes(error.source_context.project)) {
+        return false
+      }
+      if (filters.branch.length &&
+          !filters.branch.includes(error.source_context.branch)) {
+        return false
+      }
+      if (filters.severity.length &&
+          !filters.severity.includes(error.severity)) {
+        return false
+      }
+      if (filters.name.length &&
+          !filters.name.includes(error.name)) {
+        return false
+      }
+      return true
+    })
+  }
+
   render () {
-    const { configErrors } = this.props
+    const { configErrors, history } = this.props
     return (
       <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <div className="pull-right">
@@ -50,24 +160,18 @@ class ConfigErrorsPage extends React.Component {
             <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
           </a>
         </div>
-        <div className="pull-left">
-          <List isPlain isBordered>
-            {configErrors.map((item, idx) => {
-              let ctxPath = item.source_context.path
-              if (item.source_context.branch !== 'master') {
-                ctxPath += ' (' + item.source_context.branch + ')'
-              }
-              return (
-                <ListItem key={idx}>
-                  <h3>{item.source_context.project} - {ctxPath}</h3>
-                  <p style={{whiteSpace: 'pre-wrap'}}>
-                    {item.error}
-                  </p>
-                </ListItem>
-              )
-            })}
-          </List>
-        </div>
+        <FilterToolbar
+          filterCategories={this.filterCategories}
+          onFilterChange={this.handleFilterChange}
+          filters={this.state.filters}
+          filterInputValidation={this.filterInputValidation}
+        />
+        <ConfigErrorTable
+          errors={this.filterErrors(configErrors, this.state.filters)}
+          fetching={false}
+          onClearFilters={this.handleClearFilters}
+          history={history}
+        />
       </PageSection>
     )
   }
