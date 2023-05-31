@@ -6013,7 +6013,7 @@ class ZuulTestCase(BaseTestCase):
             repo.create_tag(tag)
         return before
 
-    def commitConfigUpdate(self, project_name, source_name):
+    def commitConfigUpdate(self, project_name, source_name, branch="master"):
         """Commit an update to zuul.yaml
 
         This overwrites the zuul.yaml in the specificed project with
@@ -6039,7 +6039,7 @@ class ZuulTestCase(BaseTestCase):
                 files['playbooks/%s.yaml' % jobname] = ''
         before = self.addCommitToRepo(
             project_name, 'Pulling content from %s' % source_name,
-            files)
+            files, branch=branch)
         return before
 
     def newTenantConfig(self, source_name):
