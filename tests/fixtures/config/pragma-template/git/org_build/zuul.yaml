@@ -1,0 +1,8 @@
+- pragma:
+    implied-branch-matchers: True
+    implied-branches:
+      - master
+      - ^foobar-(.*-)?mainline$
+
+- job:
+    name: build-job

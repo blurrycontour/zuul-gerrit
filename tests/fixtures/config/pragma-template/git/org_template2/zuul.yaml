@@ -1,0 +1,12 @@
+- job:
+    name: test-job
+
+- project-template:
+    name: test-template
+    check:
+      jobs:
+        - test-job:
+            branches:
+              - ^foobar-(.*-)?mainline$
+            dependencies:
+              - build-job

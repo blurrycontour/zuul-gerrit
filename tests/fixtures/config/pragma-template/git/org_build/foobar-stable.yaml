@@ -1,0 +1,7 @@
+- pragma:
+    implied-branch-matchers: True
+    implied-branches:
+      - foobar-stable
+
+- job:
+    name: build-job

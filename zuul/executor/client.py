@@ -66,6 +66,7 @@ class ExecutorClient(object):
             redact_secrets_and_keys=False)
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
+        self.log.debug(f"SWE> job: {job.name} {list(job.inheritance_path)}")
 
         semaphore_handler = item.pipeline.tenant.semaphore_handler
         params['semaphore_handle'] = semaphore_handler.getSemaphoreHandle(

@@ -6105,6 +6105,48 @@ class TestPragmaMultibranch(ZuulTestCase):
         ], ordered=False)
 
 
+class TestPragmaProjectTemplate(ZuulTestCase):
+    tenant_config_file = 'config/pragma-template/main.yaml'
+
+    def test_branch_matcher(self):
+        self.create_branch('org/project', 'foobar-mainline')
+        self.create_branch('org/project', 'foobar-stable')
+        self.create_branch('org/build', 'foobar-stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'foobar-mainline'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'foobar-stable'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/build', 'foobar-stable'))
+        self.waitUntilSettled()
+
+        self.commitConfigUpdate(
+            'org/build',
+            'config/pragma-template/git/org_build/foobar-stable.yaml',
+            branch='foobar-stable'
+        )
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        A = self.fake_gerrit.addFakeChange(
+            'org/project', 'foobar-mainline', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange(
+            'org/project', 'foobar-stable', 'A')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        C = self.fake_gerrit.addFakeChange(
+            'org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+
 class TestBaseJobs(ZuulTestCase):
     tenant_config_file = 'config/base-jobs/main.yaml'
 
