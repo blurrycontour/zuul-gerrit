@@ -1978,8 +1978,8 @@ class PipelineManager(metaclass=ABCMeta):
                                           event.elapsed_time, elapsed=True)
 
     def _onMergeCompleted(self, event, build_set):
-
         item = build_set.item
+        log = get_annotated_logger(self.log, item.event)
         source = self.sched.connections.getSource(
             item.change.project.connection_name)
         if isinstance(item.change, model.Tag):
@@ -1990,22 +1990,15 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.merge_state = build_set.COMPLETE
             if event.merged:
                 build_set.commit = event.commit
-                items_ahead = item.getNonLiveItemsAhead()
-                for index, item in enumerate(items_ahead):
-                    if item.current_build_set.files:
-                        continue
-                    with item.current_build_set.activeContext(
-                            self.current_context):
-                        item.current_build_set.setFiles(
-                            event.files[:index + 1])
-                # An earlier merge job may have supplied our files
-                if not build_set.files:
+                try:
                     build_set.setFiles(event.files)
+                except Exception:
+                    log.exception("Unable to set files for build set:")
             elif event.updated:
                 build_set.commit = (item.change.newrev or
                                     '0000000000000000000000000000000000000000')
         if not build_set.commit:
-            self.log.info("Unable to merge change %s" % item.change)
+            log.info("Unable to merge change %s" % item.change)
             item.setUnableToMerge(event.errors)
 
     def _onGlobalRepoStateCompleted(self, event, build_set):
