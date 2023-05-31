@@ -4824,6 +4824,20 @@ class QueueItem(zkobject.ZKObject):
             return self.queue.pipeline
         return None
 
+    @property
+    def bundle_build_set(self):
+        if self.bundle:
+            for item in self.bundle.items:
+                if item.live:
+                    return item.current_build_set
+        return self.current_build_set
+
+    @property
+    def bundle_items(self):
+        if self.bundle:
+            return self.bundle.items
+        return [self]
+
     @classmethod
     def new(klass, context, **kw):
         obj = klass()
@@ -5074,10 +5088,6 @@ class QueueItem(zkobject.ZKObject):
         while item_ahead:
             yield item_ahead
             item_ahead = item_ahead.item_ahead
-
-    def getNonLiveItemsAhead(self):
-        items = [item for item in self.items_ahead if not item.live]
-        return reversed(items)
 
     def haveAllJobsStarted(self):
         if not self.hasJobGraph():

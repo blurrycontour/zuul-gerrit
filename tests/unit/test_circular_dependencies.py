@@ -1305,10 +1305,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
 
-    def test_circular_config_change_merge_order(self):
-        """Regression tests to make sure that merge completed events
-        which don't arrive in the same order as requested, don't cause
-        any side-effects."""
+    def test_circular_config_change_single_merge_job(self):
+        """Regression tests to make sure that a bundle with non-live
+        config changes only spawns one merge job (so that we avoid
+        problems with multiple jobs arriving in the wrong order)."""
 
         define_job = textwrap.dedent(
             """
@@ -1344,11 +1344,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        # Release pending merge requests in reverse order to test that
-        # there are no unintended side-effects.
-        for merge_job in reversed(self.merger_api.queued()):
-            self.merger_api.release(merge_job)
-            self.waitUntilSettled()
+        # Assert that there is a single merge job for the bundle.
+        self.assertEqual(len(self.merger_api.queued()), 1)
 
         self.hold_merge_jobs_in_queue = False
         self.merger_api.release()
