@@ -1305,6 +1305,59 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
 
+    def test_circular_config_change_merge_order(self):
+        """Regression tests to make sure that merge completed events
+        which don't arrive in the same order as requested, don't cause
+        any side-effects."""
+
+        define_job = textwrap.dedent(
+            """
+            - job:
+                name: new-job
+            """)
+        use_job = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - new-job
+                gate:
+                  jobs:
+                    - new-job
+            """)
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A",
+                                           files={"zuul.yaml": define_job})
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B",
+                                           files={"zuul.yaml": use_job})
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.waitUntilSettled()
+        self.hold_merge_jobs_in_queue = True
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Release pending merge requests in reverse order to test that
+        # there are no unintended side-effects.
+        for merge_job in reversed(self.merger_api.queued()):
+            self.merger_api.release(merge_job)
+            self.waitUntilSettled()
+
+        self.hold_merge_jobs_in_queue = False
+        self.merger_api.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
     def test_bundle_id_in_zuul_var(self):
         A = self.fake_gerrit.addFakeChange("org/project1", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
