@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffd9264d_5a1dcb82",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-31T21:12:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a252aa91_2085e6d0",
+      "revId": "1d90986194634f97c989b93331a07bb4c9a286ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9485ca12_897a7e12",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-31T21:02:33Z",
       "side": 1,
       "message": "See above.",
+      "revId": "1d90986194634f97c989b93331a07bb4c9a286ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4f030e0_8a0b9eb7",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-05-31T21:12:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9485ca12_897a7e12",
       "revId": "1d90986194634f97c989b93331a07bb4c9a286ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
