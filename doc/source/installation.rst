@@ -30,6 +30,19 @@ components, and also to communicate with each other.  You can run a
 simple single-node ZooKeeper instance, or a multi-node cluster.
 Ensure that all Zuul and Nodepool hosts have access to the cluster.
 
+Zuul stores all possible state within ZooKeeper so that it can be
+effectively shared and coordinated between instances of its component
+services. Most of this is ephemeral and can be recreated or is of low
+value if lost, but a clustered deployment will provide improved
+continuity and resilience in the event of an incident adversely
+impacting a ZooKeeper server.
+
+Zuul's keystore (project-specific keys for asymmetric encryption of
+job secrets and SSH access) is also stored in ZooKeeper, and unlike
+the other data it **cannot be recreated** if lost. As such,
+periodic :ref:`export and backup <backup>` of these keys is strongly
+recommended.
+
 .. _ansible-installation-options:
 
 Executor Deployment

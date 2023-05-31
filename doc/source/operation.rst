@@ -65,6 +65,42 @@ changes to the configuration stored in ZooKeeper and automatically
 update their configuration in the background without interrupting
 processing.
 
+.. _backup:
+
+Backup and Restoration
+~~~~~~~~~~~~~~~~~~~~~~
+
+While all of Zuul's component services are designed to be run in a
+resilient active-active clustered deployment, a good disaster recovery
+plan should include backing up critical data. At a minimum, the
+randomly-generated project keys used for encryption of job secrets and
+SSH access should be backed up, as they **cannot be recreated** if
+lost. Zuul stores these keys in a keystore in ZooKeeper which is
+inconvenient to back up directly, but provides an administrative tool
+to :ref:`export <export-keys>` these keys to and :ref:`import
+<import-keys>` them from a local directory.
+
+It's highly recommended to set up periodic automation for dumping such
+an export to a secure location (for example, on the filesystem of each
+Zuul Scheduler) for use in a disaster where all ZooKeeper content is
+lost. You may also consider configuring a safe remote backup of these
+files with the tool of your choice, but be aware that they are
+potentially sensitive since anyone who gains access to them could
+decrypt job secrets or access protected systems which have been
+instructed to trust those keys.
+
+Note that the exported keys are symmetrically encrypted with the same
+:ref:`keystore.password` which is used for encrypting and decrypting
+the copy of them in ZooKeeper, because its the encrypted versions of
+the keys which are exported and imported. Someone with access to the
+keys would also need a copy of the keystore.password from Zuul's
+configuration, so for security-sensitive environments you may not want
+to back them up together. Conversely, if you lose the
+keystore.password then you also lose the use of the project keys in
+the keystore and any exports, so you will likely want to make sure you
+keep a secured copy of it somewhere as well in the event your server
+configuration is lost.
+
 Merger
 ------
 

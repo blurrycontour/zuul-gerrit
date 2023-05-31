@@ -251,6 +251,8 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
 .. attr:: keystore
 
+   .. _keystore.password:
+
    .. attr:: password
       :required:
 
