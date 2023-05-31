@@ -1,0 +1,10 @@
+- pragma:
+    implied-branch-matchers: True
+    implied-branches:
+      - ^foobar-(.*-)?mainline$
+
+- project-template:
+    name: build-template
+    check:
+      jobs:
+        - build-job
