@@ -54,6 +54,8 @@ Example::
 
     bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbWFuYWdlc2Yuc2ZyZG90ZXN0aW5zdGFuY2Uub3JnIiwienV1bC50ZW5hbnRzIjp7ImxvY2FsIjoiKiJ9LCJleHAiOjE1Mzc0MTcxOTguMzc3NTQ0fQ.DLbKx1J84wV4Vm7sv3zw9Bw9-WuIka7WkPQxGDAHz7s
 
+.. _export-keys:
+
 export-keys
 ^^^^^^^^^^^
 
@@ -62,6 +64,8 @@ export-keys
 Example::
 
   zuul-admin export-keys /var/backup/zuul-keys.json
+
+.. _import-keys:
 
 import-keys
 ^^^^^^^^^^^
