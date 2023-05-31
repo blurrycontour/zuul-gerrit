@@ -1316,9 +1316,15 @@ class PipelineManager(metaclass=ABCMeta):
 
     def scheduleMerge(self, item, files=None, dirs=None):
         log = item.annotateLogger(self.log)
+        build_set = item.bundle_build_set
+        if build_set.item is not item:
+            # This is a bundle, but this isn't the bundle buildset.
+            # Just say we're not ready and let the real one get
+            # scheduled later.
+            return False
+
         log.debug("Scheduling merge for item %s (files: %s, dirs: %s)" %
                   (item, files, dirs))
-        build_set = item.current_build_set
 
         # If the involved projects exclude unprotected branches we should also
         # exclude them from the merge and repo state except the branch of the
@@ -1336,13 +1342,13 @@ class PipelineManager(metaclass=ABCMeta):
 
         if isinstance(item.change, model.Change):
             self.sched.merger.mergeChanges(build_set.merger_items,
-                                           item.current_build_set, files, dirs,
+                                           build_set, files, dirs,
                                            precedence=self.pipeline.precedence,
                                            event=item.event,
                                            branches=branches)
         else:
             self.sched.merger.getRepoState(build_set.merger_items,
-                                           item.current_build_set,
+                                           build_set,
                                            precedence=self.pipeline.precedence,
                                            event=item.event,
                                            branches=branches)
@@ -1985,21 +1991,21 @@ class PipelineManager(metaclass=ABCMeta):
         if isinstance(item.change, model.Tag):
             source.setChangeAttributes(
                 item.change, containing_branches=event.item_in_branches)
-        with build_set.activeContext(self.current_context):
-            build_set.setMergeRepoState(event.repo_state)
-            build_set.merge_state = build_set.COMPLETE
-            if event.merged:
-                build_set.commit = event.commit
-                try:
-                    build_set.setFiles(event.files)
-                except Exception:
-                    log.exception("Unable to set files for build set:")
-            elif event.updated:
-                build_set.commit = (item.change.newrev or
-                                    '0000000000000000000000000000000000000000')
-        if not build_set.commit:
-            log.info("Unable to merge change %s" % item.change)
-            item.setUnableToMerge(event.errors)
+        for other_item in item.bundle_items:
+            other_build_set = other_item.current_build_set
+            with other_build_set.activeContext(self.current_context):
+                other_build_set.setMergeRepoState(event.repo_state)
+                other_build_set.merge_state = other_build_set.COMPLETE
+                if event.merged:
+                    other_build_set.commit = event.commit
+                    other_build_set.setFiles(event.files)
+                elif event.updated:
+                    other_build_set.commit = (
+                        item.change.newrev or
+                        '0000000000000000000000000000000000000000')
+            if not other_build_set.commit:
+                log.info("Unable to merge change %s" % item.change)
+                item.setUnableToMerge(event.errors)
 
     def _onGlobalRepoStateCompleted(self, event, build_set):
         item = build_set.item
