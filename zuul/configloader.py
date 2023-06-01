@@ -2697,8 +2697,11 @@ class TenantParser(object):
                     if project_metadata.merge_mode not in tpc.merge_modes:
                         mode = model.get_merge_mode_name(
                             project_metadata.merge_mode)
+                        allowed_modes = list(map(model.get_merge_mode_name,
+                                                 tpc.merge_modes))
                         raise Exception(f'Merge mode {mode} not supported '
-                                        f'by project {project_name}')
+                                        f'by project {project_name}. '
+                                        f'Supported modes: {allowed_modes}.')
 
     def _parseLayout(self, tenant, data, loading_errors, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because
