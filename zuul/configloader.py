@@ -1162,6 +1162,7 @@ class ProjectTemplateParser(object):
         project_template = model.ProjectConfig(conf.get('name'))
         project_template.source_context = conf['_source_context']
         project_template.start_mark = conf['_start_mark']
+        project_template.is_template = True
         project_template.queue_name = conf.get('queue')
         for pipeline_name, conf_pipeline in conf.items():
             if pipeline_name in self.not_pipelines:

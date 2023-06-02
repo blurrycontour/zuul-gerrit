@@ -7313,6 +7313,7 @@ class ProjectConfig(ConfigObject):
     def __init__(self, name):
         super(ProjectConfig, self).__init__()
         self.name = name
+        self.is_template = False
         self.templates = []
         # Pipeline name -> ProjectPipelineConfig
         self.pipelines = {}
