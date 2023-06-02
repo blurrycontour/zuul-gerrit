@@ -827,6 +827,14 @@ class TestGerritFake(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
     tenant_config_file = "config/circular-dependencies/main.yaml"
 
+    def _make_tuple(self, data):
+        ret = []
+        for c in data:
+            dep_change = c['number']
+            dep_ps = c['currentPatchSet']['number']
+            ret.append((int(dep_change), int(dep_ps)))
+        return sorted(ret)
+
     def _get_tuple(self, change_number):
         ret = []
         data = self.fake_gerrit.get(
@@ -903,6 +911,11 @@ class TestGerritFake(ZuulTestCase):
         ret = self.fake_gerrit._getSubmittedTogether(C1, None)
         self.assertEqual(ret, [(4, 1)])
 
+        # Test also the query used by the GerritConnection:
+        ret = self.fake_gerrit._simpleQuery('status:open topic:test-topic')
+        ret = self._make_tuple(ret)
+        self.assertEqual(ret, [(3, 1), (4, 1)])
+
 
 class TestGerritConnection(ZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'
@@ -957,3 +970,134 @@ class TestGerritConnection(ZuulTestCase):
         self.assertEqual(B.queried, 2)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
+
+    def test_submit_requirements(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        # Set an unsatisfied submit requirement
+        A.setSubmitRequirements([
+            {
+                "name": "Code-Review",
+                "description": "Disallow self-review",
+                "status": "UNSATISFIED",
+                "is_legacy": False,
+                "submittability_expression_result": {
+                    "expression": "label:Code-Review=MAX,user=non_uploader "
+                        "AND -label:Code-Review=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [],
+                    "failing_atoms": [
+                        "label:Code-Review=MAX,user=non_uploader",
+                        "label:Code-Review=MIN"
+                    ]
+                }
+            },
+            {
+                "name": "Verified",
+                "status": "UNSATISFIED",
+                "is_legacy": True,
+                "submittability_expression_result": {
+                    "expression": "label:Verified=MAX -label:Verified=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [],
+                    "failing_atoms": [
+                        "label:Verified=MAX",
+                        "-label:Verified=MIN"
+                    ]
+                }
+            },
+        ])
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([])
+        self.assertEqual(A.queried, 1)
+        self.assertEqual(A.data['status'], 'NEW')
+
+        # Mark the requirement satisfied
+        A.setSubmitRequirements([
+            {
+                "name": "Code-Review",
+                "description": "Disallow self-review",
+                "status": "SATISFIED",
+                "is_legacy": False,
+                "submittability_expression_result": {
+                    "expression": "label:Code-Review=MAX,user=non_uploader "
+                        "AND -label:Code-Review=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [
+                        "label:Code-Review=MAX,user=non_uploader",
+                    ],
+                    "failing_atoms": [
+                        "label:Code-Review=MIN"
+                    ]
+                }
+            },
+            {
+                "name": "Verified",
+                "status": "UNSATISFIED",
+                "is_legacy": True,
+                "submittability_expression_result": {
+                    "expression": "label:Verified=MAX -label:Verified=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [],
+                    "failing_atoms": [
+                        "label:Verified=MAX",
+                        "-label:Verified=MIN"
+                    ]
+                }
+            },
+        ])
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name="project-merge", result="SUCCESS", changes="1,1"),
+            dict(name="project-test1", result="SUCCESS", changes="1,1"),
+            dict(name="project-test2", result="SUCCESS", changes="1,1"),
+        ], ordered=False)
+        self.assertEqual(A.queried, 3)
+        self.assertEqual(A.data['status'], 'MERGED')
+
+
+class TestGerritUnicodeRefs(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    upload_pack_data = (b'014452944ee370db5c87691e62e0f9079b6281319b4e HEAD'
+                        b'\x00multi_ack thin-pack side-band side-band-64k '
+                        b'ofs-delta shallow deepen-since deepen-not '
+                        b'deepen-relative no-progress include-tag '
+                        b'multi_ack_detailed allow-tip-sha1-in-want '
+                        b'allow-reachable-sha1-in-want '
+                        b'symref=HEAD:refs/heads/faster filter '
+                        b'object-format=sha1 agent=git/2.37.1.gl1\n'
+                        b'003d5f42665d737b3fd4ec22ca0209e6191859f09fd6 '
+                        b'refs/for/faster\n'
+                        b'004952944ee370db5c87691e62e0f9079b6281319b4e '
+                        b'refs/heads/foo/\xf0\x9f\x94\xa5\xf0\x9f\x94\xa5'
+                        b'\xf0\x9f\x94\xa5\n'
+                        b'003f52944ee370db5c87691e62e0f9079b6281319b4e '
+                        b'refs/heads/faster\n0000').decode("utf-8")
+
+    def test_mb_unicode_refs(self):
+        gerrit_config = {
+            'user': 'gerrit',
+            'server': 'localhost',
+        }
+        driver = GerritDriver()
+        gerrit = GerritConnection(driver, 'review_gerrit', gerrit_config)
+
+        def _uploadPack(project):
+            return self.upload_pack_data
+
+        self.patch(gerrit, '_uploadPack', _uploadPack)
+
+        project = gerrit.source.getProject('org/project')
+        refs = gerrit.getInfoRefs(project)
+
+        self.assertEqual(refs,
+                         {'refs/for/faster':
+                          '5f42665d737b3fd4ec22ca0209e6191859f09fd6',
+                          'refs/heads/foo/🔥🔥🔥':
+                          '52944ee370db5c87691e62e0f9079b6281319b4e',
+                          'refs/heads/faster':
+                          '52944ee370db5c87691e62e0f9079b6281319b4e'})

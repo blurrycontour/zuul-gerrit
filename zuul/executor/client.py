@@ -113,6 +113,8 @@ class ExecutorClient(object):
         # is up to date.
         attempts = build.build_set.getTries(job.name)
         params["zuul"]['attempts'] = attempts
+        params['zuul']['max_attempts'] = job.attempts
+        # TODO (swestphahl): Remove deprecated 'max_attempts' parameter
         params['max_attempts'] = job.attempts
 
         # Store the NodeRequest ID in the job arguments, so we can look it up

@@ -13,6 +13,7 @@
 // under the License.
 
 import * as React from 'react'
+import { connect } from 'react-redux'
 import { Fragment } from 'react'
 import ReAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
@@ -38,6 +39,9 @@ import {
   TimesIcon,
   TimesCircleIcon,
 } from '@patternfly/react-icons'
+
+const ANSI_REGEX = new RegExp('\x33[[0-9;]+m')
+
 
 class BuildOutputLabel extends React.Component {
   static propTypes = {
@@ -73,6 +77,7 @@ class BuildOutputLabel extends React.Component {
 class BuildOutput extends React.Component {
   static propTypes = {
     output: PropTypes.object,
+    preferences: PropTypes.object,
   }
 
   renderHosts (hosts) {
@@ -107,10 +112,35 @@ class BuildOutput extends React.Component {
     )
   }
 
-  renderFailedTask (host, task) {
+  getLines(lines) {
     const max_lines = 42
+    if (lines && lines.length > 0) {
+      return [
+        lines.slice(0, -max_lines).join('\n'),
+        lines.slice(-max_lines).join('\n')
+      ]
+    }
+    return ['', '']
+  }
+
+  renderFailedTask (host, task) {
+    let zuulOutputClass = 'zuul-build-output'
+    if (this.props.preferences.darkMode) {
+      zuulOutputClass = 'zuul-build-output-dark'
+    }
+    const [stdout_early_lines, stdout_late_lines] = this.getLines(task.stdout_lines)
+    const [stderr_early_lines, stderr_late_lines] = this.getLines(task.stderr_lines)
+    // If there is an ANSI color escape string, set a white-on-black
+    // color scheme so the output looks more like what we would expect in a console.
+    let term_style = {}
+    if (ANSI_REGEX.test(stdout_early_lines) ||
+        ANSI_REGEX.test(stdout_late_lines) ||
+        ANSI_REGEX.test(stderr_early_lines) ||
+        ANSI_REGEX.test(stderr_late_lines)) {
+      term_style = {backgroundColor: 'black', color: 'white'}
+    }
     return (
-      <Card key={host + task.zuul_log_id} className="zuul-task-summary-failed">
+      <Card key={host + task.zuul_log_id} className="zuul-task-summary-failed" style={this.props.preferences.darkMode ? {background: 'var(--pf-global--BackgroundColor--300)'} : {}}>
         <CardHeader>
           <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
             &nbsp;Task&nbsp;<strong>{task.name}</strong>&nbsp;
@@ -119,40 +149,40 @@ class BuildOutput extends React.Component {
         <CardBody>
           {task.invocation && task.invocation.module_args &&
            task.invocation.module_args._raw_params && (
-            <pre key="cmd" title="cmd" className={`${'cmd'}`}>
+            <pre key="cmd" title="cmd" className={'cmd ' + zuulOutputClass}>
               {task.invocation.module_args._raw_params}
             </pre>
           )}
           {task.msg && (
-            <pre key="msg" title="msg">{task.msg}</pre>
+            <pre key="msg" title="msg" className={zuulOutputClass}>{task.msg}</pre>
           )}
           {task.exception && (
-            <pre key="exc" style={{ color: 'red' }} title="exc">{task.exception}</pre>
+            <pre key="exc" style={{ color: 'red' }} title="exc" className={zuulOutputClass}>{task.exception}</pre>
           )}
-          {task.stdout_lines && task.stdout_lines.length > 0 && (
+          {stdout_late_lines.length > 0 && (
             <Fragment>
-              {task.stdout_lines.length > max_lines && (
+              {stdout_early_lines.length > 0 && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
-                  <pre key="stdout" title="stdout">
-                    <ReAnsi log={task.stdout_lines.slice(0, -max_lines).join('\n')} />
+                  <pre key="stdout" title="stdout" className={zuulOutputClass} style={term_style}>
+                    <ReAnsi log={stdout_early_lines} />
                   </pre>
                 </details>)}
-              <pre key="stdout" title="stdout">
-                <ReAnsi log={task.stdout_lines.slice(-max_lines).join('\n')} />
+              <pre key="stdout" title="stdout" className={zuulOutputClass} style={term_style}>
+                <ReAnsi log={stdout_late_lines} />
               </pre>
             </Fragment>
           )}
-          {task.stderr_lines && task.stderr_lines.length > 0 && (
+          {stderr_late_lines.length > 0 && (
             <Fragment>
-              {task.stderr_lines.length > max_lines && (
+              {stderr_early_lines.length > 0 && (
                 <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
-                  <pre key="stderr" title="stderr">
-                    <ReAnsi log={task.stderr_lines.slice(0, -max_lines).join('\n')} />
+                  <pre key="stderr" title="stderr" className={zuulOutputClass} style={term_style}>
+                    <ReAnsi log={stderr_early_lines} />
                   </pre>
                 </details>
               )}
-              <pre key="stderr" title="stderr">
-                <ReAnsi log={task.stderr_lines.slice(-max_lines).join('\n')} />
+              <pre key="stderr" title="stderr" className={zuulOutputClass} style={term_style}>
+                <ReAnsi log={stderr_late_lines} />
               </pre>
             </Fragment>
           )}
@@ -177,4 +207,10 @@ class BuildOutput extends React.Component {
 }
 
 
-export default BuildOutput
+function mapStateToProps(state) {
+  return {
+    preferences: state.preferences,
+  }
+}
+
+export default connect(mapStateToProps)(BuildOutput)

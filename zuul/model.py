@@ -112,6 +112,10 @@ SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'
 
+# Error severity
+SEVERITY_ERROR = 'error'
+SEVERITY_WARNING = 'warning'
+
 
 def add_debug_line(debug_messages, msg, indent=0):
     if debug_messages is None:
@@ -180,6 +184,9 @@ class ConfigurationErrorKey(object):
     sufficient to determine whether we should show an error to a user.
     """
 
+    # Note: this class is serialized to ZK via ConfigurationErrorList,
+    # ensure that it serializes and deserializes appropriately.
+
     def __init__(self, context, mark, error_text):
         self.context = context
         self.mark = mark
@@ -240,23 +247,34 @@ class ConfigurationErrorKey(object):
 
 
 class ConfigurationError(object):
-
     """A configuration error"""
-    def __init__(self, context, mark, error, short_error=None):
-        self.error = str(error)
+
+    # Note: this class is serialized to ZK via ConfigurationErrorList,
+    # ensure that it serializes and deserializes appropriately.
+
+    def __init__(self, context, mark, error, short_error=None,
+                 severity=None, name=None):
+        self.error = error
         self.short_error = short_error
+        self.severity = severity or SEVERITY_ERROR
+        self.name = name or 'Unknown'
         self.key = ConfigurationErrorKey(context, mark, self.error)
 
     def serialize(self):
         return {
             "error": self.error,
             "short_error": self.short_error,
-            "key": self.key.serialize()
+            "key": self.key.serialize(),
+            "severity": self.severity,
+            "name": self.name,
         }
 
     @classmethod
     def deserialize(cls, data):
         data["key"] = ConfigurationErrorKey.deserialize(data["key"])
+        # These attributes were added in MODEL_API 13
+        data['severity'] = data.get('severity', SEVERITY_ERROR)
+        data['name'] = data.get('name', 'Unknown')
         o = cls.__new__(cls)
         o.__dict__.update(data)
         return o
@@ -269,7 +287,9 @@ class ConfigurationError(object):
             return False
         return (self.error == other.error and
                 self.short_error == other.short_error and
-                self.key == other.key)
+                self.key == other.key and
+                self.severity == other.severity and
+                self.name == other.name)
 
 
 class ConfigurationErrorList(zkobject.ShardedZKObject):
@@ -306,8 +326,12 @@ class LoadingErrors(object):
         self.errors = []
         self.error_keys = set()
 
-    def addError(self, context, mark, error, short_error=None):
-        e = ConfigurationError(context, mark, error, short_error)
+    def addError(self, context, mark, error, short_error=None,
+                 severity=None, name=None):
+        e = ConfigurationError(context, mark, error,
+                               short_error=short_error,
+                               severity=severity,
+                               name=name)
         self.errors.append(e)
         self.error_keys.add(e.key)
 
@@ -620,6 +644,18 @@ class PipelineState(zkobject.ZKObject):
             _read_only=False,
         )
 
+    def _lateInitData(self):
+        # If we're initializing the object on our initial refresh,
+        # reset the data to this.
+        return dict(
+            state=Pipeline.STATE_NORMAL,
+            queues=[],
+            old_queues=[],
+            consecutive_failures=0,
+            disabled=False,
+            layout_uuid=self.pipeline.tenant.layout.uuid,
+        )
+
     @classmethod
     def fromZK(klass, context, path, pipeline, **kw):
         obj = klass()
@@ -631,21 +667,23 @@ class PipelineState(zkobject.ZKObject):
         return obj
 
     @classmethod
-    def create(cls, pipeline, layout_uuid, old_state=None):
-        # If the object does not exist in ZK, create it with the
-        # default attributes and the supplied layout UUID.  Otherwise,
-        # return an initialized object (or the old object for reuse)
-        # without loading any data so that data can be loaded on the
-        # next refresh.
-        ctx = pipeline.manager.current_context
+    def create(cls, pipeline, old_state=None):
+        # If we are resetting an existing pipeline, we will have an
+        # old_state, so just clean up the object references there and
+        # let the next refresh handle updating any data.
+        if old_state:
+            old_state._resetObjectRefs()
+            return old_state
+
+        # Otherwise, we are initializing a pipeline that we haven't
+        # seen before.  It still might exist in ZK, but since we
+        # haven't seen it, we don't have any object references to
+        # clean up.  We can just start with a clean object, set the
+        # pipeline reference, and let the next refresh deal with
+        # whether there might be any data in ZK.
         state = cls()
         state._set(pipeline=pipeline)
-        if state.exists(ctx):
-            if old_state:
-                old_state._resetObjectRefs()
-                return old_state
-            return state
-        return cls.new(ctx, pipeline=pipeline, layout_uuid=layout_uuid)
+        return state
 
     def _resetObjectRefs(self):
         # Update the pipeline references on the queue objects.
@@ -712,14 +750,54 @@ class PipelineState(zkobject.ZKObject):
         # This is so that we can refresh the object in circumstances
         # where we haven't verified that our local layout matches
         # what's in ZK.
+
+        # Notably, this need not prevent us from performing the
+        # initialization below if necessary.  The case of the object
+        # being brand new in ZK supercedes our worry that our old copy
+        # might be out of date since our old copy is, itself, brand
+        # new.
         self._set(_read_only=read_only)
-        return super().refresh(context)
+        try:
+            return super().refresh(context)
+        except NoNodeError:
+            # If the object doesn't exist we will receive a
+            # NoNodeError.  This happens because the postConfig call
+            # creates this object without holding the pipeline lock,
+            # so it can't determine whether or not it exists in ZK.
+            # We do hold the pipeline lock here, so if we get this
+            # error, we know we're initializing the object, and we
+            # should write it to ZK.
+
+            # Note that typically this code is not used since
+            # currently other objects end up creating the pipeline
+            # path in ZK first.  It is included in case that ever
+            # changes.  Currently the empty byte-string code path in
+            # deserialize() is used instead.
+            context.log.warning("Initializing pipeline state for %s; "
+                                "this is expected only for new pipelines",
+                                self.pipeline.name)
+            self._set(**self._lateInitData())
+            self.internalCreate(context)
 
     def deserialize(self, raw, context):
         # We may have old change objects in the pipeline cache, so
         # make sure they are the same objects we would get from the
         # source change cache.
         self.pipeline.manager.clearCache()
+
+        # If the object doesn't exist we will get back an empty byte
+        # string.  This happens because the postConfig call creates
+        # this object without holding the pipeline lock, so it can't
+        # determine whether or not it exists in ZK.  We do hold the
+        # pipeline lock here, so if we get the empty byte string, we
+        # know we're initializing the object.  In that case, we should
+        # initialize the layout id to the current layout.  Nothing
+        # else needs to be set.
+        if raw == b'':
+            context.log.warning("Initializing pipeline state for %s; "
+                                "this is expected only for new pipelines",
+                                self.pipeline.name)
+            return self._lateInitData()
 
         data = super().deserialize(raw, context)
 
@@ -895,11 +973,34 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         super().__init__()
         self._set(
             changes=[],
+            _change_keys=[],
         )
 
-    def refresh(self, context):
-        self._retry(context, super().refresh,
-                    context, max_tries=5)
+    def refresh(self, context, allow_init=True):
+        # Set allow_init to false to indicate that we don't hold the
+        # lock and we should not try to initialize the object in ZK if
+        # it does not exist.
+        try:
+            self._retry(context, super().refresh,
+                        context, max_tries=5)
+        except NoNodeError:
+            # If the object doesn't exist we will receive a
+            # NoNodeError.  This happens because the postConfig call
+            # creates this object without holding the pipeline lock,
+            # so it can't determine whether or not it exists in ZK.
+            # We do hold the pipeline lock here, so if we get this
+            # error, we know we're initializing the object, and
+            # we should write it to ZK.
+            if allow_init:
+                context.log.warning(
+                    "Initializing pipeline change list for %s; "
+                    "this is expected only for new pipelines",
+                    self.pipeline.name)
+                self.internalCreate(context)
+            else:
+                # If we're called from a context where we can't
+                # initialize the change list, re-raise the exception.
+                raise
 
     def getPath(self):
         return self.getChangeListPath(self.pipeline)
@@ -910,19 +1011,14 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         return pipeline_path + '/change_list'
 
     @classmethod
-    def create(cls, pipeline, old_list=None):
-        # If the object does not exist in ZK, create it with the
-        # default attributes.  Otherwise, return an initialized object
-        # (or the old object for reuse) without loading any data so
-        # that data can be loaded on the next refresh.
-        ctx = pipeline.manager.current_context
+    def create(cls, pipeline):
+        # This object may or may not exist in ZK, but we using any of
+        # that data here.  We can just start with a clean object, set
+        # the pipeline reference, and let the next refresh deal with
+        # whether there might be any data in ZK.
         change_list = cls()
         change_list._set(pipeline=pipeline)
-        if change_list.exists(ctx):
-            if old_list:
-                return old_list
-            return change_list
-        return cls.new(ctx, pipeline=pipeline)
+        return change_list
 
     def serialize(self, context):
         data = {
@@ -930,8 +1026,8 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, data, context):
-        data = super().deserialize(data, context)
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
         change_keys = []
         # We must have a dictionary with a 'changes' key; otherwise we
         # may be reading immediately after truncating.  Allow the
@@ -1336,6 +1432,7 @@ class Node(ConfigObject):
         self.private_ipv6 = None
         self.connection_port = 22
         self.connection_type = None
+        self.slot = None
         self._keys = []
         self.az = None
         self.provider = None
@@ -1386,7 +1483,7 @@ class Node(ConfigObject):
         if internal_attributes:
             # These attributes are only useful for the rpc serialization
             d['name'] = self.name[0]
-            d['aliases'] = self.name[1:]
+            d['aliases'] = list(self.name[1:])
             d['label'] = self.label
         return d
 
@@ -1810,24 +1907,6 @@ class FrozenSecret(ConfigObject):
         )
 
 
-class ProjectContext(ConfigObject):
-
-    def __init__(self, project_canonical_name, project_name):
-        super().__init__()
-        self.project_canonical_name = project_canonical_name
-        self.project_name = project_name
-        self.branch = None
-        self.path = None
-
-    def __str__(self):
-        return self.project_name
-
-    def toDict(self):
-        return dict(
-            project=self.project_name,
-        )
-
-
 class SourceContext(ConfigObject):
     """A reference to the branch of a project in configuration.
 
@@ -2094,7 +2173,8 @@ class ZuulRole(Role):
         return '<ZuulRole %s %s>' % (self.project_canonical_name,
                                      self.target_name)
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
 
     def __eq__(self, other):
         if not isinstance(other, ZuulRole):
@@ -2164,6 +2244,14 @@ class JobData(zkobject.ShardedZKObject):
             "_path": self._path,
         }
         return json_dumps(data, sort_keys=True).encode("utf8")
+
+    def __hash__(self):
+        return hash(self.hash)
+
+    def __eq__(self, other):
+        if not isinstance(other, JobData):
+            return False
+        return self.hash == other.hash
 
 
 class FrozenJob(zkobject.ZKObject):
@@ -2290,6 +2378,9 @@ class FrozenJob(zkobject.ZKObject):
         return self.jobPath(self.name, self.buildset.getPath())
 
     def serialize(self, context):
+        # Ensure that any special handling in this method is matched
+        # in Job.freezeJob so that FrozenJobs are identical regardless
+        # of whether they have been desiraliazed.
         data = {}
         for k in self.attributes:
             # TODO: Backwards compat handling, remove after 5.0
@@ -2328,6 +2419,9 @@ class FrozenJob(zkobject.ZKObject):
         return json_dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
+        # Ensure that any special handling in this method is matched
+        # in Job.freezeJob so that FrozenJobs are identical regardless
+        # of whether they have been desiraliazed.
         data = super().deserialize(raw, context)
 
         # MODEL_API < 8
@@ -2395,6 +2489,12 @@ class FrozenJob(zkobject.ZKObject):
             else:
                 data['_' + job_data_key] = None
         return data
+
+    def _save(self, context, *args, **kw):
+        # Before saving, update the buildset with the new job version
+        # so that future readers know to refresh it.
+        self.buildset.updateJobVersion(context, self)
+        return super()._save(context, *args, **kw)
 
     def setWaitingStatus(self, status):
         if self.waiting_status == status:
@@ -2842,11 +2942,18 @@ class Job(ConfigObject):
                     for pb in v:
                         self._deduplicateSecrets(context, secrets, pb)
             kw[k] = v
-        kw['nodeset_alternatives'] = self.flattenNodesetAlternatives(layout)
         kw['nodeset_index'] = 0
         kw['secrets'] = secrets
         kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
+        # Ensure that the these attributes are exactly equal to what
+        # would be deserialized on another scheduler.
+        kw['nodeset_alternatives'] = [
+            NodeSet.fromDict(alt.toDict()) for alt in
+            self.flattenNodesetAlternatives(layout)
+        ]
+        kw['dependencies'] = frozenset(kw['dependencies'])
+        kw['semaphores'] = list(kw['semaphores'])
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
         return FrozenJob.new(context, **kw)
@@ -2946,20 +3053,30 @@ class Job(ConfigObject):
             # possibility of success, which may help prevent errors in
             # most cases.  If we don't raise an error here, the
             # possibility of later failure still remains.
-            nonfinal_parents = [p for p in parents if not p.final]
-            if not nonfinal_parents:
+            nonfinal_parent_found = False
+            nonintermediate_parent_found = False
+            nonprotected_parent_found = False
+            for p in parents:
+                if not p.final:
+                    nonfinal_parent_found = True
+                if not p.intermediate:
+                    nonintermediate_parent_found = True
+                if not p.protected:
+                    nonprotected_parent_found = True
+                if (nonfinal_parent_found and
+                    nonintermediate_parent_found and
+                    nonprotected_parent_found):
+                    break
+
+            if not nonfinal_parent_found:
                 raise Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
                     'is final and can not act as a parent')
-            nonintermediate_parents = [
-                p for p in parents if not p.intermediate]
-            if not nonintermediate_parents and not self.abstract:
+            if not nonintermediate_parent_found and not self.abstract:
                 raise Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
                     f'is intermediate but "{self.name}" is not abstract')
-            nonprotected_parents = [
-                p for p in parents if not p.protected]
-            if (not nonprotected_parents and
+            if (not nonprotected_parent_found and
                 parents[0].source_context.project_canonical_name !=
                 self.source_context.project_canonical_name):
                 raise Exception(
@@ -3310,6 +3427,14 @@ class JobProject(ConfigObject):
                    data['override_branch'],
                    data['override_checkout'])
 
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __eq__(self, other):
+        if not isinstance(other, JobProject):
+            return False
+        return self.toDict() == other.toDict()
+
 
 class JobSemaphore(ConfigObject):
     """ A reference to a semaphore from a job. """
@@ -3328,6 +3453,14 @@ class JobSemaphore(ConfigObject):
     @classmethod
     def fromDict(cls, data):
         return cls(data['name'], data['resources_first'])
+
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __eq__(self, other):
+        if not isinstance(other, JobSemaphore):
+            return False
+        return self.toDict() == other.toDict()
 
 
 class JobList(ConfigObject):
@@ -3366,7 +3499,8 @@ class JobDependency(ConfigObject):
             return False
         return self.toDict() == other.toDict()
 
-    __hash__ = object.__hash__
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
 
     def toDict(self):
         return {'name': self.name,
@@ -3878,6 +4012,12 @@ class Build(zkobject.ZKObject):
     def getPath(self):
         return f"{self.job.getPath()}/build/{self.uuid}"
 
+    def _save(self, context, *args, **kw):
+        # Before saving, update the buildset with the new job version
+        # so that future readers know to refresh it.
+        self.job.buildset.updateBuildVersion(context, self)
+        return super()._save(context, *args, **kw)
+
     def __repr__(self):
         return ('<Build %s of %s voting:%s>' %
                 (self.uuid, self.job.name, self.job.voting))
@@ -4088,6 +4228,8 @@ class BuildSet(zkobject.ZKObject):
             job_graph=None,
             jobs={},
             deduplicated_jobs=[],
+            job_versions={},
+            build_versions={},
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
@@ -4199,6 +4341,8 @@ class BuildSet(zkobject.ZKObject):
             "configured_time": self.configured_time,
             "start_time": self.start_time,
             "repo_state_request_time": self.repo_state_request_time,
+            "job_versions": self.job_versions,
+            "build_versions": self.build_versions,
             # jobs (serialize as separate objects)
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
@@ -4283,6 +4427,8 @@ class BuildSet(zkobject.ZKObject):
         # order.
         tpe_jobs = []
         tpe = context.executor[BuildSet]
+        job_versions = data.get('job_versions', {})
+        build_versions = data.get('build_versions', {})
         # jobs (deserialize as separate objects)
         if data['job_graph']:
             for job_name in data['job_graph'].jobs:
@@ -4296,7 +4442,8 @@ class BuildSet(zkobject.ZKObject):
 
                 if job_name in self.jobs:
                     job = self.jobs[job_name]
-                    if not old_build_exists:
+                    if ((not old_build_exists) or
+                        self.shouldRefreshJob(job, job_versions)):
                         tpe_jobs.append((None, job_name,
                                          tpe.submit(job.refresh, context)))
                 else:
@@ -4308,7 +4455,7 @@ class BuildSet(zkobject.ZKObject):
                     build = self.builds.get(job_name)
                     builds[job_name] = build
                     if build and build.getPath() == build_path:
-                        if not build.result:
+                        if self.shouldRefreshBuild(build, build_versions):
                             tpe_jobs.append((
                                 None, job_name, tpe.submit(
                                     build.refresh, context)))
@@ -4362,6 +4509,48 @@ class BuildSet(zkobject.ZKObject):
             "_old_jobs": {},
         })
         return data
+
+    def updateBuildVersion(self, context, build):
+        # It's tempting to update versions regardless of the model
+        # API, but if we start writing versions before all components
+        # are upgraded we could get out of sync.
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+
+        # It is common for a lot of builds/jobs to be added at once,
+        # so to avoid writing this buildset object repeatedly during
+        # that time, we only update the version after the initial
+        # creation.
+        version = build.getZKVersion()
+        # If zstat is None, we created the object
+        if version is not None:
+            self.build_versions[build.uuid] = version + 1
+            self.updateAttributes(context, build_versions=self.build_versions)
+
+    def updateJobVersion(self, context, job):
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+
+        version = job.getZKVersion()
+        if version is not None:
+            self.job_versions[job.name] = version + 1
+            self.updateAttributes(context, job_versions=self.job_versions)
+
+    def shouldRefreshBuild(self, build, build_versions):
+        # Unless all schedulers are updating versions, we can't trust
+        # the data.
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+        current = build.getZKVersion()
+        expected = build_versions.get(build.uuid, 0)
+        return expected != current
+
+    def shouldRefreshJob(self, job, job_versions):
+        if (COMPONENT_REGISTRY.model_api < 12):
+            return True
+        current = job.getZKVersion()
+        expected = job_versions.get(job.name, 0)
+        return expected != current
 
     @property
     def ref(self):
@@ -4552,6 +4741,37 @@ class BuildSet(zkobject.ZKObject):
         return Attributes(uuid=self.uuid)
 
 
+class EventInfo:
+
+    def __init__(self):
+        self.zuul_event_id = None
+        self.timestamp = time.time()
+        self.span_context = None
+
+    @classmethod
+    def fromEvent(cls, event):
+        tinfo = cls()
+        tinfo.zuul_event_id = event.zuul_event_id
+        tinfo.timestamp = event.timestamp
+        tinfo.span_context = event.span_context
+        return tinfo
+
+    @classmethod
+    def fromDict(cls, d):
+        tinfo = cls()
+        tinfo.zuul_event_id = d["zuul_event_id"]
+        tinfo.timestamp = d["timestamp"]
+        tinfo.span_context = d["span_context"]
+        return tinfo
+
+    def toDict(self):
+        return {
+            "zuul_event_id": self.zuul_event_id,
+            "timestamp": self.timestamp,
+            "span_context": self.span_context,
+        }
+
+
 class QueueItem(zkobject.ZKObject):
 
     """Represents the position of a Change in a ChangeQueue.
@@ -4586,7 +4806,7 @@ class QueueItem(zkobject.ZKObject):
             live=True,  # Whether an item is intended to be processed at all
             layout_uuid=None,
             _cached_sql_results={},
-            event=None,  # The trigger event that lead to this queue item
+            event=None,  # Info about the event that lead to this queue item
 
             # Additional container for connection specifig information to be
             # used by reporters throughout the lifecycle
@@ -4608,6 +4828,9 @@ class QueueItem(zkobject.ZKObject):
     def new(klass, context, **kw):
         obj = klass()
         obj._set(**kw)
+        if COMPONENT_REGISTRY.model_api >= 13:
+            obj._set(event=obj.event and EventInfo.fromEvent(obj.event))
+
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
         files_state = (BuildSet.COMPLETE if obj.change.files is not None
@@ -4636,10 +4859,18 @@ class QueueItem(zkobject.ZKObject):
         return (tenant, pipeline, uuid)
 
     def serialize(self, context):
-        if isinstance(self.event, TriggerEvent):
-            event_type = "TriggerEvent"
+        if COMPONENT_REGISTRY.model_api < 13:
+            if isinstance(self.event, TriggerEvent):
+                event_type = "TriggerEvent"
+            else:
+                event_type = self.event.__class__.__name__
         else:
-            event_type = self.event.__class__.__name__
+            event_type = "EventInfo"
+            if not isinstance(self.event, EventInfo):
+                # Convert our local trigger event to a trigger info
+                # object. This will only happen on the transition to
+                # model API version 13.
+                self._set(event=EventInfo.fromEvent(self.event))
 
         data = {
             "uuid": self.uuid,
@@ -4681,14 +4912,18 @@ class QueueItem(zkobject.ZKObject):
         # child objects.
         self._set(uuid=data["uuid"])
 
-        event_type = data["event"]["type"]
-        if event_type == "TriggerEvent":
-            event_class = (
-                self.pipeline.manager.sched.connections.getTriggerEventClass(
-                    data["event"]["data"]["driver_name"])
-            )
+        if COMPONENT_REGISTRY.model_api < 13:
+            event_type = data["event"]["type"]
+            if event_type == "TriggerEvent":
+                event_class = (
+                    self.pipeline.manager.sched.connections
+                        .getTriggerEventClass(
+                            data["event"]["data"]["driver_name"])
+                )
+            else:
+                event_class = EventTypeIndex.event_type_mapping.get(event_type)
         else:
-            event_class = EventTypeIndex.event_type_mapping.get(event_type)
+            event_class = EventInfo
 
         if event_class is None:
             raise NotImplementedError(
@@ -5910,8 +6145,7 @@ class Bundle:
     def deserialize(cls, context, queue, items_by_path, data):
         bundle = cls(data["uuid"])
         bundle.items = [
-            items_by_path.get(p) or QueueItem.fromZK(
-                context, p, pipeline=queue.pipeline, queue=queue)
+            items_by_path.get(p) or QueueItem.fromZK(context, p, queue=queue)
             for p in data["items"]
         ]
         bundle.started_reporting = data["started_reporting"]
@@ -7029,24 +7263,15 @@ class TenantProjectConfig(object):
 
     def includesBranch(self, branch):
         if self.include_branches is not None:
-            included = False
             for r in self.include_branches:
                 if r.fullmatch(branch):
-                    included = True
-                    break
-        else:
-            included = True
-        if not included:
+                    return True
             return False
 
-        excluded = False
         if self.exclude_branches is not None:
             for r in self.exclude_branches:
                 if r.fullmatch(branch):
-                    excluded = True
-                    break
-        if excluded:
-            return False
+                    return False
         return True
 
 
@@ -7155,8 +7380,19 @@ class ProjectMetadata:
 
     def __init__(self):
         self.merge_mode = None
-        self.default_branch = None
+        self._default_branch = None
         self.queue_name = None
+
+    def isDefaultBranchSet(self):
+        return self._default_branch is not None
+
+    @property
+    def default_branch(self):
+        return self._default_branch or "master"
+
+    @default_branch.setter
+    def default_branch(self, default_branch):
+        self._default_branch = default_branch
 
     def toDict(self):
         return {
@@ -7493,6 +7729,10 @@ class UnparsedConfig(object):
         return r
 
     def extend(self, conf):
+        # conf might be None in the case of a file with only comments.
+        if conf is None:
+            return
+
         if isinstance(conf, UnparsedConfig):
             self.pragmas.extend(conf.pragmas)
             self.pipelines.extend(conf.pipelines)
@@ -7636,31 +7876,33 @@ class Layout(object):
     def addJob(self, job):
         # We can have multiple variants of a job all with the same
         # name, but these variants must all be defined in the same repo.
-        prior_jobs = [j for j in self.getJobs(job.name) if
-                      j.source_context.project_canonical_name !=
-                      job.source_context.project_canonical_name]
         # Unless the repo is permitted to shadow another.  If so, and
         # the job we are adding is from a repo that is permitted to
         # shadow the one with the older jobs, skip adding this job.
         job_project = job.source_context.project_canonical_name
         job_tpc = self.tenant.project_configs[job_project]
         skip_add = False
-        for prior_job in prior_jobs[:]:
-            prior_project = prior_job.source_context.project_canonical_name
-            if prior_project in job_tpc.shadow_projects:
-                prior_jobs.remove(prior_job)
-                skip_add = True
-
+        prior_jobs = self.jobs.get(job.name, [])
         if prior_jobs:
-            raise Exception("Job %s in %s is not permitted to shadow "
-                            "job %s in %s" % (
-                                job,
-                                job.source_context.project_name,
-                                prior_jobs[0],
-                                prior_jobs[0].source_context.project_name))
+            # All jobs we've added so far should be from the same
+            # project, so pick the first one.
+            prior_job = prior_jobs[0]
+            if (prior_job.source_context.project_canonical_name !=
+                job.source_context.project_canonical_name):
+                prior_project = prior_job.source_context.project_canonical_name
+                if prior_project in job_tpc.shadow_projects:
+                    skip_add = True
+                else:
+                    raise Exception("Job %s in %s is not permitted to shadow "
+                                    "job %s in %s" % (
+                                        job,
+                                        job.source_context.project_name,
+                                        prior_job,
+                                        prior_job.source_context.project_name))
+
         if skip_add:
             return False
-        if job.name in self.jobs:
+        if prior_jobs:
             self.jobs[job.name].append(job)
         else:
             self.jobs[job.name] = [job]
@@ -7748,10 +7990,24 @@ class Layout(object):
         return semaphore
 
     def addQueue(self, queue):
-        # Change queues must be unique and cannot be overridden.
-        if queue.name in self.queues:
-            raise Exception('Queue %s is already defined' % queue.name)
-
+        # It's ok to have a duplicate queue definition, but only if
+        # they are in different branches of the same repo, and have
+        # the same values.
+        other = self.queues.get(queue.name)
+        if other is not None:
+            if not queue.source_context.isSameProject(other.source_context):
+                raise Exception(
+                    "Queue %s already defined in project %s" %
+                    (queue.name, other.source_context.project_name))
+            if queue.source_context.branch == other.source_context.branch:
+                raise Exception("Queue %s already defined" % (queue.name,))
+            if queue != other:
+                raise Exception("Queue %s does not match existing definition"
+                                " in branch %s" %
+                                (queue.name, other.source_context.branch))
+            # Identical data in a different branch of the same project;
+            # ignore the duplicate definition
+            return
         self.queues[queue.name] = queue
 
     def addPipeline(self, pipeline):
@@ -7795,7 +8051,7 @@ class Layout(object):
         md = self.project_metadata[project_config.name]
         if md.merge_mode is None and project_config.merge_mode is not None:
             md.merge_mode = project_config.merge_mode
-        if (md.default_branch is None and
+        if (not md.isDefaultBranchSet() and
             project_config.default_branch is not None):
             md.default_branch = project_config.default_branch
         if (

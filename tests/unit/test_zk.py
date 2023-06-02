@@ -18,6 +18,7 @@ import json
 import queue
 import threading
 import uuid
+from unittest import mock
 
 import testtools
 
@@ -53,10 +54,12 @@ from tests.base import (
     BaseTestCase, HoldableExecutorApi, HoldableMergerApi,
     iterate_timeout
 )
-from zuul.zk.zkobject import ShardedZKObject, ZKObject, ZKContext
+from zuul.zk.zkobject import (
+    ShardedZKObject, ZKObject, ZKContext
+)
 from zuul.zk.locks import tenant_write_lock
 
-from kazoo.exceptions import ZookeeperError, OperationTimeoutError
+from kazoo.exceptions import ZookeeperError, OperationTimeoutError, NoNodeError
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -2037,3 +2040,80 @@ class TestBlobStore(ZooKeeperBaseTestCase):
 
             with testtools.ExpectedException(KeyError):
                 bs.get(path)
+
+
+class TestPipelineInit(ZooKeeperBaseTestCase):
+    # Test the initialize-on-refresh code paths of various pipeline objects
+
+    def test_pipeline_state_new_object(self):
+        # Test the initialize-on-refresh code path with no existing object
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.state = model.PipelineState.create(
+            pipeline, pipeline.state)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        pipeline.state.refresh(context)
+        self.assertTrue(self.zk_client.client.exists(pipeline.state.getPath()))
+        self.assertEqual(pipeline.state.layout_uuid, layout.uuid)
+
+    def test_pipeline_state_existing_object(self):
+        # Test the initialize-on-refresh code path with a pre-existing object
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.manager = mock.Mock()
+        pipeline.state = model.PipelineState.create(
+            pipeline, pipeline.state)
+        pipeline.change_list = model.PipelineChangeList.create(
+            pipeline)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        # We refresh the change list here purely for the side effect
+        # of creating the pipeline state object with no data (the list
+        # is a subpath of the state object).
+        pipeline.change_list.refresh(context)
+        pipeline.state.refresh(context)
+        self.assertTrue(
+            self.zk_client.client.exists(pipeline.change_list.getPath()))
+        self.assertTrue(self.zk_client.client.exists(pipeline.state.getPath()))
+        self.assertEqual(pipeline.state.layout_uuid, layout.uuid)
+
+    def test_pipeline_change_list_new_object(self):
+        # Test the initialize-on-refresh code path with no existing object
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.state = model.PipelineState.create(
+            pipeline, pipeline.state)
+        pipeline.change_list = model.PipelineChangeList.create(
+            pipeline)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        pipeline.change_list.refresh(context)
+        self.assertTrue(
+            self.zk_client.client.exists(pipeline.change_list.getPath()))
+        pipeline.manager = mock.Mock()
+        pipeline.state.refresh(context)
+        self.assertEqual(pipeline.state.layout_uuid, layout.uuid)
+
+    def test_pipeline_change_list_new_object_without_lock(self):
+        # Test the initialize-on-refresh code path if we don't have
+        # the lock.  This should fail.
+        tenant = model.Tenant('tenant')
+        pipeline = model.Pipeline('gate', tenant)
+        layout = model.Layout(tenant)
+        tenant.layout = layout
+        pipeline.state = model.PipelineState.create(
+            pipeline, pipeline.state)
+        pipeline.change_list = model.PipelineChangeList.create(
+            pipeline)
+        context = ZKContext(self.zk_client, None, None, self.log)
+        with testtools.ExpectedException(NoNodeError):
+            pipeline.change_list.refresh(context, allow_init=False)
+        self.assertIsNone(
+            self.zk_client.client.exists(pipeline.change_list.getPath()))
+        pipeline.manager = mock.Mock()
+        pipeline.state.refresh(context)
+        self.assertEqual(pipeline.state.layout_uuid, layout.uuid)

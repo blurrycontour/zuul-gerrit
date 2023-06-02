@@ -105,8 +105,8 @@ class ZuulApp(object):
         self.commands = {}
 
     def _get_version(self):
-        from zuul.version import version_info as zuul_version_info
-        return "Zuul version: %s" % zuul_version_info.release_string()
+        from zuul.version import release_string
+        return "Zuul version: %s" % release_string
 
     def createParser(self):
         parser = argparse.ArgumentParser(
@@ -197,8 +197,10 @@ class ZuulApp(object):
                 logging_config.setDebug()
         logging_config.apply()
 
-    def configure_connections(self, source_only=False, require_sql=False):
-        self.connections = zuul.lib.connections.ConnectionRegistry()
+    def configure_connections(self, source_only=False,
+                              require_sql=False, check_bwrap=False):
+        self.connections = zuul.lib.connections.ConnectionRegistry(
+            check_bwrap=check_bwrap)
         self.connections.configure(self.config, source_only, require_sql)
 
 
@@ -226,12 +228,12 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
 
     def setup_logging(self, section, parameter):
         super(ZuulDaemonApp, self).setup_logging(section, parameter)
-        from zuul.version import version_info as zuul_version_info
+        from zuul.version import release_string
         log = logging.getLogger(
             "zuul.{section}".format(section=section.title()))
         log.debug(
             "Configured logging: {version}".format(
-                version=zuul_version_info.release_string()))
+                version=release_string))
 
     def main(self):
         self.parseArguments()

@@ -12,9 +12,9 @@
 
 import PropTypes from 'prop-types'
 import React from 'react'
-import Select from 'react-select'
+import Select, { components } from 'react-select'
 import moment from 'moment-timezone'
-import { OutlinedClockIcon } from '@patternfly/react-icons'
+import { OutlinedClockIcon, ChevronDownIcon } from '@patternfly/react-icons'
 import { connect } from 'react-redux'
 import { setTimezoneAction } from '../../actions/timezone'
 
@@ -58,7 +58,7 @@ class SelectTz extends React.Component {
   }
 
   render() {
-    const textColor = '#d1d1d1'
+    const textColor = '#fff'
     const containerStyles= {
       border: 'solid #2b2b2b',
       borderWidth: '0 0 0 1px',
@@ -83,7 +83,11 @@ class SelectTz extends React.Component {
       }),
       dropdownIndicator:(provided) => ({
         ...provided,
-        padding: '3px'
+        color: '#fff',
+        padding: '3px',
+        ':hover': {
+          color: '#fff'
+        }
       }),
       indicatorSeparator: () => {},
       menu: (provided) => ({
@@ -93,12 +97,23 @@ class SelectTz extends React.Component {
         top: '22px',
       })
     }
+
+    const DropdownIndicator = (props) => {
+      return (
+        <components.DropdownIndicator {...props}>
+          <ChevronDownIcon />
+        </components.DropdownIndicator>
+      )
+    }
+
     return (
       <div style={containerStyles}>
         <OutlinedClockIcon/>
         <Select
           className="zuul-select-tz"
+          classNamePrefix="zuul-select-tz"
           styles={customStyles}
+          components={{ DropdownIndicator }}
           value={this.state.currentValue}
           onChange={this.handleChange}
           options={this.state.availableTz}

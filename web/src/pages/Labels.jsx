@@ -15,8 +15,15 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import {
+  Table,
+  TableVariant,
+  TableHeader,
+  TableBody,
+} from '@patternfly/react-table'
+import { TagIcon } from '@patternfly/react-icons'
+import { IconProperty } from '../Misc'
 
 import { fetchLabelsIfNeeded } from '../actions/labels'
 import { Fetchable, Fetching } from '../containers/Fetching'
@@ -54,18 +61,22 @@ class LabelsPage extends React.Component {
       return <Fetching />
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = value => <Table.Cell>{value}</Table.Cell>
-    const columns = []
-    const myColumns = ['name']
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      columns.push({
-        header: {label: column, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
+    const columns = [
+      {
+        title: (
+          <IconProperty icon={<TagIcon />} value="Name" />
+        ),
+        dataLabel: 'name'
+      }
+    ]
+    let rows = []
+    labels.forEach((label) => {
+      let r = {
+        cells: [
+          {title: label.name, props: {column: 'Name'}}
+        ],
+      }
+      rows.push(r)
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
@@ -75,18 +86,16 @@ class LabelsPage extends React.Component {
             fetchCallback={this.updateData}
           />
         </PageSection>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
+        <Table
+          aria-label="Labels Table"
+          variant={TableVariant.compact}
+          cells={columns}
+          rows={rows}
+          className="zuul-table"
         >
-          <Table.Header/>
-          <Table.Body
-            rows={labels}
-            rowKey="name"
-          />
-        </Table.PfProvider>
+          <TableHeader />
+          <TableBody />
+        </Table>
       </PageSection>
     )
   }

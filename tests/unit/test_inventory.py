@@ -57,7 +57,8 @@ class TestInventoryBase(ZuulTestCase):
 
         build = self.getBuildByName(name)
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        inventory = yaml.safe_load(open(inv_path, 'r'))
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
         return inventory
 
     def _get_setup_inventory(self, name):
@@ -65,7 +66,9 @@ class TestInventoryBase(ZuulTestCase):
 
         build = self.getBuildByName(name)
         setup_inv_path = build.jobdir.setup_playbook.inventory
-        return yaml.ansible_unsafe_load(open(setup_inv_path, 'r'))
+        with open(setup_inv_path, 'r') as f:
+            inventory = yaml.ansible_unsafe_load(f)
+        return inventory
 
     def runJob(self, name):
         self.hold_jobs_in_queue = False
@@ -101,6 +104,8 @@ class TestInventoryGithub(TestInventoryBase):
         self.assertIn('zuul', inventory['all']['vars'])
         self.assertIn('attempts', inventory['all']['vars']['zuul'])
         self.assertEqual(1, inventory['all']['vars']['zuul']['attempts'])
+        self.assertIn('max_attempts', inventory['all']['vars']['zuul'])
+        self.assertEqual(3, inventory['all']['vars']['zuul']['max_attempts'])
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
@@ -225,6 +230,8 @@ class TestInventory(TestInventoryBase):
         self.assertIn('zuul', inventory['all']['vars'])
         self.assertIn('attempts', inventory['all']['vars']['zuul'])
         self.assertEqual(1, inventory['all']['vars']['zuul']['attempts'])
+        self.assertIn('max_attempts', inventory['all']['vars']['zuul'])
+        self.assertEqual(3, inventory['all']['vars']['zuul']['max_attempts'])
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
@@ -409,26 +416,34 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
 
         build = self.history[0]
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        inventory = yaml.safe_load(open(inv_path, 'r'))
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
 
         zv_path = os.path.join(build.jobdir.root, 'ansible', 'zuul_vars.yaml')
-        zv = yaml.safe_load(open(zv_path, 'r'))
+        with open(zv_path, 'r') as f:
+            zv = yaml.ansible_unsafe_load(f)
 
         # TODO(corvus): zuul vars aren't really stored here anymore;
         # rework these tests to examine them separately.
         inventory['all']['vars'] = {'zuul': zv['zuul']}
 
+        # The deprecated base64 version
         decoded_message = base64.b64decode(
             inventory['all']['vars']['zuul']['message']).decode('utf-8')
         self.assertEqual(decoded_message, expected_message)
-
         obtained_message = self._get_file(self.history[0],
                                           'work/logs/commit-message.txt')
+        self.assertEqual(obtained_message, expected_message)
 
+        # The new !unsafe version
+        decoded_message = inventory['all']['vars']['zuul']['change_message']
+        self.assertEqual(decoded_message, expected_message)
+        obtained_message = self._get_file(self.history[0],
+                                          'work/logs/change-message.txt')
         self.assertEqual(obtained_message, expected_message)
 
     def test_jinja2_message_brackets(self):
-        self._jinja2_message("This message has {{ jinja2 }} in it ")
+        self._jinja2_message("This message has {{ ansible_host }} in it ")
 
     def test_jinja2_message_raw(self):
         self._jinja2_message("This message has {% raw %} in {% endraw %} it ")

@@ -38,6 +38,7 @@ class BuildsetPage extends React.Component {
     buildset: PropTypes.object,
     isFetching: PropTypes.bool.isRequired,
     fetchBuildset: PropTypes.func.isRequired,
+    preferences: PropTypes.object,
   }
 
   updateData = () => {
@@ -105,10 +106,10 @@ class BuildsetPage extends React.Component {
 
     return (
       <>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
           <Buildset buildset={buildset} />
         </PageSection>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
           <Title headingLevel="h3">
             <BuildIcon
               style={{
@@ -134,6 +135,7 @@ function mapStateToProps(state, ownProps) {
     buildset,
     tenant: state.tenant,
     isFetching: state.build.isFetching,
+    preferences: state.preferences,
   }
 }
 

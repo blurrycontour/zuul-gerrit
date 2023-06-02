@@ -244,6 +244,79 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.assertTrue(all(l == new.uuid for l in layout_uuids))
         self.waitUntilSettled()
 
+    def test_live_reconfiguration_del_pipeline(self):
+        # Test pipeline deletion while changes are enqueued
+
+        # Create a second scheduler instance
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        for _ in iterate_timeout(10, "Wait until priming is complete"):
+            old = self.scheds.first.sched.tenant_layout_state.get("tenant-one")
+            if old is not None:
+                break
+
+        for _ in iterate_timeout(
+                10, "Wait for all schedulers to have the same layout state"):
+            layout_states = [a.sched.local_layout_state.get("tenant-one")
+                             for a in self.scheds.instances]
+            if all(l == old for l in layout_states):
+                break
+
+        pipeline_zk_path = app.sched.abide.tenants[
+            "tenant-one"].layout.pipelines["check"].state.getPath()
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        # Let the first scheduler enqueue the change into the pipeline that
+        # will be removed later on.
+        with app.sched.run_handler_lock:
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled(matcher=[self.scheds.first])
+
+        # Process item only on second scheduler so the first scheduler has
+        # an outdated pipeline state.
+        with self.scheds.first.sched.run_handler_lock:
+            self.executor_server.release('.*-merge')
+            self.waitUntilSettled(matcher=[app])
+            self.assertEqual(len(self.builds), 2)
+
+        self.commitConfigUpdate(
+            'common-config',
+            'layouts/live-reconfiguration-del-pipeline.yaml')
+        # Trigger a reconfiguration on the first scheduler with the outdated
+        # pipeline state of the pipeline that will be removed.
+        self.scheds.execute(lambda a: a.sched.reconfigure(a.config),
+                            matcher=[self.scheds.first])
+
+        new = self.scheds.first.sched.tenant_layout_state.get("tenant-one")
+        for _ in iterate_timeout(
+                10, "Wait for all schedulers to have the same layout state"):
+            layout_states = [a.sched.local_layout_state.get("tenant-one")
+                             for a in self.scheds.instances]
+            if all(l == new for l in layout_states):
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 0)
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='ABORTED', changes='1,1'),
+            dict(name='project-test2', result='ABORTED', changes='1,1'),
+        ], ordered=False)
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(len(tenant.layout.pipelines), 0)
+        stat = self.zk_client.client.exists(pipeline_zk_path)
+        self.assertIsNone(stat)
+
     def test_change_cache(self):
         # Test re-using a change from the change cache.
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')

@@ -47,6 +47,18 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         self.fingergw = kwargs.pop('fingergw')
         super(RequestHandler, self).__init__(*args, **kwargs)
 
+    def _readSocket(self, sock, build_uuid):
+        # timeout only on the connection, let recv() wait forever
+        sock.settimeout(None)
+        msg = "%s\n" % build_uuid    # Must have a trailing newline!
+        sock.sendall(msg.encode('utf-8'))
+        while True:
+            data = sock.recv(1024)
+            if data:
+                self.request.sendall(data)
+            else:
+                break
+
     def _fingerClient(self, server, port, build_uuid, use_ssl):
         '''
         Open a finger connection and return all streaming results.
@@ -59,24 +71,16 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         '''
         with socket.create_connection((server, port), timeout=10) as s:
             if use_ssl:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = self.fingergw.tls_verify_hostnames
                 context.load_cert_chain(self.fingergw.tls_cert,
                                         self.fingergw.tls_key)
                 context.load_verify_locations(self.fingergw.tls_ca)
-                s = context.wrap_socket(s, server_hostname=server)
-
-            # timeout only on the connection, let recv() wait forever
-            s.settimeout(None)
-            msg = "%s\n" % build_uuid    # Must have a trailing newline!
-            s.sendall(msg.encode('utf-8'))
-            while True:
-                data = s.recv(1024)
-                if data:
-                    self.request.sendall(data)
-                else:
-                    break
+                with context.wrap_socket(s, server_hostname=server) as s:
+                    self._readSocket(s, build_uuid)
+            else:
+                self._readSocket(s, build_uuid)
 
     def handle(self):
         '''

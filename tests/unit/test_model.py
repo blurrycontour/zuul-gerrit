@@ -32,7 +32,9 @@ import zuul.lib.connections
 from tests.base import BaseTestCase, FIXTURE_DIR
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib import tracing
+from zuul.model_api import MODEL_API
 from zuul.zk.zkobject import LocalZKContext
+from zuul.zk.components import COMPONENT_REGISTRY
 from zuul import change_matcher
 
 
@@ -44,6 +46,8 @@ class Dummy(object):
 
 class TestJob(BaseTestCase):
     def setUp(self):
+        COMPONENT_REGISTRY.registry = Dummy()
+        COMPONENT_REGISTRY.registry.model_api = MODEL_API
         self._env_fixture = self.useFixture(
             fixtures.EnvironmentVariable('HISTTIMEFORMAT', '%Y-%m-%dT%T%z '))
         super(TestJob, self).setUp()

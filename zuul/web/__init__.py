@@ -94,13 +94,18 @@ COMMANDS = [
 ]
 
 
-def get_request_logger(logger=None):
-    if logger is None:
-        logger = logging.getLogger("zuul.web")
+def get_zuul_request_id():
     request = cherrypy.serving.request
     if not hasattr(request, 'zuul_request_id'):
         request.zuul_request_id = uuid.uuid4().hex
-    return get_annotated_logger(logger, None, request=request.zuul_request_id)
+    return request.zuul_request_id
+
+
+def get_request_logger(logger=None):
+    if logger is None:
+        logger = logging.getLogger("zuul.web")
+    zuul_request_id = get_zuul_request_id()
+    return get_annotated_logger(logger, None, request=zuul_request_id)
 
 
 class APIError(cherrypy.HTTPError):
@@ -395,7 +400,7 @@ class LogStreamer(object):
         self.finger_socket = socket.create_connection(
             (server, port), timeout=10)
         if use_ssl:
-            context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
             context.verify_mode = ssl.CERT_REQUIRED
             context.check_hostname = self.zuulweb.finger_tls_verify_hostnames
             context.load_cert_chain(
@@ -463,6 +468,8 @@ class ZuulWebAPI(object):
 
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
+        # SQL build query timeout, in milliseconds:
+        self.query_timeout = 30000
 
     @property
     def log(self):
@@ -538,6 +545,7 @@ class ZuulWebAPI(object):
             event = DequeueEvent(
                 tenant_name, pipeline_name, project.canonical_hostname,
                 project.name, body.get('change', None), body.get('ref', None))
+            event.zuul_event_id = get_zuul_request_id()
             self.zuulweb.pipeline_management_events[tenant_name][
                 pipeline_name].put(event)
         else:
@@ -581,6 +589,7 @@ class ZuulWebAPI(object):
         event = EnqueueEvent(tenant.name, pipeline.name,
                              project.canonical_hostname, project.name,
                              change, ref=None, oldrev=None, newrev=None)
+        event.zuul_event_id = get_zuul_request_id()
         self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
 
@@ -591,6 +600,7 @@ class ZuulWebAPI(object):
                              project.canonical_hostname, project.name,
                              change=None, ref=ref, oldrev=oldrev,
                              newrev=newrev)
+        event.zuul_event_id = get_zuul_request_id()
         self.zuulweb.pipeline_management_events[tenant.name][
             pipeline.name].put(event)
 
@@ -620,6 +630,7 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400, 'Unknown pipeline')
 
         event = PromoteEvent(tenant_name, pipeline_name, changes)
+        event.zuul_event_id = get_zuul_request_id()
         self.zuulweb.pipeline_management_events[tenant_name][
             pipeline_name].put(event)
 
@@ -1190,8 +1201,13 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def config_errors(self, tenant_name, tenant, auth):
         ret = [
-            {'source_context': e.key.context.toDict(),
-             'error': e.error}
+            {
+                'source_context': e.key.context.toDict(),
+                'error': e.error,
+                'short_error': e.short_error,
+                'severity': e.severity,
+                'name': e.name,
+            }
             for e in tenant.layout.loading_errors.errors
         ]
         return ret
@@ -1454,7 +1470,8 @@ class ZuulWebAPI(object):
             newrev=newrev, uuid=uuid, job_name=job_name, voting=voting,
             nodeset=nodeset, result=result, final=final, held=held,
             complete=complete, limit=limit, offset=skip, idx_min=_idx_min,
-            idx_max=_idx_max, exclude_result=exclude_result)
+            idx_max=_idx_max, exclude_result=exclude_result,
+            query_timeout=self.query_timeout)
 
         return [self.buildToDict(b, b.buildset) for b in builds]
 
@@ -1510,7 +1527,8 @@ class ZuulWebAPI(object):
 
         buildsets = connection.getBuildsets(
             tenant=tenant_name, project=project, pipeline=pipeline,
-            branch=branch, complete=True, limit=1)
+            branch=branch, complete=True, limit=1,
+            query_timeout=self.query_timeout)
         if not buildsets:
             raise cherrypy.HTTPError(404, 'No buildset found')
 
@@ -1551,7 +1569,8 @@ class ZuulWebAPI(object):
             tenant=tenant_name, project=project, pipeline=pipeline,
             change=change, branch=branch, patchset=patchset, ref=ref,
             newrev=newrev, uuid=uuid, result=result, complete=complete,
-            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max)
+            limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max,
+            query_timeout=self.query_timeout)
 
         return [self.buildsetToDict(b) for b in buildsets]
 

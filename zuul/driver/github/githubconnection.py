@@ -81,6 +81,10 @@ ANNOTATION_LEVELS = {
     "warning": "warning",
     "error": "failure",
 }
+# The maximum size for the 'message' field is 64 KB. Since it's unclear
+# from the Github docs if the unit is KiB or KB we'll use KB to be on
+# the safe side.
+ANNOTATION_MAX_MESSAGE_SIZE = 64 * 1000
 
 EventTuple = collections.namedtuple(
     "EventTuple", [
@@ -403,7 +407,8 @@ class GithubEventProcessor(object):
             # Returns empty on unhandled events
             return
 
-        self.log.debug("Handling %s event", self.event_type)
+        self.log.debug("Handling %s event with installation id %s",
+                       self.event_type, installation_id)
         events = []
         try:
             events = method()
@@ -439,7 +444,11 @@ class GithubEventProcessor(object):
                 # branch is now protected.
                 if hasattr(event, "branch") and event.branch:
                     protected = None
-                    if change:
+                    # Only use the `branch_protected` flag if the
+                    # target branch of change and event are the same.
+                    # The base branch could have changed in the
+                    # meantime.
+                    if change and change.branch == event.branch:
                         # PR based events already have the information if the
                         # target branch is protected so take the information
                         # from there.
@@ -675,6 +684,11 @@ class GithubEventProcessor(object):
                            branch, project_name)
             events.append(
                 self._branch_protection_rule_to_event(project_name, branch))
+
+        for event in events:
+            # Make sure every event has a branch cache ltime
+            self.connection.clearConnectionCacheOnBranchEvent(event)
+
         return events
 
     def _branch_protection_rule_to_event(self, project_name, branch):
@@ -1105,11 +1119,13 @@ class GithubClientManager:
                            project_name)
             return ''
 
-        now = datetime.datetime.now(utc)
+        # Consider tokens outdated 5min before the actual expiry time
+        cutoff_time = datetime.datetime.now(utc) + datetime.timedelta(
+            minutes=5)
         token, expiry = self.installation_token_cache.get(installation_id,
                                                           (None, None))
 
-        if ((not expiry) or (not token) or (now >= expiry)):
+        if ((not expiry) or (not token) or (expiry < cutoff_time)):
             headers = self._get_app_auth_headers()
 
             url = "%s/app/installations/%s/access_tokens" % (
@@ -1122,7 +1138,6 @@ class GithubClientManager:
             data = response.json()
 
             expiry = iso8601.parse_date(data['expires_at'])
-            expiry -= datetime.timedelta(minutes=5)
             token = data['token']
 
             self.installation_token_cache[installation_id] = (token, expiry)
@@ -1461,6 +1476,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             log.debug("Change %s is currently being updated, "
                       "waiting for it to finish", change)
             with lock:
+                change = self._change_cache.get(change_key)
                 log.debug('Finished updating change %s', change)
         return change
 
@@ -2427,7 +2443,9 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 raw_annotation = {
                     "path": fn,
                     "annotation_level": annotation_level,
-                    "message": comment["message"],
+                    "message": comment["message"].encode(
+                        "utf8")[:ANNOTATION_MAX_MESSAGE_SIZE].decode(
+                            "utf8", "ignore"),
                     "start_line": start_line,
                     "end_line": end_line,
                     "start_column": start_column,

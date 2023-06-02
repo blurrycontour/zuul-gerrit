@@ -18,6 +18,7 @@ import * as React from 'react'
 import ReAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
+import { connect } from 'react-redux'
 
 import {
   Button,
@@ -54,12 +55,14 @@ import {
 } from '../../actions/build'
 
 const INTERESTING_KEYS = ['msg', 'cmd', 'stdout', 'stderr']
+const ANSI_REGEX = new RegExp('\x33[[0-9;]+m')
 
 
 class TaskOutput extends React.Component {
   static propTypes = {
     data: PropTypes.object,
     include: PropTypes.array,
+    preferences: PropTypes.object,
   }
 
   renderResults(value) {
@@ -117,8 +120,11 @@ class TaskOutput extends React.Component {
         </pre>
       )
     } else if (typeof(value) === 'string') {
+      // If there is an ANSI color escape string, set a white-on-black
+      // color scheme so the output looks more like what we would expect in a console.
+      const style = ANSI_REGEX.test(value) ? {backgroundColor: 'black', color: 'white'} : {}
       ret = (
-        <pre>
+        <pre style={style}>
           <ReAnsi log={value} />
         </pre>
       )
@@ -130,7 +136,8 @@ class TaskOutput extends React.Component {
             name={null}
             sortKeys={true}
             enableClipboard={false}
-            displayDataTypes={false}/>
+            displayDataTypes={false}
+            theme={this.props.preferences.darkMode ? 'tomorrow' : 'rjv-default'}/>
         </pre>
       )
     } else {
@@ -142,7 +149,7 @@ class TaskOutput extends React.Component {
     }
 
     return (
-      <div key={key}>
+      <div className={this.props.preferences.darkMode ? 'zuul-console-dark' : 'zuul-console-light'} key={key}>
         {ret && <h5>{key}</h5>}
         {ret && ret}
       </div>
@@ -170,6 +177,7 @@ class HostTask extends React.Component {
     errorIds: PropTypes.object,
     taskPath: PropTypes.array,
     displayPath: PropTypes.array,
+    preferences: PropTypes.object,
   }
 
   state = {
@@ -290,7 +298,7 @@ class HostTask extends React.Component {
       </DataListCell>
     )
 
-    const content = <TaskOutput data={this.props.host} include={INTERESTING_KEYS}/>
+    const content = <TaskOutput data={this.props.host} include={INTERESTING_KEYS} preferences={this.props.preferences}/>
 
     let item = null
     if (interestingKeys) {
@@ -354,7 +362,7 @@ class HostTask extends React.Component {
           isOpen={this.state.showModal}
           onClose={this.close}
           description={modalDescription}>
-          <TaskOutput data={host}/>
+          <TaskOutput data={host} preferences={this.props.preferences}/>
         </Modal>
       </>
     )
@@ -367,6 +375,7 @@ class PlayBook extends React.Component {
     errorIds: PropTypes.object,
     taskPath: PropTypes.array,
     displayPath: PropTypes.array,
+    preferences: PropTypes.object,
   }
 
   constructor(props) {
@@ -404,8 +413,8 @@ class PlayBook extends React.Component {
     dataListCells.push(
       <DataListCell key='name' width={1}>
         <strong>
-          {playbook.phase[0].toUpperCase() + playbook.phase.slice(1)} playbook<
-          /strong>
+          {playbook.phase[0].toUpperCase() + playbook.phase.slice(1)} playbook
+        </strong>
       </DataListCell>)
         dataListCells.push(
         <DataListCell key='path' width={5}>
@@ -463,7 +472,8 @@ class PlayBook extends React.Component {
                           taskPath={taskPath.concat([
                             idx.toString(), idx2.toString(), hostname])}
                           displayPath={displayPath} task={task} host={host}
-                          errorIds={errorIds}/>
+                          errorIds={errorIds}
+                          preferences={this.props.preferences}/>
                       ))))}
                   </DataList>
 
@@ -484,6 +494,7 @@ class Console extends React.Component {
     errorIds: PropTypes.object,
     output: PropTypes.array,
     displayPath: PropTypes.array,
+    preferences: PropTypes.object,
   }
 
   render () {
@@ -492,7 +503,7 @@ class Console extends React.Component {
     return (
       <React.Fragment>
         <br />
-        <span className="zuul-console">
+        <span className={`zuul-console ${this.props.preferences.darkMode ? 'zuul-console-dark' : 'zuul-console-light'}`}>
           <DataList isCompact={true}
                     style={{ fontSize: 'var(--pf-global--FontSize--md)' }}>
             {
@@ -500,6 +511,7 @@ class Console extends React.Component {
                 <PlayBook
                   key={idx} playbook={playbook} taskPath={[idx.toString()]}
                   displayPath={displayPath} errorIds={errorIds}
+                  preferences={this.props.preferences}
                 />))
             }
           </DataList>
@@ -509,5 +521,11 @@ class Console extends React.Component {
   }
 }
 
+function mapStateToProps(state) {
+  return {
+    preferences: state.preferences,
+  }
+}
 
-export default Console
+
+export default connect(mapStateToProps)(Console)

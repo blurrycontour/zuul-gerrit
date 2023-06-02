@@ -97,7 +97,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
             # info on subsequent requests we can continue to do the
             # requested job work.
             try:
-                dep = self.getChangeByURL(url, event)
+                return self.getChangeByURL(url, event)
             except Exception:
                 # Note that if the change isn't found dep is None.
                 # We do not raise in that case and do not need to handle it
@@ -109,7 +109,6 @@ class BaseSource(object, metaclass=abc.ABCMeta):
                     time.sleep(1)
                 else:
                     raise
-            return dep
 
     @abc.abstractmethod
     def getChangesDependingOn(self, change, projects, tenant):

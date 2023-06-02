@@ -333,6 +333,26 @@ class Repo(object):
                 os.rmdir(root)
 
     @staticmethod
+    def _cleanup_leaked_rebase_dirs(local_path, log, messages):
+        for rebase_dir in [".git/rebase-merge", ".git/rebase-apply"]:
+            leaked_dir = os.path.join(local_path, rebase_dir)
+            if not os.path.exists(leaked_dir):
+                continue
+            if log:
+                log.debug("Cleaning leaked %s dir", leaked_dir)
+            else:
+                messages.append(
+                    f"Cleaning leaked {leaked_dir} dir")
+            try:
+                shutil.rmtree(leaked_dir)
+            except Exception as exc:
+                msg = f"Failed to remove leaked {leaked_dir} dir:"
+                if log:
+                    log.exception(msg)
+                else:
+                    messages.append(f"{msg}\n{exc}")
+
+    @staticmethod
     def refNameToZuulRef(ref_name: str) -> str:
         return "refs/zuul/{}".format(
             hashlib.sha1(ref_name.encode("utf-8")).hexdigest()
@@ -383,6 +403,8 @@ class Repo(object):
             else:
                 messages.append("Delete stale Zuul ref {}".format(ref))
             Repo._deleteRef(ref.path, repo)
+
+        Repo._cleanup_leaked_rebase_dirs(local_path, log, messages)
 
         # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
         # directory foo behind that will block creating the reference foo
@@ -573,14 +595,32 @@ class Repo(object):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         self.fetch(ref, zuul_event_id=zuul_event_id)
-        if len(repo.commit("FETCH_HEAD").parents) > 1:
+        fetch_head = repo.commit("FETCH_HEAD")
+        if len(fetch_head.parents) > 1:
             args = ["-s", "resolve", "FETCH_HEAD"]
             log.debug("Merging %s with args %s instead of cherry-picking",
                       ref, args)
             repo.git.merge(*args)
         else:
             log.debug("Cherry-picking %s", ref)
-            repo.git.cherry_pick("FETCH_HEAD")
+            # Git doesn't have an option to ignore commits that are already
+            # applied to the working tree when cherry-picking, so pass the
+            # --keep-redundant-commits option, which will cause it to make an
+            # empty commit
+            repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
+
+            # If the newly applied commit is empty, it means either:
+            #  1) The commit being cherry-picked was empty, in which the empty
+            #     commit should be kept
+            #  2) The commit being cherry-picked was already applied to the
+            #     tree, in which case the empty commit should be backed out
+            head = repo.commit("HEAD")
+            parent = head.parents[0]
+            if not any(head.diff(parent)) and \
+                    any(fetch_head.diff(fetch_head.parents[0])):
+                log.debug("%s was already applied. Removing it", ref)
+                self._checkout(repo, parent)
+
         return repo.head.commit
 
     def merge(self, ref, strategy=None, zuul_event_id=None):
@@ -615,7 +655,11 @@ class Repo(object):
         self.fetch(ref, zuul_event_id=zuul_event_id)
         log.debug("Rebasing %s with args %s", ref, args)
         repo.git.checkout('FETCH_HEAD')
-        repo.git.rebase(*args)
+        try:
+            repo.git.rebase(*args)
+        except Exception:
+            repo.git.rebase(abort=True)
+            raise
         return repo.head.commit
 
     def fetch(self, ref, zuul_event_id=None):
@@ -678,9 +722,11 @@ class Repo(object):
         ret = {}
         repo = self.createRepoObject(zuul_event_id)
         if branch:
-            tree = repo.heads[branch].commit.tree
+            head = repo.heads[branch].commit
         else:
-            tree = repo.commit(commit).tree
+            head = repo.commit(commit)
+        log.debug("Getting files for %s at %s", self.local_path, head.hexsha)
+        tree = head.tree
         for fn in files:
             if fn in tree:
                 if tree[fn].type != 'blob':

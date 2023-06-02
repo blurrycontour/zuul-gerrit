@@ -52,8 +52,9 @@ from tests.base import (
     skipIfMultiScheduler,
 )
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.event_queues import PIPELINE_NAME_ROOT
 from zuul.zk.layout import LayoutState
-from zuul.zk.locks import management_queue_lock
+from zuul.zk.locks import management_queue_lock, pipeline_lock
 from zuul.zk import zkobject
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
@@ -460,6 +461,7 @@ class TestScheduler(ZuulTestCase):
             'zuul.mergers.online', value='1', kind='g')
         self.assertReportedStat('zuul.scheduler.eventqueues.connection.gerrit',
                                 value='0', kind='g')
+        self.assertReportedStat('zuul.scheduler.run_handler', kind='ms')
 
         # Catch time / monotonic errors
         for key in [
@@ -489,9 +491,10 @@ class TestScheduler(ZuulTestCase):
                 'zuul.tenant.tenant-one.pipeline.gate.write_objects',
                 'zuul.tenant.tenant-one.pipeline.gate.read_znodes',
                 'zuul.tenant.tenant-one.pipeline.gate.write_znodes',
-                'zuul.tenant.tenant-one.pipeline.gate.read_bytes',
                 'zuul.tenant.tenant-one.pipeline.gate.write_bytes',
         ]:
+            # 'zuul.tenant.tenant-one.pipeline.gate.read_bytes' is
+            # expected to be zero since it's initialized after reading
             val = self.assertReportedStat(key, kind='g')
             self.assertTrue(0.0 < float(val) < 60000.0)
 
@@ -3586,8 +3589,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with self.createZKContext() as ctx,\
-             gate.manager.currentContext(ctx):
+        with pipeline_lock(
+                self.zk_client, tenant.name,
+                gate.name) as lock,\
+                self.createZKContext(lock) as ctx,\
+                gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3609,8 +3615,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with self.createZKContext() as ctx,\
-             gate.manager.currentContext(ctx):
+        with pipeline_lock(
+                self.zk_client, tenant.name,
+                gate.name) as lock,\
+                self.createZKContext(lock) as ctx,\
+                gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3632,8 +3641,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with self.createZKContext() as ctx,\
-             gate.manager.currentContext(ctx):
+        with pipeline_lock(
+                self.zk_client, tenant.name,
+                gate.name) as lock,\
+                self.createZKContext(lock) as ctx,\
+                gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3654,8 +3666,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with self.createZKContext() as ctx,\
-             gate.manager.currentContext(ctx):
+        with pipeline_lock(
+                self.zk_client, tenant.name,
+                gate.name) as lock,\
+                self.createZKContext(lock) as ctx,\
+                gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3677,8 +3692,11 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with self.createZKContext() as ctx,\
-             gate.manager.currentContext(ctx):
+        with pipeline_lock(
+                self.zk_client, tenant.name,
+                gate.name) as lock,\
+                self.createZKContext(lock) as ctx,\
+                gate.manager.currentContext(ctx):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3941,6 +3959,10 @@ class TestScheduler(ZuulTestCase):
                 break
             else:
                 time.sleep(0)
+
+        self.assertGreater(new.last_reconfigured, old.last_reconfigured)
+        self.assertGreater(new.last_reconfigure_event_ltime,
+                           old.last_reconfigure_event_ltime)
 
     def test_tenant_reconfiguration_command_socket(self):
         "Test that single-tenant reconfiguration via command socket works"
@@ -6199,7 +6221,8 @@ For CI problems and help debugging, contact ci@example.org"""
 
         build = self.getBuildByName('check-job')
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        inventory = yaml.safe_load(open(inv_path, 'r'))
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
         label = inventory['all']['hosts']['controller']['nodepool']['label']
         self.assertEqual('slow-label', label)
 
@@ -6242,9 +6265,10 @@ For CI problems and help debugging, contact ci@example.org"""
         self.hold_merge_jobs_in_queue = False
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
+        event = zuul.model.TriggerEvent()
         self.scheds.first.sched.reconfigureTenant(
             self.scheds.first.sched.abide.tenants['tenant-one'],
-            project1, None)
+            project1, event)
         self.waitUntilSettled()
 
         # Verify the merge job is still running and that the item is
@@ -6444,8 +6468,8 @@ For CI problems and help debugging, contact ci@example.org"""
         # they don't they may be a good way for us to catch unintended
         # extra read operations.  If they change too much, they may
         # not be worth keeping and we can just remove them.
-        self.assertEqual(6, ctx.cumulative_read_objects)
-        self.assertEqual(6, ctx.cumulative_read_znodes)
+        self.assertEqual(5, ctx.cumulative_read_objects)
+        self.assertEqual(5, ctx.cumulative_read_znodes)
         self.assertEqual(0, ctx.cumulative_write_objects)
         self.assertEqual(0, ctx.cumulative_write_znodes)
 
@@ -6467,8 +6491,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertIs(old_check_build_results, new_check_build_results)
 
         # Again check the object read counts
-        self.assertEqual(6, ctx.cumulative_read_objects)
-        self.assertEqual(6, ctx.cumulative_read_znodes)
+        self.assertEqual(4, ctx.cumulative_read_objects)
+        self.assertEqual(4, ctx.cumulative_read_znodes)
         self.assertEqual(0, ctx.cumulative_write_objects)
         self.assertEqual(0, ctx.cumulative_write_znodes)
 
@@ -6507,6 +6531,33 @@ For CI problems and help debugging, contact ci@example.org"""
         ], ordered=False)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
+
+    def test_leaked_pipeline_cleanup(self):
+        self.waitUntilSettled()
+        sched = self.scheds.first.sched
+
+        pipeline_state_path = "/zuul/tenant/tenant-one/pipeline/invalid"
+        self.zk_client.client.ensure_path(pipeline_state_path)
+
+        # Create the ZK path as a side-effect of getting the event queue.
+        sched.pipeline_management_events["tenant-one"]["invalid"]
+        pipeline_event_queue_path = PIPELINE_NAME_ROOT.format(
+            tenant="tenant-one", pipeline="invalid")
+
+        self.assertIsNotNone(self.zk_client.client.exists(pipeline_state_path))
+        # Wait for the event watcher to create the event queues
+        for _ in iterate_timeout(30, "create event queues"):
+            for event_queue in ("management", "trigger", "result"):
+                if self.zk_client.client.exists(
+                        f"{pipeline_event_queue_path}/{event_queue}") is None:
+                    break
+            else:
+                break
+
+        sched._runLeakedPipelineCleanup()
+        self.assertIsNone(
+            self.zk_client.client.exists(pipeline_event_queue_path))
+        self.assertIsNone(self.zk_client.client.exists(pipeline_state_path))
 
 
 class TestChangeQueues(ZuulTestCase):
@@ -6681,6 +6732,44 @@ class TestChangeQueues(ZuulTestCase):
         references the queue on project level instead of pipeline level.
         """
         self._test_dependent_queues_per_branch('org/project4')
+
+    def test_duplicate_definition_on_branches(self):
+        project = 'org/project3'
+        self.create_branch(project, 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(project, 'stable'))
+        self.waitUntilSettled()
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "No error should have been accumulated")
+        # This error is expected and unrelated to this test (the
+        # ignored configuration is used by other tests in this class):
+        self.assertIn('Queue integrated already defined',
+                      tenant.layout.loading_errors[0].error)
+
+        # At this point we've verified that we can have identical
+        # queue definitions on multiple branches without conflict.
+        # Next, let's try to change the queue def on one branch so it
+        # doesn't match (flip the per-branch boolean):
+        conf = textwrap.dedent(
+            """
+            - queue:
+                name: integrated-untrusted
+                per-branch: false
+            """)
+
+        file_dict = {'zuul.d/queue.yaml': conf}
+        A = self.fake_gerrit.addFakeChange(project, 'stable', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(len(A.messages), 1)
+        self.assertTrue(
+            'Queue integrated-untrusted does not match '
+            'existing definition in branch master' in A.messages[0])
+        self.assertEqual(A.data['status'], 'NEW')
 
 
 class TestJobUpdateBrokenConfig(ZuulTestCase):
@@ -7389,6 +7478,85 @@ class TestSchedulerMerges(ZuulTestCase):
             'C-1']
         result = self._test_project_merge_mode('cherry-pick')
         self.assertEqual(result, expected_messages)
+
+    def test_project_merge_mode_cherrypick_redundant(self):
+        # A redundant commit (that is, one that has already been applied to the
+        # working tree) should be skipped
+        self.executor_server.keep_jobdir = False
+        project = 'org/project-cherry-pick'
+        files = {
+            "foo.txt": "ABC",
+        }
+        A = self.fake_gerrit.addFakeChange(project, 'master', 'A', files=files)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+        B = self.fake_gerrit.addFakeChange(project, 'master', 'B', files=files)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        build = self.builds[-1]
+        path = os.path.join(build.jobdir.src_root, 'review.example.com',
+                            project)
+        repo = git.Repo(path)
+        repo_messages = [c.message.strip() for c in repo.iter_commits()]
+        repo_messages.reverse()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        expected_messages = [
+            'initial commit',
+            'add content from fixture',
+            'A-1',
+        ]
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+        ])
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(repo_messages, expected_messages)
+
+    def test_project_merge_mode_cherrypick_empty(self):
+        # An empty commit (that is, one that doesn't modify any files) should
+        # be preserved
+        self.executor_server.keep_jobdir = False
+        project = 'org/project-cherry-pick'
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange(project, 'master', 'A', empty=True)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        build = self.builds[-1]
+        path = os.path.join(build.jobdir.src_root, 'review.example.com',
+                            project)
+        repo = git.Repo(path)
+        repo_messages = [c.message.strip() for c in repo.iter_commits()]
+        repo_messages.reverse()
+
+        changed_files = list(repo.commit("HEAD").diff(repo.commit("HEAD~1")))
+        self.assertEqual(changed_files, [])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        expected_messages = [
+            'initial commit',
+            'add content from fixture',
+            'A-1',
+        ]
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+        ])
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(repo_messages, expected_messages)
 
     def test_project_merge_mode_cherrypick_branch_merge(self):
         "Test that branches can be merged together in cherry-pick mode"

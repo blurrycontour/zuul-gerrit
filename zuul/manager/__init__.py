@@ -11,6 +11,7 @@
 # under the License.
 import collections
 import contextlib
+import itertools
 import logging
 import textwrap
 import time
@@ -28,6 +29,8 @@ from zuul.model import (
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
+from zuul.zk.exceptions import LockException
+from zuul.zk.locks import pipeline_lock
 
 from opentelemetry import trace
 
@@ -95,21 +98,46 @@ class PipelineManager(metaclass=ABCMeta):
     def _postConfig(self):
         layout = self.pipeline.tenant.layout
         self.buildChangeQueues(layout)
-        with self.sched.createZKContext(None, self.log) as ctx,\
-             self.currentContext(ctx):
-            # Make sure we have state and change list objects, and
-            # ensure that they exist in ZK.  We don't hold the
-            # pipeline lock, but if they don't exist, that means they
-            # are new, so no one else will either, so the write on
-            # create is okay.  If they do exist and we have an old
-            # object, we'll just reuse it.  If it does exist and we
-            # don't have an old object, we'll get a new empty one.
-            # Regardless, these will not automatically refresh now, so
-            # they will be out of date until they are refreshed later.
-            self.pipeline.state = PipelineState.create(
-                self.pipeline, layout.uuid, self.pipeline.state)
-            self.pipeline.change_list = PipelineChangeList.create(
-                self.pipeline)
+        # Make sure we have state and change list objects.  We
+        # don't actually ensure they exist in ZK here; these are
+        # just local objects until they are serialized the first
+        # time.  Since we don't hold the pipeline lock, we can't
+        # reliably perform any read or write operations; we just
+        # need to ensure we have in-memory objects to work with
+        # and they will be initialized or loaded on the next
+        # refresh.
+
+        # These will be out of date until they are refreshed later.
+        self.pipeline.state = PipelineState.create(
+            self.pipeline, self.pipeline.state)
+        self.pipeline.change_list = PipelineChangeList.create(
+            self.pipeline)
+
+        # Now, try to acquire a non-blocking pipeline lock and refresh
+        # them for the side effect of initializing them if necessary.
+        # In the case of a new pipeline, no one else should have a
+        # lock anyway, and this helps us avoid emitting a whole bunch
+        # of errors elsewhere on startup when these objects don't
+        # exist.  If the pipeline already exists and we can't acquire
+        # the lock, that's fine, we're much less likely to encounter
+        # read errors elsewhere in that case anyway.
+        try:
+            with pipeline_lock(
+                    self.sched.zk_client, self.pipeline.tenant.name,
+                    self.pipeline.name, blocking=False) as lock,\
+                    self.sched.createZKContext(lock, self.log) as ctx,\
+                    self.currentContext(ctx):
+                if not self.pipeline.state.exists(ctx):
+                    # We only do this if the pipeline doesn't exist in
+                    # ZK because in that case, this process should be
+                    # fast since it's empty.  If it does exist,
+                    # refreshing it may be slow and since other actors
+                    # won't encounter errors due to its absence, we
+                    # would rather defer the work to later.
+                    self.pipeline.state.refresh(ctx)
+                    self.pipeline.change_list.refresh(ctx)
+        except LockException:
+            pass
 
     def buildChangeQueues(self, layout):
         self.log.debug("Building relative_priority queues")
@@ -216,7 +244,7 @@ class PipelineManager(metaclass=ABCMeta):
                         and self.useDependenciesByTopic(change.project))
                     if (update_commit_dependencies
                             or update_topic_dependencies):
-                        self.updateCommitDependencies(change, None, event=None)
+                        self.updateCommitDependencies(change, event=None)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
@@ -258,11 +286,18 @@ class PipelineManager(metaclass=ABCMeta):
                 return True
         return False
 
-    def isAnyVersionOfChangeInPipeline(self, change):
-        # Checks any items in the pipeline
+    def isChangeRelevantToPipeline(self, change):
+        # Checks if any version of the change or its deps matches any
+        # item in the pipeline.
         for change_key in self.pipeline.change_list.getChangeKeys():
             if change.cache_stat.key.isSameChange(change_key):
                 return True
+        if isinstance(change, model.Change):
+            for dep_change_ref in change.getNeedsChanges(
+                    self.useDependenciesByTopic(change.project)):
+                dep_change_key = ChangeKey.fromReference(dep_change_ref)
+                if change.cache_stat.key.isSameChange(dep_change_key):
+                    return True
         return False
 
     def isChangeAlreadyInQueue(self, change, change_queue):
@@ -276,19 +311,19 @@ class PipelineManager(metaclass=ABCMeta):
         if not isinstance(change, model.Change):
             return
 
-        change_in_pipeline = False
+        to_refresh = set()
         for item in self.pipeline.getAllItems():
             if not isinstance(item.change, model.Change):
                 continue
+            if item.change.equals(change):
+                to_refresh.add(item.change)
             for dep_change_ref in item.change.commit_needs_changes:
-                if item.change.equals(change):
-                    change_in_pipeline = True
                 dep_change_key = ChangeKey.fromReference(dep_change_ref)
                 if dep_change_key.isSameChange(change.cache_stat.key):
-                    self.updateCommitDependencies(item.change, None, event)
+                    to_refresh.add(item.change)
 
-        if change_in_pipeline:
-            self.updateCommitDependencies(change, None, event)
+        for existing_change in to_refresh:
+            self.updateCommitDependencies(existing_change, event)
 
     def reportEnqueue(self, item):
         if not self.pipeline.state.disabled:
@@ -489,7 +524,8 @@ class PipelineManager(metaclass=ABCMeta):
 
     def addChange(self, change, event, quiet=False, enqueue_time=None,
                   ignore_requirements=False, live=True,
-                  change_queue=None, history=None, dependency_graph=None):
+                  change_queue=None, history=None, dependency_graph=None,
+                  skip_presence_check=False):
         log = get_annotated_logger(self.log, event)
         log.debug("Considering adding change %s" % change)
 
@@ -504,7 +540,9 @@ class PipelineManager(metaclass=ABCMeta):
         # If we are adding a live change, check if it's a live item
         # anywhere in the pipeline.  Otherwise, we will perform the
         # duplicate check below on the specific change_queue.
-        if live and self.isChangeAlreadyInPipeline(change):
+        if (live and
+            self.isChangeAlreadyInPipeline(change) and
+            not skip_presence_check):
             log.debug("Change %s is already in pipeline, ignoring" % change)
             return True
 
@@ -537,7 +575,7 @@ class PipelineManager(metaclass=ABCMeta):
         # to date and this is a noop; otherwise, we need to refresh
         # them anyway.
         if isinstance(change, model.Change):
-            self.updateCommitDependencies(change, None, event)
+            self.updateCommitDependencies(change, event)
 
         with self.getChangeQueue(change, event, change_queue) as change_queue:
             if not change_queue:
@@ -563,8 +601,10 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("History after enqueuing changes ahead: %s", history)
 
             if self.isChangeAlreadyInQueue(change, change_queue):
-                log.debug("Change %s is already in queue, ignoring" % change)
-                return True
+                if not skip_presence_check:
+                    log.debug("Change %s is already in queue, ignoring",
+                              change)
+                    return True
 
             cycle = []
             if isinstance(change, model.Change):
@@ -598,7 +638,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if enqueue_time:
                     item.enqueue_time = enqueue_time
                 item.live = live
-                self.reportStats(item, added=True)
+                self.reportStats(item, trigger_event=event)
                 item.quiet = quiet
 
             if item.live:
@@ -661,6 +701,13 @@ class PipelineManager(metaclass=ABCMeta):
                 # Change can not be part of multiple cycles, so we can return
                 return scc
         return []
+
+    def getCycleDependencies(self, change, dependency_graph, event):
+        cycle = self.cycleForChange(change, dependency_graph, event)
+        return set(
+            itertools.chain.from_iterable(
+                dependency_graph[c] for c in cycle if c != change)
+        ) - set(cycle)
 
     def getQueueConfig(self, project):
         layout = self.pipeline.tenant.layout
@@ -830,7 +877,7 @@ class PipelineManager(metaclass=ABCMeta):
                         self.pipeline.tenant.name][other_pipeline.name].put(
                             event, needs_result=False)
 
-    def updateCommitDependencies(self, change, change_queue, event):
+    def updateCommitDependencies(self, change, event):
         log = get_annotated_logger(self.log, event)
 
         must_update_commit_deps = (
@@ -1421,16 +1468,17 @@ class PipelineManager(metaclass=ABCMeta):
                 item.bundle and
                 item.bundle.updatesConfig(tenant) and tpc is not None
             ):
-                extra_config_files = set(tpc.extra_config_files)
-                extra_config_dirs = set(tpc.extra_config_dirs)
-                # Merge extra_config_files and extra_config_dirs of the
-                # dependent change
-                for item_ahead in item.items_ahead:
-                    tpc_ahead = tenant.project_configs.get(
-                        item_ahead.change.project.canonical_name)
-                    if tpc_ahead:
-                        extra_config_files.update(tpc_ahead.extra_config_files)
-                        extra_config_dirs.update(tpc_ahead.extra_config_dirs)
+                # Collect extra config files and dirs of required changes.
+                extra_config_files = set()
+                extra_config_dirs = set()
+                for merger_item in item.current_build_set.merger_items:
+                    source = self.sched.connections.getSource(
+                        merger_item["connection"])
+                    project = source.getProject(merger_item["project"])
+                    tpc = tenant.project_configs.get(project.canonical_name)
+                    if tpc:
+                        extra_config_files.update(tpc.extra_config_files)
+                        extra_config_dirs.update(tpc.extra_config_dirs)
 
                 ready = self.scheduleMerge(
                     item,
@@ -1527,6 +1575,7 @@ class PipelineManager(metaclass=ABCMeta):
             log.info("Dequeuing change %s because "
                      "it can no longer merge" % item.change)
             self.cancelJobs(item)
+            quiet_dequeue = False
             if item.isBundleFailing():
                 item.setDequeuedBundleFailing('Bundle is failing')
             elif not meets_reqs:
@@ -1538,7 +1587,28 @@ class PipelineManager(metaclass=ABCMeta):
                 else:
                     msg = f'Change {clist} is needed.'
                 item.setDequeuedNeedingChange(msg)
-            if item.live:
+                # If all the dependencies are already in the pipeline
+                # (but not ahead of this change), then we probably
+                # just added updated versions of them, possibly
+                # updating a cycle.  In that case, attempt to
+                # re-enqueue this change with the updated deps.
+                if (item.live and
+                    all([self.isChangeAlreadyInPipeline(c)
+                         for c in needs_changes])):
+                    # Try enqueue, if that succeeds, keep this dequeue quiet
+                    try:
+                        log.info("Attempting re-enqueue of change %s",
+                                 item.change)
+                        quiet_dequeue = self.addChange(
+                            item.change, item.event,
+                            enqueue_time=item.enqueue_time,
+                            quiet=True,
+                            skip_presence_check=True)
+                    except Exception:
+                        log.exception("Unable to re-enqueue change %s "
+                                      "which is missing dependencies",
+                                      item.change)
+            if item.live and not quiet_dequeue:
                 try:
                     self.reportItem(item)
                 except exceptions.MergeFailure:
@@ -2170,7 +2240,7 @@ class PipelineManager(metaclass=ABCMeta):
                 log.error("Reporting item %s received: %s", item, ret)
         return action, (not ret)
 
-    def reportStats(self, item, added=False):
+    def reportStats(self, item, trigger_event=None):
         if not self.sched.statsd:
             return
         try:
@@ -2209,18 +2279,21 @@ class PipelineManager(metaclass=ABCMeta):
                 if dt:
                     self.sched.statsd.timing(key + '.resident_time', dt)
                     self.sched.statsd.incr(key + '.total_changes')
-            if added and hasattr(item.event, 'arrived_at_scheduler_timestamp'):
+            if (
+                trigger_event
+                and hasattr(trigger_event, 'arrived_at_scheduler_timestamp')
+            ):
                 now = time.time()
-                arrived = item.event.arrived_at_scheduler_timestamp
+                arrived = trigger_event.arrived_at_scheduler_timestamp
                 processing = (now - arrived) * 1000
-                elapsed = (now - item.event.timestamp) * 1000
+                elapsed = (now - trigger_event.timestamp) * 1000
                 self.sched.statsd.timing(
                     basekey + '.event_enqueue_processing_time',
                     processing)
                 self.sched.statsd.timing(
                     basekey + '.event_enqueue_time', elapsed)
                 self.reportPipelineTiming('event_enqueue_time',
-                                          item.event.timestamp)
+                                          trigger_event.timestamp)
         except Exception:
             self.log.exception("Exception reporting pipeline stats")
 

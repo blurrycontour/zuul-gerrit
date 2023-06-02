@@ -13,5 +13,5 @@
 # under the License.
 
 # When making ZK schema changes, increment this and add a record to
-# docs/developer/model-changelog.rst
-MODEL_API = 11
+# doc/source/developer/model-changelog.rst
+MODEL_API = 13

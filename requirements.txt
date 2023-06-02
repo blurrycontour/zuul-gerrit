@@ -18,7 +18,7 @@ PrettyTable>=0.6,<0.8
 babel>=1.0
 netaddr
 kazoo>=2.9.0
-sqlalchemy
+sqlalchemy>=2.0.0
 alembic
 cryptography>=39.0.0
 cachecontrol<0.12.7

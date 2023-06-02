@@ -106,3 +106,16 @@ Version 11
 
 :Prior Zuul version: 8.0.1
 :Description: Adds merge_modes to branch cache.  Affects schedulers and web.
+
+Version 12
+----------
+:Prior Zuul version: 8.0.1
+:Description: Adds job_versions and build_versions to BuildSet.
+              Affects schedulers.
+
+Version 13
+----------
+:Prior Zuul version: 8.2.0
+:Description: Stores only the necessary event info as part of a queue item
+              instead of the full trigger event.
+              Affects schedulers.

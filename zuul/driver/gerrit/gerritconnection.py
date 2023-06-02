@@ -161,6 +161,8 @@ class GerritEventConnector(threading.Thread):
 
     IGNORED_EVENTS = (
         'cache-eviction',  # evict-cache plugin
+        'fetch-ref-replicated',
+        'fetch-ref-replication-scheduled',
         'ref-replicated',
         'ref-replication-scheduled',
         'ref-replication-done'
@@ -1180,9 +1182,34 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return True
         if change.wip:
             return False
-        if change.missing_labels <= set(allow_needs):
-            return True
-        return False
+        if change.missing_labels > set(allow_needs):
+            self.log.debug("Unable to merge due to "
+                           "missing labels: %s", change.missing_labels)
+            return False
+        for sr in change.submit_requirements:
+            if sr.get('status') == 'UNSATISFIED':
+                # Otherwise, we don't care and should skip.
+
+                # We're going to look at each unsatisfied submit
+                # requirement, and if one of the involved labels is an
+                # "allow_needs" label, we will assume that Zuul may be
+                # able to take an action which can cause the
+                # requirement to be satisfied, and we will ignore it.
+                # Otherwise, it is likely a requirement that Zuul can
+                # not alter in which case the requirement should stand
+                # and block merging.
+                result = sr.get("submittability_expression_result", {})
+                expression = result.get("expression", '')
+                expr_contains_allow = False
+                for allow in allow_needs:
+                    if f'label:{allow}' in expression:
+                        expr_contains_allow = True
+                        break
+                if not expr_contains_allow:
+                    self.log.debug("Unable to merge due to "
+                                   "submit requirement: %s", sr)
+                    return False
+        return True
 
     def getProjectOpenChanges(self, project: Project) -> List[GerritChange]:
         # This is a best-effort function in case Gerrit is unable to return
@@ -1441,13 +1468,22 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         return data
 
     def queryChangeHTTP(self, number, event=None):
-        data = self.get('changes/%s?o=DETAILED_ACCOUNTS&o=CURRENT_REVISION&'
-                        'o=CURRENT_COMMIT&o=CURRENT_FILES&o=LABELS&'
-                        'o=DETAILED_LABELS' % (number,))
+        query = ('changes/%s?o=DETAILED_ACCOUNTS&o=CURRENT_REVISION&'
+                 'o=CURRENT_COMMIT&o=CURRENT_FILES&o=LABELS&'
+                 'o=DETAILED_LABELS' % (number,))
+        if self.version >= (3, 5, 0):
+            query += '&o=SUBMIT_REQUIREMENTS'
+        data = self.get(query)
         related = self.get('changes/%s/revisions/%s/related' % (
             number, data['current_revision']))
-        files = self.get('changes/%s/revisions/%s/files?parent=1' % (
-            number, data['current_revision']))
+
+        files_query = 'changes/%s/revisions/%s/files' % (
+            number, data['current_revision'])
+
+        if data['revisions'][data['current_revision']]['commit']['parents']:
+            files_query += '?parent=1'
+
+        files = self.get(files_query)
         return data, related, files
 
     def queryChange(self, number, event=None):
@@ -1643,7 +1679,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def getInfoRefs(self, project: Project) -> Dict[str, str]:
         try:
-            data = self._uploadPack(project)
+            # Encode the UTF-8 data back to a byte array, as the size of
+            # each record in the pack is in bytes, and so the slicing must
+            # also be done on a byte-basis.
+            data = self._uploadPack(project).encode("utf-8")
         except Exception:
             self.log.error("Cannot get references from %s" % project)
             raise  # keeps error information
@@ -1662,7 +1701,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 plen -= 4
             if len(data) - i < plen:
                 raise Exception("Invalid data in info/refs")
-            line = data[i:i + plen]
+            # Once the pack data is sliced, we can safely decode it back
+            # into a (UTF-8) string.
+            line = data[i:i + plen].decode("utf-8")
             i += plen
             if not read_advertisement:
                 read_advertisement = True

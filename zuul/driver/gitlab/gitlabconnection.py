@@ -281,6 +281,7 @@ class GitlabAPIClient():
         self.api_token = api_token
         self.keepalive = keepalive
         self.disable_pool = disable_pool
+        self.get_mr_wait_factor = 2
         self.headers = {'Authorization': 'Bearer %s' % (
             self.api_token)}
 
@@ -342,11 +343,36 @@ class GitlabAPIClient():
 
     # https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr
     def get_mr(self, project_name, number, zuul_event_id=None):
-        path = "/projects/%s/merge_requests/%s" % (
-            quote_plus(project_name), number)
-        resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
-        self._manage_error(*resp, zuul_event_id=zuul_event_id)
-        return resp[0]
+        log = get_annotated_logger(self.log, zuul_event_id)
+        attempts = 0
+
+        def _get_mr():
+            path = "/projects/%s/merge_requests/%s" % (
+                quote_plus(project_name), number)
+            resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
+            self._manage_error(*resp, zuul_event_id=zuul_event_id)
+            return resp[0]
+
+        # The Gitlab API might not return a complete MR description as
+        # some attributes are updated asynchronously. This loop ensures
+        # we query the API until all async attributes are available or until
+        # a defined delay is reached.
+        while True:
+            attempts += 1
+            mr = _get_mr()
+            # The diff_refs attribute is updated asynchronously
+            if all(map(lambda k: mr.get(k, None), ['diff_refs'])):
+                return mr
+            if attempts > 4:
+                log.warning(
+                    "Fetched MR %s#%s with imcomplete data" % (
+                        project_name, number))
+                return mr
+            wait_delay = attempts * self.get_mr_wait_factor
+            log.info(
+                "Will retry to fetch %s#%s due to imcomplete data "
+                "(in %s seconds) ..." % (project_name, number, wait_delay))
+            time.sleep(wait_delay)
 
     # https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
     def get_project_branches(self, project_name, exclude_unprotected,
@@ -607,17 +633,12 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return change
         project = self.source.getProject(change_key.project_name)
         if not change:
-            if not event:
-                self.log.error("Change %s not found in cache and no event",
-                               change_key)
-            if event:
-                url = event.change_url
             change = MergeRequest(project.name)
             change.project = project
             change.number = number
             # patch_number is the tips commit SHA of the MR
             change.patchset = change_key.revision
-            change.url = url or self.getMRUrl(project.name, number)
+            change.url = self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
 
         log.debug("Getting change mr#%s from project %s" % (
@@ -672,8 +693,12 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.is_current_patchset = (change.mr['sha'] == change.patchset)
-        change.base_sha = change.mr['diff_refs'].get('base_sha')
-        change.commit_id = change.mr['diff_refs'].get('head_sha')
+        change.commit_id = event.patch_number
+        diff_refs = change.mr.get("diff_refs", {})
+        if diff_refs:
+            change.base_sha = diff_refs.get('base_sha')
+        else:
+            change.base_sha = None
         change.owner = change.mr['author'].get('username')
         # Files changes are not part of the Merge Request data
         # See api/merge_requests.html#get-single-mr-changes

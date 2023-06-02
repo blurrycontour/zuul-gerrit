@@ -233,7 +233,18 @@ class ZKObject:
         obj._load(context, path=path)
         return obj
 
+    def internalCreate(self, context):
+        """Create the object in ZK from an existing ZKObject
+
+        This should only be used in special circumstances: when we
+        know it's safe to start using a ZKObject before it's actually
+        created in ZK.  Normally use .new()
+        """
+        data = self._trySerialize(context)
+        self._save(context, data, create=True)
+
     def refresh(self, context):
+
         """Update data from ZK"""
         self._load(context)
 
@@ -307,6 +318,17 @@ class ZKObject:
         uncompressed_size += u
 
         return (compressed_size, uncompressed_size)
+
+    def getZKVersion(self):
+        """Return the ZK version of the object as of the last load/refresh.
+
+        Returns None if the object is newly created.
+        """
+        zstat = getattr(self, '_zstat', None)
+        # If zstat is None, we created the object
+        if zstat is None:
+            return None
+        return zstat.version
 
     # Private methods below
 

@@ -38,22 +38,38 @@
 
 - job:
     name: common-job
-    required-projects:
-      - org/project1
-      - org/project2
 
 - job:
     name: project1-job
+    run: playbooks/foo.yaml
 
 - job:
     name: project2-job
+    run: playbooks/bar.yaml
 
 - project:
     name: org/project1
     queue: integrated
     gate:
       jobs:
-        - common-job
+        - common-job:
+            # Set some identical attributes on the project-pipeline
+            # job config to make sure we're generating some distinct
+            # objects.
+            required-projects:
+              - org/project1
+              - org/project2
+            semaphores:
+              - test-semaphore
+            run:
+              - playbooks/foo.yaml
+              - playbooks/bar.yaml
+            files:
+              - '.*'
+            dependencies: []
+            provides: a
+            requires: b
+            tags: c
         - project1-job
 
 - project:
@@ -61,5 +77,19 @@
     queue: integrated
     gate:
       jobs:
-        - common-job
+        - common-job:
+            required-projects:
+              - org/project1
+              - org/project2
+            semaphores:
+              - test-semaphore
+            run:
+              - playbooks/foo.yaml
+              - playbooks/bar.yaml
+            files:
+              - '.*'
+            dependencies: []
+            provides: a
+            requires: b
+            tags: c
         - project2-job

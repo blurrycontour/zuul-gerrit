@@ -44,6 +44,7 @@ import time
 
 from ansible.plugins.callback import default
 from ansible.module_utils._text import to_text
+from ansible.module_utils.parsing.convert_bool import boolean
 from zuul.ansible import paths
 
 from zuul.ansible import logconfig
@@ -332,6 +333,10 @@ class CallbackModule(default.CallbackModule):
                         'ansible_inventory_host'))
                 if (ip in ('localhost', '127.0.0.1')):
                     # Don't try to stream from localhost
+                    continue
+                if boolean(play_vars[host].get(
+                        'zuul_console_disabled', False)):
+                    # The user has told us not to even try
                     continue
                 if play_vars[host].get('ansible_connection') in ('winrm',):
                     # The winrm connections don't support streaming for now

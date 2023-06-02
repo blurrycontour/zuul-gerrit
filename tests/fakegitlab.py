@@ -21,6 +21,7 @@ import re
 import socketserver
 import threading
 import urllib.parse
+import time
 
 from git.util import IterableList
 
@@ -32,12 +33,17 @@ class GitlabWebServer(object):
         self.merge_requests = merge_requests
         self.fake_repos = defaultdict(lambda: IterableList('name'))
         # A dictionary so we can mutate it
-        self.options = dict(community_edition=False)
+        self.options = dict(
+            community_edition=False,
+            delayed_complete_mr=0,
+            uncomplete_mr=False)
+        self.stats = {"get_mr": 0}
 
     def start(self):
         merge_requests = self.merge_requests
         fake_repos = self.fake_repos
         options = self.options
+        stats = self.stats
 
         class Server(http.server.SimpleHTTPRequestHandler):
             log = logging.getLogger("zuul.test.GitlabWebServer")
@@ -146,6 +152,7 @@ class GitlabWebServer(object):
                 self.wfile.write(data)
 
             def get_mr(self, project, mr):
+                stats["get_mr"] += 1
                 mr = self._get_mr(project, mr)
                 data = {
                     'target_branch': mr.branch,
@@ -162,13 +169,20 @@ class GitlabWebServer(object):
                     'labels': mr.labels,
                     'merged_at': mr.merged_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
                     if mr.merged_at else mr.merged_at,
-                    'diff_refs': {
+                    'merge_status': mr.merge_status,
+                }
+                if options['delayed_complete_mr'] and \
+                        time.monotonic() < options['delayed_complete_mr']:
+                    diff_refs = None
+                elif options['uncomplete_mr']:
+                    diff_refs = None
+                else:
+                    diff_refs = {
                         'base_sha': mr.base_sha,
                         'head_sha': mr.sha,
                         'start_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00'
-                    },
-                    'merge_status': mr.merge_status,
-                }
+                    }
+                data['diff_refs'] = diff_refs
                 self.send_data(data)
 
             def get_mr_approvals(self, project, mr):
@@ -262,3 +276,4 @@ class GitlabWebServer(object):
     def stop(self):
         self.httpd.shutdown()
         self.thread.join()
+        self.httpd.server_close()

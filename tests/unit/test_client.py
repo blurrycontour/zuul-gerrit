@@ -21,16 +21,19 @@ import time
 import configparser
 import datetime
 import dateutil.tz
+import uuid
 
 import fixtures
 import jwt
 import testtools
+import sqlalchemy
 
 from zuul.zk import ZooKeeperClient
+from zuul.zk.locks import SessionAwareLock
 from zuul.cmd.client import parse_cutoff
 
 from tests.base import BaseTestCase, ZuulTestCase
-from tests.base import FIXTURE_DIR
+from tests.base import FIXTURE_DIR, iterate_timeout
 
 from kazoo.exceptions import NoNodeError
 
@@ -362,81 +365,116 @@ class TestOnlineZKOperations(ZuulTestCase):
     def assertSQLState(self):
         pass
 
-    def test_delete_pipeline_check(self):
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+    def _test_delete_pipeline(self, pipeline):
+        sched = self.scheds.first.sched
+        tenant = sched.abide.tenants['tenant-one']
+        # Force a reconfiguration due to a config change (so that the
+        # tenant trigger event queue gets a minimum timestamp set)
+        file_dict = {'zuul.yaml': ''}
+        M = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        M.setMerged()
+        self.fake_gerrit.addEvent(M.getChangeMergedEvent())
         self.waitUntilSettled()
 
-        config_file = os.path.join(self.test_root, 'zuul.conf')
-        with open(config_file, 'w') as f:
-            self.config.write(f)
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        if pipeline == 'check':
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        else:
+            A.addApproval('Code-Review', 2)
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
 
-        # Make sure the pipeline exists
-        self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
-        p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul-admin'),
-             '-c', config_file,
-             'delete-pipeline-state',
-             'tenant-one', 'check',
-             ],
-            stdout=subprocess.PIPE)
-        out, _ = p.communicate()
-        self.log.debug(out.decode('utf8'))
-        # Make sure it's deleted
-        with testtools.ExpectedException(NoNodeError):
-            self.getZKTree('/zuul/tenant/tenant-one/pipeline/check/item')
+        # Lock the check pipeline so we don't process the event we're
+        # about to submit (it should go into the pipeline trigger event
+        # queue and stay there while we delete the pipeline state).
+        # This way we verify that events arrived before the deletion
+        # still work.
+        plock = SessionAwareLock(
+            self.zk_client.client,
+            f"/zuul/locks/pipeline/{tenant.name}/{pipeline}")
+        plock.acquire(blocking=True, timeout=None)
+        try:
+            self.log.debug('Got pipeline lock')
+            # Add a new event while our old last reconfigure time is
+            # in place.
+            B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+            if pipeline == 'check':
+                self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+            else:
+                B.addApproval('Code-Review', 2)
+                self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+            # Wait until it appears in the pipeline trigger event queue
+            self.log.debug('Waiting for event')
+            for x in iterate_timeout(30, 'trigger event queue has events'):
+                if sched.pipeline_trigger_events[
+                        tenant.name][pipeline].hasEvents():
+                    break
+            self.log.debug('Got event')
+        except Exception:
+            plock.release()
+            raise
+        # Grab the run handler lock so that we will continue to avoid
+        # further processing of the event after we release the
+        # pipeline lock (which the delete command needs to acquire).
+        sched.run_handler_lock.acquire()
+        try:
+            plock.release()
+            self.log.debug('Got run lock')
+            config_file = os.path.join(self.test_root, 'zuul.conf')
+            with open(config_file, 'w') as f:
+                self.config.write(f)
+
+            # Make sure the pipeline exists
+            self.getZKTree(
+                f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/item')
+            # Save the old layout uuid
+            tenant = sched.abide.tenants[tenant.name]
+            old_layout_uuid = tenant.layout.uuid
+            self.log.debug('Deleting pipeline state')
+            p = subprocess.Popen(
+                [os.path.join(sys.prefix, 'bin/zuul-admin'),
+                 '-c', config_file,
+                 'delete-pipeline-state',
+                 tenant.name, pipeline,
+                 ],
+                stdout=subprocess.PIPE)
+            # Delete the pipeline state
+            out, _ = p.communicate()
+            self.log.debug(out.decode('utf8'))
+            self.assertEqual(p.returncode, 0, 'The command must exit 0')
+            # Make sure it's deleted
+            with testtools.ExpectedException(NoNodeError):
+                self.getZKTree(
+                    f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/item')
+            # Make sure the change list is re-created
+            self.getZKTree(
+                f'/zuul/tenant/{tenant.name}/pipeline/{pipeline}/change_list')
+        finally:
+            sched.run_handler_lock.release()
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([
-            dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-merge', result='SUCCESS', changes='2,1'),
-            dict(name='project-test1', result='SUCCESS', changes='2,1'),
-            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project-merge', result='SUCCESS', changes='3,1'),
+            dict(name='project-test1', result='SUCCESS', changes='3,1'),
+            dict(name='project-test2', result='SUCCESS', changes='3,1'),
         ], ordered=False)
+        tenant = sched.abide.tenants[tenant.name]
+        new_layout_uuid = tenant.layout.uuid
+        self.assertEqual(old_layout_uuid, new_layout_uuid)
+        self.assertEqual(tenant.layout.pipelines[pipeline].state.layout_uuid,
+                         old_layout_uuid)
+
+    def test_delete_pipeline_check(self):
+        self._test_delete_pipeline('check')
 
     def test_delete_pipeline_gate(self):
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.waitUntilSettled()
-
-        config_file = os.path.join(self.test_root, 'zuul.conf')
-        with open(config_file, 'w') as f:
-            self.config.write(f)
-
-        # Make sure the pipeline exists
-        self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
-        p = subprocess.Popen(
-            [os.path.join(sys.prefix, 'bin/zuul-admin'),
-             '-c', config_file,
-             'delete-pipeline-state',
-             'tenant-one', 'gate',
-             ],
-            stdout=subprocess.PIPE)
-        out, _ = p.communicate()
-        self.log.debug(out.decode('utf8'))
-        # Make sure it's deleted
-        with testtools.ExpectedException(NoNodeError):
-            self.getZKTree('/zuul/tenant/tenant-one/pipeline/gate/item')
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='project-merge', result='SUCCESS', changes='1,1'),
-            dict(name='project-merge', result='SUCCESS', changes='2,1'),
-            dict(name='project-test1', result='SUCCESS', changes='2,1'),
-            dict(name='project-test2', result='SUCCESS', changes='2,1'),
-        ], ordered=False)
+        self._test_delete_pipeline('gate')
 
 
 class TestDBPruneParse(BaseTestCase):
@@ -467,27 +505,107 @@ class TestDBPruneParse(BaseTestCase):
 
 class DBPruneTestCase(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
+    # This should be larger than the limit size in sqlconnection
+    num_buildsets = 55
+
+    def _createBuildset(self, update_time):
+        connection = self.scheds.first.sched.sql.connection
+        buildset_uuid = uuid.uuid4().hex
+        event_id = uuid.uuid4().hex
+        with connection.getSession() as db:
+            start_time = update_time - datetime.timedelta(seconds=1)
+            end_time = update_time
+            db_buildset = db.createBuildSet(
+                uuid=buildset_uuid,
+                tenant='tenant-one',
+                pipeline='check',
+                project='org/project',
+                change='1',
+                patchset='1',
+                ref='refs/changes/1',
+                oldrev='',
+                newrev='',
+                branch='master',
+                zuul_ref='Zref',
+                ref_url='http://gerrit.example.com/1',
+                event_id=event_id,
+                event_timestamp=update_time,
+                updated=update_time,
+                first_build_start_time=start_time,
+                last_build_end_time=end_time,
+                result='SUCCESS',
+            )
+            for build_num in range(2):
+                build_uuid = uuid.uuid4().hex
+                db_build = db_buildset.createBuild(
+                    uuid=build_uuid,
+                    job_name=f'job{build_num}',
+                    start_time=start_time,
+                    end_time=end_time,
+                    result='SUCCESS',
+                    voting=True,
+                )
+                for art_num in range(2):
+                    db_build.createArtifact(
+                        name=f'artifact{art_num}',
+                        url='http://example.com',
+                    )
+                for provides_num in range(2):
+                    db_build.createProvides(
+                        name=f'item{provides_num}',
+                    )
+                for event_num in range(2):
+                    db_build.createBuildEvent(
+                        event_type=f'event{event_num}',
+                        event_time=start_time,
+                    )
+
+    def _query(self, db, model):
+        table = model.__table__
+        q = db.session().query(model).order_by(table.c.id.desc())
+        try:
+            return q.all()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return []
+
+    def _getBuildsets(self, db):
+        return self._query(db, db.connection.buildSetModel)
+
+    def _getBuilds(self, db):
+        return self._query(db, db.connection.buildModel)
+
+    def _getProvides(self, db):
+        return self._query(db, db.connection.providesModel)
+
+    def _getArtifacts(self, db):
+        return self._query(db, db.connection.artifactModel)
+
+    def _getBuildEvents(self, db):
+        return self._query(db, db.connection.buildEventModel)
 
     def _setup(self):
         config_file = os.path.join(self.test_root, 'zuul.conf')
         with open(config_file, 'w') as f:
             self.config.write(f)
 
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        time.sleep(1)
-
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
+        update_time = (datetime.datetime.utcnow() -
+                       datetime.timedelta(minutes=self.num_buildsets))
+        for x in range(self.num_buildsets):
+            update_time = update_time + datetime.timedelta(minutes=1)
+            self._createBuildset(update_time)
 
         connection = self.scheds.first.sched.sql.connection
-        buildsets = connection.getBuildsets()
-        builds = connection.getBuilds()
-        self.assertEqual(len(buildsets), 2)
-        self.assertEqual(len(builds), 6)
+        with connection.getSession() as db:
+            buildsets = self._getBuildsets(db)
+            builds = self._getBuilds(db)
+            artifacts = self._getArtifacts(db)
+            provides = self._getProvides(db)
+            events = self._getBuildEvents(db)
+        self.assertEqual(len(buildsets), self.num_buildsets)
+        self.assertEqual(len(builds), 2 * self.num_buildsets)
+        self.assertEqual(len(artifacts), 4 * self.num_buildsets)
+        self.assertEqual(len(provides), 4 * self.num_buildsets)
+        self.assertEqual(len(events), 4 * self.num_buildsets)
         for build in builds:
             self.log.debug("Build %s %s %s",
                            build, build.start_time, build.end_time)
@@ -503,6 +621,7 @@ class DBPruneTestCase(ZuulTestCase):
         start_time = buildsets[0].first_build_start_time
         self.log.debug("Cutoff %s", start_time)
 
+        # Use the default batch size (omit --batch-size arg)
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul-admin'),
              '-c', config_file,
@@ -513,13 +632,20 @@ class DBPruneTestCase(ZuulTestCase):
         out, _ = p.communicate()
         self.log.debug(out.decode('utf8'))
 
-        buildsets = connection.getBuildsets()
-        builds = connection.getBuilds()
-        self.assertEqual(len(buildsets), 1)
-        self.assertEqual(len(builds), 3)
+        with connection.getSession() as db:
+            buildsets = self._getBuildsets(db)
+            builds = self._getBuilds(db)
+            artifacts = self._getArtifacts(db)
+            provides = self._getProvides(db)
+            events = self._getBuildEvents(db)
         for build in builds:
             self.log.debug("Build %s %s %s",
                            build, build.start_time, build.end_time)
+        self.assertEqual(len(buildsets), 1)
+        self.assertEqual(len(builds), 2)
+        self.assertEqual(len(artifacts), 4)
+        self.assertEqual(len(provides), 4)
+        self.assertEqual(len(events), 4)
 
     def test_db_prune_older_than(self):
         # Test pruning buildsets older than a relative time
@@ -535,15 +661,23 @@ class DBPruneTestCase(ZuulTestCase):
              '-c', config_file,
              'prune-database',
              '--older-than', '0d',
+             '--batch-size', '5',
              ],
             stdout=subprocess.PIPE)
         out, _ = p.communicate()
         self.log.debug(out.decode('utf8'))
 
-        buildsets = connection.getBuildsets()
-        builds = connection.getBuilds()
+        with connection.getSession() as db:
+            buildsets = self._getBuildsets(db)
+            builds = self._getBuilds(db)
+            artifacts = self._getArtifacts(db)
+            provides = self._getProvides(db)
+            events = self._getBuildEvents(db)
         self.assertEqual(len(buildsets), 0)
         self.assertEqual(len(builds), 0)
+        self.assertEqual(len(artifacts), 0)
+        self.assertEqual(len(provides), 0)
+        self.assertEqual(len(events), 0)
 
 
 class TestDBPruneMysql(DBPruneTestCase):

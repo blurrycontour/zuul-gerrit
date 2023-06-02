@@ -120,4 +120,30 @@ IconProperty.propTypes = {
 const ConditionalWrapper = ({ condition, wrapper, children }) =>
   condition ? wrapper(children) : children
 
-export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper }
+function resolveDarkMode(theme) {
+  let darkMode = false
+
+  if (theme === 'Auto') {
+    let matchMedia = window.matchMedia || function () {
+      return {
+        matches: false,
+      }
+    }
+
+    darkMode = matchMedia('(prefers-color-scheme: dark)').matches
+  } else if (theme === 'Dark') {
+    darkMode = true
+  }
+
+  return darkMode
+}
+
+function setDarkMode(darkMode) {
+  if (darkMode) {
+    document.documentElement.classList.add('pf-theme-dark')
+  } else {
+    document.documentElement.classList.remove('pf-theme-dark')
+  }
+}
+
+export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper, resolveDarkMode, setDarkMode }

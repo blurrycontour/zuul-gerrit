@@ -226,6 +226,7 @@ class TimerDriver(Driver, TriggerInterface):
             event.branch = branch
             event.zuul_event_id = str(uuid4().hex)
             event.timestamp = time.time()
+            event.arrived_at_scheduler_timestamp = event.timestamp
             # Refresh the branch in order to update the item in the
             # change cache.
             change_key = project.source.getChangeKey(event)

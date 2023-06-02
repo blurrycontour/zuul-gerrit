@@ -138,6 +138,17 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
         s.close()
         self.streamer.stop()
 
+    def _readSocket(self, sock, build_uuid, event, name):
+        msg = "%s\r\n" % build_uuid
+        sock.sendall(msg.encode('utf-8'))
+        event.set()  # notify we are connected and req sent
+        while True:
+            data = sock.recv(1024)
+            if not data:
+                break
+            self.streaming_data[name] += data.decode('utf-8')
+        sock.shutdown(socket.SHUT_RDWR)
+
     def runFingerClient(self, build_uuid, gateway_address, event, name=None):
         # Wait until the gateway is started
         for x in iterate_timeout(30, "finger client to start"):
@@ -154,7 +165,7 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
         self.streaming_data[name] = ''
         with socket.create_connection(gateway_address) as s:
             if self.fingergw_use_ssl:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = False
                 context.load_cert_chain(
@@ -162,17 +173,10 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
                     os.path.join(FIXTURE_DIR, 'fingergw/fingergw.key'))
                 context.load_verify_locations(
                     os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
-                s = context.wrap_socket(s)
-
-            msg = "%s\r\n" % build_uuid
-            s.sendall(msg.encode('utf-8'))
-            event.set()  # notify we are connected and req sent
-            while True:
-                data = s.recv(1024)
-                if not data:
-                    break
-                self.streaming_data[name] += data.decode('utf-8')
-            s.shutdown(socket.SHUT_RDWR)
+                with context.wrap_socket(s) as s:
+                    self._readSocket(s, build_uuid, event, name)
+            else:
+                self._readSocket(s, build_uuid, event, name)
 
     def runFingerGateway(self, zone=None):
         self.log.info('Starting fingergw with zone %s', zone)

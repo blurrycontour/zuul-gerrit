@@ -15,13 +15,14 @@
 import {
   PREFERENCE_SET,
 } from '../actions/preferences'
-
+import { resolveDarkMode, setDarkMode } from '../Misc'
 
 const stored_prefs = localStorage.getItem('preferences')
 let default_prefs
 if (stored_prefs === null) {
   default_prefs = {
-    autoReload: true
+    autoReload: true,
+    theme: 'Auto'
   }
 } else {
   default_prefs = JSON.parse(stored_prefs)
@@ -30,13 +31,15 @@ if (stored_prefs === null) {
 export default (state = {
   ...default_prefs
 }, action) => {
-  let newstate
-  switch (action.type) {
-    case PREFERENCE_SET:
-      newstate = { ...state, [action.key]: action.value }
-      localStorage.setItem('preferences', JSON.stringify(newstate))
-      return newstate
-    default:
-      return state
+  if (action.type === PREFERENCE_SET) {
+    let newstate = { ...state, [action.key]: action.value }
+    delete newstate.darkMode
+    localStorage.setItem('preferences', JSON.stringify(newstate))
+    let darkMode = resolveDarkMode(newstate.theme)
+    setDarkMode(darkMode)
+    return { ...newstate, darkMode: darkMode }
   }
+  let darkMode = resolveDarkMode(state.theme)
+  setDarkMode(darkMode)
+  return { ...state, darkMode: darkMode }
 }

@@ -140,7 +140,8 @@ def _read_config_file(filename: str):
         raise ValueError("Unable to read logging config file at %s" % filename)
 
     if os.path.splitext(filename)[1] in ('.yml', '.yaml', '.json'):
-        return yaml.safe_load(open(filename, 'r'))
+        with open(filename, 'r') as f:
+            return yaml.safe_load(f)
     return filename
 
 

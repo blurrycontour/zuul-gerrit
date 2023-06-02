@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 from zuul.source import BaseSource
 from zuul.model import Project
 from zuul.driver.gerrit.gerritmodel import GerritRefFilter
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list
 from zuul.lib.dependson import find_dependency_headers
 from zuul.zk.change_cache import ChangeKey
 
@@ -164,11 +164,14 @@ class GerritSource(BaseSource):
             change = self.connection._getChange(change_key)
             changes[change_key] = change
 
-        for change in changes.values():
-            for git_key in change.git_needs_changes:
-                if git_key in changes:
+        # Convert to list here because the recursive call can mutate
+        # the set.
+        for change in list(changes.values()):
+            for git_change_ref in change.git_needs_changes:
+                change_key = ChangeKey.fromReference(git_change_ref)
+                if change_key in changes:
                     continue
-                git_change = self.getChange(git_key)
+                git_change = self.getChange(change_key)
                 if not git_change.topic or git_change.topic == topic:
                     continue
                 self.getChangesByTopic(git_change.topic, changes)
@@ -206,21 +209,15 @@ class GerritSource(BaseSource):
         return self.connection._getGitwebUrl(project, sha)
 
     def getRequireFilters(self, config):
-        f = GerritRefFilter(
-            connection_name=self.connection.connection_name,
-            open=config.get('open'),
-            current_patchset=config.get('current-patchset'),
-            wip=config.get('wip'),
-            statuses=to_list(config.get('status')),
-            required_approvals=to_list(config.get('approval')),
-        )
+        f = GerritRefFilter.requiresFromConfig(
+            self.connection.connection_name,
+            config)
         return [f]
 
     def getRejectFilters(self, config):
-        f = GerritRefFilter(
-            connection_name=self.connection.connection_name,
-            reject_approvals=to_list(config.get('approval')),
-        )
+        f = GerritRefFilter.rejectFromConfig(
+            self.connection.connection_name,
+            config)
         return [f]
 
     def getRefForChange(self, change):
@@ -244,11 +241,13 @@ def getRequireSchema():
                'current-patchset': bool,
                'wip': bool,
                'status': scalar_or_list(str)}
-
     return require
 
 
 def getRejectSchema():
-    reject = {'approval': scalar_or_list(approval)}
-
+    reject = {'approval': scalar_or_list(approval),
+              'open': bool,
+              'current-patchset': bool,
+              'wip': bool,
+              'status': scalar_or_list(str)}
     return reject

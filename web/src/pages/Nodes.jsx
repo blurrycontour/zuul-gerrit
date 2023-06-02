@@ -15,9 +15,29 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
+import {
+  Table,
+  TableVariant,
+  TableHeader,
+  TableBody,
+} from '@patternfly/react-table'
 import * as moment from 'moment'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import {
+  PageSection,
+  PageSectionVariants,
+  ClipboardCopy,
+} from '@patternfly/react-core'
+import {
+  BuildIcon,
+  ClusterIcon,
+  ConnectedIcon,
+  OutlinedCalendarAltIcon,
+  TagIcon,
+  RunningIcon,
+  PencilAltIcon,
+  ZoneIcon,
+} from '@patternfly/react-icons'
+import { IconProperty } from '../Misc'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'
 import { Fetchable } from '../containers/Fetching'
@@ -51,43 +71,69 @@ class NodesPage extends React.Component {
     const { remoteData } = this.props
     const nodes = remoteData.nodes
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = value => <Table.Cell>{value}</Table.Cell>
-    const cellLabelsFormat = value => <Table.Cell>{value.join(',')}</Table.Cell>
-    const cellPreFormat = value => (
-      <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
-        {value}
-      </Table.Cell>)
-    const cellAgeFormat = value => (
-      <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
-        {moment.unix(value).fromNow()}
-      </Table.Cell>)
-
-    const columns = []
-    const myColumns = [
-      'id', 'labels', 'connection', 'server', 'provider', 'state',
-      'age', 'comment'
-    ]
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      if (column === 'labels') {
-        prop = 'type'
-        formatter = cellLabelsFormat
-      } else if (column === 'connection') {
-        prop = 'connection_type'
-      } else if (column === 'server') {
-        prop = 'external_id'
-        formatter = cellPreFormat
-      } else if (column === 'age') {
-        prop = 'state_time'
-        formatter = cellAgeFormat
+    const columns = [
+      {
+        title: (
+          <IconProperty icon={<BuildIcon />} value="ID" />
+        ),
+        dataLabel: 'id',
+      },
+      {
+        title: (
+          <IconProperty icon={<TagIcon />} value="Labels" />
+        ),
+        dataLabel: 'labels',
+      },
+      {
+        title: (
+          <IconProperty icon={<ConnectedIcon />} value="Connection" />
+        ),
+        dataLabel: 'connection',
+      },
+      {
+        title: (
+          <IconProperty icon={<ClusterIcon />} value="Server" />
+        ),
+        dataLabel: 'server',
+      },
+      {
+        title: (
+          <IconProperty icon={<ZoneIcon />} value="Provider" />
+        ),
+        dataLabel: 'provider',
+      },
+      {
+        title: (
+          <IconProperty icon={<RunningIcon />} value="State" />
+        ),
+        dataLabel: 'state',
+      },
+      {
+        title: (
+          <IconProperty icon={<OutlinedCalendarAltIcon />} value="Age" />
+        ),
+        dataLabel: 'age',
+      },
+      {
+        title: (
+          <IconProperty icon={<PencilAltIcon />} value="Comment" />
+        ),
+        dataLabel: 'comment',
       }
-      columns.push({
-        header: {label: column, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
+    ]
+    let rows = []
+    nodes.forEach((node) => {
+        let r = [
+            {title: node.id, props: {column: 'ID'}},
+            {title: node.type.join(','), props: {column: 'Label' }},
+            {title: node.connection_type, props: {column: 'Connection'}},
+            {title: <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant="inline-compact">{node.external_id}</ClipboardCopy>, props: {column: 'Server'}},
+            {title: node.provider, props: {column: 'Provider'}},
+            {title: node.state, props: {column: 'State'}},
+            {title: moment.unix(node.state_time).fromNow(), props: {column: 'Age'}},
+            {title: node.comment, props: {column: 'Comment'}},
+        ]
+        rows.push({cells: r})
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
@@ -97,18 +143,17 @@ class NodesPage extends React.Component {
             fetchCallback={this.updateData}
           />
         </PageSection>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
+
+        <Table
+          aria-label="Nodes Table"
+          variant={TableVariant.compact}
+          cells={columns}
+          rows={rows}
+          className="zuul-table"
         >
-          <Table.Header/>
-          <Table.Body
-            rows={nodes}
-            rowKey="id"
-          />
-        </Table.PfProvider>
+          <TableHeader />
+          <TableBody />
+        </Table>
       </PageSection>
     )
   }

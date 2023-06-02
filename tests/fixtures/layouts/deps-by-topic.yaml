@@ -47,24 +47,27 @@
     run: playbooks/run.yaml
 
 - job:
-    name: test-job
+    name: check-job
+
+- job:
+    name: gate-job
 
 - project:
     name: org/project1
     queue: integrated
     check:
       jobs:
-        - test-job
+        - check-job
     gate:
       jobs:
-        - test-job
+        - gate-job
 
 - project:
     name: org/project2
     queue: integrated
     check:
       jobs:
-        - test-job
+        - check-job
     gate:
       jobs:
-        - test-job
+        - gate-job

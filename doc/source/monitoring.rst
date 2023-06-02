@@ -444,6 +444,11 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
       Indicates if the executor is paused. 1 means paused else 0.
 
+   .. stat:: pct_used_hdd
+      :type: gauge
+
+      The used disk on this executor, as a percentage multiplied by 100.
+
    .. stat:: pct_used_ram
       :type: gauge
 
@@ -710,6 +715,12 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          :type: gauge
 
          The size of the current connection event queue.
+
+   .. stat:: run_handler
+      :type: timer
+
+      A timer metric reporting the time taken for one scheduler run
+      handler iteration.
 
    .. stat:: time_query
       :type: timer

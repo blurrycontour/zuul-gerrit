@@ -249,7 +249,7 @@ paths:
       - tenant
   /api/tenant/{tenant}/key/{project}.pub:
     get:
-      operationId: get-project-key
+      operationId: get-project-secrets-key
       parameters:
       - description: The tenant name
         in: path
@@ -275,12 +275,44 @@ paths:
 
                 '
               schema:
-                description: The project public key
+                description: The project secrets public key in PKCS8 format
                 type: string
-          description: Returns the project public key
+          description: Returns the project public key that is used to encrypt secrets
         '404':
           description: Tenant or Project not found
-      summary: Get a project public key
+      summary: Get a project public key that is used to encrypt secrets
+      tags:
+      - tenant
+  /api/tenant/{tenant}/project-ssh-key/{project}.pub:
+    get:
+      operationId: get-project-ssh-key
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      - description: The project name
+        in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            text/plain:
+              example: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACA
+
+                '
+              schema:
+                description: The project ssh public key in SSH2 format
+                type: string
+          description: Returns the project public key that executor adds to SSH agent
+        '404':
+          description: Tenant or Project not found
+      summary: Get a project public key that is used for SSH in post-merge pipelines
       tags:
       - tenant
   /api/tenant/{tenant}/semaphores:

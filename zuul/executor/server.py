@@ -14,6 +14,7 @@
 # under the License.
 
 import collections
+import copy
 import datetime
 import json
 import logging
@@ -1049,7 +1050,7 @@ class AnsibleJob(object):
         # The same, but frozen
         self.frozen_hostvars = {}
         # The zuul.* vars
-        self.zuul_vars = {}
+        self.debug_zuul_vars = {}
         self.waiting_for_semaphores = False
 
     def run(self):
@@ -1337,8 +1338,8 @@ class AnsibleJob(object):
                         result=None,
                         error_detail=f'Failed to update project '
                                      f'{task.project_name}')
-                    self.job.sendWorkComplete(
-                        json.dumps(result, sort_keys=True))
+                    self.executor_server.completeBuild(
+                        self.build_request, result)
                     return
 
                 raise ExecutorError(
@@ -1888,7 +1889,8 @@ class AnsibleJob(object):
                 logfile=json_output))
             return
         try:
-            output = json.load(open(json_output, 'r'))
+            with open(json_output, 'r') as f:
+                output = json.load(f)
             last_playbook = output[-1]
             # Transform json to yaml - because it's easier to read and given
             # the size of the data it'll be extra-hard to read this as an
@@ -1929,6 +1931,7 @@ class AnsibleJob(object):
                         region=node.region,
                         host_id=node.host_id,
                         external_id=getattr(node, 'external_id', None),
+                        slot=node.slot,
                         interface_ip=node.interface_ip,
                         public_ipv4=node.public_ipv4,
                         private_ipv4=node.private_ipv4,
@@ -2332,7 +2335,8 @@ class AnsibleJob(object):
     def prepareKubeConfig(self, jobdir, data):
         kube_cfg_path = jobdir.kubeconfig
         if os.path.exists(kube_cfg_path):
-            kube_cfg = yaml.safe_load(open(kube_cfg_path))
+            with open(kube_cfg_path) as f:
+                kube_cfg = yaml.safe_load(f)
         else:
             kube_cfg = {
                 'apiVersion': 'v1',
@@ -2495,10 +2499,18 @@ class AnsibleJob(object):
                        if ri.role_path is not None],
             ))
 
+        # The zuul vars in the debug inventory.yaml file should not
+        # have any !unsafe tags, so save those before we update the
+        # execution version of those.
+        self.debug_zuul_vars = copy.deepcopy(zuul_vars)
+        if 'change_message' in zuul_vars:
+            zuul_vars['change_message'] = yaml.mark_strings_unsafe(
+                zuul_vars['change_message'])
+
         with open(self.jobdir.zuul_vars, 'w') as zuul_vars_yaml:
             zuul_vars_yaml.write(
-                yaml.safe_dump({'zuul': zuul_vars}, default_flow_style=False))
-        self.zuul_vars = zuul_vars
+                yaml.ansible_unsafe_dump({'zuul': zuul_vars},
+                                         default_flow_style=False))
 
         # Squash all and extra vars into localhost (it's not
         # explicitly listed).
@@ -2552,7 +2564,7 @@ class AnsibleJob(object):
         inventory = make_inventory_dict(
             self.host_list, self.nodeset, self.original_hostvars)
 
-        inventory['all']['vars']['zuul'] = self.zuul_vars
+        inventory['all']['vars']['zuul'] = self.debug_zuul_vars
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
                 yaml.ansible_unsafe_dump(
@@ -3481,6 +3493,8 @@ class ExecutorServer(BaseMergeServer):
             self.statsd.gauge(base_key + '.load_average', 0)
             self.statsd.gauge(base_key + '.pct_used_ram', 0)
             self.statsd.gauge(base_key + '.running_builds', 0)
+            self.statsd.close()
+            self.statsd = None
 
         # Use the BaseMergeServer's stop method to disconnect from
         # ZooKeeper.  We do this as one of the last steps to ensure
@@ -3618,6 +3632,10 @@ class ExecutorServer(BaseMergeServer):
             # requests.
             log.exception('Process pool got broken')
             self.resetProcessPool()
+            task.transient_error = True
+        except IOError:
+            log.exception('Got I/O error while updating repo %s/%s',
+                          task.connection_name, task.project_name)
             task.transient_error = True
         except Exception:
             log.exception('Got exception while updating repo %s/%s',
@@ -4057,7 +4075,12 @@ class ExecutorServer(BaseMergeServer):
             # result.
             if result.get("result") is None:
                 attempts = params["zuul"]["attempts"]
-                max_attempts = params["max_attempts"]
+                try:
+                    max_attempts = params["zuul"]["max_attempts"]
+                except KeyError:
+                    # TODO (swestphahl):
+                    # Remove backward compatibility handling
+                    max_attempts = params["max_attempts"]
                 if attempts >= max_attempts:
                     result["result"] = "RETRY_LIMIT"
 

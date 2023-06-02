@@ -609,7 +609,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                         self.kazoo_client.delete(lock_path, recursive=True)
                 except Exception:
                     self.log.exception(
-                        "Unable to delete lock %s", path)
+                        "Unable to delete lock %s", lock_path)
         except Exception:
             self.log.exception("Error cleaning up locks %s", self)
 

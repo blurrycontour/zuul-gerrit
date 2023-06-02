@@ -332,6 +332,12 @@ of item.
       connectivity issues then previous attempts may have been cancelled,
       and this value will be greater than 1.
 
+   .. var:: max_attempts
+
+      The number of attempts that will be be made for this job when
+      encountering an error in a pre-playbook before it is reported as failed.
+      This value is taken from :attr:`job.attempts`.
+
    .. var:: ansible_version
 
       The version of the Ansible community package release used for executing
@@ -612,7 +618,6 @@ of item.
          The patchset identifier for the change.  If a change is
          revised, this will have a different value.
 
-
       .. var:: resources
          :type: dict
 
@@ -670,6 +675,68 @@ of item.
        - shell: echo example
          when: zuul_success | bool
 
+.. var:: nodepool
+
+   Information about each host from Nodepool is supplied in the
+   `nodepool` host variable.  Availability of values varies based on
+   the node and the driver that supplied it.  Values may be ``null``
+   if they are not applicable.
+
+   .. var:: label
+
+      The nodepool label of this node.
+
+   .. var:: az
+
+      The availability zone in which this node was placed.
+
+   .. var:: cloud
+
+      The name of the cloud in which this node was created.
+
+   .. var:: provider
+
+      The name of the nodepool provider of this node.
+
+   .. var:: region
+
+      The name of the nodepool provider's region.
+
+   .. var:: host_id
+
+      The cloud's host identification for this node's hypervisor.
+
+   .. var:: external_id
+
+      The cloud's identifier for this node.
+
+   .. var:: slot
+
+      If the node supports running multiple jobs on the node, a unique
+      numeric ID for the subdivision of the node assigned to this job.
+      This may be used to avoid build directory collisions.
+
+   .. var:: interface_ip
+
+      The best IP address to use to contact the node as determined by
+      the cloud provider and nodepool.
+
+   .. var:: public_ipv4
+
+      A public IPv4 address of the node.
+
+   .. var:: private_ipv4
+
+      A private IPv4 address of the node.
+
+   .. var:: public_ipv6
+
+      A public IPv6 address of the node.
+
+   .. var:: private_ipv6
+
+      A private IPv6 address of the node.
+
 
 Change Items
 ~~~~~~~~~~~~
@@ -706,14 +773,18 @@ are available:
       The commit or pull request message of the change base64 encoded. Use the
       `b64decode` filter in ansible when working with it.
 
-      .. code-block:: yaml
+      .. warning:: This variable is deprecated and will be removed in
+                   a future version.  Use :var:`zuul.change_message`
+                   instead.
 
-         - hosts: all
-           tasks:
-             - name: Dump commit message
-               copy:
-                 content: "{{ zuul.message | b64decode }}"
-                 dest: "{{ zuul.executor.log_root }}/commit-message.txt"
+   .. var:: change_message
+
+      The commit or pull request message of the change.  When Zuul
+      runs Ansible, this variable is tagged with the ``!unsafe`` YAML
+      tag so that Ansible will not interpolate values into it.  Note,
+      however, that the `inventory.yaml` file placed in the build's
+      workspace for debugging and inspection purposes does not inclued
+      the ``!unsafe`` tag.
 
 
 Branch Items
